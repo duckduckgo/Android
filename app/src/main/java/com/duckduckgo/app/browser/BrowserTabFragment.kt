@@ -423,7 +423,6 @@ class BrowserTabFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.i("PDHy: tabfragment onCreate")
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         decorator = BrowserTabFragmentDecorator()
@@ -450,13 +449,11 @@ class BrowserTabFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Timber.i("PDHy: tabfragment onCreateView")
         return inflater.inflate(R.layout.fragment_browser_tab, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        Timber.i("PDHy: tabfragment onActivityCreated")
         configureObservers()
         configurePrivacyShield()
         configureWebView()
@@ -529,7 +526,6 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
-        Timber.i("PDHy: tabfragment onResume")
         appBarLayout.setExpanded(true)
         viewModel.onViewResumed()
 
@@ -543,14 +539,12 @@ class BrowserTabFragment :
     }
 
     override fun onPause() {
-        Timber.i("PDHy: tabfragment onPause")
         dismissDownloadFragment()
         dismissAuthenticationDialog()
         super.onPause()
     }
 
     override fun onStop() {
-        Timber.i("PDHy: tabfragment onStop")
         // workaround for: https://app.asana.com/0/0/1202537960603388/f
         renderer.cancelTrackersAnimation()
         trackerAnimationContainer.removeAllViews()
@@ -739,7 +733,6 @@ class BrowserTabFragment :
         hideKeyboard()
         renderer.hideFindInPage()
         viewModel.registerDaxBubbleCtaDismissed()
-        Timber.i("PDHy: tabfragment loadUrl")
         webView?.loadUrl(url, headers)
     }
 
@@ -753,10 +746,8 @@ class BrowserTabFragment :
     }
 
     private fun processCommand(it: Command?) {
-        Timber.i("Lottie: command $it")
         if (it !is Command.DaxCommand) {
             if (it is NavigationCommand) {
-                Timber.i("Lottie: will cancel animations $it")
                 renderer.cancelTrackersAnimation()
             }
         }
@@ -858,7 +849,6 @@ class BrowserTabFragment :
                 extractUrlFromAmpLink(it.initialUrl)
             }
             is Command.LoadExtractedUrl -> {
-                Timber.i("PDHy: tabfragment loadUrl")
                 webView?.loadUrl(it.extractedUrl)
                 destroyUrlExtractingWebView()
             }
@@ -1149,7 +1139,6 @@ class BrowserTabFragment :
                         launchDialogForIntent(it, pm, fallbackIntent, fallbackActivities, useFirstActivityFound)
                     }
                     fallbackUrl != null -> {
-                        Timber.i("PDHy: tabfragment loadUrl")
                         webView?.loadUrl(fallbackUrl, headers)
                     }
                     else -> {
@@ -1473,7 +1462,6 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        Timber.i("PDHy: tabfragment configureWebView")
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
             webViewContainer,
@@ -1822,7 +1810,7 @@ class BrowserTabFragment :
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        Timber.e("onConfigurationChanged Lottie")
+
         ddgLogo.setImageResource(R.drawable.logo_full)
         if (ctaContainer.isNotEmpty()) {
             renderer.renderHomeCta()
@@ -1996,7 +1984,6 @@ class BrowserTabFragment :
     }
 
     private fun finishTrackerAnimation() {
-        Timber.i("Lottie: finishTrackerAnimation")
         animatorHelper.finishPartialTrackerAnimation()
     }
 
@@ -2072,7 +2059,7 @@ class BrowserTabFragment :
     fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, searchIcon)
 
     override fun onAnimationFinished() {
-        Timber.i("Lottie: onAnimationFinished")
+
     }
 
     private fun showEmailTooltip(address: String) {
@@ -2445,16 +2432,11 @@ class BrowserTabFragment :
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackingEntities()
 
-                    Timber.i("Lottie fix: trackers ${site?.url} $trackersAnimation")
-                    Timber.i("Lottie fix: trackers ${site?.url} attached ${trackersAnimation?.isAttachedToWindow}")
-                    Timber.i("Lottie fix: container ${site?.url} child count ${trackerAnimationContainer.childCount}")
-                    Timber.i("Lottie fix: shield ${site?.url} $shieldIcon")
-
                     // workaround for: https://app.asana.com/0/0/1202537960603388/f
                     val trackerAnimationView = if (trackersAnimation?.isAttachedToWindow == true) {
                         trackersAnimation
                     } else {
-                        Timber.i("Lottie fix: inflate new view ${site?.url}")
+
                         layoutInflater.inflate(R.layout.view_tracker_animation, trackerAnimationContainer, true).findViewById(R.id.trackersAnimation)
                     }
 

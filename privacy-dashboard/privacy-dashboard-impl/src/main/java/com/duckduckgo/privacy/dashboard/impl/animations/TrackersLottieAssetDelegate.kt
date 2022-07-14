@@ -34,7 +34,6 @@ import com.duckduckgo.privacy.dashboard.impl.R
 import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.ImageLogo
 import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.LetterLogo
 import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.StackedLogo
-import timber.log.Timber
 
 internal class TrackersLottieAssetDelegate(
     val context: Context,
@@ -42,7 +41,7 @@ internal class TrackersLottieAssetDelegate(
 ) : ImageAssetDelegate {
 
     override fun fetchBitmap(asset: LottieImageAsset?): Bitmap? {
-        Timber.i("Lottie: ${asset?.id} ${asset?.fileName}")
+
         return when (asset?.id) {
             "image_0" -> {
                 kotlin.runCatching { logos[0].asDrawable(context) }
@@ -83,7 +82,7 @@ internal class TrackersLottieAssetDelegate(
         context: Context,
         letter: String
     ): Drawable {
-        Timber.i("Lottie: will create logo for $letter")
+
         return object : Drawable() {
 
             private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -103,7 +102,7 @@ internal class TrackersLottieAssetDelegate(
                 val textBaseLineHeight = textPaint.fontMetrics.ascent * -0.4f
                 canvas.drawCircle(centerX, centerY, centerX, backgroundPaint)
                 canvas.drawText(letter, centerX - textWidth, centerY + textBaseLineHeight, textPaint)
-                Timber.i("Lottie: will create logo for $letter")
+
             }
 
             override fun setAlpha(alpha: Int) {

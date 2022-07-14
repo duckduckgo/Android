@@ -31,7 +31,6 @@ import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.ImageLogo
 import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.LetterLogo
 import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.StackedLogo
 import com.duckduckgo.trackerdetection.model.Entity
-import timber.log.Timber
 
 class BrowserLottieTrackersAnimatorHelper(
     val context: Context,
@@ -56,20 +55,14 @@ class BrowserLottieTrackersAnimatorHelper(
         this.trackersAnimation = trackersAnimationView
         this.shieldAnimation = shieldAnimationView
 
-        Timber.i("Lottie: isAnimating ${trackersAnimationView.isAnimating}")
         if (trackersAnimationView.isAnimating) return
 
         if (entities.isNullOrEmpty()) { // no badge nor tracker animations
-            Timber.i("Lottie: entities.isNullOrEmpty()")
             return
         }
 
-        entities.forEach {
-            Timber.i("Lottie: entities ${it.name}")
-        }
         val logos = getLogos(context, entities)
         if (logos.isEmpty()) {
-            Timber.i("Lottie: logos empty")
             return
         }
 
@@ -82,13 +75,11 @@ class BrowserLottieTrackersAnimatorHelper(
             this.removeAllAnimatorListeners()
             this.addAnimatorListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator?) {
-                    Timber.i("Lottie: onAnimationStart")
                     if (completePartialAnimation) return
                     animateOmnibarOut(omnibarViews).start()
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {
-                    Timber.i("Lottie: onAnimationEnd $runPartialAnimation $completePartialAnimation")
                     if (!runPartialAnimation) {
                         animateOmnibarIn(omnibarViews).start()
                         completePartialAnimation = false
@@ -103,7 +94,6 @@ class BrowserLottieTrackersAnimatorHelper(
                 }
             })
 
-            Timber.i("Lottie: ctaVisible? $runPartialAnimation")
             if (runPartialAnimation) {
                 this.setMaxProgress(0.5f)
                 shieldAnimationView.setMaxProgress(0.5f)
@@ -127,7 +117,7 @@ class BrowserLottieTrackersAnimatorHelper(
     override fun cancelAnimations(
         omnibarViews: List<View>
     ) {
-        Timber.i("Lottie: cancelAnimations")
+
         stopTrackersAnimation()
         omnibarViews.forEach { it.alpha = 1f }
     }
@@ -135,7 +125,7 @@ class BrowserLottieTrackersAnimatorHelper(
     override fun finishPartialTrackerAnimation() {
         runPartialAnimation = false
         completePartialAnimation = true
-        Timber.i("Lottie: finishTrackerAnimation")
+
         this.trackersAnimation.setMinAndMaxProgress(0.5f, 1f)
         this.shieldAnimation.setMinAndMaxProgress(0.5f, 1f)
         this.trackersAnimation.playAnimation()
@@ -184,10 +174,9 @@ class BrowserLottieTrackersAnimatorHelper(
     }
 
     private fun stopTrackersAnimation() {
-        Timber.i("Lottie: stopTrackersAnimation")
+
         if (!::trackersAnimation.isInitialized || !::shieldAnimation.isInitialized) return
 
-        Timber.i("Lottie: stopTrackersAnimation real")
         if (trackersAnimation.isAnimating) {
             trackersAnimation.cancelAnimation()
             trackersAnimation.progress = 1f
@@ -199,7 +188,7 @@ class BrowserLottieTrackersAnimatorHelper(
     }
 
     private fun animateOmnibarOut(views: List<View>): AnimatorSet {
-        Timber.i("Lottie: animateOmnibarOut")
+
         val animators = views.map {
             animateFadeOut(it)
         }
@@ -209,7 +198,7 @@ class BrowserLottieTrackersAnimatorHelper(
     }
 
     private fun animateOmnibarIn(views: List<View>): AnimatorSet {
-        Timber.i("Lottie: animateOmnibarIn")
+
         val animators = views.map {
             animateFadeIn(it)
         }
@@ -222,14 +211,14 @@ class BrowserLottieTrackersAnimatorHelper(
         view: View,
         durationInMs: Long = DEFAULT_ANIMATION_DURATION
     ): ObjectAnimator {
-        Timber.i("Lottie: animateFadeOut")
+
         return ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
             duration = durationInMs
         }
     }
 
     private fun animateFadeIn(view: View): ObjectAnimator {
-        Timber.i("Lottie: animateFadeIn")
+
         if (view.alpha == 1f) {
             return ObjectAnimator.ofFloat(view, "alpha", 1f, 1f).apply {
                 duration = DEFAULT_ANIMATION_DURATION

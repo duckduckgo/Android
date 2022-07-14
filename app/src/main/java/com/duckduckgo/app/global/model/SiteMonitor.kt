@@ -107,7 +107,7 @@ class SiteMonitor(
 
     override fun updatePrivacyData(sitePrivacyData: SitePrivacyData) {
         this.entity = sitePrivacyData.entity
-        Timber.i("PDHy: fullSiteDetailsAvailable entity ${sitePrivacyData.entity} for $domain")
+        Timber.i("fullSiteDetailsAvailable entity ${sitePrivacyData.entity} for $domain")
         fullSiteDetailsAvailable = true
     }
 
