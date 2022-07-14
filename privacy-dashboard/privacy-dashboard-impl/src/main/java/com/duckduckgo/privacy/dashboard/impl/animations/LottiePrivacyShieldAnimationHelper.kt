@@ -33,7 +33,7 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class LottiePrivacyShieldView @Inject constructor(val appTheme: AppTheme) : PrivacyShieldAnimationHelper {
+class LottiePrivacyShieldAnimationHelper @Inject constructor(val appTheme: AppTheme) : PrivacyShieldAnimationHelper {
 
     override fun setAnimationView(
         holder: LottieAnimationView,
