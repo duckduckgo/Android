@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.UUID
+import java.util.*
 import javax.inject.Inject
 
 @SuppressLint("StaticFieldLeak")
@@ -40,10 +40,6 @@ class AutofillSettingsViewModel @Inject constructor(
     private val applicationContext: Context,
     private val autofillStore: AutofillStore,
 ) : ViewModel() {
-
-    init {
-        Timber.e("AutofillSettingsViewModel being instantiated %s", this)
-    }
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState
