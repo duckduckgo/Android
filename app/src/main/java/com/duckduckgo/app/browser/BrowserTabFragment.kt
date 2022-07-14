@@ -150,6 +150,7 @@ import android.content.pm.ResolveInfo
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.webkit.URLUtil
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -194,7 +195,6 @@ import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
 import com.duckduckgo.privacy.dashboard.api.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.privacy.dashboard.api.animations.PrivacyShieldView
 import com.google.android.material.snackbar.BaseTransientBottomBar
-import kotlinx.android.synthetic.main.view_tracker_animation.*
 import kotlinx.coroutines.flow.cancellable
 import javax.inject.Provider
 
@@ -2426,11 +2426,12 @@ class BrowserTabFragment :
                     val events = site?.orderedTrackingEntities()
 
                     // workaround for: https://app.asana.com/0/0/1202537960603388/f
+                    val trackersAnimation = trackerAnimationContainer.findViewById<LottieAnimationView>(R.id.trackersAnimation)
                     val trackerAnimationView = if (trackersAnimation?.isAttachedToWindow == true) {
                         trackersAnimation
                     } else {
-
-                        layoutInflater.inflate(R.layout.view_tracker_animation, trackerAnimationContainer, true).findViewById(R.id.trackersAnimation)
+                        layoutInflater.inflate(R.layout.view_tracker_animation, trackerAnimationContainer, true)
+                            .findViewById<LottieAnimationView>(R.id.trackersAnimation)
                     }
 
                     activity?.let { activity ->
