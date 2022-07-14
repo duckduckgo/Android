@@ -27,7 +27,6 @@ import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Error
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Failed
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -106,8 +105,7 @@ class RealAuthLauncher @Inject constructor(
 
         override fun onAuthenticationFailed() {
             super.onAuthenticationFailed()
-            Timber.d("onAuthenticationFailed")
-            onResult(Failed)
+            Timber.v("onAuthenticationFailed")
         }
     }
 
