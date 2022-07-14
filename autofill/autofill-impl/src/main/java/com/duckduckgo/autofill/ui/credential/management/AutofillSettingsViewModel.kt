@@ -26,7 +26,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -35,11 +35,15 @@ import java.util.UUID
 import javax.inject.Inject
 
 @SuppressLint("StaticFieldLeak")
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(ActivityScope::class)
 class AutofillSettingsViewModel @Inject constructor(
     private val applicationContext: Context,
     private val autofillStore: AutofillStore,
 ) : ViewModel() {
+
+    init {
+        Timber.e("AutofillSettingsViewModel being instantiated %s", this)
+    }
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState
