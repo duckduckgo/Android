@@ -27,7 +27,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     implementation project(path: ':privacy-dashboard-api')
-    api project(path: ':browser-api')
+    implementation project(path: ':browser-api')
 
     implementation Google.dagger
     implementation AndroidX.appCompat
@@ -38,6 +38,8 @@ dependencies {
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
     testImplementation Testing.mockito.kotlin
+    testImplementation Testing.robolectric
+    testImplementation AndroidX.test.ext.junit
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
