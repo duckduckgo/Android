@@ -149,7 +149,7 @@ class FireAndForgetFeedbackSubmitter(
             version = version(),
             manufacturer = Build.MANUFACTURER,
             model = Build.MODEL,
-            api = Build.VERSION.SDK_INT,
+            api = appBuildConfig.sdkInt,
             atb = atbWithVariant()
         )
     }

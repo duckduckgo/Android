@@ -1,0 +1,16 @@
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  create-asana-attachment-job:
+    runs-on: ubuntu-latest
+    name: Create pull request attachments on Asana tasks
+    steps:
+      - name: Create pull request attachments
+        uses: Asana/create-app-attachment-github-action@latest
+        id: postAttachment
+        with:
+          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
+      - name: Log output status
+        run: echo "Status is ${{ steps.postAttachment.outputs.status }}"

@@ -59,6 +59,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.macos_api.MacWaitlistState.*
@@ -95,6 +96,9 @@ class SettingsActivity :
 
     @Inject
     lateinit var addWidgetLauncher: AddWidgetLauncher
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     @Inject
     lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
@@ -195,7 +199,7 @@ class SettingsActivity :
     }
 
     private fun configureAppLinksSettingVisibility() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+        if (appBuildConfig.sdkInt < Build.VERSION_CODES.N) {
             viewsPrivacy.appLinksSetting.visibility = View.GONE
         }
     }
@@ -365,8 +369,9 @@ class SettingsActivity :
         }
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun launchDefaultAppScreen() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             launchDefaultAppActivity()
         } else {
             throw IllegalStateException("Unable to launch default app activity on this OS")

@@ -20,6 +20,7 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.os.Build
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.SearchWidget
 import com.duckduckgo.widget.SearchWidgetLight
@@ -31,19 +32,20 @@ interface WidgetCapabilities {
     val hasInstalledWidgets: Boolean
 }
 
-class AppWidgetCapabilities @Inject constructor(val context: Context) : WidgetCapabilities {
+class AppWidgetCapabilities @Inject constructor(
+    private val context: Context,
+    private val appBuildConfig: AppBuildConfig,
+) : WidgetCapabilities {
 
-    override val supportsStandardWidgetAdd: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+    override val supportsStandardWidgetAdd = true
 
     override val supportsAutomaticWidgetAdd: Boolean
-        get() = context.supportsAutomaticWidgetAdd
+        @Suppress("NewApi") // we use appBuildConfig
+        get() = appBuildConfig.sdkInt >= Build.VERSION_CODES.O && AppWidgetManager.getInstance(context).isRequestPinAppWidgetSupported
 
     override val hasInstalledWidgets: Boolean
         get() = context.hasInstalledWidgets
 }
-
-val Context.supportsAutomaticWidgetAdd: Boolean
-    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && AppWidgetManager.getInstance(this).isRequestPinAppWidgetSupported
 
 val Context.hasInstalledWidgets: Boolean
     get() {
