@@ -19,6 +19,11 @@ package com.duckduckgo.privacy.dashboard.api.animations
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.privacy.dashboard.api.PrivacyShield
 
-interface PrivacyShieldView {
+/** Public interface for the Privacy Shield Animation Helper */
+interface PrivacyShieldAnimationHelper {
+
+    /**
+     * This method will setup into [holder] a LottieAnimation based on [PrivacyShield] state.
+     */
     fun setAnimationView(holder: LottieAnimationView, privacyShield: PrivacyShield)
 }

@@ -24,7 +24,7 @@ import com.duckduckgo.privacy.dashboard.api.PrivacyShield.PROTECTED
 import com.duckduckgo.privacy.dashboard.api.PrivacyShield.UNKNOWN
 import com.duckduckgo.privacy.dashboard.api.PrivacyShield.UNPROTECTED
 import com.duckduckgo.privacy.dashboard.api.PrivacyShield.WARNING
-import com.duckduckgo.privacy.dashboard.api.animations.PrivacyShieldView
+import com.duckduckgo.privacy.dashboard.api.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.privacy.dashboard.impl.R
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -33,7 +33,7 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class LottiePrivacyShieldView @Inject constructor(val appTheme: AppTheme) : PrivacyShieldView {
+class LottiePrivacyShieldView @Inject constructor(val appTheme: AppTheme) : PrivacyShieldAnimationHelper {
 
     override fun setAnimationView(
         holder: LottieAnimationView,

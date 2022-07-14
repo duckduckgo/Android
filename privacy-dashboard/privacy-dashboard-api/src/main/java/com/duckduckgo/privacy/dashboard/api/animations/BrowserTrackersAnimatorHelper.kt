@@ -67,3 +67,16 @@ interface BrowserTrackersAnimatorHelper {
      */
     fun finishPartialTrackerAnimation()
 }
+
+/**
+ * A TrackersAnimatorListener receives animation related events,
+ * such as the end of the animation.
+ */
+interface TrackersAnimatorListener {
+
+    /**
+     * Notifies the end of the animation.
+     * The callback is not be invoked when a partial animation is paused.
+     */
+    fun onAnimationFinished()
+}
