@@ -24,7 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.site.api.Site
 import com.duckduckgo.site.api.domain
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.tabs.TabRepository
 import com.duckduckgo.site.api.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.site.api.TrackingEvent

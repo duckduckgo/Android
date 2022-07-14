@@ -24,7 +24,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Https

@@ -18,7 +18,7 @@ package com.duckduckgo.app.tabs.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.browser.api.tabs.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.di.scopes.AppScope
 import kotlinx.coroutines.flow.Flow

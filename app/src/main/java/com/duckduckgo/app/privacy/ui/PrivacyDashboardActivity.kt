@@ -40,8 +40,8 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchMan
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.ViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.browser.api.tabs.TabRepository
+import com.duckduckgo.browser.api.tabs.tabId
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding

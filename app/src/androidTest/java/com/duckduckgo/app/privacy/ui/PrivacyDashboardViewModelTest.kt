@@ -24,7 +24,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.site.api.Site
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
 import com.duckduckgo.site.api.HttpsStatus
 import com.duckduckgo.site.api.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices

@@ -30,12 +30,12 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.tabs.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.api.Site

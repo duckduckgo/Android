@@ -37,8 +37,8 @@ import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.tabs.TabEntity
+import com.duckduckgo.browser.api.tabs.TabRepository
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

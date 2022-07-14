@@ -30,8 +30,8 @@ import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.tabs.TabEntity
+import com.duckduckgo.browser.api.tabs.TabRepository
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

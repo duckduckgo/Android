@@ -33,7 +33,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.tabs.model.TabDataRepository
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.tabs.TabRepository
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.ui.store.ThemingSharedPreferences
 import com.duckduckgo.app.widget.FavoritesObserver

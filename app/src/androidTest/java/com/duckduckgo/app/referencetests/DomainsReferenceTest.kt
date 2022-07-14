@@ -36,7 +36,7 @@ import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore

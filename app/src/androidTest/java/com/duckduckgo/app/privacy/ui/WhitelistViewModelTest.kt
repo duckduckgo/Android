@@ -21,8 +21,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
-import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
+import com.duckduckgo.browser.api.allowlist.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.ShowAdd
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.ShowWhitelistFormatError

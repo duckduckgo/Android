@@ -19,7 +19,7 @@ package com.duckduckgo.app.trackerdetection
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.site.api.TrackingEvent

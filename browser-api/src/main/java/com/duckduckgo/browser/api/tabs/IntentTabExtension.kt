@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.model
+package com.duckduckgo.browser.api.tabs
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import android.content.Intent
 
-@Entity(tableName = "user_whitelist")
-data class UserWhitelistedDomain(
-    @PrimaryKey val domain: String
-)
+private const val TAB_ID_EXTRA: String = "TAB_ID_EXTRA"
+
+var Intent.tabId: String?
+    get() = getStringExtra(TAB_ID_EXTRA)
+    set(value) {
+        putExtra(TAB_ID_EXTRA, value)
+    }

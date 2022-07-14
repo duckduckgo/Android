@@ -17,7 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.site.api.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking

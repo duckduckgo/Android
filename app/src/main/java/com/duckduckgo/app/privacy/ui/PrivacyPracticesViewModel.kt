@@ -23,7 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.site.api.domain
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.tabs.TabRepository
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject

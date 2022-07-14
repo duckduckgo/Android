@@ -38,7 +38,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.image.GlideRequests
 import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.browser.api.tabs.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import kotlinx.coroutines.launch
 import timber.log.Timber

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.privacy.db
 
+import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject

@@ -25,9 +25,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
-import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
+import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
+import com.duckduckgo.browser.api.allowlist.UserWhitelistedDomain
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

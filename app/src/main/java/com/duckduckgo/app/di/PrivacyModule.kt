@@ -37,7 +37,7 @@ import com.duckduckgo.app.location.GeoLocationPermissionsManager
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.tabs.TabRepository
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao

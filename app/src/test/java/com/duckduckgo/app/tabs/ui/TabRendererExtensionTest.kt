@@ -19,7 +19,7 @@ package com.duckduckgo.app.tabs.ui
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.browser.api.tabs.TabEntity
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith

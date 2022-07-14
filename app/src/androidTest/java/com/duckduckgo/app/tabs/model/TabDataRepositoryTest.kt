@@ -32,6 +32,7 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.site.api.SiteFactory
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.browser.api.tabs.TabEntity
 import com.duckduckgo.site.api.EntityLookup
 import com.duckduckgo.site.impl.SiteFactoryImpl
 import org.mockito.kotlin.*

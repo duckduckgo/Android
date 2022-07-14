@@ -35,7 +35,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName.*
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
 import com.duckduckgo.site.api.HttpsStatus
 import com.duckduckgo.site.api.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -45,8 +45,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
-import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.tabs.TabEntity
+import com.duckduckgo.browser.api.tabs.TabRepository
 import com.duckduckgo.site.api.Entity
 import com.duckduckgo.site.api.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities

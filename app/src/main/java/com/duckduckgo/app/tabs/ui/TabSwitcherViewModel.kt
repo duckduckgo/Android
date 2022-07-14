@@ -23,8 +23,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.tabs.TabEntity
+import com.duckduckgo.browser.api.tabs.TabRepository
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 

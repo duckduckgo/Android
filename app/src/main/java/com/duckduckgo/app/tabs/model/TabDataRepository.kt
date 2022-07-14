@@ -24,6 +24,8 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.site.api.Site
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.browser.api.tabs.TabEntity
+import com.duckduckgo.browser.api.tabs.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.api.SiteFactory
 import com.squareup.anvil.annotations.ContributesBinding

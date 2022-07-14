@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.tabpreview
 
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
-import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.browser.api.tabs.TabEntity
 
 class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
 

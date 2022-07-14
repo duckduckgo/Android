@@ -36,7 +36,7 @@ import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
 import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.feature.toggles.api.FeatureToggle
