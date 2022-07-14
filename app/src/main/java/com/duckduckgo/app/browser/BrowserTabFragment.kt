@@ -747,11 +747,10 @@ class BrowserTabFragment :
     }
 
     private fun processCommand(it: Command?) {
-        if (it !is Command.DaxCommand) {
-            if (it is NavigationCommand) {
-                renderer.cancelTrackersAnimation()
-            }
+        if (it is NavigationCommand) {
+            renderer.cancelTrackersAnimation()
         }
+
         when (it) {
             is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
