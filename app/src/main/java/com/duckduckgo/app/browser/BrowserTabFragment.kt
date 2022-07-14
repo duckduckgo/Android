@@ -2059,7 +2059,7 @@ class BrowserTabFragment :
     fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, searchIcon)
 
     override fun onAnimationFinished() {
-
+        // NO OP
     }
 
     private fun showEmailTooltip(address: String) {
