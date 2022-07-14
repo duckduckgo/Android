@@ -36,6 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.macos_api.MacOsWaitlist
@@ -76,7 +77,8 @@ class SettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     private val appBuildConfig: AppBuildConfig,
     private val emailManager: EmailManager,
-    private val macOsWaitlist: MacOsWaitlist
+    private val macOsWaitlist: MacOsWaitlist,
+    private val internalTestUserChecker: InternalTestUserChecker
 ) : ViewModel(), LifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -96,7 +98,8 @@ class SettingsViewModel @Inject constructor(
         val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
         val appTrackingProtectionEnabled: Boolean = false,
         val emailAddress: String? = null,
-        val macOsWaitlistState: MacWaitlistState = MacWaitlistState.NotJoinedQueue
+        val macOsWaitlistState: MacWaitlistState = MacWaitlistState.NotJoinedQueue,
+        val showAutofill: Boolean = false
     )
 
     data class AutomaticallyClearData(
@@ -110,6 +113,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchEmailProtection : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
+        object LaunchAutofillSettings : Command()
         object LaunchAccessibilitySettings : Command()
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
@@ -161,7 +165,8 @@ class SettingsViewModel @Inject constructor(
                     appTrackingProtectionEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
                     appTrackingProtectionWaitlistState = atpRepository.getState(),
                     emailAddress = emailManager.getEmailAddress(),
-                    macOsWaitlistState = macOsWaitlist.getWaitlistState()
+                    macOsWaitlistState = macOsWaitlist.getWaitlistState(),
+                    showAutofill = internalTestUserChecker.isInternalTestUser
                 )
             )
         }
@@ -231,6 +236,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onFireproofWebsitesClicked() {
         viewModelScope.launch { command.send(Command.LaunchFireproofWebsites) }
+    }
+
+    fun onAutofillSettingsClick() {
+        viewModelScope.launch { command.send(Command.LaunchAutofillSettings) }
     }
 
     fun onLocationClicked() {
