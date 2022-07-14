@@ -237,5 +237,6 @@ export default [
     { html: 'disneyworld_signup.html', expectedFailures: ['birthday'] },
     { html: 'irsgov_refund.html' },
     { html: 'googlecalendar_eventnotification.html' },
-    { html: 'givesmart_login.html' }
+    { html: 'givesmart_login.html' },
+    { html: 'vancity_login.html' }
 ]

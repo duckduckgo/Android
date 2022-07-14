@@ -138,9 +138,13 @@ export function loginPage (page, server, opts = {}) {
         },
         async clickIntoUsernameInput () {
             const usernameField = page.locator('#email').first()
-            // const input = page.locator(selectors.identity)
             // click the input field (not within Dax icon)
             await usernameField.click()
+        },
+        async clickIntoPasswordInput () {
+            const passwordField = page.locator('#password').first()
+            // click the input field (not within Dax icon)
+            await passwordField.click()
         },
         async fieldsDoNotContainIcons () {
             const styles1 = await page.locator('#email').getAttribute('style')
@@ -250,6 +254,15 @@ export function loginPage (page, server, opts = {}) {
             const calls = await page.evaluate('window.__playwright.mocks.calls')
             const mockCall = calls.find(([name]) => name === mockCallName)
             expect(mockCall).toBeDefined()
+        },
+        /**
+         * @param {string} mockCallName
+         * @param {number} times
+         */
+        async assertMockCallOccurredTimes (mockCallName, times) {
+            const calls = await page.evaluate('window.__playwright.mocks.calls')
+            const mockCalls = calls.filter(([name]) => name === mockCallName)
+            expect(mockCalls).toHaveLength(times)
         },
         /**
          * @param {Partial<import('../../src/deviceApiCalls/__generated__/validators-ts').AutofillFeatureToggles>} expected
