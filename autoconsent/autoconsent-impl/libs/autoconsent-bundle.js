@@ -5,8 +5,9 @@
 
     const autoconsent = new k(
         (message) => {
-            var msg = MARCOS.console(message.type);
-            console.log('sending', message);
+            var jsonMessage = JSON.stringify(message);
+            console.log('sending', jsonMessage);
+            MARCOS.process(jsonMessage);
         },
     );
     window.autoconsentMessageCallback = (msg) => {

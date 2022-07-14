@@ -27,6 +27,7 @@ import java.io.BufferedReader
 import javax.inject.Inject
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
@@ -49,7 +50,7 @@ class RealAutoconsent @Inject constructor() : Autoconsent {
         GlobalScope.launch(Dispatchers.Main) {
             try {
                 Timber.d("MARCOS receiving init and responding")
-                webView.evaluateJavascript("javascript:${selftTest()}", null)
+                webView.evaluateJavascript("javascript:${initResp()}", null)
             } catch (e: Exception) {
                 Timber.d("MARCOS exception is ${e.localizedMessage}")
             }
@@ -68,7 +69,7 @@ class RealAutoconsent @Inject constructor() : Autoconsent {
     private fun initResp(): String {
         return """
             (function() {
-                window.postMessage({type: 'initResp', rules: '${getRules()}', config: '{'enabled': true}'}, window.origin);
+                window.autoconsentMessageCallback({type: "initResp", rules: ${getRules()}, config: {"enabled": true, "autoAction": true, "disabledCmps": false, "enablePrehide": true}}, window.origin);
             })();
         """.trimIndent()
     }
@@ -97,8 +98,16 @@ class RealAutoconsent @Inject constructor() : Autoconsent {
 
 class AutoconsentInterface(val autoconsent: RealAutoconsent, val webView: WebView) {
     @JavascriptInterface
+    fun process(message: String) {
+        val parsedMessage = JSONObject(message)
+        val type = parsedMessage.get("type")
+        when (type) {
+            "init" -> autoconsent.init(webView)
+        }
+    }
+
+    @JavascriptInterface
     fun console(message: String) {
-        Timber.d("MARCOS message is $message")
-        autoconsent.init(webView)
+        Timber.d("MARCOS $message")
     }
 }

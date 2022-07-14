@@ -2,8 +2,8 @@ import AutoConsent from '@duckduckgo/autoconsent';
 
 const autoconsent = new k(
     (message) => {
-        var msg = MARCOS.console(message.type);
         console.log('sending', message);
+        var msg = MARCOS.process(message);
     },
 );
 window.autoconsentMessageCallback = (msg) => {
