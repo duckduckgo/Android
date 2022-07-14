@@ -415,7 +415,7 @@ class BrowserTabViewModel @Inject constructor(
         class InjectEmailAddress(val address: String) : Command()
         class ShowEmailTooltip(val address: String) : Command()
         sealed class DaxCommand : Command() {
-            object FinishTrackerAnimation : DaxCommand()
+            object FinishPartialTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
 
@@ -2327,7 +2327,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onDaxDialogDismissed() {
         val cta = currentCtaViewState().cta ?: return
         if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
-            command.value = DaxCommand.FinishTrackerAnimation
+            command.value = DaxCommand.FinishPartialTrackerAnimation
         }
         onUserDismissedCta()
     }

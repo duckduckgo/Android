@@ -862,7 +862,7 @@ class BrowserTabFragment :
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
-            is Command.DaxCommand.FinishTrackerAnimation -> finishTrackerAnimation()
+            is Command.DaxCommand.FinishPartialTrackerAnimation -> finishPartialTrackerAnimation()
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
@@ -1983,7 +1983,7 @@ class BrowserTabFragment :
         }
     }
 
-    private fun finishTrackerAnimation() {
+    private fun finishPartialTrackerAnimation() {
         animatorHelper.finishPartialTrackerAnimation()
     }
 

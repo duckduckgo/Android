@@ -2099,7 +2099,7 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onDaxDialogDismissed()
         val command = captureCommands().lastValue
-        assertTrue(command is Command.DaxCommand.FinishTrackerAnimation)
+        assertTrue(command is Command.DaxCommand.FinishPartialTrackerAnimation)
     }
 
     @Test
@@ -2107,7 +2107,7 @@ class BrowserTabViewModelTest {
         val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
         setCta(cta)
         testee.onDaxDialogDismissed()
-        assertCommandNotIssued<Command.DaxCommand.FinishTrackerAnimation>()
+        assertCommandNotIssued<Command.DaxCommand.FinishPartialTrackerAnimation>()
     }
 
     @Test
