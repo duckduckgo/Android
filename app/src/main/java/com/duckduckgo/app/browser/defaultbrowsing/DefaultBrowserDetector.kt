@@ -38,7 +38,7 @@ class AndroidDefaultBrowserDetector(
 ) : DefaultBrowserDetector {
 
     override fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+        return appBuildConfig.sdkInt >= Build.VERSION_CODES.N
     }
 
     override fun isDefaultBrowser(): Boolean {

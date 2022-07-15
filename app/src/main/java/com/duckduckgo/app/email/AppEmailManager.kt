@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.email
 
+import com.duckduckgo.app.email.EmailManager.FetchCodeResult
+import com.duckduckgo.app.email.EmailManager.WaitlistState
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.global.DispatcherProvider
@@ -29,35 +31,6 @@ import org.json.JSONObject
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
-
-interface EmailManager {
-    fun signedInFlow(): StateFlow<Boolean>
-    fun getAlias(): String?
-    fun isSignedIn(): Boolean
-    fun storeCredentials(
-        token: String,
-        username: String,
-        cohort: String
-    )
-
-    fun signOut()
-    fun getEmailAddress(): String?
-    fun getUserData(): String
-    fun waitlistState(): AppEmailManager.WaitlistState
-    fun joinWaitlist(
-        timestamp: Int,
-        token: String
-    )
-
-    fun getInviteCode(): String
-    fun doesCodeAlreadyExist(): Boolean
-    suspend fun fetchInviteCode(): AppEmailManager.FetchCodeResult
-    fun notifyOnJoinedWaitlist()
-    fun getCohort(): String
-    fun isEmailFeatureSupported(): Boolean
-    fun getLastUsedDate(): String
-    fun setNewLastUsedDate()
-}
 
 class AppEmailManager(
     private val emailService: EmailService,
@@ -207,18 +180,6 @@ class AppEmailManager(
                 Timber.w(it, "Failed to fetch alias")
             }
         }
-    }
-
-    sealed class FetchCodeResult {
-        object Code : FetchCodeResult()
-        object NoCode : FetchCodeResult()
-        object CodeExisted : FetchCodeResult()
-    }
-
-    sealed class WaitlistState {
-        object NotJoinedQueue : WaitlistState()
-        data class JoinedQueue(val notify: Boolean = false) : WaitlistState()
-        object InBeta : WaitlistState()
     }
 
     companion object {

@@ -32,6 +32,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -46,19 +47,21 @@ import dagger.SingleInstanceIn
 class AppShortcutCreatorModule {
     @Provides
     @IntoSet
-    fun provideAppShortcutCreatorObserver(appShortcutCreator: AppShortcutCreator): LifecycleObserver {
-        return AppShortcutCreatorLifecycleObserver(appShortcutCreator)
+    fun provideAppShortcutCreatorObserver(appShortcutCreator: AppShortcutCreator, appBuildConfig: AppBuildConfig): LifecycleObserver {
+        return AppShortcutCreatorLifecycleObserver(appShortcutCreator, appBuildConfig)
     }
 }
 
 class AppShortcutCreatorLifecycleObserver(
-    private val appShortcutCreator: AppShortcutCreator
+    private val appShortcutCreator: AppShortcutCreator,
+    private val appBuildConfig: AppBuildConfig
 ) : LifecycleObserver {
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    @Suppress("NewApi") // we use appBuildConfig
     fun configureAppShortcuts() {
         Timber.i("Configure app shortcuts")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N_MR1) {
             appShortcutCreator.configureAppShortcuts()
         }
     }

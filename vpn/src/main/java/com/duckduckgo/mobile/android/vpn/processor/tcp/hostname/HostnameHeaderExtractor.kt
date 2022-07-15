@@ -16,28 +16,32 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
+import java.nio.charset.StandardCharsets
+
 interface HostnameHeaderExtractor {
 
-    fun extract(payload: String): String?
+    fun extract(payload: ByteArray): String?
 }
 
 class PlaintextHostHeaderExtractor : HostnameHeaderExtractor {
 
-    override fun extract(payload: String): String? {
-
-        payload.split(NEWLINE_REGEX)
-            .map { it.trim() }
-            .forEach { line ->
-                if (line.startsWith(HOST_HEADER_PREFIX)) {
-                    return line.substring(HOST_HEADER_PREFIX.length)
-                }
+    override fun extract(payload: ByteArray): String? {
+        val hostIdx = payload.indexOf(HOST_HEADER_PREFIX)
+        if (hostIdx >= 0) {
+            val hostEndIdx = payload.indexOf(CARRIAGE_RETURN, hostIdx)
+            if (hostEndIdx > hostIdx) {
+                val hostLen = hostEndIdx - hostIdx - CARRIAGE_RETURN.size
+                val hostname = String(payload, hostIdx, hostLen, StandardCharsets.US_ASCII)
+                if (hostname.isNotEmpty())
+                    return hostname
             }
+        }
 
         return null
     }
 
     companion object {
-        private const val HOST_HEADER_PREFIX = "Host: "
-        private val NEWLINE_REGEX: Regex = "\\n".toRegex()
+        private val HOST_HEADER_PREFIX = "\nHost: ".toByteArray(StandardCharsets.US_ASCII)
+        private val CARRIAGE_RETURN = "\r\n".toByteArray(StandardCharsets.US_ASCII)
     }
 }

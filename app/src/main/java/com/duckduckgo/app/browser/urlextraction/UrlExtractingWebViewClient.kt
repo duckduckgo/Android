@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.urlextraction
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.net.http.SslError.*
-import android.os.Build
 import android.webkit.*
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
@@ -44,7 +43,7 @@ class UrlExtractingWebViewClient(
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val urlExtractor: DOMUrlExtractor
+    private val urlExtractor: DOMUrlExtractor,
 ) : WebViewClient() {
 
     var urlExtractionListener: UrlExtractionListener? = null
@@ -150,11 +149,7 @@ class UrlExtractingWebViewClient(
         if (webView != null) {
             val initialUrl = (webView as UrlExtractingWebView).initialUrl
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (error?.errorCode == ERROR_CONNECT) {
-                    urlExtractionListener?.onUrlExtractionError(initialUrl)
-                }
-            } else {
+            if (error?.errorCode == ERROR_CONNECT) {
                 urlExtractionListener?.onUrlExtractionError(initialUrl)
             }
         }

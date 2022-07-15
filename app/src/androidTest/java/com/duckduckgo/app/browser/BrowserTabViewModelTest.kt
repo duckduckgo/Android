@@ -118,6 +118,7 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -364,6 +365,8 @@ class BrowserTabViewModelTest {
 
     private val favoriteListFlow = Channel<List<Favorite>>()
 
+    private val mockAutofillStore: AutofillStore = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -460,7 +463,8 @@ class BrowserTabViewModelTest {
             trackingParameters = mockTrackingParameters,
             voiceSearchAvailability = voiceSearchAvailability,
             voiceSearchPixelLogger = voiceSearchPixelLogger,
-            settingsDataStore = mockSettingsDataStore
+            settingsDataStore = mockSettingsDataStore,
+            autofillStore = mockAutofillStore
         )
 
         testee.loadData("abc", null, false, false)

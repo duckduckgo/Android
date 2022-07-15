@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.processor.requestingapp
 
 import android.annotation.SuppressLint
 import android.os.Build
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.net.InetAddress
 import javax.inject.Inject
 import javax.inject.Named
@@ -36,13 +37,14 @@ interface OriginatingAppPackageIdentifier {
 
 class OriginatingAppPackageIdentifierStrategy @Inject constructor(
     @Named("DetectOriginatingAppPackageModern") private val modern: OriginatingAppPackageIdentifier,
-    @Named("DetectOriginatingAppPackageLegacy") private val legacy: OriginatingAppPackageIdentifier
+    @Named("DetectOriginatingAppPackageLegacy") private val legacy: OriginatingAppPackageIdentifier,
+    private val appBuildConfig: AppBuildConfig,
 ) {
 
     @SuppressLint("NewApi")
     fun resolvePackageId(
         connectionInfo: ConnectionInfo,
-        sdkVersion: Int = Build.VERSION.SDK_INT
+        sdkVersion: Int = appBuildConfig.sdkInt
     ): String {
 
         return if (sdkVersion >= Build.VERSION_CODES.Q) {

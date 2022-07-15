@@ -58,11 +58,11 @@ import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
+import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_api.MacWaitlistState
-import com.duckduckgo.macos_api.MacWaitlistState.InBeta
-import com.duckduckgo.macos_api.MacWaitlistState.JoinedWaitlist
-import com.duckduckgo.macos_api.MacWaitlistState.NotJoinedQueue
+import com.duckduckgo.macos_api.MacWaitlistState.*
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
@@ -96,6 +96,12 @@ class SettingsActivity :
 
     @Inject
     lateinit var addWidgetLauncher: AddWidgetLauncher
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
 
     private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onDefaultBrowserToggled(isChecked)
@@ -193,7 +199,7 @@ class SettingsActivity :
     }
 
     private fun configureAppLinksSettingVisibility() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+        if (appBuildConfig.sdkInt < Build.VERSION_CODES.N) {
             viewsPrivacy.appLinksSetting.visibility = View.GONE
         }
     }
@@ -215,6 +221,7 @@ class SettingsActivity :
                     updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
                     updateEmailSubtitle(it.emailAddress)
                     updateMacOsSettings(it.macOsWaitlistState)
+                    updateAutofill(it.showAutofill)
                 }
             }.launchIn(lifecycleScope)
 
@@ -222,6 +229,15 @@ class SettingsActivity :
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    private fun updateAutofill(autofillEnabled: Boolean) {
+        if (autofillEnabled) {
+            viewsPrivacy.autofill.visibility = View.VISIBLE
+            viewsPrivacy.autofill.setOnClickListener { viewModel.onAutofillSettingsClick() }
+        } else {
+            viewsPrivacy.autofill.visibility = View.GONE
+        }
     }
 
     private fun updateEmailSubtitle(emailAddress: String?) {
@@ -293,6 +309,7 @@ class SettingsActivity :
             is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
             is Command.LaunchFeedback -> launchFeedback()
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
+            is Command.LaunchAutofillSettings -> launchAutofillSettings()
             is Command.LaunchAccessibilitySettings -> launchAccessibilitySettings()
             is Command.LaunchLocation -> launchLocation()
             is Command.LaunchWhitelist -> launchWhitelist()
@@ -352,8 +369,9 @@ class SettingsActivity :
         }
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun launchDefaultAppScreen() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             launchDefaultAppActivity()
         } else {
             throw IllegalStateException("Unable to launch default app activity on this OS")
@@ -368,6 +386,11 @@ class SettingsActivity :
     private fun launchFireproofWebsites() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(FireproofWebsitesActivity.intent(this), options)
+    }
+
+    private fun launchAutofillSettings() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(autofillSettingsActivityLauncher.intent(this), options)
     }
 
     private fun launchAccessibilitySettings() {
