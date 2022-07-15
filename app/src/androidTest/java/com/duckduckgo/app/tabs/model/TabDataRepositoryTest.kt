@@ -29,7 +29,6 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.tabs.db.TabsDao

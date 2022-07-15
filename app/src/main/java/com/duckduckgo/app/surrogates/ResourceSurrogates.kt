@@ -41,4 +41,3 @@ class ResourceSurrogatesImpl : ResourceSurrogates {
         return surrogates
     }
 }
-
