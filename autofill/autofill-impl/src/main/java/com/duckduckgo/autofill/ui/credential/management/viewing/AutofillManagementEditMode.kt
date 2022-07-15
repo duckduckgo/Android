@@ -90,8 +90,9 @@ class AutofillManagementEditMode : Fragment() {
 
     private fun saveCredentials() {
         val updatedCredentials = getCredentials().copy(
-            username = binding.usernameEditText.text.toString(),
-            password = binding.passwordEditText.text.toString(),
+            username = binding.usernameEditText.text.toString().convertBlankToNull(),
+            password = binding.passwordEditText.text.toString().convertBlankToNull(),
+
         )
         viewModel.updateCredentials(updatedCredentials)
     }
@@ -118,6 +119,8 @@ class AutofillManagementEditMode : Fragment() {
             }
         }
     }
+
+    private fun String.convertBlankToNull(): String? = this.ifBlank { null }
 
     private fun processCommand(command: Command) {
         var processed = true
