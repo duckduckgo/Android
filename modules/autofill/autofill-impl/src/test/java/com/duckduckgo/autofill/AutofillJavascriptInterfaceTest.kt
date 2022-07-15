@@ -218,18 +218,9 @@ class AutofillJavascriptInterfaceTest {
 
     private fun assertCredentialsContains(property: (LoginCredentials) -> String?, vararg expected: String?) {
         val numberExpected = expected.size
-        var numberMatched = 0
-        var numberUnmatched = 0
-        TestCallback.credentials?.forEach { foundLogin ->
-            if (expected.contains(property(foundLogin))) {
-                numberMatched++
-            } else {
-                numberUnmatched++
-            }
-        }
-
+        val numberMatched = TestCallback.credentials?.filter { expected.contains(property(it)) }?.count()
         assertEquals("Wrong number of matched properties. Expected $numberExpected but found $numberMatched", numberExpected, numberMatched)
-        assertEquals("$numberUnmatched unmatched entries found", 0, numberUnmatched)
+
     }
 
     private fun loginCredential(username: String?, password: String?) = LoginCredentials(0, "example.com", username, password)
