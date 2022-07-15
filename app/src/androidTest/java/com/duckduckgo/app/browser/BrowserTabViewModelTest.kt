@@ -28,8 +28,10 @@ import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.asFlow
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.InstantSchedulersRule
@@ -47,6 +49,8 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.CancelIncomingAutofillRequest
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.InjectCredentials
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
@@ -118,6 +122,7 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.FileDownloader
@@ -4105,6 +4110,60 @@ class BrowserTabViewModelTest {
         buildNavigationHistoryStack(stackSize = 20)
         testee.onUserLongPressedBack()
         assertShowHistoryCommandSent(expectedStackSize = 10)
+    }
+
+    @Test
+    fun whenShareCredentialsWithPageThenEmitInjectCredentialsCommand() = runTest {
+        val url = "originalurl.com"
+        val credentials = LoginCredentials(
+            id = 1,
+            domain = url,
+            username = "tester",
+            password = "test123"
+        )
+        testee.shareCredentialsWithPage(url, credentials)
+
+        testee.command.asFlow().test {
+            assertEquals(InjectCredentials(url, credentials), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenReturnNoCredentialsWithPageThenEmitCancelIncomingAutofillRequestCommand() = runTest {
+        val url = "originalurl.com"
+        testee.returnNoCredentialsWithPage(url)
+
+        testee.command.asFlow().test {
+            assertEquals(CancelIncomingAutofillRequest(url), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenSaveCredentialsThenSaveCredentialsInAutofillStore() = runTest {
+        val url = "originalurl.com"
+        val credentials = LoginCredentials(
+            id = 1,
+            domain = url,
+            username = "tester",
+            password = "test123"
+        )
+        testee.saveCredentials(url, credentials)
+
+        verify(mockAutofillStore).saveCredentials(url, credentials)
+    }
+
+    @Test
+    fun whenUpdateCredentialsThenUpdateCredentialsInAutofillStore() = runTest {
+        val url = "originalurl.com"
+        val credentials = LoginCredentials(
+            id = 1,
+            domain = url,
+            username = "tester",
+            password = "test123"
+        )
+        testee.updateCredentials(url, credentials)
+
+        verify(mockAutofillStore).updateCredentials(url, credentials)
     }
 
     private fun assertShowHistoryCommandSent(expectedStackSize: Int) {
