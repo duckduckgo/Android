@@ -78,4 +78,6 @@ data class PacketInfo(
     val transportProtocol: Int,
     val destinationAddress: InetAddress,
     val destinationPort: Int,
+    val sourceAddress: InetAddress,
+    val sourcePort: Int,
 )
