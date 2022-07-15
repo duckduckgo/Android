@@ -40,6 +40,9 @@ android {
                         srcDirs += files("$projectDir/../submodules/".toString())
                     }
                 }
+                assets {
+                    srcDirs += files("$projectDir/../node_modules/@duckduckgo/privacy_dashboard/build/android".toString())
+                }
             }
         }
     }
