@@ -38,6 +38,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
@@ -53,6 +54,9 @@ class DefaultBrowserPage : OnboardingPageFragment() {
 
     @Inject
     lateinit var variantManager: VariantManager
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     private var userTriedToSetDDGAsDefault = false
     private var userSelectedExternalBrowser = false
@@ -78,13 +82,11 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         }
     }
 
-    internal fun applyStyle() {
+    private fun applyStyle() {
         activity?.window?.apply {
             clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
             addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            }
+            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             statusBarColor = Color.WHITE
         }
         ViewCompat.requestApplyInsets(longDescriptionContainer)
@@ -204,9 +206,10 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun onLaunchDefaultBrowserSettingsClicked() {
         userTriedToSetDDGAsDefault = true
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             val intent = DefaultBrowserSystemSettings.intent()
             try {
                 startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_SETTINGS)

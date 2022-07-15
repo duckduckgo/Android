@@ -21,9 +21,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.email.AppEmailManager.Companion.DUCK_EMAIL_DOMAIN
 import com.duckduckgo.app.email.AppEmailManager.Companion.UNKNOWN_COHORT
-import com.duckduckgo.app.email.AppEmailManager.WaitlistState.InBeta
-import com.duckduckgo.app.email.AppEmailManager.WaitlistState.JoinedQueue
-import com.duckduckgo.app.email.AppEmailManager.WaitlistState.NotJoinedQueue
+import com.duckduckgo.app.email.EmailManager.FetchCodeResult
+import com.duckduckgo.app.email.EmailManager.WaitlistState.*
 import com.duckduckgo.app.email.api.EmailAlias
 import com.duckduckgo.app.email.api.EmailInviteCodeResponse
 import com.duckduckgo.app.email.api.EmailService
@@ -281,7 +280,7 @@ class AppEmailManagerTest {
     fun whenFetchInviteCodeIfCodeAlreadyExistsThenReturnCodeExisted() = runTest {
         mockEmailDataStore.inviteCode = "inviteCode"
 
-        assertEquals(AppEmailManager.FetchCodeResult.CodeExisted, testee.fetchInviteCode())
+        assertEquals(FetchCodeResult.CodeExisted, testee.fetchInviteCode())
     }
 
     @Test
@@ -309,7 +308,7 @@ class AppEmailManagerTest {
         givenUserIsTopOfTheQueue()
         whenever(mockEmailService.getCode(any())).thenReturn(EmailInviteCodeResponse("code"))
 
-        assertEquals(AppEmailManager.FetchCodeResult.Code, testee.fetchInviteCode())
+        assertEquals(FetchCodeResult.Code, testee.fetchInviteCode())
     }
 
     @Test
@@ -317,7 +316,7 @@ class AppEmailManagerTest {
         givenUserIsTopOfTheQueue()
         whenever(mockEmailService.getCode(any())).thenReturn(EmailInviteCodeResponse(""))
 
-        assertEquals(AppEmailManager.FetchCodeResult.NoCode, testee.fetchInviteCode())
+        assertEquals(FetchCodeResult.NoCode, testee.fetchInviteCode())
     }
 
     @Test
@@ -325,7 +324,7 @@ class AppEmailManagerTest {
         testee = AppEmailManager(TestEmailService(), mockEmailDataStore, coroutineRule.testDispatcherProvider, TestScope())
         givenUserIsTopOfTheQueue()
 
-        assertEquals(AppEmailManager.FetchCodeResult.NoCode, testee.fetchInviteCode())
+        assertEquals(FetchCodeResult.NoCode, testee.fetchInviteCode())
     }
 
     @Test
@@ -333,7 +332,7 @@ class AppEmailManagerTest {
         testee = AppEmailManager(TestEmailService(), mockEmailDataStore, coroutineRule.testDispatcherProvider, TestScope())
         givenUserIsInWaitlist()
 
-        assertEquals(AppEmailManager.FetchCodeResult.NoCode, testee.fetchInviteCode())
+        assertEquals(FetchCodeResult.NoCode, testee.fetchInviteCode())
     }
 
     @Test

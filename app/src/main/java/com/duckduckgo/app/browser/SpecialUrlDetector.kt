@@ -25,6 +25,7 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.TrackingParameters
@@ -65,7 +66,8 @@ interface SpecialUrlDetector {
 class SpecialUrlDetectorImpl(
     private val packageManager: PackageManager,
     private val ampLinks: AmpLinks,
-    private val trackingParameters: TrackingParameters
+    private val trackingParameters: TrackingParameters,
+    private val appBuildConfig: AppBuildConfig
 ) : SpecialUrlDetector {
 
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
@@ -95,12 +97,13 @@ class SpecialUrlDetectorImpl(
 
     private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
 
+    @Suppress("NewApi") // we use appBuildConfig
     override fun processUrl(initiatingUrl: String?, uriString: String): UrlType {
         trackingParameters.cleanTrackingParameters(initiatingUrl = initiatingUrl, url = uriString)?.let { cleanedUrl ->
             return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             try {
                 val activities = queryActivities(uriString)
                 val nonBrowserActivities = keepNonBrowserActivities(activities)

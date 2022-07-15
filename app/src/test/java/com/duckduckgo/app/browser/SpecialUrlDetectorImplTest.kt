@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.*
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.TrackingParameters
@@ -58,13 +59,17 @@ class SpecialUrlDetectorImplTest {
     @Mock
     lateinit var mockTrackingParameters: TrackingParameters
 
+    @Mock
+    lateinit var appBuildConfig: AppBuildConfig
+
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
         testee = SpecialUrlDetectorImpl(
             packageManager = mockPackageManager,
             ampLinks = mockAmpLinks,
-            trackingParameters = mockTrackingParameters
+            trackingParameters = mockTrackingParameters,
+            appBuildConfig = appBuildConfig
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
     }

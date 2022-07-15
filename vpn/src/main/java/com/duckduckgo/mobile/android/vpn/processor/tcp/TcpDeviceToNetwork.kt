@@ -288,7 +288,7 @@ class TcpDeviceToNetwork(
             val isLocalAddress = determineIfLocalIpAddress(packet)
             val requestingApp = determineRequestingApp(tcb, packet)
             val hostName = determineHostName(tcb, packet, payloadBuffer)
-            val requestType = determineIfTracker(tcb, packet, requestingApp, payloadBuffer, isLocalAddress)
+            val requestType = determineIfTracker(tcb, packet, requestingApp, payloadBuffer, isLocalAddress, hostName)
             val isATrackerRetryRequest = isARetryForRecentlyBlockedTracker(requestingApp, hostName, payloadSize)
             Timber.v(
                 "App %s attempting to send %d bytes to (%s). %s host=%s, localAddress=%s, retry=%s",
@@ -385,7 +385,8 @@ class TcpDeviceToNetwork(
         packet: Packet,
         requestingApp: OriginatingApp,
         payloadBuffer: ByteBuffer,
-        isLocalAddress: Boolean
+        isLocalAddress: Boolean,
+        hostName: String?
     ): RequestTrackerType {
         Timber.v("Determining if a tracker. Already determined? %s", tcb.trackerTypeDetermined)
         if (tcb.trackerTypeDetermined) {
@@ -394,7 +395,7 @@ class TcpDeviceToNetwork(
             )
         }
 
-        return trackerDetector.determinePacketType(tcb, packet, payloadBuffer, isLocalAddress, requestingApp)
+        return trackerDetector.determinePacketType(tcb, packet, payloadBuffer, isLocalAddress, requestingApp, hostName)
     }
 
     private fun determineIfLocalIpAddress(packet: Packet): Boolean {

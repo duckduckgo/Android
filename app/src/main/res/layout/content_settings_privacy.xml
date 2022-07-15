@@ -49,12 +49,20 @@
         app:layout_constraintTop_toBottomOf="@id/globalPrivacyControlSetting" />
 
     <TextView
+        android:id="@+id/autofill"
+        style="@style/SettingsItemClickable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/autofillSettingsDisplayName"
+        app:layout_constraintTop_toBottomOf="@id/fireproofWebsites" />
+
+    <TextView
         android:id="@+id/locationPermissions"
         style="@style/SettingsItemClickable"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/settingsPreciseLocation"
-        app:layout_constraintTop_toBottomOf="@id/fireproofWebsites" />
+        app:layout_constraintTop_toBottomOf="@id/autofill" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/automaticallyClearWhatSetting"
