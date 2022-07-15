@@ -421,7 +421,7 @@ class BrowserTabFragment :
     }
 
     private val autofillCallback = object : Callback {
-        override fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
+        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
             showAutofillDialogChooseCredentials(credentials)
         }
 
@@ -429,27 +429,28 @@ class BrowserTabFragment :
             viewModel.returnNoCredentialsWithPage(originalUrl)
         }
 
-        override fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials) {
-            launch {
-                val username = credentials.username
-                val password = credentials.password
+        override suspend fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials) {
+            val username = credentials.username
+            val password = credentials.password
 
-                if (username == null) {
-                    Timber.w("Not saving credentials with null username")
-                    return@launch
-                }
+            if (username == null) {
+                Timber.w("Not saving credentials with null username")
+                return
+            }
 
-                if (password == null) {
-                    Timber.w("Not saving credentials with null password")
-                    return@launch
-                }
+            if (password == null) {
+                Timber.w("Not saving credentials with null password")
+                return
+            }
 
-                when (existingCredentialMatchDetector.determine(currentUrl, username, password)) {
-                    ExactMatch -> Timber.w("Credentials already exist for %s", currentUrl)
-                    UsernameMatch -> showAutofillDialogUpdateCredentials(currentUrl, credentials)
-                    NoMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
-                    UrlOnlyMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
-                }
+            // we need this delay to ensure web navigation / form submission events aren't blocked
+            delay(100)
+
+            when (existingCredentialMatchDetector.determine(currentUrl, username, password)) {
+                ExactMatch -> Timber.w("Credentials already exist for %s", currentUrl)
+                UsernameMatch -> showAutofillDialogUpdateCredentials(currentUrl, credentials)
+                NoMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
+                UrlOnlyMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
             }
         }
     }

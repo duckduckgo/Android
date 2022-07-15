@@ -131,12 +131,12 @@ class AutofillStoredBackJavascriptInterfaceTest {
         var credentials: List<LoginCredentials>? = null
         var credentialsAvailable: Boolean? = null
 
-        override fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
+        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
             credentialsAvailable = true
             this.credentials = credentials
         }
 
-        override fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials) {
+        override suspend fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials) {
 
         }
 
