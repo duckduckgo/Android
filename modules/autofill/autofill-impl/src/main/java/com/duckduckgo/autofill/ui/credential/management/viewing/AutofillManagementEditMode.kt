@@ -141,7 +141,4 @@ class AutofillManagementEditMode : Fragment() {
     }
 }
 
-private fun String.convertBlankToNull(): String? {
-    if (this.isBlank()) return null
-    return this
-}
+private fun String.convertBlankToNull(): String? = this.ifBlank { null }
