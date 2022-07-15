@@ -26,6 +26,7 @@ import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputMainType.CREDENTIALS
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.USERNAME
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
@@ -106,6 +107,129 @@ class AutofillStoredBackJavascriptInterfaceTest {
         whenever(autofillStore.getCredentials(any())).thenReturn(listOf(LoginCredentials(0, "example.com", "username", "password")))
         initiateGetAutofillDataRequest()
         assertCredentialsAvailable()
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypeUsernameAndNoEntriesThenNoCredentialsCallbackInvoked() = runTest {
+        setupRequestForSubTypeUsername()
+        whenever(autofillStore.getCredentials(any())).thenReturn(emptyList())
+        initiateGetAutofillDataRequest()
+        assertCredentialsUnavailable()
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypeUsernameAndNoEntriesWithAUsernameThenNoCredentialsCallbackInvoked() = runTest {
+        setupRequestForSubTypeUsername()
+        whenever(autofillStore.getCredentials(any())).thenReturn(
+            listOf(
+                loginCredential(username = null, password = "foo"),
+                loginCredential(username = null, password = "bar")
+            )
+        )
+        initiateGetAutofillDataRequest()
+        assertCredentialsUnavailable()
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypeUsernameAndSingleEntryWithAUsernameThenCredentialsAvailableCallbackInvoked() = runTest {
+        setupRequestForSubTypeUsername()
+        whenever(autofillStore.getCredentials(any())).thenReturn(
+            listOf(
+                loginCredential(username = null, password = "foo"),
+                loginCredential(username = null, password = "bar"),
+                loginCredential(username = "foo", password = "bar")
+            )
+        )
+        initiateGetAutofillDataRequest()
+        assertCredentialsAvailable()
+        assertCredentialsContains({ it.username }, "foo")
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypeUsernameAndMultipleEntriesWithAUsernameThenCredentialsAvailableCallbackInvoked() = runTest {
+        setupRequestForSubTypeUsername()
+        whenever(autofillStore.getCredentials(any())).thenReturn(
+            listOf(
+                loginCredential(username = null, password = "foo"),
+                loginCredential(username = "username1", password = "bar"),
+                loginCredential(username = null, password = "bar"),
+                loginCredential(username = null, password = "bar"),
+                loginCredential(username = "username2", password = null),
+            )
+        )
+        initiateGetAutofillDataRequest()
+        assertCredentialsAvailable()
+        assertCredentialsContains({ it.username }, "username1", "username2")
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypePasswordAndNoEntriesThenNoCredentialsCallbackInvoked() = runTest {
+        setupRequestForSubTypePassword()
+        initiateGetAutofillDataRequest()
+        whenever(autofillStore.getCredentials(any())).thenReturn(emptyList())
+        assertCredentialsUnavailable()
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypePasswordAndNoEntriesWithAPasswordThenNoCredentialsCallbackInvoked() = runTest {
+        setupRequestForSubTypePassword()
+        whenever(autofillStore.getCredentials(any())).thenReturn(
+            listOf(
+                loginCredential(username = "foo", password = null),
+                loginCredential(username = "bar", password = null)
+            )
+        )
+        initiateGetAutofillDataRequest()
+        assertCredentialsUnavailable()
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypePasswordAndSingleEntryWithAPasswordThenCredentialsAvailableCallbackInvoked() = runTest {
+        setupRequestForSubTypePassword()
+        whenever(autofillStore.getCredentials(any())).thenReturn(
+            listOf(
+                loginCredential(username = null, password = null),
+                loginCredential(username = "foobar", password = null),
+                loginCredential(username = "foo", password = "bar")
+            )
+        )
+        initiateGetAutofillDataRequest()
+        assertCredentialsAvailable()
+        assertCredentialsContains({ it.password }, "bar")
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypePasswordAndMultipleEntriesWithAPasswordThenCredentialsAvailableCallbackInvoked() = runTest {
+        setupRequestForSubTypePassword()
+        whenever(autofillStore.getCredentials(any())).thenReturn(
+            listOf(
+                loginCredential(username = null, password = null),
+                loginCredential(username = "username2", password = null),
+                loginCredential(username = "username1", password = "password1"),
+                loginCredential(username = null, password = "password2"),
+                loginCredential(username = null, password = "password3"),
+
+            )
+        )
+        initiateGetAutofillDataRequest()
+        assertCredentialsAvailable()
+        assertCredentialsContains({ it.password }, "password1", "password2", "password3")
+    }
+
+    private fun assertCredentialsContains(property: (LoginCredentials) -> String?, vararg expected: String?) {
+        val numberExpected = expected.size
+        val numberMatched = TestCallback.credentials?.filter { expected.contains(property(it)) }?.count()
+        assertEquals("Wrong number of matched properties. Expected $numberExpected but found $numberMatched", numberExpected, numberMatched)
+    }
+
+    private fun loginCredential(username: String?, password: String?) = LoginCredentials(0, "example.com", username, password)
+
+    private suspend fun setupRequestForSubTypeUsername() {
+        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(AutofillDataRequest(CREDENTIALS, USERNAME))
+    }
+
+    private suspend fun setupRequestForSubTypePassword() {
+        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(AutofillDataRequest(CREDENTIALS, PASSWORD))
     }
 
     private fun assertCredentialsUnavailable() {
