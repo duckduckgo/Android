@@ -146,8 +146,13 @@ class DefaultScanner {
         const previouslyFoundParent = [...this.forms.keys()].find((form) => form.contains(parentForm))
 
         if (previouslyFoundParent) {
-            // If we've already met the form or a descendant, add the input
-            this.forms.get(previouslyFoundParent)?.addInput(input)
+            if (parentForm instanceof HTMLFormElement && parentForm !== previouslyFoundParent) {
+                // If we had a prior parent but this is an explicit form, the previous was a false positive
+                this.forms.delete(previouslyFoundParent)
+            } else {
+                // If we've already met the form or a descendant, add the input
+                this.forms.get(previouslyFoundParent)?.addInput(input)
+            }
         } else {
             // if this form is an ancestor of an existing form, remove that before adding this
             const childForm = [...this.forms.keys()].find((form) => parentForm.contains(form))
