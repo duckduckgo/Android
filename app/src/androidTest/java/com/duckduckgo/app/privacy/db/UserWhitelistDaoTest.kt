@@ -22,7 +22,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking

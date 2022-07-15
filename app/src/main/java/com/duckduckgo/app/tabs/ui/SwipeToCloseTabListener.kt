@@ -20,7 +20,7 @@ import android.graphics.Canvas
 import androidx.core.math.MathUtils
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.browser.api.tabs.TabEntity
+import com.duckduckgo.app.tabs.model.TabEntity
 import kotlin.math.abs
 
 class SwipeToCloseTabListener(

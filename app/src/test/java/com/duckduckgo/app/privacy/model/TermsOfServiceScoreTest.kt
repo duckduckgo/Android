@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.privacy.model
 
-import com.duckduckgo.site.api.TermsOfService
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

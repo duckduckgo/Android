@@ -18,7 +18,7 @@ package com.duckduckgo.app.privacy.renderer
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.site.api.PrivacyGrade
+import com.duckduckgo.app.privacy.model.PrivacyGrade
 
 class PrivacyUpgradeRenderer {
 

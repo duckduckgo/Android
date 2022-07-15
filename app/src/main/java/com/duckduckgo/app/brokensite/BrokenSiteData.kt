@@ -18,7 +18,7 @@ package com.duckduckgo.app.brokensite
 
 import android.net.Uri
 import com.duckduckgo.app.global.baseHost
-import com.duckduckgo.site.api.Site
+import com.duckduckgo.app.global.model.Site
 
 data class BrokenSiteData(
     val url: String,

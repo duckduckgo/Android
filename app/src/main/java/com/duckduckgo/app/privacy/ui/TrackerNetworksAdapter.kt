@@ -28,8 +28,8 @@ import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
-import com.duckduckgo.site.api.Entity
-import com.duckduckgo.site.api.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.Theming
 import java.util.*

@@ -47,7 +47,7 @@ import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.privacy.db.*
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
-import com.duckduckgo.browser.api.allowlist.UserWhitelistedDomain
+import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper
 import com.duckduckgo.app.statistics.model.PixelEntity
@@ -56,7 +56,7 @@ import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
-import com.duckduckgo.browser.api.tabs.TabEntity
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.app.trackerdetection.db.*
 import com.duckduckgo.app.trackerdetection.model.*
@@ -64,7 +64,6 @@ import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
-import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
 
 @Database(
     exportSchema = true, version = 43,

@@ -22,10 +22,9 @@ import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.uri.removeSubdomain
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
-import com.duckduckgo.site.api.Entity
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.site.api.EntityLookup
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 

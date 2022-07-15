@@ -19,7 +19,7 @@ package com.duckduckgo.app.tabs.db
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.duckduckgo.browser.api.tabs.TabRepository
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

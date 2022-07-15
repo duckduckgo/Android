@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.surrogates
 
-import com.duckduckgo.site.api.SurrogateResponse
-
 interface ResourceSurrogates {
     fun loadSurrogates(urls: List<SurrogateResponse>)
     fun get(scriptId: String): SurrogateResponse

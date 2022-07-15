@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.surrogates
 
-import com.duckduckgo.site.api.SurrogateResponse
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

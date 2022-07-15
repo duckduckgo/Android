@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.tabs.ui
 
-import com.duckduckgo.browser.api.tabs.TabEntity
+import com.duckduckgo.app.tabs.model.TabEntity
 
 interface TabSwitcherListener {
     fun onNewTabRequested()

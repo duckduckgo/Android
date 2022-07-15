@@ -22,8 +22,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
-import com.duckduckgo.browser.api.tabs.TabEntity
-import com.duckduckgo.browser.api.tabs.TabRepository
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi

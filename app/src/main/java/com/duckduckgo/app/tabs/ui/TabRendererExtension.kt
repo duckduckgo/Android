@@ -20,8 +20,8 @@ import android.content.Context
 import android.net.Uri
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.browser.api.tabs.TabEntity
-import com.duckduckgo.browser.api.tabs.isBlank
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.isBlank
 
 fun TabEntity.displayTitle(context: Context): String {
     if (isBlank) {

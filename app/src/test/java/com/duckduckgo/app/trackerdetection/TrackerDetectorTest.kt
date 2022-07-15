@@ -17,15 +17,14 @@
 package com.duckduckgo.app.trackerdetection
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
-import com.duckduckgo.site.api.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.duckduckgo.site.api.EntityLookup
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.junit.Assert.*

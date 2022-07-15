@@ -30,7 +30,7 @@ import com.duckduckgo.app.browser.databinding.EditWhitelistBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.browser.api.allowlist.UserWhitelistedDomain
+import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding

@@ -22,12 +22,12 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.baseHost
-import com.duckduckgo.site.api.Site
-import com.duckduckgo.site.api.domain
-import com.duckduckgo.browser.api.tabs.TabRepository
-import com.duckduckgo.site.api.Entity
+import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.domain
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
-import com.duckduckgo.site.api.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.*
 import java.util.*

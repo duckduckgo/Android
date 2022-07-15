@@ -19,7 +19,6 @@ package com.duckduckgo.app.privacy.model
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.privacy.model.PredefinedGradeDataJsonConverter.GradeTestCase
 import com.duckduckgo.app.privacy.model.PredefinedGradeDataJsonConverter.JsonGradeTestCase
-import com.duckduckgo.site.api.Grade
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Test

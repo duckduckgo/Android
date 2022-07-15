@@ -38,7 +38,7 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
-import com.duckduckgo.site.api.Entity
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.mobile.android.R as CommonR
 
 interface TrackersAnimatorListener {

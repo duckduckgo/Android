@@ -36,12 +36,12 @@ import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import com.duckduckgo.app.trackerdetection.Client
-import com.duckduckgo.site.api.EntityLookup
+import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsClient
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.TrackerDetector

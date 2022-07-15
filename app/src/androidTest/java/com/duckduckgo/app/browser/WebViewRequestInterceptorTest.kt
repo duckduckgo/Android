@@ -31,9 +31,9 @@ import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
-import com.duckduckgo.site.api.SurrogateResponse
+import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.TrackerDetector
-import com.duckduckgo.site.api.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.UserAgent

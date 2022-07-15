@@ -98,7 +98,7 @@ import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
-import com.duckduckgo.site.api.orderedTrackingEntities
+import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.DaxDialog
 import com.duckduckgo.app.global.view.DaxDialogListener
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
@@ -122,7 +122,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
-import com.duckduckgo.browser.api.tabs.TabEntity
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme

@@ -22,11 +22,11 @@ import androidx.lifecycle.MutableLiveData
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
-import com.duckduckgo.site.api.Site
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.POOR
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
-import com.duckduckgo.browser.api.tabs.TabRepository
+import com.duckduckgo.app.tabs.model.TabRepository
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever

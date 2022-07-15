@@ -18,7 +18,7 @@ package com.duckduckgo.app.privacy.renderer
 
 import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.site.api.PrivacyGrade
+import com.duckduckgo.app.privacy.model.PrivacyGrade
 
 @DrawableRes
 fun PrivacyGrade?.icon(): Int {

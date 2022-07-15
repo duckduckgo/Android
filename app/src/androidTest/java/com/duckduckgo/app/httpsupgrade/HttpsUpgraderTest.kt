@@ -18,7 +18,7 @@ package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
-import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName

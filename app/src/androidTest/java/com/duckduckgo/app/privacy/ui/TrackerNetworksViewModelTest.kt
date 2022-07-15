@@ -22,10 +22,10 @@ import androidx.lifecycle.MutableLiveData
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
-import com.duckduckgo.site.api.Site
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.browser.api.tabs.TabRepository
-import com.duckduckgo.site.api.TrackingEvent
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever

@@ -33,7 +33,7 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.privacy.renderer.*
-import com.duckduckgo.browser.api.tabs.tabId
+import com.duckduckgo.app.tabs.tabId
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.launch

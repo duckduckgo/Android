@@ -17,10 +17,10 @@
 package com.duckduckgo.app.brokensite
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.site.api.Site
-import com.duckduckgo.site.impl.SiteMonitor
-import com.duckduckgo.site.api.SurrogateResponse
-import com.duckduckgo.site.api.TrackingEvent
+import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.SiteMonitor
+import com.duckduckgo.app.surrogates.SurrogateResponse
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -131,7 +131,7 @@ class BrokenSiteDataTest {
         url: String,
         httpsUpgraded: Boolean = false
     ): Site {
-        return com.duckduckgo.site.impl.SiteMonitor(url, "", upgradedHttps = httpsUpgraded)
+        return SiteMonitor(url, "", upgradedHttps = httpsUpgraded)
     }
 
     companion object {

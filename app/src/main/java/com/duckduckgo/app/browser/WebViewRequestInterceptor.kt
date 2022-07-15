@@ -28,7 +28,7 @@ import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.TrackerDetector
-import com.duckduckgo.site.api.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.Gpc
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

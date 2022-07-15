@@ -17,8 +17,8 @@
 package com.duckduckgo.app.privacy.ui
 
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.site.api.Entity
-import com.duckduckgo.site.api.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.*
