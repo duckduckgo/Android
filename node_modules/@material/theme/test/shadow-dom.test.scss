@@ -1,0 +1,41 @@
+@use 'sass:selector';
+@use '../selector-ext';
+@use '../shadow-dom';
+
+:host,
+:host(:not(.hidden)[outlined]),
+:host .my-class,
+gm-fab {
+  @include shadow-dom.host-aware(selector.append(&, '[lowered]')) {
+    color: blue;
+
+    @include shadow-dom.host-aware(selector.append(&, ':hover')) {
+      background-color: red;
+    }
+  }
+
+  @include shadow-dom.host-aware(selector.append(&, ':focus'), &) {
+    border-color: green;
+  }
+}
+
+/* Test replacement for deprecated shadow-dom.host-aware() */
+:host,
+:host(:not(.hidden)[outlined]),
+:host .my-class,
+gm-fab {
+  @include selector-ext.append-strict(&, '[lowered]') {
+    color: blue;
+
+    @include selector-ext.append-strict(&, ':hover') {
+      background-color: red;
+    }
+  }
+
+  @at-root {
+    #{selector-ext.append-strict(&, ':focus')},
+    & {
+      border-color: green;
+    }
+  }
+}

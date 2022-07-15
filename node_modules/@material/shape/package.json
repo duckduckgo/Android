@@ -1,0 +1,27 @@
+{
+  "name": "@material/shape",
+  "description": "Shape utilities for Material Components for the web",
+  "version": "14.0.0",
+  "license": "MIT",
+  "keywords": [
+    "material components",
+    "material design",
+    "shape"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/material-components/material-components-web.git",
+    "directory": "packages/mdc-shape"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "dependencies": {
+    "@material/feature-targeting": "^14.0.0",
+    "@material/rtl": "^14.0.0",
+    "@material/theme": "^14.0.0",
+    "tslib": "^2.1.0"
+  },
+  "gitHead": "432c815e58d61a257742836f816cf95e271e6ea1"
+}

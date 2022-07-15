@@ -1,0 +1,22 @@
+@use "@material/theme" with (
+  $primary: #678FFF,
+  $secondary: rgba(#678FFF, 0.38),
+);
+@use "@material/switch/styles";
+@use "@material/ripple";
+
+.material-design-ripple {
+    @include ripple.surface;
+    @include ripple.radius-bounded;
+    @include ripple.states;
+}
+
+.body--theme-light .material-design-ripple {
+  @include ripple.states-base-color(black);
+  @include ripple.states-opacities((hover: 0, focus: .08, press: .08));
+}
+
+.body--theme-dark .material-design-ripple {
+  @include ripple.states-base-color(white);
+  @include ripple.states-opacities((hover: 0, focus: .30, press: .30));
+}

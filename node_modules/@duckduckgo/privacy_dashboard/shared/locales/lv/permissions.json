@@ -1,0 +1,43 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "camera" : {
+    "title" : "Kamera",
+    "note" : "Camera permission is used by the browser to ask the user for access to computer or phone camera"
+  },
+  "microphone" : {
+    "title" : "Mikrofons",
+    "note" : "Microphone permission is used by the browser to ask the user for access to computer or phone microphone"
+  },
+  "geolocation" : {
+    "title" : "Ģeolokācija",
+    "note" : "Geolocation permission is used by the browser to ask the user to share their current location with the website"
+  },
+  "popups" : {
+    "title" : "Uznirstošie logi",
+    "note" : "Pop-ups permission is used by the browser to ask the user to allow the website to open new windows"
+  },
+  "ask" : {
+    "title" : "Jautāt katru reizi",
+    "note" : "A permission setting that specifies the user should be asked each time the website wants to use a given permission"
+  },
+  "notify" : {
+    "title" : "Paziņot",
+    "note" : "A permission setting that specifies the user should be notified each time the website wants to use a given permission"
+  },
+  "grant" : {
+    "title" : "Vienmēr atļaut",
+    "note" : "A permission setting that allows the website to always use this permission without asking"
+  },
+  "deny" : {
+    "title" : "Vienmēr liegt",
+    "note" : "A permission setting that always blocks the website from using this permission"
+  }
+}

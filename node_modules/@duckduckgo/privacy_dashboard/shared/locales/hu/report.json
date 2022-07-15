@@ -1,0 +1,75 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "selectTheOptionDesc" : {
+    "title" : "Válaszd ki azt a lehetőséget, amelyik a legjobban leírja a tapasztalt problémát.",
+    "note" : "The user will see this UI when they're running into issues with a given website, that we may be causing"
+  },
+  "pickYourIssueFromTheList" : {
+    "title" : "Válaszd ki a problémát a listából…",
+    "note" : "Asks the user to pick a specific list from the pulldown"
+  },
+  "videos" : {
+    "title" : "A videót nem játszotta le",
+    "note" : "User is reporting this page because a video didn't play"
+  },
+  "images" : {
+    "title" : "A képek nem töltődtek be",
+    "note" : "User is reporting this page because one or more images did not load"
+  },
+  "comments" : {
+    "title" : "A megjegyzések nem töltődtek be",
+    "note" : "User is reporting this page because one or more comments did not load"
+  },
+  "content" : {
+    "title" : "Hiányzik a tartalom",
+    "note" : "User is reporting this page because some other type of content did not load"
+  },
+  "links" : {
+    "title" : "A hivatkozások vagy a gombok nem működnek",
+    "note" : "User is reporting this page because one or more links or buttons did not work when clicked"
+  },
+  "login" : {
+    "title" : "Nem tudok bejelentkezni",
+    "note" : "User is reporting this page because they are unable to log into the website"
+  },
+  "paywall" : {
+    "title" : "A webhely kérte tőlem a letiltást",
+    "note" : "User is reporting this page asked them to disable their privacy or ad blocking extension"
+  },
+  "other" : {
+    "title" : "Valami más",
+    "note" : "User is reporting this page because of some other reason than the ones we listed"
+  },
+  "reportBrokenSite" : {
+    "title" : "Hibás weboldal jelentése",
+    "note" : "Title for reporting broken website view"
+  },
+  "tellUsMoreDesc" : {
+    "title" : "Ha szeretnéd, írd le részletesebben a problémát",
+    "note" : "A hint for a text box that lets user enter free text to describe their problem"
+  },
+  "sendReport" : {
+    "title" : "Jelentés küldése",
+    "note" : "Button for submitting report"
+  },
+  "reportsAreAnonymousDesc" : {
+    "title" : "A DuckDuckGónak küldött jelentések 100%-ban névtelenek, és csak a fenti választást, az opcionális leírást, az URL-címet és a webhelyen talált nyomkövetők listáját tartalmazzák.",
+    "note" : "A small disclaimer at the bottom of the view describing what is included in the report"
+  },
+  "thankYou" : {
+    "title" : "Köszönjük!",
+    "note" : "Title for what the user sees upon submitting the report"
+  },
+  "yourReportWillHelpDesc" : {
+    "title" : "A jelentésed alapján tökéletesíthetjük a böngészőt, és jobb élményt nyújthatunk másoknak.",
+    "note" : "Body that the user sees upon submitting the report"
+  }
+}

@@ -1,0 +1,53 @@
+.status-list--right {
+  .status-list__item {
+    padding-left: 0;
+    padding-right: 40px;
+
+    &:before {
+      left: auto;
+      right: 0;
+    }
+  }
+}
+
+.status-list__item {
+    padding-left: 40px;
+    list-style-type: none;
+    line-height: 22px;
+    margin-bottom: 23px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    &:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        height: 20px;
+        width: 23px;
+        top: -1px;
+        background-repeat: no-repeat;
+        background-position-y: center;
+
+        // doing the height this way allows it to be centered for one-line items
+        // but flush with the top of the text for longer items
+        min-height: 22px;
+        max-height: 30px;
+    }
+}
+
+$statuses: ("good", "bad", "mixed");
+
+@each $status in $statuses {
+    .status-list__item--#{$status} {
+        &:before {
+            @include cross_platform_bg_image("status--#{$status}.svg");
+        }
+    }
+}
+
+/* privacy practices uses the modifier 'poor' */
+.status-list__item--poor:before {
+    @include cross_platform_bg_image("status--bad.svg");
+}

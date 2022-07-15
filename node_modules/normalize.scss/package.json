@@ -1,0 +1,16 @@
+{
+  "name": "normalize.scss",
+  "version": "0.1.0",
+  "description": "Normalize.scss as a node packaged module",
+  "style": "normalize.scss",
+  "files": [
+    "normalize.scss"
+  ],
+  "homepage": "https://github.com/guerrero/normalize.scss",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/guerrero/normalize.scss.git"
+  },
+  "author": ["Nicolas Gallagher","Alex Guerrero"],
+  "license": "MIT"
+}

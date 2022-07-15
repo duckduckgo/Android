@@ -1,0 +1,147 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "updatingProtectionList" : {
+    "title" : "Aggiornamento elenco delle protezioni",
+    "note" : "Message shown while updating the list of protections"
+  },
+  "protectionsDisabled" : {
+    "title" : "Le protezioni sono state <b>DISATTIVATE</b>",
+    "note" : "Headline when privacy protections are disabled"
+  },
+  "protectionsEnabled" : {
+    "title" : "Le protezioni sono <b>ATTIVATE</b> per questo sito",
+    "note" : "Headline when privacy protections are enabled"
+  },
+  "connectionDescriptionUnencrypted" : {
+    "title" : "Altri utenti potrebbero riuscire a intercettare le informazioni sensibili che vengono trasmesse.",
+    "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
+  },
+  "connectionDescriptionUpgraded" : {
+    "title" : "Abbiamo aggiornato la connessione di questa pagina per proteggere le informazioni inviate.",
+    "note" : "Shown when the connection has been upgraded from unencrypted to encrypted (HTTP to HTTPS)"
+  },
+  "connectionDescriptionEncrypted" : {
+    "title" : "La connessione di questa pagina è sicura e protegge le informazioni trasmesse.",
+    "note" : "Shown when the connection is encrypted (HTTPS not HTTP)"
+  },
+  "trackerNetworksSummaryNone" : {
+    "title" : "In questa pagina non è stata individuata alcuna azienda che cerca di tracciarti.",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerNetworksSummaryOwn" : {
+    "title" : "Abbiamo trovato solo sistemi di tracciamento di proprietà di {name}, che non abbiamo bloccato.",
+    "note" : "We found but did not block trackers from company named"
+  },
+  "trackerNetworksSummaryOther" : {
+    "title" : "In questa pagina abbiamo {isWhitelisted, select, true {trovato} other {bloccato}} {displayCount} {displayCount, plural, =1 {sistema di tracciamento noto} other {sistemi di tracciamento noti}} da {companyCount} {companyCount, plural, one {azienda} other {aziende}}.",
+    "note" : "This summarizes the number of trackers that we either blocked or did not block (depending on the protection setting for this site)"
+  },
+  "websiteNotWorkingQ" : {
+    "title" : "Il sito web non funziona come dovrebbe?",
+    "note" : "Call to action for user to click if they are having issues with this web page"
+  },
+  "takePrecautions" : {
+    "title" : "Adotta le dovute precauzioni",
+    "note" : "Title shown when the page is unencrypted"
+  },
+  "protectionsAreDisabled" : {
+    "title" : "Le protezioni sono DISATTIVATE",
+    "note" : "Shown when user has disabled protections for this site (or they have been programatically disabled)"
+  },
+  "foundCompanyNamesList" : {
+    "title" : "{companyCount, plural, =0 {In questa pagina abbiamo trovato alcune aziende che effettuano il tracciamento e la profilazione dell'utente.} =2 {È stato rilevato che {firstCompany} e {secondCompany} stanno effettuando il tracciamento e la profilazione dell'utente su questa pagina.} one {È stato rilevato che {firstCompany} sta effettuando il tracciamento e la profilazione dell'utente su questa pagina.} other {È stato rilevato che {firstCompany}, {secondCompany} e altre aziende stanno effettuando il tracciamento e la profilazione dell'utente su questa pagina.}}",
+    "note" : "Returns a string in the form of 'We found CompanyA, CompanyB and others tracking and profiling you on this page.'"
+  },
+  "majorTrackerNetwork" : {
+    "title" : "Reti di sistemi di tracciamento",
+    "note" : "Tracker network is a group of trackers, usually in the form of a company name, that track users across websites"
+  },
+  "majorTrackingNetworkDesc" : {
+    "title" : "{companyDisplayName} (proprietaria di {domain})\ntraccia la tua attività tramite il {companyPrevalence}% dei migliori siti.\nNon possiamo impedirle di accedere ai siti di cui è titolare, ma possiamo intervenire su altre pagine.",
+    "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
+  },
+  "noActivityToReport" : {
+    "title" : "Nessuna attività da segnalare",
+    "note" : "Title when we did not find any trackers on this page"
+  },
+  "trackersBlocked" : {
+    "title" : "Aziende bloccate",
+    "note" : "Title for the list of companies that we blocked"
+  },
+  "trackersBlockedDesc" : {
+    "title" : "{companyCount, plural, =0 {Abbiamo impedito il tentativo di tracciamento da parte di alcune aziende.} =2 {Abbiamo impedito il tentativo di tracciamento da parte di {firstCompany} e {secondCompany}.} one {Abbiamo impedito il tentativo di tracciamento da parte di {firstCompany}.} other {Abbiamo impedito il tentativo di tracciamento da parte di {firstCompany}, {secondCompany} e altre aziende.}}",
+    "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
+  },
+  "cookiesMinimized" : {
+    "title" : "Cookie ridotti al minimo",
+    "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedDesc" : {
+    "title" : "Abbiamo configurato le preferenze dei cookie in modo da massimizzare la privacy e abbiamo chiuso il pop-up di consenso.",
+    "note" : "Description for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "connectionSecure" : {
+    "title" : "La connessione è sicura",
+    "note" : "The connection to the website is secure (HTTPS)"
+  },
+  "connectionNotSecure" : {
+    "title" : "Impossibile proteggere la connessione",
+    "note" : "The connection is not secure (HTTP)"
+  },
+  "trackerNetworksDesc" : {
+    "title" : "{blocked, select, true {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} rete di tracciamento principale bloccata} other {{trackerCount} reti di tracciamento principali bloccate}}} other {{trackerCount, plural, one {{trackerCount} sistema di tracciamento bloccato} other {{trackerCount} sistemi di tracciamento bloccati}}}}} other {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} rete di tracciamento principale rilevata} other {{trackerCount} reti di tracciamento principali rilevate}}} other {{trackerCount, plural, one {{trackerCount} sistema di tracciamento rilevato} other {{trackerCount} sistemi di tracciamento rilevati}}}}}}",
+    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+  },
+  "firstPartyDesc" : {
+    "title" : "{companyName} è proprietaria di questo sito e dei sistemi di tracciamento noti presenti in questa pagina, pertanto non li abbiamo bloccati.",
+    "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
+  },
+  "trackersFoundForAllowlisted" : {
+    "title" : "I sistemi di tracciamento consentono alle aziende di tracciare un profilo dell'utente. In questa pagina sono presenti queste aziende che monitorano la tua attività.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections disabled"
+  },
+  "trackersFoundAndBlocked" : {
+    "title" : "I sistemi di tracciamento consentono alle aziende di tracciare un profilo dell'utente. Abbiamo impedito a queste aziende di monitorare la tua attività su questa pagina.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections enabled"
+  },
+  "trackerNetworkUnknown" : {
+    "title" : "Rete di sistemi di tracciamento sconosciuta",
+    "note" : "Shown when we don't have a company name for a given tracker"
+  },
+  "trackerDomainsForCompany" : {
+    "title" : "Domini di sistemi di tracciamento per {companyName}",
+    "note" : "Title for the list of tracker domains detected from a given company"
+  },
+  "zeroTrackersFound" : {
+    "title" : "0 sistemi di tracciamento trovati",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerOwnedByThisSite" : {
+    "title" : "Sistemi di tracciamento appartenenti a questo sito (consentiti)",
+    "note" : "Trackers owned by this site are not blocked"
+  },
+  "trackerCountForDomain" : {
+    "title" : "{blocked, select, true {{trackerCount, plural, one {{trackerCount} sistema di tracciamento bloccato su {domain}} other {{trackerCount} sistemi di tracciamento bloccati su {domain}}}} other {{trackerCount, plural, one {{trackerCount} sistema di tracciamento trovato su {domain}} other {{trackerCount} sistemi di tracciamento trovati su {domain}}}}}",
+    "note" : "For a given domain, the count of trackers either blocked or just detected (found).  Ex 4 Trackers Blocked"
+  },
+  "analyticsCategory" : {
+    "title" : "Analisi",
+    "note" : "Used to describe the type of tracker, in this case one that is used to report analytics back to the site owner"
+  },
+  "advertisingCategory" : {
+    "title" : "Pubblicità",
+    "note" : "Used to describe the type of tracker, in this case one that is used for advertising"
+  },
+  "socialCategory" : {
+    "title" : "Social Network",
+    "note" : "Used to describe the type of tracker, in this case one that is used by one of the popular social networksr"
+  }
+}

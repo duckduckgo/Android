@@ -1,0 +1,15 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "trackers" : {
+    "title" : "Sistemi di tracciamento",
+    "note" : "Trackers are a pieces of code on a website that monitors users as they navigate the web"
+  }
+}

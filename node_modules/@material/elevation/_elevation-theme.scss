@@ -1,0 +1,477 @@
+//
+// Copyright 2017 Google Inc.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+// stylelint-disable selector-class-pattern --
+// Selector '.mdc-*' should only be used in this project.
+
+@use 'sass:map';
+@use 'sass:math';
+@use 'sass:meta';
+@use '@material/animation/variables' as animation-variables;
+@use '@material/theme/custom-properties';
+@use '@material/base/mixins' as base-mixins;
+@use '@material/feature-targeting/feature-targeting';
+@use '@material/rtl/rtl';
+@use '@material/theme/css';
+@use '@material/theme/theme';
+@use '@material/theme/theme-color';
+
+$baseline-color: black !default;
+$umbra-opacity: 0.2 !default;
+$penumbra-opacity: 0.14 !default;
+$ambient-opacity: 0.12 !default;
+
+$umbra-map: (
+  0: '0px 0px 0px 0px',
+  1: '0px 2px 1px -1px',
+  2: '0px 3px 1px -2px',
+  3: '0px 3px 3px -2px',
+  4: '0px 2px 4px -1px',
+  5: '0px 3px 5px -1px',
+  6: '0px 3px 5px -1px',
+  7: '0px 4px 5px -2px',
+  8: '0px 5px 5px -3px',
+  9: '0px 5px 6px -3px',
+  10: '0px 6px 6px -3px',
+  11: '0px 6px 7px -4px',
+  12: '0px 7px 8px -4px',
+  13: '0px 7px 8px -4px',
+  14: '0px 7px 9px -4px',
+  15: '0px 8px 9px -5px',
+  16: '0px 8px 10px -5px',
+  17: '0px 8px 11px -5px',
+  18: '0px 9px 11px -5px',
+  19: '0px 9px 12px -6px',
+  20: '0px 10px 13px -6px',
+  21: '0px 10px 13px -6px',
+  22: '0px 10px 14px -6px',
+  23: '0px 11px 14px -7px',
+  24: '0px 11px 15px -7px',
+) !default;
+
+$penumbra-map: (
+  0: '0px 0px 0px 0px',
+  1: '0px 1px 1px 0px',
+  2: '0px 2px 2px 0px',
+  3: '0px 3px 4px 0px',
+  4: '0px 4px 5px 0px',
+  5: '0px 5px 8px 0px',
+  6: '0px 6px 10px 0px',
+  7: '0px 7px 10px 1px',
+  8: '0px 8px 10px 1px',
+  9: '0px 9px 12px 1px',
+  10: '0px 10px 14px 1px',
+  11: '0px 11px 15px 1px',
+  12: '0px 12px 17px 2px',
+  13: '0px 13px 19px 2px',
+  14: '0px 14px 21px 2px',
+  15: '0px 15px 22px 2px',
+  16: '0px 16px 24px 2px',
+  17: '0px 17px 26px 2px',
+  18: '0px 18px 28px 2px',
+  19: '0px 19px 29px 2px',
+  20: '0px 20px 31px 3px',
+  21: '0px 21px 33px 3px',
+  22: '0px 22px 35px 3px',
+  23: '0px 23px 36px 3px',
+  24: '0px 24px 38px 3px',
+) !default;
+
+$ambient-map: (
+  0: '0px 0px 0px 0px',
+  1: '0px 1px 3px 0px',
+  2: '0px 1px 5px 0px',
+  3: '0px 1px 8px 0px',
+  4: '0px 1px 10px 0px',
+  5: '0px 1px 14px 0px',
+  6: '0px 1px 18px 0px',
+  7: '0px 2px 16px 1px',
+  8: '0px 3px 14px 2px',
+  9: '0px 3px 16px 2px',
+  10: '0px 4px 18px 3px',
+  11: '0px 4px 20px 3px',
+  12: '0px 5px 22px 4px',
+  13: '0px 5px 24px 4px',
+  14: '0px 5px 26px 4px',
+  15: '0px 6px 28px 5px',
+  16: '0px 6px 30px 5px',
+  17: '0px 6px 32px 5px',
+  18: '0px 7px 34px 6px',
+  19: '0px 7px 36px 6px',
+  20: '0px 8px 38px 7px',
+  21: '0px 8px 40px 7px',
+  22: '0px 8px 42px 7px',
+  23: '0px 9px 44px 8px',
+  24: '0px 9px 46px 8px',
+) !default;
+
+// The css property used for elevation. In most cases this should not be changed. It is exposed
+// as a variable for abstraction / easy use when needing to reference the property directly, for
+// example in a `will-change` rule.
+$property: box-shadow !default;
+
+// The default color for the elevation overlay.
+$overlay-color: #fff;
+
+// The css property used for elevation overlay transitions. In most cases this should not be changed. It is exposed
+// as a variable for abstraction / easy use when needing to reference the property directly, for
+// example in a `will-change` rule.
+$overlay-property: opacity !default;
+
+// The default duration value for elevation transitions.
+$transition-duration: 280ms !default;
+
+// The default easing value for elevation transitions.
+$transition-timing-function: animation-variables.$standard-curve-timing-function !default;
+
+///
+/// Sets the elevation transition value.
+///
+/// @param {String} $duration - The duration of the transition.
+/// @param {String} $easing - The easing function for the transition.
+/// @return {String}
+///
+@function transition-value(
+  $duration: $transition-duration,
+  $easing: $transition-timing-function
+) {
+  @return #{$property} #{$duration} #{$easing};
+}
+
+///
+/// Sets the elevation overlay transition value.
+///
+/// @param {String} $duration - The duration of the transition.
+/// @param {String} $easing - The easing function for the transition.
+/// @return {String}
+///
+@function overlay-transition-value(
+  $duration: $transition-duration,
+  $easing: $transition-timing-function
+) {
+  @return #{$overlay-property} #{$duration} #{$easing};
+}
+
+///
+/// Creates a box-shadow from the Material elevation system.
+/// @param {Number} $level - the level of the Material elevation system.
+/// @param {String} $color - the color of the shadow.
+/// @param {Number} $opacity-boost [0] - optional opacity boost for the shadow.
+/// @return {List} the complete box shadow.
+///
+@function _box-shadow($level, $color, $opacity-boost: 0) {
+  $color: theme-color.prop-value($color);
+  $umbra-z-value: map.get($umbra-map, $level);
+  $penumbra-z-value: map.get($penumbra-map, $level);
+  $ambient-z-value: map.get($ambient-map, $level);
+
+  $umbra-color: rgba($color, $umbra-opacity + $opacity-boost);
+  $penumbra-color: rgba($color, $penumbra-opacity + $opacity-boost);
+  $ambient-color: rgba($color, $ambient-opacity + $opacity-boost);
+
+  @return (
+    #{'#{$umbra-z-value} #{$umbra-color}'},
+    #{'#{$penumbra-z-value} #{$penumbra-color}'},
+    #{$ambient-z-value} $ambient-color
+  );
+}
+
+// Returns the correct box-shadow specified by $z-value.
+// The $z-value must be between 0 and 24.
+// If $color has an alpha channel, it will be ignored and overridden. To increase the opacity of the shadow, use
+// $opacity-boost.
+@function elevation-box-shadow(
+  $z-value,
+  $color: $baseline-color,
+  $opacity-boost: 0
+) {
+  @if meta.type-of($z-value) != number or not math.is-unitless($z-value) {
+    @error "$z-value must be a unitless number, but received '#{$z-value}'";
+  }
+
+  @if $z-value < 0 or $z-value > 24 {
+    @error "$z-value must be between 0 and 24, but received '#{$z-value}'";
+  }
+
+  @return _box-shadow($z-value, $color, $opacity-boost);
+}
+
+///
+/// Returns a shadow or null if params are invalid.
+/// @param {Number} $level - the level of the Material elevation system.
+/// @param {String} $color - the color of the shadow.
+/// @return {List|null} the complete box shadow or null.
+///
+@function _shadow($level, $color) {
+  @if $level == null and $color == null {
+    // Do not emit a warning if both are null, which means the user did not
+    // provide tokens.
+    @return null;
+  }
+
+  @if $level == null or $color == null {
+    // If one of the tokens is null, emit a warning: the user may not realize
+    // that both are required.
+    @warn "both $level and $color are required; received $level: '#{$level}', $color: '#{$color}'";
+    @return null;
+  }
+
+  @if $level < 0 or $level > 24 {
+    @warn "$level must be between 0 and 24; received '#{$level}'";
+    @return null;
+  }
+
+  @return _box-shadow($level, $color);
+}
+
+@function get-elevation($level) {
+  @return (box-shadow: elevation-box-shadow($level));
+}
+
+///
+/// Sets the shadow of the element.
+///
+/// @param {String} $box-shadow - The shadow to apply to the element.
+///
+@mixin _box-shadow($shadow, $query: feature-targeting.all()) {
+  $feat-color: feature-targeting.create-target($query, color);
+
+  @include feature-targeting.targets($feat-color) {
+    @include theme.property(box-shadow, $shadow);
+  }
+}
+
+///
+/// Sets the shadow of the element.
+///
+/// @param {String} $box-shadow - The shadow to apply to the element.
+///
+@mixin shadow($box-shadow, $query: feature-targeting.all()) {
+  $feat-color: feature-targeting.create-target($query, color);
+
+  @include feature-targeting.targets($feat-color) {
+    @if custom-properties.is-custom-prop($box-shadow) {
+      // TODO(b/185188458): Use theme.property() once resolved.
+      $fallback: custom-properties.get-fallback($box-shadow);
+
+      // var(--<box-shadow-prop>, var(--m-elevation-box-shadow-for-gss))
+      $gss-custom-prop: custom-properties.create(
+        custom-properties.get-varname($box-shadow),
+        custom-properties.create(elevation-box-shadow-for-gss)
+      );
+
+      $value: custom-properties.create-var($gss-custom-prop);
+      @if $value == null {
+        // Custom properties are disabled, since $gss-custom-prop
+        // does not have a fallback. Avoid emitting two non-custom
+        // prop declarations by setting $fallback to null.
+        $value: $fallback;
+        $fallback: null;
+      }
+
+      @include custom-properties.declaration(
+        custom-properties.create(elevation-box-shadow-for-gss, $fallback)
+      );
+      @include css.declaration(box-shadow, $value, $fallback-value: $fallback);
+    } @else {
+      /* @alternate */
+      box-shadow: $box-shadow;
+    }
+  }
+}
+
+///
+/// Sets the elevation overlay surface required positioning.
+///
+@mixin overlay-surface-position($query: feature-targeting.all()) {
+  $feat-structure: feature-targeting.create-target($query, structure);
+
+  @include feature-targeting.targets($feat-structure) {
+    /* @alternate */
+    position: relative;
+  }
+}
+
+///
+/// Sets the dimensions of the elevation overlay, including positioning and sizing.
+///
+/// @param {Number} $width - The width of the elevation overlay
+/// @param {Number} [$height] - The height of the elevation overlay
+/// @param {Boolean} [$has-content-sizing] - Set to false if the container has no content sizing
+///
+@mixin overlay-dimensions(
+  $width,
+  $height: $width,
+  $has-content-sizing: true,
+  $query: feature-targeting.all()
+) {
+  $feat-structure: feature-targeting.create-target($query, structure);
+
+  .mdc-elevation-overlay {
+    @include feature-targeting.targets($feat-structure) {
+      @include theme.property(width, $width);
+      @include theme.property(height, $height);
+
+      @if $has-content-sizing {
+        top: 0;
+        @include rtl.ignore-next-line();
+        left: 0;
+      } @else {
+        top: 50%;
+        @include rtl.ignore-next-line();
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  }
+}
+
+///
+/// Sets the elevation overlay fill color.
+/// Expected to be called directly on the elevation overlay element.
+///
+/// @param {Color} $color - The color of the elevation overlay.
+///
+@mixin overlay-fill-color($color, $query: feature-targeting.all()) {
+  $feat-color: feature-targeting.create-target($query, color);
+
+  @include feature-targeting.targets($feat-color) {
+    @include theme.property(background-color, $color);
+  }
+}
+
+///
+/// Applies the given color to the container of the overlay.
+/// @param {color} $color - the color of the overlay container
+///
+@mixin overlay-container-color($color, $query: feature-targeting.all()) {
+  .mdc-elevation-overlay {
+    @include overlay-fill-color($color, $query: $query);
+  }
+}
+
+///
+/// Sets the elevation overlay opacity.
+/// Expected to be called from a parent element.
+///
+/// @param {Number} $opacity - The opacity of the elevation overlay.
+///
+@mixin overlay-opacity($opacity, $query: feature-targeting.all()) {
+  $feat-color: feature-targeting.create-target($query, color);
+
+  .mdc-elevation-overlay {
+    @include feature-targeting.targets($feat-color) {
+      @include theme.property(opacity, $opacity);
+    }
+  }
+}
+
+// Applies the correct CSS rules to an element to give it the elevation specified by $z-value.
+// The $z-value must be between 0 and 24.
+// If $color has an alpha channel, it will be ignored and overridden. To increase the opacity of the shadow, use
+// $opacity-boost.
+@mixin elevation(
+  $z-value,
+  $color: $baseline-color,
+  $opacity-boost: 0,
+  $query: feature-targeting.all()
+) {
+  $box-shadow: elevation-box-shadow(
+    $z-value,
+    $color: $color,
+    $opacity-boost: $opacity-boost
+  );
+
+  @include shadow($box-shadow, $query: $query);
+}
+
+///
+/// Represents the configurable values of the elevation theme.
+///
+$_theme-values: (
+  shadow: null,
+  overlay-opacity: null,
+  overlay-color: null,
+);
+
+///
+/// Applies the shadow theme with the given $resolver function.
+/// @param {Function} $resolver - a function that returns a valid theme config.
+///   @see resolver for an example and expected arguments and return value.
+/// Accepts the following optional keyword args:
+/// @param {Number} $elevation - the level in the elevation system.
+/// @param {String} $shadow-color - the color used for the shadow.
+///
+@mixin with-resolver($resolver, $query: feature-targeting.all(), $args...) {
+  @if $resolver {
+    @include _theme(meta.call($resolver, $args...), $query: $query);
+  }
+}
+
+///
+/// Applies the given theme with validation.
+/// @param {Map} $theme - @see $_theme-values for accepted theme properties.
+///
+@mixin theme($theme: (), $query: feature-targeting.all()) {
+  @include theme.validate-theme($_theme-values, $theme);
+  @include _theme($theme, $query: $query);
+}
+
+///
+/// Applies the given theme.
+/// @param {Map} $theme - @see $_theme-values for accepted theme properties.
+///
+@mixin _theme($theme: (), $query: feature-targeting.all()) {
+  @include shadow(map.get($theme, shadow), $query: $query);
+  @include overlay-opacity(map.get($theme, overlay-opacity), $query: $query);
+  @include overlay-container-color(
+    map.get($theme, overlay-color),
+    $query: $query
+  );
+}
+
+///
+/// Transforms the following optional parameters into a theme config.
+/// @param {Number} $elevation - the level of the elevation system in Material.
+/// @param {String} $shadow-color - the color to be used by the shadow.
+/// @return {Map} @see $_theme-values for accepted theme properties.
+///
+@function resolver($args...) {
+  $opts: meta.keywords($args);
+  $elevation: map.get($opts, elevation);
+  $shadow-color: map.get($opts, shadow-color);
+  @if custom-properties.is-custom-prop($elevation) {
+    @return _resolve-custom-props($elevation, $shadow-color);
+  }
+
+  @return (shadow: _shadow($elevation, $shadow-color));
+}
+
+@function _resolve-custom-props($elevation, $shadow-color) {
+  $fallback-dp: custom-properties.get-fallback($elevation);
+  $fallback-shadow-color: custom-properties.get-fallback($shadow-color);
+  $shadow: custom-properties.set-fallback(
+    $elevation,
+    _shadow($fallback-dp, $fallback-shadow-color)
+  );
+  @return (shadow: $shadow);
+}
