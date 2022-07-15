@@ -87,6 +87,28 @@ describe('Test the form class reading values correctly', () => {
             expValues: {credentials: undefined}
         },
         {
+            testCase: 'form with hidden email field',
+            form: `
+<form>
+    <input type="hidden" value="name@email.com" name="email" />
+    <input type="password" value="testPassword" autocomplete="new-password" />
+    <button type="submit">Sign up</button>
+</form>`,
+            expHasValues: true,
+            expValues: {credentials: {username: 'name@email.com', password: 'testPassword'}}
+        },
+        {
+            testCase: 'form with hidden username field',
+            form: `
+<form>
+    <input type="hidden" value="testUsername" name="username" />
+    <input type="password" value="testPassword" autocomplete="new-password" />
+    <button type="submit">Sign up</button>
+</form>`,
+            expHasValues: true,
+            expValues: {credentials: {username: 'testUsername', password: 'testPassword'}}
+        },
+        {
             testCase: 'complete checkout form',
             form: `
 <form method="post" id="usrForm">

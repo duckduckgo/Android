@@ -20,9 +20,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.WorkManager
-import com.duckduckgo.app.email.AppEmailManager
-import com.duckduckgo.app.email.AppEmailManager.FetchCodeResult.*
 import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.app.email.EmailManager.FetchCodeResult.CodeExisted
+import com.duckduckgo.app.email.EmailManager.FetchCodeResult.Code
+import com.duckduckgo.app.email.EmailManager.FetchCodeResult.NoCode
+import com.duckduckgo.app.email.EmailManager.WaitlistState
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.SchedulableNotification
@@ -46,7 +48,7 @@ class AppEmailWaitlistCodeFetcher(
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun executeWaitlistCodeFetcher() {
         appCoroutineScope.launch {
-            if (emailManager.waitlistState() is AppEmailManager.WaitlistState.JoinedQueue) {
+            if (emailManager.waitlistState() is WaitlistState.JoinedQueue) {
                 fetchInviteCode()
             }
         }

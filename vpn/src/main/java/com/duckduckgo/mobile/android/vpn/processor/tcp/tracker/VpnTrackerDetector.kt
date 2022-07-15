@@ -41,7 +41,8 @@ interface VpnTrackerDetector {
         packet: Packet,
         payloadBuffer: ByteBuffer,
         isLocalAddress: Boolean,
-        requestingApp: OriginatingApp
+        requestingApp: OriginatingApp,
+        hostname: String?
     ): RequestTrackerType
 }
 
@@ -60,7 +61,8 @@ class DomainBasedTrackerDetector(
         packet: Packet,
         payloadBuffer: ByteBuffer,
         isLocalAddress: Boolean,
-        requestingApp: OriginatingApp
+        requestingApp: OriginatingApp,
+        hostname: String?
     ): RequestTrackerType {
 
         if (isLocalAddress) {
@@ -71,8 +73,6 @@ class DomainBasedTrackerDetector(
             return RequestTrackerType.NotTracker(packet.ipHeader.destinationAddress.hostName)
         }
 
-        val payloadBytes = payloadBytesExtractor.extract(packet, payloadBuffer)
-        val hostname = hostnameExtractor.extract(tcb, payloadBytes)
         if (hostname == null) {
             Timber.w("Failed to determine if packet is a tracker as hostname not extracted %s", tcb.ipAndPort)
             return RequestTrackerType.Undetermined
@@ -106,6 +106,7 @@ class DomainBasedTrackerDetector(
                 } else {
                     tcb.trackerHostName = trackerHostname
 
+                    val payloadBytes = payloadBytesExtractor.extract(packet, payloadBuffer)
                     when (tlsContentTypeExtractor.isTlsApplicationData(payloadBytes)) {
                         Undetermined -> {
                             Timber.v("Unable to determine TLS content type, fallback to blocking as if it were application data %s", tcb.ipAndPort)

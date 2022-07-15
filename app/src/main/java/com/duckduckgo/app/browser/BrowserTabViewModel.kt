@@ -54,6 +54,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -83,9 +84,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.site.api.Site
-import com.duckduckgo.site.api.SiteFactory
-import com.duckduckgo.site.api.domain
 import com.duckduckgo.app.global.view.asLocationPermissionOrigin
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
@@ -94,8 +92,6 @@ import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
-import com.duckduckgo.site.api.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ALWAYS
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ASK_EVERY_TIME
@@ -103,26 +99,29 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
-import com.duckduckgo.site.api.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
-import com.duckduckgo.site.api.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.store.AutofillStore
+import com.duckduckgo.browser.api.allowlist.UserWhitelistDao
 import com.duckduckgo.browser.api.tabs.TabEntity
 import com.duckduckgo.browser.api.tabs.TabRepository
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.AmpLinks
-import com.duckduckgo.privacy.config.api.AmpLinkInfo
+import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.site.api.PrivacyGrade
+import com.duckduckgo.site.api.Site
+import com.duckduckgo.site.api.SiteFactory
+import com.duckduckgo.site.api.SurrogateResponse
+import com.duckduckgo.site.api.TrackingEvent
+import com.duckduckgo.site.api.domain
 import com.duckduckgo.site.api.domainMatchesUrl
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -175,13 +174,16 @@ class BrowserTabViewModel @Inject constructor(
     private val downloadCallback: DownloadCallback,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
+    private val autofillStore: AutofillStore,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     HttpAuthenticationListener,
     SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener,
     UrlExtractionListener,
+    AutofillCredentialsSelectionResultHandler.AutofillCredentialSaver,
+    AutofillCredentialsSelectionResultHandler.CredentialInjector,
     ViewModel(),
     NavigationHistoryListener {
 
@@ -430,6 +432,12 @@ class BrowserTabViewModel @Inject constructor(
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
 
+        class InjectCredentials(
+            val url: String,
+            val credentials: LoginCredentials
+        ) : Command()
+
+        class CancelIncomingAutofillRequest(val url: String) : Command()
         class EditWithSelectedQuery(val query: String) : Command()
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
         class NavigateToHistory(val historyStackIndex: Int) : Command()
@@ -2654,6 +2662,35 @@ class BrowserTabViewModel @Inject constructor(
             initialUrl
         }
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
+    }
+
+    override fun shareCredentialsWithPage(
+        originalUrl: String,
+        credentials: LoginCredentials
+    ) {
+        command.postValue(InjectCredentials(originalUrl, credentials))
+    }
+
+    override fun returnNoCredentialsWithPage(originalUrl: String) {
+        command.postValue(CancelIncomingAutofillRequest(originalUrl))
+    }
+
+    override fun saveCredentials(
+        url: String,
+        credentials: LoginCredentials
+    ) {
+        viewModelScope.launch {
+            autofillStore.saveCredentials(url, credentials)
+        }
+    }
+
+    override fun updateCredentials(
+        url: String,
+        credentials: LoginCredentials
+    ) {
+        viewModelScope.launch {
+            autofillStore.updateCredentials(url, credentials)
+        }
     }
 
     fun onConfigurationChanged() {
