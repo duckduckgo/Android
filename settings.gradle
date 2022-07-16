@@ -111,7 +111,6 @@ include ':app'
 }
 
 "site".with {
-    include ":$it-api"; project(":$it-api").projectDir = new File("$it-api")
     include ":$it-impl"; project(":$it-impl").projectDir = new File("$it-impl")
 }
 

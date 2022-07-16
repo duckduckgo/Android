@@ -28,9 +28,8 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     implementation project(path: ':common')
-    api project(path: ':browser-api')
+    implementation project(path: ':browser-api')
     implementation project(path: ':app-build-config-api')
-    implementation project(path: ':site-api')
 
     implementation AndroidX.core.ktx
     implementation JakeWharton.timber

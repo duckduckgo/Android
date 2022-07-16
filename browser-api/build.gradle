@@ -23,7 +23,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     api project(path: ':common-ui')
-    api project(path: ':site-api')
+    implementation project(path: ':common')
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
