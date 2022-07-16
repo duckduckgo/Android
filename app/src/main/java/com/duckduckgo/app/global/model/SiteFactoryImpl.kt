@@ -18,9 +18,6 @@ package com.duckduckgo.app.global.model
 
 import androidx.annotation.AnyThread
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.model.SiteFactory
-import com.duckduckgo.app.global.model.SitePrivacyData
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.di.scopes.AppScope
