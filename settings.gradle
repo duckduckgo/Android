@@ -110,10 +110,6 @@ include ':app'
     include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
 }
 
-"site".with {
-    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it-impl")
-}
-
 rootProject.children.each { subproject ->
 
     if (subproject.name == "vpn") {

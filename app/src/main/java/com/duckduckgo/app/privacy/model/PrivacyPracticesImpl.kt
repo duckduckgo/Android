@@ -17,6 +17,7 @@
 package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.global.UriString
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import javax.inject.Inject
@@ -46,10 +47,10 @@ class PrivacyPracticesImpl @Inject constructor(
         this.entityScores = entityScores
     }
 
-    override fun privacyPracticesFor(url: String): PrivacyPractices.Practices {
+    override fun privacyPracticesFor(url: String): Practices {
         val entity = entityLookup.entityForUrl(url)
         val terms = termsOfServiceStore.terms.find { UriString.sameOrSubdomain(url, it.name ?: "") } ?: return PrivacyPractices.UNKNOWN
         val score = entityScores[entity?.name] ?: terms.derivedScore
-        return PrivacyPractices.Practices(score, terms.practices, terms.goodPrivacyTerms, terms.badPrivacyTerms)
+        return Practices(score, terms.practices, terms.goodPrivacyTerms, terms.badPrivacyTerms)
     }
 }

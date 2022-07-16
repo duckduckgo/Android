@@ -19,7 +19,9 @@ package com.duckduckgo.app.global.model
 import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.Site.SiteGrades
+import com.duckduckgo.app.global.model.SitePrivacyData
 import com.duckduckgo.app.privacy.model.Grade
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
