@@ -51,6 +51,10 @@ class SecureStoreBackedAutofillStore(
         get() = internalTestUserChecker.isInternalTestUser && prefs.getBoolean(AUTOFILL_ENABLED, true)
         set(value) = prefs.edit { putBoolean(AUTOFILL_ENABLED, value && internalTestUserChecker.isInternalTestUser) }
 
+    override var showOnboardingWhenOfferingToSaveLogin: Boolean
+        get() = prefs.getBoolean(SHOW_SAVE_LOGIN_ONBOARDING, true)
+        set(value) = prefs.edit { putBoolean(SHOW_SAVE_LOGIN_ONBOARDING, value) }
+
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
         Timber.i("Querying secure store for stored credentials. rawUrl: %s, extractedDomain:%s", rawUrl, rawUrl.extractSchemeAndDomain())
         val url = rawUrl.extractSchemeAndDomain() ?: return emptyList()
@@ -77,6 +81,8 @@ class SecureStoreBackedAutofillStore(
         val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(loginDetails, password = credentials.password)
 
         secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)
+
+        showOnboardingWhenOfferingToSaveLogin = false
     }
 
     override suspend fun updateCredentials(
@@ -172,6 +178,7 @@ class SecureStoreBackedAutofillStore(
     companion object {
         const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
         const val AUTOFILL_ENABLED = "autofill_enabled"
+        const val SHOW_SAVE_LOGIN_ONBOARDING = "autofill_show_onboardind_saved_login"
     }
 }
 

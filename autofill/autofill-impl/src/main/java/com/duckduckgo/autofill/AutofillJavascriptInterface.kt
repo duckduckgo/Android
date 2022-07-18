@@ -174,6 +174,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     }
 
     override fun injectCredentials(credentials: LoginCredentials) {
+        Timber.v("Informing JS layer with credentials selected")
         getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
             val jsCredentials = credentials.asJsCredentials()
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateResponseGetAutofillData(jsCredentials))
@@ -181,6 +182,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     }
 
     override fun injectNoCredentials() {
+        Timber.v("No credentials selected; informing JS layer")
         getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateEmptyResponseGetAutofillData())
         }

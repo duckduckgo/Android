@@ -14,24 +14,16 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
+<Button
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/moreOptionsButton"
+    style="@style/Widget.DuckDuckGo.Button.Secondary"
+    android:layout_width="0dp"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    android:paddingStart="10dp"
-    android:paddingEnd="10dp">
-
-    <include
-        android:id="@+id/primaryButton"
-        layout="@layout/item_row_autofill_chooser_primary_button" />
-
-    <include
-        android:id="@+id/secondaryButton"
-        layout="@layout/item_row_autofill_chooser_secondary_button" />
-
-    <include
-        android:id="@+id/optionsButton"
-        layout="@layout/item_row_autofill_chooser_options_button" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    android:text="@string/saveLoginDialogMoreOptionsButtonLabel"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintWidth_percent="0.8" />

@@ -30,8 +30,11 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSelectCredentialsTooltipBinding
+import com.duckduckgo.autofill.ui.credential.dialog.animateClosed
 import com.duckduckgo.di.scopes.FragmentScope
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.launch
@@ -39,6 +42,8 @@ import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialAutofillPickerDialog {
+
+    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -57,6 +62,13 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     private fun configureViews(binding: ContentAutofillSelectCredentialsTooltipBinding) {
         configureSiteDetails(binding)
         configureRecyclerView(binding)
+        configureCloseButton(binding)
+    }
+
+    private fun configureCloseButton(binding: ContentAutofillSelectCredentialsTooltipBinding) {
+        binding.closeButton.setOnClickListener {
+            (dialog as BottomSheetDialog).animateClosed()
+        }
     }
 
     private fun configureSiteDetails(binding: ContentAutofillSelectCredentialsTooltipBinding) {
@@ -71,16 +83,19 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     private fun configureRecyclerView(binding: ContentAutofillSelectCredentialsTooltipBinding) {
-        binding.availableCredentialsRecycler.adapter =
-            CredentialsPickerRecyclerAdapter(this, faviconManager, getAvailableCredentials()) { selectedCredentials ->
-                val result = Bundle().also {
-                    it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, false)
-                    it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
-                    it.putParcelable(CredentialAutofillPickerDialog.KEY_CREDENTIALS, selectedCredentials)
-                }
-                parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.RESULT_KEY_CREDENTIAL_PICKER, result)
-                dismiss()
+        binding.availableCredentialsRecycler.adapter = configureAdapter()
+    }
+
+    private fun configureAdapter(): CredentialsPickerRecyclerAdapter {
+        return CredentialsPickerRecyclerAdapter(this, faviconManager, getAvailableCredentials()) { selectedCredentials ->
+            val result = Bundle().also {
+                it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, false)
+                it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
+                it.putParcelable(CredentialAutofillPickerDialog.KEY_CREDENTIALS, selectedCredentials)
             }
+            parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.RESULT_KEY_CREDENTIAL_PICKER, result)
+            dismiss()
+        }
     }
 
     override fun onCancel(dialog: DialogInterface) {

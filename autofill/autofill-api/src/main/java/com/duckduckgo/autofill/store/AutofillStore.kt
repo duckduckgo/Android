@@ -30,6 +30,13 @@ interface AutofillStore {
     var autofillEnabled: Boolean
 
     /**
+     * Used to determine whether we show additional onboarding info when offering to save a login credential
+     *
+     * This will default to true, and remain true until after the first credential has been saved
+     */
+    var showOnboardingWhenOfferingToSaveLogin: Boolean
+
+    /**
      * Find saved credentials for the given URL, returning an empty list where no matches are found
      * @param rawUrl Can be a full, unmodified URL taken from the URL bar (containing subdomains, query params etc...)
      */
