@@ -27,6 +27,8 @@ import com.android.tools.lint.detector.api.Scope.TEST_SOURCES
 import com.android.tools.lint.detector.api.Severity.ERROR
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import org.jetbrains.uast.UAnnotation
+import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UFile
 import java.util.*
 
 @Suppress("UnstableApiUsage")
@@ -37,7 +39,7 @@ class NoSingletonDetector : Detector(), SourceCodeScanner {
 
     internal class NoInternalImportHandler(private val context: JavaContext) : UElementHandler() {
         override fun visitAnnotation(node: UAnnotation) {
-            if (node.javaPsi?.qualifiedName?.contains("Singleton") == true) {
+            if (node.qualifiedName?.contains("Singleton") == true) {
                 context.report(NO_SINGLETON_ISSUE, node, context.getNameLocation(node), "The Singleton annotation must not be used")
             }
         }

@@ -28,6 +28,8 @@ class NoSingletonDetectorTest {
             .files(kt("""
               package com.duckduckgo.lint
     
+                annotation class Singleton
+
                 @Singleton
                 class Duck {
                     fun quack() {                    
@@ -37,7 +39,7 @@ class NoSingletonDetectorTest {
             .issues(NoSingletonDetector.NO_SINGLETON_ISSUE)
             .run()
             .expect("""
-               src/com/duckduckgo/lint/Duck.kt:5: Error: The Singleton annotation must not be used [NoSingletonAnnotation]
+               src/com/duckduckgo/lint/Singleton.kt: : Error: The Singleton annotation must not be used [NoSingletonAnnotation]
                  @Singleton
                  ~~~~~~~~~~
                1 errors, 0 warnings
