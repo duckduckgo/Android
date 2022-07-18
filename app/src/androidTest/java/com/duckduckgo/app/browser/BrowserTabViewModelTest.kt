@@ -28,10 +28,8 @@ import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.asFlow
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.InstantSchedulersRule
@@ -4123,8 +4121,9 @@ class BrowserTabViewModelTest {
         )
         testee.shareCredentialsWithPage(url, credentials)
 
-        testee.command.asFlow().test {
-            assertEquals(InjectCredentials(url, credentials), awaitItem())
+        assertCommandIssued<Command.InjectCredentials> {
+            assertEquals(url, this.url)
+            assertEquals(credentials, this.credentials)
         }
     }
 
@@ -4133,8 +4132,8 @@ class BrowserTabViewModelTest {
         val url = "originalurl.com"
         testee.returnNoCredentialsWithPage(url)
 
-        testee.command.asFlow().test {
-            assertEquals(CancelIncomingAutofillRequest(url), awaitItem())
+        assertCommandIssued<Command.CancelIncomingAutofillRequest> {
+            assertEquals(url, this.url)
         }
     }
 

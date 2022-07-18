@@ -54,10 +54,10 @@ class InlineBrowserAutofillTest {
     private lateinit var testWebView: WebView
     private val coroutineScope: CoroutineScope = TestScope()
     private val testCallback = object : Callback {
-        override fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
+        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
         }
 
-        override fun onCredentialsAvailableToSave(
+        override suspend fun onCredentialsAvailableToSave(
             currentUrl: String,
             credentials: LoginCredentials
         ) {

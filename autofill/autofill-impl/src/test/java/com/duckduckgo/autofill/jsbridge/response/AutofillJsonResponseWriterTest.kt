@@ -77,7 +77,7 @@ class AutofillJsonResponseWriterTest {
     }
 
     @Test
-    fun generateContentScope() {
+    fun whenGenerateContentScopeTheReturnContentScopeString() {
         val expectedJson = "contentScope = {\n" +
             "  \"features\": {\n" +
             "    \"autofill\": {\n" +
@@ -94,7 +94,7 @@ class AutofillJsonResponseWriterTest {
     }
 
     @Test
-    fun generateUserUnprotectedDomains() {
+    fun whenGenerateUserUnprotectedDomainsThenReturnUserUnprotectedDomainsString() {
         val expectedJson = "userUnprotectedDomains = [];"
         assertEquals(
             expectedJson,
@@ -103,7 +103,7 @@ class AutofillJsonResponseWriterTest {
     }
 
     @Test
-    fun generateUserPreferences() {
+    fun whenGenerateUserPreferencesThenReturnUserPreferencesString() {
         val expectedJson = "userPreferences = {\n" +
             "  \"debug\": false,\n" +
             "  \"platform\": {\n" +
@@ -133,5 +133,4 @@ class AutofillJsonResponseWriterTest {
             )
         )
     }
-
 }

@@ -431,8 +431,8 @@ class BrowserTabViewModel @Inject constructor(
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
-        data class InjectCredentials(val url: String, val credentials: LoginCredentials) : Command()
-        data class CancelIncomingAutofillRequest(val url: String) : Command()
+        class InjectCredentials(val url: String, val credentials: LoginCredentials) : Command()
+        class CancelIncomingAutofillRequest(val url: String) : Command()
         class EditWithSelectedQuery(val query: String) : Command()
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
         class NavigateToHistory(val historyStackIndex: Int) : Command()
