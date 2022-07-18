@@ -24,14 +24,9 @@ import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.NoMatch
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -172,20 +167,5 @@ class SecureStoreBackedAutofillStore(
     companion object {
         const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
         const val AUTOFILL_ENABLED = "autofill_enabled"
-    }
-}
-
-@Module
-@ContributesTo(AppScope::class)
-class AutofillStoreModule {
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun autofillStore(
-        secureStorage: SecureStorage,
-        context: Context,
-        internalTestUserChecker: InternalTestUserChecker
-    ): AutofillStore {
-        return SecureStoreBackedAutofillStore(secureStorage, context, internalTestUserChecker)
     }
 }

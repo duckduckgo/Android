@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.internal
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.PLAY
@@ -28,9 +29,8 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class RealInternalTestUserCheckerTest {
     @Mock
     private lateinit var appBuildConfig: AppBuildConfig

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.ui.credential.management
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.autofill.domain.app.LoginCredentials
@@ -30,10 +31,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.robolectric.RobolectricTestRunner
 import kotlin.reflect.KClass
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
 class AutofillSettingsViewModelTest {
 
