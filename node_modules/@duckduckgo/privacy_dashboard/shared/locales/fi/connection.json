@@ -1,0 +1,99 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "connection" : {
+    "title" : "Yhteys",
+    "note" : "The technical details of the connection between the browser and the website (whether encrypted and how)"
+  },
+  "encrypt" : {
+    "title" : "Salaa",
+    "note" : "When the cryptographic key can be used to encrypt data"
+  },
+  "sign" : {
+    "title" : "Allekirjoita",
+    "note" : "When the cryptographic key can be used to sign data"
+  },
+  "verify" : {
+    "title" : "Vahvista",
+    "note" : "When the cryptographic key can be used to verify data"
+  },
+  "derive" : {
+    "title" : "Johda",
+    "note" : "When the cryptographic key can be used to derive new keys"
+  },
+  "wrap" : {
+    "title" : "Rivitä",
+    "note" : "When the cryptographic key can be used to wrap another key"
+  },
+  "unwrap" : {
+    "title" : "Poista rivitys",
+    "note" : "When the cryptographic key can be used to unwrap another key"
+  },
+  "unknown" : {
+    "title" : "Tuntematon",
+    "note" : "The cryptographic key can be used some other purpose we don't recognize"
+  },
+  "certificateDetail" : {
+    "title" : "Suojausvarmenteen tiedot",
+    "note" : "Header for section that contains the SSL certificate details"
+  },
+  "commonName" : {
+    "title" : "Yleinen nimi",
+    "note" : "The Common Name for an SSL certificate"
+  },
+  "publicKey" : {
+    "title" : "Julkinen avain",
+    "note" : "The Public Key for an SSL certificate"
+  },
+  "algorithm" : {
+    "title" : "Algoritmi",
+    "note" : "The Algorithm used for an SSL certificate"
+  },
+  "keySize" : {
+    "title" : "Avaimen koko",
+    "note" : "The size of the encryption key for an SSL certificate"
+  },
+  "usage" : {
+    "title" : "Käyttö",
+    "note" : "The allowed uses for an SSL certificate (references 'encrypt', 'sign', 'verify', 'unwrap', etc. strings in this file)"
+  },
+  "summary" : {
+    "title" : "Yhteenveto",
+    "note" : "Header for summary of connection details"
+  },
+  "permanent" : {
+    "title" : "Pysyvä",
+    "note" : "Whether certificate is permanent"
+  },
+  "effectiveSize" : {
+    "title" : "Tehokas koko",
+    "note" : "Effective size of encryption key for an SSL certificate"
+  },
+  "certificateNotFound" : {
+    "title" : "Varmennetta ei löydy",
+    "note" : "When the connection is not encrypted (ie. http) we do not have any certificate details to show"
+  },
+  "certificateForDomain" : {
+    "title" : "Verkkotunnuksen {domain} varmenne",
+    "note" : "Header for certificate details for a given domain"
+  },
+  "insecureConnectionDesc" : {
+    "title" : "Tämä sivu ei salli suojattua yhteyttä. Muut saattavat pystyä sieppaamaan tällä sivulla lähettämäsi arkaluonteiset tiedot.",
+    "note" : "Shown we connection is not encrypted"
+  },
+  "upgradedConnectionDesc" : {
+    "title" : "Päivitimme tämän sivun yhteyden suojataksemme siirron aikana lähettämiäsi tietoja.",
+    "note" : "Shown when we successfully upgrade a connection from an insecure one to a secure connection"
+  },
+  "secureConnectionDesc" : {
+    "title" : "Tällä sivulla käytetään suojattua yhteyttä, joka suojaa siirron aikana lähettämiäsi tietoja.",
+    "note" : "Shown when the user navigated directly to a secure connection"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "selectTheOptionDesc" : {
+    "title" : "Seleciona a opção que melhor descreve o problema que enfrentaste.",
+    "note" : "The user will see this UI when they're running into issues with a given website, that we may be causing"
+  },
+  "pickYourIssueFromTheList" : {
+    "title" : "Escolhe o teu problema na lista…",
+    "note" : "Asks the user to pick a specific list from the pulldown"
+  },
+  "videos" : {
+    "title" : "O vídeo não foi reproduzido",
+    "note" : "User is reporting this page because a video didn't play"
+  },
+  "images" : {
+    "title" : "As imagens não foram carregadas",
+    "note" : "User is reporting this page because one or more images did not load"
+  },
+  "comments" : {
+    "title" : "Os comentários não foram carregados",
+    "note" : "User is reporting this page because one or more comments did not load"
+  },
+  "content" : {
+    "title" : "Falta conteúdo",
+    "note" : "User is reporting this page because some other type of content did not load"
+  },
+  "links" : {
+    "title" : "Os links ou botões não funcionam",
+    "note" : "User is reporting this page because one or more links or buttons did not work when clicked"
+  },
+  "login" : {
+    "title" : "Não consigo entrar",
+    "note" : "User is reporting this page because they are unable to log into the website"
+  },
+  "paywall" : {
+    "title" : "O site pediu-me para desativar",
+    "note" : "User is reporting this page asked them to disable their privacy or ad blocking extension"
+  },
+  "other" : {
+    "title" : "Outra coisa",
+    "note" : "User is reporting this page because of some other reason than the ones we listed"
+  },
+  "reportBrokenSite" : {
+    "title" : "Denunciar site danificado",
+    "note" : "Title for reporting broken website view"
+  },
+  "tellUsMoreDesc" : {
+    "title" : "Se preferires, fala-nos do problema que enfrentaste",
+    "note" : "A hint for a text box that lets user enter free text to describe their problem"
+  },
+  "sendReport" : {
+    "title" : "Enviar relatório",
+    "note" : "Button for submitting report"
+  },
+  "reportsAreAnonymousDesc" : {
+    "title" : "Os relatórios enviados para o DuckDuckGo são 100% anónimos e apenas incluem a tua seleção acima, a tua descrição opcional, o URL e uma lista de rastreadores que encontrámos no site.",
+    "note" : "A small disclaimer at the bottom of the view describing what is included in the report"
+  },
+  "thankYou" : {
+    "title" : "Obrigado!",
+    "note" : "Title for what the user sees upon submitting the report"
+  },
+  "yourReportWillHelpDesc" : {
+    "title" : "O teu relatório ajudará a melhorar o navegador e melhorará a experiência de todos.",
+    "note" : "Body that the user sees upon submitting the report"
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "updatingProtectionList" : {
+    "title" : "Skyddslistan uppdateras",
+    "note" : "Message shown while updating the list of protections"
+  },
+  "protectionsDisabled" : {
+    "title" : "Skydd har <b>INAKTIVERATS</b>",
+    "note" : "Headline when privacy protections are disabled"
+  },
+  "protectionsEnabled" : {
+    "title" : "Skydd är <b>AKTIVERADE</b> för den här webbplatsen",
+    "note" : "Headline when privacy protections are enabled"
+  },
+  "connectionDescriptionUnencrypted" : {
+    "title" : "Andra kan få tillgång till känslig information som du skickar på den här sidan.",
+    "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
+  },
+  "connectionDescriptionUpgraded" : {
+    "title" : "Vi har uppgraderat anslutningen på den här sidan för att skydda den information som du skickar medan den överförs.",
+    "note" : "Shown when the connection has been upgraded from unencrypted to encrypted (HTTP to HTTPS)"
+  },
+  "connectionDescriptionEncrypted" : {
+    "title" : "Anslutningen på den här sidan är säker för att skydda information som du skickar medan den överförs.",
+    "note" : "Shown when the connection is encrypted (HTTPS not HTTP)"
+  },
+  "trackerNetworksSummaryNone" : {
+    "title" : "Vi har inte hittat några företag som försöker spåra dig på den här sidan.",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerNetworksSummaryOwn" : {
+    "title" : "Vi hittade bara spårare som ägs av {name}, vilka vi inte har blockerat.",
+    "note" : "We found but did not block trackers from company named"
+  },
+  "trackerNetworksSummaryOther" : {
+    "title" : "Vi {isWhitelisted, select, true {hittade} other {blockerade}} {displayCount} {displayCount, plural, =1 {känd spårare} other {kända spårare}} från {companyCount} {companyCount, plural, one {företag} other {företag}} på den här sidan.",
+    "note" : "This summarizes the number of trackers that we either blocked or did not block (depending on the protection setting for this site)"
+  },
+  "websiteNotWorkingQ" : {
+    "title" : "Fungerar inte webbplatsen som förväntat?",
+    "note" : "Call to action for user to click if they are having issues with this web page"
+  },
+  "takePrecautions" : {
+    "title" : "Vidta försiktighetsåtgärder",
+    "note" : "Title shown when the page is unencrypted"
+  },
+  "protectionsAreDisabled" : {
+    "title" : "Skydd är INAKTIVERADE",
+    "note" : "Shown when user has disabled protections for this site (or they have been programatically disabled)"
+  },
+  "foundCompanyNamesList" : {
+    "title" : "{companyCount, plural, =0 {Vi hittade några företag som spårar och profilerar dig på den här sidan.} =2 {Vi har upptäckt att {firstCompany} och {secondCompany} spårar och profilerar dig på den här sidan.} one {Vi har upptäckt att {firstCompany} spårar och profilerar dig på den här sidan.} other {Vi har upptäckt att {firstCompany}, {secondCompany} med flera spårar och profilerar dig på den här sidan.}}",
+    "note" : "Returns a string in the form of 'We found CompanyA, CompanyB and others tracking and profiling you on this page.'"
+  },
+  "majorTrackerNetwork" : {
+    "title" : "Spårningsnätverk",
+    "note" : "Tracker network is a group of trackers, usually in the form of a company name, that track users across websites"
+  },
+  "majorTrackingNetworkDesc" : {
+    "title" : "{companyDisplayName} (som äger {domain})\nspårar dig på {companyPrevalence} % av de populäraste webbplatserna.\nVi kan inte blockera dem på webbplatser som de själva äger, men vi kan göra det på andra webbplatser.",
+    "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
+  },
+  "noActivityToReport" : {
+    "title" : "Ingen aktivitet att rapportera",
+    "note" : "Title when we did not find any trackers on this page"
+  },
+  "trackersBlocked" : {
+    "title" : "Vilka vi har blockerat",
+    "note" : "Title for the list of companies that we blocked"
+  },
+  "trackersBlockedDesc" : {
+    "title" : "{companyCount, plural, =0 {Vi har blockerat vissa företag från att försöka spåra dig.} =2 {Vi har blockerat {firstCompany} och {secondCompany} från att försöka spåra dig.} one {Vi har blockerat {firstCompany} från att försöka spåra dig.} other {Vi har blockerat {firstCompany}, {secondCompany} med flera från att försöka spåra dig.}}",
+    "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
+  },
+  "cookiesMinimized" : {
+    "title" : "Cookies minimerade",
+    "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedDesc" : {
+    "title" : "Vi har konfigurerat dina cookieinställningar för att maximera din integritet och stängt popup-fönstret för samtycke.",
+    "note" : "Description for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "connectionSecure" : {
+    "title" : "Anslutningen är säker",
+    "note" : "The connection to the website is secure (HTTPS)"
+  },
+  "connectionNotSecure" : {
+    "title" : "Anslutningen kunde inte säkras",
+    "note" : "The connection is not secure (HTTP)"
+  },
+  "trackerNetworksDesc" : {
+    "title" : "{blocked, select, true {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} större spårningsnätverk blockerades} other {{trackerCount} större spårningsnätverk blockerades}}} other {{trackerCount, plural, one {{trackerCount} spårare blockerades} other {{trackerCount} spårare blockerades}}}}} other {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} större spårningsnätverk hittades} other {{trackerCount} större spårningsnätverk hittades}}} other {{trackerCount, plural, one {{trackerCount} spårare hittades} other {{trackerCount} spårare hittades}}}}}}",
+    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+  },
+  "firstPartyDesc" : {
+    "title" : "{companyName} äger den här webbplatsen och de kända spårare som hittades på sidan, så vi har inte blockerat dem.",
+    "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
+  },
+  "trackersFoundForAllowlisted" : {
+    "title" : "Spårare hjälper företag att profilera dig. Vi har upptäckt att följande företag övervakar din aktivitet på den här sidan.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections disabled"
+  },
+  "trackersFoundAndBlocked" : {
+    "title" : "Spårare hjälper företag att profilera dig. Vi har blockerat följande företag från att övervaka din aktivitet på den här sidan.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections enabled"
+  },
+  "trackerNetworkUnknown" : {
+    "title" : "Okänt spårarnätverk",
+    "note" : "Shown when we don't have a company name for a given tracker"
+  },
+  "trackerDomainsForCompany" : {
+    "title" : "Spårardomäner för {companyName}",
+    "note" : "Title for the list of tracker domains detected from a given company"
+  },
+  "zeroTrackersFound" : {
+    "title" : "0 spårare hittades",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerOwnedByThisSite" : {
+    "title" : "Spårare som ägs av den här webbplatsen (tillåtna)",
+    "note" : "Trackers owned by this site are not blocked"
+  },
+  "trackerCountForDomain" : {
+    "title" : "{blocked, select, true {{trackerCount, plural, one {{trackerCount} spårare blockerad på {domain}} other {{trackerCount} spårare blockerade på {domain}}}} other {{trackerCount, plural, one {{trackerCount} spårare hittades på {domain}} other {{trackerCount} spårare hittades på {domain}}}}}",
+    "note" : "For a given domain, the count of trackers either blocked or just detected (found).  Ex 4 Trackers Blocked"
+  },
+  "analyticsCategory" : {
+    "title" : "Analys",
+    "note" : "Used to describe the type of tracker, in this case one that is used to report analytics back to the site owner"
+  },
+  "advertisingCategory" : {
+    "title" : "Annonsering",
+    "note" : "Used to describe the type of tracker, in this case one that is used for advertising"
+  },
+  "socialCategory" : {
+    "title" : "Socialt nätverk",
+    "note" : "Used to describe the type of tracker, in this case one that is used by one of the popular social networksr"
+  }
+}

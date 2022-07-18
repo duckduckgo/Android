@@ -1,0 +1,99 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "connection" : {
+    "title" : "Forbindelse",
+    "note" : "The technical details of the connection between the browser and the website (whether encrypted and how)"
+  },
+  "encrypt" : {
+    "title" : "Krypter",
+    "note" : "When the cryptographic key can be used to encrypt data"
+  },
+  "sign" : {
+    "title" : "Log ind",
+    "note" : "When the cryptographic key can be used to sign data"
+  },
+  "verify" : {
+    "title" : "Verificer",
+    "note" : "When the cryptographic key can be used to verify data"
+  },
+  "derive" : {
+    "title" : "Udled",
+    "note" : "When the cryptographic key can be used to derive new keys"
+  },
+  "wrap" : {
+    "title" : "Pak",
+    "note" : "When the cryptographic key can be used to wrap another key"
+  },
+  "unwrap" : {
+    "title" : "Pak",
+    "note" : "When the cryptographic key can be used to unwrap another key"
+  },
+  "unknown" : {
+    "title" : "Ukendt",
+    "note" : "The cryptographic key can be used some other purpose we don't recognize"
+  },
+  "certificateDetail" : {
+    "title" : "Detaljer om sikkerhedscertifikat",
+    "note" : "Header for section that contains the SSL certificate details"
+  },
+  "commonName" : {
+    "title" : "Almindeligt navn",
+    "note" : "The Common Name for an SSL certificate"
+  },
+  "publicKey" : {
+    "title" : "Offentlig nøgle",
+    "note" : "The Public Key for an SSL certificate"
+  },
+  "algorithm" : {
+    "title" : "Algoritme",
+    "note" : "The Algorithm used for an SSL certificate"
+  },
+  "keySize" : {
+    "title" : "Nøglestørrelse",
+    "note" : "The size of the encryption key for an SSL certificate"
+  },
+  "usage" : {
+    "title" : "Anvendelse",
+    "note" : "The allowed uses for an SSL certificate (references 'encrypt', 'sign', 'verify', 'unwrap', etc. strings in this file)"
+  },
+  "summary" : {
+    "title" : "Resumé",
+    "note" : "Header for summary of connection details"
+  },
+  "permanent" : {
+    "title" : "Permanent",
+    "note" : "Whether certificate is permanent"
+  },
+  "effectiveSize" : {
+    "title" : "Effektiv størrelse",
+    "note" : "Effective size of encryption key for an SSL certificate"
+  },
+  "certificateNotFound" : {
+    "title" : "Certifikat ikke fundet",
+    "note" : "When the connection is not encrypted (ie. http) we do not have any certificate details to show"
+  },
+  "certificateForDomain" : {
+    "title" : "Certifikat for {domain}",
+    "note" : "Header for certificate details for a given domain"
+  },
+  "insecureConnectionDesc" : {
+    "title" : "Denne side giver ikke mulighed for en sikker forbindelse. Andre kan muligvis opfange følsomme oplysninger, som du sender på denne side.",
+    "note" : "Shown we connection is not encrypted"
+  },
+  "upgradedConnectionDesc" : {
+    "title" : "Vi har opgraderet forbindelsen på denne side for at beskytte de oplysninger, du sender, mens de overføres.",
+    "note" : "Shown when we successfully upgrade a connection from an insecure one to a secure connection"
+  },
+  "secureConnectionDesc" : {
+    "title" : "Denne side bruger en sikker forbindelse, som beskytter de oplysninger, du sender, mens de overføres.",
+    "note" : "Shown when the user navigated directly to a secure connection"
+  }
+}

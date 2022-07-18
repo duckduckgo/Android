@@ -1,0 +1,51 @@
+// General form styles, mostly ripped from
+// https://github.com/duckduckgo/duckduckgo-styles
+// and
+// https://github.com/duckduckgo/litestrap
+
+.btn {
+    display: inline-block;
+    vertical-align: middle;
+    white-space: nowrap;
+    text-align: center;
+    position: relative;
+    text-decoration: none;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0 1em;
+
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    border-radius: 0.25em;
+    box-sizing: content-box;
+    user-select: none;
+
+    outline: none !important;
+    background-color: $blue-light;
+    border: 1px solid $blue-light;
+    line-height: 2;
+    font-weight: normal;
+    font-size: 1em;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    color: $white;
+    -webkit-appearance: none !important;
+
+    &:hover, &:focus {
+        text-decoration: none !important;
+        color: $white;
+        background-color: $blue;
+        border-color: $blue;
+    }
+    &:active {
+        color: $white;
+        background-color: $blue-dark;
+        border-color: $blue-dark;
+    }
+    &.is-disabled {
+        border-color: $platinum-darker;
+        background-color: $platinum-darker;
+        cursor: default;
+        color: $color--dark-platinum;
+    }
+}

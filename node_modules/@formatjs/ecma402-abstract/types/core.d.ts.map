@@ -1,0 +1,1 @@
+{"version":3,"file":"core.d.ts","sourceRoot":"","sources":["../../../../../../packages/ecma402-abstract/types/core.ts"],"names":[],"mappings":"AAAA,oBAAY,MAAM,GAAG,MAAM,CAAA;AAC3B,MAAM,WAAW,UAAU,CAAC,CAAC;IAC3B,IAAI,EAAE,CAAC,CAAA;IACP,MAAM,EAAE,MAAM,CAAA;CACf;AAED,MAAM,WAAW,mBAAmB;IAClC,MAAM,EAAE,MAAM,CAAA;IACd,SAAS,CAAC,EAAE,MAAM,CAAA;IAClB,EAAE,CAAC,EAAE,MAAM,CAAA;CACZ"}

@@ -1,0 +1,99 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "connection" : {
+    "title" : "Ligação",
+    "note" : "The technical details of the connection between the browser and the website (whether encrypted and how)"
+  },
+  "encrypt" : {
+    "title" : "Encriptar",
+    "note" : "When the cryptographic key can be used to encrypt data"
+  },
+  "sign" : {
+    "title" : "Assinar",
+    "note" : "When the cryptographic key can be used to sign data"
+  },
+  "verify" : {
+    "title" : "Verificar",
+    "note" : "When the cryptographic key can be used to verify data"
+  },
+  "derive" : {
+    "title" : "Derivar",
+    "note" : "When the cryptographic key can be used to derive new keys"
+  },
+  "wrap" : {
+    "title" : "Embrulhar",
+    "note" : "When the cryptographic key can be used to wrap another key"
+  },
+  "unwrap" : {
+    "title" : "Desembrulhar",
+    "note" : "When the cryptographic key can be used to unwrap another key"
+  },
+  "unknown" : {
+    "title" : "Desconhecido",
+    "note" : "The cryptographic key can be used some other purpose we don't recognize"
+  },
+  "certificateDetail" : {
+    "title" : "Detalhe do Certificado de Segurança",
+    "note" : "Header for section that contains the SSL certificate details"
+  },
+  "commonName" : {
+    "title" : "Nome comum",
+    "note" : "The Common Name for an SSL certificate"
+  },
+  "publicKey" : {
+    "title" : "Chave pública",
+    "note" : "The Public Key for an SSL certificate"
+  },
+  "algorithm" : {
+    "title" : "Algoritmo",
+    "note" : "The Algorithm used for an SSL certificate"
+  },
+  "keySize" : {
+    "title" : "Tamanho da chave",
+    "note" : "The size of the encryption key for an SSL certificate"
+  },
+  "usage" : {
+    "title" : "Uso",
+    "note" : "The allowed uses for an SSL certificate (references 'encrypt', 'sign', 'verify', 'unwrap', etc. strings in this file)"
+  },
+  "summary" : {
+    "title" : "Resumo",
+    "note" : "Header for summary of connection details"
+  },
+  "permanent" : {
+    "title" : "Permanente",
+    "note" : "Whether certificate is permanent"
+  },
+  "effectiveSize" : {
+    "title" : "Tamanho efetivo",
+    "note" : "Effective size of encryption key for an SSL certificate"
+  },
+  "certificateNotFound" : {
+    "title" : "Certificado não encontrado",
+    "note" : "When the connection is not encrypted (ie. http) we do not have any certificate details to show"
+  },
+  "certificateForDomain" : {
+    "title" : "Certificado para {domain}",
+    "note" : "Header for certificate details for a given domain"
+  },
+  "insecureConnectionDesc" : {
+    "title" : "Esta página não permite uma ligação segura. Outras pessoas podem intercetar informações confidenciais que enviares nesta página.",
+    "note" : "Shown we connection is not encrypted"
+  },
+  "upgradedConnectionDesc" : {
+    "title" : "Melhorámos a ligação nesta página para proteger a informação que envias enquanto estás em trânsito.",
+    "note" : "Shown when we successfully upgrade a connection from an insecure one to a secure connection"
+  },
+  "secureConnectionDesc" : {
+    "title" : "Esta página utiliza uma ligação segura que protege a informação que envias enquanto está em trânsito.",
+    "note" : "Shown when the user navigated directly to a secure connection"
+  }
+}

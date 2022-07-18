@@ -1,0 +1,75 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "selectTheOptionDesc" : {
+    "title" : "Vælg den mulighed, der bedst beskriver det problem, du oplevede.",
+    "note" : "The user will see this UI when they're running into issues with a given website, that we may be causing"
+  },
+  "pickYourIssueFromTheList" : {
+    "title" : "Vælg dit emne fra listen ...",
+    "note" : "Asks the user to pick a specific list from the pulldown"
+  },
+  "videos" : {
+    "title" : "Videoen blev ikke spillet",
+    "note" : "User is reporting this page because a video didn't play"
+  },
+  "images" : {
+    "title" : "Billeder blev ikke indlæst",
+    "note" : "User is reporting this page because one or more images did not load"
+  },
+  "comments" : {
+    "title" : "Kommentarer blev ikke indlæst",
+    "note" : "User is reporting this page because one or more comments did not load"
+  },
+  "content" : {
+    "title" : "Indhold mangler",
+    "note" : "User is reporting this page because some other type of content did not load"
+  },
+  "links" : {
+    "title" : "Links eller knapper fungerer ikke",
+    "note" : "User is reporting this page because one or more links or buttons did not work when clicked"
+  },
+  "login" : {
+    "title" : "Jeg kan ikke logge ind",
+    "note" : "User is reporting this page because they are unable to log into the website"
+  },
+  "paywall" : {
+    "title" : "Webstedet bad mig om at deaktivere",
+    "note" : "User is reporting this page asked them to disable their privacy or ad blocking extension"
+  },
+  "other" : {
+    "title" : "Noget andet",
+    "note" : "User is reporting this page because of some other reason than the ones we listed"
+  },
+  "reportBrokenSite" : {
+    "title" : "Rapporter ødelagt websted",
+    "note" : "Title for reporting broken website view"
+  },
+  "tellUsMoreDesc" : {
+    "title" : "Hvis du vil, kan du fortælle os om det problem, du oplevede",
+    "note" : "A hint for a text box that lets user enter free text to describe their problem"
+  },
+  "sendReport" : {
+    "title" : "Send rapport",
+    "note" : "Button for submitting report"
+  },
+  "reportsAreAnonymousDesc" : {
+    "title" : "Rapporter sendt til DuckDuckGo er 100 % anonyme og inkluderer kun dit valg ovenfor, din valgfri beskrivelse, URL'en og en liste over trackere, vi fandt på webstedet.",
+    "note" : "A small disclaimer at the bottom of the view describing what is included in the report"
+  },
+  "thankYou" : {
+    "title" : "Tak!",
+    "note" : "Title for what the user sees upon submitting the report"
+  },
+  "yourReportWillHelpDesc" : {
+    "title" : "Din rapport vil være med til at forbedre browseren og gøre oplevelsen bedre for andre brugere.",
+    "note" : "Body that the user sees upon submitting the report"
+  }
+}

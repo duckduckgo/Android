@@ -1,0 +1,147 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "updatingProtectionList" : {
+    "title" : "Актуализиране на списъка за защита",
+    "note" : "Message shown while updating the list of protections"
+  },
+  "protectionsDisabled" : {
+    "title" : "Защитите са <b>ДЕАКТИВИРАНИ</b>",
+    "note" : "Headline when privacy protections are disabled"
+  },
+  "protectionsEnabled" : {
+    "title" : "Защитите за този сайт са <b>АКТИВИРАНИ</b>",
+    "note" : "Headline when privacy protections are enabled"
+  },
+  "connectionDescriptionUnencrypted" : {
+    "title" : "Възможно е други лица да могат да прихванат поверителна информация, която изпращате на тази страница.",
+    "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
+  },
+  "connectionDescriptionUpgraded" : {
+    "title" : "Надградихме връзката на тази страница, за да защитим изпращаната от Вас информация по време на преноса.",
+    "note" : "Shown when the connection has been upgraded from unencrypted to encrypted (HTTP to HTTPS)"
+  },
+  "connectionDescriptionEncrypted" : {
+    "title" : "Връзката на тази страница е сигурна и защитава изпращаната от Вас информация по време на преноса.",
+    "note" : "Shown when the connection is encrypted (HTTPS not HTTP)"
+  },
+  "trackerNetworksSummaryNone" : {
+    "title" : "Не открихме компании, които да се опитват да Ви следят на тази страница.",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerNetworksSummaryOwn" : {
+    "title" : "Открихме само тракери, собственост на {name}, които не блокирахме.",
+    "note" : "We found but did not block trackers from company named"
+  },
+  "trackerNetworksSummaryOther" : {
+    "title" : "Ние {isWhitelisted, select, true {открихме} other {блокирахме}} {displayCount} {displayCount, plural, =1 {тракер} other {тракера}} от {companyCount} {companyCount, plural, one {компания} other {компании}} на тази страница.",
+    "note" : "This summarizes the number of trackers that we either blocked or did not block (depending on the protection setting for this site)"
+  },
+  "websiteNotWorkingQ" : {
+    "title" : "Уебсайтът не работи според очакванията?",
+    "note" : "Call to action for user to click if they are having issues with this web page"
+  },
+  "takePrecautions" : {
+    "title" : "Вземете предпазни мерки",
+    "note" : "Title shown when the page is unencrypted"
+  },
+  "protectionsAreDisabled" : {
+    "title" : "Защитите са ДЕАКТИВИРАНИ",
+    "note" : "Shown when user has disabled protections for this site (or they have been programatically disabled)"
+  },
+  "foundCompanyNamesList" : {
+    "title" : "{companyCount, plural, =0 {Открихме, че няколко компании Ви следят и профилират на тази страница.} =2 {Открихме, че {firstCompany} и {secondCompany} Ви следят и профилират на тази страница.} one {Открихме, че {firstCompany} Ви следи и профилира на тази страница.} other {Открихме, че {firstCompany}, {secondCompany} и други Ви следят и профилират на тази страница.}}",
+    "note" : "Returns a string in the form of 'We found CompanyA, CompanyB and others tracking and profiling you on this page.'"
+  },
+  "majorTrackerNetwork" : {
+    "title" : "Проследяващи мрежи",
+    "note" : "Tracker network is a group of trackers, usually in the form of a company name, that track users across websites"
+  },
+  "majorTrackingNetworkDesc" : {
+    "title" : "{companyDisplayName} (собственик на {domain})\nВи следи в {companyPrevalence}% от водещите сайтове.\nНе можем да блокираме компанията на сайтовете, които притежава, но можем да я блокираме на други страници.",
+    "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
+  },
+  "noActivityToReport" : {
+    "title" : "Няма активност за отчитане",
+    "note" : "Title when we did not find any trackers on this page"
+  },
+  "trackersBlocked" : {
+    "title" : "Кои компании блокирахме",
+    "note" : "Title for the list of companies that we blocked"
+  },
+  "trackersBlockedDesc" : {
+    "title" : "{companyCount, plural, =0 {Блокирахме няколко компании, които се опитват да Ви следят.} =2 {Блокирахме {firstCompany} и {secondCompany}, които се опитват да Ви следят.} one {Блокирахме {firstCompany}, която се опитва да Ви следи.} other {Блокирахме {firstCompany}, {secondCompany} и други, които се опитват да Ви следят.}}",
+    "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
+  },
+  "cookiesMinimized" : {
+    "title" : "Бисквитките са намалени до минимум",
+    "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedDesc" : {
+    "title" : "Настроихме предпочитанията Ви за бисквитките, за да увеличим поверителността, и затворихме изскачащия прозорец за съгласие.",
+    "note" : "Description for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "connectionSecure" : {
+    "title" : "Връзката е сигурна",
+    "note" : "The connection to the website is secure (HTTPS)"
+  },
+  "connectionNotSecure" : {
+    "title" : "Връзката не може да бъде защитена",
+    "note" : "The connection is not secure (HTTP)"
+  },
+  "trackerNetworksDesc" : {
+    "title" : "{blocked, select, true {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} блокирана основна проследяваща мрежа} other {{trackerCount} блокирани основни проследяващи мрежи}}} other {{trackerCount, plural, one {{trackerCount} блокирано проследяващо устройство} other {{trackerCount} блокирани проследяващи устройства}}}}} other {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} открита основна проследяваща мрежа} other {{trackerCount} открити основни проследяващи мрежи}}} other {{trackerCount, plural, one {{trackerCount} открито проследяващо устройство} other {{trackerCount} открити проследяващи устройства}}}}}}",
+    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+  },
+  "firstPartyDesc" : {
+    "title" : "{companyName} е собственик на този сайт и на установените тракери, които се намират на тази страница, затова не ги блокирахме.",
+    "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
+  },
+  "trackersFoundForAllowlisted" : {
+    "title" : "Тракерите се използват от компаниите за профилиране. Открихме, че тези компании следят Вашата дейност на тази страница.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections disabled"
+  },
+  "trackersFoundAndBlocked" : {
+    "title" : "Тракерите се използват от компаниите за профилиране. Блокирахме тези компании, които следят Вашата дейност на тази страница.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections enabled"
+  },
+  "trackerNetworkUnknown" : {
+    "title" : "Проследяващата мрежа е неизвестна",
+    "note" : "Shown when we don't have a company name for a given tracker"
+  },
+  "trackerDomainsForCompany" : {
+    "title" : "Домейни на тракери за {companyName}",
+    "note" : "Title for the list of tracker domains detected from a given company"
+  },
+  "zeroTrackersFound" : {
+    "title" : "0 открити тракери",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerOwnedByThisSite" : {
+    "title" : "Тракери, притежавани от този сайт (разрешени)",
+    "note" : "Trackers owned by this site are not blocked"
+  },
+  "trackerCountForDomain" : {
+    "title" : "{blocked, select, true {{trackerCount, plural, one {Блокиран е {trackerCount} тракер на {domain}} other {Блокирани са {trackerCount} тракера на {domain}}}} other {{trackerCount, plural, one {Открит е {trackerCount} тракер на {domain}} other {Открити са {trackerCount} тракера на {domain}}}}}",
+    "note" : "For a given domain, the count of trackers either blocked or just detected (found).  Ex 4 Trackers Blocked"
+  },
+  "analyticsCategory" : {
+    "title" : "Анализ",
+    "note" : "Used to describe the type of tracker, in this case one that is used to report analytics back to the site owner"
+  },
+  "advertisingCategory" : {
+    "title" : "Реклама",
+    "note" : "Used to describe the type of tracker, in this case one that is used for advertising"
+  },
+  "socialCategory" : {
+    "title" : "Социална мрежа",
+    "note" : "Used to describe the type of tracker, in this case one that is used by one of the popular social networksr"
+  }
+}

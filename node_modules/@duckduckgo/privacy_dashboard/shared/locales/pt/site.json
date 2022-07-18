@@ -1,0 +1,147 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "updatingProtectionList" : {
+    "title" : "A atualizar a lista de proteção",
+    "note" : "Message shown while updating the list of protections"
+  },
+  "protectionsDisabled" : {
+    "title" : "As proteções foram <b>DESATIVADAS</b>",
+    "note" : "Headline when privacy protections are disabled"
+  },
+  "protectionsEnabled" : {
+    "title" : "As proteções estão <b>ATIVADAS</b> neste site",
+    "note" : "Headline when privacy protections are enabled"
+  },
+  "connectionDescriptionUnencrypted" : {
+    "title" : "Outros poderão ser capazes de intercetar informações sensíveis que envias nesta página.",
+    "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
+  },
+  "connectionDescriptionUpgraded" : {
+    "title" : "Melhorámos a ligação nesta página para proteger a informação que envias em trânsito.",
+    "note" : "Shown when the connection has been upgraded from unencrypted to encrypted (HTTP to HTTPS)"
+  },
+  "connectionDescriptionEncrypted" : {
+    "title" : "A ligação nesta página é segura e protege a informação que envias em trânsito.",
+    "note" : "Shown when the connection is encrypted (HTTPS not HTTP)"
+  },
+  "trackerNetworksSummaryNone" : {
+    "title" : "Não encontrámos nenhuma empresa a tentar monitorizar-te nesta página.",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerNetworksSummaryOwn" : {
+    "title" : "Encontrámos apenas monitorizadores pertencentes a {name}, que não bloqueámos.",
+    "note" : "We found but did not block trackers from company named"
+  },
+  "trackerNetworksSummaryOther" : {
+    "title" : "Nós {isWhitelisted, select, true {encontrámos} other {bloqueámos}} {displayCount} {displayCount, plural, =1 {rastreador} other {rastreadores}} conhecido(s) de {companyCount} {companyCount, plural, one {empresa} other {empresas}} nesta página.",
+    "note" : "This summarizes the number of trackers that we either blocked or did not block (depending on the protection setting for this site)"
+  },
+  "websiteNotWorkingQ" : {
+    "title" : "O website não funciona como esperado?",
+    "note" : "Call to action for user to click if they are having issues with this web page"
+  },
+  "takePrecautions" : {
+    "title" : "Toma precauções",
+    "note" : "Title shown when the page is unencrypted"
+  },
+  "protectionsAreDisabled" : {
+    "title" : "As proteções estão DESATIVADAS",
+    "note" : "Shown when user has disabled protections for this site (or they have been programatically disabled)"
+  },
+  "foundCompanyNamesList" : {
+    "title" : "{companyCount, plural, =0 {Encontrámos algumas empresas a monitorizar e a segmentar o teu perfil nesta página.} =2 {Encontrámos as empresas {firstCompany} e {secondCompany} a rastrear-te e segmentar-te nesta página.} one {Encontrámos a empresa {firstCompany} a rastrear-te e segmentar-te nesta página.} other {Encontrámos as empresas {firstCompany}, {secondCompany} e outras a rastrear-te e segmentar-te nesta página.}}",
+    "note" : "Returns a string in the form of 'We found CompanyA, CompanyB and others tracking and profiling you on this page.'"
+  },
+  "majorTrackerNetwork" : {
+    "title" : "Rede de rastreamento",
+    "note" : "Tracker network is a group of trackers, usually in the form of a company name, that track users across websites"
+  },
+  "majorTrackingNetworkDesc" : {
+    "title" : "{companyDisplayName} (proprietário de {domain})\nrastreia-te em {companyPrevalence}% dos sites principais.\nNão podemos bloqueá-lo em sites da sua propriedade, mas podemos noutras páginas.",
+    "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
+  },
+  "noActivityToReport" : {
+    "title" : "Nenhuma atividade a relatar",
+    "note" : "Title when we did not find any trackers on this page"
+  },
+  "trackersBlocked" : {
+    "title" : "Quem bloqueamos",
+    "note" : "Title for the list of companies that we blocked"
+  },
+  "trackersBlockedDesc" : {
+    "title" : "{companyCount, plural, =0 {Bloqueámos as tentativas de monitorização de algumas empresas.} =2 {Bloqueámos as tentativas de monitorização de {firstCompany} e {secondCompany}.} one {Bloqueámos a tentativa de monitorização de {firstCompany}.} other {Bloqueámos as tentativas de monitorização de {firstCompany}, {secondCompany} e outros.}}",
+    "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
+  },
+  "cookiesMinimized" : {
+    "title" : "Cookies minimizados",
+    "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedDesc" : {
+    "title" : "Definimos as tuas preferências de cookies para maximizar a privacidade e fechamos o pop-up de consentimento.",
+    "note" : "Description for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "connectionSecure" : {
+    "title" : "A ligação é segura",
+    "note" : "The connection to the website is secure (HTTPS)"
+  },
+  "connectionNotSecure" : {
+    "title" : "A ligação pode não ser segura",
+    "note" : "The connection is not secure (HTTP)"
+  },
+  "trackerNetworksDesc" : {
+    "title" : "{blocked, select, true {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} rede principal de rastreamento bloqueada} other {{trackerCount} rede principais de rastreamento bloqueadas}}} other {{trackerCount, plural, one {{trackerCount} rastreador bloqueado} other {{trackerCount} rastreadores bloqueados}}}}} other {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} rede principal de rastreamento encontrada} other {{trackerCount} redes principais de rastreamento encontradas}}} other {{trackerCount, plural, one {{trackerCount} rastreador encontrado} other {{trackerCount} rastreadores encontrados}}}}}}",
+    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+  },
+  "firstPartyDesc" : {
+    "title" : "{companyName} é proprietário deste site e dos monitorizadores detetados nesta página, portanto não os bloqueámos.",
+    "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
+  },
+  "trackersFoundForAllowlisted" : {
+    "title" : "Os rastreadores ajudam as empresas a segmentar-te. Encontrámos estas empresas a rastrear a tua atividade nesta página.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections disabled"
+  },
+  "trackersFoundAndBlocked" : {
+    "title" : "Os rastreadores ajudam as empresas a segmentar-te. Bloqueámos o rastreio da tua atividade nesta página por parte destas empresas.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections enabled"
+  },
+  "trackerNetworkUnknown" : {
+    "title" : "Rede de rastreadores desconhecida",
+    "note" : "Shown when we don't have a company name for a given tracker"
+  },
+  "trackerDomainsForCompany" : {
+    "title" : "Domínios de rastreador de {companyName}",
+    "note" : "Title for the list of tracker domains detected from a given company"
+  },
+  "zeroTrackersFound" : {
+    "title" : "0 rastreadores encontrados",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerOwnedByThisSite" : {
+    "title" : "Rastreadores propriedade deste Site (Permitido)",
+    "note" : "Trackers owned by this site are not blocked"
+  },
+  "trackerCountForDomain" : {
+    "title" : "{blocked, select, true {{trackerCount, plural, one {{trackerCount} rastreador bloqueado em {domain}} other {{trackerCount} rastreadores bloqueados em {domain}}}} other {{trackerCount, plural, one {{trackerCount} rastreador encontrado em {domain}} other {{trackerCount} rastreadores encontrados em {domain}}}}}",
+    "note" : "For a given domain, the count of trackers either blocked or just detected (found).  Ex 4 Trackers Blocked"
+  },
+  "analyticsCategory" : {
+    "title" : "Dados analíticos",
+    "note" : "Used to describe the type of tracker, in this case one that is used to report analytics back to the site owner"
+  },
+  "advertisingCategory" : {
+    "title" : "Publicidade",
+    "note" : "Used to describe the type of tracker, in this case one that is used for advertising"
+  },
+  "socialCategory" : {
+    "title" : "Redes sociais",
+    "note" : "Used to describe the type of tracker, in this case one that is used by one of the popular social networksr"
+  }
+}

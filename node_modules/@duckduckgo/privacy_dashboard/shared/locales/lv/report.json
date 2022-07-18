@@ -1,0 +1,75 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "selectTheOptionDesc" : {
+    "title" : "Izvēlies atbilstošāko problēmas raksturojumu.",
+    "note" : "The user will see this UI when they're running into issues with a given website, that we may be causing"
+  },
+  "pickYourIssueFromTheList" : {
+    "title" : "Norādi problēmu sarakstā...",
+    "note" : "Asks the user to pick a specific list from the pulldown"
+  },
+  "videos" : {
+    "title" : "Video netika demonstrēts",
+    "note" : "User is reporting this page because a video didn't play"
+  },
+  "images" : {
+    "title" : "Attēli netika ielādēti",
+    "note" : "User is reporting this page because one or more images did not load"
+  },
+  "comments" : {
+    "title" : "Komentāri netika ielādēti",
+    "note" : "User is reporting this page because one or more comments did not load"
+  },
+  "content" : {
+    "title" : "Trūkst satura",
+    "note" : "User is reporting this page because some other type of content did not load"
+  },
+  "links" : {
+    "title" : "Saites vai pogas nedarbojas",
+    "note" : "User is reporting this page because one or more links or buttons did not work when clicked"
+  },
+  "login" : {
+    "title" : "Es nevaru pierakstīties",
+    "note" : "User is reporting this page because they are unable to log into the website"
+  },
+  "paywall" : {
+    "title" : "Vietne pieprasīja atspējošanu",
+    "note" : "User is reporting this page asked them to disable their privacy or ad blocking extension"
+  },
+  "other" : {
+    "title" : "Kaut kas cits",
+    "note" : "User is reporting this page because of some other reason than the ones we listed"
+  },
+  "reportBrokenSite" : {
+    "title" : "Ziņot par bojātu vietni",
+    "note" : "Title for reporting broken website view"
+  },
+  "tellUsMoreDesc" : {
+    "title" : "Ja vēlies, pastāsti mums par savu problēmu",
+    "note" : "A hint for a text box that lets user enter free text to describe their problem"
+  },
+  "sendReport" : {
+    "title" : "Nosūtīt ziņojumu",
+    "note" : "Button for submitting report"
+  },
+  "reportsAreAnonymousDesc" : {
+    "title" : "DuckDuckGo nosūtītie ziņojumi ir 100% anonīmi, un tajos ir iekļauta tikai tava augstāk norādītā izvēle, neobligātais apraksts, URL un vietnē atrasto izsekotāju saraksts.",
+    "note" : "A small disclaimer at the bottom of the view describing what is included in the report"
+  },
+  "thankYou" : {
+    "title" : "Paldies!",
+    "note" : "Title for what the user sees upon submitting the report"
+  },
+  "yourReportWillHelpDesc" : {
+    "title" : "Tavs ziņojums palīdzēs uzlabot pārlūkprogrammu un uzlabot citu lietotāju pieredzi.",
+    "note" : "Body that the user sees upon submitting the report"
+  }
+}

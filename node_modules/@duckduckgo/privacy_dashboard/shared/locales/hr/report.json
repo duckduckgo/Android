@@ -1,0 +1,75 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "selectTheOptionDesc" : {
+    "title" : "Odaberi opciju koja najbolje opisuje nastali problem.",
+    "note" : "The user will see this UI when they're running into issues with a given website, that we may be causing"
+  },
+  "pickYourIssueFromTheList" : {
+    "title" : "Odaberi svoj problem s popisa...",
+    "note" : "Asks the user to pick a specific list from the pulldown"
+  },
+  "videos" : {
+    "title" : "Videozapis nije se reproducirao",
+    "note" : "User is reporting this page because a video didn't play"
+  },
+  "images" : {
+    "title" : "Slike se nisu učitale",
+    "note" : "User is reporting this page because one or more images did not load"
+  },
+  "comments" : {
+    "title" : "Komentari se nisu učitali",
+    "note" : "User is reporting this page because one or more comments did not load"
+  },
+  "content" : {
+    "title" : "Nedostaje sadržaj",
+    "note" : "User is reporting this page because some other type of content did not load"
+  },
+  "links" : {
+    "title" : "Veze ili gumbi ne funkcioniraju",
+    "note" : "User is reporting this page because one or more links or buttons did not work when clicked"
+  },
+  "login" : {
+    "title" : "Ne mogu se prijaviti",
+    "note" : "User is reporting this page because they are unable to log into the website"
+  },
+  "paywall" : {
+    "title" : "Web-mjesto zatražilo je da onemogućim",
+    "note" : "User is reporting this page asked them to disable their privacy or ad blocking extension"
+  },
+  "other" : {
+    "title" : "Nešto drugo",
+    "note" : "User is reporting this page because of some other reason than the ones we listed"
+  },
+  "reportBrokenSite" : {
+    "title" : "Prijavi neispravno web-mjesto",
+    "note" : "Title for reporting broken website view"
+  },
+  "tellUsMoreDesc" : {
+    "title" : "Ako želiš, reci nam više o svom problemu",
+    "note" : "A hint for a text box that lets user enter free text to describe their problem"
+  },
+  "sendReport" : {
+    "title" : "Pošalji izvještaj",
+    "note" : "Button for submitting report"
+  },
+  "reportsAreAnonymousDesc" : {
+    "title" : "Izvještaji poslani DuckDuckGo 100 % su anonimni i uključuju samo tvoj gornji odabir, izborni opis, URL i popis alata za praćenje koje smo pronašli na web-mjestu.",
+    "note" : "A small disclaimer at the bottom of the view describing what is included in the report"
+  },
+  "thankYou" : {
+    "title" : "Hvala!",
+    "note" : "Title for what the user sees upon submitting the report"
+  },
+  "yourReportWillHelpDesc" : {
+    "title" : "Tvoj će izvještaj pomoći poboljšati preglednik, kao i doživljaj pretraživanja za druge posjetitelje.",
+    "note" : "Body that the user sees upon submitting the report"
+  }
+}

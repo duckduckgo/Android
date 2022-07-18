@@ -1,0 +1,99 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "connection" : {
+    "title" : "Připojení",
+    "note" : "The technical details of the connection between the browser and the website (whether encrypted and how)"
+  },
+  "encrypt" : {
+    "title" : "Zašifrujte",
+    "note" : "When the cryptographic key can be used to encrypt data"
+  },
+  "sign" : {
+    "title" : "Podepište",
+    "note" : "When the cryptographic key can be used to sign data"
+  },
+  "verify" : {
+    "title" : "Ověřte",
+    "note" : "When the cryptographic key can be used to verify data"
+  },
+  "derive" : {
+    "title" : "Odvoďte",
+    "note" : "When the cryptographic key can be used to derive new keys"
+  },
+  "wrap" : {
+    "title" : "Zabalte",
+    "note" : "When the cryptographic key can be used to wrap another key"
+  },
+  "unwrap" : {
+    "title" : "Rozbalte",
+    "note" : "When the cryptographic key can be used to unwrap another key"
+  },
+  "unknown" : {
+    "title" : "Neznámé",
+    "note" : "The cryptographic key can be used some other purpose we don't recognize"
+  },
+  "certificateDetail" : {
+    "title" : "Podrobnosti o bezpečnostním certifikátu",
+    "note" : "Header for section that contains the SSL certificate details"
+  },
+  "commonName" : {
+    "title" : "Obecný název",
+    "note" : "The Common Name for an SSL certificate"
+  },
+  "publicKey" : {
+    "title" : "Veřejný klíč",
+    "note" : "The Public Key for an SSL certificate"
+  },
+  "algorithm" : {
+    "title" : "Algoritmus",
+    "note" : "The Algorithm used for an SSL certificate"
+  },
+  "keySize" : {
+    "title" : "Velikost klíče",
+    "note" : "The size of the encryption key for an SSL certificate"
+  },
+  "usage" : {
+    "title" : "Využití",
+    "note" : "The allowed uses for an SSL certificate (references 'encrypt', 'sign', 'verify', 'unwrap', etc. strings in this file)"
+  },
+  "summary" : {
+    "title" : "Shrnutí",
+    "note" : "Header for summary of connection details"
+  },
+  "permanent" : {
+    "title" : "Trvale",
+    "note" : "Whether certificate is permanent"
+  },
+  "effectiveSize" : {
+    "title" : "Efektivní velikost",
+    "note" : "Effective size of encryption key for an SSL certificate"
+  },
+  "certificateNotFound" : {
+    "title" : "Certifikát nenalezen",
+    "note" : "When the connection is not encrypted (ie. http) we do not have any certificate details to show"
+  },
+  "certificateForDomain" : {
+    "title" : "Certifikát pro doménu {domain}",
+    "note" : "Header for certificate details for a given domain"
+  },
+  "insecureConnectionDesc" : {
+    "title" : "Tahle stránka neumožňuje zabezpečené připojení. Ostatní můžou zachytit citlivé informace, které jejím prostřednictvím odešleš.",
+    "note" : "Shown we connection is not encrypted"
+  },
+  "upgradedConnectionDesc" : {
+    "title" : "Aktualizovali jsme připojení na téhle stránce, abychom ochránili zadávané informace.",
+    "note" : "Shown when we successfully upgrade a connection from an insecure one to a secure connection"
+  },
+  "secureConnectionDesc" : {
+    "title" : "Tahle stránka používá zabezpečené připojení, které chrání zadávané informace.",
+    "note" : "Shown when the user navigated directly to a secure connection"
+  }
+}

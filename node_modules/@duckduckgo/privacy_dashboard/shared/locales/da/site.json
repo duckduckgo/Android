@@ -1,0 +1,147 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "updatingProtectionList" : {
+    "title" : "Opdatering af beskyttelseslisten",
+    "note" : "Message shown while updating the list of protections"
+  },
+  "protectionsDisabled" : {
+    "title" : "Beskyttelse er blevet <b>DEAKTIVERET</b>",
+    "note" : "Headline when privacy protections are disabled"
+  },
+  "protectionsEnabled" : {
+    "title" : "Beskyttelse er <b>AKTIVERET</b> for dette websted",
+    "note" : "Headline when privacy protections are enabled"
+  },
+  "connectionDescriptionUnencrypted" : {
+    "title" : "Andre kan muligvis opfange følsomme oplysninger, som du sender på denne side.",
+    "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
+  },
+  "connectionDescriptionUpgraded" : {
+    "title" : "Vi har opgraderet forbindelsen på denne side for at beskytte oplysninger, du sender under overførslen.",
+    "note" : "Shown when the connection has been upgraded from unencrypted to encrypted (HTTP to HTTPS)"
+  },
+  "connectionDescriptionEncrypted" : {
+    "title" : "Forbindelsen på denne side er sikker til at beskytte de oplysninger, du sender, når de overføres.",
+    "note" : "Shown when the connection is encrypted (HTTPS not HTTP)"
+  },
+  "trackerNetworksSummaryNone" : {
+    "title" : "Vi har ikke fundet nogen virksomheder, der forsøger at spore dig på denne side.",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerNetworksSummaryOwn" : {
+    "title" : "Vi fandt kun trackere, der ejes af {name}, som vi ikke blokerede.",
+    "note" : "We found but did not block trackers from company named"
+  },
+  "trackerNetworksSummaryOther" : {
+    "title" : "Vi {isWhitelisted, select, true {fandt} other {blokerede}} {displayCount} kendt(e) {displayCount, plural, =1 {tracker} other {trackere}} fra {companyCount} {companyCount, plural, one {virksomhed} other {virksomheder}} på denne side.",
+    "note" : "This summarizes the number of trackers that we either blocked or did not block (depending on the protection setting for this site)"
+  },
+  "websiteNotWorkingQ" : {
+    "title" : "Fungerer webstedet ikke som forventet?",
+    "note" : "Call to action for user to click if they are having issues with this web page"
+  },
+  "takePrecautions" : {
+    "title" : "Tag forholdsregler",
+    "note" : "Title shown when the page is unencrypted"
+  },
+  "protectionsAreDisabled" : {
+    "title" : "Beskyttelse er DEAKTIVERET",
+    "note" : "Shown when user has disabled protections for this site (or they have been programatically disabled)"
+  },
+  "foundCompanyNamesList" : {
+    "title" : "{companyCount, plural, =0 {Vi har fundet nogle virksomheder, der sporer og profilerer dig på denne side.} =2 {Vi har fundet {firstCompany} og {secondCompany}, der sporer og profilerer dig på denne side.} one {Vi fandt {firstCompany}, der sporede og profilerede dig på denne side.} other {Vi fandt {firstCompany}, {secondCompany} og andre, der sporede og profilerede dig på denne side.}}",
+    "note" : "Returns a string in the form of 'We found CompanyA, CompanyB and others tracking and profiling you on this page.'"
+  },
+  "majorTrackerNetwork" : {
+    "title" : "Tracker-netværk",
+    "note" : "Tracker network is a group of trackers, usually in the form of a company name, that track users across websites"
+  },
+  "majorTrackingNetworkDesc" : {
+    "title" : "{companyDisplayName} (ejer af {domain})\nsporer dig på {companyPrevalence} % af de bedste sider.\nVi kan ikke blokere dem på websteder, de ejer, men vi kan blokere dem på andre sider.",
+    "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
+  },
+  "noActivityToReport" : {
+    "title" : "Ingen aktivitet at rapportere",
+    "note" : "Title when we did not find any trackers on this page"
+  },
+  "trackersBlocked" : {
+    "title" : "Dem har vi blokeret",
+    "note" : "Title for the list of companies that we blocked"
+  },
+  "trackersBlockedDesc" : {
+    "title" : "{companyCount, plural, =0 {Vi har forhindret nogle virksomheder i at forsøge at spore dig.} =2 {Vi har forhindret {firstCompany} og {secondCompany} i at forsøge at spore dig.} one {Vi har forhindret {firstCompany} i at forsøge at spore dig.} other {Vi har forhindret {firstCompany}, {secondCompany} og andre i at forsøge at spore dig.}}",
+    "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
+  },
+  "cookiesMinimized" : {
+    "title" : "Cookies minimeret",
+    "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedDesc" : {
+    "title" : "Vi har sat dine cookie-indstillinger til at maksimere fortrolighed og lukket pop op-vinduet med samtykke.",
+    "note" : "Description for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "connectionSecure" : {
+    "title" : "Forbindelsen er sikker",
+    "note" : "The connection to the website is secure (HTTPS)"
+  },
+  "connectionNotSecure" : {
+    "title" : "Forbindelsen kunne ikke sikres",
+    "note" : "The connection is not secure (HTTP)"
+  },
+  "trackerNetworksDesc" : {
+    "title" : "{blocked, select, true {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} større tracker-netværk blokeret} other {{trackerCount} større tracker-netværk blokeret}}} other {{trackerCount, plural, one {{trackerCount} tracker blokeret} other {{trackerCount} trackere blokeret}}}}} other {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} større tracker-netværk fundet} other {{trackerCount} større tracker-netværk fundet}}} other {{trackerCount, plural, one {{trackerCount} tracker fundet} other {{trackerCount} trackere fundet}}}}}}",
+    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+  },
+  "firstPartyDesc" : {
+    "title" : "{companyName} ejer dette websted og de kendte trackere, der findes på denne side, så vi blokerede dem ikke.",
+    "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
+  },
+  "trackersFoundForAllowlisted" : {
+    "title" : "Trackere hjælper virksomheder med at profilere dig. Vi har fundet disse virksomheder, der overvåger din aktivitet på denne side.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections disabled"
+  },
+  "trackersFoundAndBlocked" : {
+    "title" : "Trackere hjælper virksomheder med at profilere dig. Vi har forhindret disse virksomheder i at overvåge din aktivitet på denne side.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections enabled"
+  },
+  "trackerNetworkUnknown" : {
+    "title" : "Tracker-netværk ukendt",
+    "note" : "Shown when we don't have a company name for a given tracker"
+  },
+  "trackerDomainsForCompany" : {
+    "title" : "Tracker-domæner for {companyName}",
+    "note" : "Title for the list of tracker domains detected from a given company"
+  },
+  "zeroTrackersFound" : {
+    "title" : "'{'0'}' tracker fundet",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerOwnedByThisSite" : {
+    "title" : "Trackere ejet af dette websted (tilladt)",
+    "note" : "Trackers owned by this site are not blocked"
+  },
+  "trackerCountForDomain" : {
+    "title" : "{blocked, select, true {{trackerCount, plural, one {{trackerCount} Tracker blokeret på {domain}} other {{trackerCount} Trackere blokeret på {domain}}}} other {{trackerCount, plural, one {{trackerCount} Tracker fundet på {domain}} other {{trackerCount} Trackere fundet på {domain}}}}}",
+    "note" : "For a given domain, the count of trackers either blocked or just detected (found).  Ex 4 Trackers Blocked"
+  },
+  "analyticsCategory" : {
+    "title" : "Analyseværktøj",
+    "note" : "Used to describe the type of tracker, in this case one that is used to report analytics back to the site owner"
+  },
+  "advertisingCategory" : {
+    "title" : "Reklamer",
+    "note" : "Used to describe the type of tracker, in this case one that is used for advertising"
+  },
+  "socialCategory" : {
+    "title" : "Sociale netværk",
+    "note" : "Used to describe the type of tracker, in this case one that is used by one of the popular social networksr"
+  }
+}

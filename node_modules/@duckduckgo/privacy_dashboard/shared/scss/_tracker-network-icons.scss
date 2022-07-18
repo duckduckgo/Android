@@ -1,0 +1,126 @@
+$abstract-color-palette: (
+    1: #94B3AF,
+    2: #727998,
+    3: #645468,
+    4: #4D5F7F,
+    5: #855DB6,
+    6: #5E5ADB,
+    7: #678FFF,
+    8: #6BB4EF,
+    9: #4A9BAE,
+    10: #66C4C6,
+    11: #55D388,
+    12: #99DB7A,
+    13: #ECCC7B,
+    14: #E7A538,
+    15: #DD6B4C,
+    16: #D65D62
+);
+
+@mixin tracker_network_icons_colors () {
+    @each $id, $color in $abstract-color-palette {
+        &.color-#{$id} {
+            background-color: $color;
+        }
+    }
+}
+
+$tracker-letter-fallbacks: (
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z"
+);
+
+$tracker-network-icons: (
+    "adjust",
+    "adobe",
+    "amazon",
+    "amplitude",
+    "appnexus",
+    "appsflyer",
+    "beeswax",
+    "branchmetrics",
+    "braze",
+    "bugsnag",
+    "chartbeat",
+    "comscore",
+    "criteo",
+    "facebook",
+    "google",
+    "indexexchange",
+    "iponweb",
+    "kochava",
+    "linkedin",
+    "liveramp",
+    "mediamath",
+    "microsoft",
+    "mixpanel",
+    "neustar",
+    "newrelic",
+    "openx",
+    "oracle",
+    "outbrain",
+    "pinterest",
+    "pubmatic",
+    "quantcast",
+    "magnite",
+    "rythmone",
+    "salesforce",
+    "sharetrough",
+    "smaato",
+    "spotx",
+    "taboola",
+    "tapad",
+    "thenielsencompany",
+    "thetradedesk",
+    "twitter",
+    "urbanairship",
+    "verizonmedia",
+    "warnermedia",
+    "xaxis",
+    "yahoojapan",
+    "yandex",
+    "zeotap"
+);
+
+@mixin tracker_network_icons_subview () {
+    @each $name in $tracker-letter-fallbacks {
+        &.#{$name} {
+            margin: 0 4px 0 0;
+            @include icon_display();
+            @include cross_platform_bg_image("refresh-assets/tracker-icons/letters/#{$name}.svg");
+        }
+    }
+
+    @each $name in $tracker-network-icons {
+        &.#{$name} {
+            margin: 0 4px 0 0;
+            @include icon_display();
+            @include cross_platform_bg_image("refresh-assets/tracker-icons/logos/#{$name}.svg");
+            background-color: transparent;
+        }
+    }
+}

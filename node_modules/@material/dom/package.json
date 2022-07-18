@@ -1,0 +1,22 @@
+{
+  "name": "@material/dom",
+  "description": "DOM manipulation utilities for Material Components for the web",
+  "version": "14.0.0",
+  "license": "MIT",
+  "main": "dist/mdc.dom.js",
+  "module": "index.js",
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/material-components/material-components-web.git",
+    "directory": "packages/mdc-dom"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@material/feature-targeting": "^14.0.0",
+    "tslib": "^2.1.0"
+  },
+  "gitHead": "432c815e58d61a257742836f816cf95e271e6ea1"
+}
