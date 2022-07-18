@@ -86,6 +86,24 @@ test.describe('Auto-fill a login form on iOS', () => {
                 await login.promptWasNotShown()
             })
         })
+
+        test.describe('check tooltip opening logic', () => {
+            test('tapping into an autofilled field does not prompt', async ({page}) => {
+                const {login} = await testLoginPage(page, server, {
+                    featureToggles: {
+                        inputType_credentials: true
+                    },
+                    availableInputTypes: {
+                        credentials: true
+                    },
+                    credentials
+                })
+                await login.promptWasShown('ios')
+
+                await login.clickIntoPasswordInput()
+                await login.assertMockCallOccurredTimes('getAutofillData', 1)
+            })
+        })
     })
     test.describe('when `inputType_credentials` is false', () => {
         test('I should not be prompted at all', async ({page}) => {

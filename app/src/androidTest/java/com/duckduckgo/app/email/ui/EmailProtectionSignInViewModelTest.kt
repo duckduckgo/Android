@@ -25,8 +25,8 @@ import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.email.AppEmailManager.WaitlistState.JoinedQueue
-import com.duckduckgo.app.email.AppEmailManager.WaitlistState.NotJoinedQueue
+import com.duckduckgo.app.email.EmailManager.WaitlistState.JoinedQueue
+import com.duckduckgo.app.email.EmailManager.WaitlistState.NotJoinedQueue
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.api.EmailAlias
 import com.duckduckgo.app.email.api.EmailInviteCodeResponse

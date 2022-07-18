@@ -223,7 +223,9 @@ class RealTcpSocketWriter @Inject constructor(
             IPVersion = ipHeader.version,
             transportProtocol = ipHeader.protocol.number,
             destinationAddress = ipHeader.sourceAddress,
-            destinationPort = tcpHeader.sourcePort
+            destinationPort = tcpHeader.sourcePort,
+            sourceAddress = ipHeader.destinationAddress,
+            sourcePort = tcpHeader.destinationPort,
         )
     }
 

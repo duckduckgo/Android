@@ -35,6 +35,7 @@ import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.macos_api.MacOsWaitlist
 import com.duckduckgo.macos_api.MacWaitlistState
@@ -107,6 +108,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockMacOsWaitlist: MacOsWaitlist
 
+    @Mock
+    private lateinit var internalTestUserChecker: InternalTestUserChecker
+
     private lateinit var appTrackingProtectionWaitlistDataStore: FakeAppTrackingProtectionWaitlistDataStore
 
     @get:Rule
@@ -143,7 +147,8 @@ class SettingsViewModelTest {
             mockPixel,
             mockAppBuildConfig,
             mockEmailManager,
-            mockMacOsWaitlist
+            mockMacOsWaitlist,
+            internalTestUserChecker
         )
     }
 
@@ -624,6 +629,26 @@ class SettingsViewModelTest {
             assertEquals(Command.LaunchMacOs, awaitItem())
 
             cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenIsInternalTestUserTheShowAutofillTrue() = runTest {
+        whenever(internalTestUserChecker.isInternalTestUser).thenReturn(true)
+        testee.start()
+
+        testee.viewState().test {
+            assertTrue(awaitItem().showAutofill)
+        }
+    }
+
+    @Test
+    fun whenIsInternalTestUserTheShowAutofillFalse() = runTest {
+        whenever(internalTestUserChecker.isInternalTestUser).thenReturn(false)
+        testee.start()
+
+        testee.viewState().test {
+            assertFalse(awaitItem().showAutofill)
         }
     }
 

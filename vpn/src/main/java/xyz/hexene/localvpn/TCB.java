@@ -69,7 +69,6 @@ public class TCB {
     public final Packet referencePacket;
 
     public final SocketChannel channel;
-    public boolean waitingForNetworkData;
 
     private static final int MAX_CACHE_SIZE = 500; // XXX: Is this ideal?
     private static final LRUCache<String, TCB> tcbCache =
