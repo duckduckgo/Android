@@ -16,10 +16,6 @@
 
 package com.duckduckgo.autofill.ui.credential.management
 
-import android.annotation.SuppressLint
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -34,11 +30,10 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
-@SuppressLint("StaticFieldLeak")
 @ContributesViewModel(ActivityScope::class)
 class AutofillSettingsViewModel @Inject constructor(
-    private val applicationContext: Context,
     private val autofillStore: AutofillStore,
+    private val clipboardInteractor: AutofillClipboardInteractor
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -48,12 +43,12 @@ class AutofillSettingsViewModel @Inject constructor(
     val commands: StateFlow<List<Command>> = _commands
 
     fun onCopyUsername(username: String?) {
-        username?.copyToClipboard()
+        username?.let { clipboardInteractor.copyToClipboard(it) }
         addCommand(ShowUserUsernameCopied())
     }
 
     fun onCopyPassword(password: String?) {
-        password?.copyToClipboard()
+        password?.let { clipboardInteractor.copyToClipboard(it) }
         addCommand(ShowUserPasswordCopied())
     }
 
@@ -92,14 +87,6 @@ class AutofillSettingsViewModel @Inject constructor(
             val updatedList = currentCommands.filterNot { it.id == command.id }
             _commands.value = updatedList
         }
-    }
-
-    private fun String.copyToClipboard() {
-        clipboardManager().setPrimaryClip(ClipData.newPlainText("", this))
-    }
-
-    private fun clipboardManager(): ClipboardManager {
-        return applicationContext.getSystemService(ClipboardManager::class.java)
     }
 
     fun observeCredentials() {
