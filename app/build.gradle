@@ -321,6 +321,7 @@ dependencies {
 
     androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')
+    lintChecks project(":lint-rules")
 }
 
 tasks.register('fastlaneVersionCode') {

@@ -3,6 +3,7 @@ plugins {
 }
 
 include ':app'
+include ':lint-rules'
 
 "feature-toggles".with {
     include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
