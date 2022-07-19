@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Proteção de Privacidade do Site</string>
     <string name="privacyProtectionEnabled">PROTEÇÃO DO SITE ATIVADA</string>
     <string name="privacyProtectionDisabled">PROTEÇÃO DO SITE DESATIVADA</string>
-    <string name="privacyDashboardActivityTitle">Painel de privacidade</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MELHORADO DE &lt;img src=\"%1$d\" /&gt; PARA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Grau de privacidade</string>
     <string name="privacyProtectionTemporarilyDisabled">Desativámos temporariamente a Proteção de Privacidade, pois parece estar a bloquear este site.</string>

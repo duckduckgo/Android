@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Protección de privacidad del sitio web</string>
     <string name="privacyProtectionEnabled">PROTECCIÓN DEL SITIO WEB HABILITADA</string>
     <string name="privacyProtectionDisabled">PROTECCIÓN DEL SITIO WEB DESHABILITADA</string>
-    <string name="privacyDashboardActivityTitle">Panel de privacidad</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MEJORA DE &lt;img src=\"%1$d\" /&gt; CON &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Nivel de privacidad</string>
     <string name="privacyProtectionTemporarilyDisabled">Hemos desactivado temporalmente la protección de privacidad, ya que parece que está causando errores en el sitio.</string>

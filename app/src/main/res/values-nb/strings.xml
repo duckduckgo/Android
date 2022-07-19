@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Personvern for side</string>
     <string name="privacyProtectionEnabled">BESKYTTELSE AV STEDET ER AKTIVERT</string>
     <string name="privacyProtectionDisabled">BESKYTTELSE AV NETTSIDEN DEAKTIVERT</string>
-    <string name="privacyDashboardActivityTitle">Dashbord for personvern</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FORBEDRET FRA &lt;img src=\"%1$d\" /&gt; TIL &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Grad av personvern</string>
     <string name="privacyProtectionTemporarilyDisabled">Vi har midlertidig deaktivert personvernbeskyttelse, da det ser ut til å få nettstedet til å slutte å fungere.</string>

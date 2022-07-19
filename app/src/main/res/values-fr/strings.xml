@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Protection de la confidentialité du site</string>
     <string name="privacyProtectionEnabled">PROTECTION DU SITE ACTIVÉE</string>
     <string name="privacyProtectionDisabled">PROTECTION DU SITE DÉSACTIVÉE</string>
-    <string name="privacyDashboardActivityTitle">Tableau de bord de confidentialité</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">AMÉLIORÉ DE &lt;img src=\"%1$d\" /&gt; À &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Degré de confidentialité</string>
     <string name="privacyProtectionTemporarilyDisabled">Nous avons temporairement désactivé la protection de la confidentialité car elle semble perturber ce site.</string>

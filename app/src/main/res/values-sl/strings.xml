@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Zaščita zasebnosti na strani</string>
     <string name="privacyProtectionEnabled">OMOGOČI ZAŠČITO NA STRANI</string>
     <string name="privacyProtectionDisabled">ONEMOGOČI ZAŠČITO NA STRANI</string>
-    <string name="privacyDashboardActivityTitle">Nadzorna plošča zasebnosti</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">IZBOLJŠANO OD &lt;img src=\"%1$d\" /&gt; DO &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Ocena zasebnosti</string>
     <string name="privacyProtectionTemporarilyDisabled">Začasno smo onemogočili zaščito zasebnosti, saj se zdi, da zato pride do napak na tem spletnem mestu.</string>

@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Saidi privaatsuse kaitse</string>
     <string name="privacyProtectionEnabled">Saidi kaitse on lubatud</string>
     <string name="privacyProtectionDisabled">Saidi kaitse on keelatud</string>
-    <string name="privacyDashboardActivityTitle">Privaatsuse juhtpaneel</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TÄIUSTATUD &lt;img src=\"%1$d\" /&gt; - &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privaatsusaste</string>
     <string name="privacyProtectionTemporarilyDisabled">Keelasime ajutiselt privaatsuse kaitse, kuna näib, et see kahjustab seda saiti.</string>

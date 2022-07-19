@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Ochrona prywatności witryny</string>
     <string name="privacyProtectionEnabled">WŁĄCZONA OCHRONA STRONY</string>
     <string name="privacyProtectionDisabled">WYŁĄCZONA OCHRONA STRONY</string>
-    <string name="privacyDashboardActivityTitle">Panel zarządzania prywatnością</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">USPRAWNIONY OD &lt;img src=\"%1$d\" /&gt; DO &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Poziom prywatności</string>
     <string name="privacyProtectionTemporarilyDisabled">Tymczasowo wyłączyliśmy ochronę prywatności, ponieważ wygląda na to, że zniekształca tę witrynę.</string>

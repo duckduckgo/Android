@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Sivuston yksityisyydensuoja</string>
     <string name="privacyProtectionEnabled">SIVUSTOSUOJAUS KÄYTÖSSÄ</string>
     <string name="privacyProtectionDisabled">SIVUSTOSUOJAUS EI KÄYTÖSSÄ</string>
-    <string name="privacyDashboardActivityTitle">Tietosuojan ohjauspaneeli</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">PARANNETTU &lt;img src=\"%1$d\" /&gt;–&lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Tietosuoja-arvosana</string>
     <string name="privacyProtectionTemporarilyDisabled">Yksityisyyden suoja on väliaikaisesti poistettu käytöstä, koska se näyttäisi rikkovan tämän sivun.</string>

@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Ochrana súkromia stránky</string>
     <string name="privacyProtectionEnabled">OCHRANA STRÁNKY ZAPNUTÁ</string>
     <string name="privacyProtectionDisabled">OCHRANA STRÁNKY ZAKÁZANÁ</string>
-    <string name="privacyDashboardActivityTitle">Ovládací panel ochrany súkromia</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ZDOKONALENÉ Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Stupeň ochrany súkromia</string>
     <string name="privacyProtectionTemporarilyDisabled">Dočasne sme vypli ochranu súkromia, pretože sa zdá, že spôsobuje poruchy na tejto lokalite.</string>

@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Svetainės privatumo apsauga</string>
     <string name="privacyProtectionEnabled">SVETAINĖS APSAUGA ĮJUNGTA</string>
     <string name="privacyProtectionDisabled">SVETAINĖS APSAUGA IŠJUNGTA</string>
-    <string name="privacyDashboardActivityTitle">Privatumo valdymo skydelis</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">PATOBULINTA NUO &lt;img src=\"%1$d\" /&gt; IKI &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privatumo laipsnis</string>
     <string name="privacyProtectionTemporarilyDisabled">Laikinai išjungiame privatumo apsaugą, kadangi atrodo, kad ji trukdo šios svetainės veikimui.</string>
