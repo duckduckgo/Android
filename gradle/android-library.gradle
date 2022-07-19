@@ -49,6 +49,9 @@ android {
         baseline file("lint-baseline.xml")
     }
 }
+dependencies {
+    lintChecks project(':lint-rules')
+}
 
 tasks.register('checks') {
     dependsOn 'jvm_checks', 'android_checks'
