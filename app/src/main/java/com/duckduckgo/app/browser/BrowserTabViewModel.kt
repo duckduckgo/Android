@@ -46,7 +46,6 @@ import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
-import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Browser
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Invalidated
@@ -114,6 +113,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadCommand

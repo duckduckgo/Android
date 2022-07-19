@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.brokensite
+package com.duckduckgo.browser.api.brokensite
 
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.model.Site
+
+interface BrokenSiteNav {
+    fun navigate(context: Context, data: BrokenSiteData): Intent
+}
 
 data class BrokenSiteData(
     val url: String,
@@ -27,7 +33,6 @@ data class BrokenSiteData(
     val upgradedToHttps: Boolean,
     val urlParametersRemoved: Boolean
 ) {
-
     companion object {
         fun fromSite(site: Site?): BrokenSiteData {
             val events = site?.trackingEvents

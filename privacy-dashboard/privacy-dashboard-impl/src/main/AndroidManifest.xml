@@ -17,4 +17,12 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duckduckgo.privacy.dashboard.impl">
+    <application>
+        <activity
+            android:name="com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridActivity"
+            android:label="@string/privacyDashboardActivityTitle"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:parentActivityName=".BrowserActivity" />
+    </application>
 </manifest>

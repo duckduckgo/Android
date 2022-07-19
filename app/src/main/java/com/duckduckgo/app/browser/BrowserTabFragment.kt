@@ -66,7 +66,6 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
-import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -193,6 +192,7 @@ import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.Compani
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.autofill.ui.ExistingCredentialMatchDetector
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher

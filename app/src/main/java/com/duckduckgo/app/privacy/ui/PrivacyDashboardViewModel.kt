@@ -19,7 +19,7 @@ package com.duckduckgo.app.privacy.ui
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.brokensite.BrokenSiteData
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
