@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M12,12m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0"
+      android:fillColor="?attr/omnibarRoundedFieldBackgroundColor"/>
+  <path
+      android:pathData="M24,12C24,18.6274 18.6274,24 12,24C5.3726,24 0,18.6274 0,12C0,5.3726 5.3726,0 12,0C18.6274,0 24,5.3726 24,12ZM2,10V11.2432H3.3587V14.8505H4.8533V11.2432H6.2119V10H2ZM19.4389,13.6073H18.8547V11.2432H19.3302C20.4103,11.2432 20.5054,12.0923 20.5054,12.3981C20.5054,12.8533 20.3695,13.6073 19.4389,13.6073ZM14.8058,13.1182L15.2745,11.6236H15.2881L15.7229,13.1182H14.8058ZM11.7419,12.2282H11.1644V11.2432H11.8302C12.1971,11.2432 12.5367,11.2704 12.5367,11.7119C12.5367,12.2011 12.1291,12.2282 11.7419,12.2282ZM7.1156,13.1182L7.5843,11.6236H7.5979L8.0327,13.1182H7.1156ZM19.8125,10H17.3601V13.7123L16.0083,10H14.5477L13.9491,11.6251C13.9349,10.9349 13.4674,10 12.1699,10H9.6699V13.7124L8.318,10H6.8574L5.0708,14.8505H6.5721L6.7895,14.1576H8.3316L8.5354,14.8505H9.6699H10.0843H11.1644V13.3831H12.0476C12.6389,13.3831 13.1384,13.2281 13.4769,12.9069L12.761,14.8505H14.2623L14.4797,14.1576H16.0218L16.2256,14.8505H17.3601H17.7746H19.5204C21.2119,14.8505 22,13.9062 22,12.4185C22,11.1956 21.4294,10 19.8125,10Z"
+      android:fillColor="?attr/toolbarIconColor"
+      android:fillType="evenOdd"/>
+</vector>

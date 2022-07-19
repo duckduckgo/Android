@@ -21,6 +21,11 @@ include ':app'
     include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
 }
 
+"privacy-dashboard".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+}
+
 "voice-search".with {
     include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
     include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")

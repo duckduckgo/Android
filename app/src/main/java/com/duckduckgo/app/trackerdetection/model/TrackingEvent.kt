@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.trackerdetection.model
 
+import com.duckduckgo.trackerdetection.model.Entity
+
 data class TrackingEvent(
     val documentUrl: String,
     val trackerUrl: String,

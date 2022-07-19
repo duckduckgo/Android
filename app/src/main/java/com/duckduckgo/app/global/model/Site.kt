@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.model
 
 import android.net.Uri
+import android.net.http.SslCertificate
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.domain
@@ -24,8 +25,9 @@ import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.privacy.dashboard.api.PrivacyShield
 import com.duckduckgo.app.surrogates.SurrogateResponse
-import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 interface Site {
@@ -46,9 +48,11 @@ interface Site {
     val https: HttpsStatus
     var hasHttpResources: Boolean
     var upgradedHttps: Boolean
+    var userAllowList: Boolean
 
     val privacyPractices: PrivacyPractices.Practices
     val entity: Entity?
+    var certificate: SslCertificate?
     val trackingEvents: List<TrackingEvent>
     val trackerCount: Int
     val majorNetworkCount: Int
@@ -59,6 +63,7 @@ interface Site {
     fun surrogateDetected(surrogate: SurrogateResponse)
 
     fun calculateGrades(): SiteGrades
+    fun privacyProtection(): PrivacyShield
 
     data class SiteGrades(
         val grade: PrivacyGrade,

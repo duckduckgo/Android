@@ -18,7 +18,7 @@ package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.privacy.model.PredefinedGradeDataJsonConverter.GradeTestCase.Input
 import com.duckduckgo.app.privacy.model.PredefinedGradeDataJsonConverter.GradeTestCase.Tracker
-import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.trackerdetection.model.Entity
 
 class PredefinedGradeDataJsonConverter {
 

@@ -30,9 +30,11 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -67,6 +69,10 @@ class TabDataRepositoryTest {
     private val mockPrivacyPractices: PrivacyPractices = mock()
 
     private val mockEntityLookup: EntityLookup = mock()
+
+    private val mockWhitelistDao: UserWhitelistDao = mock()
+
+    private val mockContentBlocking: ContentBlocking = mock()
 
     private val mockWebViewPreviewPersister: WebViewPreviewPersister = mock()
 
@@ -417,7 +423,7 @@ class TabDataRepositoryTest {
     private fun tabDataRepository(dao: TabsDao): TabDataRepository {
         return TabDataRepository(
             dao,
-            SiteFactory(mockPrivacyPractices, mockEntityLookup),
+            SiteFactory(mockPrivacyPractices, mockEntityLookup, mockWhitelistDao, mockContentBlocking, TestScope()),
             mockWebViewPreviewPersister,
             mockFaviconManager,
             TestScope()
