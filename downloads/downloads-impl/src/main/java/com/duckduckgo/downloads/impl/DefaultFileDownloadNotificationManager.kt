@@ -21,15 +21,20 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import androidx.annotation.AnyThread
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloadNotificationManager
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
@@ -37,16 +42,27 @@ private const val DOWNLOAD_IN_PROGRESS_GROUP = "com.duckduckgo.downloads.IN_PROG
 private const val SUMMARY_ID = 0
 
 @AnyThread
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = FileDownloadNotificationManager::class
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = BrowserLifecycleObserver::class
+)
 @SingleInstanceIn(AppScope::class)
 class DefaultFileDownloadNotificationManager @Inject constructor(
     private val notificationManager: NotificationManager,
     private val applicationContext: Context,
     private val appBuildConfig: AppBuildConfig,
-) : FileDownloadNotificationManager {
+) : FileDownloadNotificationManager, BrowserLifecycleObserver {
 
     // Group notifications are not automatically cleared when the last notification in the group is removed. So we need to do this manually.
     private val groupNotificationsCounter = AtomicReference<Map<Long, String>>(mapOf())
+    // This is not great but didn't find any other way to do it. When the user closes the app all the downloads are cancelled
+    // but the in progress notifications are not dismissed however they should.
+    // This will flag when the application is closing so that we don't post any more notifications.
+    private val applicationClosing = AtomicBoolean(false)
 
     @AnyThread
     override fun showDownloadInProgressNotification(downloadId: Long, filename: String, progress: Int) {
@@ -74,6 +90,12 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setGroupSummary(true)
             .build()
 
+        // we don't want to post any notification while the DDG application is closing
+        if (applicationClosing.get()) {
+            cancelDownloadFileNotification(downloadId)
+            return
+        }
+
         notificationManager.apply {
             notify(downloadId.toInt(), notification)
             notify(SUMMARY_ID, summary)
@@ -99,6 +121,9 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .build()
 
         cancelDownloadFileNotification(downloadId)
+
+        // we don't want to post any notification while the DDG application is closing
+        if (applicationClosing.get()) return
         notificationManager.notify(downloadId.toInt(), notification)
     }
 
@@ -125,6 +150,9 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .build()
 
         cancelDownloadFileNotification(downloadId)
+
+        // we don't want to post any notification while the DDG application is closing
+        if (applicationClosing.get()) return
         notificationManager.notify(downloadId.toInt(), notification)
     }
 
@@ -136,6 +164,25 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             }
         }
         notificationManager.cancel(downloadId.toInt())
+    }
+
+    override fun onOpen(isFreshLaunch: Boolean) {
+        // because this is a singleton in AppScope, we want to make sure this state doesn't persist across app launches.
+        applicationClosing.set(false)
+    }
+
+    override fun onClose() {
+        synchronized(groupNotificationsCounter) {
+            applicationClosing.set(true)
+            val downloadIds = groupNotificationsCounter.get().keys
+            downloadIds.forEach { cancelDownloadFileNotification(it) }
+            groupNotificationsCounter.set(mapOf())
+        }
+        // we can't detect the app swipe closed event reliably because the app lifecycle behaves differently when the AppTP (process) is enabled
+        // or disabled. Eg. Swipe closing the app when AppTP (process) is enabled doens't really kill the app as it happens when AppTP is disabled
+        // The only way I found is the postDelayed below. If the Runnable is executed, it means the app is still alive, so we want in progress
+        // notifications to continue appearing
+        Handler(Looper.getMainLooper()).postDelayed({ applicationClosing.set(false) }, 250)
     }
 
     // We could have used [AtomicReference#getAndUpdate] but it's not available in Android API level 24.
