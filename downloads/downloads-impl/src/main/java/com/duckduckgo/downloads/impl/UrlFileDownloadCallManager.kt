@@ -16,8 +16,10 @@
 
 package com.duckduckgo.downloads.impl
 
+import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -31,9 +33,16 @@ interface UrlFileDownloadCallManager {
     fun remove(downloadId: Long)
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = UrlFileDownloadCallManager::class
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = BrowserLifecycleObserver::class
+)
 @SingleInstanceIn(AppScope::class)
-class RealUrlFileDownloadCallManager @Inject constructor() : UrlFileDownloadCallManager {
+class RealUrlFileDownloadCallManager @Inject constructor() : UrlFileDownloadCallManager, BrowserLifecycleObserver {
     private val callsMap = ConcurrentHashMap<Long, Call<ResponseBody>>()
 
     /**
@@ -53,5 +62,11 @@ class RealUrlFileDownloadCallManager @Inject constructor() : UrlFileDownloadCall
     override fun add(downloadId: Long, call: Call<ResponseBody>) {
         Timber.d("Adding download $downloadId")
         callsMap[downloadId] = call
+    }
+
+    override fun onExit() {
+        // this callback will only be called when the AppTP process is enabled and the user swipe closes the app :shrug:
+        // to be consistent with the behavior when AppTP process is disabled, we want to cancel downloads
+        callsMap.keys.forEach { remove(it) }
     }
 }
