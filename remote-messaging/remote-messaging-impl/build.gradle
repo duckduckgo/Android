@@ -33,9 +33,10 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     implementation project(path: ':common')
+    implementation project(path: ':common-ui')
     implementation project(path: ':remote-messaging-api')
-    api project(path: ':remote-messaging-store')
-    api project(path: ':browser-api')
+    implementation project(path: ':remote-messaging-store')
+    implementation project(path: ':browser-api')
     implementation project(path: ':app-build-config-api')
 
     implementation KotlinX.coroutines.core

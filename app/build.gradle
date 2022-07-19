@@ -165,6 +165,7 @@ dependencies {
     implementation project(path: ':common-ui')
     implementation project(path: ':di')
     implementation project(path: ':vpn')
+    implementation project(path: ':vpn-api')
     implementation project(path: ':vpn-store')
     internalImplementation project(path: ':vpn-internal')
 
@@ -172,24 +173,31 @@ dependencies {
     implementation project(path: ':feature-toggles-impl')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':privacy-config-impl')
+    implementation project(path: ':privacy-config-store')
     implementation project(path: ':anrs-api')
+    implementation project(path: ':anrs-store')
     implementation project(path: ':anrs-impl')
     implementation project(path: ':macos-api')
     implementation project(path: ':macos-impl')
+    implementation project(path: ':macos-store')
 
     implementation project(path: ':remote-messaging-api')
     implementation project(path: ':remote-messaging-impl')
+    implementation project(path: ':remote-messaging-store')
 
     implementation project(path: ':voice-search-api')
     implementation project(path: ':voice-search-impl')
+    implementation project(path: ':voice-search-store')
 
     implementation project(path: ':downloads-api')
     implementation project(path: ':downloads-impl')
+    implementation project(path: ':downloads-store')
 
     internalImplementation project(path: ':traces-api')
     internalImplementation project(path: ':traces-impl')
 
     implementation project(path: ':bandwidth-impl')
+    implementation project(path: ':bandwidth-store')
 
     implementation project(path: ':secure-storage-api')
     implementation project(path: ':secure-storage-impl')
