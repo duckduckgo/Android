@@ -132,7 +132,7 @@ class UrlFileDownloader @Inject constructor(
                 sink.write(buffer, didRead)
                 val fakeProgress = floor(calculateFakeProgress(progressSteps) * 100.0).toInt().also { progressSteps += 0.0001 }
                 val calculatedProgress = (totalRead * 100 / contentLength).coerceAtLeast(0L)
-                val progress = if (calculatedProgress == 0L) fakeProgress else calculatedProgress
+                val progress = if (calculatedProgress < 0L) fakeProgress else calculatedProgress
                 downloadCallback.onProgress(downloadId, fileName, progress.toInt())
             }
             true
