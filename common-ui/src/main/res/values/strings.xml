@@ -25,6 +25,7 @@
     <string name="tab_title_component_cards">Cards</string>
     <string name="tab_title_component_messaging">Messaging</string>
     <string name="tab_title_component_list_items">List items</string>
+    <string name="tab_title_component_others">Others</string>
     <string name="tab_title_component_system">System</string>
 
     <!--Components-->

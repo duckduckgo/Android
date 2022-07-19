@@ -107,6 +107,8 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
+    class DividerComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_section_divider))
+
     companion object {
         fun create(
             parent: ViewGroup,
@@ -124,6 +126,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
                 Component.SINGLE_LINE_LIST_ITEM -> SingleLineItemComponentViewHolder(parent)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
+                Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
                 else -> {
                     TODO()
                 }

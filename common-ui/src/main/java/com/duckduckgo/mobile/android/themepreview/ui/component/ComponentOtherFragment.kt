@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,28 +16,8 @@
 
 package com.duckduckgo.mobile.android.themepreview.ui.component
 
-enum class Component {
-    BUTTON,
-    FAB,
-    CARD,
-    TOP_APP_BAR,
-    CHIP,
-    DRAWER,
-    TEXT_FIELD,
-    BOTTOM_NAVIGATION,
-    SWITCH,
-    RADIO_BUTTON,
-    CHECKBOX,
-    BOTTOM_APP_BAR,
-    TABS,
-    SNACKBAR,
-    INFO_PANEL,
-    DIALOG,
-    BOTTOM_SHEET,
-    IMAGE,
-    SEARCH_BAR,
-    MENU_ITEM,
-    SINGLE_LINE_LIST_ITEM,
-    TWO_LINE_LIST_ITEM,
-    SECTION_DIVIDER
+class ComponentOtherFragment : ComponentFragment() {
+    override fun getComponents(): List<Component> {
+        return listOf(Component.SECTION_DIVIDER)
+    }
 }

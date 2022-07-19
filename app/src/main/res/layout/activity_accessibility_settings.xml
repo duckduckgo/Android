@@ -109,10 +109,10 @@
                     android:textColor="?attr/normalTextColor" />
             </LinearLayout>
 
-            <View
-                android:id="@+id/accessibilityDivider"
-                style="@style/SettingsGroupDivider"
-                android:layout_marginBottom="@dimen/keyline_5" />
+            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/accessibilityDivider"/>
 
             <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
                 android:id="@+id/forceZoomToggle"
