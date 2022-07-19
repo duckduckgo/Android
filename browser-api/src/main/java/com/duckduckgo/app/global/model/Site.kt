@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,11 @@ import android.net.http.SslCertificate
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.domain
-import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.privacy.dashboard.api.PrivacyShield
 import com.duckduckgo.app.surrogates.SurrogateResponse
-import com.duckduckgo.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 interface Site {

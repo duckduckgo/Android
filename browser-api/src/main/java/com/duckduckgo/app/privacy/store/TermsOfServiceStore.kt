@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.model
+package com.duckduckgo.app.privacy.store
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import com.duckduckgo.app.global.initialization.DataLoadable
+import com.duckduckgo.app.privacy.model.TermsOfService
 
-@Entity(tableName = "tds_entity")
-data class TdsEntity(
-    @PrimaryKey override val name: String,
-    override val displayName: String,
-    override val prevalence: Double
-) : com.duckduckgo.app.trackerdetection.model.Entity
+interface TermsOfServiceStore : DataLoadable {
+
+    val terms: List<TermsOfService>
+}

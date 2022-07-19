@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs
+package com.duckduckgo.app.global.model
 
-import android.content.Intent
-import com.duckduckgo.app.tabs.Intent.Companion.TAB_ID_EXTRA
+import androidx.annotation.AnyThread
+import androidx.annotation.WorkerThread
 
-class Intent {
-    companion object {
-        const val TAB_ID_EXTRA: String = "TAB_ID_EXTRA"
-    }
+interface SiteFactory {
+    @AnyThread
+    fun buildSite(
+        url: String,
+        title: String? = null,
+        httpUpgraded: Boolean = false
+    ): Site
+
+    /**
+     * Updates the given Site with the full details
+     *
+     * This can be expensive to execute.
+     */
+    @WorkerThread
+    fun loadFullSiteDetails(site: Site)
 }
-
-var Intent.tabId: String?
-    get() = getStringExtra(TAB_ID_EXTRA)
-    set(value) {
-        putExtra(TAB_ID_EXTRA, value)
-    }

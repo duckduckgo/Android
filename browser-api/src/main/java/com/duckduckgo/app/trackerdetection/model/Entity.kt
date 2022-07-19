@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.model
+package com.duckduckgo.app.trackerdetection.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+interface Entity {
+    val name: String
+    val displayName: String
+    val prevalence: Double
 
-@Entity(tableName = "user_whitelist")
-data class UserWhitelistedDomain(
-    @PrimaryKey val domain: String
-)
+    val isMajor get() = prevalence > MAJOR_NETWORK_PREVALENCE
+
+    companion object {
+        const val MAJOR_NETWORK_PREVALENCE = 25.0
+    }
+}

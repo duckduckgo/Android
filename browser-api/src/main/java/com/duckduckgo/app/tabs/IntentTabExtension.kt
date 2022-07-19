@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.model
+package com.duckduckgo.app.tabs
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import android.content.Intent
 
-@Entity(tableName = "tds_entity")
-data class TdsEntity(
-    @PrimaryKey override val name: String,
-    override val displayName: String,
-    override val prevalence: Double
-) : com.duckduckgo.app.trackerdetection.model.Entity
+private const val TAB_ID_EXTRA: String = "TAB_ID_EXTRA"
+
+var Intent.tabId: String?
+    get() = getStringExtra(TAB_ID_EXTRA)
+    set(value) {
+        putExtra(TAB_ID_EXTRA, value)
+    }

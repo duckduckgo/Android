@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.store
+package com.duckduckgo.app.trackerdetection.model
 
-import com.duckduckgo.app.global.initialization.DataLoadable
-import com.duckduckgo.app.privacy.model.TermsOfService
-
-interface TermsOfServiceStore : DataLoadable {
-
-    val terms: List<TermsOfService>
-}
+data class TrackingEvent(
+    val documentUrl: String,
+    val trackerUrl: String,
+    val categories: List<String>?,
+    val entity: Entity?,
+    val blocked: Boolean,
+    val surrogateId: String?
+)

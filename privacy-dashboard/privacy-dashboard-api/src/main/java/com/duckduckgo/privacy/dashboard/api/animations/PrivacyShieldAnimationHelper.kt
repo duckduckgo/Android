@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.dashboard.api.animations
 
 import com.airbnb.lottie.LottieAnimationView
-import com.duckduckgo.privacy.dashboard.api.PrivacyShield
+import com.duckduckgo.app.global.model.PrivacyShield
 
 /** Public interface for the Privacy Shield Animation Helper */
 interface PrivacyShieldAnimationHelper {

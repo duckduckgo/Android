@@ -90,7 +90,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
@@ -129,7 +129,7 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEA
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
-import com.duckduckgo.privacy.dashboard.api.PrivacyShield.PROTECTED
+import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
@@ -404,7 +404,7 @@ class BrowserTabViewModelTest {
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector()
         )
 
-        val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, TestScope())
+        val siteFactory = SiteFactoryImpl(mockPrivacyPractices, mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, TestScope())
 
         accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestScope())
 

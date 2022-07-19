@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.dashboard.api
+package com.duckduckgo.app.privacy.model
 
-enum class PrivacyShield {
-    PROTECTED,
-    UNPROTECTED,
-    WARNING,
-    UNKNOWN
-}
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "user_whitelist")
+data class UserWhitelistedDomain(
+    @PrimaryKey val domain: String
+)

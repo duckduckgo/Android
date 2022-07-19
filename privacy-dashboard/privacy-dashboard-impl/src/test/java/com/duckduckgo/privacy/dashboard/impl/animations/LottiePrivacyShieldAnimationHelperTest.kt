@@ -18,9 +18,9 @@ package com.duckduckgo.privacy.dashboard.impl.animations
 
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.mobile.android.ui.store.AppTheme
-import com.duckduckgo.privacy.dashboard.api.PrivacyShield.PROTECTED
-import com.duckduckgo.privacy.dashboard.api.PrivacyShield.UNPROTECTED
-import com.duckduckgo.privacy.dashboard.api.PrivacyShield.WARNING
+import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
+import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
+import com.duckduckgo.app.global.model.PrivacyShield.WARNING
 import com.duckduckgo.privacy.dashboard.impl.R
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify

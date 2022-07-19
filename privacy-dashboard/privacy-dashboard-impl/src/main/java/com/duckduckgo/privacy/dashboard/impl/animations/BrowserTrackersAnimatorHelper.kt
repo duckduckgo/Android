@@ -23,6 +23,7 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.view.View
 import com.airbnb.lottie.LottieAnimationView
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.privacy.dashboard.api.animations.BrowserTrackersAnimatorHelper
@@ -31,7 +32,6 @@ import com.duckduckgo.privacy.dashboard.impl.R
 import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.ImageLogo
 import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.LetterLogo
 import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.StackedLogo
-import com.duckduckgo.trackerdetection.model.Entity
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 

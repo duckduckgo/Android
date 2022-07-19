@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.model
+package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.trackerdetection.model.Entity
+import androidx.annotation.WorkerThread
+import com.duckduckgo.app.trackerdetection.model.Entity
 
-data class TrackingEvent(
-    val documentUrl: String,
-    val trackerUrl: String,
-    val categories: List<String>?,
-    val entity: Entity?,
-    val blocked: Boolean,
-    val surrogateId: String?
-)
+interface EntityLookup {
+    @WorkerThread
+    fun entityForUrl(url: String): Entity?
+
+    @WorkerThread
+    fun entityForName(name: String): Entity?
+}

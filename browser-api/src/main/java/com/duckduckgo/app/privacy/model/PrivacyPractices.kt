@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,28 @@
 
 package com.duckduckgo.app.privacy.model
 
-import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.global.initialization.DataLoadable
 
-data class TestingEntity(
-    override val name: String,
-    override val displayName: String,
-    override val prevalence: Double
-) : Entity
+interface PrivacyPractices : DataLoadable {
+
+    enum class Summary {
+        POOR,
+        GOOD,
+        MIXED,
+        UNKNOWN
+    }
+
+    data class Practices(
+        val score: Int,
+        val summary: Summary,
+        val goodReasons: List<String>,
+        val badReasons: List<String>
+    )
+
+    fun privacyPracticesFor(url: String): Practices
+
+    companion object {
+
+        val UNKNOWN = Practices(2, Summary.UNKNOWN, emptyList(), emptyList())
+    }
+}

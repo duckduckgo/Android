@@ -18,7 +18,7 @@ package com.duckduckgo.privacy.dashboard.api.animations
 
 import android.view.View
 import com.airbnb.lottie.LottieAnimationView
-import com.duckduckgo.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.Entity
 
 /** Public interface for the Browser URL Bar Privacy and Trackers animations */
 interface BrowserTrackersAnimatorHelper {

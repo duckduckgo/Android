@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,21 +22,22 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.trackerdetection.EntityLookup
-import com.duckduckgo.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import javax.inject.Inject
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 
+@ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class SiteFactory @Inject constructor(
+class SiteFactoryImpl @Inject constructor(
     private val privacyPractices: PrivacyPractices,
     private val entityLookup: EntityLookup,
     private val userWhitelistDao: UserWhitelistDao,
     private val contentBlocking: ContentBlocking,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
-) {
+) : SiteFactory {
 
     /**
      * Builds a Site with minimal details; this is quick to build but won't contain the full details needed for all functionality
@@ -44,10 +45,10 @@ class SiteFactory @Inject constructor(
      * @see [loadFullSiteDetails] to ensure full privacy details are loaded
      */
     @AnyThread
-    fun buildSite(
+    override fun buildSite(
         url: String,
-        title: String? = null,
-        httpUpgraded: Boolean = false
+        title: String?,
+        httpUpgraded: Boolean
     ): Site {
         return SiteMonitor(url, title, httpUpgraded, userWhitelistDao, contentBlocking, appCoroutineScope)
     }
@@ -58,17 +59,10 @@ class SiteFactory @Inject constructor(
      * This can be expensive to execute.
      */
     @WorkerThread
-    fun loadFullSiteDetails(site: Site) {
+    override fun loadFullSiteDetails(site: Site) {
         val practices = privacyPractices.privacyPracticesFor(site.url)
         val memberNetwork = entityLookup.entityForUrl(site.url)
         val siteDetails = SitePrivacyData(site.url, practices, memberNetwork, memberNetwork?.prevalence ?: 0.0)
         site.updatePrivacyData(siteDetails)
     }
-
-    data class SitePrivacyData(
-        val url: String,
-        val practices: PrivacyPractices.Practices,
-        val entity: Entity?,
-        val prevalence: Double?
-    )
 }

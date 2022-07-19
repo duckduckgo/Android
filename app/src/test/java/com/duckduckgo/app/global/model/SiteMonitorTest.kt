@@ -17,7 +17,6 @@
 package com.duckduckgo.app.global.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -25,10 +24,10 @@ import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.dashboard.api.PrivacyShield.PROTECTED
-import com.duckduckgo.privacy.dashboard.api.PrivacyShield.UNKNOWN
-import com.duckduckgo.privacy.dashboard.api.PrivacyShield.UNPROTECTED
-import com.duckduckgo.trackerdetection.model.Entity
+import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
+import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
+import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
+import com.duckduckgo.app.trackerdetection.model.Entity
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
