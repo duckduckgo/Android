@@ -51,7 +51,7 @@ class NoSingletonDetector : Detector(), SourceCodeScanner {
             """
                 The @Singleton annotation must not be used to contribute dependencies
                 to the App dagger component.
-                Use @SingleInstanceIn(AppObjectGraph::class) instead.
+                Use @SingleInstanceIn(SomeScope::class) instead.
             """.trimIndent(),
             Category.CORRECTNESS, 10, ERROR,
             Implementation(NoSingletonDetector::class.java, EnumSet.of(JAVA_FILE, TEST_SOURCES))
