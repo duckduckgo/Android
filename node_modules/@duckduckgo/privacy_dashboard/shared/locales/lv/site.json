@@ -1,0 +1,147 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "updatingProtectionList" : {
+    "title" : "Aizsardzības saraksta atjaunināšana",
+    "note" : "Message shown while updating the list of protections"
+  },
+  "protectionsDisabled" : {
+    "title" : "Aizsardzība ir <b>ATSPĒJOTA</b>",
+    "note" : "Headline when privacy protections are disabled"
+  },
+  "protectionsEnabled" : {
+    "title" : "Aizsardzība šajā vietnē ir <b>IESPĒJOTA</b>",
+    "note" : "Headline when privacy protections are enabled"
+  },
+  "connectionDescriptionUnencrypted" : {
+    "title" : "Citi var pārtvert šai lapai nosūtīto sensitīvo informāciju.",
+    "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
+  },
+  "connectionDescriptionUpgraded" : {
+    "title" : "Mēs esam uzlabojuši šīs lapas savienojumu, lai aizsargātu nosūtīto informāciju tās pārraidīšanas laikā.",
+    "note" : "Shown when the connection has been upgraded from unencrypted to encrypted (HTTP to HTTPS)"
+  },
+  "connectionDescriptionEncrypted" : {
+    "title" : "Šīs lapas savienojums ir drošs un aizsargā nosūtīto informāciju.",
+    "note" : "Shown when the connection is encrypted (HTTPS not HTTP)"
+  },
+  "trackerNetworksSummaryNone" : {
+    "title" : "Neatradām nevienu uzņēmumu, kas censtos tevi izsekot šajā lapā.",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerNetworksSummaryOwn" : {
+    "title" : "Esam atraduši tikai {name} piederošus izsekotājus, kurus nebloķējām.",
+    "note" : "We found but did not block trackers from company named"
+  },
+  "trackerNetworksSummaryOther" : {
+    "title" : "Mēs {isWhitelisted, select, true {esam atraduši} other {esam bloķējuši}} {displayCount} zināmus {displayCount, plural, =1 {izsekotāju} other {izsekotājus}} no {companyCount} {companyCount, plural, one {uzņēmuma} other {uzņēmumiem}} šajā lapā.",
+    "note" : "This summarizes the number of trackers that we either blocked or did not block (depending on the protection setting for this site)"
+  },
+  "websiteNotWorkingQ" : {
+    "title" : "Tīmekļa vietne nedarbojas, kā paredzēts?",
+    "note" : "Call to action for user to click if they are having issues with this web page"
+  },
+  "takePrecautions" : {
+    "title" : "Veikt piesardzības pasākumus",
+    "note" : "Title shown when the page is unencrypted"
+  },
+  "protectionsAreDisabled" : {
+    "title" : "Aizsardzība ir ATSPĒJOTA",
+    "note" : "Shown when user has disabled protections for this site (or they have been programatically disabled)"
+  },
+  "foundCompanyNamesList" : {
+    "title" : "{companyCount, plural, =0 {Esam atraduši dažus uzņēmumus, kas tevi izseko un profilē šajā lapā.} =2 {Esam atraduši {firstCompany} un {secondCompany}, kas tevi izseko un profilē šajā lapā.} zero {Esam atraduši {firstCompany}, {secondCompany} un citus, kas izseko un profilē tevi šajā lapā.} one {Esam atraduši {firstCompany}, kas izseko un profilē tevi šajā lapā.} other {Esam atraduši {firstCompany}, {secondCompany} un citus, kas izseko un profilē tevi šajā lapā.}}",
+    "note" : "Returns a string in the form of 'We found CompanyA, CompanyB and others tracking and profiling you on this page.'"
+  },
+  "majorTrackerNetwork" : {
+    "title" : "Izsekotāju tīkls",
+    "note" : "Tracker network is a group of trackers, usually in the form of a company name, that track users across websites"
+  },
+  "majorTrackingNetworkDesc" : {
+    "title" : "{companyDisplayName} ({domain} īpašnieks)\nizseko tevi {companyPrevalence}% populārāko vietņu.\nMēs nevaram tos bloķēt viņiem piederošajās vietnēs, bet varam bloķēt citās lapās.",
+    "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
+  },
+  "noActivityToReport" : {
+    "title" : "Nav darbību, par kurām ziņot",
+    "note" : "Title when we did not find any trackers on this page"
+  },
+  "trackersBlocked" : {
+    "title" : "Ko mēs esam bloķējuši",
+    "note" : "Title for the list of companies that we blocked"
+  },
+  "trackersBlockedDesc" : {
+    "title" : "{companyCount, plural, =0 {Esam bloķējuši dažu uzņēmumu mēģinājumus izsekot tevi.} =2 {Esam bloķējuši {firstCompany} un {secondCompany} mēģinājumus izsekot tevi.} zero {Esam bloķējuši {firstCompany}, {secondCompany} un citu centienus izsekot tevi.} one {Esam bloķējuši {firstCompany} centienus izsekot tevi.} other {Esam bloķējuši {firstCompany}, {secondCompany} un citu centienus izsekot tevi.}}",
+    "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
+  },
+  "cookiesMinimized" : {
+    "title" : "Minimizēti sīkfaili",
+    "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedDesc" : {
+    "title" : "Mēs esam iestatījuši sīkfailu preferences, lai maksimāli palielinātu konfidencialitāti, un aizvēruši piekrišanas uznirstošo logu.",
+    "note" : "Description for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "connectionSecure" : {
+    "title" : "Savienojums ir drošs",
+    "note" : "The connection to the website is secure (HTTPS)"
+  },
+  "connectionNotSecure" : {
+    "title" : "Savienojumu nav iespējams padarīt drošu",
+    "note" : "The connection is not secure (HTTP)"
+  },
+  "trackerNetworksDesc" : {
+    "title" : "{blocked, select, true {{majorNetwork, select, true {{trackerCount, plural, zero {{trackerCount} lielāko izsekotāju tīkli ir bloķēti} one {{trackerCount} lielāko izsekotāju tīkls ir bloķēts} other {{trackerCount} lielāko izsekotāju tīkli ir bloķēti}}} other {{trackerCount, plural, zero {{trackerCount} Izsekotāji ir bloķēti} one {{trackerCount} Izsekotājs ir bloķēts} other {{trackerCount} Izsekotāji ir bloķēti}}}}} other {{majorNetwork, select, true {{trackerCount, plural, zero {Atrasti {trackerCount} lielāko izsekotāju tīkli} one {Atrasts {trackerCount} lielāko izsekotāju tīkls} other {Atrasti {trackerCount} lielāko izsekotāju tīkli}}} other {{trackerCount, plural, zero {{trackerCount} Atrasti izsekotāji} one {{trackerCount} Atrasts izsekotājs} other {{trackerCount} Atrasti izsekotāji}}}}}}",
+    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+  },
+  "firstPartyDesc" : {
+    "title" : "{companyName} ir šīs vietnes un šajā lapā atrodamo zināmo izsekotāju īpašnieks, tāpēc mēs tos nebloķējām.",
+    "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
+  },
+  "trackersFoundForAllowlisted" : {
+    "title" : "Izsekotāji palīdz uzņēmumiem tevi profilēt. Esam atraduši šos uzņēmumus, kuri novēro tavas darbības šajā lapā.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections disabled"
+  },
+  "trackersFoundAndBlocked" : {
+    "title" : "Izsekotāji palīdz uzņēmumiem veidot tavu profilu. Esam bloķējuši šo uzņēmumu iespēju pārraudzīt tavas darbības šajā lapā.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections enabled"
+  },
+  "trackerNetworkUnknown" : {
+    "title" : "Izsekošanas tīkls nav zināms",
+    "note" : "Shown when we don't have a company name for a given tracker"
+  },
+  "trackerDomainsForCompany" : {
+    "title" : "{companyName} izsekošanas domēni",
+    "note" : "Title for the list of tracker domains detected from a given company"
+  },
+  "zeroTrackersFound" : {
+    "title" : "Atrasti 0 izsekotāji",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerOwnedByThisSite" : {
+    "title" : "Šai vietnei piederošie izsekotāji (atļauts)",
+    "note" : "Trackers owned by this site are not blocked"
+  },
+  "trackerCountForDomain" : {
+    "title" : "{blocked, select, true {{trackerCount, plural, zero {{trackerCount} bloķēti izsekotāji {domain}} one {{trackerCount} bloķēts izsekotājs {domain}} other {{trackerCount} bloķēti izsekotāji {domain}}}} other {{trackerCount, plural, zero {Atrasti {trackerCount} izsekotāji {domain}} one {Atrasts {trackerCount} izsekotājs {domain}} other {Atrasti {trackerCount} izsekotāji {domain}}}}}",
+    "note" : "For a given domain, the count of trackers either blocked or just detected (found).  Ex 4 Trackers Blocked"
+  },
+  "analyticsCategory" : {
+    "title" : "Analītika",
+    "note" : "Used to describe the type of tracker, in this case one that is used to report analytics back to the site owner"
+  },
+  "advertisingCategory" : {
+    "title" : "Reklāma",
+    "note" : "Used to describe the type of tracker, in this case one that is used for advertising"
+  },
+  "socialCategory" : {
+    "title" : "Sociālais tīkls",
+    "note" : "Used to describe the type of tracker, in this case one that is used by one of the popular social networksr"
+  }
+}

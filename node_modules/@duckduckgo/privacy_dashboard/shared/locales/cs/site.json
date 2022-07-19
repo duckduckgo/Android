@@ -1,0 +1,147 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "updatingProtectionList" : {
+    "title" : "Aktualizace seznamu ochranných prvků",
+    "note" : "Message shown while updating the list of protections"
+  },
+  "protectionsDisabled" : {
+    "title" : "Ochrana je <b>VYPNUTÁ</b>",
+    "note" : "Headline when privacy protections are disabled"
+  },
+  "protectionsEnabled" : {
+    "title" : "Na tomhle webu je ochrana <b>ZAPNUTÁ</b>",
+    "note" : "Headline when privacy protections are enabled"
+  },
+  "connectionDescriptionUnencrypted" : {
+    "title" : "Ostatní můžou zachytit citlivé informace, které na téhle stránce zadáš.",
+    "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
+  },
+  "connectionDescriptionUpgraded" : {
+    "title" : "Aktualizovali jsme připojení na téhle stránce, abychom ochránili zadávané informace.",
+    "note" : "Shown when the connection has been upgraded from unencrypted to encrypted (HTTP to HTTPS)"
+  },
+  "connectionDescriptionEncrypted" : {
+    "title" : "Připojení na téhle stránce je zabezpečené, aby byly zadávané informace chráněné.",
+    "note" : "Shown when the connection is encrypted (HTTPS not HTTP)"
+  },
+  "trackerNetworksSummaryNone" : {
+    "title" : "Na téhle stránce jsme nenašli žádné služby, které by se tě snažily sledovat.",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerNetworksSummaryOwn" : {
+    "title" : "Našli jsme jen trackery vlastněné službou {name}, které jsme nezablokovali.",
+    "note" : "We found but did not block trackers from company named"
+  },
+  "trackerNetworksSummaryOther" : {
+    "title" : "Na téhle stránce jsme {isWhitelisted, select, true {našli} other {zablokovali}} {displayCount, plural, =1 {tracker} other {trackery}} (celkem {displayCount}) od {companyCount} {companyCount, plural, one {služby} other {služeb}}.",
+    "note" : "This summarizes the number of trackers that we either blocked or did not block (depending on the protection setting for this site)"
+  },
+  "websiteNotWorkingQ" : {
+    "title" : "Nefunguje web podle očekávání?",
+    "note" : "Call to action for user to click if they are having issues with this web page"
+  },
+  "takePrecautions" : {
+    "title" : "Tady to chce opatrnost",
+    "note" : "Title shown when the page is unencrypted"
+  },
+  "protectionsAreDisabled" : {
+    "title" : "Ochrana je VYPNUTÁ",
+    "note" : "Shown when user has disabled protections for this site (or they have been programatically disabled)"
+  },
+  "foundCompanyNamesList" : {
+    "title" : "{companyCount, plural, =0 {Zjistili jsme, že na téhle stránce tě sledují některé služby, které si zároveň vytvářejí tvůj profil.} =2 {Zjistili jsme, že na téhle stránce tě sleduje {firstCompany} a {secondCompany} a zároveň si vytvářejí tvůj profil.} one {Zjistili jsme, že na téhle stránce tě sleduje {secondCompany}. Zároveň si i vytváří tvůj profil.} few {Zjistili jsme, že na téhle stránce tě sleduje {firstCompany}, {secondCompany} a další služby, které si zároveň vytvářejí tvůj profil.} many {Zjistili jsme, že na téhle stránce tě sleduje {firstCompany}, {secondCompany} a další služby, které si zároveň vytvářejí tvůj profil.} other {Zjistili jsme, že na téhle stránce tě sleduje {firstCompany}, {secondCompany} a další služby, které si zároveň vytvářejí tvůj profil.}}",
+    "note" : "Returns a string in the form of 'We found CompanyA, CompanyB and others tracking and profiling you on this page.'"
+  },
+  "majorTrackerNetwork" : {
+    "title" : "Sledovací síť",
+    "note" : "Tracker network is a group of trackers, usually in the form of a company name, that track users across websites"
+  },
+  "majorTrackingNetworkDesc" : {
+    "title" : "{companyDisplayName} (vlastník domény {domain})\ntě sleduje na {companyPrevalence} % nejvýznamnějších webů.\nTuhle službu můžeme blokovat jen na stránkách, které nevlastní.",
+    "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
+  },
+  "noActivityToReport" : {
+    "title" : "Žádná aktivita k nahlášení",
+    "note" : "Title when we did not find any trackers on this page"
+  },
+  "trackersBlocked" : {
+    "title" : "Koho jsme zablokovali",
+    "note" : "Title for the list of companies that we blocked"
+  },
+  "trackersBlockedDesc" : {
+    "title" : "{companyCount, plural, =0 {Zablokovali jsme některé služby, které se tě snažily sledovat.} =2 {Zablokovali jsme služby {firstCompany} a {secondCompany}, které se tě snažily sledovat.} one {Zablokovali jsme službu {firstCompany}, která se tě snažila sledovat.} few {Zablokovali jsme {firstCompany}, {secondCompany} a další služby, které se tě snažily sledovat.} many {Zablokovali jsme {firstCompany}, {secondCompany} a další služby, které se tě snažily sledovat} other {Zablokovali jsme {firstCompany}, {secondCompany} a další služby, které se tě snažily sledovat}}",
+    "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
+  },
+  "cookiesMinimized" : {
+    "title" : "Omezili jsme cookies",
+    "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedDesc" : {
+    "title" : "Tvoje předvolby souborů cookie jsme nastavili na co největší ochranu soukromí a vyskakovací okno se žádostí o souhlas jsme zavřeli.",
+    "note" : "Description for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "connectionSecure" : {
+    "title" : "Připojení je zabezpečené",
+    "note" : "The connection to the website is secure (HTTPS)"
+  },
+  "connectionNotSecure" : {
+    "title" : "Připojení se nepovedlo zabezpečit",
+    "note" : "The connection is not secure (HTTP)"
+  },
+  "trackerNetworksDesc" : {
+    "title" : "{blocked, select, true {{majorNetwork, select, true {{trackerCount, plural, one {Zablokována {trackerCount} hlavní sledovací síť} few {Zablokovány {trackerCount} hlavní sledovací sítě} many {Zablokováno {trackerCount} hlavních sledovacích sítí} other {Zablokováno {trackerCount} hlavních sledovacích sítí}}} other {{trackerCount, plural, one {Zablokován {trackerCount} tracker} few {Zablokovány {trackerCount} trackery} many {Zablokováno {trackerCount} trackerů} other {Zablokováno {trackerCount} trackerů}}}}} other {{majorNetwork, select, true {{trackerCount, plural, one {Nalezena {trackerCount} hlavní sledovací síť} few {Nalezeny {trackerCount} hlavní sledovací sítě} many {Nalezeno {trackerCount} hlavních sledovacích sítí} other {Nalezeno {trackerCount} hlavních sledovacích sítí}}} other {{trackerCount, plural, one {Nalezen {trackerCount} tracker} few {Nalezeny {trackerCount} trackery} many {Nalezeno {trackerCount} trackerů} other {Nalezeno {trackerCount} trackerů}}}}}}",
+    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+  },
+  "firstPartyDesc" : {
+    "title" : "{companyName} vlastní tenhle web a trackery, které jsme na něm našli, takže jsme je nezablokovali.",
+    "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
+  },
+  "trackersFoundForAllowlisted" : {
+    "title" : "Trackery umožňují různým službám, aby si vytvořily tvůj profil. Na téhle stránce sledují tvou aktivitu tyhle služby.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections disabled"
+  },
+  "trackersFoundAndBlocked" : {
+    "title" : "Trackery umožňují různým službám, aby si vytvořily tvůj profil. Na téhle stránce jsme zablokovali tyhle služby, které sledují tvou aktivitu.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections enabled"
+  },
+  "trackerNetworkUnknown" : {
+    "title" : "Neznámá sledovací síť",
+    "note" : "Shown when we don't have a company name for a given tracker"
+  },
+  "trackerDomainsForCompany" : {
+    "title" : "Domény trackerů služby {companyName}",
+    "note" : "Title for the list of tracker domains detected from a given company"
+  },
+  "zeroTrackersFound" : {
+    "title" : "Žádné trackery nenalezeny",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerOwnedByThisSite" : {
+    "title" : "Trackery vlastněné tímhle webem (povolené)",
+    "note" : "Trackers owned by this site are not blocked"
+  },
+  "trackerCountForDomain" : {
+    "title" : "{blocked, select, true {{trackerCount, plural, one {{trackerCount} zablokovaný tracker v doméně {domain}} few {{trackerCount} zablokované trackery v doméně {domain}} many {{trackerCount} zablokovaného trackeru v doméně {domain}} other {{trackerCount} zablokovaných trackerů v doméně {domain}}}} other {{trackerCount, plural, one {V doméně {domain} jsme našli {trackerCount} tracker} few {V doméně {domain} jsme našli {trackerCount} trackery} many {V doméně {domain} jsme našli {trackerCount} trackeru} other {V doméně {domain} jsme našli {trackerCount} trackerů}}}}",
+    "note" : "For a given domain, the count of trackers either blocked or just detected (found).  Ex 4 Trackers Blocked"
+  },
+  "analyticsCategory" : {
+    "title" : "Analytika",
+    "note" : "Used to describe the type of tracker, in this case one that is used to report analytics back to the site owner"
+  },
+  "advertisingCategory" : {
+    "title" : "Reklama",
+    "note" : "Used to describe the type of tracker, in this case one that is used for advertising"
+  },
+  "socialCategory" : {
+    "title" : "Sociální síť",
+    "note" : "Used to describe the type of tracker, in this case one that is used by one of the popular social networksr"
+  }
+}

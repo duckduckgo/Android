@@ -1,0 +1,75 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "selectTheOptionDesc" : {
+    "title" : "Επιλέξτε αυτό που περιγράφει καλύτερα το πρόβλημα που αντιμετωπίσατε.",
+    "note" : "The user will see this UI when they're running into issues with a given website, that we may be causing"
+  },
+  "pickYourIssueFromTheList" : {
+    "title" : "Επιλέξτε το πρόβλημα που αντιμετωπίζετε, από τη λίστα...",
+    "note" : "Asks the user to pick a specific list from the pulldown"
+  },
+  "videos" : {
+    "title" : "Το βίντεο δεν έπαιξε",
+    "note" : "User is reporting this page because a video didn't play"
+  },
+  "images" : {
+    "title" : "Οι εικόνες δεν φορτώθηκαν",
+    "note" : "User is reporting this page because one or more images did not load"
+  },
+  "comments" : {
+    "title" : "Τα σχόλια δεν φορτώθηκαν",
+    "note" : "User is reporting this page because one or more comments did not load"
+  },
+  "content" : {
+    "title" : "Το περιεχόμενο λείπει",
+    "note" : "User is reporting this page because some other type of content did not load"
+  },
+  "links" : {
+    "title" : "Οι σύνδεσμοι ή τα κουμπιά δεν λειτουργούν",
+    "note" : "User is reporting this page because one or more links or buttons did not work when clicked"
+  },
+  "login" : {
+    "title" : "Δεν μπορώ να συνδεθώ",
+    "note" : "User is reporting this page because they are unable to log into the website"
+  },
+  "paywall" : {
+    "title" : "Ο ιστότοπος μου ζήτησε να απενεργοποιήσω",
+    "note" : "User is reporting this page asked them to disable their privacy or ad blocking extension"
+  },
+  "other" : {
+    "title" : "Κάτι άλλο",
+    "note" : "User is reporting this page because of some other reason than the ones we listed"
+  },
+  "reportBrokenSite" : {
+    "title" : "Αναφορά ιστότοπου που δεν λειτουργεί",
+    "note" : "Title for reporting broken website view"
+  },
+  "tellUsMoreDesc" : {
+    "title" : "Αν θέλετε, πείτε μας για το πρόβλημα που αντιμετωπίσατε",
+    "note" : "A hint for a text box that lets user enter free text to describe their problem"
+  },
+  "sendReport" : {
+    "title" : "Αποστολή Αναφοράς",
+    "note" : "Button for submitting report"
+  },
+  "reportsAreAnonymousDesc" : {
+    "title" : "Οι αναφορές που αποστέλλονται στο DuckDuckGo είναι 100% ανώνυμες και περιλαμβάνουν μόνο την πιο πάνω επιλογή σας, την προαιρετική περιγραφή σας, τη διεύθυνση URL και μια λίστα με εφαρμογές παρακολούθησης που βρήκαμε στον ιστότοπο.",
+    "note" : "A small disclaimer at the bottom of the view describing what is included in the report"
+  },
+  "thankYou" : {
+    "title" : "Σε ευχαριστώ!",
+    "note" : "Title for what the user sees upon submitting the report"
+  },
+  "yourReportWillHelpDesc" : {
+    "title" : "Η αναφορά σας θα μας βοηθήσει στο να βελτιώσουμε το πρόγραμμα περιήγησης και θα καταστήσει την εμπειρία καλύτερη για άλλα άτομα που χρησιμοποιούν τις υπηρεσίες μας.",
+    "note" : "Body that the user sees upon submitting the report"
+  }
+}

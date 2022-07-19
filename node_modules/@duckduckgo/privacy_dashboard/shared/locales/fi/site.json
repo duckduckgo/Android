@@ -1,0 +1,147 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "updatingProtectionList" : {
+    "title" : "Suojausluettelon päivittäminen",
+    "note" : "Message shown while updating the list of protections"
+  },
+  "protectionsDisabled" : {
+    "title" : "Suojaukset ovat <b>POIS KÄYTÖSTÄ</b>",
+    "note" : "Headline when privacy protections are disabled"
+  },
+  "protectionsEnabled" : {
+    "title" : "Tämän sivuston suojaukset ovat <b>KÄYTÖSSÄ</b>",
+    "note" : "Headline when privacy protections are enabled"
+  },
+  "connectionDescriptionUnencrypted" : {
+    "title" : "Muut saattavat pystyä sieppaamaan tällä sivulla lähettämäsi arkaluonteiset tiedot.",
+    "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
+  },
+  "connectionDescriptionUpgraded" : {
+    "title" : "Päivitimme tämän sivun yhteyden suojataksemme siirron aikana lähettämäsi tiedot.",
+    "note" : "Shown when the connection has been upgraded from unencrypted to encrypted (HTTP to HTTPS)"
+  },
+  "connectionDescriptionEncrypted" : {
+    "title" : "Tämän sivun yhteys on suojattu, jotta lähettämäsi tiedot voidaan suojata siirron aikana.",
+    "note" : "Shown when the connection is encrypted (HTTPS not HTTP)"
+  },
+  "trackerNetworksSummaryNone" : {
+    "title" : "Emme löytäneet yrityksiä, jotka yrittäisivät seurata sinua tällä sivulla.",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerNetworksSummaryOwn" : {
+    "title" : "Löysimme vain yrityksen {name} omistamia seurantaohjelmia, joita emme estäneet.",
+    "note" : "We found but did not block trackers from company named"
+  },
+  "trackerNetworksSummaryOther" : {
+    "title" : "Me {isWhitelisted, select, true {löysimme} other {estimme}} {displayCount} tunnettua {displayCount, plural, =1 {seurantaohjelma} other {seurantaohjelmaa}} from {companyCount} {companyCount, plural, one {yrityksestä} other {yrityksistä}} tältä sivulta.",
+    "note" : "This summarizes the number of trackers that we either blocked or did not block (depending on the protection setting for this site)"
+  },
+  "websiteNotWorkingQ" : {
+    "title" : "Eikö verkkosivusto toimi odotetulla tavalla?",
+    "note" : "Call to action for user to click if they are having issues with this web page"
+  },
+  "takePrecautions" : {
+    "title" : "Ota varotoimet käyttöön",
+    "note" : "Title shown when the page is unencrypted"
+  },
+  "protectionsAreDisabled" : {
+    "title" : "Suojaukset ovat POIS KÄYTÖSTÄ",
+    "note" : "Shown when user has disabled protections for this site (or they have been programatically disabled)"
+  },
+  "foundCompanyNamesList" : {
+    "title" : "{companyCount, plural, =0 {Löysimme joitakin yrityksiä seuraamassa ja profiloimassa sinua tällä sivulla.} =2 {Löysimme yritykset {firstCompany} ja {secondCompany} seuraamassa ja profiloimassa sinua tällä sivulla.} one {Löysimme yrityksen {firstCompany} seuraamassa ja profiloimassa sinua tällä sivulla.} other {Löysimme yritykset {firstCompany}, {secondCompany} sekä muita yrityksiä seuraamassa ja profiloimassa sinua tällä sivulla.}}",
+    "note" : "Returns a string in the form of 'We found CompanyA, CompanyB and others tracking and profiling you on this page.'"
+  },
+  "majorTrackerNetwork" : {
+    "title" : "Seurantaverkosto",
+    "note" : "Tracker network is a group of trackers, usually in the form of a company name, that track users across websites"
+  },
+  "majorTrackingNetworkDesc" : {
+    "title" : "{companyDisplayName} (verkkotunnuksen {domain} omistaja)\nseuraa sinua {companyPrevalence} prosentissa suosituimmista sivustoista.\nEmme voi estää heitä omistamillaan sivustoilla, mutta voimme estää heitä muilla sivuilla.",
+    "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
+  },
+  "noActivityToReport" : {
+    "title" : "Ei raportoitavaa toimintaa",
+    "note" : "Title when we did not find any trackers on this page"
+  },
+  "trackersBlocked" : {
+    "title" : "Kenet olemme estäneet?",
+    "note" : "Title for the list of companies that we blocked"
+  },
+  "trackersBlockedDesc" : {
+    "title" : "{companyCount, plural, =0 {Olemme estäneet joitakin yrityksiä jäljittämästä sinua.} =2 {Olemme estäneet yritykset {firstCompany} ja {secondCompany} jäljittämästä sinua.} one {Olemme estäneet yrityksen {firstCompany} jäljittämästä sinua.} other {Olemme estäneet yritykset {firstCompany} ja {secondCompany} sekä muita yrityksiä jäljittämästä sinua.}}",
+    "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
+  },
+  "cookiesMinimized" : {
+    "title" : "Evästeet minimoitu",
+    "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedDesc" : {
+    "title" : "Olemme asettaneet evästeasetukset maksimoimaan tietosuojan ja sulkeneet suostumuksen ponnahdusikkunan.",
+    "note" : "Description for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "connectionSecure" : {
+    "title" : "Yhteys on suojattu",
+    "note" : "The connection to the website is secure (HTTPS)"
+  },
+  "connectionNotSecure" : {
+    "title" : "Yhteyttä ei voitu suojata",
+    "note" : "The connection is not secure (HTTP)"
+  },
+  "trackerNetworksDesc" : {
+    "title" : "{blocked, select, true {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} merkittävä seurantaverkosto estetty} other {{trackerCount} merkittävää seurantaverkostoa estetty}}} other {{trackerCount, plural, one {{trackerCount} seurantapalvelin estetty} other {{trackerCount} seurantapalvelinta estetty}}}}} other {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} merkittävä seurantaverkosto löytynyt} other {{trackerCount} merkittävää seurantaverkostoa löytynyt}}} other {{trackerCount, plural, one {{trackerCount} seurantapalvelin löytynyt} other {{trackerCount} seurantapalvelinta löytynyt}}}}}}",
+    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+  },
+  "firstPartyDesc" : {
+    "title" : "Yritys {companyName} omistaa tämän sivuston ja tällä sivulla olevat tunnetut seurantaohjelmat, joten emme estäneet niitä.",
+    "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
+  },
+  "trackersFoundForAllowlisted" : {
+    "title" : "Seurantaohjelmat auttavat yrityksiä profiloimaan sinut. Löysimme nämä yritykset seuraamassa ja profiloimassa sinua tällä sivulla.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections disabled"
+  },
+  "trackersFoundAndBlocked" : {
+    "title" : "Seurantaohjelmat auttavat yrityksiä profiloimaan sinut. Olemme estäneet nämä yritykset seuraamasta toimintaasi tällä sivulla.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections enabled"
+  },
+  "trackerNetworkUnknown" : {
+    "title" : "Tuntematon seurantaverkosto",
+    "note" : "Shown when we don't have a company name for a given tracker"
+  },
+  "trackerDomainsForCompany" : {
+    "title" : "Yrityksen {companyName} seurantaverkkotunnukset",
+    "note" : "Title for the list of tracker domains detected from a given company"
+  },
+  "zeroTrackersFound" : {
+    "title" : "0 seurantaohjelmaa löytyi",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerOwnedByThisSite" : {
+    "title" : "Tämän sivuston omistamat seurantaohjelmat (sallittu)",
+    "note" : "Trackers owned by this site are not blocked"
+  },
+  "trackerCountForDomain" : {
+    "title" : "{blocked, select, true {{trackerCount, plural, one {{trackerCount} seurantaohjelma estetty verkkotunnuksessa {domain}} other {{trackerCount} seurantaohjelmaa estetty verkkotunnuksessa {domain}}}} other {{trackerCount, plural, one {{trackerCount} seuraaja löydetty verkkotunnuksessa {domain}} other {{trackerCount} seuraajaa löydetty verkkotunnuksessa {domain}}}}}",
+    "note" : "For a given domain, the count of trackers either blocked or just detected (found).  Ex 4 Trackers Blocked"
+  },
+  "analyticsCategory" : {
+    "title" : "Analyysi",
+    "note" : "Used to describe the type of tracker, in this case one that is used to report analytics back to the site owner"
+  },
+  "advertisingCategory" : {
+    "title" : "Mainostus",
+    "note" : "Used to describe the type of tracker, in this case one that is used for advertising"
+  },
+  "socialCategory" : {
+    "title" : "Someverkosto",
+    "note" : "Used to describe the type of tracker, in this case one that is used by one of the popular social networksr"
+  }
+}

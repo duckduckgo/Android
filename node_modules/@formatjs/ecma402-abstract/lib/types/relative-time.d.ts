@@ -1,0 +1,41 @@
+import { LocaleData } from './core';
+import { LDMLPluralRule } from './plural-rules';
+export interface FieldData {
+    '0'?: string;
+    '1'?: string;
+    '-1'?: string;
+    '2'?: string;
+    '-2'?: string;
+    '3'?: string;
+    '-3'?: string;
+    future: RelativeTimeData;
+    past: RelativeTimeData;
+}
+declare type RelativeTimeData = {
+    [u in LDMLPluralRule]?: string;
+};
+export declare type UnpackedLocaleFieldsData = {
+    [f in RelativeTimeField]?: FieldData;
+} & {
+    nu: Array<string | null>;
+};
+export declare type LocaleFieldsData = {
+    [f in RelativeTimeField]?: FieldData;
+} & {
+    nu?: Array<string | null>;
+};
+export declare type RelativeTimeField = 'second' | 'second-short' | 'second-narrow' | 'minute' | 'minute-short' | 'minute-narrow' | 'hour' | 'hour-short' | 'hour-narrow' | 'day' | 'day-short' | 'day-narrow' | 'week' | 'week-short' | 'week-narrow' | 'month' | 'month-short' | 'month-narrow' | 'quarter' | 'quarter-short' | 'quarter-narrow' | 'year' | 'year-short' | 'year-narrow';
+export declare type RelativeTimeFormatSingularUnit = Exclude<Intl.RelativeTimeFormatUnit, 'seconds' | 'minutes' | 'hours' | 'days' | 'weeks' | 'months' | 'quarters' | 'years'>;
+export declare type RelativeTimeLocaleData = LocaleData<LocaleFieldsData>;
+export interface RelativeTimeFormatInternal {
+    numberFormat: Intl.NumberFormat;
+    pluralRules: Intl.PluralRules;
+    locale: string;
+    fields: LocaleFieldsData;
+    style: Intl.ResolvedRelativeTimeFormatOptions['style'];
+    numeric: Intl.ResolvedRelativeTimeFormatOptions['numeric'];
+    numberingSystem: string;
+    initializedRelativeTimeFormat: boolean;
+}
+export {};
+//# sourceMappingURL=relative-time.d.ts.map

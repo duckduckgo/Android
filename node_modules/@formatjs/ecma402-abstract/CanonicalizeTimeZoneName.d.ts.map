@@ -1,0 +1,1 @@
+{"version":3,"file":"CanonicalizeTimeZoneName.d.ts","sourceRoot":"","sources":["../../../../../packages/ecma402-abstract/CanonicalizeTimeZoneName.ts"],"names":[],"mappings":"AAAA;;;GAGG;AACH,wBAAgB,wBAAwB,CACtC,EAAE,EAAE,MAAM,EACV,EACE,MAAM,EACN,cAAc,GACf,EAAE;IACD,MAAM,EAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,CAAA;IAC/B,cAAc,EAAE,MAAM,CAAC,MAAM,EAAE,MAAM,CAAC,CAAA;CACvC,UAgBF"}

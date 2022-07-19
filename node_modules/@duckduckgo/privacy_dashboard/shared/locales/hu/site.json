@@ -1,0 +1,147 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "updatingProtectionList" : {
+    "title" : "A védelmi lista frissítése",
+    "note" : "Message shown while updating the list of protections"
+  },
+  "protectionsDisabled" : {
+    "title" : "Védelmek <b>LETILTVA</b>",
+    "note" : "Headline when privacy protections are disabled"
+  },
+  "protectionsEnabled" : {
+    "title" : "A védelmek <b>ENGEDÉLYEZVE</b> vannak ezen az oldalon",
+    "note" : "Headline when privacy protections are enabled"
+  },
+  "connectionDescriptionUnencrypted" : {
+    "title" : "Mások megszerezhetik az ezen az oldalon keresztül küldött érzékeny adatokat.",
+    "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
+  },
+  "connectionDescriptionUpgraded" : {
+    "title" : "Az oldal kapcsolatát biztonságosabbá tettük, hogy megvédjük az elküldött adatokat az átvitel során.",
+    "note" : "Shown when the connection has been upgraded from unencrypted to encrypted (HTTP to HTTPS)"
+  },
+  "connectionDescriptionEncrypted" : {
+    "title" : "Az oldal kapcsolata biztonságos, hogy megvédje az elküldött adatokat az átvitel során.",
+    "note" : "Shown when the connection is encrypted (HTTPS not HTTP)"
+  },
+  "trackerNetworksSummaryNone" : {
+    "title" : "Az oldalon nem található olyan cég, amely megpróbált volna nyomon követni.",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerNetworksSummaryOwn" : {
+    "title" : "Csak a(z) {name} tulajdonában lévő nyomkövetőket találtunk, amelyeket nem tiltottunk le.",
+    "note" : "We found but did not block trackers from company named"
+  },
+  "trackerNetworksSummaryOther" : {
+    "title" : "Ezen az oldalon {companyCount} {companyCount, plural, one {cég} other {cég}} {displayCount} ismert {displayCount, plural, =1 {nyomkövetőjét} other {nyomkövetőjét}} {isWhitelisted, select, true {találtuk meg} other {tiltottuk le}}.",
+    "note" : "This summarizes the number of trackers that we either blocked or did not block (depending on the protection setting for this site)"
+  },
+  "websiteNotWorkingQ" : {
+    "title" : "A weboldal nem az elvártak szerint működik?",
+    "note" : "Call to action for user to click if they are having issues with this web page"
+  },
+  "takePrecautions" : {
+    "title" : "Óvintézkedésekre van szükség",
+    "note" : "Title shown when the page is unencrypted"
+  },
+  "protectionsAreDisabled" : {
+    "title" : "Védelmek LETILTVA",
+    "note" : "Shown when user has disabled protections for this site (or they have been programatically disabled)"
+  },
+  "foundCompanyNamesList" : {
+    "title" : "{companyCount, plural, =0 {Azt észleltük, hogy néhány cég ezen az oldalon nyomon követ és profilt alkot rólad.} =2 {Azt észleltük, hogy a(z) {firstCompany} és a(z) {secondCompany} ezen az oldalon nyomon követ és profilt alkot rólad.} one {Azt észleltük, hogy a(z) {firstCompany} ezen az oldalon nyomon követ és profilt alkot rólad.} other {Azt észleltük, hogy a(z) {firstCompany}, a(z) {secondCompany} és mások ezen az oldalon nyomon követnek és profilt alkotnak rólad.}}",
+    "note" : "Returns a string in the form of 'We found CompanyA, CompanyB and others tracking and profiling you on this page.'"
+  },
+  "majorTrackerNetwork" : {
+    "title" : "Nyomkövető hálózat",
+    "note" : "Tracker network is a group of trackers, usually in the form of a company name, that track users across websites"
+  },
+  "majorTrackingNetworkDesc" : {
+    "title" : "A(z) {companyDisplayName} (a(z) {domain} tulajdonosa)\na legnépszerűbb oldalak {companyPrevalence}%-án nyomon követ téged.\nA saját oldalaikon nem tudjuk letiltani őket, de más oldalakon igen.",
+    "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
+  },
+  "noActivityToReport" : {
+    "title" : "Nincs jelentendő tevékenység",
+    "note" : "Title when we did not find any trackers on this page"
+  },
+  "trackersBlocked" : {
+    "title" : "Letiltott cégek",
+    "note" : "Title for the list of companies that we blocked"
+  },
+  "trackersBlockedDesc" : {
+    "title" : "{companyCount, plural, =0 {Megtiltottuk néhány cégnek hogy megpróbáljon nyomon követni téged.} =2 {Megtiltottuk, hogy a(z) {firstCompany} és a(z) {secondCompany} megpróbáljon nyomon követni téged.} one {Megtiltottuk, hogy a(z) {firstCompany} megpróbáljon nyomon követni téged.} other {Megtiltottuk, hogy a(z) {firstCompany}, a(z) {secondCompany} és mások megpróbáljanak nyomon követni téged.}}",
+    "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
+  },
+  "cookiesMinimized" : {
+    "title" : "Sütik minimalizálva",
+    "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedDesc" : {
+    "title" : "A sütibeállításokat az adatvédelem maximalizálására állítottuk be, és bezártuk a beleegyezést kérő felugró ablakot.",
+    "note" : "Description for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "connectionSecure" : {
+    "title" : "A kapcsolat biztonságos",
+    "note" : "The connection to the website is secure (HTTPS)"
+  },
+  "connectionNotSecure" : {
+    "title" : "A kapcsolatot nem sikerült biztonságossá tenni",
+    "note" : "The connection is not secure (HTTP)"
+  },
+  "trackerNetworksDesc" : {
+    "title" : "{blocked, select, true {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} nagy nyomkövető-hálózat letiltva} other {{trackerCount} nagy nyomkövető-hálózat letiltva}}} other {{trackerCount, plural, one {{trackerCount} nyomkövető letiltva} other {{trackerCount} nyomkövető letiltva}}}}} other {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} nagy nyomkövető-hálózat megtalálva} other {{trackerCount} nagy nyomkövető-hálózat megtalálva}}} other {{trackerCount, plural, one {{trackerCount} nyomkövető megtalálva} other {{trackerCount} nyomkövető megtalálva}}}}}}",
+    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+  },
+  "firstPartyDesc" : {
+    "title" : "A(z) {companyName} tulajdonában van ez az oldal és az oldalon található ismert nyomkövetők, ezért nem tiltottuk lő őket.",
+    "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
+  },
+  "trackersFoundForAllowlisted" : {
+    "title" : "A nyomkövetők segítségével a cégek profilt alkothatnak rólad. Azt észleltük, hogy ezen az oldalon ezek a cégek nyomon követik a tevékenységedet.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections disabled"
+  },
+  "trackersFoundAndBlocked" : {
+    "title" : "A nyomkövetők segítségével a cégek profilt alkothatnak rólad. Letiltottuk ezeket a cégeket, hogy nyomon kövessék az oldalon végzett tevékenységedet.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections enabled"
+  },
+  "trackerNetworkUnknown" : {
+    "title" : "A nyomkövető hálózat ismeretlen",
+    "note" : "Shown when we don't have a company name for a given tracker"
+  },
+  "trackerDomainsForCompany" : {
+    "title" : "A(z) {companyName} nyomkövető tartományai",
+    "note" : "Title for the list of tracker domains detected from a given company"
+  },
+  "zeroTrackersFound" : {
+    "title" : "0 nyomkövetőt találtunk",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerOwnedByThisSite" : {
+    "title" : "A webhely tulajdonában lévő nyomkövetők (engedélyezett)",
+    "note" : "Trackers owned by this site are not blocked"
+  },
+  "trackerCountForDomain" : {
+    "title" : "{blocked, select, true {{trackerCount, plural, one {{trackerCount} nyomkövető letiltva itt: {domain}} other {{trackerCount} nyomkövető letiltva itt: {domain}}}} other {{trackerCount, plural, one {{trackerCount} nyomkövető található itt: {domain}} other {{trackerCount} nyomkövető található itt: {domain}}}}}",
+    "note" : "For a given domain, the count of trackers either blocked or just detected (found).  Ex 4 Trackers Blocked"
+  },
+  "analyticsCategory" : {
+    "title" : "Analitika",
+    "note" : "Used to describe the type of tracker, in this case one that is used to report analytics back to the site owner"
+  },
+  "advertisingCategory" : {
+    "title" : "Hirdetés",
+    "note" : "Used to describe the type of tracker, in this case one that is used for advertising"
+  },
+  "socialCategory" : {
+    "title" : "Közösségi hálózat",
+    "note" : "Used to describe the type of tracker, in this case one that is used by one of the popular social networksr"
+  }
+}

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import com.duckduckgo.privacy.dashboard.api.animations.TrackersAnimatorListener
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
@@ -116,7 +117,6 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
@@ -125,8 +125,6 @@ import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
-import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
@@ -157,6 +155,7 @@ import android.content.pm.ResolveInfo
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.webkit.URLUtil
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -164,15 +163,15 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.NavigateToHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyShieldViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
 import com.duckduckgo.app.browser.history.NavigationHistorySheet
@@ -181,6 +180,7 @@ import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.asMessage
+import com.duckduckgo.app.cta.ui.DaxDialogCta.DaxTrackersBlockedCta
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
@@ -204,6 +204,9 @@ import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
+import com.duckduckgo.privacy.dashboard.api.animations.BrowserTrackersAnimatorHelper
+import com.duckduckgo.privacy.dashboard.api.animations.PrivacyShieldAnimationHelper
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.coroutines.flow.cancellable
 import javax.inject.Provider
@@ -296,7 +299,7 @@ class BrowserTabFragment :
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
 
     @Inject
-    lateinit var themingDataStore: ThemingDataStore
+    lateinit var appTheme: BrowserAppTheme
 
     @Inject
     lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
@@ -344,6 +347,12 @@ class BrowserTabFragment :
     @Inject
     lateinit var existingCredentialMatchDetector: ExistingCredentialMatchDetector
 
+    @Inject
+    lateinit var privacyShieldView: PrivacyShieldAnimationHelper
+
+    @Inject
+    lateinit var animatorHelper: BrowserTrackersAnimatorHelper
+
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
@@ -381,8 +390,6 @@ class BrowserTabFragment :
         launchDownloadMessagesJob()
         viewModel
     }
-
-    private val animatorHelper by lazy { BrowserTrackersAnimatorHelper() }
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
@@ -510,9 +517,8 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         configureObservers()
-        configurePrivacyGrade()
+        configurePrivacyShield()
         configureWebView()
         configureSwipeRefresh()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
@@ -583,7 +589,6 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
-
         appBarLayout.setExpanded(true)
         viewModel.onViewResumed()
 
@@ -603,6 +608,9 @@ class BrowserTabFragment :
     }
 
     override fun onStop() {
+        // workaround for: https://app.asana.com/0/0/1202537960603388/f
+        renderer.cancelTrackersAnimation()
+        trackerAnimationContainer.removeAllViews()
         alertDialog?.dismiss()
         super.onStop()
     }
@@ -692,10 +700,10 @@ class BrowserTabFragment :
             }
         )
 
-        viewModel.privacyGradeViewState.observe(
+        viewModel.privacyShieldViewState.observe(
             viewLifecycleOwner,
             Observer {
-                it.let { renderer.renderPrivacyGrade(it) }
+                it.let { renderer.renderPrivacyShield(it) }
             }
         )
 
@@ -801,11 +809,12 @@ class BrowserTabFragment :
     }
 
     private fun processCommand(it: Command?) {
-        if (it !is Command.DaxCommand) {
+        if (it is NavigationCommand) {
             renderer.cancelTrackersAnimation()
         }
+
         when (it) {
-            is Command.Refresh -> refresh()
+            is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query, it.sourceTabId)
             }
@@ -823,15 +832,15 @@ class BrowserTabFragment :
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
             is Command.ShowPrivacyProtectionDisabledConfirmation -> privacyProtectionDisabledConfirmation(it.domain)
-            is Command.Navigate -> {
+            is NavigationCommand.Navigate -> {
                 dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
             }
-            is Command.NavigateBack -> {
+            is NavigationCommand.NavigateBack -> {
                 dismissAppLinkSnackBar()
                 webView?.goBackOrForward(-it.steps)
             }
-            is Command.NavigateForward -> {
+            is NavigationCommand.NavigateForward -> {
                 dismissAppLinkSnackBar()
                 webView?.goForward()
             }
@@ -915,7 +924,7 @@ class BrowserTabFragment :
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
-            is Command.DaxCommand.FinishTrackerAnimation -> finishTrackerAnimation()
+            is Command.DaxCommand.FinishPartialTrackerAnimation -> finishPartialTrackerAnimation()
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
@@ -940,7 +949,7 @@ class BrowserTabFragment :
                 omnibarTextInput.setSelection(it.query.length)
             }
             is ShowBackNavigationHistory -> showBackNavigationHistory(it)
-            is NavigateToHistory -> navigateBackHistoryStack(it.historyStackIndex)
+            is NavigationCommand.NavigateToHistory -> navigateBackHistoryStack(it.historyStackIndex)
             is Command.EmailSignEvent -> {
                 notifyEmailSignEvent()
             }
@@ -1447,8 +1456,8 @@ class BrowserTabFragment :
         recyclerView.setPadding(sidePadding, recyclerView.paddingTop, sidePadding, recyclerView.paddingBottom)
     }
 
-    private fun configurePrivacyGrade() {
-        toolbar.privacyGradeButton.setOnClickListener {
+    private fun configurePrivacyShield() {
+        toolbar.shieldIcon.setOnClickListener {
             browserActivity?.launchPrivacyDashboard()
         }
     }
@@ -1638,17 +1647,9 @@ class BrowserTabFragment :
     }
 
     private fun configureDarkThemeSupport(webSettings: WebSettings) {
-        when (themingDataStore.theme) {
-            DuckDuckGoTheme.LIGHT -> webSettings.enableLightMode()
-            DuckDuckGoTheme.DARK -> webSettings.enableDarkMode()
-            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
-                val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-                if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
-                    webSettings.enableDarkMode()
-                } else {
-                    webSettings.enableLightMode()
-                }
-            }
+        when (appTheme.isLightModeEnabled()) {
+            true -> webSettings.enableLightMode()
+            false -> webSettings.enableDarkMode()
         }
     }
 
@@ -1934,6 +1935,7 @@ class BrowserTabFragment :
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+
         ddgLogo.setImageResource(R.drawable.logo_full)
         if (ctaContainer.isNotEmpty()) {
             renderer.renderHomeCta()
@@ -2105,8 +2107,8 @@ class BrowserTabFragment :
         }
     }
 
-    private fun finishTrackerAnimation() {
-        animatorHelper.finishTrackerAnimation(omnibarViews(), animationContainer)
+    private fun finishPartialTrackerAnimation() {
+        animatorHelper.finishPartialTrackerAnimation()
     }
 
     private fun showHideTipsDialog(cta: Cta) {
@@ -2181,7 +2183,7 @@ class BrowserTabFragment :
     fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, searchIcon)
 
     override fun onAnimationFinished() {
-        viewModel.stopShowingEmptyGrade()
+        // NO OP
     }
 
     private fun showEmailTooltip(address: String) {
@@ -2441,38 +2443,12 @@ class BrowserTabFragment :
         private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
         private var lastSeenCtaViewState: CtaViewState? = null
-        private var lastSeenPrivacyGradeViewState: PrivacyGradeViewState? = null
+        private var lastSeenPrivacyShieldViewState: PrivacyShieldViewState? = null
 
-        fun renderPrivacyGrade(viewState: PrivacyGradeViewState) {
-
-            renderIfChanged(viewState, lastSeenPrivacyGradeViewState) {
-
-                val oldGrade = lastSeenPrivacyGradeViewState?.privacyGrade
-                val oldShowEmptyGrade = lastSeenPrivacyGradeViewState?.showEmptyGrade
-                val grade = viewState.privacyGrade
-                val newShowEmptyGrade = viewState.showEmptyGrade
-
-                val canChangeGrade = (oldGrade != grade && !newShowEmptyGrade) || (oldGrade == grade && oldShowEmptyGrade != newShowEmptyGrade)
-                lastSeenPrivacyGradeViewState = viewState
-
-                if (canChangeGrade) {
-                    context?.let {
-                        val drawable = if (viewState.showEmptyGrade || viewState.shouldAnimate) {
-                            ContextCompat.getDrawable(it, R.drawable.privacygrade_icon_loading)
-                        } else {
-                            ContextCompat.getDrawable(it, viewState.privacyGrade.icon())
-                        }
-                        privacyGradeButton?.setImageDrawable(drawable)
-                    }
-                }
-
-                privacyGradeButton?.isEnabled = viewState.isEnabled
-
-                if (viewState.shouldAnimate) {
-                    animatorHelper.startPulseAnimation(privacyGradeButton)
-                } else {
-                    animatorHelper.stopPulseAnimation()
-                }
+        fun renderPrivacyShield(viewState: PrivacyShieldViewState) {
+            renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
+                lastSeenPrivacyShieldViewState = viewState
+                privacyShieldView.setAnimationView(shieldIcon, viewState.privacyShield)
             }
         }
 
@@ -2565,19 +2541,37 @@ class BrowserTabFragment :
                 delay(TRACKERS_INI_DELAY)
                 viewModel.refreshCta()
                 delay(TRACKERS_SECONDARY_DELAY)
+                if (isHidden) {
+                    return@launch
+                }
                 if (lastSeenOmnibarViewState?.isEditing != true) {
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackingEntities()
 
+                    // workaround for: https://app.asana.com/0/0/1202537960603388/f
+                    val trackersAnimation = trackerAnimationContainer.findViewById<LottieAnimationView>(R.id.trackersAnimation)
+                    val trackerAnimationView = if (trackersAnimation?.isAttachedToWindow == true) {
+                        trackersAnimation
+                    } else {
+                        layoutInflater.inflate(R.layout.view_tracker_animation, trackerAnimationContainer, true)
+                            .findViewById<LottieAnimationView>(R.id.trackersAnimation)
+                    }
+
                     activity?.let { activity ->
-                        animatorHelper.startTrackersAnimation(lastSeenCtaViewState?.cta, activity, animationContainer, omnibarViews(), events)
+                        animatorHelper.startTrackersAnimation(
+                            shouldRunPartialAnimation = lastSeenCtaViewState?.cta is DaxTrackersBlockedCta,
+                            shieldAnimationView = shieldIcon,
+                            trackersAnimationView = trackerAnimationView,
+                            omnibarViews = omnibarViews(),
+                            entities = events
+                        )
                     }
                 }
             }
         }
 
         fun cancelTrackersAnimation() {
-            animatorHelper.cancelAnimations(omnibarViews(), animationContainer)
+            animatorHelper.cancelAnimations(omnibarViews())
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
@@ -2657,12 +2651,12 @@ class BrowserTabFragment :
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             if (viewState.browserShowing) {
                 daxIcon?.isVisible = viewState.showDaxIcon
-                privacyGradeButton?.isInvisible = !viewState.showPrivacyGrade || viewState.showDaxIcon
+                shieldIcon?.isInvisible = !viewState.showPrivacyShield || viewState.showDaxIcon
                 clearTextButton?.isVisible = viewState.showClearButton
                 searchIcon?.isVisible = viewState.showSearchIcon
             } else {
                 daxIcon.isVisible = false
-                privacyGradeButton?.isVisible = false
+                shieldIcon?.isVisible = false
                 clearTextButton?.isVisible = viewState.showClearButton
                 searchIcon?.isVisible = true
             }

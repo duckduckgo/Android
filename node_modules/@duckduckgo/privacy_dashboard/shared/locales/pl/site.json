@@ -1,0 +1,147 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "updatingProtectionList" : {
+    "title" : "Aktualizowanie listy ochrony",
+    "note" : "Message shown while updating the list of protections"
+  },
+  "protectionsDisabled" : {
+    "title" : "Zabezpieczenia zostały <b>WYŁĄCZONE</b>",
+    "note" : "Headline when privacy protections are disabled"
+  },
+  "protectionsEnabled" : {
+    "title" : "Zabezpieczenia są <b>WŁĄCZONE</b> dla tej strony",
+    "note" : "Headline when privacy protections are enabled"
+  },
+  "connectionDescriptionUnencrypted" : {
+    "title" : "Inne osoby mogą przechwycić poufne informacje przesyłane przez użytkownika na tej stronie.",
+    "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
+  },
+  "connectionDescriptionUpgraded" : {
+    "title" : "Uaktualniliśmy połączenie na tej stronie, aby chronić przesyłane informacje.",
+    "note" : "Shown when the connection has been upgraded from unencrypted to encrypted (HTTP to HTTPS)"
+  },
+  "connectionDescriptionEncrypted" : {
+    "title" : "Połączenie na tej stronie jest bezpieczne, chroniąc przesyłane informacje.",
+    "note" : "Shown when the connection is encrypted (HTTPS not HTTP)"
+  },
+  "trackerNetworksSummaryNone" : {
+    "title" : "Nie znaleźliśmy żadnych firm próbujących śledzić Cię na tej stronie.",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerNetworksSummaryOwn" : {
+    "title" : "Znaleźliśmy tylko skrypty śledzące należące do {name}, których nie zablokowaliśmy.",
+    "note" : "We found but did not block trackers from company named"
+  },
+  "trackerNetworksSummaryOther" : {
+    "title" : "{isWhitelisted, select, true {Znaleźliśmy} other {Zablokowaliśmy}} {displayCount} znany(-e) {displayCount, plural, =1 {moduł śledzący} other {moduły śledzące}} {companyCount} {companyCount, plural, one {firmy} other {firm}} na tej stronie.",
+    "note" : "This summarizes the number of trackers that we either blocked or did not block (depending on the protection setting for this site)"
+  },
+  "websiteNotWorkingQ" : {
+    "title" : "Witryna internetowa nie działa zgodnie z oczekiwaniami?",
+    "note" : "Call to action for user to click if they are having issues with this web page"
+  },
+  "takePrecautions" : {
+    "title" : "Zachowaj środki ostrożności",
+    "note" : "Title shown when the page is unencrypted"
+  },
+  "protectionsAreDisabled" : {
+    "title" : "Zabezpieczenia są WYŁĄCZONE",
+    "note" : "Shown when user has disabled protections for this site (or they have been programatically disabled)"
+  },
+  "foundCompanyNamesList" : {
+    "title" : "{companyCount, plural, =0 {Na tej stronie znaleźliśmy firmy śledzące i profilujące użytkownika.} =2 {Na tej stronie znaleźliśmy firmy {firstCompany} i {secondCompany} śledzące i profilujące użytkownika.} one {Na tej stronie znaleźliśmy {firstCompany} śledzącą i profilującą użytkownika.} few {Na tej stronie znaleźliśmy {firstCompany}, {secondCompany} i inne firmy śledzące i profilujące użytkownika.} many {Na tej stronie znaleźliśmy {firstCompany}, {secondCompany} i inne firmy śledzące i profilujące użytkownika.} other {Na tej stronie znaleźliśmy {firstCompany}, {secondCompany} i inne firmy śledzące i profilujące użytkownika.}}",
+    "note" : "Returns a string in the form of 'We found CompanyA, CompanyB and others tracking and profiling you on this page.'"
+  },
+  "majorTrackerNetwork" : {
+    "title" : "Sieć skryptów śledzących",
+    "note" : "Tracker network is a group of trackers, usually in the form of a company name, that track users across websites"
+  },
+  "majorTrackingNetworkDesc" : {
+    "title" : "{companyDisplayName} (właściciel {domain})\nśledzi Cię na {companyPrevalence}% najpopularniejszych stron.\nNie możemy blokować ich w witrynach, których są właścicielami, ale możemy to robić na innych stronach.",
+    "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
+  },
+  "noActivityToReport" : {
+    "title" : "Brak aktywności do zgłoszenia",
+    "note" : "Title when we did not find any trackers on this page"
+  },
+  "trackersBlocked" : {
+    "title" : "Kogo zablokowaliśmy",
+    "note" : "Title for the list of companies that we blocked"
+  },
+  "trackersBlockedDesc" : {
+    "title" : "{companyCount, plural, =0 {Zablokowaliśmy niektórym firmom możliwość prób śledzenia użytkownika.} =2 {Zablokowaliśmy próbę profilowania użytkownika przez {firstCompany} i {secondCompany}.} one {Zablokowaliśmy próbę śledzenia użytkownika przez {firstCompany}.} few {Zablokowaliśmy próbę śledzenia użytkownika przez {firstCompany}, {secondCompany} i inne firmy.} many {Zablokowaliśmy próbę śledzenia użytkownika przez {firstCompany}, {secondCompany} i inne firmy.} other {Zablokowaliśmy próbę śledzenia użytkownika przez {firstCompany}, {secondCompany} i inne firmy.}}",
+    "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
+  },
+  "cookiesMinimized" : {
+    "title" : "Ograniczono pliki cookie",
+    "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedDesc" : {
+    "title" : "Ustawiliśmy preferencje dotyczące plików cookie, aby zmaksymalizować prywatność, i zamknęliśmy wyskakujące okienko zgody.",
+    "note" : "Description for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "connectionSecure" : {
+    "title" : "Połączenie jest bezpieczne",
+    "note" : "The connection to the website is secure (HTTPS)"
+  },
+  "connectionNotSecure" : {
+    "title" : "Połączenie nie może zostać zabezpieczone",
+    "note" : "The connection is not secure (HTTP)"
+  },
+  "trackerNetworksDesc" : {
+    "title" : "{blocked, select, true {{majorNetwork, select, true {{trackerCount, plural, one {Zablokowano {trackerCount} dużą sieć skryptów śledzących} few {Zablokowano {trackerCount} duże sieci skryptów śledzących} many {Zablokowano {trackerCount} dużych sieci skryptów śledzących} other {Zablokowano {trackerCount} dużej sieci skryptów śledzących}}} other {{trackerCount, plural, one {Zablokowano {trackerCount} skrypt śledzący} few {Zablokowano {trackerCount} skrypty śledzące} many {Zablokowano {trackerCount} skryptów śledzących} other {Zablokowano {trackerCount} skryptu śledzącego}}}}} other {{majorNetwork, select, true {{trackerCount, plural, one {Znaleziono {trackerCount} dużą sieć skryptów śledzących} few {Znaleziono {trackerCount} duże sieci skryptów śledzących} many {Znaleziono {trackerCount} dużych sieci skryptów śledzących} other {Znaleziono {trackerCount} dużej sieci skryptów śledzących}}} other {{trackerCount, plural, one {Znaleziono {trackerCount} skrypt śledzący} few {Znaleziono {trackerCount} skrypty śledzące} many {Znaleziono {trackerCount} skryptów śledzących} other {Znaleziono {trackerCount} skryptów śledzących}}}}}}",
+    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+  },
+  "firstPartyDesc" : {
+    "title" : "{companyName} jest właścicielem tej witryny i znanych skryptów śledzących znalezionych na tej stronie, dlatego ich nie zablokowaliśmy.",
+    "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
+  },
+  "trackersFoundForAllowlisted" : {
+    "title" : "Skrypty śledzące ułatwiają firmom profilowanie użytkownika. Znaleźliśmy następujące firmy, które monitorują Twoją aktywność na tej stronie.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections disabled"
+  },
+  "trackersFoundAndBlocked" : {
+    "title" : "Skrypty śledzące ułatwiają firmom profilowanie użytkownika. Zablokowaliśmy tym firmom możliwość monitorowania Twojej aktywności na tej stronie.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections enabled"
+  },
+  "trackerNetworkUnknown" : {
+    "title" : "Nieznana sieć skryptów śledzących",
+    "note" : "Shown when we don't have a company name for a given tracker"
+  },
+  "trackerDomainsForCompany" : {
+    "title" : "Domeny skryptów śledzących {companyName}",
+    "note" : "Title for the list of tracker domains detected from a given company"
+  },
+  "zeroTrackersFound" : {
+    "title" : "Znaleziono 0 skryptów śledzących",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerOwnedByThisSite" : {
+    "title" : "Skrypty śledzące należące do tej strony (dozwolone)",
+    "note" : "Trackers owned by this site are not blocked"
+  },
+  "trackerCountForDomain" : {
+    "title" : "{blocked, select, true {{trackerCount, plural, one {Zablokowano {trackerCount} skrypt śledzący na {domain}} few {Zablokowano {trackerCount} skrypty śledzące na {domain}} many {Zablokowano {trackerCount} skryptów śledzących na {domain}} other {Zablokowano {trackerCount} skryptu śledzącego na {domain}}}} other {{trackerCount, plural, one {Znaleziono {trackerCount} skrypt śledzący na {domain}} few {Znaleziono {trackerCount} skrypty śledzące na {domain}} many {Znaleziono {trackerCount} skryptów śledzących na {domain}} other {Znaleziono {trackerCount} skryptu śledzącego na {domain}}}}}",
+    "note" : "For a given domain, the count of trackers either blocked or just detected (found).  Ex 4 Trackers Blocked"
+  },
+  "analyticsCategory" : {
+    "title" : "Analityka",
+    "note" : "Used to describe the type of tracker, in this case one that is used to report analytics back to the site owner"
+  },
+  "advertisingCategory" : {
+    "title" : "Reklama",
+    "note" : "Used to describe the type of tracker, in this case one that is used for advertising"
+  },
+  "socialCategory" : {
+    "title" : "Sieć społecznościowa",
+    "note" : "Used to describe the type of tracker, in this case one that is used by one of the popular social networksr"
+  }
+}

@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
+import android.net.http.SslCertificate
 import android.os.Message
 import android.util.Patterns
 import android.view.ContextMenu
@@ -97,7 +98,7 @@ import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
-import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ALWAYS
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ASK_EVERY_TIME
@@ -210,7 +211,7 @@ class BrowserTabViewModel @Inject constructor(
         val isFullScreen: Boolean = false,
         val isDesktopBrowsingMode: Boolean = false,
         val canChangeBrowsingMode: Boolean = false,
-        val showPrivacyGrade: Boolean = false,
+        val showPrivacyShield: Boolean = false,
         val showSearchIcon: Boolean = false,
         val showClearButton: Boolean = false,
         val showTabsButton: Boolean = true,
@@ -288,13 +289,9 @@ class BrowserTabViewModel @Inject constructor(
         val numberMatches: Int = 0
     )
 
-    data class PrivacyGradeViewState(
-        val privacyGrade: PrivacyGrade? = null,
-        val shouldAnimate: Boolean = false,
-        val showEmptyGrade: Boolean = true
-    ) {
-        val isEnabled: Boolean = privacyGrade != PrivacyGrade.UNKNOWN
-    }
+    data class PrivacyShieldViewState(
+        val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN
+    )
 
     data class AutoCompleteViewState(
         val showSuggestions: Boolean = false,
@@ -309,14 +306,6 @@ class BrowserTabViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object Refresh : Command()
-        class Navigate(
-            val url: String,
-            val headers: Map<String, String>
-        ) : Command()
-
-        class NavigateBack(val steps: Int) : Command()
-        object NavigateForward : Command()
         class OpenInNewTab(
             val query: String,
             val sourceTabId: String? = null
@@ -428,15 +417,26 @@ class BrowserTabViewModel @Inject constructor(
         class InjectEmailAddress(val address: String) : Command()
         class ShowEmailTooltip(val address: String) : Command()
         sealed class DaxCommand : Command() {
-            object FinishTrackerAnimation : DaxCommand()
+            object FinishPartialTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
         class InjectCredentials(val url: String, val credentials: LoginCredentials) : Command()
         class CancelIncomingAutofillRequest(val url: String) : Command()
         class EditWithSelectedQuery(val query: String) : Command()
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
-        class NavigateToHistory(val historyStackIndex: Int) : Command()
         object EmailSignEvent : Command()
+    }
+
+    sealed class NavigationCommand() : Command() {
+        class NavigateToHistory(val historyStackIndex: Int) : Command()
+        object Refresh : NavigationCommand()
+        class Navigate(
+            val url: String,
+            val headers: Map<String, String>
+        ) : NavigationCommand()
+
+        class NavigateBack(val steps: Int) : NavigationCommand()
+        object NavigateForward : NavigationCommand()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -448,7 +448,7 @@ class BrowserTabViewModel @Inject constructor(
     val accessibilityViewState: MutableLiveData<AccessibilityViewState> = MutableLiveData()
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
     var siteLiveData: MutableLiveData<Site> = MutableLiveData()
-    val privacyGradeViewState: MutableLiveData<PrivacyGradeViewState> = MutableLiveData()
+    val privacyShieldViewState: MutableLiveData<PrivacyShieldViewState> = MutableLiveData()
 
     var skipHome = false
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -853,7 +853,7 @@ class BrowserTabViewModel @Inject constructor(
                     clearPreviousUrl()
                 }
 
-                command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+                command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
             }
         }
 
@@ -989,9 +989,9 @@ class BrowserTabViewModel @Inject constructor(
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateForward)
         if (!currentBrowserViewState().browserShowing) {
             browserViewState.value = browserStateModifier.copyForBrowserShowing(currentBrowserViewState())
-            command.value = Refresh
+            command.value = NavigationCommand.Refresh
         } else {
-            command.value = NavigateForward
+            command.value = NavigationCommand.NavigateForward
         }
     }
 
@@ -1004,7 +1004,7 @@ class BrowserTabViewModel @Inject constructor(
         if (currentGlobalLayoutState() is Invalidated) {
             recoverTabWithQuery(url.orEmpty())
         } else {
-            command.value = Refresh
+            command.value = NavigationCommand.Refresh
         }
     }
 
@@ -1029,7 +1029,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (navigation.canGoBack) {
-            command.value = NavigateBack(navigation.stepsToPreviousPage)
+            command.value = NavigationCommand.NavigateBack(navigation.stepsToPreviousPage)
             return true
         } else if (hasSourceTab) {
             viewModelScope.launch {
@@ -1153,7 +1153,7 @@ class BrowserTabViewModel @Inject constructor(
             addToHomeEnabled = domain != null,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = domain != null,
-            showPrivacyGrade = true,
+            showPrivacyShield = true,
             canReportSite = domain != null,
             canChangePrivacyProtection = domain != null,
             isPrivacyProtectionEnabled = false,
@@ -1166,8 +1166,6 @@ class BrowserTabViewModel @Inject constructor(
             showDaxIcon = shouldShowDaxIcon(url, true),
             canPrintPage = domain != null
         )
-
-        Timber.d("showPrivacyGrade=true, showSearchIcon=false, showClearButton=false")
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             statisticsUpdater.refreshSearchRetentionAtb()
@@ -1214,10 +1212,10 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun shouldShowDaxIcon(
         currentUrl: String?,
-        showPrivacyGrade: Boolean
+        showPrivacyShield: Boolean
     ): Boolean {
         val url = currentUrl ?: return false
-        return showPrivacyGrade && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
+        return showPrivacyShield && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
     }
 
     private suspend fun updateLoadingStatePrivacy(domain: String) {
@@ -1336,7 +1334,7 @@ class BrowserTabViewModel @Inject constructor(
             addToHomeEnabled = false,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = false,
-            showPrivacyGrade = false,
+            showPrivacyShield = false,
             canReportSite = false,
             showSearchIcon = true,
             showClearButton = true,
@@ -1344,7 +1342,7 @@ class BrowserTabViewModel @Inject constructor(
             showDaxIcon = false,
             canPrintPage = false
         )
-        Timber.d("showPrivacyGrade=false, showSearchIcon=true, showClearButton=true")
+        Timber.d("showPrivacyShield=false, showSearchIcon=true, showClearButton=true")
     }
 
     override fun pageRefreshed(refreshedUrl: String) {
@@ -1368,12 +1366,6 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
-
-        val showLoadingGrade = progress.privacyOn || isLoading
-        privacyGradeViewState.value = currentPrivacyGradeState().copy(
-            shouldAnimate = isLoading,
-            showEmptyGrade = showLoadingGrade
-        )
 
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
@@ -1587,6 +1579,7 @@ class BrowserTabViewModel @Inject constructor(
         site?.surrogateDetected(surrogate)
     }
 
+    // This is called when interceptor upgrades to https
     override fun upgradedToHttps() {
         httpsUpgraded = true
     }
@@ -1612,6 +1605,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    override fun onCertificateReceived(certificate: SslCertificate?) {
+        site?.certificate = certificate
+    }
+
     private fun enableUrlParametersRemovedFlag() {
         site?.urlParametersRemoved = true
         onSiteChanged()
@@ -1620,28 +1617,17 @@ class BrowserTabViewModel @Inject constructor(
     private fun onSiteChanged() {
         httpsUpgraded = false
         viewModelScope.launch {
-
-            val improvedGrade = withContext(dispatchers.io()) {
-                site?.calculateGrades()?.improvedGrade
+            val privacyProtection: PrivacyShield = withContext(dispatchers.io()) {
+                site?.privacyProtection() ?: PrivacyShield.UNKNOWN
             }
-
+            Timber.i("Shield: privacyProtection $privacyProtection")
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
-                val isWhiteListed: Boolean = site?.domain?.let { isWhitelisted(it) } ?: false
-                if (!isWhiteListed) {
-                    privacyGradeViewState.value = currentPrivacyGradeState().copy(privacyGrade = improvedGrade)
-                }
+                privacyShieldViewState.value = currentPrivacyShieldState().copy(privacyShield = privacyProtection)
             }
-
             withContext(dispatchers.io()) {
                 tabRepository.update(tabId, site)
             }
-        }
-    }
-
-    fun stopShowingEmptyGrade() {
-        if (currentPrivacyGradeState().showEmptyGrade) {
-            privacyGradeViewState.value = currentPrivacyGradeState().copy(showEmptyGrade = false)
         }
     }
 
@@ -1660,14 +1646,13 @@ class BrowserTabViewModel @Inject constructor(
     private fun currentOmnibarViewState(): OmnibarViewState = omnibarViewState.value!!
     private fun currentLoadingViewState(): LoadingViewState = loadingViewState.value!!
     private fun currentCtaViewState(): CtaViewState = ctaViewState.value!!
-    private fun currentPrivacyGradeState(): PrivacyGradeViewState = privacyGradeViewState.value!!
+    private fun currentPrivacyShieldState(): PrivacyShieldViewState = privacyShieldViewState.value!!
 
     fun onOmnibarInputStateChanged(
         query: String,
         hasFocus: Boolean,
         hasQueryChanged: Boolean
     ) {
-
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank() || !hasFocus) {
             AutoCompleteResult(query, emptyList())
@@ -1687,13 +1672,8 @@ class BrowserTabViewModel @Inject constructor(
         }
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
-        val showPrivacyGrade = !hasFocus
+        val showPrivacyShield = !hasFocus
         val showSearchIcon = hasFocus
-
-        // show the real grade in case the animation was canceled before changing the state, this avoids showing an empty grade when regaining focus.
-        if (showPrivacyGrade) {
-            privacyGradeViewState.value = currentPrivacyGradeState().copy(showEmptyGrade = false)
-        }
 
         omnibarViewState.value = currentOmnibarViewState().copy(
             isEditing = hasFocus,
@@ -1705,7 +1685,7 @@ class BrowserTabViewModel @Inject constructor(
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyGrade = showPrivacyGrade,
+            showPrivacyShield = showPrivacyShield,
             showSearchIcon = showSearchIcon,
             showTabsButton = showControls,
             fireButton = if (showControls) {
@@ -1719,10 +1699,10 @@ class BrowserTabViewModel @Inject constructor(
                 HighlightableButton.Gone
             },
             showClearButton = showClearButton,
-            showDaxIcon = shouldShowDaxIcon(url, showPrivacyGrade)
+            showDaxIcon = shouldShowDaxIcon(url, showPrivacyShield)
         )
 
-        Timber.d("showPrivacyGrade=$showPrivacyGrade, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
+        Timber.d("showPrivacyShield=$showPrivacyShield, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
 
         autoCompleteViewState.value = currentAutoCompleteViewState()
             .copy(
@@ -1958,7 +1938,7 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 addToWhitelist(domain)
             }
-            command.postValue(Refresh)
+            command.postValue(NavigationCommand.Refresh)
         }
     }
 
@@ -1989,7 +1969,7 @@ class BrowserTabViewModel @Inject constructor(
             userWhitelistDao.insert(domain)
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = true)
-                command.value = Refresh
+                command.value = NavigationCommand.Refresh
             }
         }
     }
@@ -1999,7 +1979,7 @@ class BrowserTabViewModel @Inject constructor(
             userWhitelistDao.delete(domain)
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = false)
-                command.value = Refresh
+                command.value = NavigationCommand.Refresh
             }
         }
     }
@@ -2110,9 +2090,9 @@ class BrowserTabViewModel @Inject constructor(
         if (desktopSiteRequested && uri.isMobileSite) {
             val desktopUrl = uri.toDesktopUri().toString()
             Timber.i("Original URL $url - attempting $desktopUrl with desktop site UA string")
-            command.value = Navigate(desktopUrl, getUrlHeaders(desktopUrl))
+            command.value = NavigationCommand.Navigate(desktopUrl, getUrlHeaders(desktopUrl))
         } else {
-            command.value = Refresh
+            command.value = NavigationCommand.Refresh
         }
     }
 
@@ -2128,7 +2108,7 @@ class BrowserTabViewModel @Inject constructor(
         )
         findInPageViewState.value = FindInPageViewState()
         ctaViewState.value = CtaViewState()
-        privacyGradeViewState.value = PrivacyGradeViewState()
+        privacyShieldViewState.value = PrivacyShieldViewState()
         accessibilityViewState.value = AccessibilityViewState(
             fontSize = accessibilitySettingsDataStore.fontSize,
             forceZoom = accessibilitySettingsDataStore.forceZoom,
@@ -2153,7 +2133,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun historicalPageSelected(stackIndex: Int) {
-        command.value = NavigateToHistory(stackIndex)
+        command.value = NavigationCommand.NavigateToHistory(stackIndex)
     }
 
     private fun removeAtbAndSourceParamsFromSearch(url: String): String {
@@ -2350,7 +2330,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onDaxDialogDismissed() {
         val cta = currentCtaViewState().cta ?: return
         if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
-            command.value = DaxCommand.FinishTrackerAnimation
+            command.value = DaxCommand.FinishPartialTrackerAnimation
         }
         onUserDismissedCta()
     }

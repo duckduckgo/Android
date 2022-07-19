@@ -1,0 +1,147 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "updatingProtectionList" : {
+    "title" : "Ενημέρωση του καταλόγου προστασίας",
+    "note" : "Message shown while updating the list of protections"
+  },
+  "protectionsDisabled" : {
+    "title" : "Οι επιλογές προστασίας έχουν <b>ΑΠΕΝΕΡΓΟΠΟΙΗΘΕΙ</b>",
+    "note" : "Headline when privacy protections are disabled"
+  },
+  "protectionsEnabled" : {
+    "title" : "Οι επιλογές προστασίας είναι <b>ΕΝΕΡΓΟΠΟΙΗΜΕΝΕΣ</b> για τον συγκεκριμένο ιστότοπο",
+    "note" : "Headline when privacy protections are enabled"
+  },
+  "connectionDescriptionUnencrypted" : {
+    "title" : "Άλλα άτομα ενδέχεται να μπορούν να υποκλέψουν ευαίσθητες πληροφορίες που στέλνετε στη σελίδα αυτή.",
+    "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
+  },
+  "connectionDescriptionUpgraded" : {
+    "title" : "Αναβαθμίσαμε τη σύνδεση στη σελίδα αυτή για προστασία των πληροφοριών που στέλνετε κατά τη μεταφορά τους.",
+    "note" : "Shown when the connection has been upgraded from unencrypted to encrypted (HTTP to HTTPS)"
+  },
+  "connectionDescriptionEncrypted" : {
+    "title" : "Η σύνδεση στη σελίδα αυτή είναι ασφαλής για προστασία των πληροφοριών που στέλνετε κατά τη μεταφορά τους.",
+    "note" : "Shown when the connection is encrypted (HTTPS not HTTP)"
+  },
+  "trackerNetworksSummaryNone" : {
+    "title" : "Δεν βρήκαμε εταιρείες που να προσπαθούν να σας παρακολουθήσουν στη σελίδα αυτή.",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerNetworksSummaryOwn" : {
+    "title" : "Βρήκαμε μόνο εφαρμογές παρακολούθησης που ανήκουν στην εταιρεία {name}, τους οποίους δεν μπλοκάραμε.",
+    "note" : "We found but did not block trackers from company named"
+  },
+  "trackerNetworksSummaryOther" : {
+    "title" : "{isWhitelisted, select, true {Βρήκαμε} other {Αποκλείσαμε}} {displayCount} γνωστό {displayCount, plural, =1 {εφαρμογή παρακολούθησης} other {εφαρμογές παρακολούθησης}} από {companyCount} {companyCount, plural, one {εταιρεία} other {εταιρείες}} σε αυτήν τη σελίδα.",
+    "note" : "This summarizes the number of trackers that we either blocked or did not block (depending on the protection setting for this site)"
+  },
+  "websiteNotWorkingQ" : {
+    "title" : "Δεν λειτουργεί ο ιστότοπος όπως αναμενόταν;",
+    "note" : "Call to action for user to click if they are having issues with this web page"
+  },
+  "takePrecautions" : {
+    "title" : "Λάβετε μέτρα προφύλαξης",
+    "note" : "Title shown when the page is unencrypted"
+  },
+  "protectionsAreDisabled" : {
+    "title" : "Οι επιλογές προστασίας είναι ΑΠΕΝΕΡΓΟΠΟΙΗΜΕΝΕΣ",
+    "note" : "Shown when user has disabled protections for this site (or they have been programatically disabled)"
+  },
+  "foundCompanyNamesList" : {
+    "title" : "{companyCount, plural, =0 {Βρήκαμε ορισμένες εταιρείες οι οποίες σας παρακολουθούν και σκιαγραφούν το προφίλ σας σε αυτήν τη σελίδα.} =2 {Βρήκαμε τις εταιρείες {firstCompany} και {secondCompany} οι οποίες σας παρακολουθούν και σκιαγραφούν το προφίλ σας σε αυτήν τη σελίδα.} one {Βρήκαμε την εταιρεία {firstCompany} η οποία σας παρακολουθεί και σκιαγραφεί το προφίλ σας σε αυτήν τη σελίδα.} other {Βρήκαμε τις εταιρείες {firstCompany}, {secondCompany} και άλλες οι οποίες σας παρακολουθούν και σκιαγραφούν το προφίλ σας σε αυτήν τη σελίδα.}}",
+    "note" : "Returns a string in the form of 'We found CompanyA, CompanyB and others tracking and profiling you on this page.'"
+  },
+  "majorTrackerNetwork" : {
+    "title" : "Δίκτυο παρακολούθησης",
+    "note" : "Tracker network is a group of trackers, usually in the form of a company name, that track users across websites"
+  },
+  "majorTrackingNetworkDesc" : {
+    "title" : "{companyDisplayName} (ιδιοκτήτης του {domain})\nσάς παρακολουθεί στο {companyPrevalence}% των κορυφαίων ιστότοπων.\nΔεν μπορούμε να τους αποκλείσουμε σε ιστότοπους που τους ανήκουν, ωστόσο μπορούμε σε άλλες σελίδες.",
+    "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
+  },
+  "noActivityToReport" : {
+    "title" : "Δεν υπάρχει καμία δραστηριότητα προς αναφορά",
+    "note" : "Title when we did not find any trackers on this page"
+  },
+  "trackersBlocked" : {
+    "title" : "Ποιους μπλοκάραμε",
+    "note" : "Title for the list of companies that we blocked"
+  },
+  "trackersBlockedDesc" : {
+    "title" : "{companyCount, plural, =0 {Αποκλείσαμε ορισμένες εταιρείες από την προσπάθειά τους να σας παρακολουθήσουν.} =2 {Αποκλείσαμε τις εταιρείες {firstCompany} και {secondCompany} από την προσπάθειά τους να σας παρακολουθήσουν.} one {Αποκλείσαμε την εταιρεία {firstCompany} από την προσπάθειά της να σας παρακολουθήσει.} other {Αποκλείσαμε τις εταιρείες {firstCompany}, {secondCompany} και άλλες από την προσπάθειά τους να σας παρακολουθήσουν.}}",
+    "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
+  },
+  "cookiesMinimized" : {
+    "title" : "Ελαχιστοποίηση cookies",
+    "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedDesc" : {
+    "title" : "Ρυθμίσαμε τις προτιμήσεις σας σχετικά με τα cookies ώστε να μεγιστοποιήσουμε το απόρρητο και κλείσαμε το αναδυόμενο παράθυρο συγκατάθεσης.",
+    "note" : "Description for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "connectionSecure" : {
+    "title" : "Η σύνδεση είναι ασφαλής",
+    "note" : "The connection to the website is secure (HTTPS)"
+  },
+  "connectionNotSecure" : {
+    "title" : "Η σύνδεση ενδέχεται να μην είναι ασφαλής",
+    "note" : "The connection is not secure (HTTP)"
+  },
+  "trackerNetworksDesc" : {
+    "title" : "{blocked, select, true {{majorNetwork, select, true {{trackerCount, plural, one {Αποκλείστηκε {trackerCount} κύριο δίκτυο παρακολούθησης} other {Αποκλείστηκαν {trackerCount} κύρια δίκτυα παρακολούθησης}}} other {{trackerCount, plural, one {Αποκλείστηκε {trackerCount} παρακολούθηση} other {Αποκλείστηκαν {trackerCount} παρακολουθήσεις}}}}} other {{majorNetwork, select, true {{trackerCount, plural, one {Βρέθηκε {trackerCount} κύριο δίκτυο παρακολούθησης} other {Βρέθηκαν {trackerCount} κύρια δίκτυα παρακολούθησης}}} other {{trackerCount, plural, one {Βρέθηκε {trackerCount} παρακολούθηση} other {Βρέθηκαν {trackerCount} παρακολουθήσεις}}}}}}",
+    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+  },
+  "firstPartyDesc" : {
+    "title" : "Η εταιρεία {companyName} αποτελεί κάτοχο αυτού του ιστότοπου και των γνωστών εφαρμογών παρακολούθησης που βρέθηκαν στη σελίδα αυτή, γι' αυτό δεν τα αποκλείσαμε.",
+    "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
+  },
+  "trackersFoundForAllowlisted" : {
+    "title" : "Οι εφαρμογές παρακολούθησης βοηθούν τις εταιρείες να σκιαγραφήσουν το προφίλ σας. Βρήκαμε αυτές τις εταιρείες οι οποίες παρακολουθούν τη δραστηριότητά σας στη συγκεκριμένη σελίδα.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections disabled"
+  },
+  "trackersFoundAndBlocked" : {
+    "title" : "Οι εφαρμογές παρακολούθησης βοηθούν τις εταιρείες να σκιαγραφήσουν το προφίλ σας. Αποκλείσαμε αυτές τις εταιρείες από το να παρακολουθούν τη δραστηριότητά σας στη συγκεκριμένη σελίδα.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections enabled"
+  },
+  "trackerNetworkUnknown" : {
+    "title" : "Άγνωστο δίκτυο παρακολούθησης",
+    "note" : "Shown when we don't have a company name for a given tracker"
+  },
+  "trackerDomainsForCompany" : {
+    "title" : "Τομείς παρακολούθησης για την εταιρεία {companyName}",
+    "note" : "Title for the list of tracker domains detected from a given company"
+  },
+  "zeroTrackersFound" : {
+    "title" : "Βρέθηκαν 0 εφαρμογές παρακολούθησης",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerOwnedByThisSite" : {
+    "title" : "Εφαρμογές παρακολούθησης που ανήκουν σε αυτόν τον ιστότοπο (Επιτρέπονται)",
+    "note" : "Trackers owned by this site are not blocked"
+  },
+  "trackerCountForDomain" : {
+    "title" : "{blocked, select, true {{trackerCount, plural, one {{trackerCount} εφαρμογή παρακολούθησης αποκλείστηκε στο {domain}} other {{trackerCount} εφαρμογές παρακολούθησης μπλοκαρίστηκαν στο {domain}}}} other {{trackerCount, plural, one {{trackerCount} εφαρμογή παρακολούθησης βρέθηκε στο {domain}} other {{trackerCount} εφαρμογές παρακολούθησης βρέθηκαν στο {domain}}}}}",
+    "note" : "For a given domain, the count of trackers either blocked or just detected (found).  Ex 4 Trackers Blocked"
+  },
+  "analyticsCategory" : {
+    "title" : "Ανάλυση",
+    "note" : "Used to describe the type of tracker, in this case one that is used to report analytics back to the site owner"
+  },
+  "advertisingCategory" : {
+    "title" : "διαφήμιση",
+    "note" : "Used to describe the type of tracker, in this case one that is used for advertising"
+  },
+  "socialCategory" : {
+    "title" : "Κοινωνικό δίκτυο",
+    "note" : "Used to describe the type of tracker, in this case one that is used by one of the popular social networksr"
+  }
+}

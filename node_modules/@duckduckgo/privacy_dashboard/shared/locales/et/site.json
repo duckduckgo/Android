@@ -1,0 +1,147 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "updatingProtectionList" : {
+    "title" : "Kaitseloendi värskendamine",
+    "note" : "Message shown while updating the list of protections"
+  },
+  "protectionsDisabled" : {
+    "title" : "Kaitsed on <b>KEELATUD</b>",
+    "note" : "Headline when privacy protections are disabled"
+  },
+  "protectionsEnabled" : {
+    "title" : "Kaitsed on sellel saidil <b>LUBATUD</b>",
+    "note" : "Headline when privacy protections are enabled"
+  },
+  "connectionDescriptionUnencrypted" : {
+    "title" : "Teised võivad olla võimelised kinni püüdma tundlikku teavet, mida sa sellel lehel saadad.",
+    "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
+  },
+  "connectionDescriptionUpgraded" : {
+    "title" : "Me täiendasime sellel lehel olevat ühendust, et kaitsta sinu saadetud teavet selle edastamise ajal.",
+    "note" : "Shown when the connection has been upgraded from unencrypted to encrypted (HTTP to HTTPS)"
+  },
+  "connectionDescriptionEncrypted" : {
+    "title" : "Sellel lehel kasutatav ühendus on turvaline, et kaitsta sinu saadetud teavet.",
+    "note" : "Shown when the connection is encrypted (HTTPS not HTTP)"
+  },
+  "trackerNetworksSummaryNone" : {
+    "title" : "Me ei leidnud ühtegi ettevõtet, mis üritaks sind sellel lehel jälgida.",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerNetworksSummaryOwn" : {
+    "title" : "Me leidsime ainult ettevõttele {name} kuuluvad jälgurid, mida me ei blokeerinud.",
+    "note" : "We found but did not block trackers from company named"
+  },
+  "trackerNetworksSummaryOther" : {
+    "title" : "Me {isWhitelisted, select, true {leidsime} other {blokeerisime}} sellel leheküljel {displayCount} teadaoleva {displayCount, plural, =1 {jälguri} {jälgurit}} {companyCount} {companyCount, plural, one {ettevõttelt} other {ettevõttelt}}.",
+    "note" : "This summarizes the number of trackers that we either blocked or did not block (depending on the protection setting for this site)"
+  },
+  "websiteNotWorkingQ" : {
+    "title" : "Kas veebisait ei tööta ootuspäraselt?",
+    "note" : "Call to action for user to click if they are having issues with this web page"
+  },
+  "takePrecautions" : {
+    "title" : "Kasuta ettevaatusabinõusid",
+    "note" : "Title shown when the page is unencrypted"
+  },
+  "protectionsAreDisabled" : {
+    "title" : "Kaitsed on KEELATUD",
+    "note" : "Shown when user has disabled protections for this site (or they have been programatically disabled)"
+  },
+  "foundCompanyNamesList" : {
+    "title" : "{companyCount, plural, =0 {Leidsime sellel lehel mõned ettevõtted, kes sind jälgivad ja profileerivad.} =2 {Me leidsime ettevõtte {firstCompany} ja {secondCompany}, kes sind sellel lehel jälgivad ja profileerivad.} one {Leidsime ettevõtte {firstCompany}, kes jälgib ja profileerib sind sellel lehel.} other {Leidsime ettevõtted {firstCompany}, {secondCompany} ja veel teisi, kes jälgivad ja profileerivad sind sellel lehel.}}",
+    "note" : "Returns a string in the form of 'We found CompanyA, CompanyB and others tracking and profiling you on this page.'"
+  },
+  "majorTrackerNetwork" : {
+    "title" : "Jälgimisvõrk",
+    "note" : "Tracker network is a group of trackers, usually in the form of a company name, that track users across websites"
+  },
+  "majorTrackingNetworkDesc" : {
+    "title" : "{companyDisplayName} (domeeni {domain} omanik)\njälgib sind {companyPrevalence}% populaarseimatest saitidest.\nMe ei saa blokeerida neid nende enda saitidel, kuid saame blokeerida teisi lehekülgi.",
+    "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
+  },
+  "noActivityToReport" : {
+    "title" : "Raporteeritavat tegevust ei ole",
+    "note" : "Title when we did not find any trackers on this page"
+  },
+  "trackersBlocked" : {
+    "title" : "Kelle me blokeerisime",
+    "note" : "Title for the list of companies that we blocked"
+  },
+  "trackersBlockedDesc" : {
+    "title" : "{companyCount, plural, =0 {Me blokeerisime mõnede ettevõtete püüded sind jälgida.} =2 {Me blokeerisime ettevõtete {firstCompany} ja {secondCompany} püüded sind jälgida.} one {Me blokeerisime ettevõtte {firstCompany} püüded sind jälgida.} other {Me blokeerisime ettevõtte {firstCompany}, {secondCompany} ja teiste püüded sind jälgida.}}",
+    "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
+  },
+  "cookiesMinimized" : {
+    "title" : "Minimeeritud küpsised",
+    "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedDesc" : {
+    "title" : "Me seadistasime sinu küpsiste eelistused maksimeerima privaatsust ja sulgesime nõusoleku hüpikakna.",
+    "note" : "Description for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "connectionSecure" : {
+    "title" : "Ühendus on turvaline",
+    "note" : "The connection to the website is secure (HTTPS)"
+  },
+  "connectionNotSecure" : {
+    "title" : "Ühendust ei saanud turvata",
+    "note" : "The connection is not secure (HTTP)"
+  },
+  "trackerNetworksDesc" : {
+    "title" : "{blocked, select, true {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} Peamine jälgimisvõrk on blokeeritud} other {{trackerCount} Peamine jälgimisvõrk on blokeeritud}}} other {{trackerCount, plural, one {{trackerCount} jälgija on blokeeritud} other {{trackerCount} jälgijat on blokeeritud}}}}} other {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} Leitud peamine jälgimisvõrk} other {{trackerCount} Leitud peamine jälgimisvõrk}}} other {{trackerCount, plural, one {{trackerCount} jälitaja leitud} other {{trackerCount} jälitajat leitud}}}}}}",
+    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+  },
+  "firstPartyDesc" : {
+    "title" : "{companyName} omab seda saiti ja sellel lehel kasutatavaid teada olevaid jälgureid, seega me ei blokeerinud neid.",
+    "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
+  },
+  "trackersFoundForAllowlisted" : {
+    "title" : "Jälgurid aitavad ettevõtetel sind profileerida. Leidsime, et need ettevõtted jälgivad sinu tegevust sellel lehel.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections disabled"
+  },
+  "trackersFoundAndBlocked" : {
+    "title" : "Jälgurid aitavad ettevõtetel sind profileerida. Blokeerisime need ettevõtted, kes jälgivad sinu tegevust sellel lehel.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections enabled"
+  },
+  "trackerNetworkUnknown" : {
+    "title" : "Tundmatu jälgimisvõrk",
+    "note" : "Shown when we don't have a company name for a given tracker"
+  },
+  "trackerDomainsForCompany" : {
+    "title" : "Ettevõtte {companyName} jälguri domeenid",
+    "note" : "Title for the list of tracker domains detected from a given company"
+  },
+  "zeroTrackersFound" : {
+    "title" : "Leiti 0 jälgurit",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerOwnedByThisSite" : {
+    "title" : "Sellele saidile kuuluvad jälgurid (lubatud)",
+    "note" : "Trackers owned by this site are not blocked"
+  },
+  "trackerCountForDomain" : {
+    "title" : "{blocked, select, true {{trackerCount, plural, one {Saidil {domain} blokeeriti {trackerCount} jälgur} other {Saidil {domain} blokeeriti {trackerCount} jälgurit}}} other {{trackerCount, plural, one {Saidilt {domain} leiti {trackerCount} jälgur} other {Saidilt {domain} leiti {trackerCount} jälgurit}}}}",
+    "note" : "For a given domain, the count of trackers either blocked or just detected (found).  Ex 4 Trackers Blocked"
+  },
+  "analyticsCategory" : {
+    "title" : "Analüütika",
+    "note" : "Used to describe the type of tracker, in this case one that is used to report analytics back to the site owner"
+  },
+  "advertisingCategory" : {
+    "title" : "Reklaamimine",
+    "note" : "Used to describe the type of tracker, in this case one that is used for advertising"
+  },
+  "socialCategory" : {
+    "title" : "Sotsiaalvõrk",
+    "note" : "Used to describe the type of tracker, in this case one that is used by one of the popular social networksr"
+  }
+}

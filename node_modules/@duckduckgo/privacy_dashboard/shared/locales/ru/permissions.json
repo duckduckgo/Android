@@ -1,0 +1,43 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "camera" : {
+    "title" : "Камера",
+    "note" : "Camera permission is used by the browser to ask the user for access to computer or phone camera"
+  },
+  "microphone" : {
+    "title" : "Микрофон",
+    "note" : "Microphone permission is used by the browser to ask the user for access to computer or phone microphone"
+  },
+  "geolocation" : {
+    "title" : "Геолокация",
+    "note" : "Geolocation permission is used by the browser to ask the user to share their current location with the website"
+  },
+  "popups" : {
+    "title" : "Всплывающие окна",
+    "note" : "Pop-ups permission is used by the browser to ask the user to allow the website to open new windows"
+  },
+  "ask" : {
+    "title" : "Спрашивать каждый раз",
+    "note" : "A permission setting that specifies the user should be asked each time the website wants to use a given permission"
+  },
+  "notify" : {
+    "title" : "Спрашивать разрешение",
+    "note" : "A permission setting that specifies the user should be notified each time the website wants to use a given permission"
+  },
+  "grant" : {
+    "title" : "Разрешать всегда",
+    "note" : "A permission setting that allows the website to always use this permission without asking"
+  },
+  "deny" : {
+    "title" : "Не разрешать",
+    "note" : "A permission setting that always blocks the website from using this permission"
+  }
+}

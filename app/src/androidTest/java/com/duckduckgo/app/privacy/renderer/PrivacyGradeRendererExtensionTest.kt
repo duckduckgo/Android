@@ -24,31 +24,6 @@ import org.junit.Test
 class PrivacyGradeRendererExtensionTest {
 
     @Test
-    fun whenGradeIsAThenIconReflectsSame() {
-        assertEquals(R.drawable.privacygrade_icon_a, PrivacyGrade.A.icon())
-    }
-
-    @Test
-    fun whenGradeIsBThenIconReflectsSame() {
-        assertEquals(R.drawable.privacygrade_icon_b, PrivacyGrade.B.icon())
-    }
-
-    @Test
-    fun whenGradeIsCThenIconReflectsSame() {
-        assertEquals(R.drawable.privacygrade_icon_c, PrivacyGrade.C.icon())
-    }
-
-    @Test
-    fun whenGradeIsDThenIconReflectsSame() {
-        assertEquals(R.drawable.privacygrade_icon_d, PrivacyGrade.D.icon())
-    }
-
-    @Test
-    fun whenGradeIsUnknownThenIconReflectsSame() {
-        assertEquals(R.drawable.privacygrade_icon_unknown, PrivacyGrade.UNKNOWN.icon())
-    }
-
-    @Test
     fun whenGradeIsAThenSmallIconReflectsSame() {
         assertEquals(R.drawable.privacygrade_icon_small_a, PrivacyGrade.A.smallIcon())
     }

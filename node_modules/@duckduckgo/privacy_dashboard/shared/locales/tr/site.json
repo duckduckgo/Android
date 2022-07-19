@@ -1,0 +1,147 @@
+{
+  "smartling" : {
+    "string_format" : "icu",
+    "translate_paths" : [
+    {
+      "path" : "*/title",
+      "key" : "{*}/title",
+      "instruction" : "*/note"
+    }]
+  },
+  "updatingProtectionList" : {
+    "title" : "Koruma listesi güncelleniyor",
+    "note" : "Message shown while updating the list of protections"
+  },
+  "protectionsDisabled" : {
+    "title" : "Korumalar <b>DEVRE DIŞI BIRAKILDI</b>",
+    "note" : "Headline when privacy protections are disabled"
+  },
+  "protectionsEnabled" : {
+    "title" : "Korumalar bu site için <b>ETKİNLEŞTİRİLDİ</b>",
+    "note" : "Headline when privacy protections are enabled"
+  },
+  "connectionDescriptionUnencrypted" : {
+    "title" : "Başkaları bu sayfada gönderdiğiniz hassas bilgileri ele geçirebilir.",
+    "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
+  },
+  "connectionDescriptionUpgraded" : {
+    "title" : "Aktarım sırasında gönderdiğiniz bilgileri korumak için bu sayfadaki bağlantıyı yükselttik.",
+    "note" : "Shown when the connection has been upgraded from unencrypted to encrypted (HTTP to HTTPS)"
+  },
+  "connectionDescriptionEncrypted" : {
+    "title" : "Bu sayfadaki bağlantı, gönderdiğiniz bilgileri aktarım sırasında korumak için güvenlidir.",
+    "note" : "Shown when the connection is encrypted (HTTPS not HTTP)"
+  },
+  "trackerNetworksSummaryNone" : {
+    "title" : "Bu sayfada sizi takip etmeye çalışan herhangi bir şirket bulamadık.",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerNetworksSummaryOwn" : {
+    "title" : "Yalnızca {name} şirketine ait ve engellemediğimiz izleyiciler bulduk.",
+    "note" : "We found but did not block trackers from company named"
+  },
+  "trackerNetworksSummaryOther" : {
+    "title" : "Bu sayfada {companyCount} {companyCount, plural, one {company} other {companies}} şirketten {displayCount} bilinen {displayCount, plural, =1 {tracker} other {trackers}} izleyiciyi {isWhitelisted, select, true {found} other {blocked}}.",
+    "note" : "This summarizes the number of trackers that we either blocked or did not block (depending on the protection setting for this site)"
+  },
+  "websiteNotWorkingQ" : {
+    "title" : "Web sitesi beklendiği gibi çalışmıyor mu?",
+    "note" : "Call to action for user to click if they are having issues with this web page"
+  },
+  "takePrecautions" : {
+    "title" : "Önlem Alın",
+    "note" : "Title shown when the page is unencrypted"
+  },
+  "protectionsAreDisabled" : {
+    "title" : "Korumalar DEVRE DIŞI",
+    "note" : "Shown when user has disabled protections for this site (or they have been programatically disabled)"
+  },
+  "foundCompanyNamesList" : {
+    "title" : "{companyCount, plural, =0 {Bu sayfada sizi izleyen ve profilinizi çıkaran bazı şirketler olduğunu belirledik.} =2 {Bu sayfada sizi izleyen ve profilinizi çıkaran {firstCompany} ve {secondCompany} bulduk.} one {{firstCompany} şirketinin sizi bu sayfada izlediğini ve profilinizi çıkardığını belirledik.} other {{firstCompany}, {secondCompany} ve diğerlerinin sizi bu sayfada izlediğini ve profilinizi çıkardığını belirledik.}}",
+    "note" : "Returns a string in the form of 'We found CompanyA, CompanyB and others tracking and profiling you on this page.'"
+  },
+  "majorTrackerNetwork" : {
+    "title" : "İzleyici Ağı",
+    "note" : "Tracker network is a group of trackers, usually in the form of a company name, that track users across websites"
+  },
+  "majorTrackingNetworkDesc" : {
+    "title" : "{companyDisplayName} ({domain} alan adının sahibi)\nsizi en popüler sitelerin %{companyPrevalence} kadarında izliyor.\nOnları sahip oldukları sitelerde engelleyemiyor, ancak diğer sayfalarda engelleyebiliyoruz.",
+    "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
+  },
+  "noActivityToReport" : {
+    "title" : "Raporlanacak Etkinlik Yok",
+    "note" : "Title when we did not find any trackers on this page"
+  },
+  "trackersBlocked" : {
+    "title" : "Engellenen Şirketler",
+    "note" : "Title for the list of companies that we blocked"
+  },
+  "trackersBlockedDesc" : {
+    "title" : "{companyCount, plural, =0 {Bazı şirketlerin sizi izlemesini engelledik.} =2 {{firstCompany} ve {secondCompany} tarafından izlenmenizi engelledik.} one {{firstCompany} tarafından izlenmenizi engelledik.} other {{firstCompany}, {secondCompany} ve diğerlerinin sizi izlemesini engelledik.}}",
+    "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
+  },
+  "cookiesMinimized" : {
+    "title" : "Çerezler Minimize Edildi",
+    "note" : "Title for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "cookiesMinimizedDesc" : {
+    "title" : "Çerez tercihlerinizi gizliliği en üst düzeye çıkaracak şekilde ayarladık ve onay açılır penceresini kapattık.",
+    "note" : "Description for when we have set the cookie privacy settings on this website to maximize privacy"
+  },
+  "connectionSecure" : {
+    "title" : "Bağlantı Güvenli",
+    "note" : "The connection to the website is secure (HTTPS)"
+  },
+  "connectionNotSecure" : {
+    "title" : "Bağlantı Güvenli Hâle Getirilemedi",
+    "note" : "The connection is not secure (HTTP)"
+  },
+  "trackerNetworksDesc" : {
+    "title" : "{blocked, select, true {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} Başlıca İzleyici Ağı Engellendi} other {{trackerCount} Başlıca İzleyici Ağları Engellendi}}} other {{trackerCount, plural, one {{trackerCount} İzleyici Engellendi} other {{trackerCount} İzleyici Engellendi}}}}} other {{majorNetwork, select, true {{trackerCount, plural, one {{trackerCount} Ana İzleyici Ağı Bulundu} other {{trackerCount} Başlıca İzleyici Ağları Bulundu}}} other {{trackerCount, plural, one {{trackerCount} İzleyici Bulundu} other {{trackerCount} İzleyici Bulundu}}}}}}",
+    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+  },
+  "firstPartyDesc" : {
+    "title" : "{companyName} bu sitenin ve bu sayfada bulunan bilinen izleyicilerin sahibi olduğundan bu şirketi engellemedik.",
+    "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
+  },
+  "trackersFoundForAllowlisted" : {
+    "title" : "Şirketler izleyici kullanarak profilinizi çıkarabilir. Bu sayfadaki etkinliğinizi bu şirketlerin izlediğini belirledik.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections disabled"
+  },
+  "trackersFoundAndBlocked" : {
+    "title" : "Şirketler izleyici kullanarak profilinizi çıkarabilir. Bu sayfadaki etkinliğinizin bu şirketler tarafından izlenmesini engelledik.",
+    "note" : "This header for the list of tracker companies is shown when a site has protections enabled"
+  },
+  "trackerNetworkUnknown" : {
+    "title" : "İzleyici ağı bilinmiyor",
+    "note" : "Shown when we don't have a company name for a given tracker"
+  },
+  "trackerDomainsForCompany" : {
+    "title" : "{companyName} için izleyici alan adları",
+    "note" : "Title for the list of tracker domains detected from a given company"
+  },
+  "zeroTrackersFound" : {
+    "title" : "0 İzleyici Bulundu",
+    "note" : "We did not find any trackers on this page"
+  },
+  "trackerOwnedByThisSite" : {
+    "title" : "Bu Sitenin Sahip Olduğu İzleyiciler (İzin Verilenler)",
+    "note" : "Trackers owned by this site are not blocked"
+  },
+  "trackerCountForDomain" : {
+    "title" : "{blocked, select, true {{trackerCount, plural, one {{domain} üzerinde {trackerCount} İzleyici Engellendi} other {{domain} üzerinde {trackerCount} İzleyici Engellendi}}} other {{trackerCount, plural, one {{domain} üzerinde {trackerCount} İzleyici Bulundu} other {{domain} üzerinde {trackerCount} İzleyici Bulundu}}}}",
+    "note" : "For a given domain, the count of trackers either blocked or just detected (found).  Ex 4 Trackers Blocked"
+  },
+  "analyticsCategory" : {
+    "title" : "Analitik",
+    "note" : "Used to describe the type of tracker, in this case one that is used to report analytics back to the site owner"
+  },
+  "advertisingCategory" : {
+    "title" : "tanıtım",
+    "note" : "Used to describe the type of tracker, in this case one that is used for advertising"
+  },
+  "socialCategory" : {
+    "title" : "Sosyal Ağ",
+    "note" : "Used to describe the type of tracker, in this case one that is used by one of the popular social networksr"
+  }
+}

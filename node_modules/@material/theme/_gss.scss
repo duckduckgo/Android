@@ -1,0 +1,62 @@
+//
+// Copyright 2020 Google Inc.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:meta';
+
+/// Adds optional GSS annotation comments. Useful for theme mixins where one or
+/// more properties are set indirectly.
+///
+/// Annotations may be provided as a Map of annotations or as named arguments.
+///
+/// @example - scss
+///   @include annotate((noflip: true));
+///   left: 0;
+///
+/// @example - scss
+///   @include annotate($noflip: true);
+///   left: 0;
+///
+/// @example - css
+///   /* @noflip */ /*rtl:ignore*/
+///   left: 0;
+///
+/// @param {Map} $annotations - Map of annotations. Values must be set to `true`
+///     for an annotation to be added.
+@mixin annotate($annotations...) {
+  $keywords: meta.keywords($annotations);
+  @if list.length($annotations) > 0 {
+    $annotations: list.nth($annotations, 1);
+  } @else {
+    $annotations: $keywords;
+  }
+
+  @if (map.get($annotations, alternate) == true) {
+    /* @alternate */
+  }
+
+  // noflip must be the last tag right before the property
+  @if (map.get($annotations, noflip) == true) {
+    /* @noflip */ /*rtl:ignore*/
+  }
+}
