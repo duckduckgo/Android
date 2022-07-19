@@ -193,7 +193,6 @@ import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.Compani
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.autofill.ui.ExistingCredentialMatchDetector
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -331,9 +330,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var printInjector: PrintInjector
-
-    @Inject
-    lateinit var deviceAuthenticator: DeviceAuthenticator
 
     @Inject
     lateinit var credentialAutofillDialogFactory: CredentialAutofillDialogFactory
@@ -1580,20 +1576,18 @@ class BrowserTabFragment :
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
-        if (deviceAuthenticator.hasValidDeviceAuthentication()) {
-            browserAutofill.addJsInterface(it, autofillCallback)
+        browserAutofill.addJsInterface(it, autofillCallback)
 
-            setFragmentResultListener(RESULT_KEY_CREDENTIAL_PICKER) { _, result ->
-                autofillCredentialsSelectionResultHandler.processAutofillCredentialSelectionResult(result, this, viewModel)
-            }
+        setFragmentResultListener(RESULT_KEY_CREDENTIAL_PICKER) { _, result ->
+            autofillCredentialsSelectionResultHandler.processAutofillCredentialSelectionResult(result, this, viewModel)
+        }
 
-            setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_SAVE) { _, result ->
-                autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)
-            }
+        setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_SAVE) { _, result ->
+            autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)
+        }
 
-            setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_UPDATE) { _, result ->
-                autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)
-            }
+        setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_UPDATE) { _, result ->
+            autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)
         }
     }
 
