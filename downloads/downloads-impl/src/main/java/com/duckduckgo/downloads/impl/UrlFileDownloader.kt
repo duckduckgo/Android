@@ -30,6 +30,8 @@ import okio.sink
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import kotlin.math.exp
+import kotlin.math.floor
 import kotlin.random.Random
 
 class UrlFileDownloader @Inject constructor(
@@ -114,7 +116,8 @@ class UrlFileDownloader @Inject constructor(
     ): Boolean {
         Timber.d("Writing streaming response body to disk $fileName")
 
-        val contentLength = body.contentLength()
+        // ensure content length never 0
+        val contentLength = if (body.contentLength() > 0) body.contentLength() else -1
         val file = directory.getOrCreate(fileName)
         val sink = file.sink()
         val source = body.source()
@@ -122,11 +125,14 @@ class UrlFileDownloader @Inject constructor(
         var totalRead = 0L
         val buffer = Buffer()
         val success = try {
+            var progressSteps = 0.0
             while (!source.exhausted()) {
                 val didRead = source.read(buffer, READ_SIZE_BYTES)
                 totalRead += didRead
                 sink.write(buffer, didRead)
-                val progress = totalRead * 100 / contentLength
+                val fakeProgress = floor(calculateFakeProgress(progressSteps) * 100.0).toInt().also { progressSteps += 0.0001 }
+                val calculatedProgress = (totalRead * 100 / contentLength).coerceAtLeast(0L)
+                val progress = if (calculatedProgress == 0L) fakeProgress else calculatedProgress
                 downloadCallback.onProgress(downloadId, fileName, progress.toInt())
             }
             true
@@ -150,6 +156,14 @@ class UrlFileDownloader @Inject constructor(
         if (!this.exists()) this.mkdirs()
         if (!file.exists()) file.createNewFile()
         return file
+    }
+
+    /**
+     * This method calculates fake progress that will be used in cases where the file content length is not known.
+     * The fake progress curve follows 1-Math.exp(-step)
+     */
+    private fun calculateFakeProgress(step: Double): Double {
+        return(1 - exp(-step))
     }
 
     companion object {
