@@ -2639,10 +2639,7 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
     }
 
-    override fun shareCredentialsWithPage(
-        originalUrl: String,
-        credentials: LoginCredentials
-    ) {
+    override fun shareCredentialsWithPage(originalUrl: String, credentials: LoginCredentials) {
         command.postValue(InjectCredentials(originalUrl, credentials))
     }
 
@@ -2650,19 +2647,13 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(CancelIncomingAutofillRequest(originalUrl))
     }
 
-    override fun saveCredentials(
-        url: String,
-        credentials: LoginCredentials
-    ) {
+    override fun saveCredentials(url: String, credentials: LoginCredentials) {
         viewModelScope.launch {
             autofillStore.saveCredentials(url, credentials)
         }
     }
 
-    override fun updateCredentials(
-        url: String,
-        credentials: LoginCredentials
-    ) {
+    override fun updateCredentials(url: String, credentials: LoginCredentials) {
         viewModelScope.launch {
             autofillStore.updateCredentials(url, credentials)
         }
