@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.dashboard.impl.ui
 
+import android.os.Build.VERSION_CODES
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
@@ -24,6 +25,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.nhaarman.mockitokotlin2.mock
@@ -49,6 +51,10 @@ class PrivacyDashboardHybridViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
+    private val androidQAppBuildConfig = com.nhaarman.mockitokotlin2.mock<AppBuildConfig>().apply {
+        com.nhaarman.mockitokotlin2.whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)
+    }
+
     private val userWhitelistDao = mock<UserWhitelistDao>()
 
     private val contentBlocking = mock<ContentBlocking>()
@@ -60,7 +66,8 @@ class PrivacyDashboardHybridViewModelTest {
         contentBlocking = contentBlocking,
         pixel = pixel,
         dispatcher = coroutineRule.testDispatcherProvider,
-        appCoroutineScope = TestScope()
+        appCoroutineScope = TestScope(),
+        siteProtectionsViewStateMapper = AppSiteProtectionsViewStateMapper(PublicKeyInfoMapper(androidQAppBuildConfig))
     )
 
     @Test
