@@ -98,7 +98,7 @@ import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
-import com.duckduckgo.app.global.model.orderedTrackingEntities
+import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.DaxDialog
 import com.duckduckgo.app.global.view.DaxDialogListener
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
@@ -2546,7 +2546,7 @@ class BrowserTabFragment :
                 }
                 if (lastSeenOmnibarViewState?.isEditing != true) {
                     val site = viewModel.siteLiveData.value
-                    val events = site?.orderedTrackingEntities()
+                    val events = site?.orderedTrackerBlockedEntities()
 
                     // workaround for: https://app.asana.com/0/0/1202537960603388/f
                     val trackersAnimation = trackerAnimationContainer.findViewById<LottieAnimationView>(R.id.trackersAnimation)
