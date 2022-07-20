@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -184,6 +185,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     fun onPrivacyProtectionsClicked(enabled: Boolean) {
+        Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $enabled")
 
         viewModelScope.launch(dispatcher.io()) {
             if (enabled) {

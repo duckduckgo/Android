@@ -31,7 +31,10 @@ interface PrivacyDashboardRendererFactory {
 sealed class RendererViewHolder {
     data class WebviewRenderer(
         val holder: WebView,
-        val onPrivacyProtectionSettingChanged: (Boolean) -> Unit
+        val onPrivacyProtectionSettingChanged: (Boolean) -> Unit,
+        val onBrokenSiteClicked: () -> Unit,
+        val onPrivacyProtectionsClicked: (Boolean) -> Unit,
+        val onClose: () -> Unit
     ) : RendererViewHolder()
 }
 
@@ -43,7 +46,14 @@ class BrowserPrivacyDashboardRendererFactory @Inject constructor(
 
     override fun createRenderer(renderer: RendererViewHolder): PrivacyDashboardRenderer {
         return when (renderer) {
-            is WebviewRenderer -> PrivacyDashboardRenderer(renderer.holder, renderer.onPrivacyProtectionSettingChanged, moshi)
+            is WebviewRenderer -> PrivacyDashboardRenderer(
+                renderer.holder,
+                renderer.onPrivacyProtectionSettingChanged,
+                moshi,
+                renderer.onBrokenSiteClicked,
+                renderer.onPrivacyProtectionsClicked,
+                renderer.onClose
+            )
         }
     }
 }

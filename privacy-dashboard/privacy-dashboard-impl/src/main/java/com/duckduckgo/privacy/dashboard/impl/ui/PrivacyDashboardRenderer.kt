@@ -21,14 +21,34 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteProtectionsViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ViewState
 import com.squareup.moshi.Moshi
+import timber.log.Timber
 
 class PrivacyDashboardRenderer(
     private val webView: WebView,
     private val onPrivacyProtectionSettingChanged: (Boolean) -> Unit,
     private val moshi: Moshi,
+    private val onBrokenSiteClicked: () -> Unit,
+    private val onPrivacyProtectionsClicked: (Boolean) -> Unit,
+    private val onClose: () -> Unit
 ) {
 
+    fun loadDashboard(webView: WebView) {
+        webView.addJavascriptInterface(
+            PrivacyDashboardJavascriptInterface(
+                onBrokenSiteClicked = { onBrokenSiteClicked() },
+                onPrivacyProtectionsClicked = { newValue ->
+                    Timber.i("PrivacyDashboard onPrivacyProtectionsClicked interface $newValue")
+                    onPrivacyProtectionsClicked(newValue)
+                },
+                onClose = { onClose() }
+            ),
+            PrivacyDashboardJavascriptInterface.JAVASCRIPT_INTERFACE_NAME
+        )
+        webView.loadUrl("file:///android_asset/html/popup.html")
+    }
+
     fun render(viewState: ViewState) {
+        Timber.i("PrivacyDashboard viewState $viewState")
         val adapter = moshi.adapter(SiteProtectionsViewState::class.java)
         val json = adapter.toJson(viewState.siteProtectionsViewState)
 

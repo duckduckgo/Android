@@ -43,6 +43,7 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -69,7 +70,18 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         get() = binding.privacyDashboardWebview
 
     private val dashboardRenderer by lazy {
-        rendererFactory.createRenderer(RendererViewHolder.WebviewRenderer(webView, { userChangedValues -> updateActivityResult(userChangedValues) }))
+        rendererFactory.createRenderer(
+            RendererViewHolder.WebviewRenderer(
+                holder = webView,
+                onPrivacyProtectionSettingChanged = { userChangedValues -> updateActivityResult(userChangedValues) },
+                onPrivacyProtectionsClicked = { newValue ->
+                    Timber.i("PrivacyDashboard onPrivacyProtectionsClicked lambda $newValue")
+                    viewModel.onPrivacyProtectionsClicked(newValue)
+                },
+                onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },
+                onClose = { this@PrivacyDashboardHybridActivity.finish() }
+            )
+        )
     }
 
     private val viewModel: PrivacyDashboardHybridViewModel by bindViewModel()
@@ -78,7 +90,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         configureWebView()
-        webView.loadUrl("file:///android_asset/html/popup.html")
+        dashboardRenderer.loadDashboard(webView)
         configureObservers()
     }
 
@@ -112,6 +124,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         }
 
         webView.webViewClient = object : WebViewClient() {
+            @Deprecated("Deprecated in Java")
             override fun shouldOverrideUrlLoading(
                 view: WebView?,
                 url: String?
@@ -134,17 +147,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 configViewStateObserver()
             }
         }
-
-        webView.addJavascriptInterface(
-            PrivacyDashboardJavascriptInterface(
-                onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },
-                onPrivacyProtectionsClicked = { newValue ->
-                    viewModel.onPrivacyProtectionsClicked(newValue)
-                },
-                onClose = { finish() }
-            ),
-            PrivacyDashboardJavascriptInterface.JAVASCRIPT_INTERFACE_NAME
-        )
     }
 
     private fun configureDarkThemeSupport(webSettings: WebSettings) {
