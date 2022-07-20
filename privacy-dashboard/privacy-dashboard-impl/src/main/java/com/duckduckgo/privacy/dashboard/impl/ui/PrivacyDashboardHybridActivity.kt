@@ -19,7 +19,6 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
@@ -37,14 +36,13 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
 import com.duckduckgo.browser.api.brokensite.BrokenSiteNav
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.privacy.dashboard.impl.databinding.ActivityPrivacyHybridDashboardBinding
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -62,6 +60,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var brokenSiteNav: BrokenSiteNav
 
+    @Inject
+    lateinit var appTheme: AppTheme
+
     private val binding: ActivityPrivacyHybridDashboardBinding by viewBinding()
 
     private val webView
@@ -77,8 +78,11 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         configureWebView()
-        Timber.i("PDHy: onCreate")
         webView.loadUrl("file:///android_asset/html/popup.html")
+        configureObservers()
+    }
+
+    private fun configureObservers() {
         repository.retrieveSiteData(intent.tabId!!).observe(
             this
         ) {
@@ -127,8 +131,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 url: String?
             ) {
                 super.onPageFinished(view, url)
-                Timber.i("PDHy: onPageFinished")
-                setupObservers()
+                configViewStateObserver()
             }
         }
 
@@ -145,23 +148,13 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     }
 
     private fun configureDarkThemeSupport(webSettings: WebSettings) {
-        when (themingDataStore.theme) {
-            DuckDuckGoTheme.LIGHT -> webSettings.enableLightMode()
-            DuckDuckGoTheme.DARK -> webSettings.enableDarkMode()
-            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
-                val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-                if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
-                    Timber.i("PDHy: trying night mode")
-                    webSettings.enableDarkMode()
-                } else {
-                    Timber.i("PDHy: trying light mode")
-                    webSettings.enableLightMode()
-                }
-            }
+        when (appTheme.isLightModeEnabled()) {
+            true -> webSettings.enableLightMode()
+            false -> webSettings.enableDarkMode()
         }
     }
 
-    private fun setupObservers() {
+    private fun configViewStateObserver() {
         lifecycleScope.launch {
             viewModel.viewState()
                 .flowWithLifecycle(lifecycle, STARTED)
@@ -172,9 +165,8 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateActivityResult(shouldReload: Boolean) {
-        Timber.i("PDHy: updateActivityResult $shouldReload")
-        if (shouldReload) {
+    private fun updateActivityResult(shouldClose: Boolean) {
+        if (shouldClose) {
             setResult(RELOAD_RESULT_CODE)
             finish()
         } else {
@@ -191,7 +183,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-
         const val RELOAD_RESULT_CODE = 100
 
         fun intent(

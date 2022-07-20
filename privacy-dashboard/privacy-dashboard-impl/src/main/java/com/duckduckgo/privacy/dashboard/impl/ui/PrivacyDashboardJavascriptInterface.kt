@@ -17,7 +17,6 @@
 package com.duckduckgo.privacy.dashboard.impl.ui
 
 import android.webkit.JavascriptInterface
-import timber.log.Timber
 
 class PrivacyDashboardJavascriptInterface constructor(
     val onBrokenSiteClicked: () -> Unit,
@@ -26,29 +25,29 @@ class PrivacyDashboardJavascriptInterface constructor(
 ) {
     @JavascriptInterface
     fun toggleWhitelist(newValue: String) {
-        Timber.i("PDHy: JavascriptInterface toggleWhitelist $newValue")
+
         onPrivacyProtectionsClicked(newValue.toBoolean())
     }
 
     @JavascriptInterface
     fun updatePermission(message: String) {
-        Timber.i("PDHy: JavascriptInterface updatePermission $message")
+
     }
 
     @JavascriptInterface
     fun firePixel(message: String) {
-        Timber.i("PDHy: JavascriptInterface firePixel $message")
+
     }
 
     @JavascriptInterface
     fun close() {
-        Timber.i("PDHy: JavascriptInterface close")
+
         onClose()
     }
 
     @JavascriptInterface
     fun showBreakageForm() {
-        Timber.i("PDHy: JavascriptInterface showBreakageForm")
+
         onBrokenSiteClicked()
     }
 

@@ -21,7 +21,6 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteProtectionsViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ViewState
 import com.squareup.moshi.Moshi
-import timber.log.Timber
 
 class PrivacyDashboardRenderer(
     private val webView: WebView,
@@ -36,8 +35,6 @@ class PrivacyDashboardRenderer(
         val adapterParententity = moshi.adapter(EntityViewState::class.java)
         val parentEntityJson = adapterParententity.toJson(viewState.siteProtectionsViewState.parentEntity)
 
-        Timber.i("PDHy: received $json")
-        Timber.i("PDHy: parentEntityJson $parentEntityJson")
         onPrivacyProtectionSettingChanged(viewState.userChangedValues)
         webView.evaluateJavascript("javascript:onChangeParentEntity($parentEntityJson);", null)
         webView.evaluateJavascript("javascript:onChangeCertificateData($json);", null)

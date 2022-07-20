@@ -41,7 +41,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -157,7 +156,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     fun onSiteChanged(site: Site?) {
-        Timber.i("PDHy: onSiteChanged $site")
+
         this.site = site
         if (site == null) {
             resetViewState()
@@ -170,9 +169,9 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     private suspend fun updateSite(site: Site) {
-        Timber.i("PDHy: will generate viewstate for site:$site entity:${site.entity}")
+
         withContext(dispatcher.main()) {
-            Timber.i("PDHy: site had ${site.trackingEvents.size} events / ${site.trackerCount}")
+
             viewState.emit(
                 ViewState(
                     siteProtectionsViewState = siteProtectionsViewStateMapper.mapFromSite(site),
@@ -185,7 +184,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     fun onPrivacyProtectionsClicked(enabled: Boolean) {
-        Timber.i("PDHy: onPrivacyProtectionsClicked newValue $enabled")
+
         viewModelScope.launch(dispatcher.io()) {
             if (enabled) {
                 userWhitelistDao.delete(currentViewState().siteProtectionsViewState.site.domain)
