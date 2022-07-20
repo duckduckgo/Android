@@ -317,7 +317,9 @@ class CtaTest {
         val site = site(events = trackers)
 
         val testee =
-            DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, site.orderedTrackerBlockedEntities(), "http://www.trackers.com")
+            DaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore, mockAppInstallStore, site.orderedTrackerBlockedEntities(), "http://www.trackers.com"
+            )
         val value = testee.getDaxText(mockActivity)
 
         assertEquals("<b>Other, Facebook</b>withZero", value)
