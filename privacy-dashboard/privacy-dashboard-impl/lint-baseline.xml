@@ -2,6 +2,17 @@
 <issues format="6" by="lint 7.0.4" type="baseline" client="gradle" name="AGP (7.0.4)" variant="all" version="7.0.4">
 
     <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 23): `publicKeyInfo`"
+        errorLine1="        return sslCertificate.publicKeyInfo()"
+        errorLine2="                              ~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/privacy/dashboard/impl/ui/PublicKeyInfoMapper.kt"
+            line="37"
+            column="31"/>
+    </issue>
+
+    <issue
         id="ExtraText"
         message="Unexpected text found in layout file: &quot;android:fillType=&quot;evenOdd&quot;/>&quot;"
         errorLine1="&lt;/vector>"
@@ -10,6 +21,17 @@
             file="src/main/res/drawable/network_logo_comscore_inc.xml"
             line="14"
             column="7"/>
+    </issue>
+
+    <issue
+        id="SetJavaScriptEnabled"
+        message="Using `setJavaScriptEnabled` can introduce XSS vulnerabilities into your application, review carefully"
+        errorLine1="            javaScriptEnabled = true"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridActivity.kt"
+            line="122"
+            column="13"/>
     </issue>
 
     <issue

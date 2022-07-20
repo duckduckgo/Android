@@ -18,6 +18,7 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 
 import android.net.http.SslCertificate
 import android.os.Build.VERSION_CODES
+import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
@@ -36,6 +37,7 @@ class PublicKeyInfoMapper @Inject constructor(
         return sslCertificate.publicKeyInfo()
     }
 
+    @RequiresApi(VERSION_CODES.Q)
     private fun SslCertificate.publicKeyInfo(): PublicKeyInfo? {
         if (appBuildConfig.sdkInt < VERSION_CODES.Q) return null
 
