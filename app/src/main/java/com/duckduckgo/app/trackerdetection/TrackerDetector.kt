@@ -65,9 +65,10 @@ class TrackerDetectorImpl @Inject constructor(
         documentUrl: String
     ): TrackingEvent? {
 
-        if (firstParty(url, documentUrl)) {
+        val firstParty = firstParty(url, documentUrl)
+
+        if (firstParty) {
             Timber.v("$url is a first party url")
-            return null
         }
 
         val result = clients
@@ -79,7 +80,7 @@ class TrackerDetectorImpl @Inject constructor(
             val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else null
             val isDocumentInAllowedList = userWhitelistDao.isDocumentWhitelisted(documentUrl) || isSiteAContentBlockingException(documentUrl)
             val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrl, url)
-            val isBlocked = !isDocumentInAllowedList && !isInTrackerAllowList
+            val isBlocked = !isDocumentInAllowedList && !isInTrackerAllowList && !firstParty
 
             val trackerCompany = entity?.displayName ?: "Undefined"
             webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = url, trackerCompany = trackerCompany))

@@ -72,6 +72,7 @@ interface Site {
 }
 
 fun Site.orderedTrackingEntities(): List<Entity> = trackingEvents
+    .filter { it.blocked }
     .mapNotNull { it.entity }
     .filter { it.displayName.isNotBlank() }
     .sortedByDescending { it.prevalence }
