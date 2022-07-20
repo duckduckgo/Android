@@ -154,19 +154,25 @@ class TrackerDetectorTest {
     @Test
     fun whenUrlHasSameDomainAsDocumentThenEvaluateReturnsNull() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com"))
+        val expected = TrackingEvent("http://example.com/index.com", "http://example.com/update.js", null, null, false, null)
+        val actual = trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com")
+        assertEquals(expected, actual)
     }
 
     @Test
     fun whenUrlIsSubdomainOfDocumentThenEvaluateReturnsNull() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        assertNull(trackerDetector.evaluate("http://mobile.example.com/update.js", "http://example.com/index.com"))
+        val expected = TrackingEvent("http://example.com/index.com", "http://mobile.example.com/update.js", null, null, false, null)
+        val actual = trackerDetector.evaluate("http://mobile.example.com/update.js", "http://example.com/index.com")
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun whenUrlIsParentOfDocumentThenEvaluateReturnsNull() {
+    fun whenUrlIsParentOfDocumentThenEvaluateReturnsUnblockedTrackingEvent() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://mobile.example.com/index.com"))
+        val expected = TrackingEvent("http://mobile.example.com/index.com", "http://example.com/update.js", null, null, false, null)
+        val actual = trackerDetector.evaluate("http://example.com/update.js", "http://mobile.example.com/index.com")
+        assertEquals(expected, actual)
     }
 
     private fun alwaysMatchingClient(name: ClientName): Client {
