@@ -38,6 +38,7 @@ dependencies {
 
     implementation Kotlin.stdlib.jdk7
 
+    implementation JakeWharton.timber
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
