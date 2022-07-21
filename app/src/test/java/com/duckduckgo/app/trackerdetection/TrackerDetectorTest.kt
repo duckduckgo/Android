@@ -154,24 +154,30 @@ class TrackerDetectorTest {
     @Test
     fun whenUrlHasSameDomainAsDocumentThenEvaluateReturnsNull() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        val expected = TrackingEvent("http://example.com/index.com", "http://example.com/update.js", null, null, false, null)
-        val actual = trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com")
-        assertEquals(expected, actual)
+        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com"))
     }
 
     @Test
     fun whenUrlIsSubdomainOfDocumentThenEvaluateReturnsNull() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        val expected = TrackingEvent("http://example.com/index.com", "http://mobile.example.com/update.js", null, null, false, null)
-        val actual = trackerDetector.evaluate("http://mobile.example.com/update.js", "http://example.com/index.com")
-        assertEquals(expected, actual)
+        assertNull(trackerDetector.evaluate("http://mobile.example.com/update.js", "http://example.com/index.com"))
     }
 
     @Test
-    fun whenUrlIsParentOfDocumentThenEvaluateReturnsUnblockedTrackingEvent() {
+    fun whenUrlIsParentOfDocumentThenEvaluateReturnsNull() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        val expected = TrackingEvent("http://mobile.example.com/index.com", "http://example.com/update.js", null, null, false, null)
-        val actual = trackerDetector.evaluate("http://example.com/update.js", "http://mobile.example.com/index.com")
+        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://mobile.example.com/index.com"))
+    }
+
+    @Test
+    fun whenUrlBelongsToSameNetworkDocumentThenReturnsUnblockedTrackingEvent() {
+        whenever(mockEntityLookup.entityForUrl("http://tracker.com/update.jss")).thenReturn(ENTITY)
+        whenever(mockEntityLookup.entityForUrl("http://parentnetwork.com/index.com")).thenReturn(ENTITY)
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        val expected = TrackingEvent("http://parentnetwork.com/index.com", "http://tracker.com/update.jss", null, null, false, null)
+
+        val actual = trackerDetector.evaluate("http://tracker.com/update.jss", "http://parentnetwork.com/index.com")
+
         assertEquals(expected, actual)
     }
 
@@ -195,10 +201,10 @@ class TrackerDetectorTest {
         whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(matches = true, surrogate = "testId"))
         return client
     }
-
     companion object {
         // It doesn't matter what the value of these is they just need to be different
         private val CLIENT_A = EASYLIST
         private val CLIENT_B = EASYPRIVACY
+        private val ENTITY = TestEntity("name", "displayName", 10.0)
     }
 }

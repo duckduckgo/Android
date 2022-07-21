@@ -65,10 +65,9 @@ class TrackerDetectorImpl @Inject constructor(
         documentUrl: String
     ): TrackingEvent? {
 
-        val firstParty = firstParty(url, documentUrl)
-
-        if (firstParty) {
+        if (firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
+            return null
         }
 
         val result = clients
@@ -77,10 +76,11 @@ class TrackerDetectorImpl @Inject constructor(
             .firstOrNull { it.matches }
 
         if (result != null) {
+            val sameNetwork = sameNetworkName(url, documentUrl)
             val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else null
             val isDocumentInAllowedList = userWhitelistDao.isDocumentWhitelisted(documentUrl) || isSiteAContentBlockingException(documentUrl)
             val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrl, url)
-            val isBlocked = !isDocumentInAllowedList && !isInTrackerAllowList && !firstParty
+            val isBlocked = !isDocumentInAllowedList && !isInTrackerAllowList && !sameNetwork
 
             val trackerCompany = entity?.displayName ?: "Undefined"
             webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = url, trackerCompany = trackerCompany))
@@ -102,7 +102,7 @@ class TrackerDetectorImpl @Inject constructor(
         firstUrl: String,
         secondUrl: String
     ): Boolean =
-        sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl) || sameNetworkName(firstUrl, secondUrl)
+        sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl)
 
     private fun sameNetworkName(
         firstUrl: String,
