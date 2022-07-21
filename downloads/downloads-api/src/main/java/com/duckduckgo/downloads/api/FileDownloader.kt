@@ -16,18 +16,18 @@
 
 package com.duckduckgo.downloads.api
 
-import androidx.annotation.WorkerThread
 import java.io.File
 import java.io.Serializable
 import android.os.Environment
+import androidx.annotation.AnyThread
 
 /** Interface for the starting point of a download. */
 interface FileDownloader {
 
     /** Starts a download. Takes as parameters a [PendingFileDownload] containing all details about the file to be downloaded and
      * a [DownloadCallback]. */
-    @WorkerThread
-    fun download(pending: PendingFileDownload, callback: DownloadCallback)
+    @AnyThread
+    fun enqueueDownload(pending: PendingFileDownload)
 
     /** Data class for pending download.*/
     data class PendingFileDownload(

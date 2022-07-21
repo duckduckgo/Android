@@ -17,7 +17,6 @@
 package com.duckduckgo.downloads.impl
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,7 +51,7 @@ class UrlFileDownloaderTest {
         whenever(downloadFileService.downloadFile(anyString(), anyString(), anyString())).thenReturn(call)
 
         urlFileDownloader = UrlFileDownloader(
-            downloadFileService, realFileDownloadManager, coroutineRule.testDispatcherProvider, FakeCookieManagerWrapper()
+            downloadFileService, realFileDownloadManager, FakeCookieManagerWrapper()
         )
     }
 
