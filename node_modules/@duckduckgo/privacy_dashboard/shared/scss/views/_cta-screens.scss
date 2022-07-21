@@ -1,0 +1,61 @@
+.cta-screen {
+  padding-top: 24px;
+}
+.cta {
+  max-width: 85%;
+  margin: 0 auto;
+  margin-top: 32px;
+}
+.cta__icon {
+  width: 100px;
+  height: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.cta__title {
+  font-size: 16px;
+  line-height: 20px;
+  margin-top: 14px;
+}
+.cta__text {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: normal;
+  margin-top: 2px;
+}
+.cta__action {
+  text-align: center;
+  margin-top: 22px;
+}
+.cta__button {
+  display: inline-block;
+  background: $color--blue-20;
+  border-radius: 8px;
+  padding: 10px 16px;
+  max-width: 165px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 14px;
+  color: #FFFFFF;
+
+  &:hover,
+  &:focus {
+    background-color: $color--blue-40;
+    text-decoration: none;
+  }
+
+  .body--theme-dark & {
+    background: $link-color--blue;
+    color: #222222;
+
+    &:hover,
+    &:focus {
+      background-color: darken($link-color--blue, 10%);
+      text-decoration: none;
+    }
+  }
+}
