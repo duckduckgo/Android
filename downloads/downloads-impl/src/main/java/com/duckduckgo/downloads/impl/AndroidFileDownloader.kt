@@ -17,28 +17,42 @@
 package com.duckduckgo.downloads.impl
 
 import android.webkit.URLUtil
-import androidx.annotation.WorkerThread
-import com.duckduckgo.downloads.api.DownloadCallback
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-class AndroidFileDownloader @Inject constructor(
+class AndroidFileDownloader constructor(
     private val dataUriDownloader: DataUriDownloader,
-    private val networkFileDownloader: NetworkFileDownloader
+    private val callback: FileDownloadCallback,
+    private val workManager: WorkManager,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : FileDownloader {
 
-    @WorkerThread
-    override fun download(
+    override fun enqueueDownload(
         pending: PendingFileDownload,
-        callback: DownloadCallback
     ) {
         when {
-            pending.isNetworkUrl -> networkFileDownloader.download(pending, callback)
-            pending.isDataUrl -> dataUriDownloader.download(pending, callback)
+            pending.isNetworkUrl -> enqueueToWorker(pending)
+            // We don't delegate the data URLs to the worker because you can't pass a lot of data through the [Data] class.
+            pending.isDataUrl -> coroutineScope.launch(dispatcherProvider.io()) { dataUriDownloader.download(pending, callback) }
             else -> callback.onError(url = pending.url, reason = DownloadFailReason.UnsupportedUrlType)
         }
+    }
+
+    private fun enqueueToWorker(pending: PendingFileDownload) {
+        OneTimeWorkRequestBuilder<FileDownloadWorker>()
+            .setInputData(pending.toInputData())
+            .build()
+            .let {
+                workManager.enqueue(it)
+            }
     }
 }
 
