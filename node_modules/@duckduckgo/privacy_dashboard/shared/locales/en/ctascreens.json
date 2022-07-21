@@ -1,0 +1,34 @@
+{
+    "smartling": {
+        "string_format" : "icu",
+        "translate_paths": [{
+            "path": "*/title",
+            "key": "{*}/title",
+            "instruction": "*/note"
+        }]
+    },
+    "protectionsUnavailableNote": {
+        "title": "Privacy Protection is not available for special pages or local pages.",
+        "note": "The text for the warning"
+    },
+    "spreadTitle": {
+        "title": "Love using DuckDuckGo?",
+        "note": "Title text for 'spread' CTA"
+    },
+    "spreadText": {
+        "title": "Help us spread the word to your family and friends",
+        "note": "Secondary text for 'spread' CTA"
+    },
+    "spreadButton": {
+        "title": "Spread DuckDuckGo",
+        "note": "Button text for 'spread' CTA"
+    },
+    "emailTitle": {
+        "title": "Tired of emails being tracked?",
+        "note": "Title text for 'email' CTA"
+    },
+    "emailText": {
+        "title": "Sign up for DuckDuckGo Email Protection for your extension now!",
+        "note": "Secondary text for 'email' CTA"
+    }
+}

@@ -16,7 +16,7 @@ out/
 # Gradle files
 .gradle/
 build/
-!node_modules/@duckduckgo/privacy_dashboard/
+!node_modules/@duckduckgo/privacy_dashboard/build
 .externalNativeBuild/
 
 
