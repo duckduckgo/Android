@@ -1,0 +1,7 @@
+{
+  "name": "marksandspencer.com",
+  "isHidingRule": true,
+  "detectCmp": [{ "exists": ".navigation-cookiebbanner" }],
+  "detectPopup": [{ "visible": ".navigation-cookiebbanner" }],
+  "optOut": [{ "hide": [".navigation-cookiebbanner"]}]
+}

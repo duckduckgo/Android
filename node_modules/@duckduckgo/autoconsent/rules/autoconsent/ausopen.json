@@ -1,0 +1,7 @@
+{
+  "name": "ausopen.com",
+  "isHidingRule": true,
+  "detectCmp": [{ "exists": ".gdpr-popup__message" }],
+  "detectPopup": [{ "visible": ".gdpr-popup__message" }],
+  "optOut": [{ "hide": [".gdpr-popup__message"]}]
+}

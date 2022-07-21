@@ -1,0 +1,7 @@
+{
+    "name": "snigel",
+    "detectCmp": [{ "exists": ".snigel-cmp-framework" }],
+    "detectPopup": [{ "visible": ".snigel-cmp-framework" }],
+    "optOut": [{ "click": "#sn-b-custom" }, {"click": "#sn-b-save"}],
+    "test": [{ "eval": "!!document.cookie.match('snconsent')"}]
+  }

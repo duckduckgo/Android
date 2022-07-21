@@ -1,0 +1,23 @@
+{
+    "name": "@types/filewriter",
+    "version": "0.0.29",
+    "description": "TypeScript definitions for File API: Writer",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "Kon",
+            "url": "http://phyzkit.net/"
+        }
+    ],
+    "main": "",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "directory": "types/filewriter"
+    },
+    "scripts": {},
+    "dependencies": {},
+    "typesPublisherContentHash": "a74f4f7803d24767c76fe5ffe6eb414434fcc1ec14600c518621b3ff9f7f1203",
+    "typeScriptVersion": "3.5"
+}

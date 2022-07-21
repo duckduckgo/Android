@@ -1,0 +1,8 @@
+{
+    "name": "nhs.uk",
+    "prehideSelectors": ["#nhsuk-cookie-banner"],
+    "detectCmp": [{ "exists": "#nhsuk-cookie-banner" }],
+    "detectPopup": [{ "exists": "#nhsuk-cookie-banner" }],
+    "optOut": [{ "click": "#nhsuk-cookie-banner__link_accept"}],
+    "optIn": [{ "click": "#nhsuk-cookie-banner__link_accept_analytics"}]
+}
