@@ -16,59 +16,6 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="DashboardHeader">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:letterSpacing">0.14</item>
-        <item name="android:textColor">@color/grayishTwo</item>
-        <item name="android:textSize">12sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="DashboardEntryText">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:paddingBottom">15dp</item>
-        <item name="android:paddingTop">15dp</item>
-        <item name="android:paddingEnd">22dp</item>
-        <item name="android:textColor">@color/almostBlackDark</item>
-        <item name="android:textIsSelectable">false</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:clickable">false</item>
-    </style>
-
-    <style name="DashboardEntryIcon">
-        <item name="android:layout_width">66dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:clickable">false</item>
-        <item name="android:importantForAccessibility">no</item>
-    </style>
-
-    <style name="ScorecardText">
-        <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textColor">@color/almostBlackDark</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="android:selectable">true</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingEnd">20dp</item>
-        <item name="android:paddingStart">20dp</item>
-    </style>
-
-    <style name="ScorecardSpecialText">
-        <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textColor">@color/midGreen</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingEnd">20dp</item>
-        <item name="android:paddingStart">20dp</item>
-    </style>
-
     <style name="SettingsSectionTitle">
         <item name="android:paddingTop">32dp</item>
         <item name="android:paddingBottom">14dp</item>

@@ -297,11 +297,6 @@
             android:label="@string/scorecardActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity" />
         <activity
-            android:name="com.duckduckgo.app.privacy.ui.TrackerNetworksActivity"
-            android:exported="false"
-            android:label="@string/networksActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity" />
-        <activity
             android:name="com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity"
             android:exported="false"
             android:label="@string/privacyTermsActivityTitle"
