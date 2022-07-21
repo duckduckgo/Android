@@ -19,6 +19,9 @@ build/
 !node_modules/@duckduckgo/privacy_dashboard/build
 .externalNativeBuild/
 
+#node modules
+/node_modules
+!node_modules/@duckduckgo
 
 # Local configuration file (sdk path, etc)
 local.properties
