@@ -22,8 +22,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
+import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
 import com.duckduckgo.mobile.android.ui.view.SingleLineListItem
 import com.duckduckgo.mobile.android.ui.view.TwoLineListItem
 import com.google.android.material.snackbar.Snackbar
@@ -109,6 +112,39 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class DividerComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_section_divider))
 
+    class OutlinedTextInputComponentViewHolder(parent: ViewGroup) :
+        ComponentViewHolder(inflate(parent, R.layout.component_outline_text_input)) {
+        init {
+            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext1).onAction {
+                when (it) {
+                    is Action.PerformEndAction -> Toast.makeText(
+                        parent.context,
+                        "End icon clicked on editable OutlinedInputText 1",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext2).onAction {
+                when (it) {
+                    is Action.PerformEndAction -> Toast.makeText(
+                        parent.context,
+                        "End icon clicked on not editable OutlinedInputText",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext4).onAction {
+                when (it) {
+                    is Action.PerformEndAction -> Toast.makeText(
+                        parent.context,
+                        "End icon clicked on OutlinedInputText password",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
     companion object {
         fun create(
             parent: ViewGroup,
@@ -127,6 +163,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SINGLE_LINE_LIST_ITEM -> SingleLineItemComponentViewHolder(parent)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
+                Component.OUTLINED_TEXT_INPUT -> OutlinedTextInputComponentViewHolder(parent)
                 else -> {
                     TODO()
                 }
