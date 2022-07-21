@@ -24,7 +24,6 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
-import timber.log.Timber
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -47,10 +46,6 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
         fragment.viewLifecycleOwnerLiveData.observe(fragment) { lifecycleOwner ->
             lifecycleOwner.lifecycle.addObserver(
                 object : DefaultLifecycleObserver {
-                    override fun onCreate(owner: LifecycleOwner) {
-                        Timber.d("Registering fragment lifecycle observer: ${fragment.javaClass.canonicalName}")
-                        super.onCreate(owner)
-                    }
                     override fun onDestroy(owner: LifecycleOwner) {
                         nullifyBindingHandler.post { binding = null }
                         super.onDestroy(owner)
