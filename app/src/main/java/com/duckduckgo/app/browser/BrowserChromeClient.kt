@@ -85,7 +85,7 @@ class BrowserChromeClient @Inject constructor(
         newProgress: Int
     ) {
         try {
-            Timber.d("MARCOS onProgressChanged ${webView.url}, $newProgress")
+            Timber.d("onProgressChanged ${webView.url}, $newProgress")
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList, newProgress))
             webViewClientListener?.progressChanged(newProgress)

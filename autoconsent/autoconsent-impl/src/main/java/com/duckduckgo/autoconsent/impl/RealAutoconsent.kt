@@ -16,25 +16,20 @@
 
 package com.duckduckgo.autoconsent.impl
 
-import android.webkit.JavascriptInterface
 import android.webkit.WebView
-import androidx.annotation.UiThread
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.Dispatchers
-import java.io.BufferedReader
 import javax.inject.Inject
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.json.JSONObject
 import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
-class RealAutoconsent @Inject constructor() : Autoconsent {
+class RealAutoconsent @Inject constructor(
+    private val messageHandlerPlugins: PluginPoint<MessageHandlerPlugin>,
+) : Autoconsent {
 
-    private lateinit var functions: String
-    private lateinit var rules: String
+    private lateinit var autoconsentJs: String
 
     override fun injectAutoconsent(webView: WebView) {
         Timber.d("MARCOS injecting autoconsent")
@@ -42,72 +37,13 @@ class RealAutoconsent @Inject constructor() : Autoconsent {
     }
 
     override fun addJsInterface(webView: WebView) {
-        webView.addJavascriptInterface(AutoconsentInterface(this, webView), "MARCOS")
-    }
-
-    @UiThread
-    override fun init(webView: WebView) {
-        GlobalScope.launch(Dispatchers.Main) {
-            try {
-                Timber.d("MARCOS receiving init and responding")
-                webView.evaluateJavascript("javascript:${initResp()}", null)
-            } catch (e: Exception) {
-                Timber.d("MARCOS exception is ${e.localizedMessage}")
-            }
-        }
-        // webView.evaluateJavascript("javascript:${initResp()}", null)
-    }
-
-    private fun selftTest(): String {
-        return """
-            (function() {
-                window.autoconsentMessageCallback({type: 'selfTest'}, window.origin);
-            })();
-        """.trimIndent()
-    }
-
-    private fun initResp(): String {
-        return """
-            (function() {
-                window.autoconsentMessageCallback({type: "initResp", rules: ${getRules()}, config: {"enabled": true, "autoAction": true, "disabledCmps": false, "enablePrehide": true}}, window.origin);
-            })();
-        """.trimIndent()
+        webView.addJavascriptInterface(AutoconsentInterface(messageHandlerPlugins, webView), "MARCOS")
     }
 
     private fun getFunctionsJS(): String {
-        if (!this::functions.isInitialized) {
-            functions = loadJs("autoconsent-bundle.js")
+        if (!this::autoconsentJs.isInitialized) {
+            autoconsentJs = JsReader.loadJs("autoconsent-bundle.js")
         }
-        return functions
-    }
-
-    private fun getRules(): String {
-        if (!this::rules.isInitialized) {
-            rules = loadJs("rules.json")
-        }
-        return rules
-    }
-
-    private fun loadJs(resourceName: String): String =
-        readResource(resourceName).use { it?.readText() }.orEmpty()
-
-    private fun readResource(resourceName: String): BufferedReader? {
-        return javaClass.classLoader?.getResource(resourceName)?.openStream()?.bufferedReader()
-    }
-}
-
-class AutoconsentInterface(val autoconsent: RealAutoconsent, val webView: WebView) {
-    @JavascriptInterface
-    fun process(message: String) {
-        val parsedMessage = JSONObject(message)
-        val type = parsedMessage.get("type")
-        when (type) {
-            "init" -> autoconsent.init(webView)
-        }
-    }
-
-    @JavascriptInterface
-    fun console(message: String) {
-        Timber.d("MARCOS $message")
+        return autoconsentJs
     }
 }
