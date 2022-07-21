@@ -1,5 +1,0 @@
---compilers     coffee:coffee-script/register
---require coffee-coverage/register-istanbul
---reporter      spec
---timeout       60000
---slow          1000
