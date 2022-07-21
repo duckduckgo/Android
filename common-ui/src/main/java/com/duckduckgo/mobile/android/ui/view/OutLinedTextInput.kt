@@ -93,9 +93,9 @@ class OutLinedTextInputView @JvmOverloads constructor(
         }
 
     override var isEditable: Boolean
-        get() = binding.internalEditText.isFocusable
+        get() = binding.internalEditText.isEnabled
         set(value) {
-            binding.internalEditText.isFocusable = value
+            binding.internalEditText.isEnabled = value
         }
 
     override fun onAction(actionHandler: (Action) -> Unit) {
