@@ -16,25 +16,23 @@
 
 package com.duckduckgo.app.tabs.db
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @SingleInstanceIn(AppScope::class)
 class TabsDbSanitizer @Inject constructor(
     private val tabRepository: TabRepository
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun purgeTabsDatabase() {
+    override fun onStart(owner: LifecycleOwner) {
         runBlocking {
             launch { purgeTabsDatabaseAsync() }
         }

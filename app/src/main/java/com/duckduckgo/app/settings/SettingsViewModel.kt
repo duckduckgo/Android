@@ -17,9 +17,10 @@
 package com.duckduckgo.app.settings
 
 import android.content.Context
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
@@ -79,7 +80,7 @@ class SettingsViewModel @Inject constructor(
     private val emailManager: EmailManager,
     private val macOsWaitlist: MacOsWaitlist,
     private val internalTestUserChecker: InternalTestUserChecker
-) : ViewModel(), LifecycleObserver {
+) : ViewModel(), DefaultLifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
 
@@ -190,8 +191,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun stopPollingDeviceShieldState() {
+    override fun onStop(owner: LifecycleOwner) {
         deviceShieldStatePollingJob?.cancel()
     }
 

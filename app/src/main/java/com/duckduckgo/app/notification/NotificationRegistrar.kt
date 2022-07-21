@@ -24,11 +24,10 @@ import android.content.Context
 import android.os.Build.VERSION_CODES.O
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.model.Channel
@@ -44,8 +43,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.vpn.R as VpnR
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
 class NotificationRegistrar @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val context: Context,
@@ -55,7 +58,7 @@ class NotificationRegistrar @Inject constructor(
     private val pixel: Pixel,
     private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>,
     private val appBuildConfig: AppBuildConfig,
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
     object NotificationId {
         const val ClearData = 100
@@ -86,14 +89,12 @@ class NotificationRegistrar @Inject constructor(
         // Do not add new channels here, instead follow https://app.asana.com/0/1125189844152671/1201842645469204
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun onApplicationCreated() {
+    override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch { registerApp() }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     @Suppress("NewApi") // we use appBuildConfig
-    fun updateNotificationStatus() {
+    override fun onResume(owner: LifecycleOwner) {
         val systemEnabled = compatManager.areNotificationsEnabled()
         val allChannelsEnabled = when {
             appBuildConfig.sdkInt >= O -> manager.notificationChannels.all { it.importance != IMPORTANCE_NONE }
