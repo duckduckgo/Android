@@ -59,7 +59,7 @@ class AppSiteProtectionsViewStateMapper @Inject constructor(
                 url = site.url,
                 domain = site.domain!!,
                 trackersUrls = trackingEvents.trackerUrls,
-                whitelisted = site.userAllowList
+                allowlisted = site.userAllowList
             ),
             trackers = trackingEvents.trackerEvents,
             trackerBlocked = trackingEvents.blockedTrackerEvents,

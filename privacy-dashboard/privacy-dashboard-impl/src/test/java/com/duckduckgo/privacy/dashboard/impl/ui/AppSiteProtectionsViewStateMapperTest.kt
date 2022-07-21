@@ -72,7 +72,7 @@ class AppSiteProtectionsViewStateMapperTest {
         assertEquals(site.upgradedHttps, siteProtectionsViewState.upgradedHttps)
         assertEquals(site.url, siteProtectionsViewState.site.url)
         assertEquals(site.domain, siteProtectionsViewState.site.domain)
-        assertEquals(site.userAllowList, siteProtectionsViewState.site.whitelisted)
+        assertEquals(site.userAllowList, siteProtectionsViewState.site.allowlisted)
     }
 
     @Test

@@ -116,7 +116,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val url: String,
         val domain: String,
         val trackersUrls: Set<String>,
-        val whitelisted: Boolean,
+        val allowlisted: Boolean,
     )
 
     data class TrackerViewState(

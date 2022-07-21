@@ -24,30 +24,25 @@ class PrivacyDashboardJavascriptInterface constructor(
     val onClose: () -> Unit
 ) {
     @JavascriptInterface
-    fun toggleWhitelist(newValue: String) {
-
+    fun toggleAllowlist(newValue: String) {
         onPrivacyProtectionsClicked(newValue.toBoolean())
     }
 
     @JavascriptInterface
     fun updatePermission(message: String) {
-
     }
 
     @JavascriptInterface
     fun firePixel(message: String) {
-
     }
 
     @JavascriptInterface
     fun close() {
-
         onClose()
     }
 
     @JavascriptInterface
     fun showBreakageForm() {
-
         onBrokenSiteClicked()
     }
 
