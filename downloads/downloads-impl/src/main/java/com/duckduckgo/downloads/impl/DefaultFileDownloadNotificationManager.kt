@@ -73,6 +73,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
+            .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
             .setContentTitle(applicationContext.getString(R.string.downloadInProgress))
             .setContentText("$filename ($progress%).")
             .setShowWhen(false)
@@ -84,6 +85,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .build()
 
         val summary = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
+            .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
             .setShowWhen(false)
             .setSmallIcon(R.drawable.ic_file_download_white_24dp)
             .setGroup(DOWNLOAD_IN_PROGRESS_GROUP)
@@ -112,6 +114,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
         val pendingIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
         val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
+            .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
             .setShowWhen(false)
             .setContentTitle(filename)
             .setContentText(applicationContext.getString(R.string.notificationDownloadComplete))
@@ -130,6 +133,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
     @AnyThread
     override fun showDownloadFailedNotification(downloadId: Long, url: String?) {
         val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
+            .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
             .setShowWhen(false)
             .setContentTitle(applicationContext.getString(R.string.notificationDownloadFailed))
             .setSmallIcon(R.drawable.ic_file_download_white_24dp)
