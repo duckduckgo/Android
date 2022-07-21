@@ -16,12 +16,8 @@
 
 package com.duckduckgo.downloads.impl
 
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -32,7 +28,6 @@ class NetworkFileDownloader @Inject constructor(
     private val filenameExtractor: FilenameExtractor,
     private val fileService: DownloadFileService,
     private val urlFileDownloader: UrlFileDownloader,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) {
 
     fun download(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
@@ -105,8 +100,6 @@ class NetworkFileDownloader @Inject constructor(
         callback: DownloadCallback
     ) {
 
-        coroutineScope.launch {
-            urlFileDownloader.downloadFile(pendingDownload, guessedFileName, callback)
-        }
+        urlFileDownloader.downloadFile(pendingDownload, guessedFileName, callback)
     }
 }

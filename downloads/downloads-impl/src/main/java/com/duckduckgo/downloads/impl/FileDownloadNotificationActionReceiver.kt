@@ -45,7 +45,6 @@ import javax.inject.Inject
 class FileDownloadNotificationActionReceiver @Inject constructor(
     private val context: Context,
     private val fileDownloader: FileDownloader,
-    private val downloadCallback: DownloadCallback,
     private val fileDownloadNotificationManager: FileDownloadNotificationManager,
     private val downloadsRepository: DownloadsRepository,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
@@ -97,7 +96,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
                 Timber.v("Retrying download for $url")
                 coroutineScope.launch(dispatcherProvider.io()) {
                     downloadsRepository.delete(downloadId)
-                    fileDownloader.download(this@run, downloadCallback)
+                    fileDownloader.enqueueDownload(this@run)
                 }
             }
         }

@@ -77,7 +77,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setContentText("$filename ($progress%).")
             .setShowWhen(false)
             .setSmallIcon(R.drawable.ic_file_download_white_24dp)
-            .setProgress(100, progress, progress == SUMMARY_ID)
+            .setProgress(100, progress, progress == 0)
             .setOngoing(true)
             .setGroup(DOWNLOAD_IN_PROGRESS_GROUP)
             .addAction(R.drawable.ic_file_download_white_24dp, applicationContext.getString(R.string.downloadsCancel), pendingIntent)

@@ -37,7 +37,50 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
+interface DownloadCallback {
+    /**
+     * Called when a download started. Takes a [downloadItem] as parameter with all data related to the file that is downloaded.
+     */
+    fun onStart(downloadItem: DownloadItem)
+
+    /**
+     * Called during the download progress. Takes as parameters the [downloadId] and the [progress] of the download.
+     */
+    fun onProgress(downloadId: Long, filename: String, progress: Int)
+
+    /**
+     * Called when a download done using the DownloadManager finishes with success. Takes as parameters the [downloadId] and [contentLength]
+     * provided by the DownloadManager.
+     */
+    fun onSuccess(downloadId: Long, contentLength: Long, file: File, mimeType: String?)
+
+    /**
+     * Called when a download done without using the DownloadManager finishes with success. Takes as parameters the [file]
+     * downloaded and the [mimeType] associated with the download.
+     */
+    fun onSuccess(file: File, mimeType: String?)
+
+    /**
+     * Called when the download fails. Takes as optional parameter the [url] which started the download. Takes optional parameters download [url] and
+     * [downloadId] and a mandatory parameter [reason] describing why the download has failed.
+     */
+    fun onError(url: String? = null, downloadId: Long? = null, reason: DownloadFailReason)
+
+    /**
+     * Called when the download is cancelled from the app or from the notification. Takes as mandatory parameter the [downloadId] provided by
+     * the DownloadManager.
+     */
+    fun onCancel(downloadId: Long)
+}
+
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = DownloadCallback::class
+)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = DownloadStateListener::class
+)
 @SingleInstanceIn(AppScope::class)
 class FileDownloadCallback @Inject constructor(
     private val fileDownloadNotificationManager: FileDownloadNotificationManager,
@@ -45,7 +88,7 @@ class FileDownloadCallback @Inject constructor(
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
-) : DownloadCallback {
+) : DownloadCallback, DownloadStateListener {
 
     private val command = Channel<DownloadCommand>(1, BufferOverflow.DROP_OLDEST)
 
