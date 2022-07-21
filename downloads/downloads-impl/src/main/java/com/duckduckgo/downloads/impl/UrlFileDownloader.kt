@@ -16,14 +16,12 @@
 
 package com.duckduckgo.downloads.impl
 
-import com.duckduckgo.app.global.DispatcherProvider
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
-import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import okio.Buffer
 import okio.sink
@@ -37,15 +35,15 @@ import kotlin.random.Random
 class UrlFileDownloader @Inject constructor(
     private val downloadFileService: DownloadFileService,
     private val urlFileDownloadCallManager: UrlFileDownloadCallManager,
-    private val dispatcherProvider: DispatcherProvider,
     private val cookieManagerWrapper: CookieManagerWrapper,
 ) {
 
-    suspend fun downloadFile(
+    @WorkerThread
+    fun downloadFile(
         pendingFileDownload: FileDownloader.PendingFileDownload,
         fileName: String,
         downloadCallback: DownloadCallback,
-    ) = withContext(dispatcherProvider.io()) {
+    ) {
         val url = pendingFileDownload.url
         val directory = pendingFileDownload.directory
         val call = downloadFileService.downloadFile(
