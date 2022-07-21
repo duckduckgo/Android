@@ -67,7 +67,7 @@ class OutLinedTextInputView @JvmOverloads constructor(
             binding.internalInputLayout.hint = getString(R.styleable.OutLinedTextInputView_android_hint)
 
             getDrawable(R.styleable.OutLinedTextInputView_endIcon)?.let {
-                setupEndIcon(it)
+                setupEndIcon(it, getString(R.styleable.OutLinedTextInputView_endIconContentDescription) ?: "")
             }
 
             isPassword = getBoolean(R.styleable.OutLinedTextInputView_isPassword, false)
@@ -104,11 +104,12 @@ class OutLinedTextInputView @JvmOverloads constructor(
         }
     }
 
-    private fun setupEndIcon(drawable: Drawable) {
+    private fun setupEndIcon(drawable: Drawable, contentDescription: String) {
         binding.internalInputLayout.apply {
             endIconMode = END_ICON_CUSTOM
             endIconDrawable = drawable
             isEndIconVisible = true
+            endIconContentDescription = contentDescription
         }
     }
 
