@@ -23,7 +23,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.marginEnd
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewOutlinedTextInputBinding
@@ -31,6 +30,7 @@ import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
 import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action.PerformEndAction
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.textfield.TextInputLayout.END_ICON_CUSTOM
+import com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
 
 interface OutlinedTextInput {
     var text: String
@@ -63,13 +63,13 @@ class OutLinedTextInputView @JvmOverloads constructor(
             com.google.android.material.R.style.Widget_MaterialComponents_TextInputEditText_OutlinedBox
         ).apply {
             text = getString(R.styleable.OutLinedTextInputView_android_text) ?: ""
-            isEditable = getBoolean(R.styleable.OutLinedTextInputView_editable, true)
-            binding.internalInputLayout.hint = getString(R.styleable.OutLinedTextInputView_android_hint)
-
             getDrawable(R.styleable.OutLinedTextInputView_endIcon)?.let {
                 setupEndIcon(it, getString(R.styleable.OutLinedTextInputView_endIconContentDescription) ?: "")
             }
 
+            // This needs to be done after we know that the view has the end icon set
+            isEditable = getBoolean(R.styleable.OutLinedTextInputView_editable, true)
+            binding.internalInputLayout.hint = getString(R.styleable.OutLinedTextInputView_android_hint)
             isPassword = getBoolean(R.styleable.OutLinedTextInputView_isPassword, false)
             if (isPassword) {
                 setupPasswordMode()
@@ -78,8 +78,9 @@ class OutLinedTextInputView @JvmOverloads constructor(
             }
 
             binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
-                binding.internalInputLayout.isEndIconVisible = !hasFocus
-                handlePasswordFocusChanged(hasFocus)
+                if (hasFocus) {
+                    showKeyboard()
+                }
             }
 
             recycle()
@@ -96,7 +97,23 @@ class OutLinedTextInputView @JvmOverloads constructor(
         get() = binding.internalEditText.isEnabled
         set(value) {
             binding.internalEditText.isEnabled = value
+            handleIsEditableChangeForEndIcon(value)
         }
+
+    private fun handleIsEditableChangeForEndIcon(isEditable: Boolean) {
+        if (binding.internalInputLayout.endIconMode != END_ICON_NONE) {
+            binding.internalInputLayout.isEndIconVisible = !isEditable
+            if (isEditable && isPassword) {
+                binding.internalPasswordIcon.updateLayoutParams<LayoutParams> {
+                    this.marginEnd = context.resources.getDimensionPixelSize(R.dimen.outlinedTextPasswordEndMarginWithoutEndIcon)
+                }
+            } else {
+                binding.internalPasswordIcon.updateLayoutParams<LayoutParams> {
+                    this.marginEnd = context.resources.getDimensionPixelSize(R.dimen.outlinedTextPasswordEndMarginWithEndIcon)
+                }
+            }
+        }
+    }
 
     override fun onAction(actionHandler: (Action) -> Unit) {
         binding.internalInputLayout.setEndIconOnClickListener {
@@ -104,7 +121,10 @@ class OutLinedTextInputView @JvmOverloads constructor(
         }
     }
 
-    private fun setupEndIcon(drawable: Drawable, contentDescription: String) {
+    private fun setupEndIcon(
+        drawable: Drawable,
+        contentDescription: String
+    ) {
         binding.internalInputLayout.apply {
             endIconMode = END_ICON_CUSTOM
             endIconDrawable = drawable
@@ -144,17 +164,5 @@ class OutLinedTextInputView @JvmOverloads constructor(
     private fun setupTextMode() {
         binding.internalPasswordIcon.visibility = View.GONE
         binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
-    }
-
-    private fun handlePasswordFocusChanged(hasFocus: Boolean) {
-        if (isPassword) {
-            if (hasFocus) {
-                binding.internalPasswordIcon.visibility = GONE
-                binding.internalInputLayout.suffixTextView.visibility = GONE
-            } else {
-                binding.internalPasswordIcon.visibility = VISIBLE
-                binding.internalInputLayout.suffixTextView.visibility = VISIBLE
-            }
-        }
     }
 }

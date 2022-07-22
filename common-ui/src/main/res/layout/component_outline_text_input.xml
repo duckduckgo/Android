@@ -36,7 +36,8 @@
         android:id="@+id/outlinedinputtext1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Outlined hint 1"
+        android:hint="Editable text"
+        android:text="This is an editable text!"
         app:editable="true"
         app:endIcon="@drawable/ic_copy" />
 
@@ -45,7 +46,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_3"
-        android:hint="Outlined hint 2"
+        android:hint="Non-editable text with end icon"
         android:text="This is not editable."
         app:editable="false"
         app:endIcon="@drawable/ic_copy" />
@@ -55,7 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_3"
-        android:hint="Outlined hint 3"
+        android:hint="Non-editable text without end icon"
         android:text="This is not editable and has no icon. Lorem ipsum dolor sit amet, consectetur
          adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
         app:editable="false" />
@@ -65,7 +66,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_3"
-        android:hint="Password"
+        android:hint="Editable password"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit,
         sed do eiusmod tempor incididunt ut labore."
         app:endIcon="@drawable/ic_copy"
@@ -76,9 +77,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_3"
-        android:hint="Password"
+        android:hint="Non-editable password without icon"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit,
         sed do eiusmod tempor incididunt ut labore."
         app:editable="false"
+        app:isPassword="true" />
+
+    <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+        android:id="@+id/outlinedinputtext6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_3"
+        android:hint="Non.editable password with icon"
+        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+        sed do eiusmod tempor incididunt ut labore."
+        app:editable="false"
+        app:endIcon="@drawable/ic_copy"
         app:isPassword="true" />
 </LinearLayout>

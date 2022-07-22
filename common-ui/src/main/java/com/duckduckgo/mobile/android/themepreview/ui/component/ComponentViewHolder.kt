@@ -112,36 +112,20 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class DividerComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_section_divider))
 
-    class OutlinedTextInputComponentViewHolder(parent: ViewGroup) :
+    class OutlinedTextInputComponentViewHolder(val parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_outline_text_input)) {
         init {
-            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext1).onAction {
-                when (it) {
-                    is Action.PerformEndAction -> Toast.makeText(
-                        parent.context,
-                        "End icon clicked on editable OutlinedInputText 1",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext2).onAction {
-                when (it) {
-                    is Action.PerformEndAction -> Toast.makeText(
-                        parent.context,
-                        "End icon clicked on not editable OutlinedInputText",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext4).onAction {
-                when (it) {
-                    is Action.PerformEndAction -> Toast.makeText(
-                        parent.context,
-                        "End icon clicked on OutlinedInputText password",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
+            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext1).onAction { toastOnClick(it) }
+            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext2).onAction { toastOnClick(it) }
+            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext4).onAction { toastOnClick(it) }
+            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext6).onAction { toastOnClick(it) }
+        }
+        private fun toastOnClick(action: Action) = when (action) {
+            is Action.PerformEndAction -> Toast.makeText(
+                parent.context,
+                "End icon clicked!",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
