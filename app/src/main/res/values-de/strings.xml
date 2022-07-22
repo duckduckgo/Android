@@ -108,61 +108,7 @@
     <string name="tabClosedUndo">Rückgängig machen</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Datenschutz der Website</string>
-    <string name="privacyProtectionEnabled">WEBSITE-SCHUTZ AKTIVIERT</string>
-    <string name="privacyProtectionDisabled">WEBSITE-SCHUTZ DEAKTIVIERT</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VERBESSERT VON &lt;img src=\"%1$d\" /&gt; AUF &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Datenschutzstufe</string>
-    <string name="privacyProtectionTemporarilyDisabled">Wir haben den Datenschutz vorübergehend deaktiviert, da die Seite derzeit dadurch gestört wird.</string>
-
-    <string name="httpsGood">Verschlüsselte Verbindung</string>
-    <string name="httpsMixed">Verschlüsselte und unverschlüsselte Verbindung</string>
-    <string name="httpsBad">Unverschlüsselte Verbindung</string>
-
-    <string name="networksActivityTitle">Tracker-Netzwerke</string>
-    <string name="networksContentDescription">Tracker-Netzwerke</string>
-    <string name="networksOverview">Tracker-Netzwerke fassen deinen Browserverlauf in einem Datenprofil über dich zusammen. Große Tracker-Netzwerke sind schädlicher, da sie dich weiter im Internet verfolgen und gezielt ansprechen können.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s Tracker gefunden</item>
-        <item quantity="other">%1$s Tracker gefunden</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s Tracker blockiert</item>
-        <item quantity="other">%1$s Tracker blockiert</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s Großes Tracker-Netzwerk gefunden</item>
-        <item quantity="other">%1$s Große Tracker-Netzwerke gefunden</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s Großes Tracker-Netzwerk blockiert</item>
-        <item quantity="other">%1$s Große Tracker-Netzwerke blockiert</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Datenschutzstufe</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Diese Website gehört zu einem großen Tracker-Netzwerk</string>
-    <string name="scorecardPrivacyGrade">Datenschutzstufe</string>
-    <string name="scorecardEnhancedGrade">Erhöhte Stufe</string>
-
-    <string name="privacyTermsActivityTitle">Datenschutzpraktiken</string>
-    <string name="practicesGood">Gute Datenschutzpraktiken</string>
-    <string name="practicesMixed">Gemischte Datenschutzpraktiken</string>
-    <string name="practicesBad">Schlechte Datenschutzpraktiken</string>
-    <string name="practicesUnknown">Unbekannte Datenschutzpraktiken</string>
-    <string name="practicesOverview">Datenschutzpraktiken geben an, inwieweit die personenbezogenen Daten, die du mit einer Website teilst, geschützt sind.</string>
-    <string name="practicesTosdrLink">Datenschutzpraktiken von <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Good Practice Icon</string>
-    <string name="practicesIconContentBad">Bad Practice Icon</string>
-
-    <string name="networkTrackerSummaryHeader">HARTNÄCKIGSTE TRACKER-NETZWERKE</string>
-    <string name="networkTrackerSummaryNotReady">Wir sammeln immer noch Daten, um anzuzeigen, wie viele Tracker wir blockiert haben.</string>
-
-    <!-- Fire -->
+   <!-- Fire -->
     <string name="fireMenu">Daten löschen</string>
     <string name="fireClearAll">Alle Tabs schließen und Daten löschen</string>
     <string name="fireCancel">Abbrechen</string>

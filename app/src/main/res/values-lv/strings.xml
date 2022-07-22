@@ -108,64 +108,6 @@
     <string name="tabClosedUndo">Atsaukt</string>
     <string name="downloadsMenuItemTitle">Lejupielādes</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Vietnes privātuma aizsardzība</string>
-    <string name="privacyProtectionEnabled">VIETNES AIZSARDZĪBA IR IESPĒJOTA</string>
-    <string name="privacyProtectionDisabled">VIETAS AIZSARDZĪBA IR ATSPĒJOTA</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">UZLABOTS NO &lt;img src=\"%1$d\" /&gt; UZ &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Privātuma līmenis</string>
-    <string name="privacyProtectionTemporarilyDisabled">Mēs īslaicīgi atspējojām privātuma aizsardzību, jo šķiet, ka tā traucē šīs vietnes darbību.</string>
-
-    <string name="httpsGood">Šifrēts savienojums</string>
-    <string name="httpsMixed">Jaukts šifrēšanas savienojums</string>
-    <string name="httpsBad">Nešifrēts savienojums</string>
-
-    <string name="networksActivityTitle">Izsekotāju tīkli</string>
-    <string name="networksContentDescription">Izsekotāju tīkli</string>
-    <string name="networksOverview">Izsekotāju tīkli apkopo jūsu tīmekļa vēsturi datu profilā par jums. Lielākie izsekotāju tīkli ir kaitīgāki, jo tie var izsekot un atlasīt jūs kā mērķauditoriju internetā plašākā mērogā.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="zero">%1$s Atrasti izsekotāji</item>
-        <item quantity="one">%1$s Atrasts izsekotājs</item>
-        <item quantity="other">%1$s Atrasti izsekotāji</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="zero">%1$s Izsekotāji ir bloķēti</item>
-        <item quantity="one">%1$s Izsekotājs ir bloķēts</item>
-        <item quantity="other">%1$s Izsekotāji ir bloķēti</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="zero">Atrasti %1$s lielākie izsekotāju tīkli</item>
-        <item quantity="one">%1$s Atrasts lielākais izsekotāju tīkls</item>
-        <item quantity="other">Atrasti %1$s lielākie izsekotāju tīkli</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="zero">%1$s Lielākie izsekotāju tīkli ir bloķēti</item>
-        <item quantity="one">%1$s Galvenais izsekotāju tīkls ir bloķēts</item>
-        <item quantity="other">%1$s Lielākie izsekotāju tīkli ir bloķēti</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Privātuma līmenis</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Vietne ir lielākais izsekotāju tīkls</string>
-    <string name="scorecardPrivacyGrade">Privātuma līmenis</string>
-    <string name="scorecardEnhancedGrade">Uzlabots līmenis</string>
-
-    <string name="privacyTermsActivityTitle">Privātuma prakse</string>
-    <string name="practicesGood">Laba privātuma prakse</string>
-    <string name="practicesMixed">Jaukta privātuma prakse</string>
-    <string name="practicesBad">Slikta privātuma prakse</string>
-    <string name="practicesUnknown">Nezināma privātuma prakse</string>
-    <string name="practicesOverview">Privātuma prakse norāda, cik aizsargāta ir personiskā informācija, kuru kopīgojat ar vietni.</string>
-    <string name="practicesTosdrLink">Privātuma prakse no <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Labas prakses ikona</string>
-    <string name="practicesIconContentBad">Sliktas prakses ikona</string>
-
-    <string name="networkTrackerSummaryHeader">IZSEKOTĀJU TĪKLA LIELĀKIE PĀRKĀPĒJI</string>
-    <string name="networkTrackerSummaryNotReady">Mēs joprojām apkopojam datus, lai parādītu, cik daudz izsekotāju esam nobloķējuši.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Izdzēst datus</string>
     <string name="fireClearAll">Notīrīt visas cilnes un datus</string>

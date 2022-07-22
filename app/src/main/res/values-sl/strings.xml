@@ -108,68 +108,6 @@
     <string name="tabClosedUndo">Prekliči spremembe</string>
     <string name="downloadsMenuItemTitle">Prenosi</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Zaščita zasebnosti na strani</string>
-    <string name="privacyProtectionEnabled">OMOGOČI ZAŠČITO NA STRANI</string>
-    <string name="privacyProtectionDisabled">ONEMOGOČI ZAŠČITO NA STRANI</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">IZBOLJŠANO OD &lt;img src=\"%1$d\" /&gt; DO &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Ocena zasebnosti</string>
-    <string name="privacyProtectionTemporarilyDisabled">Začasno smo onemogočili zaščito zasebnosti, saj se zdi, da zato pride do napak na tem spletnem mestu.</string>
-
-    <string name="httpsGood">Šifrirana povezava</string>
-    <string name="httpsMixed">Mešana šifrirna povezava</string>
-    <string name="httpsBad">Nešifrirana povezava</string>
-
-    <string name="networksActivityTitle">Sledilna omrežja</string>
-    <string name="networksContentDescription">Sledilna omrežja</string>
-    <string name="networksOverview">Sledilna omrežja združijo vašo spletno zgodovino v podatkovni profil o vas. Glavna sledilna omrežja so bolj škodljiva, ker vas lahko spremljajo in ciljajo na večjem delu interneta.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">Najden %1$s sledilnik</item>
-        <item quantity="two">Najdena %1$s sledilnika</item>
-        <item quantity="few">Najdeni %1$s sledilniki</item>
-        <item quantity="other">Najdenih %1$s sledilnikov</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">Blokiran %1$s sledilnik</item>
-        <item quantity="two">Blokirana %1$s sledilnika</item>
-        <item quantity="few">Blokiranih %1$s sledilnikov</item>
-        <item quantity="other">Blokiranih %1$s sledilnikov</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">Najdeno %1$s glavno sledilno omrežje</item>
-        <item quantity="two">Najdeni %1$s glavni omrežji</item>
-        <item quantity="few">Najdenih %1$s glavnih omrežij</item>
-        <item quantity="other">Najdenih %1$s glavnih sledilnih omrežij</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">Blokirano %1$s glavno sledilno omrežje</item>
-        <item quantity="two">Blokirani %1$s glavni omrežji</item>
-        <item quantity="few">Blokiranih %1$s glavnih omrežij</item>
-        <item quantity="other">Blokiranih %1$s glavnih sledilnih omrežij</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Ocena zasebnosti</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Spletno mesto je glavno sledilno omrežje</string>
-    <string name="scorecardPrivacyGrade">Ocena zasebnosti</string>
-    <string name="scorecardEnhancedGrade">Izboljšana ocena</string>
-
-    <string name="privacyTermsActivityTitle">Prakse zasebnosti</string>
-    <string name="practicesGood">Dobre prakse zasebnosti</string>
-    <string name="practicesMixed">Mešane prakse zasebnosti</string>
-    <string name="practicesBad">Slabe prakse zasebnosti</string>
-    <string name="practicesUnknown">Neznane prakse zasebnosti</string>
-    <string name="practicesOverview">Prakse zasebnosti kažejo, koliko osebnih podatkov, ki jih delite s spletnim mestom, je zaščitenih.</string>
-    <string name="practicesTosdrLink">Prakse zasebnosti od <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Ikona dobre prakse</string>
-    <string name="practicesIconContentBad">Ikona slabe prakse</string>
-
-    <string name="networkTrackerSummaryHeader">GLAVNI KRŠITELJI MED SLEDILNIMI OMREŽJI</string>
-    <string name="networkTrackerSummaryNotReady">Še vedno zbiramo podatke za prikaz, koliko sledilnikov smo blokirali.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Počisti podatke</string>
     <string name="fireClearAll">Počisti vse zavihke in podatke</string>

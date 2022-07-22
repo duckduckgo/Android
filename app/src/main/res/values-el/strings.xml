@@ -108,60 +108,6 @@
     <string name="tabClosedUndo">Αναίρεση</string>
     <string name="downloadsMenuItemTitle">Λήψεις</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Προστασία της ιδιωτικότητας του ιστότοπου</string>
-    <string name="privacyProtectionEnabled">ΕΝΕΡΓΟΠΟΙΗΣΗ ΤΗΣ ΠΡΟΣΤΑΣΙΑΣ ΤΟΥ ΙΣΤΟΤΟΠΟΥ</string>
-    <string name="privacyProtectionDisabled">ΑΠΕΝΕΡΓΟΠΟΊΗΣΗ ΤΗΣ ΠΡΟΣΤΑΣΙΑΣ ΤΟΥ ΙΣΤΟΤΟΠΟΥ</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ΒΕΛΤΙΩΘΗΚΕ ΑΠΟ &lt;img src=\"%1$d\" /&gt; ΣΕ &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Βαθμολογία ιδιωτικότητας</string>
-    <string name="privacyProtectionTemporarilyDisabled">Απενεργοποιήσαμε προσωρινά την Προστασία προσωπικών δεδομένων καθώς φαίνεται ότι ρίχνει τον ιστότοπο.</string>
-
-    <string name="httpsGood">Κρυπτογραφημένη σύνδεση</string>
-    <string name="httpsMixed">Σύνδεση μεικτής κρυπτογράφησης</string>
-    <string name="httpsBad">Μη κρυπτογραφημένη σύνδεση</string>
-
-    <string name="networksActivityTitle">Δίκτυα παρακολούθησης</string>
-    <string name="networksContentDescription">Δίκτυα παρακολούθησης</string>
-    <string name="networksOverview">Τα δίκτυα παρακολούθησης συγκεντρώνουν το ιστορικό διαδικτύου σας σε ένα προφίλ δεδομένων για εσάς. Τα κύρια δίκτυα παρακολούθησης είναι πιο επιβλαβή, καθώς μπορούν να σας παρακολουθούν και να σας στοχοποιούν σε όλο το διαδίκτυο.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">Βρέθηκε %1$s παρακολούθηση</item>
-        <item quantity="other">Βρέθηκαν %1$s παρακολουθήσεις</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">Αποκλείστηκε %1$s παρακολούθηση</item>
-        <item quantity="other">Αποκλείστηκαν %1$s παρακολουθήσεις</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">Βρέθηκε %1$s κύριο δίκτυο παρακολούθησης</item>
-        <item quantity="other">Βρέθηκαν %1$s κύρια δίκτυα παρακολούθησης</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">Αποκλείστηκε %1$s κύριο δίκτυο παρακολούθησης</item>
-        <item quantity="other">Αποκλείστηκαν %1$s κύρια δίκτυα παρακολούθησης</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Βαθμολογία ιδιωτικότητας</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Ο ιστότοπος είναι κύριο δίκτυο παρακολούθησης</string>
-    <string name="scorecardPrivacyGrade">Βαθμολογία ιδιωτικότητας</string>
-    <string name="scorecardEnhancedGrade">Βελτιωμένη βαθμολογία</string>
-
-    <string name="privacyTermsActivityTitle">Πρακτικές ιδιωτικότητας</string>
-    <string name="practicesGood">Ορθές πρακτικές ιδιωτικότητας</string>
-    <string name="practicesMixed">Μεικτές πρακτικές ιδιωτικότητας</string>
-    <string name="practicesBad">Ακατάλληλες πρακτικές ιδιωτικότητας</string>
-    <string name="practicesUnknown">Άγνωστες πρακτικές ιδιωτικότητας</string>
-    <string name="practicesOverview">Οι πρακτικές ιδιωτικότητας υποδεικνύουν τον βαθμό προστασίας των προσωπικών πληροφοριών που μοιράζεστε με έναν ιστότοπο.</string>
-    <string name="practicesTosdrLink">Αποτελέσματα πρακτικών ιδιωτικότητας από <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Εικονίδιο ορθής πρακτικής</string>
-    <string name="practicesIconContentBad">Εικονίδιο ακατάλληλης πρακτικής</string>
-
-    <string name="networkTrackerSummaryHeader">ΚΟΡΥΦΑΙΟΙ ΠΑΡΑΒΑΤΕΣ ΤΟΥ ΔΙΚΤΥΟΥ ΠΑΡΑΚΟΛΟΥΘΗΣΗΣ</string>
-    <string name="networkTrackerSummaryNotReady">Εξακολουθούμε να συλλέγουμε δεδομένα για να δείξουμε πόσες παρακολουθήσεις έχουμε αποκλείσει.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Εκκαθάριση δεδομένων</string>
     <string name="fireClearAll">Εκκαθάριση όλων των καρτελών και δεδομένων</string>

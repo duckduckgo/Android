@@ -108,60 +108,6 @@
     <string name="tabClosedUndo">Fortryd</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Webstedets beskyttelse af personlige oplysninger</string>
-    <string name="privacyProtectionEnabled">BESKYTTELSE AF WEBSTEDET ER AKTIVERET</string>
-    <string name="privacyProtectionDisabled">BESKYTTELSE AF WEBSTEDET ER DEAKTIVERET</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FORSTÆRKET FRA &lt;img src=\"%1$d\" /&gt; TIL &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Grad af privatliv</string>
-    <string name="privacyProtectionTemporarilyDisabled">Vi har midlertidigt deaktiveret beskyttelse af privatlivets fred, da det ser ud til at ødelægge dette websted.</string>
-
-    <string name="httpsGood">Krypteret forbindelse</string>
-    <string name="httpsMixed">Blandet krypteringsforbindelse</string>
-    <string name="httpsBad">Ukrypteret forbindelse</string>
-
-    <string name="networksActivityTitle">Tracker-netværk</string>
-    <string name="networksContentDescription">Tracker-netværk</string>
-    <string name="networksOverview">Tracker-netværk samler din webhistorik i en dataprofil om dig. Større tracker-netværk er mere skadelige, fordi de kan spore og målrette sig dig over en større del af internettet.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s tracker fundet</item>
-        <item quantity="other">%1$s trackere fundet</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s tracker blokeret</item>
-        <item quantity="other">%1$s trackere blokeret</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s større tracker-netværk fundet</item>
-        <item quantity="other">%1$s større tracker-netværk fundet</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s større tracker-netværk blokeret</item>
-        <item quantity="other">%1$s større tracker-netværk blokeret</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Grad af privatliv</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Websted er et stort tracker-netværk</string>
-    <string name="scorecardPrivacyGrade">Grad af privatliv</string>
-    <string name="scorecardEnhancedGrade">Forstærket grad</string>
-
-    <string name="privacyTermsActivityTitle">Praksis for beskyttelse af privatlivets fred</string>
-    <string name="practicesGood">God praksis for beskyttelse af privatlivets fred</string>
-    <string name="practicesMixed">Blandet praksis for beskyttelse af privatlivets fred</string>
-    <string name="practicesBad">Dårlig praksis for beskyttelse af privatlivets fred</string>
-    <string name="practicesUnknown">Ukendt praksis for beskyttelse af privatlivets fred</string>
-    <string name="practicesOverview">Praksis for beskyttelse af privatlivets fred angiver, i hvor høj grad de personoplysninger, som du deler med et websted, er beskyttet.</string>
-    <string name="practicesTosdrLink">Databeskyttelsespraksisser fra <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Ikon for god praksis</string>
-    <string name="practicesIconContentBad">Ikon for dårlig praksis</string>
-
-    <string name="networkTrackerSummaryHeader">DE STØRSTE LOVOVERTRÆDERE FRA TRACKER-NETVÆRK</string>
-    <string name="networkTrackerSummaryNotReady">Vi indsamler stadig data for at vise, hvor mange trackere vi har blokeret.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Ryd data</string>
     <string name="fireClearAll">Ryd alle faner og data</string>

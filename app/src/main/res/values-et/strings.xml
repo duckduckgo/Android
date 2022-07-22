@@ -108,61 +108,7 @@
     <string name="tabClosedUndo">Võta tagasi</string>
     <string name="downloadsMenuItemTitle">Allalaadimised</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Saidi privaatsuse kaitse</string>
-    <string name="privacyProtectionEnabled">Saidi kaitse on lubatud</string>
-    <string name="privacyProtectionDisabled">Saidi kaitse on keelatud</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TÄIUSTATUD &lt;img src=\"%1$d\" /&gt; - &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Privaatsusaste</string>
-    <string name="privacyProtectionTemporarilyDisabled">Keelasime ajutiselt privaatsuse kaitse, kuna näib, et see kahjustab seda saiti.</string>
-
-    <string name="httpsGood">Krüptitud ühendus</string>
-    <string name="httpsMixed">Erinevate krüpteeringutega ühendus</string>
-    <string name="httpsBad">Krüptimata ühendus</string>
-
-    <string name="networksActivityTitle">Jälgimisvõrgud</string>
-    <string name="networksContentDescription">Jälgimisvõrgud</string>
-    <string name="networksOverview">Jälgimisvõrgud koondavad teie veebiajaloo teie kohta käivaks andmeprofiiliks. Suured jälgimisvõrgud on kahjulikumad, kuna nad saavad teid jälgida ja sihtida kogu Internetis.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s jälitaja leitud</item>
-        <item quantity="other">%1$s jälitajat leitud</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s jälgija on blokeeritud</item>
-        <item quantity="other">%1$s jälgijat on blokeeritud</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s leitud suur jälgimisvõrk</item>
-        <item quantity="other">%1$s leitud suurt jälgimisvõrku</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s suur jälgimisvõrk blokeeritud</item>
-        <item quantity="other">%1$s suurt jälgimisvõrku blokeeritud</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Privaatsusaste</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Sait on peamine jälgimisvõrk</string>
-    <string name="scorecardPrivacyGrade">Privaatsusaste</string>
-    <string name="scorecardEnhancedGrade">Täiustatud aste</string>
-
-    <string name="privacyTermsActivityTitle">Privaatsuspraktikad</string>
-    <string name="practicesGood">Hea privaatsustava</string>
-    <string name="practicesMixed">Erinevad privaatsustavad</string>
-    <string name="practicesBad">Kehv privaatsustava</string>
-    <string name="practicesUnknown">Teadmata privaatsustava</string>
-    <string name="practicesOverview">Privaatsustavad näitavad, kui palju on veebisaidiga jagatav isiklik teave kaitstud.</string>
-    <string name="practicesTosdrLink">Privaatsustava tuleneb <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Hea tava ikoon</string>
-    <string name="practicesIconContentBad">Halva tava ikoon</string>
-
-    <string name="networkTrackerSummaryHeader">JÄLGIMISVÕRGU SUURIMAD RIKKUJAD</string>
-    <string name="networkTrackerSummaryNotReady">Kogume endiselt andmeid, et näidata, kui palju jälgijaid oleme blokeerinud.</string>
-
-    <!-- Fire -->
+   <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>
     <string name="fireClearAll">Kustuta kõik vahekaardid ja andmed</string>
     <string name="fireCancel">Tühista</string>

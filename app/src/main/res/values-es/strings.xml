@@ -108,60 +108,6 @@
     <string name="tabClosedUndo">Deshacer</string>
     <string name="downloadsMenuItemTitle">Descargas</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Protección de privacidad del sitio web</string>
-    <string name="privacyProtectionEnabled">PROTECCIÓN DEL SITIO WEB HABILITADA</string>
-    <string name="privacyProtectionDisabled">PROTECCIÓN DEL SITIO WEB DESHABILITADA</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MEJORA DE &lt;img src=\"%1$d\" /&gt; CON &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Nivel de privacidad</string>
-    <string name="privacyProtectionTemporarilyDisabled">Hemos desactivado temporalmente la protección de privacidad, ya que parece que está causando errores en el sitio.</string>
-
-    <string name="httpsGood">Conexión cifrada</string>
-    <string name="httpsMixed">Conexión con cifrado mixto</string>
-    <string name="httpsBad">Conexión no cifrada</string>
-
-    <string name="networksActivityTitle">Redes de rastreadores</string>
-    <string name="networksContentDescription">Redes de rastreadores</string>
-    <string name="networksOverview">Las redes de rastreadores agregan tu historial web para crear un perfil de datos sobre ti. Las principales redes de rastreadores suponen una mayor amenaza, ya que abarcan una mayor parte de Internet para rastrearte e identificarte.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s rastreador encontrado</item>
-        <item quantity="other">%1$s rastreadores encontrados</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s rastreador bloqueado</item>
-        <item quantity="other">%1$s rastreadores bloqueados</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s red de rastreadores principal encontrada</item>
-        <item quantity="other">%1$s redes de rastreadores principales encontradas</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s red de rastreadores principal bloqueada</item>
-        <item quantity="other">%1$s redes de rastreadores principales bloqueadas</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Nivel de privacidad</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">El sitio web es una de las principales redes de rastreadores</string>
-    <string name="scorecardPrivacyGrade">Nivel de privacidad</string>
-    <string name="scorecardEnhancedGrade">Nivel incrementado</string>
-
-    <string name="privacyTermsActivityTitle">Prácticas de privacidad</string>
-    <string name="practicesGood">Buenas prácticas de privacidad</string>
-    <string name="practicesMixed">Prácticas de privacidad mixtas</string>
-    <string name="practicesBad">Prácticas de privacidad deficientes</string>
-    <string name="practicesUnknown">Prácticas de privacidad desconocidas</string>
-    <string name="practicesOverview">Las prácticas de privacidad indican el nivel de protección de los datos personales que compartes con un sitio web.</string>
-    <string name="practicesTosdrLink">Prácticas de privacidad de <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Icono de buenas prácticas</string>
-    <string name="practicesIconContentBad">Icono de malas prácticas</string>
-
-    <string name="networkTrackerSummaryHeader">PRINCIPALES CULPABLES DE LAS REDES DE RASTREADORES</string>
-    <string name="networkTrackerSummaryNotReady">Continuamos recopilando datos que demuestran cuántos rastreadores hemos bloqueado.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Borrar datos</string>
     <string name="fireClearAll">Borrar todos los datos y pestañas</string>

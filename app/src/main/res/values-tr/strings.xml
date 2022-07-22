@@ -108,60 +108,6 @@
     <string name="tabClosedUndo">Geri al</string>
     <string name="downloadsMenuItemTitle">İndirilenler</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Site Gizlilik Koruması</string>
-    <string name="privacyProtectionEnabled">SAHA KORUMASI ETKİN</string>
-    <string name="privacyProtectionDisabled">SİTE KORUMASI KAPATILDI</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">&lt;img src=\"%1$d\" /&gt; \'dan &lt;img src=\"%2$d\" /&gt;\' ye GELİŞTİRİLDİ</string>
-    <string name="privacyGradeContentDescription">Gizlilik Derecesi</string>
-    <string name="privacyProtectionTemporarilyDisabled">Bu sitede hatalara neden olduğu için Gizlilik Korumasını geçici olarak devre dışı bıraktık.</string>
-
-    <string name="httpsGood">Şifreli Bağlantı</string>
-    <string name="httpsMixed">Karma Şifreleme Bağlantısı</string>
-    <string name="httpsBad">Şifrelenmemiş Bağlantı</string>
-
-    <string name="networksActivityTitle">İzleyici Ağları</string>
-    <string name="networksContentDescription">İzleyici Ağları</string>
-    <string name="networksOverview">İzleyici ağları, web geçmişinizi sizinle ilgili bir veri profilinde toplar. Büyük izleyici ağları daha zararlıdır, çünkü sizi İnternet\'te izleyebilir ve hedefleyebilirler.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s İzleyici Bulundu</item>
-        <item quantity="other">%1$s İzleyici Bulundu</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s İzleyici Engellendi</item>
-        <item quantity="other">%1$s İzleyici Engellendi</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s Ana İzleyici Ağı Bulundu</item>
-        <item quantity="other">%1$s Başlıca İzleyici Ağları Bulundu</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s Başlıca İzleyici Ağı Engellendi</item>
-        <item quantity="other">%1$s Başlıca İzleyici Ağları Engellendi</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Gizlilik Derecesi</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Site Önemli İzleyici Ağlarından Biri</string>
-    <string name="scorecardPrivacyGrade">Gizlilik Derecesi</string>
-    <string name="scorecardEnhancedGrade">Geliştirilmiş Sınıf</string>
-
-    <string name="privacyTermsActivityTitle">Gizlilik Uygulamaları</string>
-    <string name="practicesGood">Öne Çıkan Gizlilik Uygulamaları</string>
-    <string name="practicesMixed">Karma Gizlilik Uygulamaları</string>
-    <string name="practicesBad">Kötü Gizlilik Uygulamaları</string>
-    <string name="practicesUnknown">Bilinmeyen Gizlilik Uygulamaları</string>
-    <string name="practicesOverview">Gizlilik uygulamaları, bir web sitesiyle paylaştığınız kişisel bilgilerin ne kadar korunduğunu gösterir.</string>
-    <string name="practicesTosdrLink">Gizlilik Uygulamaları: <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">İyi Uygulama Simgesi</string>
-    <string name="practicesIconContentBad">Kötü Uygulama Simgesi</string>
-
-    <string name="networkTrackerSummaryHeader">İZLEYİCİ AĞ ÜSTÜ TEKLİFLER</string>
-    <string name="networkTrackerSummaryNotReady">Kaç izleyiciyi engellediğimizi göstermek için hala veri topluyoruz.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
     <string name="fireClearAll">Tüm Sekmeleri ve Verileri Temizle</string>

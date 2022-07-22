@@ -108,60 +108,6 @@
     <string name="tabClosedUndo">Kumoa</string>
     <string name="downloadsMenuItemTitle">Lataukset</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Sivuston yksityisyydensuoja</string>
-    <string name="privacyProtectionEnabled">SIVUSTOSUOJAUS KÄYTÖSSÄ</string>
-    <string name="privacyProtectionDisabled">SIVUSTOSUOJAUS EI KÄYTÖSSÄ</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">PARANNETTU &lt;img src=\"%1$d\" /&gt;–&lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Tietosuoja-arvosana</string>
-    <string name="privacyProtectionTemporarilyDisabled">Yksityisyyden suoja on väliaikaisesti poistettu käytöstä, koska se näyttäisi rikkovan tämän sivun.</string>
-
-    <string name="httpsGood">Salattu yhteys</string>
-    <string name="httpsMixed">Salaukseltaan vaihteleva yhteys</string>
-    <string name="httpsBad">Salaamaton yhteys</string>
-
-    <string name="networksActivityTitle">Seurantaverkostot</string>
-    <string name="networksContentDescription">Seurantaverkostot</string>
-    <string name="networksOverview">Seurantaverkostot kokoavat verkkohistoriasi sinua koskevaksi tietoprofiiliksi. Merkittävät seurantaverkostot ovat haitallisempia, koska ne voivat seurata toimiasi ja harjoittaa kohdennusta useammassa osassa verkkoa.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s seurantapalvelin löytynyt</item>
-        <item quantity="other">%1$s seurantapalvelinta löytynyt</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s seurantapalvelin estetty</item>
-        <item quantity="other">%1$s seurantapalvelinta estetty</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s merkittävä seurantaverkosto löytynyt</item>
-        <item quantity="other">%1$s merkittävää seurantaverkostoa löytynyt</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s merkittävä seurantaverkosto estetty</item>
-        <item quantity="other">%1$s merkittävää seurantaverkostoa estetty</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Tietosuoja-arvosana</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Sivusto on merkittävä seurantaverkosto</string>
-    <string name="scorecardPrivacyGrade">Tietosuoja-arvosana</string>
-    <string name="scorecardEnhancedGrade">Parannettu arvosana</string>
-
-    <string name="privacyTermsActivityTitle">Tietosuojakäytännöt</string>
-    <string name="practicesGood">Hyvät tietosuojakäytännöt</string>
-    <string name="practicesMixed">Vaihtelevat tietosuojakäytännöt</string>
-    <string name="practicesBad">Huonot tietosuojakäytännöt</string>
-    <string name="practicesUnknown">Tuntemattomat tietosuojakäytännöt</string>
-    <string name="practicesOverview">Tietosuojakäytännöt kertovat, missä määrin verkkosivuston kanssa jakamiasi henkilötietoja suojataan.</string>
-    <string name="practicesTosdrLink">Tietosuojakäytäntöjen tulokset kohteesta <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Hyvä käytäntö -kuvake</string>
-    <string name="practicesIconContentBad">Huono käytäntö -kuvake</string>
-
-    <string name="networkTrackerSummaryHeader">PAHIMMAT SEURANTAVERKOSTOT</string>
-    <string name="networkTrackerSummaryNotReady">Keräämme edelleen tietoja näyttääksemme, kuinka monta seurantapalvelinta olemme estäneet.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
     <string name="fireClearAll">Poista kaikki välilehdet ja tiedot</string>

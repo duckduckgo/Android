@@ -108,60 +108,6 @@
     <string name="tabClosedUndo">Visszavonás</string>
     <string name="downloadsMenuItemTitle">Letöltések</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">A weboldal adatvédelme</string>
-    <string name="privacyProtectionEnabled">WEBOLDAL VÉDELME ENGEDÉLYEZVE</string>
-    <string name="privacyProtectionDisabled">WEBOLDAL VÉDELME LETILTVA</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TOVÁBBFEJLESZTETT ETTŐL: &lt;img src=\"%1$d\" /&gt; EDDIG: &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Adatvédelmi fokozat</string>
-    <string name="privacyProtectionTemporarilyDisabled">Ideiglenesen letiltottuk az adatvédelmet, mert úgy tűnik, hogy kárt okoz ezen a webhelyen.</string>
-
-    <string name="httpsGood">Titkosított kapcsolat</string>
-    <string name="httpsMixed">Vegyes titkosítású kapcsolat</string>
-    <string name="httpsBad">Titkosítatlan kapcsolat</string>
-
-    <string name="networksActivityTitle">Nyomkövető hálózatok</string>
-    <string name="networksContentDescription">Nyomkövető hálózatok</string>
-    <string name="networksOverview">A nyomkövető hálózatok gyűjtik internetes előzményeidet egy rólad szóló adatprofilban. A nagy nyomkövető hálózatok károsabbak, mert az internet több területén képesek téged nyomon követni és megcélozni.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s nyomkövető megtalálva</item>
-        <item quantity="other">%1$s nyomkövető megtalálva</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s nyomkövető letiltva</item>
-        <item quantity="other">%1$s nyomkövető letiltva</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s nagy nyomkövető-hálózat megtalálva</item>
-        <item quantity="other">%1$s nagy nyomkövető-hálózat megtalálva</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s nagy nyomkövető-hálózat letiltva</item>
-        <item quantity="other">%1$s nagy nyomkövető-hálózat letiltva</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Adatvédelmi fokozat</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">A weboldal egy nagy nyomkövető-hálózat</string>
-    <string name="scorecardPrivacyGrade">Adatvédelmi fokozat</string>
-    <string name="scorecardEnhancedGrade">Emelt fokozat</string>
-
-    <string name="privacyTermsActivityTitle">Adatvédelmi gyakorlatok</string>
-    <string name="practicesGood">Jó adatvédelmi gyakorlatok</string>
-    <string name="practicesMixed">Vegyes adatvédelmi gyakorlatok</string>
-    <string name="practicesBad">Rossz adatvédelmi gyakorlatok</string>
-    <string name="practicesUnknown">Ismeretlen adatvédelmi gyakorlatok</string>
-    <string name="practicesOverview">Az adatvédelmi gyakorlatok jelzik, hogy a weboldalakkal megosztott személyes adataid védelme mennyire garantált.</string>
-    <string name="practicesTosdrLink">Adatvédelmi gyakorlatok forrása: <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Jó gyakorlat ikon</string>
-    <string name="practicesIconContentBad">Hibás gyakorlat ikon</string>
-
-    <string name="networkTrackerSummaryHeader">A NYOMKÖVETŐ-HÁLÓZAT LEGNAGYOBB BŰNELKÖVETŐI</string>
-    <string name="networkTrackerSummaryNotReady">Folyamatosan gyűjtjük az adatokat, hogy bemutathassuk, hány követőt tiltottunk le.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Adatok törlése</string>
     <string name="fireClearAll">Összes lap és adat törlése</string>
