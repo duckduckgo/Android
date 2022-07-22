@@ -16,12 +16,10 @@
 
 package com.duckduckgo.app.global.model
 
-import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.trackerdetection.model.Entity
 
 data class SitePrivacyData(
     val url: String,
-    val practices: PrivacyPractices.Practices,
     val entity: Entity?,
     val prevalence: Double?
 )

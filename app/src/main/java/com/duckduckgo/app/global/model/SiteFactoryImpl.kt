@@ -20,7 +20,6 @@ import androidx.annotation.AnyThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
-import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -32,7 +31,6 @@ import kotlinx.coroutines.CoroutineScope
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class SiteFactoryImpl @Inject constructor(
-    private val privacyPractices: PrivacyPractices,
     private val entityLookup: EntityLookup,
     private val userWhitelistDao: UserWhitelistDao,
     private val contentBlocking: ContentBlocking,
@@ -60,9 +58,8 @@ class SiteFactoryImpl @Inject constructor(
      */
     @WorkerThread
     override fun loadFullSiteDetails(site: Site) {
-        val practices = privacyPractices.privacyPracticesFor(site.url)
         val memberNetwork = entityLookup.entityForUrl(site.url)
-        val siteDetails = SitePrivacyData(site.url, practices, memberNetwork, memberNetwork?.prevalence ?: 0.0)
+        val siteDetails = SitePrivacyData(site.url, memberNetwork, memberNetwork?.prevalence ?: 0.0)
         site.updatePrivacyData(siteDetails)
     }
 }
