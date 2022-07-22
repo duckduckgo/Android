@@ -28,7 +28,6 @@ import java.security.interfaces.ECPublicKey
 import java.security.interfaces.RSAPublicKey
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
 class PublicKeyInfoMapper @Inject constructor(
     private val appBuildConfig: AppBuildConfig
 ) {

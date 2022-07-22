@@ -26,7 +26,6 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class AppBrokenSiteNav @Inject constructor() : BrokenSiteNav {
     override fun navigate(
         context: Context,

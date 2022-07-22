@@ -39,7 +39,6 @@ sealed class RendererViewHolder {
 }
 
 @ContributesBinding(ActivityScope::class)
-@SingleInstanceIn(ActivityScope::class)
 class BrowserPrivacyDashboardRendererFactory @Inject constructor(
     val moshi: Moshi
 ) : PrivacyDashboardRendererFactory {

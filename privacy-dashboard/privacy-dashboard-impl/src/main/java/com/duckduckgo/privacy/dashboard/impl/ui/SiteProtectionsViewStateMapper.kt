@@ -36,7 +36,6 @@ interface SiteProtectionsViewStateMapper {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class AppSiteProtectionsViewStateMapper @Inject constructor(
     private val publicKeyInfoMapper: PublicKeyInfoMapper
 ) : SiteProtectionsViewStateMapper {
