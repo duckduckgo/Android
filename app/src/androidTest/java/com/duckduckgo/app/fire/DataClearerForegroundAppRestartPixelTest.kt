@@ -18,6 +18,7 @@ package com.duckduckgo.app.fire
 
 import android.content.Intent
 import android.net.Uri
+import androidx.lifecycle.LifecycleOwner
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.pixels.AppPixelName
@@ -81,8 +82,10 @@ class DataClearerForegroundAppRestartPixelTest {
     @Test
     fun whenAppRestartedAfterGoingBackFromBackgroundThenPixelIsSent() {
         val intent = SystemSearchActivity.fromWidget(context)
+        val mockOwner: LifecycleOwner = mock()
+
         testee.registerIntent(intent)
-        testee.onAppBackgrounded()
+        testee.onStop(mockOwner)
         testee.incrementCount()
 
         testee.firePendingPixels()

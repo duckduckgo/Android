@@ -25,11 +25,9 @@ import androidx.core.view.isGone
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewbinding.ViewBinding
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsDescriptionBinding
-import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsDividerBinding
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsEmptyHintBinding
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsEntryBinding
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsSectionTitleBinding
@@ -40,6 +38,7 @@ import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.view.SectionDivider
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -107,7 +106,7 @@ class LocationPermissionsAdapter(
         return when (viewType) {
             DESCRIPTION_TYPE -> {
                 val binding = ViewLocationPermissionsDescriptionBinding.inflate(inflater, parent, false)
-                LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(binding)
+                LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(binding.root)
             }
             TOGGLE_TYPE -> {
                 val binding = ViewLocationPermissionsToggleBinding.inflate(inflater, parent, false)
@@ -116,8 +115,7 @@ class LocationPermissionsAdapter(
                 }
             }
             DIVIDER_TYPE -> {
-                val binding = ViewLocationPermissionsDividerBinding.inflate(inflater, parent, false)
-                LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(binding)
+                LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(SectionDivider(parent.context))
             }
             PRECISE_LOCATION_DOMAIN_TYPE -> {
                 val binding = ViewLocationPermissionsEntryBinding.inflate(inflater, parent, false)
@@ -125,7 +123,7 @@ class LocationPermissionsAdapter(
             }
             EMPTY_STATE_TYPE -> {
                 val binding = ViewLocationPermissionsEmptyHintBinding.inflate(inflater, parent, false)
-                LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(binding)
+                LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(binding.root)
             }
             ALLOWED_SITES_SECTION_TITLE_TYPE -> {
                 val binding = ViewLocationPermissionsSectionTitleBinding.inflate(inflater, parent, false)
@@ -237,7 +235,7 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
         }
     }
 
-    class LocationPermissionsSimpleViewViewHolder(binding: ViewBinding) : LocationPermissionsViewHolder(binding.root)
+    class LocationPermissionsSimpleViewViewHolder(view: View) : LocationPermissionsViewHolder(view)
 
     class LocationPermissionsItemViewHolder(
         private val layoutInflater: LayoutInflater,

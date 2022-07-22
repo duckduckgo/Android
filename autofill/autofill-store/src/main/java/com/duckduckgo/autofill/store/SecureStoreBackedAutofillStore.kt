@@ -24,14 +24,9 @@ import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.NoMatch
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -95,7 +90,8 @@ class SecureStoreBackedAutofillStore(
             return
         }
 
-        val matchingCredentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull()
+        val matchingCredentials =
+            secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull()?.filter { it.details.username == credentials.username }
         if (matchingCredentials.isNullOrEmpty()) {
             Timber.w("Cannot update credentials as no credentials were found for %s", url)
             return
@@ -179,20 +175,5 @@ class SecureStoreBackedAutofillStore(
         const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
         const val AUTOFILL_ENABLED = "autofill_enabled"
         const val SHOW_SAVE_LOGIN_ONBOARDING = "autofill_show_onboardind_saved_login"
-    }
-}
-
-@Module
-@ContributesTo(AppScope::class)
-class AutofillStoreModule {
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun autofillStore(
-        secureStorage: SecureStorage,
-        context: Context,
-        internalTestUserChecker: InternalTestUserChecker
-    ): AutofillStore {
-        return SecureStoreBackedAutofillStore(secureStorage, context, internalTestUserChecker)
     }
 }

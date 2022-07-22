@@ -33,6 +33,7 @@ import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.PA
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.USERNAME
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
@@ -67,6 +68,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val autofillResponseWriter: AutofillResponseWriter,
     private val emailManager: EmailManager,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val deviceAuthenticator: DeviceAuthenticator,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     private val currentUrlProvider: UrlProvider = WebViewUrlProvider(dispatcherProvider)
 ) : AutofillJavascriptInterface {
@@ -105,19 +107,28 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         }
     }
 
-    private fun filterRequestedSubtypes(request: AutofillDataRequest, credentials: List<LoginCredentials>): List<LoginCredentials> {
+    private fun filterRequestedSubtypes(
+        request: AutofillDataRequest,
+        credentials: List<LoginCredentials>
+    ): List<LoginCredentials> {
         return when (request.subType) {
             USERNAME -> credentials.filterNot { it.username.isNullOrBlank() }
             PASSWORD -> credentials.filterNot { it.password.isNullOrBlank() }
         }
     }
 
-    private fun handleUnknownRequestMainType(request: AutofillDataRequest, url: String) {
+    private fun handleUnknownRequestMainType(
+        request: AutofillDataRequest,
+        url: String
+    ) {
         Timber.w("Autofill type %s unsupported", request.mainType)
         callback?.noCredentialsAvailable(url)
     }
 
-    override suspend fun getRuntimeConfiguration(rawJs: String, url: String?): String {
+    override suspend fun getRuntimeConfiguration(
+        rawJs: String,
+        url: String?
+    ): String {
         Timber.v("BrowserAutofill: getRuntimeConfiguration called")
 
         val contentScope = autofillResponseWriter.generateContentScope()
@@ -145,7 +156,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()
 
     // in the future, we'll also tie this into feature toggles and remote config
-    private fun determineIfAutofillEnabled(): Boolean = autofillStore.autofillEnabled
+    private fun determineIfAutofillEnabled(): Boolean = autofillStore.autofillEnabled && deviceAuthenticator.hasValidDeviceAuthentication()
 
     private suspend fun determineIfCredentialsAvailable(url: String?): Boolean {
         return if (url == null) {
@@ -216,5 +227,4 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
             }
         }
     }
-
 }

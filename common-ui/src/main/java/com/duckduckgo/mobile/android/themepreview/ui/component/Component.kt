@@ -38,5 +38,6 @@ enum class Component {
     SEARCH_BAR,
     MENU_ITEM,
     SINGLE_LINE_LIST_ITEM,
-    TWO_LINE_LIST_ITEM
+    TWO_LINE_LIST_ITEM,
+    SECTION_DIVIDER
 }

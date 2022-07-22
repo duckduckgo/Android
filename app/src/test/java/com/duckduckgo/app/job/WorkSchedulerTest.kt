@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.job
 
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import org.mockito.kotlin.mock
@@ -37,6 +38,7 @@ class WorkSchedulerTest {
     private val jobCleaner: JobCleaner = mock()
 
     private lateinit var testee: AndroidWorkScheduler
+    private val mockOwner: LifecycleOwner = mock()
 
     @Before
     fun before() {
@@ -45,7 +47,7 @@ class WorkSchedulerTest {
 
     @Test
     fun schedulesNextNotificationAndCleansDeprecatedJobs() = runTest {
-        testee.scheduleWork()
+        testee.onResume(mockOwner)
 
         verify(notificationScheduler).scheduleNextNotification()
         verify(jobCleaner).cleanDeprecatedJobs()

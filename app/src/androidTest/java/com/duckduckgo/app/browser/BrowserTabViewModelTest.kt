@@ -47,6 +47,8 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.CancelIncomingAutofillRequest
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.InjectCredentials
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
@@ -118,6 +120,7 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.FileDownloader
@@ -4105,6 +4108,61 @@ class BrowserTabViewModelTest {
         buildNavigationHistoryStack(stackSize = 20)
         testee.onUserLongPressedBack()
         assertShowHistoryCommandSent(expectedStackSize = 10)
+    }
+
+    @Test
+    fun whenShareCredentialsWithPageThenEmitInjectCredentialsCommand() = runTest {
+        val url = "originalurl.com"
+        val credentials = LoginCredentials(
+            id = 1,
+            domain = url,
+            username = "tester",
+            password = "test123"
+        )
+        testee.shareCredentialsWithPage(url, credentials)
+
+        assertCommandIssued<Command.InjectCredentials> {
+            assertEquals(url, this.url)
+            assertEquals(credentials, this.credentials)
+        }
+    }
+
+    @Test
+    fun whenReturnNoCredentialsWithPageThenEmitCancelIncomingAutofillRequestCommand() = runTest {
+        val url = "originalurl.com"
+        testee.returnNoCredentialsWithPage(url)
+
+        assertCommandIssued<Command.CancelIncomingAutofillRequest> {
+            assertEquals(url, this.url)
+        }
+    }
+
+    @Test
+    fun whenSaveCredentialsThenSaveCredentialsInAutofillStore() = runTest {
+        val url = "originalurl.com"
+        val credentials = LoginCredentials(
+            id = 1,
+            domain = url,
+            username = "tester",
+            password = "test123"
+        )
+        testee.saveCredentials(url, credentials)
+
+        verify(mockAutofillStore).saveCredentials(url, credentials)
+    }
+
+    @Test
+    fun whenUpdateCredentialsThenUpdateCredentialsInAutofillStore() = runTest {
+        val url = "originalurl.com"
+        val credentials = LoginCredentials(
+            id = 1,
+            domain = url,
+            username = "tester",
+            password = "test123"
+        )
+        testee.updateCredentials(url, credentials)
+
+        verify(mockAutofillStore).updateCredentials(url, credentials)
     }
 
     private fun assertShowHistoryCommandSent(expectedStackSize: Int) {

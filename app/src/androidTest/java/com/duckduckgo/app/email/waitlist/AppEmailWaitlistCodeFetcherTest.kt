@@ -17,6 +17,7 @@
 package com.duckduckgo.app.email.waitlist
 
 import android.util.Log
+import androidx.lifecycle.LifecycleOwner
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.Configuration
 import androidx.work.OneTimeWorkRequestBuilder
@@ -56,6 +57,7 @@ class AppEmailWaitlistCodeFetcherTest {
     private val mockEmailManager: EmailManager = mock()
     private val mockNotification: SchedulableNotification = mock()
     private val mockNotificationSender: NotificationSender = mock()
+    private val mockOwner: LifecycleOwner = mock()
 
     private lateinit var workManager: WorkManager
     private lateinit var testee: EmailWaitlistCodeFetcher
@@ -118,7 +120,7 @@ class AppEmailWaitlistCodeFetcherTest {
     fun whenExecuteWaitlistCodeFetcherIfUserInNotInQueueThenDoNothing() = runTest {
         whenever(mockEmailManager.waitlistState()).thenReturn(EmailManager.WaitlistState.NotJoinedQueue)
 
-        (testee as AppEmailWaitlistCodeFetcher).executeWaitlistCodeFetcher()
+        (testee as AppEmailWaitlistCodeFetcher).onStart(mockOwner)
 
         verify(mockEmailManager, never()).fetchInviteCode()
     }
@@ -127,7 +129,7 @@ class AppEmailWaitlistCodeFetcherTest {
     fun whenExecuteWaitlistCodeFetcherIfUserIsInBetaThenDoNothing() = runTest {
         whenever(mockEmailManager.waitlistState()).thenReturn(EmailManager.WaitlistState.InBeta)
 
-        (testee as AppEmailWaitlistCodeFetcher).executeWaitlistCodeFetcher()
+        (testee as AppEmailWaitlistCodeFetcher).onStart(mockOwner)
 
         verify(mockEmailManager, never()).fetchInviteCode()
     }

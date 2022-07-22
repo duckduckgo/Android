@@ -16,8 +16,8 @@
 
 package com.duckduckgo.autofill.ui.credential.management
 
-import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command
@@ -26,19 +26,21 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.robolectric.RobolectricTestRunner
 import kotlin.reflect.KClass
 
-@RunWith(RobolectricTestRunner::class)
 @ExperimentalCoroutinesApi
 class AutofillSettingsViewModelTest {
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val mockStore: AutofillStore = mock()
-    private val testee = AutofillSettingsViewModel(InstrumentationRegistry.getInstrumentation().targetContext, mockStore)
+    private val clipboardInteractor: AutofillClipboardInteractor = mock()
+    private val testee = AutofillSettingsViewModel(mockStore, clipboardInteractor)
 
     @Test
     fun whenUserEnablesAutofillThenViewStateUpdatedToReflectChange() = runTest {
@@ -59,6 +61,8 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenUserCopiesPasswordThenCommandIssuedToShowChange() = runTest {
         testee.onCopyPassword("hello")
+
+        verify(clipboardInteractor).copyToClipboard("hello")
         testee.commands.test {
             awaitItem().first().assertCommandType(ShowUserPasswordCopied::class)
         }
@@ -67,6 +71,8 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenUserCopiesUsernameThenCommandIssuedToShowChange() = runTest {
         testee.onCopyUsername("username")
+
+        verify(clipboardInteractor).copyToClipboard("username")
         testee.commands.test {
             awaitItem().first().assertCommandType(ShowUserUsernameCopied::class)
         }

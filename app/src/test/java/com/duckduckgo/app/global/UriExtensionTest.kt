@@ -255,4 +255,20 @@ class UriExtensionTest {
         assertEquals("www.foo.com/path/to/foo?key=value", "https://www.foo.com/path/to/foo?key=value".toUri().toStringDropScheme())
         assertEquals("www.foo.com/path/to/foo?key=value", "http://www.foo.com/path/to/foo?key=value".toUri().toStringDropScheme())
     }
+
+    @Test
+    fun whenUriExtractSchemeAndDomainThenReturnOnlySchemeAndDomain() {
+        assertEquals("https://www.foo.com", "https://www.foo.com/path/to/foo?key=value".extractSchemeAndDomain())
+        assertEquals("https://www.foo.com", "www.foo.com/path/to/foo?key=value".extractSchemeAndDomain())
+        assertEquals("https://foo.com", "foo.com/path/to/foo?key=value".extractSchemeAndDomain())
+        assertEquals("http://foo.com", "http://foo.com/path/to/foo?key=value".extractSchemeAndDomain())
+    }
+
+    @Test
+    fun whenUriExtractDomainThenReturnDomainOnly() {
+        assertEquals("www.foo.com", "https://www.foo.com/path/to/foo?key=value".extractDomain())
+        assertEquals("www.foo.com", "www.foo.com/path/to/foo?key=value".extractDomain())
+        assertEquals("foo.com", "foo.com/path/to/foo?key=value".extractDomain())
+        assertEquals("foo.com", "http://foo.com/path/to/foo?key=value".extractDomain())
+    }
 }

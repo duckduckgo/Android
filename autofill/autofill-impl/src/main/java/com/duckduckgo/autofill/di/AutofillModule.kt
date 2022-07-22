@@ -17,12 +17,17 @@
 package com.duckduckgo.autofill.di
 
 import android.content.Context
+import com.duckduckgo.autofill.InternalTestUserChecker
+import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.store.InternalTestUserStore
 import com.duckduckgo.autofill.store.RealInternalTestUserStore
+import com.duckduckgo.autofill.store.SecureStoreBackedAutofillStore
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.securestorage.api.SecureStorage
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
@@ -30,4 +35,14 @@ class AutofillModule {
 
     @Provides
     fun provideInternalTestUserStore(applicationContext: Context): InternalTestUserStore = RealInternalTestUserStore(applicationContext)
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun autofillStore(
+        secureStorage: SecureStorage,
+        context: Context,
+        internalTestUserChecker: InternalTestUserChecker
+    ): AutofillStore {
+        return SecureStoreBackedAutofillStore(secureStorage, context, internalTestUserChecker)
+    }
 }

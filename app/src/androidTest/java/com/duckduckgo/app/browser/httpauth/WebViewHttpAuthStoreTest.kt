@@ -18,21 +18,26 @@ package com.duckduckgo.app.browser.httpauth
 
 import android.webkit.WebView
 import android.webkit.WebViewDatabase
+import androidx.lifecycle.LifecycleOwner
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.WebViewDatabaseProvider
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.fire.AuthDatabaseLocator
 import com.duckduckgo.app.fire.DatabaseCleaner
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class WebViewHttpAuthStoreTest {
@@ -47,6 +52,7 @@ class WebViewHttpAuthStoreTest {
     private val webView: WebView = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val databaseLocator = AuthDatabaseLocator(context)
+    private val mockOwner: LifecycleOwner = mock()
 
     private val webViewHttpAuthStore =
         RealWebViewHttpAuthStore(
@@ -129,7 +135,7 @@ class WebViewHttpAuthStoreTest {
     fun whenAppCreatedAndApiBetween21And27ThenJournalModeChangedToDelete() = runTest {
         for (i in android.os.Build.VERSION_CODES.LOLLIPOP..android.os.Build.VERSION_CODES.O_MR1) {
             whenever(appBuildConfig.sdkInt).thenReturn(i)
-            webViewHttpAuthStore.onAppCreated()
+            webViewHttpAuthStore.onCreate(mockOwner)
         }
         val times = (android.os.Build.VERSION_CODES.LOLLIPOP..android.os.Build.VERSION_CODES.O_MR1).toList().size
         verify(mockDatabaseCleaner, times(times)).changeJournalModeToDelete(databaseLocator.getDatabasePath())
@@ -140,7 +146,7 @@ class WebViewHttpAuthStoreTest {
     fun whenAppCreatedAndApiGreaterThan28ThenJournalModeChangedToDelete() = runTest {
         for (i in android.os.Build.VERSION_CODES.R..android.os.Build.VERSION_CODES.S) {
             whenever(appBuildConfig.sdkInt).thenReturn(i)
-            webViewHttpAuthStore.onAppCreated()
+            webViewHttpAuthStore.onCreate(mockOwner)
         }
         val times = (android.os.Build.VERSION_CODES.R..android.os.Build.VERSION_CODES.S).toList().size
         verify(mockDatabaseCleaner, times(times)).changeJournalModeToDelete(databaseLocator.getDatabasePath())
@@ -149,7 +155,7 @@ class WebViewHttpAuthStoreTest {
     @Test
     fun whenAppCreatedAndApiIs28ThenJournalModeChangedToDeleteNotCalled() = runTest {
         whenever(appBuildConfig.sdkInt).thenReturn(android.os.Build.VERSION_CODES.P)
-        webViewHttpAuthStore.onAppCreated()
+        webViewHttpAuthStore.onCreate(mockOwner)
         verify(mockDatabaseCleaner, never()).changeJournalModeToDelete(databaseLocator.getDatabasePath())
     }
 }
