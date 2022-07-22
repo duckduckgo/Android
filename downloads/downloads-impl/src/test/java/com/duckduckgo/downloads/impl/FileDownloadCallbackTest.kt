@@ -33,7 +33,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -83,7 +82,6 @@ class FileDownloadCallbackTest {
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadStartedMessage)
-            assertTrue(actualItem.showNotification)
             assertEquals(R.string.downloadsDownloadStartedMessage, actualItem.messageId)
             assertEquals(item.fileName, (actualItem as ShowDownloadStartedMessage).fileName)
         }
@@ -108,7 +106,6 @@ class FileDownloadCallbackTest {
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadSuccessMessage)
-            assertFalse(actualItem.showNotification)
             assertEquals(R.string.downloadsDownloadFinishedMessage, actualItem.messageId)
             assertEquals(item.fileName, (actualItem as ShowDownloadSuccessMessage).fileName)
             assertEquals(item.filePath, actualItem.filePath)
@@ -133,7 +130,6 @@ class FileDownloadCallbackTest {
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadSuccessMessage)
-            assertTrue(actualItem.showNotification)
             assertEquals(R.string.downloadsDownloadFinishedMessage, actualItem.messageId)
             assertEquals(item.fileName, (actualItem as ShowDownloadSuccessMessage).fileName)
             assertEquals(item.filePath, actualItem.filePath)
@@ -188,7 +184,6 @@ class FileDownloadCallbackTest {
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadFailedMessage)
-            assertTrue(actualItem.showNotification)
             assertEquals(R.string.downloadsErrorMessage, actualItem.messageId)
         }
     }
@@ -202,7 +197,6 @@ class FileDownloadCallbackTest {
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadFailedMessage)
-            assertTrue(actualItem.showNotification)
             assertEquals(R.string.downloadsDownloadGenericErrorMessage, actualItem.messageId)
         }
     }

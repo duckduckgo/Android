@@ -27,8 +27,10 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.*
+import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -49,6 +51,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     private val downloadsRepository: DownloadsRepository,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixel: Pixel,
 ) : BroadcastReceiver(), DefaultLifecycleObserver {
 
     // TODO use the UA provider
@@ -82,11 +85,15 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
 
         if (isCancelIntent(intent)) {
             Timber.v("Received cancel download intent for download id $downloadId")
+            pixel.fire(DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED_BY_USER)
+
             coroutineScope.launch(dispatcherProvider.io()) {
                 downloadsRepository.delete(downloadId)
             }
         } else if (isRetryIntent(intent)) {
             Timber.v("Received retry download intent for download id $downloadId")
+            pixel.fire(DownloadsPixelName.DOWNLOAD_REQUEST_RETRIED)
+
             val url = extractUrlFromRetryIntent(intent) ?: return
             FileDownloader.PendingFileDownload(
                 url = url,
