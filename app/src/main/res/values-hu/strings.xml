@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">A weboldal adatvédelme</string>
     <string name="privacyProtectionEnabled">WEBOLDAL VÉDELME ENGEDÉLYEZVE</string>
     <string name="privacyProtectionDisabled">WEBOLDAL VÉDELME LETILTVA</string>
-    <string name="privacyDashboardActivityTitle">Adatvédelmi műszerfal</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TOVÁBBFEJLESZTETT ETTŐL: &lt;img src=\"%1$d\" /&gt; EDDIG: &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Adatvédelmi fokozat</string>
     <string name="privacyProtectionTemporarilyDisabled">Ideiglenesen letiltottuk az adatvédelmet, mert úgy tűnik, hogy kárt okoz ezen a webhelyen.</string>

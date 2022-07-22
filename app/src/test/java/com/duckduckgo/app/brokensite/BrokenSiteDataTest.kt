@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*

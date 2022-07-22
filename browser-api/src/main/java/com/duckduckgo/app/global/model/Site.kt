@@ -71,7 +71,8 @@ interface Site {
     var urlParametersRemoved: Boolean
 }
 
-fun Site.orderedTrackingEntities(): List<Entity> = trackingEvents
+fun Site.orderedTrackerBlockedEntities(): List<Entity> = trackingEvents
+    .filter { it.blocked }
     .mapNotNull { it.entity }
     .filter { it.displayName.isNotBlank() }
     .sortedByDescending { it.prevalence }

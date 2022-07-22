@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Datenschutz der Website</string>
     <string name="privacyProtectionEnabled">WEBSITE-SCHUTZ AKTIVIERT</string>
     <string name="privacyProtectionDisabled">WEBSITE-SCHUTZ DEAKTIVIERT</string>
-    <string name="privacyDashboardActivityTitle">Privatsphäre-Dashboard</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VERBESSERT VON &lt;img src=\"%1$d\" /&gt; AUF &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Datenschutzstufe</string>
     <string name="privacyProtectionTemporarilyDisabled">Wir haben den Datenschutz vorübergehend deaktiviert, da die Seite derzeit dadurch gestört wird.</string>

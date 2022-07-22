@@ -21,7 +21,7 @@ import android.net.Uri
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.model.orderedTrackingEntities
+import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -317,7 +317,9 @@ class CtaTest {
         val site = site(events = trackers)
 
         val testee =
-            DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, site.orderedTrackingEntities(), "http://www.trackers.com")
+            DaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore, mockAppInstallStore, site.orderedTrackerBlockedEntities(), "http://www.trackers.com"
+            )
         val value = testee.getDaxText(mockActivity)
 
         assertEquals("<b>Other, Facebook</b>withZero", value)
@@ -338,8 +340,9 @@ class CtaTest {
         )
         val site = site(events = trackers)
 
-        val testee =
-            DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, site.orderedTrackingEntities(), "http://www.trackers.com")
+        val testee = DaxDialogCta.DaxTrackersBlockedCta(
+            mockOnboardingStore, mockAppInstallStore, site.orderedTrackerBlockedEntities(), "http://www.trackers.com"
+        )
         val value = testee.getDaxText(mockActivity)
 
         assertEquals("<b>Facebook</b>withZero", value)

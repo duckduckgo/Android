@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Προστασία της ιδιωτικότητας του ιστότοπου</string>
     <string name="privacyProtectionEnabled">ΕΝΕΡΓΟΠΟΙΗΣΗ ΤΗΣ ΠΡΟΣΤΑΣΙΑΣ ΤΟΥ ΙΣΤΟΤΟΠΟΥ</string>
     <string name="privacyProtectionDisabled">ΑΠΕΝΕΡΓΟΠΟΊΗΣΗ ΤΗΣ ΠΡΟΣΤΑΣΙΑΣ ΤΟΥ ΙΣΤΟΤΟΠΟΥ</string>
-    <string name="privacyDashboardActivityTitle">Πίνακας εργαλείων ιδιωτικότητας</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ΒΕΛΤΙΩΘΗΚΕ ΑΠΟ &lt;img src=\"%1$d\" /&gt; ΣΕ &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Βαθμολογία ιδιωτικότητας</string>
     <string name="privacyProtectionTemporarilyDisabled">Απενεργοποιήσαμε προσωρινά την Προστασία προσωπικών δεδομένων καθώς φαίνεται ότι ρίχνει τον ιστότοπο.</string>

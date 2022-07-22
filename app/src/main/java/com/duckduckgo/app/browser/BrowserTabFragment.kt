@@ -66,7 +66,6 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
-import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -99,7 +98,7 @@ import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
-import com.duckduckgo.app.global.model.orderedTrackingEntities
+import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.DaxDialog
 import com.duckduckgo.app.global.view.DaxDialogListener
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
@@ -193,6 +192,7 @@ import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.Compani
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.autofill.ui.ExistingCredentialMatchDetector
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -2546,7 +2546,7 @@ class BrowserTabFragment :
                 }
                 if (lastSeenOmnibarViewState?.isEditing != true) {
                     val site = viewModel.siteLiveData.value
-                    val events = site?.orderedTrackingEntities()
+                    val events = site?.orderedTrackerBlockedEntities()
 
                     // workaround for: https://app.asana.com/0/0/1202537960603388/f
                     val trackersAnimation = trackerAnimationContainer.findViewById<LottieAnimationView>(R.id.trackersAnimation)

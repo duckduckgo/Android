@@ -35,6 +35,8 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.lifecycle.viewModelKtx
 
+    implementation AndroidX.webkit
+
     // Android KTX
     implementation AndroidX.core.ktx
 

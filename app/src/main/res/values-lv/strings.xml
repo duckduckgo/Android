@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Vietnes privātuma aizsardzība</string>
     <string name="privacyProtectionEnabled">VIETNES AIZSARDZĪBA IR IESPĒJOTA</string>
     <string name="privacyProtectionDisabled">VIETAS AIZSARDZĪBA IR ATSPĒJOTA</string>
-    <string name="privacyDashboardActivityTitle">Privātuma informācijas panelis</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">UZLABOTS NO &lt;img src=\"%1$d\" /&gt; UZ &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privātuma līmenis</string>
     <string name="privacyProtectionTemporarilyDisabled">Mēs īslaicīgi atspējojām privātuma aizsardzību, jo šķiet, ka tā traucē šīs vietnes darbību.</string>

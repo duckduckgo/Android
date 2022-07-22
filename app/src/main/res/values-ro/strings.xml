@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Protecția confidențialității site-ului</string>
     <string name="privacyProtectionEnabled">PROTECȚIE SITE ACTIVATĂ</string>
     <string name="privacyProtectionDisabled">PROTECȚIE SITE DEZACTIVATĂ</string>
-    <string name="privacyDashboardActivityTitle">Tabloul de bord privind confidențialitatea</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MĂRIT DE LA &lt;img src=\"%1$d\" /&gt; LA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Grad de confidențialitate</string>
     <string name="privacyProtectionTemporarilyDisabled">Am dezactivat temporar protecția confidențialității, deoarece pare să strice acest site.</string>

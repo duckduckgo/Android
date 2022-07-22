@@ -111,7 +111,7 @@
     <string name="privacyProtectionToggle">Site Privacy Protection</string>
     <string name="privacyProtectionEnabled">SITE PROTECTION ENABLED</string>
     <string name="privacyProtectionDisabled">SITE PROTECTION DISABLED</string>
-    <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
+
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
     <string name="privacyGradeContentDescription">Privacy Grade</string>
     <string name="privacyProtectionTemporarilyDisabled">We temporarily disabled Privacy Protection as it appears to be breaking this site.</string>

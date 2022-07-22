@@ -112,7 +112,6 @@
     <string name="privacyProtectionToggle">Защита конфиденциальности сайта</string>
     <string name="privacyProtectionEnabled">ЗАЩИТА САЙТА ВКЛЮЧЕНА</string>
     <string name="privacyProtectionDisabled">ЗАЩИТА САЙТА ОТКЛЮЧЕНА</string>
-    <string name="privacyDashboardActivityTitle">Панель конфиденциальности</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">УРОВЕНЬ КОНФИДЕНЦИАЛЬНОСТИ ПОВЫШЕН С &lt;img src=\"%1$d\" /&gt; ДО &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Рейтинг конфиденциальности</string>
     <string name="privacyProtectionTemporarilyDisabled">Мы временно отключили функцию защиты конфиденциальности, так как она мешала работе сайта.</string>
