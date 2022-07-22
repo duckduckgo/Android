@@ -16,13 +16,12 @@
 
 package com.duckduckgo.app.waitlist.email
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.WorkManager
 import com.duckduckgo.app.email.EmailManager
-import com.duckduckgo.app.email.EmailManager.FetchCodeResult.CodeExisted
 import com.duckduckgo.app.email.EmailManager.FetchCodeResult.Code
+import com.duckduckgo.app.email.EmailManager.FetchCodeResult.CodeExisted
 import com.duckduckgo.app.email.EmailManager.FetchCodeResult.NoCode
 import com.duckduckgo.app.email.EmailManager.WaitlistState
 import com.duckduckgo.app.global.DispatcherProvider
@@ -32,7 +31,7 @@ import com.duckduckgo.app.waitlist.email.EmailWaitlistWorkRequestBuilder.Compani
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-interface EmailWaitlistCodeFetcher : LifecycleObserver {
+interface EmailWaitlistCodeFetcher : DefaultLifecycleObserver {
     suspend fun fetchInviteCode()
 }
 
@@ -45,8 +44,7 @@ class AppEmailWaitlistCodeFetcher(
     private val appCoroutineScope: CoroutineScope
 ) : EmailWaitlistCodeFetcher {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun executeWaitlistCodeFetcher() {
+    override fun onStart(owner: LifecycleOwner) {
         appCoroutineScope.launch {
             if (emailManager.waitlistState() is WaitlistState.JoinedQueue) {
                 fetchInviteCode()

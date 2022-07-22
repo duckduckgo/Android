@@ -532,9 +532,8 @@ class BrowserTabFragment :
             viewModel.onViewRecreated()
         }
 
-        lifecycle.addObserver(object : LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-            fun onStop() {
+        lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStop(owner: LifecycleOwner) {
                 if (isVisible) {
                     updateOrDeleteWebViewPreview()
                 }
