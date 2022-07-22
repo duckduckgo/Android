@@ -116,7 +116,7 @@ class OutLinedTextInputView @JvmOverloads constructor(
     private fun setupPasswordMode() {
         binding.internalPasswordIcon.visibility = VISIBLE
         binding.internalEditText.inputType = EditorInfo.TYPE_TEXT_VARIATION_PASSWORD or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
-        // This has to be set before the transformationMethod. Else, it will force thas password to be visible.
+        // This has to be set before the transformationMethod. Else, it will force the password to be visible.
         binding.internalEditText.isSingleLine = false
         binding.internalEditText.transformationMethod = transformationMethod
         // We are using the suffix text to make space for the password icon. We can't modify the suffix textview enough to be able to use it

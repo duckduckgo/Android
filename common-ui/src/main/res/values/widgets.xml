@@ -16,9 +16,9 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Widget" />
+    <style name="Widget"/>
 
-    <style name="Widget.DuckDuckGo" />
+    <style name="Widget.DuckDuckGo"/>
 
     <!-- Toolbar -->
     <style name="Widget.DuckDuckGo.ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -64,7 +64,7 @@
         <item name="android:background">?selectableItemBackground</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.ListItem" />
+    <style name="Widget.DuckDuckGo.ListItem"/>
 
     <style name="Widget.DuckDuckGo.ListItem.Description" parent="TextAppearance.DuckDuckGo.Body2">
         <item name="android:lineSpacingExtra">4sp</item>
@@ -173,8 +173,7 @@
         <item name="android:paddingBottom">14dp</item>
         <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
         <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
-        <item name="android:textAppearance">@style/Widget.DuckDuckGo.SectionHeader.TextAppearance
-        </item>
+        <item name="android:textAppearance">@style/Widget.DuckDuckGo.SectionHeader.TextAppearance</item>
     </style>
 
     <style name="Widget.DuckDuckGo.SectionHeader.TextAppearance" parent="TextAppearance.DuckDuckGo.Body2">
@@ -214,8 +213,7 @@
 
     <style name="Widget.DuckDuckGo.Button.Secondary">
         <item name="android:textColor">@color/cornflowerBlue</item>
-        <item name="android:background">@drawable/background_transparent_button_rounded_corners
-        </item>
+        <item name="android:background">@drawable/background_transparent_button_rounded_corners</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Borderless">
@@ -264,8 +262,7 @@
     </style>
 
     <!-- Dialogs -->
-    <style name="Widget.DuckDuckGo.Dialog" />
-
+    <style name="Widget.DuckDuckGo.Dialog"/>
     <style name="Widget.DuckDuckGo.Dialog.Title">
         <item name="android:textAppearance">@style/TextAppearance.DuckDuckGo.Headline2</item>
         <item name="android:fontFamily">sans-serif-medium</item>
