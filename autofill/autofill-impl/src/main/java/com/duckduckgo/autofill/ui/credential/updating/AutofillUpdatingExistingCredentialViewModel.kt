@@ -26,12 +26,7 @@ import javax.inject.Inject
 class AutofillUpdatingExistingCredentialViewModel @Inject constructor() : ViewModel() {
 
     fun convertPasswordToMaskedView(credentials: LoginCredentials): String {
-        val sb = StringBuilder()
-        val passwordLength = credentials.password?.length ?: 0
-        for (i in 0 until passwordLength) {
-            sb.append("•")
-        }
-        return sb.toString()
+        return credentials.password?.toCharArray()?.joinToString(separator = "") { "•" } ?: ""
     }
 
 }
