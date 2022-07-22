@@ -97,12 +97,9 @@ class FileDownloadCallback @Inject constructor(
         pixel.fire(DownloadsPixelName.DOWNLOAD_REQUEST_STARTED)
         val downloadStartedMessage = DownloadCommand.ShowDownloadStartedMessage(
             messageId = R.string.downloadsDownloadStartedMessage,
-            showNotification = true,
             fileName = downloadItem.fileName
         )
-        if (downloadStartedMessage.showNotification) {
-            fileDownloadNotificationManager.showDownloadInProgressNotification(downloadItem.downloadId, downloadItem.fileName)
-        }
+        fileDownloadNotificationManager.showDownloadInProgressNotification(downloadItem.downloadId, downloadItem.fileName)
         appCoroutineScope.launch(dispatchers.io()) {
             command.send(downloadStartedMessage)
             downloadsRepository.insert(downloadItem)
@@ -127,7 +124,6 @@ class FileDownloadCallback @Inject constructor(
                 command.send(
                     DownloadCommand.ShowDownloadSuccessMessage(
                         messageId = R.string.downloadsDownloadFinishedMessage,
-                        showNotification = false,
                         fileName = it.fileName,
                         filePath = it.filePath
                     )
@@ -149,7 +145,6 @@ class FileDownloadCallback @Inject constructor(
             command.send(
                 DownloadCommand.ShowDownloadSuccessMessage(
                     messageId = R.string.downloadsDownloadFinishedMessage,
-                    showNotification = true,
                     fileName = file.name,
                     filePath = file.absolutePath,
                     mimeType = mimeType
@@ -160,6 +155,7 @@ class FileDownloadCallback @Inject constructor(
 
     override fun onError(url: String?, downloadId: Long?, reason: DownloadFailReason) {
         Timber.d("Failed to download file with url $url (id = $downloadId) and reason $reason.")
+        pixel.fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
         handleFailedDownload(downloadId = downloadId ?: 0, url = url, reason = reason)
         downloadId?.let {
             appCoroutineScope.launch(dispatchers.io()) {
@@ -191,20 +187,12 @@ class FileDownloadCallback @Inject constructor(
     }
 
     private fun handleFailedDownload(downloadId: Long, url: String?, reason: DownloadFailReason) {
-        pixel.fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
         val messageId = when (reason) {
             ConnectionRefused -> R.string.downloadsErrorMessage
             Other, UnsupportedUrlType, DataUriParseException -> R.string.downloadsDownloadGenericErrorMessage
         }
-        val downloadFailedMessage = DownloadCommand.ShowDownloadFailedMessage(
-            messageId = messageId,
-            showNotification = true,
-        )
-        if (downloadFailedMessage.showNotification) {
-            fileDownloadNotificationManager.showDownloadFailedNotification(downloadId, url)
-        } else {
-            fileDownloadNotificationManager.cancelDownloadFileNotification(downloadId)
-        }
+        val downloadFailedMessage = DownloadCommand.ShowDownloadFailedMessage(messageId = messageId,)
+        fileDownloadNotificationManager.showDownloadFailedNotification(downloadId, url)
         appCoroutineScope.launch(dispatchers.io()) {
             command.send(downloadFailedMessage)
         }
