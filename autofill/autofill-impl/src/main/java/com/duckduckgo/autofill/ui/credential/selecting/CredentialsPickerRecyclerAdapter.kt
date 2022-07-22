@@ -59,34 +59,33 @@ class CredentialsPickerRecyclerAdapter(
         val buttonType = buttonTypeDecider.determineButtonType(position, fullCredentialListSize, showExpandedView)
 
         val button = when (buttonType) {
-            is UseCredentialPrimaryButton -> primaryButton.useCredentialButton.also {
+            is UseCredentialPrimaryButton -> useCredentialPrimaryButton.also {
                 it.text = credentials.username
                 it.setOnClickListener { onCredentialSelected(credentials) }
             }
-            is UseCredentialSecondaryButton -> secondaryButton.useCredentialButton.also {
+            is UseCredentialSecondaryButton -> useCredentialSecondaryButton.also {
                 it.text = credentials.username
                 it.setOnClickListener { onCredentialSelected(credentials) }
             }
-            is ShowMoreButton -> optionsButton.moreOptionsButton.also {
+            is ShowMoreButton -> moreOptionsButton.also {
                 it.setOnClickListener {
                     showExpandedView = true
                     notifyDataSetChanged()
                 }
             }
-            else -> null
         }
 
         with(button) {
-            this?.show()
+            this.show()
             hideOtherCallToActions(this)
         }
     }
 
     private fun ItemRowAutofillCredentialsPickerBinding.hideOtherCallToActions(buttonToKeep: Button?) {
         val hideableButtons = mutableListOf(
-            primaryButton.useCredentialButton,
-            secondaryButton.useCredentialButton,
-            optionsButton.moreOptionsButton
+            useCredentialPrimaryButton,
+            useCredentialSecondaryButton,
+            moreOptionsButton
         )
 
         hideableButtons
