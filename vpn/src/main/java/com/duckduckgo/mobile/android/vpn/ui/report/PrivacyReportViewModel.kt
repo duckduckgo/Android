@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.ui.report
 
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
@@ -42,7 +41,7 @@ class PrivacyReportViewModel @Inject constructor(
     private val vpnFeatureRemover: VpnFeatureRemover,
     vpnStateMonitor: VpnStateMonitor,
     private val dispatchers: DispatcherProvider
-) : ViewModel(), LifecycleObserver {
+) : ViewModel() {
 
     val viewStateFlow = vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN).combine(getReport()) { vpnState, trackersBlocked ->
         PrivacyReportView.ViewState(vpnState, trackersBlocked, shouldShowCTA())
