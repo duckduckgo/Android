@@ -29,14 +29,6 @@ class PrivacyDashboardJavascriptInterface constructor(
     }
 
     @JavascriptInterface
-    fun updatePermission(message: String) {
-    }
-
-    @JavascriptInterface
-    fun firePixel(message: String) {
-    }
-
-    @JavascriptInterface
     fun close() {
         onClose()
     }

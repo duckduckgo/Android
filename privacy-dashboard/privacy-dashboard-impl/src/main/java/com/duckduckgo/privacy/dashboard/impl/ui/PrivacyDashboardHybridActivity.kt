@@ -44,7 +44,6 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -76,7 +75,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 holder = webView,
                 onPrivacyProtectionSettingChanged = { userChangedValues -> updateActivityResult(userChangedValues) },
                 onPrivacyProtectionsClicked = { newValue ->
-                    Timber.i("PrivacyDashboard onPrivacyProtectionsClicked lambda $newValue")
                     viewModel.onPrivacyProtectionsClicked(newValue)
                 },
                 onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },

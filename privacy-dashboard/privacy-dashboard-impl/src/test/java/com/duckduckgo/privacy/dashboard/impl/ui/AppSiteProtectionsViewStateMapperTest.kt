@@ -27,17 +27,17 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.dashboard.impl.ui.AppSiteProtectionsViewStateMapperTest.EntityMO.MAJOR_ENTITY_A
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class AppSiteProtectionsViewStateMapperTest {
 
-    private val androidQAppBuildConfig = com.nhaarman.mockitokotlin2.mock<AppBuildConfig>().apply {
-        com.nhaarman.mockitokotlin2.whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)
+    private val androidQAppBuildConfig = mock<AppBuildConfig>().apply {
+        whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)
     }
 
     val testee = AppSiteProtectionsViewStateMapper(PublicKeyInfoMapper(androidQAppBuildConfig))
