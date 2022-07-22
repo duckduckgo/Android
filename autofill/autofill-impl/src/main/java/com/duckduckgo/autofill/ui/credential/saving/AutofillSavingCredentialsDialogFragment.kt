@@ -23,15 +23,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.autofill.CredentialSavePickerDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSaveNewCredentialsBinding
-import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.credential.dialog.animateClosed
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -50,7 +51,11 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     lateinit var faviconManager: FaviconManager
 
     @Inject
-    lateinit var autofillStore: AutofillStore
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
+    private val viewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[AutofillSavingCredentialsViewModel::class.java]
+    }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -66,7 +71,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     private fun configureViews(binding: ContentAutofillSaveNewCredentialsBinding) {
         configureSiteDetails(binding)
         configureTitles(binding)
-        configureCloseButton(binding)
+        configureCloseButtons(binding)
         configureSaveButton(binding)
     }
 
@@ -81,7 +86,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         }
     }
 
-    private fun configureCloseButton(binding: ContentAutofillSaveNewCredentialsBinding) {
+    private fun configureCloseButtons(binding: ContentAutofillSaveNewCredentialsBinding) {
         binding.closeButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
         binding.cancelButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
     }
@@ -108,7 +113,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private fun getOriginalUrl() = arguments?.getString(CredentialSavePickerDialog.KEY_URL)!!
 
-    private fun showOnboarding() = autofillStore.showOnboardingWhenOfferingToSaveLogin
+    private fun showOnboarding() = viewModel.showOnboarding()
 
     override fun asDialogFragment(): DialogFragment = this
 

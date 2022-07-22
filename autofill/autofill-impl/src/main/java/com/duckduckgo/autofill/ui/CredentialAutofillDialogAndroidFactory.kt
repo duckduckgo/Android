@@ -22,7 +22,7 @@ import com.duckduckgo.autofill.CredentialSavePickerDialog
 import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment
-import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingUpdatingExistingCredentialsDialogFragment
+import com.duckduckgo.autofill.ui.credential.updating.AutofillUpdatingExistingCredentialsDialogFragment
 import com.duckduckgo.autofill.ui.credential.selecting.AutofillSelectCredentialsDialogFragment
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -40,6 +40,6 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
     }
 
     override fun autofillSavingUpdateCredentialsDialog(url: String, credentials: LoginCredentials): CredentialUpdateExistingCredentialsDialog {
-        return AutofillSavingUpdatingExistingCredentialsDialogFragment.instance(url, credentials)
+        return AutofillUpdatingExistingCredentialsDialogFragment.instance(url, credentials)
     }
 }

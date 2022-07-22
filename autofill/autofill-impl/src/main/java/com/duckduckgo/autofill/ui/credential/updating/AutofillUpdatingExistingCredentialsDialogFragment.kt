@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.ui.credential.saving
+package com.duckduckgo.autofill.ui.credential.updating
 
 import android.content.Context
 import android.os.Bundle
@@ -23,9 +23,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
@@ -40,12 +42,19 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class AutofillSavingUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialUpdateExistingCredentialsDialog {
+class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialUpdateExistingCredentialsDialog {
 
     override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
+    private val viewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[AutofillUpdatingExistingCredentialViewModel::class.java]
+    }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -63,12 +72,9 @@ class AutofillSavingUpdatingExistingCredentialsDialogFragment : BottomSheetDialo
         val originalUrl = getOriginalUrl()
 
         configureSiteDetails(binding, originalUrl)
-        configureCloseButton(binding)
+        configureCloseButtons(binding)
         configurePasswordOutline(binding, credentials)
 
-        binding.cancelButton.setOnClickListener {
-            (dialog as BottomSheetDialog).animateClosed()
-        }
         binding.updatePasswordButton.setOnClickListener {
             val result = Bundle().also {
                 it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, originalUrl)
@@ -80,16 +86,15 @@ class AutofillSavingUpdatingExistingCredentialsDialogFragment : BottomSheetDialo
     }
 
     private fun configurePasswordOutline(binding: ContentAutofillUpdateExistingCredentialsBinding, credentials: LoginCredentials) {
-        val sb = StringBuilder()
-        val passwordLength = credentials.password?.length ?: 0
-        for (i in 0 until passwordLength) {
-            sb.append("•")
-        }
-        binding.passwordOutline.text = sb.toString()
+        val maskedPassword = viewModel.convertPasswordToMaskedView(credentials)
+        binding.passwordOutline.text = maskedPassword
     }
 
-    private fun configureCloseButton(binding: ContentAutofillUpdateExistingCredentialsBinding) {
+    private fun configureCloseButtons(binding: ContentAutofillUpdateExistingCredentialsBinding) {
         binding.closeButton.setOnClickListener {
+            (dialog as BottomSheetDialog).animateClosed()
+        }
+        binding.cancelButton.setOnClickListener {
             (dialog as BottomSheetDialog).animateClosed()
         }
     }
@@ -112,9 +117,9 @@ class AutofillSavingUpdatingExistingCredentialsDialogFragment : BottomSheetDialo
 
     companion object {
 
-        fun instance(url: String, credentials: LoginCredentials): AutofillSavingUpdatingExistingCredentialsDialogFragment {
+        fun instance(url: String, credentials: LoginCredentials): AutofillUpdatingExistingCredentialsDialogFragment {
 
-            val fragment = AutofillSavingUpdatingExistingCredentialsDialogFragment()
+            val fragment = AutofillUpdatingExistingCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {
                     it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, url)
