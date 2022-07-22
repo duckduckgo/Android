@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.dashboard.impl.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -116,6 +117,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         }
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         with(webView.settings) {
             builtInZoomControls = false

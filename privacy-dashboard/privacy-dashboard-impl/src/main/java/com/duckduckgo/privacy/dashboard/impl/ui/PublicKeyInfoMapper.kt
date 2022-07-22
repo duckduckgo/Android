@@ -16,12 +16,10 @@
 
 package com.duckduckgo.privacy.dashboard.impl.ui
 
+import android.annotation.SuppressLint
 import android.net.http.SslCertificate
 import android.os.Build.VERSION_CODES
-import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
 import java.security.cert.X509Certificate
 import java.security.interfaces.DSAPublicKey
 import java.security.interfaces.ECPublicKey
@@ -36,7 +34,7 @@ class PublicKeyInfoMapper @Inject constructor(
         return sslCertificate.publicKeyInfo()
     }
 
-    @RequiresApi(VERSION_CODES.Q)
+    @SuppressLint("NewApi")
     private fun SslCertificate.publicKeyInfo(): PublicKeyInfo? {
         if (appBuildConfig.sdkInt < VERSION_CODES.Q) return null
 
