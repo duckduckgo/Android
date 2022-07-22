@@ -116,7 +116,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val url: String,
         val domain: String,
         val trackersUrls: Set<String>,
-        val whitelisted: Boolean,
+        val allowlisted: Boolean,
     )
 
     data class TrackerViewState(
@@ -139,7 +139,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     init {
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
-        resetViewState()
     }
 
     fun viewState(): StateFlow<ViewState?> {
@@ -157,16 +156,10 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     fun onSiteChanged(site: Site?) {
-
         this.site = site
-        if (site == null) {
-            resetViewState()
-        } else {
-            viewModelScope.launch { updateSite(site) }
-        }
-    }
+        if (site == null) return
 
-    private fun resetViewState() {
+        viewModelScope.launch { updateSite(site) }
     }
 
     private suspend fun updateSite(site: Site) {

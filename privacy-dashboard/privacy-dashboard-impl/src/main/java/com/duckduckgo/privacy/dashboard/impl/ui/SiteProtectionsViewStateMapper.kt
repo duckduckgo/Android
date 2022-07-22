@@ -28,7 +28,6 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerEventViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerViewState
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface SiteProtectionsViewStateMapper {
@@ -36,7 +35,6 @@ interface SiteProtectionsViewStateMapper {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class AppSiteProtectionsViewStateMapper @Inject constructor(
     private val publicKeyInfoMapper: PublicKeyInfoMapper
 ) : SiteProtectionsViewStateMapper {
@@ -59,7 +57,7 @@ class AppSiteProtectionsViewStateMapper @Inject constructor(
                 url = site.url,
                 domain = site.domain!!,
                 trackersUrls = trackingEvents.trackerUrls,
-                whitelisted = site.userAllowList
+                allowlisted = site.userAllowList
             ),
             trackers = trackingEvents.trackerEvents,
             trackerBlocked = trackingEvents.blockedTrackerEvents,
@@ -103,7 +101,7 @@ class AppSiteProtectionsViewStateMapper @Inject constructor(
                     )
                 ),
                 count = 1,
-                type = "here goes type" // TODO: ????
+                type = DEFAULT_VIEW_STATE_TRACKER_TYPE
             )
 
             trackingEvents[entity.displayName] = trackerViewState

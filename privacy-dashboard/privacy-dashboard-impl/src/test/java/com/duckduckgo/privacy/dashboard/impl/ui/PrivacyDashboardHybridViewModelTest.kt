@@ -51,8 +51,8 @@ class PrivacyDashboardHybridViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private val androidQAppBuildConfig = com.nhaarman.mockitokotlin2.mock<AppBuildConfig>().apply {
-        com.nhaarman.mockitokotlin2.whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)
+    private val androidQAppBuildConfig = mock<AppBuildConfig>().apply {
+        whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)
     }
 
     private val userWhitelistDao = mock<UserWhitelistDao>()
@@ -90,8 +90,6 @@ class PrivacyDashboardHybridViewModelTest {
             assertEquals("https://example.com", viewState!!.siteProtectionsViewState.site.url)
         }
     }
-
-    // TODO: test using class that maps site
 
     @Test
     fun whenOnPrivacyProtectionClickedThenUpdateViewState() = runTest {

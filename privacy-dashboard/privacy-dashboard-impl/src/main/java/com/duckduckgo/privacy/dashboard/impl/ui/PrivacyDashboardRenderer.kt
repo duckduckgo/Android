@@ -37,7 +37,6 @@ class PrivacyDashboardRenderer(
             PrivacyDashboardJavascriptInterface(
                 onBrokenSiteClicked = { onBrokenSiteClicked() },
                 onPrivacyProtectionsClicked = { newValue ->
-                    Timber.i("PrivacyDashboard onPrivacyProtectionsClicked interface $newValue")
                     onPrivacyProtectionsClicked(newValue)
                 },
                 onClose = { onClose() }
