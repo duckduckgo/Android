@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.downloads.impl
+package com.duckduckgo.app.notification
 
-import androidx.core.app.NotificationManagerCompat
-import com.duckduckgo.app.notification.model.Channel
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.app.notification.model.NotificationPlugin
+import com.duckduckgo.di.scopes.AppScope
 
-internal object FileDownloadNotificationChannelType {
-    val FILE_DOWNLOADING = Channel(
-        "com.duckduckgo.downloading",
-        R.string.notificationChannelFileDownloading,
-        NotificationManagerCompat.IMPORTANCE_LOW
-    )
-    val FILE_DOWNLOADED = Channel(
-        "com.duckduckgo.downloaded",
-        R.string.notificationChannelFileDownloaded,
-        NotificationManagerCompat.IMPORTANCE_LOW
-    )
-}
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = NotificationPlugin::class
+)
+@Suppress("unused")
+interface NotificationPluginPoint

@@ -31,13 +31,13 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.model.Channel
+import com.duckduckgo.app.notification.model.NotificationPlugin
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.downloads.impl.FileDownloadNotificationChannelType
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -57,6 +57,7 @@ class NotificationRegistrar @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
     private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>,
+    private val notificationPluginPoint: PluginPoint<NotificationPlugin>,
     private val appBuildConfig: AppBuildConfig,
 ) : DefaultLifecycleObserver {
 
@@ -69,8 +70,6 @@ class NotificationRegistrar @Inject constructor(
     }
 
     object ChannelType {
-        val FILE_DOWNLOADING = FileDownloadNotificationChannelType.FILE_DOWNLOADING
-        val FILE_DOWNLOADED = FileDownloadNotificationChannelType.FILE_DOWNLOADED
         val TUTORIALS = Channel(
             "com.duckduckgo.tutorials",
             R.string.notificationChannelTutorials,
@@ -105,8 +104,6 @@ class NotificationRegistrar @Inject constructor(
     }
 
     private val channels = listOf(
-        ChannelType.FILE_DOWNLOADING,
-        ChannelType.FILE_DOWNLOADED,
         ChannelType.TUTORIALS,
         ChannelType.EMAIL_WAITLIST,
         ChannelType.APP_TP_WAITLIST
@@ -128,6 +125,13 @@ class NotificationRegistrar @Inject constructor(
         val pluginChannels = schedulableNotificationPluginPoint.getPlugins().map {
             val channel = it.getSpecification().channel
             NotificationChannel(channel.id, context.getString(channel.name), channel.priority)
+        } + notificationPluginPoint.getPlugins().map { it.getChannels() }.flatMap {
+            val list = mutableListOf<NotificationChannel>().apply {
+                for (channel in it) {
+                    add(NotificationChannel(channel.id, context.getString(channel.name), channel.priority))
+                }
+            }
+            list.toList()
         }
         manager.createNotificationChannels(notificationChannels + pluginChannels)
     }
