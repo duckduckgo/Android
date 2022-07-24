@@ -56,7 +56,6 @@ private const val URL = "URL"
 private const val CONTENT_DISPOSITION = "CONTENT_DISPOSITION"
 private const val MIME_TYPE = "MIME_TYPE"
 private const val SUBFOLDER = "SUBFOLDER"
-private const val UA = "UA"
 private const val DIRECTORY = "DIRECTORY"
 
 fun FileDownloader.PendingFileDownload.toInputData(): Data {
@@ -65,7 +64,6 @@ fun FileDownloader.PendingFileDownload.toInputData(): Data {
         .putString(CONTENT_DISPOSITION, contentDisposition)
         .putString(MIME_TYPE, mimeType)
         .putString(SUBFOLDER, subfolder)
-        .putString(UA, userAgent)
         .putString(DIRECTORY, directory.absolutePath)
         .build()
 }
@@ -76,7 +74,6 @@ fun Data.toPendingFileDownload(): FileDownloader.PendingFileDownload {
         contentDisposition = getString(CONTENT_DISPOSITION),
         mimeType = getString(MIME_TYPE),
         subfolder = getString(SUBFOLDER)!!,
-        userAgent = getString(UA)!!,
         directory = File(getString(DIRECTORY)!!)
     )
 }

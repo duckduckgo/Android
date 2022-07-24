@@ -49,7 +49,6 @@ class UrlFileDownloader @Inject constructor(
         val call = downloadFileService.downloadFile(
             urlString = url,
             cookie = cookieManagerWrapper.getCookie(url).orEmpty(),
-            userAgent = pendingFileDownload.userAgent,
         )
         val downloadId = Random.nextLong()
         urlFileDownloadCallManager.add(downloadId, call)

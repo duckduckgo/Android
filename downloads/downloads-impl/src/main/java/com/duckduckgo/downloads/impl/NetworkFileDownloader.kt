@@ -18,9 +18,6 @@ package com.duckduckgo.downloads.impl
 
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -48,8 +45,8 @@ class NetworkFileDownloader @Inject constructor(
     private fun requestHeaders(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
         Timber.d("Make a HEAD request for ${pendingDownload.url} as there are no values for Content-Disposition or Content-Type.")
 
-        fileService.getFileDetails(pendingDownload.url)?.enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+        runCatching {
+            fileService.getFileDetails(pendingDownload.url)?.execute()?.let { response ->
                 var updatedPendingDownload = pendingDownload.copy()
 
                 if (response.isSuccessful) {
@@ -79,12 +76,10 @@ class NetworkFileDownloader @Inject constructor(
 
                 downloadFile(updatedPendingDownload, callback)
             }
-
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                // Network exception occurred talking to the server or an unexpected exception occurred creating the request/processing the response.
-                callback.onError(url = pendingDownload.url, reason = DownloadFailReason.ConnectionRefused)
-            }
-        })
+        }.onFailure {
+            // Network exception occurred talking to the server or an unexpected exception occurred creating the request/processing the response.
+            callback.onError(url = pendingDownload.url, reason = DownloadFailReason.ConnectionRefused)
+        }
     }
 
     private fun downloadFile(pendingDownload: PendingFileDownload, callback: DownloadCallback) {

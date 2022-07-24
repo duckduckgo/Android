@@ -3843,7 +3843,6 @@ class BrowserTabViewModelTest {
             contentDisposition = contentDisposition,
             mimeType = mimeType,
             subfolder = "folder",
-            userAgent = "user_agent"
         )
     }
 
