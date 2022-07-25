@@ -73,7 +73,7 @@ class FolderViewHolder(
         setPadding(item.depth)
 
         if (item.isSelected) {
-            binding.icon.setImageResource(R.drawable.ic_check)
+            binding.icon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_check_action)
             binding.iconContainer.setBackgroundResource(R.drawable.selected_icon_background)
         } else {
             binding.icon.setImageResource(R.drawable.ic_folder)
