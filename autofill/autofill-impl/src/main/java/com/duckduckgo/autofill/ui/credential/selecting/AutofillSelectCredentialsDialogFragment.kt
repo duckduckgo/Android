@@ -87,7 +87,12 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     private fun configureAdapter(): CredentialsPickerRecyclerAdapter {
-        return CredentialsPickerRecyclerAdapter(this, faviconManager, getAvailableCredentials()) { selectedCredentials ->
+        return CredentialsPickerRecyclerAdapter(
+            lifecycleOwner = this,
+            faviconManager = faviconManager,
+            credentialTextExtractor = CredentialTextExtractor(requireContext()),
+            credentials = getAvailableCredentials()
+        ) { selectedCredentials ->
             val result = Bundle().also {
                 it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, false)
                 it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())

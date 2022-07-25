@@ -78,7 +78,7 @@ interface AutofillStore {
      *
      * @return The match type, which might indicate there was an exact match, a partial match etc...
      */
-    suspend fun containsCredentials(rawUrl: String, username: String, password: String): ContainsCredentialsResult
+    suspend fun containsCredentials(rawUrl: String, username: String?, password: String?): ContainsCredentialsResult
 
     /**
      * Possible match types returned when searching for the presence of credentials

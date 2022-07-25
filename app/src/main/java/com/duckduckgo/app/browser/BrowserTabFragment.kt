@@ -429,13 +429,8 @@ class BrowserTabFragment :
             val username = credentials.username
             val password = credentials.password
 
-            if (username == null) {
-                Timber.w("Not saving credentials with null username")
-                return
-            }
-
-            if (password == null) {
-                Timber.w("Not saving credentials with null password")
+            if (username == null && password == null) {
+                Timber.w("Not saving credentials with null username and password")
                 return
             }
 
