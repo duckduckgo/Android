@@ -268,4 +268,16 @@
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.OutlinedTextInputView.TextInputLayout" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:textColorHint">@color/outlined_text_input_hint_color_selector</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/keyline_2</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/keyline_2</item>
+        <item name="boxCornerRadiusTopStart">@dimen/keyline_2</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/keyline_2</item>
+        <item name="boxStrokeColor">@color/outlined_text_input_box_color_selector</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="endIconTint">?attr/normalTextColor</item>
+        <item name="hintTextColor">@color/outlined_text_input_hint_color_selector</item>
+        <item name="android:theme">@style/TextInputEditTextTheme</item>
+    </style>
 </resources>
