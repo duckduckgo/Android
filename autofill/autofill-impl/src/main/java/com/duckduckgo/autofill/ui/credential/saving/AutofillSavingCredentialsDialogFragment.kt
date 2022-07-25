@@ -21,18 +21,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.autofill.CredentialSavePickerDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSaveNewCredentialsBinding
+import com.duckduckgo.autofill.ui.credential.dialog.animateClosed
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.launch
@@ -41,8 +45,17 @@ import javax.inject.Inject
 @InjectWith(FragmentScope::class)
 class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialSavePickerDialog {
 
+    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
+
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
+    private val viewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[AutofillSavingCredentialsViewModel::class.java]
+    }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -57,6 +70,32 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private fun configureViews(binding: ContentAutofillSaveNewCredentialsBinding) {
         configureSiteDetails(binding)
+        configureTitles(binding)
+        configureCloseButtons(binding)
+        configureSaveButton(binding)
+    }
+
+    private fun configureSaveButton(binding: ContentAutofillSaveNewCredentialsBinding) {
+        binding.saveLoginButton.setOnClickListener {
+            val result = Bundle().also {
+                it.putString(CredentialSavePickerDialog.KEY_URL, getOriginalUrl())
+                it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, getCredentialsToSave())
+            }
+            parentFragment?.setFragmentResult(CredentialSavePickerDialog.RESULT_KEY_CREDENTIAL_RESULT_SAVE, result)
+            (dialog as BottomSheetDialog).animateClosed()
+        }
+    }
+
+    private fun configureCloseButtons(binding: ContentAutofillSaveNewCredentialsBinding) {
+        binding.closeButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
+        binding.cancelButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
+    }
+
+    private fun configureTitles(binding: ContentAutofillSaveNewCredentialsBinding) {
+        if (!showOnboarding()) {
+            binding.dialogTitle.text = getString(R.string.saveLoginDialogTitle)
+            binding.onboardingSubtitle.gone()
+        }
     }
 
     private fun configureSiteDetails(binding: ContentAutofillSaveNewCredentialsBinding) {
@@ -70,28 +109,11 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        view.findViewById<Button>(R.id.saveLoginButton).setOnClickListener {
-
-            val result = Bundle().also {
-                it.putString(CredentialSavePickerDialog.KEY_URL, getOriginalUrl())
-                it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, getCredentialsToSave())
-            }
-            parentFragment?.setFragmentResult(CredentialSavePickerDialog.RESULT_KEY_CREDENTIAL_RESULT_SAVE, result)
-            dismiss()
-        }
-
-        view.findViewById<Button>(R.id.cancelButton).setOnClickListener {
-            dismiss()
-        }
-
-    }
-
     private fun getCredentialsToSave() = arguments?.getParcelable<LoginCredentials>(CredentialSavePickerDialog.KEY_CREDENTIALS)!!
 
     private fun getOriginalUrl() = arguments?.getString(CredentialSavePickerDialog.KEY_URL)!!
+
+    private fun showOnboarding() = viewModel.showOnboarding()
 
     override fun asDialogFragment(): DialogFragment = this
 

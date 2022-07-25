@@ -26,12 +26,17 @@
     <string name="saveLoginDialogTitle">Save Login?</string>
     <string name="saveLoginDialogButtonSave">Save Login</string>
     <string name="saveLoginDialogNotNow">Not Now</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Logins are stored securely on this device only, and can be managed from the Autofill menu in Settings.</string>
+    <string name="saveLoginDialogFirstTimeExplanationTitle">Do you want DuckDuckGo\nto save your Login?</string>
+    <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
 
     <string name="useSavedLoginDialogTitle">Use Saved Login?</string>
 
     <string name="updateLoginDialogTitle">Update Password?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Update Password</string>
     <string name="updateLoginDialogButtonNotNow">Now Now</string>
+
+    <string name="autofillDialogCloseButtonContentDescription">Close Autofill Dialog</string>
 
     <string name="credentialManagementEditUsernameHint">Username</string>
     <string name="credentialManagementEditPasswordHint">Password</string>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.ui.credential.saving
+package com.duckduckgo.autofill.ui.credential.updating
 
 import android.content.Context
 import android.os.Bundle
@@ -23,24 +23,38 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillUpdateExistingCredentialsBinding
+import com.duckduckgo.autofill.ui.credential.dialog.animateClosed
 import com.duckduckgo.di.scopes.FragmentScope
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class AutofillSavingUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialUpdateExistingCredentialsDialog {
+class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialUpdateExistingCredentialsDialog {
+
+    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
+    private val viewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[AutofillUpdatingExistingCredentialViewModel::class.java]
+    }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -54,23 +68,38 @@ class AutofillSavingUpdatingExistingCredentialsDialogFragment : BottomSheetDialo
     }
 
     private fun configureViews(binding: ContentAutofillUpdateExistingCredentialsBinding) {
-        configureSiteDetails(binding)
+        val credentials = getCredentialsToSave()
+        val originalUrl = getOriginalUrl()
 
-        binding.cancelButton.setOnClickListener {
-            dismiss()
-        }
+        configureSiteDetails(binding, originalUrl)
+        configureCloseButtons(binding)
+        configurePasswordOutline(binding, credentials)
+
         binding.updatePasswordButton.setOnClickListener {
             val result = Bundle().also {
-                it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, getOriginalUrl())
-                it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, getCredentialsToSave())
+                it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, originalUrl)
+                it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
             }
             parentFragment?.setFragmentResult(CredentialUpdateExistingCredentialsDialog.RESULT_KEY_CREDENTIAL_RESULT_UPDATE, result)
-            dismiss()
+            (dialog as BottomSheetDialog).animateClosed()
         }
     }
 
-    private fun configureSiteDetails(binding: ContentAutofillUpdateExistingCredentialsBinding) {
-        val originalUrl = getOriginalUrl()
+    private fun configurePasswordOutline(binding: ContentAutofillUpdateExistingCredentialsBinding, credentials: LoginCredentials) {
+        val maskedPassword = viewModel.convertPasswordToMaskedView(credentials)
+        binding.passwordOutline.text = maskedPassword
+    }
+
+    private fun configureCloseButtons(binding: ContentAutofillUpdateExistingCredentialsBinding) {
+        binding.closeButton.setOnClickListener {
+            (dialog as BottomSheetDialog).animateClosed()
+        }
+        binding.cancelButton.setOnClickListener {
+            (dialog as BottomSheetDialog).animateClosed()
+        }
+    }
+
+    private fun configureSiteDetails(binding: ContentAutofillUpdateExistingCredentialsBinding, originalUrl: String) {
         val url = originalUrl.extractDomain() ?: originalUrl
 
         binding.siteName.text = url
@@ -88,9 +117,9 @@ class AutofillSavingUpdatingExistingCredentialsDialogFragment : BottomSheetDialo
 
     companion object {
 
-        fun instance(url: String, credentials: LoginCredentials): AutofillSavingUpdatingExistingCredentialsDialogFragment {
+        fun instance(url: String, credentials: LoginCredentials): AutofillUpdatingExistingCredentialsDialogFragment {
 
-            val fragment = AutofillSavingUpdatingExistingCredentialsDialogFragment()
+            val fragment = AutofillUpdatingExistingCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {
                     it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, url)

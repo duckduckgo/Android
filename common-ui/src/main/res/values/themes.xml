@@ -142,6 +142,9 @@
 
         <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorDark</item>
         <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorDark</item>
+
+        <item name="autofillDialogTitleColor">@color/white</item>
+        <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -262,6 +265,9 @@
 
         <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorLight</item>
         <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorLight</item>
+
+        <item name="autofillDialogTitleColor">@color/gray90</item>
+        <item name="autofillDialogOnboardingExplanationColor">@color/gray70</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
