@@ -103,7 +103,10 @@ class RealSecureStorage @Inject constructor(
             domain = details.domain,
             username = details.username,
             password = encryptedData?.data,
-            iv = encryptedData?.iv
+            iv = encryptedData?.iv,
+            notes = details.notes,
+            domainTitle = details.domainTitle,
+            lastUpdatedInMillis = details.lastUpdatedMillis
         )
     }
 
@@ -117,7 +120,10 @@ class RealSecureStorage @Inject constructor(
         WebsiteLoginDetails(
             domain = domain,
             username = username,
-            id = id
+            id = id,
+            domainTitle = domainTitle,
+            notes = notes,
+            lastUpdatedMillis = lastUpdatedInMillis
         )
 
     // only encrypt when there's data
