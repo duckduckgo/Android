@@ -22,8 +22,10 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialModeState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -47,6 +49,7 @@ class AutofillSettingsViewModelTest {
         testee.onEnableAutofill()
         testee.viewState.test {
             assertTrue(this.awaitItem().autofillEnabled)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -55,6 +58,7 @@ class AutofillSettingsViewModelTest {
         testee.onDisableAutofill()
         testee.viewState.test {
             assertFalse(this.awaitItem().autofillEnabled)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -65,6 +69,7 @@ class AutofillSettingsViewModelTest {
         verify(clipboardInteractor).copyToClipboard("hello")
         testee.commands.test {
             awaitItem().first().assertCommandType(ShowUserPasswordCopied::class)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -75,6 +80,7 @@ class AutofillSettingsViewModelTest {
         verify(clipboardInteractor).copyToClipboard("username")
         testee.commands.test {
             awaitItem().first().assertCommandType(ShowUserUsernameCopied::class)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -83,6 +89,7 @@ class AutofillSettingsViewModelTest {
         testee.onDeleteCredentials(someCredentials())
         testee.commands.test {
             awaitItem().first().assertCommandType(ShowListMode::class)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -91,6 +98,131 @@ class AutofillSettingsViewModelTest {
         val credentials = someCredentials()
         testee.onDeleteCredentials(credentials)
         verify(mockStore).deleteCredentials(credentials.id!!)
+    }
+
+    @Test
+    fun whenOnViewCredentialsCalledThenShowCredentialViewingMode() = runTest {
+        val credentials = someCredentials()
+        testee.onViewCredentials(credentials)
+
+        testee.commands.test {
+            awaitItem().first().assertCommandType(ShowCredentialMode::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.viewState.test {
+            assertEquals(CredentialModeState.Viewing, this.awaitItem().credentialModeState)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnEditCredentialsCalledThenShowCredentialEditingMode() = runTest {
+        testee.onEditCredentials()
+
+        testee.viewState.test {
+            assertEquals(CredentialModeState.Editing, this.awaitItem().credentialModeState)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLockCalledThenShowLockedMode() = runTest {
+        testee.lock()
+
+        testee.commands.test {
+            awaitItem().first().assertCommandType(ShowLockedMode::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLockModeCalledMOreThanOnceThenShowLockedModeOnlyOnce() = runTest {
+        testee.lock()
+
+        testee.commands.test {
+            val count = awaitItem().filter { it == ShowLockedMode }.size
+            assertEquals(1, count)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUnlockCalledThenShowListMode() = runTest {
+        testee.unlock()
+
+        testee.commands.test {
+            awaitItem().first().assertCommandType(ShowListMode::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.viewState.test {
+            assertFalse(this.awaitItem().isLocked)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDisableCalledThenShowDisabledMode() = runTest {
+        testee.disabled()
+
+        testee.commands.test {
+            awaitItem().first().assertCommandType(ShowDisabledMode::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.viewState.test {
+            assertTrue(this.awaitItem().isLocked)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUpdateCredentialsCalledThenUpdateAutofillStore() = runTest {
+        val someCredentials = someCredentials()
+        testee.updateCredentials(someCredentials)
+
+        verify(mockStore).updateCredentials(someCredentials)
+    }
+
+    @Test
+    fun whenOnExitEditModeThenUpdateCredentialModeStateToViewing() = runTest {
+        testee.onExitEditMode()
+
+        testee.viewState.test {
+            assertEquals(CredentialModeState.Viewing, this.awaitItem().credentialModeState)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnExitViewModeThenShowListMode() = runTest {
+        testee.onExitViewMode()
+
+        testee.viewState.test {
+            assertEquals(CredentialModeState.NotInCredentialMode, this.awaitItem().credentialModeState)
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.commands.test {
+            awaitItem().first().assertCommandType(ShowListMode::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenInEditModeAndChangedToDisabledThenUpdateNotInCredentialModeAndShowDisabledMode() = runTest {
+        testee.onEditCredentials()
+        testee.disabled()
+
+        testee.viewState.test {
+            val finalResult = this.expectMostRecentItem()
+            assertEquals(CredentialModeState.NotInCredentialMode, finalResult.credentialModeState)
+            assertTrue(finalResult.isLocked)
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.commands.test {
+            expectMostRecentItem().first().assertCommandType(ShowDisabledMode::class)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun someCredentials(): LoginCredentials {
