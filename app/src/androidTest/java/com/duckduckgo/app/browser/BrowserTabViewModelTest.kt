@@ -102,7 +102,6 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
-import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -198,9 +197,6 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
-
-    @Mock
-    private lateinit var mockPrivacyPractices: PrivacyPractices
 
     @Mock
     private lateinit var mockSettingsStore: SettingsDataStore
@@ -404,7 +400,7 @@ class BrowserTabViewModelTest {
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector()
         )
 
-        val siteFactory = SiteFactoryImpl(mockPrivacyPractices, mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, TestScope())
+        val siteFactory = SiteFactoryImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, TestScope())
 
         accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestScope())
 
@@ -413,7 +409,6 @@ class BrowserTabViewModelTest {
         whenever(mockNavigationAwareLoginDetector.loginEventLiveData).thenReturn(loginEventLiveData)
         whenever(mockTabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockTabRepository.childClosedTabs).thenReturn(childClosedTabsFlow)
-        whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
         whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)

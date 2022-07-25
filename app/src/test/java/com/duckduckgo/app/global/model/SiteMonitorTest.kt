@@ -19,7 +19,6 @@ package com.duckduckgo.app.global.model
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
-import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -53,8 +52,6 @@ class SiteMonitorTest {
 
         private val network = TestingEntity("Network", "Network", 1.0)
         private val majorNetwork = TestingEntity("MajorNetwork", "MajorNetwork", Entity.MAJOR_NETWORK_PREVALENCE + 1)
-
-        private val unknownPractices = PrivacyPractices.UNKNOWN
     }
 
     private val mockWhitelistDao: UserWhitelistDao = mock()
@@ -120,18 +117,6 @@ class SiteMonitorTest {
             appCoroutineScope = TestScope()
         )
         assertEquals(document, testee.url)
-    }
-
-    @Test
-    fun whenSiteMonitorCreatedWithTermsThenTermsAreSet() {
-        val testee = SiteMonitor(
-            url = document,
-            title = null,
-            userWhitelistDao = mockWhitelistDao,
-            contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope()
-        )
-        assertEquals(unknownPractices, testee.privacyPractices)
     }
 
     @Test
@@ -292,12 +277,10 @@ class SiteMonitorTest {
 
     fun givenSitePrivacyData(
         url: String = document,
-        practices: PrivacyPractices.Practices = unknownPractices,
         entity: Entity? = null,
         prevalence: Double? = null
     ) = SitePrivacyData(
         url = url,
-        practices = practices,
         entity = entity,
         prevalence = null
     )

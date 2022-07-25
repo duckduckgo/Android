@@ -31,7 +31,6 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
-import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -66,8 +65,6 @@ class TabDataRepositoryTest {
 
     private val mockDao: TabsDao = mock()
 
-    private val mockPrivacyPractices: PrivacyPractices = mock()
-
     private val mockEntityLookup: EntityLookup = mock()
 
     private val mockWhitelistDao: UserWhitelistDao = mock()
@@ -91,7 +88,6 @@ class TabDataRepositoryTest {
         runBlocking {
             whenever(mockDao.flowDeletableTabs())
                 .thenReturn(daoDeletableTabs.consumeAsFlow())
-            whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
             testee = tabDataRepository(mockDao)
         }
     }
@@ -423,7 +419,7 @@ class TabDataRepositoryTest {
     private fun tabDataRepository(dao: TabsDao): TabDataRepository {
         return TabDataRepository(
             dao,
-            SiteFactoryImpl(mockPrivacyPractices, mockEntityLookup, mockWhitelistDao, mockContentBlocking, TestScope()),
+            SiteFactoryImpl(mockEntityLookup, mockWhitelistDao, mockContentBlocking, TestScope()),
             mockWebViewPreviewPersister,
             mockFaviconManager,
             TestScope()
