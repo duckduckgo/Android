@@ -28,7 +28,6 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
 
-    implementation Square.moshi
     implementation JakeWharton.timber
     // Room
     implementation AndroidX.room.runtime
