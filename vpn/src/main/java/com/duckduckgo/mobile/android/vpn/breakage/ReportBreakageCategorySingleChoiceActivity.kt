@@ -28,16 +28,21 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.Command
-import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.ViewState
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.*
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageCategorySingleChoiceBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import kotlinx.coroutines.launch
+import dagger.WrongScope
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
-@InjectWith(ActivityScope::class)
+@WrongScope(
+    comment = "To use the right scope we first need to enable dagger component nesting",
+    correctScope = ActivityScope::class,
+)
+@InjectWith(VpnScope::class)
 class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
   @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
