@@ -27,13 +27,8 @@ class HealthClassifierTest {
     private val testee = HealthClassifier(InstrumentationRegistry.getInstrumentation().targetContext)
 
     @Test
-    fun whenNumberOfSocketReadExceptionsBelowThresholdThenReportsGoodHealth() {
-        testee.determineHealthSocketChannelReadExceptions(ACCEPTABLE_NUMBER_SOCKET_EXCEPTIONS).assertGoodHealth()
-    }
-
-    @Test
-    fun whenNumberOfSocketReadExceptionsAboveThresholdThenReportsBadHealth() {
-        testee.determineHealthSocketChannelReadExceptions(EXCESSIVE_NUMBER_SOCKET_EXCEPTIONS).assertBadHealth()
+    fun whenNumberOfSocketReadExceptionsIsVeryHighNeverTriggerBadHelath() {
+        testee.determineHealthSocketChannelReadExceptions(1_000).assertGoodHealth()
     }
 
     @Test
