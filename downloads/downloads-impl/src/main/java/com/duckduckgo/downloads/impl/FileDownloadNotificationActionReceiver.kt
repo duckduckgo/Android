@@ -20,7 +20,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.os.Environment
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
@@ -53,10 +52,6 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
 ) : BroadcastReceiver(), DefaultLifecycleObserver {
-
-    // TODO use the UA provider
-    private val defaultUA = "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE}) " +
-        "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/96.0.4664.104 Mobile Safari/537.36"
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -97,7 +92,6 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
             val url = extractUrlFromRetryIntent(intent) ?: return
             FileDownloader.PendingFileDownload(
                 url = url,
-                userAgent = defaultUA,
                 subfolder = Environment.DIRECTORY_DOWNLOADS,
             ).run {
                 Timber.v("Retrying download for $url")

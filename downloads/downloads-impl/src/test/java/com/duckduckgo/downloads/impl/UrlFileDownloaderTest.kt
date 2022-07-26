@@ -48,7 +48,7 @@ class UrlFileDownloaderTest {
     fun setup() {
 
         realFileDownloadManager = RealUrlFileDownloadCallManager()
-        whenever(downloadFileService.downloadFile(anyString(), anyString(), anyString())).thenReturn(call)
+        whenever(downloadFileService.downloadFile(anyString(), anyString())).thenReturn(call)
 
         urlFileDownloader = UrlFileDownloader(
             downloadFileService, realFileDownloadManager, FakeCookieManagerWrapper()
@@ -182,7 +182,6 @@ class UrlFileDownloaderTest {
             contentDisposition = contentDisposition,
             mimeType = mimeType,
             subfolder = "folder",
-            userAgent = "user_agent",
             directory = File("directory"),
         )
     }
