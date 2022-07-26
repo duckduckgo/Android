@@ -23,26 +23,27 @@ import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
-class TurnOffAnimationRule : Instrumentation(), TestRule {
+class AllowNotificationsRule:Instrumentation(), TestRule {
 
     private val device: UiDevice = uiDevice
 
-     override fun before() {
-        setAnimationsEnabled(false)
+    override fun before() {
+        allowNotifications()
     }
 
     override fun after() {
-        setAnimationsEnabled(true)
+        clearNotificationPermissionValue()
     }
 
-    private fun setAnimationsEnabled(isEnabled: Boolean) {
-        val value = if (isEnabled) 1 else 0
-        putDeviceSetting("transition_animation_scale", value)
-        putDeviceSetting("window_animation_scale", value)
-        putDeviceSetting("animator_duration_scale", value)
+    private fun allowNotifications() {
+        putDeviceSetting("NOTIFICATION_PERMISSION", 1)
     }
 
-    private fun putDeviceSetting(key: String, value: Int) {
+    private fun clearNotificationPermissionValue() {
+        putDeviceSetting("NOTIFICATION_PERMISSION", 0)
+    }
+
+    private fun putDeviceSetting(key: String,value: Int) {
         device.executeShellCommand("settings put global $key $value")
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-plugins {
-    `kotlin-dsl`
-}
+package com.duckduckgo.rules
 
-repositories {
-    mavenCentral()
-    google()
-}
+import org.junit.rules.RuleChain
+import org.junit.rules.TestRule
 
-dependencies {
-    /* Depend on the android gradle plugin, since we want to access it in our plugin */
-    implementation("com.android.tools.build:gradle:7.1.3")
-
-    /* Depend on the default Gradle API's since we want to build a custom plugin */
-    implementation(gradleApi())
-    implementation(localGroovy())
+class RuleChain {
+    fun RuleChain() : TestRule = RuleChain.outerRule(TurnOffAnimationRule())
+        .around(AllowNotificationsRule())
 }
