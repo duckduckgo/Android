@@ -18,8 +18,11 @@ package com.duckduckgo.mobile.android.vpn.feature.settings
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.*
+import com.duckduckgo.mobile.android.vpn.model.HealthTriggerEntity
+import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
+import org.json.JSONObject
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -29,8 +32,10 @@ import javax.inject.Inject
 )
 class BadHealthMitigationSettingPlugin @Inject constructor(
     private val appTpFeatureConfig: AppTpFeatureConfig,
+    appHealthDatabase: AppHealthDatabase
 ) : AppTpSettingPlugin {
-    private val jsonAdapter = Moshi.Builder().build().adapter(JsonConfigModel::class.java)
+    private val jsonAdapter = Moshi.Builder().add(JSONObjectAdapter()).build().adapter(JsonConfigModel::class.java)
+    private val thresholdsDao = appHealthDatabase.appHealthTriggersDao()
 
     override fun store(name: SettingName, jsonString: String): Boolean {
         @Suppress("NAME_SHADOWING")
@@ -39,6 +44,7 @@ class BadHealthMitigationSettingPlugin @Inject constructor(
             Timber.d("Received configuration: $jsonString")
             jsonAdapter.fromJson(jsonString)?.let { config ->
                 appTpFeatureConfig.edit { setEnabled(settingName, config.state == "enabled") }
+                config.settings?.let { handleSettings(it) }
             }
             return true
         }
@@ -48,5 +54,44 @@ class BadHealthMitigationSettingPlugin @Inject constructor(
 
     override val settingName: SettingName = AppTpSetting.BadHealthMitigation
 
-    private data class JsonConfigModel(val state: String)
+    private fun handleSettings(settings: BadHealthMitigationFeatureSettings) {
+        val healthTriggers = mutableSetOf<HealthTrigger>()
+        val jsonAdapter = Moshi.Builder().build().adapter(JsonHealthTrigger::class.java)
+        settings.triggers?.let { triggers ->
+            triggers.forEach { (trigger, jsonObject) ->
+                jsonAdapter.fromJson(jsonObject.toString())?.let { config ->
+                    healthTriggers.add(config.toHealthTrigger(trigger))
+                }
+            }
+        }
+        thresholdsDao.insertAll(healthTriggers.map { it.toEntity() })
+    }
+
+    private data class JsonConfigModel(
+        val state: String,
+        val settings: BadHealthMitigationFeatureSettings?
+    )
+
+    private data class BadHealthMitigationFeatureSettings(
+        val triggers: Map<String, JSONObject?>?
+    )
+
+    private data class JsonHealthTrigger(
+        val state: String,
+        val threshold: Int?,
+    ) {
+        fun toHealthTrigger(name: String): HealthTrigger {
+            return HealthTrigger(name, state, threshold)
+        }
+    }
+
+    private data class HealthTrigger(
+        val name: String,
+        val state: String,
+        val threshold: Int?,
+    ) {
+        fun toEntity(): HealthTriggerEntity {
+            return HealthTriggerEntity(name, state.lowercase() == "enabled", threshold)
+        }
+    }
 }
