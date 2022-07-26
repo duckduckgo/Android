@@ -64,13 +64,13 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = ContentAutofillSaveNewCredentialsBinding.inflate(inflater, container, false)
-        configureViews(binding)
+        configureViews(binding, getCredentialsToSave())
         return binding.root
     }
 
-    private fun configureViews(binding: ContentAutofillSaveNewCredentialsBinding) {
+    private fun configureViews(binding: ContentAutofillSaveNewCredentialsBinding, credentials: LoginCredentials) {
         configureSiteDetails(binding)
-        configureTitles(binding)
+        configureTitles(binding, credentials)
         configureCloseButtons(binding)
         configureSaveButton(binding)
     }
@@ -91,9 +91,13 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         binding.cancelButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
     }
 
-    private fun configureTitles(binding: ContentAutofillSaveNewCredentialsBinding) {
+    private fun configureTitles(binding: ContentAutofillSaveNewCredentialsBinding, credentials: LoginCredentials) {
+        val resources = viewModel.determineTextResources(credentials)
+
+        binding.dialogTitle.text = getString(resources.title)
+        binding.saveLoginButton.text = getString(resources.ctaButton)
+
         if (!showOnboarding()) {
-            binding.dialogTitle.text = getString(R.string.saveLoginDialogTitle)
             binding.onboardingSubtitle.gone()
         }
     }

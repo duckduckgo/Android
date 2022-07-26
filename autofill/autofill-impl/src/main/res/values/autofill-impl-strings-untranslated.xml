@@ -24,13 +24,17 @@
     <string name="managementDisabledModeTitle">Secure your device to use Autofill</string>
 
     <string name="saveLoginDialogTitle">Save Login?</string>
+    <string name="saveLoginMissingUsernameDialogTitle">Save Password?</string>
     <string name="saveLoginDialogButtonSave">Save Login</string>
+    <string name="saveLoginMissingUsernameDialogButtonSave">Save Password</string>
     <string name="saveLoginDialogNotNow">Not Now</string>
     <string name="saveLoginDialogOnboardingExplanationSubtitle">Logins are stored securely on this device only, and can be managed from the Autofill menu in Settings.</string>
-    <string name="saveLoginDialogFirstTimeExplanationTitle">Do you want DuckDuckGo\nto save your Login?</string>
+    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Do you want DuckDuckGo to save your Login?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
 
     <string name="useSavedLoginDialogTitle">Use Saved Login?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Login for %s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Login for site</string>
 
     <string name="updateLoginDialogTitle">Update Password?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Update Password</string>

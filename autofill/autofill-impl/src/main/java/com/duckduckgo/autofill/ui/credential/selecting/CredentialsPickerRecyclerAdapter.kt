@@ -33,6 +33,7 @@ import com.duckduckgo.mobile.android.ui.view.show
 class CredentialsPickerRecyclerAdapter(
     val lifecycleOwner: LifecycleOwner,
     val faviconManager: FaviconManager,
+    val credentialTextExtractor: CredentialTextExtractor,
     private val credentials: List<LoginCredentials>,
     private val onCredentialSelected: (credentials: LoginCredentials) -> Unit
 ) : Adapter<CredentialsViewHolder>() {
@@ -60,11 +61,11 @@ class CredentialsPickerRecyclerAdapter(
 
         val button = when (buttonType) {
             is UseCredentialPrimaryButton -> useCredentialPrimaryButton.also {
-                it.text = credentials.username
+                it.text = credentialTextExtractor.usernameOrPlaceholder(credentials)
                 it.setOnClickListener { onCredentialSelected(credentials) }
             }
             is UseCredentialSecondaryButton -> useCredentialSecondaryButton.also {
-                it.text = credentials.username
+                it.text = credentialTextExtractor.usernameOrPlaceholder(credentials)
                 it.setOnClickListener { onCredentialSelected(credentials) }
             }
             is ShowMoreButton -> moreOptionsButton.also {
