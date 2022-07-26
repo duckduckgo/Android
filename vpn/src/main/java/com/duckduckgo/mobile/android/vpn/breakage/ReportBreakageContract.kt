@@ -32,10 +32,7 @@ class ReportBreakageContract : ActivityResultContract<ReportBreakageScreen, Issu
         return when (input) {
             ReportBreakageScreen.ListOfInstalledApps -> ReportBreakageAppListActivity.intent(context)
             is ReportBreakageScreen.IssueDescriptionForm -> {
-                ReportBreakageTextFormActivity.intent(context, BrokenApp(appName = input.appName, appPackageId = input.appPackageId))
-            }
-            is ReportBreakageScreen.LoginInformation -> {
-                ReportBreakageSingleChoiceFormActivity.intent(context, BrokenApp(appName = input.appName, appPackageId = input.appPackageId))
+                ReportBreakageCategorySingleChoiceActivity.intent(context, BrokenApp(appName = input.appName, appPackageId = input.appPackageId))
             }
         }
     }
@@ -57,11 +54,6 @@ sealed class ReportBreakageScreen {
         val appName: String,
         val appPackageId: String
     ) : ReportBreakageScreen()
-
-    data class LoginInformation(
-        val appName: String,
-        val appPackageId: String
-    ) : ReportBreakageScreen()
 }
 
 @Parcelize
@@ -75,7 +67,7 @@ data class IssueReport(
     val appName: String? = null,
     val appPackageId: String? = null,
     val description: String? = null,
-    val loginInfo: String? = null,
+    val category: String? = null,
     val customMetadata: String? = null,
 ) : Parcelable {
 
@@ -84,7 +76,7 @@ data class IssueReport(
             appName?.let { this["appName"] = it }
             appPackageId?.let { this["appPackageId"] = it }
             description?.let { this["breakageDescription"] = it }
-            loginInfo?.let { this["breakageLoginInfo"] = it }
+            category?.let { this["breakageCategory"] = it }
             customMetadata?.let { this["breakageMetadata"] = it }
         }
     }
