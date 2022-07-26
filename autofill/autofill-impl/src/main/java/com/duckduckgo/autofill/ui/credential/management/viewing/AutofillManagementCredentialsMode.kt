@@ -87,7 +87,7 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
             menu.findItem(R.id.view_menu_save).isVisible = true
             menu.findItem(R.id.view_menu_delete).isVisible = false
             menu.findItem(R.id.view_menu_edit).isVisible = false
-        } else if (viewModel.viewState.value.credentialModeState == Viewing) {
+        } else if (viewModel.viewState.value.credentialModeState is Viewing) {
             menu.findItem(R.id.view_menu_save).isVisible = false
             menu.findItem(R.id.view_menu_delete).isVisible = true
             menu.findItem(R.id.view_menu_edit).isVisible = true
@@ -158,13 +158,18 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
         val updatedCredentials = credentials.copy(
             username = binding.usernameEditText.text.convertBlankToNull(),
             password = binding.passwordEditText.text.convertBlankToNull(),
+            domain = binding.domainEditText.text.convertBlankToNull(),
+            domainTitle = binding.domainTitleEditText.text.convertBlankToNull(),
+            notes = binding.notesEditText.text.convertBlankToNull()
         )
+        credentials = updatedCredentials
         viewModel.updateCredentials(updatedCredentials)
-        viewModel.onExitEditMode()
+        viewModel.onExitEditMode(false)
     }
 
     private fun populateFields() {
         binding.apply {
+            domainTitleEditText.setText(credentials.domainTitle)
             usernameEditText.setText(credentials.username)
             passwordEditText.setText(credentials.password)
             domainEditText.setText(credentials.domain)
@@ -178,6 +183,8 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
     private fun showViewMode() {
         updateToolbarForView()
         binding.apply {
+            domainTitleEditText.visibility = View.GONE
+            domainTitleEditText.isEditable = false
             usernameEditText.isEditable = false
             passwordEditText.isEditable = false
             domainEditText.isEditable = false
@@ -188,6 +195,8 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
     private fun showEditMode() {
         updateToolbarForEdit()
         binding.apply {
+            domainTitleEditText.visibility = View.VISIBLE
+            domainTitleEditText.isEditable = true
             usernameEditText.isEditable = true
             passwordEditText.isEditable = true
             domainEditText.isEditable = true
@@ -196,17 +205,21 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
     }
 
     private fun OutLinedTextInputView.setText(text: String?) {
-        text?.let { this.text = it }
+        this.text = text ?: ""
     }
 
     private fun observeViewModel() {
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.viewState.collect { state ->
-                    if (state.credentialModeState == Viewing) {
-                        showViewMode()
-                    } else if (state.credentialModeState == Editing) {
-                        showEditMode()
+                    when (state.credentialModeState) {
+                        is Viewing -> {
+                            if (state.credentialModeState.reset) populateFields()
+                            showViewMode()
+                        }
+                        Editing -> showEditMode()
+                        else -> {
+                        }
                     }
                 }
             }

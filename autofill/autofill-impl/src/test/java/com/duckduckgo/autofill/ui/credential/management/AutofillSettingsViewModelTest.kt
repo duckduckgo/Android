@@ -110,7 +110,7 @@ class AutofillSettingsViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         testee.viewState.test {
-            assertEquals(CredentialModeState.Viewing, this.awaitItem().credentialModeState)
+            assertEquals(CredentialModeState.Viewing(reset = false), this.awaitItem().credentialModeState)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -186,10 +186,10 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenOnExitEditModeThenUpdateCredentialModeStateToViewing() = runTest {
-        testee.onExitEditMode()
+        testee.onExitEditMode(true)
 
         testee.viewState.test {
-            assertEquals(CredentialModeState.Viewing, this.awaitItem().credentialModeState)
+            assertEquals(CredentialModeState.Viewing(reset = true), this.awaitItem().credentialModeState)
             cancelAndIgnoreRemainingEvents()
         }
     }

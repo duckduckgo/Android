@@ -38,6 +38,7 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Close Autofill Dialog</string>
 
+    <string name="credentialManagementEditLoginTitleHint">Login Title</string>
     <string name="credentialManagementEditUsernameHint">Username</string>
     <string name="credentialManagementEditPasswordHint">Password</string>
     <string name="credentialManagementEditTitle">Edit Login</string>

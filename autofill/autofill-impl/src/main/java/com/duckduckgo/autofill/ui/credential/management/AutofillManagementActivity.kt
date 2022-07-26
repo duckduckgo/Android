@@ -185,8 +185,8 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     override fun onBackPressed() {
         when (viewModel.viewState.value.credentialModeState) {
-            Editing -> viewModel.onExitEditMode()
-            Viewing -> viewModel.onExitViewMode()
+            Editing -> viewModel.onExitEditMode(true)
+            is Viewing -> viewModel.onExitViewMode()
             else -> super.onBackPressed()
         }
     }

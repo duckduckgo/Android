@@ -26,6 +26,17 @@
         android:layout_marginVertical="@dimen/keyline_5"
         android:orientation="vertical">
 
+
+        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+            android:id="@+id/domainTitleEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/credentialManagementEditLoginTitleHint"
+            android:layout_marginBottom="@dimen/keyline_5"
+            android:visibility="gone"
+            app:editable="true"
+            app:endIconContentDescription="@string/credentialManagementEditButtonCopyUsername" />
+
         <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
             android:id="@+id/usernameEditText"
             android:layout_width="match_parent"

@@ -56,7 +56,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun onViewCredentials(credentials: LoginCredentials) {
-        _viewState.value = viewState.value.copy(credentialModeState = Viewing)
+        _viewState.value = viewState.value.copy(credentialModeState = Viewing())
         addCommand(ShowCredentialMode(credentials))
     }
 
@@ -136,8 +136,8 @@ class AutofillSettingsViewModel @Inject constructor(
         _viewState.value = viewState.value.copy(autofillEnabled = false)
     }
 
-    fun onExitEditMode() {
-        _viewState.value = viewState.value.copy(credentialModeState = Viewing)
+    fun onExitEditMode(shouldReset: Boolean) {
+        _viewState.value = viewState.value.copy(credentialModeState = Viewing(reset = shouldReset))
     }
 
     fun onExitViewMode() {
@@ -152,10 +152,10 @@ class AutofillSettingsViewModel @Inject constructor(
         val isLocked: Boolean = false
     )
 
-    enum class CredentialModeState {
-        Viewing,
-        Editing,
-        NotInCredentialMode
+    sealed class CredentialModeState {
+        data class Viewing(val reset: Boolean = false) : CredentialModeState()
+        object Editing : CredentialModeState()
+        object NotInCredentialMode : CredentialModeState()
     }
 
     sealed class Command(val id: String = UUID.randomUUID().toString()) {
