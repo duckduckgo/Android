@@ -35,12 +35,8 @@ class PrivacyFeatureTogglesPlugin @Inject constructor(
         defaultValue: Boolean
     ): Boolean? {
         @Suppress("NAME_SHADOWING")
-        val privacyFeatureName = privacyFeatureValueOf(featureName)
-        return if (privacyFeatureName != null) {
-            privacyFeatureTogglesRepository.get(privacyFeatureName, defaultValue) &&
-                appBuildConfig.versionCode >= privacyFeatureTogglesRepository.getMinSupportedVersion(privacyFeatureName)
-        } else {
-            null
-        }
+        val privacyFeatureName = privacyFeatureValueOf(featureName) ?: return null
+        return privacyFeatureTogglesRepository.get(privacyFeatureName, defaultValue) &&
+            appBuildConfig.versionCode >= privacyFeatureTogglesRepository.getMinSupportedVersion(privacyFeatureName)
     }
 }

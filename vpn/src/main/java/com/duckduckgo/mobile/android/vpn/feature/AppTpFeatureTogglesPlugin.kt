@@ -29,12 +29,8 @@ class AppTpFeatureTogglesPlugin @Inject constructor(
     private val appBuildConfig: AppBuildConfig
 ) : FeatureTogglesPlugin {
     override fun isEnabled(featureName: String, defaultValue: Boolean): Boolean? {
-        val appTpFeatureName = appTpFeatureValueOf(featureName)
-        return if (appTpFeatureName != null) {
-            return appTpFeatureToggleRepository.get(appTpFeatureName, defaultValue) &&
-                appBuildConfig.versionCode >= appTpFeatureToggleRepository.getMinSupportedVersion(appTpFeatureName)
-        } else {
-            null
-        }
+        val appTpFeatureName = appTpFeatureValueOf(featureName) ?: return null
+        return appTpFeatureToggleRepository.get(appTpFeatureName, defaultValue) &&
+            appBuildConfig.versionCode >= appTpFeatureToggleRepository.getMinSupportedVersion(appTpFeatureName)
     }
 }

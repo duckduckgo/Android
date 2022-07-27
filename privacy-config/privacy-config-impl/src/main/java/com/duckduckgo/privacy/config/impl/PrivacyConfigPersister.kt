@@ -58,7 +58,7 @@ class RealPrivacyConfigPersister @Inject constructor(
                 jsonPrivacyConfig.features.forEach { feature ->
                     feature.value?.let { jsonObject ->
                         privacyFeaturePluginPoint.getPlugins().firstOrNull { feature.key == it.featureName }?.let { featurePlugin ->
-                            featurePlugin.store(featurePlugin.featureName, jsonObject.toString())
+                            featurePlugin.store(feature.key, jsonObject.toString())
                         }
                     }
                 }

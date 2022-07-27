@@ -34,6 +34,7 @@ class AmpLinksPlugin @Inject constructor(
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
+        @Suppress("NAME_SHADOWING")
         val privacyFeature = privacyFeatureValueOf(featureName) ?: return false
         if (privacyFeature.value == this.featureName) {
             val moshi = Moshi.Builder().build()
