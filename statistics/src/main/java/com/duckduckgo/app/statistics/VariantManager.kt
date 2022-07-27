@@ -28,10 +28,7 @@ import java.util.*
 interface VariantManager {
 
     // variant-dependant features listed here
-    sealed class VariantFeature {
-        object VpnRetentionStudyTreatment : VariantFeature()
-        object VpnRetentionStudyControl : VariantFeature()
-    }
+    sealed class VariantFeature
 
     companion object {
 
@@ -45,16 +42,6 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-
-            // AppTP Retention study experiment
-            Variant(
-                key = "na", weight = 1.0, features = listOf(VariantFeature.VpnRetentionStudyControl),
-                filterBy = { config -> config.sdkInt < 31 && isEnglishLocale() }
-            ),
-            Variant(
-                key = "nb", weight = 1.0, features = listOf(VariantFeature.VpnRetentionStudyTreatment),
-                filterBy = { config -> config.sdkInt < 31 && isEnglishLocale() }
-            ),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -183,13 +170,6 @@ class ExperimentationVariantManager(
         val randomizedIndex = indexRandomizer.random(activeVariants)
         return activeVariants[randomizedIndex]
     }
-}
-
-fun VariantManager.isVPNRetentionStudyEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.VpnRetentionStudyTreatment)
-
-fun VariantManager.isVpnExperiment(): Boolean {
-    return this.getVariant().hasFeature(VariantManager.VariantFeature.VpnRetentionStudyTreatment) ||
-        this.getVariant().hasFeature(VariantManager.VariantFeature.VpnRetentionStudyControl)
 }
 
 /**

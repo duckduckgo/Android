@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.notification
 
-import android.annotation.SuppressLint
 import android.app.IntentService
 import android.app.PendingIntent
 import android.content.Context
@@ -107,7 +106,6 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         if (intent.getBooleanExtra(NOTIFICATION_AUTO_CANCEL, true)) {
             val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
             clearNotification(notificationId)
-            closeNotificationPanel()
         }
     }
 
@@ -176,12 +174,6 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     private fun clearNotification(notificationId: Int) {
         notificationManager.cancel(notificationId)
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun closeNotificationPanel() {
-        val it = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
-        context.sendBroadcast(it)
     }
 
     object NotificationEvent {

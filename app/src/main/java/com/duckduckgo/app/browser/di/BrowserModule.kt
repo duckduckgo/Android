@@ -52,7 +52,6 @@ import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -78,6 +77,8 @@ import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.BrowserAutofill
+import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
@@ -127,10 +128,11 @@ class BrowserModule {
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        emailInjector: EmailInjector,
         accessibilityManager: AccessibilityManager,
+        browserAutofill: BrowserAutofill,
         ampLinks: AmpLinks,
-        printInjector: PrintInjector
+        printInjector: PrintInjector,
+        internalTestUserChecker: InternalTestUserChecker
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -147,10 +149,11 @@ class BrowserModule {
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
-            emailInjector,
+            browserAutofill,
             accessibilityManager,
             ampLinks,
-            printInjector
+            printInjector,
+            internalTestUserChecker
         )
     }
 
@@ -164,7 +167,7 @@ class BrowserModule {
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        urlExtractor: DOMUrlExtractor
+        urlExtractor: DOMUrlExtractor,
     ): UrlExtractingWebViewClient {
         return UrlExtractingWebViewClient(
             webViewHttpAuthStore,
@@ -175,7 +178,7 @@ class BrowserModule {
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
-            urlExtractor
+            urlExtractor,
         )
     }
 
@@ -235,8 +238,9 @@ class BrowserModule {
     fun specialUrlDetector(
         packageManager: PackageManager,
         ampLinks: AmpLinks,
-        trackingParameters: TrackingParameters
-    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters)
+        trackingParameters: TrackingParameters,
+        appBuildConfig: AppBuildConfig,
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, appBuildConfig)
 
     @Provides
     @SingleInstanceIn(AppScope::class)

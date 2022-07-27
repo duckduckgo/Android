@@ -22,6 +22,12 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
+android {
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
+}
+
 dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':common')
@@ -29,7 +35,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':statistics')
     implementation project(path: ':voice-search-api')
-    api project(path: ':voice-search-store')
+    implementation project(path: ':voice-search-store')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')

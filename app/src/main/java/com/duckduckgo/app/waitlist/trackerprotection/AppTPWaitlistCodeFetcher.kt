@@ -16,23 +16,22 @@
 
 package com.duckduckgo.app.waitlist.trackerprotection
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder.Companion.APP_TP_WAITLIST_SYNC_WORK_TAG
-import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-interface TrackingProtectionWaitlistCodeFetcher : LifecycleObserver {
+interface TrackingProtectionWaitlistCodeFetcher : DefaultLifecycleObserver {
     suspend fun fetchInviteCode()
 }
 
@@ -46,8 +45,7 @@ class AppTrackingProtectionWaitlistCodeFetcher(
     private val appCoroutineScope: CoroutineScope
 ) : TrackingProtectionWaitlistCodeFetcher {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun executeWaitlistCodeFetcher() {
+    override fun onStart(owner: LifecycleOwner) {
         appCoroutineScope.launch {
             if (atpRepository.getState() is WaitlistState.JoinedWaitlist) {
                 fetchInviteCode()

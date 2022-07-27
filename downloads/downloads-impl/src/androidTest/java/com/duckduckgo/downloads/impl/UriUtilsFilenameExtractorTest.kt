@@ -19,12 +19,10 @@ package com.duckduckgo.downloads.impl
 import androidx.test.filters.SdkSuppress
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 class UriUtilsFilenameExtractorTest {
 
@@ -275,17 +273,6 @@ class UriUtilsFilenameExtractorTest {
         extractionResult as FilenameExtractor.FilenameExtractionResult.Guess
 
         assertEquals("cat", extractionResult.bestGuess)
-    }
-
-    @Test
-    fun whenNoFilenameAndPathSegmentsThenFirePixel() {
-        val url = "http://example.com/cat/600/400"
-        val mimeType: String? = null
-        val contentDisposition: String? = null
-
-        testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-
-        verify(mockedPixel).fire(DownloadsPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
     }
 
     @Test

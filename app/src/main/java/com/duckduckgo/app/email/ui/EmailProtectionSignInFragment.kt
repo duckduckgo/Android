@@ -29,7 +29,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignInBinding
-import com.duckduckgo.app.email.AppEmailManager
+import com.duckduckgo.app.email.EmailManager.WaitlistState
 import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.di.scopes.FragmentScope
@@ -80,9 +80,9 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
 
     private fun render(signInViewState: EmailProtectionSignInViewModel.ViewState) {
         when (val state = signInViewState.waitlistState) {
-            is AppEmailManager.WaitlistState.JoinedQueue -> renderJoinedQueue(state.notify)
-            is AppEmailManager.WaitlistState.InBeta -> renderInBeta()
-            is AppEmailManager.WaitlistState.NotJoinedQueue -> renderNotJoinedQueue()
+            is WaitlistState.JoinedQueue -> renderJoinedQueue(state.notify)
+            is WaitlistState.InBeta -> renderInBeta()
+            is WaitlistState.NotJoinedQueue -> renderNotJoinedQueue()
         }
     }
 

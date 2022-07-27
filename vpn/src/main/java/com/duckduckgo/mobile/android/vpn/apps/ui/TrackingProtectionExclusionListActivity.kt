@@ -102,8 +102,8 @@ class TrackingProtectionExclusionListActivity :
         return true
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        val restoreDefault = menu?.findItem(R.id.restoreDefaults)
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val restoreDefault = menu.findItem(R.id.restoreDefaults)
         // onPrepareOptionsMenu is called when overflow menu is being displayed, that's why this can be an imperative call
         restoreDefault?.isEnabled = viewModel.canRestoreDefaults()
 

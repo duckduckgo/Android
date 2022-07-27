@@ -18,7 +18,7 @@
                                                                             ng-class="{ placeholder: !vm.model.prefix }"
                                                                             aria-label="Prefix (optional)"
                                                                             class="ng-pristine ng-valid placeholder ng-touched"
-                                                                            tabindex="0" aria-invalid="false">
+                                                                            tabindex="0" aria-invalid="false" data-manual-scoring="unknown">
                 <option value="" ng-disabled="vm.required" class="ng-binding">Prefix (optional)</option>
                 <option value="0" label="Miss">Miss</option>
                 <option value="1" label="Mr">Mr</option>
@@ -131,7 +131,7 @@
                                                                             ng-class="{ placeholder: !vm.model.suffix }"
                                                                             aria-label="Suffix (optional)"
                                                                             class="ng-pristine ng-untouched ng-valid placeholder"
-                                                                            tabindex="0" aria-invalid="false">
+                                                                            tabindex="0" aria-invalid="false" data-manual-scoring="unknown">
                 <option value="" ng-disabled="vm.config.suffix.required" class="ng-binding" aria-disabled="false">Suffix
                     (optional)
                 </option>

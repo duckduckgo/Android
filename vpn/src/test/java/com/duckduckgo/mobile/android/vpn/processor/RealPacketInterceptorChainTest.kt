@@ -25,7 +25,7 @@ import java.nio.ByteBuffer
 class RealPacketInterceptorChainTest {
 
     private val testRequest = PacketRequest(
-        PacketInfo(4, 0, InetAddress.getByName("1.1.1.1"), 1),
+        PacketInfo(4, 0, InetAddress.getByName("1.1.1.1"), 1, InetAddress.getByName("1.1.1.1"), 2),
         ByteBuffer.allocate(0),
         mock()
     )

@@ -26,29 +26,25 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.mobile.android.ui.view.setAllParentsClip
 
-class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObserver {
+class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecycleObserver {
     private var pulseAnimation: AnimatorSet = AnimatorSet()
     private var highlightImageView: View? = null
     val isActive: Boolean
         get() = pulseAnimation.isRunning
 
     @Suppress("unused")
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun onStart() {
+    override fun onStart(owner: LifecycleOwner) {
         if (pulseAnimation.isPaused) {
             pulseAnimation.resume()
         }
     }
 
     @Suppress("unused")
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onStop() {
+    override fun onStop(owner: LifecycleOwner) {
         if (pulseAnimation.isRunning) {
             pulseAnimation.pause()
         }

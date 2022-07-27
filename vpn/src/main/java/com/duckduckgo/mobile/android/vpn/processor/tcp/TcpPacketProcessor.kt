@@ -199,8 +199,8 @@ constructor(
         ) {
             val buffer = ByteBufferPool.acquire()
             synchronized(this) {
-                var responseAck = acknowledgementNumberToClient + payloadSize
-                val responseSeq = acknowledgementNumberToServer
+                var responseAck = acknowledgementNumberToClient.addAndGet(payloadSize.toLong())
+                val responseSeq = acknowledgementNumberToServer.get()
 
                 if (packet.tcpHeader.isFIN) {
                     responseAck = increaseOrWraparound(responseAck, 1)
@@ -211,10 +211,10 @@ constructor(
                 )
 
                 if (triggeredByServerEndOfStream) {
-                    finSequenceNumberToClient = sequenceNumberToClient
+                    finSequenceNumberToClient = sequenceNumberToClient.get()
                 } else {
-                    sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
-                    finSequenceNumberToClient = sequenceNumberToClient
+                    sequenceNumberToClient.set(increaseOrWraparound(sequenceNumberToClient.get(), 1))
+                    finSequenceNumberToClient = sequenceNumberToClient.get()
                 }
 
                 Timber.v(
@@ -222,8 +222,8 @@ constructor(
                     ipAndPort,
                     responseSeq,
                     responseAck,
-                    sequenceNumberToClient,
-                    acknowledgementNumberToClient,
+                    sequenceNumberToClient.get(),
+                    acknowledgementNumberToClient.get(),
                     payloadSize
                 )
             }
@@ -231,7 +231,6 @@ constructor(
             queues.networkToDevice.offerFirst(buffer)
 
             try {
-                selectionKey.cancel()
                 channel.close()
             } catch (e: Exception) {
                 Timber.w(e, "Problem closing socket connection for %s", ipAndPort)
@@ -245,17 +244,15 @@ constructor(
             synchronized(this) {
                 val payloadSize = packet.tcpPayloadSize(true)
 
-                acknowledgementNumberToClient =
-                    increaseOrWraparound(packet.tcpHeader.sequenceNumber, payloadSize.toLong())
-                sequenceNumberToClient = packet.tcpHeader.acknowledgementNumber
+                acknowledgementNumberToClient.set(increaseOrWraparound(packet.tcpHeader.sequenceNumber, payloadSize.toLong()))
+                sequenceNumberToClient.set(packet.tcpHeader.acknowledgementNumber)
 
                 if (packet.tcpHeader.isRST || packet.tcpHeader.isSYN || packet.tcpHeader.isFIN) {
-                    acknowledgementNumberToClient =
-                        increaseOrWraparound(acknowledgementNumberToClient, 1)
+                    acknowledgementNumberToClient.set(increaseOrWraparound(acknowledgementNumberToClient.get(), 1))
                     Timber.v(
                         "%s - Sending ACK from network to device. Flags contain RST, SYN or FIN so incremented acknowledge number to %d",
                         ipAndPort,
-                        acknowledgementNumberToClient
+                        acknowledgementNumberToClient.get()
                     )
                 }
 
@@ -263,16 +260,16 @@ constructor(
                     "%s - Sending ACK, payloadSize=%d, seqNumber=%d ackNumber= %d)",
                     ipAndPort,
                     payloadSize,
-                    acknowledgementNumberToClient,
-                    sequenceNumberToClient
+                    acknowledgementNumberToClient.get(),
+                    sequenceNumberToClient.get()
                 )
 
                 val buffer = ByteBufferPool.acquire()
                 packet.updateTcpBuffer(
                     buffer,
                     (ACK).toByte(),
-                    sequenceNumberToClient,
-                    acknowledgementNumberToClient,
+                    sequenceNumberToClient.get(),
+                    acknowledgementNumberToClient.get(),
                     0
                 )
                 // sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)

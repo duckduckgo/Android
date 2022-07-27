@@ -43,7 +43,7 @@ class UrlExtractingWebViewClient(
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val urlExtractor: DOMUrlExtractor
+    private val urlExtractor: DOMUrlExtractor,
 ) : WebViewClient() {
 
     var urlExtractionListener: UrlExtractionListener? = null

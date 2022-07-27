@@ -16,10 +16,11 @@
 
 package com.duckduckgo.app.browser.serviceworker
 
-import android.os.Build
-import android.webkit.ServiceWorkerController
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.webkit.ServiceWorkerControllerCompat
+import androidx.webkit.WebViewFeature
+import androidx.webkit.WebViewFeature.SERVICE_WORKER_BASIC_USAGE
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.di.scopes.AppScope
@@ -30,14 +31,14 @@ import dagger.SingleInstanceIn
 @SingleInstanceIn(AppScope::class)
 class ServiceWorkerLifecycleObserver @Inject constructor(
     private val requestInterceptor: RequestInterceptor,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
 ) : DefaultLifecycleObserver {
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (WebViewFeature.isFeatureSupported(SERVICE_WORKER_BASIC_USAGE)) {
             try {
-                ServiceWorkerController.getInstance().setServiceWorkerClient(
+                ServiceWorkerControllerCompat.getInstance().setServiceWorkerClient(
                     BrowserServiceWorkerClient(requestInterceptor, uncaughtExceptionRepository)
                 )
             } catch (e: Exception) {

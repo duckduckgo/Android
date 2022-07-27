@@ -127,7 +127,11 @@
             />
 
             <!-- Section Trackers -->
-            <View style="@style/SettingsGroupDivider" />
+            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="0dp"/>
+
             <TextView
                 android:id="@+id/sectionTrackersTitle"
                 style="@style/SettingsSectionTitle"
@@ -162,7 +166,10 @@
             />
 
             <!-- Section Protection -->
-            <View style="@style/SettingsGroupDivider" />
+            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="0dp"/>
 
             <TextView
                     android:id="@+id/sectionAppProtection"
@@ -187,7 +194,10 @@
                     android:text="Restore default protections"/>
 
             <!-- Section Logging -->
-            <View style="@style/SettingsGroupDivider" />
+            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="0dp"/>
 
             <TextView
                     android:id="@+id/sectionTrackersLogging"
@@ -207,7 +217,10 @@
             />
 
             <!-- Section Diagnostics -->
-            <View style="@style/SettingsGroupDivider" />
+            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="0dp"/>
 
             <TextView
                     android:id="@+id/sectionDiagnosticsTitle"
@@ -233,7 +246,10 @@
 
 
             <!-- Section Health -->
-            <View style="@style/SettingsGroupDivider" />
+            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="0dp"/>
 
             <TextView
                     android:id="@+id/sectionHealthTitle"

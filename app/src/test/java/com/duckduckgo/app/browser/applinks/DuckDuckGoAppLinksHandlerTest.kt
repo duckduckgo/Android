@@ -17,86 +17,85 @@
 package com.duckduckgo.app.browser.applinks
 
 import android.os.Build
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import junit.framework.TestCase.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class DuckDuckGoAppLinksHandlerTest {
 
     private lateinit var testee: DuckDuckGoAppLinksHandler
 
     private var mockCallback: () -> Unit = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
 
     @Before
     fun setup() {
-        testee = DuckDuckGoAppLinksHandler()
+        whenever(appBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.N)
+        testee = DuckDuckGoAppLinksHandler(appBuildConfig)
         testee.previousUrl = "example.com"
     }
 
     @Test
     fun whenAppLinkHandledAndIsSameOrSubdomainThenReturnFalse() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            assertFalse(
-                testee.handleAppLink(
-                    isForMainFrame = true,
-                    urlString = "example.com",
-                    launchAppLink = mockCallback,
-                    shouldHaltWebNavigation = true,
-                    appLinksEnabled = true
-                )
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                urlString = "example.com",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true
             )
-        }
+        )
     }
 
     @Test
     fun whenAppLinkHandledAndIsNotSameOrSubdomainThenReturnFalseAndLaunchAppLink() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            assertFalse(
-                testee.handleAppLink(
-                    isForMainFrame = true,
-                    urlString = "foo.com",
-                    launchAppLink = mockCallback,
-                    shouldHaltWebNavigation = false,
-                    appLinksEnabled = true
-                )
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                urlString = "foo.com",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = false,
+                appLinksEnabled = true
             )
-            verify(mockCallback).invoke()
-        }
+        )
+        verify(mockCallback).invoke()
     }
 
     @Test
     fun whenAppLinkHandledAndIsNotForMainFrameThenReturnFalse() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            assertFalse(
-                testee.handleAppLink(
-                    isForMainFrame = false,
-                    urlString = "foo.com",
-                    launchAppLink = mockCallback,
-                    shouldHaltWebNavigation = true,
-                    appLinksEnabled = true
-                )
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = false,
+                urlString = "foo.com",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true
             )
-            verifyNoInteractions(mockCallback)
-        }
+        )
+        verifyNoInteractions(mockCallback)
     }
 
     @Test
     fun whenAppLinkHandledOnApiLessThan24ThenReturnFalse() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            assertFalse(
-                testee.handleAppLink(
-                    isForMainFrame = false,
-                    urlString = "foo.com",
-                    launchAppLink = mockCallback,
-                    shouldHaltWebNavigation = true,
-                    appLinksEnabled = true
-                )
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = false,
+                urlString = "foo.com",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true
             )
-            verifyNoInteractions(mockCallback)
-        }
+        )
+        verifyNoInteractions(mockCallback)
     }
 
     @Test
@@ -107,138 +106,122 @@ class DuckDuckGoAppLinksHandlerTest {
 
     @Test
     fun whenAppLinksDisabledThenReturnFalse() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            assertFalse(
-                testee.handleAppLink(
-                    isForMainFrame = true,
-                    urlString = "example.com",
-                    launchAppLink = mockCallback,
-                    shouldHaltWebNavigation = true,
-                    appLinksEnabled = false
-                )
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                urlString = "example.com",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = false
             )
-        }
+        )
     }
 
     @Test
     fun whenPreviousUrlIsSameThenReturnFalse() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            testee.previousUrl = "example.com"
-            assertFalse(
-                testee.handleAppLink(
-                    isForMainFrame = true,
-                    urlString = "example.com",
-                    launchAppLink = mockCallback,
-                    shouldHaltWebNavigation = true,
-                    appLinksEnabled = true
-                )
+        testee.previousUrl = "example.com"
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                urlString = "example.com",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true
             )
-        }
+        )
     }
 
     @Test
     fun whenPreviousUrlIsSubdomainThenReturnFalse() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            testee.previousUrl = "foo.example.com"
-            assertFalse(
-                testee.handleAppLink(
-                    isForMainFrame = true,
-                    urlString = "example.com",
-                    launchAppLink = mockCallback,
-                    shouldHaltWebNavigation = true,
-                    appLinksEnabled = true
-                )
+        testee.previousUrl = "foo.example.com"
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                urlString = "example.com",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true
             )
-        }
+        )
     }
 
     @Test
     fun whenNextUrlIsSubdomainThenReturnFalse() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            testee.previousUrl = "example.com"
-            assertFalse(
-                testee.handleAppLink(
-                    isForMainFrame = true,
-                    urlString = "foo.example.com",
-                    launchAppLink = mockCallback,
-                    shouldHaltWebNavigation = true,
-                    appLinksEnabled = true
-                )
+        testee.previousUrl = "example.com"
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                urlString = "foo.example.com",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true
             )
-        }
+        )
     }
 
     @Test
     fun whenAppLinkIsSameOrSubdomainAndIsUserQueryThenReturnFalseAndSetPreviousUrlAndLaunchAppLink() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            testee.isAUserQuery = true
-            testee.previousUrl = "example.com"
-            assertFalse(
-                testee.handleAppLink(
-                    isForMainFrame = true,
-                    urlString = "example.com",
-                    launchAppLink = mockCallback,
-                    shouldHaltWebNavigation = true,
-                    appLinksEnabled = true
-                )
+        testee.isAUserQuery = true
+        testee.previousUrl = "example.com"
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                urlString = "example.com",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true
             )
-            assertEquals("example.com", testee.previousUrl)
-            verify(mockCallback).invoke()
-        }
+        )
+        assertEquals("example.com", testee.previousUrl)
+        verify(mockCallback).invoke()
     }
 
     @Test
     fun whenAppLinkIsSameOrSubdomainAndIsNotUserQueryThenReturnFalse() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            testee.isAUserQuery = false
-            testee.previousUrl = "foo.example.com"
-            assertFalse(
-                testee.handleAppLink(
-                    isForMainFrame = true,
-                    urlString = "example.com",
-                    launchAppLink = mockCallback,
-                    shouldHaltWebNavigation = true,
-                    appLinksEnabled = true
-                )
+        testee.isAUserQuery = false
+        testee.previousUrl = "foo.example.com"
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                urlString = "example.com",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true
             )
-            assertEquals("foo.example.com", testee.previousUrl)
-            verifyNoInteractions(mockCallback)
-        }
+        )
+        assertEquals("foo.example.com", testee.previousUrl)
+        verifyNoInteractions(mockCallback)
     }
 
     @Test
     fun whenShouldHaltWebNavigationThenReturnTrueAndSetPreviousUrlAndLaunchAppLink() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            testee.previousUrl = "foo.com"
-            assertTrue(
-                testee.handleAppLink(
-                    isForMainFrame = true,
-                    urlString = "example.com",
-                    launchAppLink = mockCallback,
-                    shouldHaltWebNavigation = true,
-                    appLinksEnabled = true
-                )
+        testee.previousUrl = "foo.com"
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                urlString = "example.com",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true
             )
-            assertEquals("example.com", testee.previousUrl)
-            verify(mockCallback).invoke()
-        }
+        )
+        assertEquals("example.com", testee.previousUrl)
+        verify(mockCallback).invoke()
     }
 
     @Test
     fun whenShouldNotHaltWebNavigationThenReturnFalseAndSetPreviousUrlAndLaunchAppLink() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            testee.previousUrl = "foo.com"
-            assertFalse(
-                testee.handleAppLink(
-                    isForMainFrame = true,
-                    urlString = "example.com",
-                    launchAppLink = mockCallback,
-                    shouldHaltWebNavigation = false,
-                    appLinksEnabled = true
-                )
+        testee.previousUrl = "foo.com"
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                urlString = "example.com",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = false,
+                appLinksEnabled = true
             )
-            assertEquals("example.com", testee.previousUrl)
-            verify(mockCallback).invoke()
-        }
+        )
+        assertEquals("example.com", testee.previousUrl)
+        verify(mockCallback).invoke()
     }
 }

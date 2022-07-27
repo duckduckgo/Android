@@ -20,10 +20,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
-import android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
 import android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED
 import android.net.NetworkCapabilities.TRANSPORT_VPN
-import android.os.Build
 import android.os.Bundle
 import android.util.Base64
 import android.view.Menu
@@ -38,6 +36,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.historicalExitReasonsByProcessName
 import com.duckduckgo.app.global.formatters.time.model.TimePassed
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.rightDrawable
 import com.duckduckgo.mobile.android.vpn.R
@@ -105,6 +104,8 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
     @Inject lateinit var appTPHealthMonitor: AppTPHealthMonitor
 
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
+
+    @Inject lateinit var appBuildConfig: AppBuildConfig
 
     private val moshi = Moshi.Builder().build()
 
@@ -393,8 +394,9 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         )
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun retrieveHistoricalCrashInfo(): AppExitHistory {
-        if (Build.VERSION.SDK_INT < 30) {
+        if (appBuildConfig.sdkInt < 30) {
             return AppExitHistory()
         }
 
@@ -484,17 +486,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
             ) { it }
     }
 
-    private fun android.net.Network.isConnected(): Boolean {
-        return connectivityManager
-            .getNetworkCapabilities(this)
-            ?.hasCapability(NET_CAPABILITY_INTERNET) == true &&
-            connectivityManager
-            .getNetworkCapabilities(this)
-            ?.hasCapability(NET_CAPABILITY_VALIDATED) == true
-    }
-
     private fun isConnectedToInternet(): Boolean {
-
         val capabilities =
             connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
                 ?: return false
@@ -552,7 +544,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         timerUpdateJob?.cancel()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.vpn_network_info_menu, menu)
         return true
     }

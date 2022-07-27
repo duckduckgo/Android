@@ -172,7 +172,9 @@ class UdpPacketProcessor @AssistedInject constructor(
                         IPVersion = packet.ipHeader.version,
                         transportProtocol = connectionInfo.protocolNumber,
                         destinationAddress = connectionInfo.destinationAddress,
-                        destinationPort = connectionInfo.destinationPort
+                        destinationPort = connectionInfo.destinationPort,
+                        sourceAddress = connectionInfo.sourceAddress,
+                        sourcePort = connectionInfo.sourcePort,
                     ),
                     byteBuffer = payloadBuffer,
                     byteChannel = channelDetails.datagramChannel

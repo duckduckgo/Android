@@ -2,6 +2,17 @@
 <issues format="6" by="lint 7.0.4" type="baseline" client="gradle" name="AGP (7.0.4)" variant="all" version="7.0.4">
 
     <issue
+        id="UseGetLayoutInflater"
+        message="Use of LayoutInflater.from(Context) detected. Consider using layoutInflater instead"
+        errorLine1="        binding = DialogRadioGroupSelectorFragmentBinding.inflate(LayoutInflater.from(context))"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/fire/fireproofwebsite/ui/FireproofSettingsSelectorFragment.kt"
+            line="43"
+            column="67"/>
+    </issue>
+
+    <issue
         id="ScrollViewSize"
         message="This androidx.constraintlayout.widget.ConstraintLayout should use `android:layout_height=&quot;wrap_content&quot;`"
         errorLine1="        android:layout_height=&quot;match_parent&quot;"
@@ -24,24 +35,13 @@
     </issue>
 
     <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 23): `android.provider.Settings#ACTION_VPN_SETTINGS`"
-        errorLine1="        val intent = Intent(Settings.ACTION_VPN_SETTINGS)"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/onboarding/ui/page/vpn/VpnPermissionPage.kt"
-            line="146"
-            column="29"/>
-    </issue>
-
-    <issue
         id="UnusedAttribute"
         message="Attribute `networkSecurityConfig` is only used in API level 24 and higher (current min is 23)"
         errorLine1="        android:networkSecurityConfig=&quot;@xml/network_security_config&quot;"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="28"
+            line="31"
             column="9"/>
     </issue>
 
@@ -226,6 +226,50 @@
             file="src/main/res/layout/include_system_search_onboarding.xml"
             line="143"
             column="13"/>
+    </issue>
+
+    <issue
+        id="Typos"
+        message="&quot;Eletrónico&quot; is a common misspelling; did you mean &quot;Electrónico&quot; or &quot;Eletrônico&quot; ?"
+        errorLine1="    &lt;string name=&quot;emailNotSupportedExplanation&quot;>A Proteção do Correio Eletrónico permite-lhe criar endereços de correio eletrónico privados que removem os rastreadores de correio eletrónico. Precisamos de encriptar e armazenar estes endereços que cria localmente no seu dispositivo. Uma vez que o dispositivo não suporta armazenamento encriptado, a Proteção do Correio Eletrónico não está disponível.&lt;/string>"
+        errorLine2="                                                                      ^">
+        <location
+            file="src/main/res/values-pt/strings.xml"
+            line="653"
+            column="71"/>
+    </issue>
+
+    <issue
+        id="Typos"
+        message="&quot;Eletrónico&quot; is a common misspelling; did you mean &quot;Electrónico&quot; or &quot;Eletrônico&quot; ?"
+        errorLine1="    &lt;string name=&quot;emailNotSupportedExplanation&quot;>A Proteção do Correio Eletrónico permite-lhe criar endereços de correio eletrónico privados que removem os rastreadores de correio eletrónico. Precisamos de encriptar e armazenar estes endereços que cria localmente no seu dispositivo. Uma vez que o dispositivo não suporta armazenamento encriptado, a Proteção do Correio Eletrónico não está disponível.&lt;/string>"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                 ^">
+        <location
+            file="src/main/res/values-pt/strings.xml"
+            line="653"
+            column="370"/>
+    </issue>
+
+    <issue
+        id="Typos"
+        message="&quot;eletrónico&quot; is a common misspelling; did you mean &quot;electrónico&quot; or &quot;eletrônico&quot; ?"
+        errorLine1="    &lt;string name=&quot;emailNotSupportedExplanation&quot;>A Proteção do Correio Eletrónico permite-lhe criar endereços de correio eletrónico privados que removem os rastreadores de correio eletrónico. Precisamos de encriptar e armazenar estes endereços que cria localmente no seu dispositivo. Uma vez que o dispositivo não suporta armazenamento encriptado, a Proteção do Correio Eletrónico não está disponível.&lt;/string>"
+        errorLine2="                                                                                                                        ^">
+        <location
+            file="src/main/res/values-pt/strings.xml"
+            line="653"
+            column="121"/>
+    </issue>
+
+    <issue
+        id="Typos"
+        message="&quot;eletrónico&quot; is a common misspelling; did you mean &quot;electrónico&quot; or &quot;eletrônico&quot; ?"
+        errorLine1="    &lt;string name=&quot;emailNotSupportedExplanation&quot;>A Proteção do Correio Eletrónico permite-lhe criar endereços de correio eletrónico privados que removem os rastreadores de correio eletrónico. Precisamos de encriptar e armazenar estes endereços que cria localmente no seu dispositivo. Uma vez que o dispositivo não suporta armazenamento encriptado, a Proteção do Correio Eletrónico não está disponível.&lt;/string>"
+        errorLine2="                                                                                                                                                                                   ^">
+        <location
+            file="src/main/res/values-pt/strings.xml"
+            line="653"
+            column="180"/>
     </issue>
 
     <issue
@@ -2407,12 +2451,23 @@
     </issue>
 
     <issue
+        id="AcceptsUserCertificates"
+        message="The Network Security Configuration allows the use of user certificates in the release version of your app"
+        errorLine1="            &lt;certificates src=&quot;user&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/internal/res/xml/network_security_config.xml"
+            line="31"
+            column="13"/>
+    </issue>
+
+    <issue
         id="InsecureBaseConfiguration"
         message="Insecure Base Configuration"
         errorLine1="    &lt;base-config cleartextTrafficPermitted=&quot;true&quot; >"
         errorLine2="                                            ~~~~">
         <location
-            file="src/main/res/xml/network_security_config.xml"
+            file="src/internal/res/xml/network_security_config.xml"
             line="26"
             column="45"/>
     </issue>
@@ -2429,189 +2484,13 @@
     </issue>
 
     <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise. For launcher activities, this should be set to `true`."
-        errorLine1="        &lt;activity"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="68"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise. For launcher activities, this should be set to `true`."
-        errorLine1="        &lt;activity-alias"
-        errorLine2="         ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="79"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise. For launcher activities, this should be set to `true`."
-        errorLine1="        &lt;activity-alias"
-        errorLine2="         ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="92"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise. For launcher activities, this should be set to `true`."
-        errorLine1="        &lt;activity-alias"
-        errorLine2="         ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="105"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise. For launcher activities, this should be set to `true`."
-        errorLine1="        &lt;activity-alias"
-        errorLine2="         ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="118"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise. For launcher activities, this should be set to `true`."
-        errorLine1="        &lt;activity-alias"
-        errorLine2="         ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="131"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise. For launcher activities, this should be set to `true`."
-        errorLine1="        &lt;activity-alias"
-        errorLine2="         ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="144"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise. For launcher activities, this should be set to `true`."
-        errorLine1="        &lt;activity-alias"
-        errorLine2="         ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="157"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise."
-        errorLine1="        &lt;activity"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="171"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise."
-        errorLine1="        &lt;activity"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="198"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise."
-        errorLine1="        &lt;activity"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="287"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise."
-        errorLine1="        &lt;activity"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="375"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise."
-        errorLine1="        &lt;receiver android:name=&quot;com.duckduckgo.widget.SearchWidget&quot; android:label=&quot;@string/searchWidgetLabel&quot;>"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="413"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise."
-        errorLine1="        &lt;receiver android:name=&quot;com.duckduckgo.widget.SearchWidgetLight&quot; android:label=&quot;@string/searchWidgetLabel&quot;>"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="422"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise."
-        errorLine1="        &lt;receiver android:name=&quot;com.duckduckgo.widget.SearchAndFavoritesWidget&quot; android:label=&quot;@string/favoritesWidgetLabel&quot;>"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="431"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise."
-        errorLine1="        &lt;receiver android:name=&quot;com.duckduckgo.widget.VoiceSearchWidgetUpdater&quot;>"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="440"
-            column="10"/>
-    </issue>
-
-    <issue
         id="UnspecifiedImmutableFlag"
         message="Missing `PendingIntent` mutability flag"
         errorLine1="            return PendingIntent.getService(context, 0, intent, 0)!!"
         errorLine2="                                                                ~">
         <location
             file="src/main/java/com/duckduckgo/app/notification/NotificationHandlerService.kt"
-            line="213"
+            line="205"
             column="65"/>
     </issue>
 
@@ -2771,50 +2650,6 @@
 
     <issue
         id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 23"
-        errorLine1="            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/onboarding/ui/page/DefaultBrowserPage.kt"
-            line="85"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 23"
-        errorLine1="            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/browser/urlextraction/UrlExtractingWebViewClient.kt"
-            line="153"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 23"
-        errorLine1="            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt"
-            line="142"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 23"
-        errorLine1="    override val supportsStandardWidgetAdd: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M"
-        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/widget/ui/WidgetCapabilities.kt"
-            line="36"
-            column="61"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
         message="This folder configuration (`v23`) is unnecessary; `minSdkVersion` is 23. Merge all the resources in this folder into `values`.">
         <location
             file="src/main/res/values-v23"/>
@@ -2905,6 +2740,28 @@
         <location
             file="src/main/res/menu/bookmarks_individual_overflow_menu.xml"
             line="17"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.layout.content_onboarding_vpn_intro` appears to be unused"
+        errorLine1="&lt;androidx.constraintlayout.widget.ConstraintLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/content_onboarding_vpn_intro.xml"
+            line="16"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.layout.content_onboarding_vpn_permission` appears to be unused"
+        errorLine1="&lt;androidx.constraintlayout.widget.ConstraintLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/content_onboarding_vpn_permission.xml"
+            line="16"
             column="1"/>
     </issue>
 
@@ -3244,6 +3101,17 @@
         <location
             file="src/main/res/drawable/network_logo_index_exchange_inc.xml"
             line="17"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.network_logo_microsoft_corporation` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/network_logo_microsoft_corporation.xml"
+            line="1"
             column="1"/>
     </issue>
 
@@ -4315,7 +4183,7 @@
         errorLine2="                                  ^">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="1489"
+            line="1490"
             column="35"/>
     </issue>
 

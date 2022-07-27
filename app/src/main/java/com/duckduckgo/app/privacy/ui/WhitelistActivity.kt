@@ -63,7 +63,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.whitelist_activity_menu, menu)
         return true
     }

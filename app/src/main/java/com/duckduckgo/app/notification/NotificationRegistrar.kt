@@ -21,15 +21,13 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_NONE
 import android.content.Context
-import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.O
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.model.Channel
@@ -37,6 +35,7 @@ import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.impl.FileDownloadNotificationChannelType
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -44,8 +43,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.vpn.R as VpnR
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
 class NotificationRegistrar @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val context: Context,
@@ -53,8 +56,9 @@ class NotificationRegistrar @Inject constructor(
     private val compatManager: NotificationManagerCompat,
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
-    private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>
-) : LifecycleObserver {
+    private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>,
+    private val appBuildConfig: AppBuildConfig,
+) : DefaultLifecycleObserver {
 
     object NotificationId {
         const val ClearData = 100
@@ -85,16 +89,15 @@ class NotificationRegistrar @Inject constructor(
         // Do not add new channels here, instead follow https://app.asana.com/0/1125189844152671/1201842645469204
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun onApplicationCreated() {
+    override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch { registerApp() }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun updateNotificationStatus() {
+    @Suppress("NewApi") // we use appBuildConfig
+    override fun onResume(owner: LifecycleOwner) {
         val systemEnabled = compatManager.areNotificationsEnabled()
         val allChannelsEnabled = when {
-            SDK_INT >= O -> manager.notificationChannels.all { it.importance != IMPORTANCE_NONE }
+            appBuildConfig.sdkInt >= O -> manager.notificationChannels.all { it.importance != IMPORTANCE_NONE }
             else -> true
         }
 
@@ -110,7 +113,7 @@ class NotificationRegistrar @Inject constructor(
     )
 
     private fun registerApp() {
-        if (SDK_INT < O) {
+        if (appBuildConfig.sdkInt < O) {
             Timber.d("No need to register for notification channels on this SDK version")
             return
         }
