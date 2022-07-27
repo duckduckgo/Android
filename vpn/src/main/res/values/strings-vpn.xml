@@ -198,10 +198,10 @@
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
     <string name="atp_ActivityManageProtection">Having Problems With An App?</string>
 
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$s tracking attempt blocked from %2$s company in <b>%3$s</b> app]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$s tracking attempt blocked from %2$s companies in <b>%3$s</b> app]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$s tracking attempts blocked from %2$s company in <b>%3$s</b> app]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$s tracking attempts blocked from %2$s companies in <b>%3$s</b> app]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d tracking attempt blocked from %2$d company in <b>%3$s</b> app]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d tracking attempt blocked from %2$d companies in <b>%3$s</b> app]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d tracking attempts blocked from %2$d company in <b>%3$s</b> app]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d tracking attempts blocked from %2$d companies in <b>%3$s</b> app]]></string>
 
     <string name="atp_ActivityEmptyListTitle">No new activity</string>
     <string name="atp_ActivityEmptyListMessage">Keep using your device. Tracking attempts that App Tracking Protection blocks appear here.</string>

@@ -224,13 +224,13 @@ class DeviceShieldNotificationFactory @Inject constructor(
             val textToStyle = if (trackerCount == 1) {
                 when(otherAppsSize) {
                     0 -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps, trackerCount, latestApp)
-                    1 -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp, trackerCount, latestApp, otherAppsSize)
+                    1 -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp, trackerCount, latestApp)
                     else -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps, trackerCount, latestApp, otherAppsSize)
                 }
             } else {
                 when(otherAppsSize) {
                     0 -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps, trackerCount, latestApp)
-                    1 -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp, trackerCount, latestApp, otherAppsSize)
+                    1 -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp, trackerCount, latestApp)
                     else -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps, trackerCount, latestApp, otherAppsSize)
                 }
             }
