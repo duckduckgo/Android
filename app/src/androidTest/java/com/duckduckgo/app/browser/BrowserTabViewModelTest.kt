@@ -47,8 +47,6 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.CancelIncomingAutofillRequest
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.InjectCredentials
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
@@ -122,7 +120,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
-import com.duckduckgo.downloads.api.DownloadCallback
+import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -307,7 +305,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockTrackingParameters: TrackingParameters
 
     @Mock
-    private lateinit var mockDownloadCallback: DownloadCallback
+    private lateinit var mockDownloadCallback: DownloadStateListener
 
     @Mock
     private lateinit var mockRemoteMessagingRepository: RemoteMessagingRepository
@@ -3832,7 +3830,7 @@ class BrowserTabViewModelTest {
 
         testee.download(pendingFileDownload)
 
-        verify(mockFileDownloader).download(pendingFileDownload, mockDownloadCallback)
+        verify(mockFileDownloader).enqueueDownload(pendingFileDownload)
     }
 
     private fun buildPendingDownload(
@@ -3845,7 +3843,6 @@ class BrowserTabViewModelTest {
             contentDisposition = contentDisposition,
             mimeType = mimeType,
             subfolder = "folder",
-            userAgent = "user_agent"
         )
     }
 

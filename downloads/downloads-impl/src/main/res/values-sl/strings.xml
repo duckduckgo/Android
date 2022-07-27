@@ -19,8 +19,5 @@
 
     <string name="notificationChannelFileDownloading">Prenašanje datoteke</string>
     <string name="notificationChannelFileDownloaded">Datoteka prenesena</string>
-
-    <string name="downloadComplete">Prenos končan</string>
-    <string name="downloadFailed">Prenos ni uspel</string>
     <string name="downloadInProgress">Prenašanje</string>
 </resources>

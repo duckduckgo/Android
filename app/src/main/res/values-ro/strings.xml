@@ -569,10 +569,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Conexiunea a fost anulată. Acest site web ar putea dăuna dispozitivului tău.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Managerul descărcărilor este dezactivat</string>
-    <string name="downloadManagerIncompatible">Managerul descărcărilor nu este disponibil pe acest dispozitiv</string>
-    <string name="enable">Activare</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Activezi locația dispozitivului pentru browserul de confidențialitate DuckDuckGo?</string>
