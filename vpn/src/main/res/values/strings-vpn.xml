@@ -197,25 +197,17 @@
     <string name="atp_ActivityReportProblem">Report a problem With an App</string>
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
     <string name="atp_ActivityManageProtection">Having Problems With An App?</string>
-    <plurals name="atp_ActivityTrackersCompanyBlocked">
-        <item quantity="one">"%d tracking attempt"</item>
-        <item quantity="other">%d tracking attempts"</item>
-    </plurals>
-    <string name="atp_ActivityTrackersBlocked">%1s blocked from <![CDATA[%2s]]> in <![CDATA[<b>%3s</b>]]> app</string>
-    <string name="atp_ActivityTrackersCountOne">from %1$s</string>
-    <string name="atp_ActivityTrackersCountTwo">from %1$s and 1 other</string>
-    <string name="atp_ActivityTrackersCountMany">from %1$s and %2$d others</string>
-    <string name="atp_ActivityToday">Today</string>
-    <string name="atp_ActivityYesterday">Yesterday</string>
-    <string name="atp_ActivityDaysAgo">%d days ago</string>
+
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$s tracking attempt blocked from %2$s company in <b>%3$s</b> app]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$s tracking attempt blocked from %2$s companies in <b>%3$s</b> app]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$s tracking attempts blocked from %2$s company in <b>%3$s</b> app]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$s tracking attempts blocked from %2$s companies in <b>%3$s</b> app]]></string>
+
     <string name="atp_ActivityEmptyListTitle">No new activity</string>
     <string name="atp_ActivityEmptyListMessage">Keep using your device. Tracking attempts that App Tracking Protection blocks appear here.</string>
     <string name="atp_ActivityPastWeekBlocked">Blocked</string>
     <string name="atp_ActivityPastWeekAcross">Across</string>
-    <plurals name="atp_ActivityTrackersBlockedCompanyCount">
-        <item quantity="one">"%d company"</item>
-        <item quantity="other">%d companies"</item>
-    </plurals>
+
     <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Tracking Attempt</item>
         <item quantity="other">Tracking Attempts</item>
