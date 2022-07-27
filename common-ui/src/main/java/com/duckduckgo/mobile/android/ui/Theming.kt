@@ -26,6 +26,7 @@ import android.content.IntentFilter
 import android.graphics.drawable.Drawable
 import android.view.ContextThemeWrapper
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.Theming.Constants.BROADCAST_THEME_CHANGED
@@ -43,10 +44,10 @@ object Theming {
         context: Context,
         drawableId: Int,
         theme: DuckDuckGoTheme
-    ): Drawable {
+    ): Drawable? {
         val themeId: Int = THEME_MAP[Pair(R.style.AppTheme, theme)] ?: R.style.AppTheme_Light
-        return context.resources.getDrawable(
-            drawableId, ContextThemeWrapper(context, themeId).theme
+        return ResourcesCompat.getDrawable(
+            context.resources, drawableId, ContextThemeWrapper(context, themeId).theme
         )
     }
 
