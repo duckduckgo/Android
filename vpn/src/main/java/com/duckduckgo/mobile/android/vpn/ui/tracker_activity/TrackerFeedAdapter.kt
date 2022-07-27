@@ -189,19 +189,27 @@ class TrackerFeedAdapter @Inject constructor(
                     val trackingAppName = item.trackingApp.appDisplayName
                     val textToStyle = if (trackersCount == 1) {
                         if (trackingCompanies == 1) {
-                            resources.getString(R.string.atp_ActivityTrackersCompanyBlockedOnetimeOneCompany,
-                                trackersCount, trackingCompanies, trackingAppName)
+                            resources.getString(
+                                R.string.atp_ActivityTrackersCompanyBlockedOnetimeOneCompany,
+                                trackersCount, trackingCompanies, trackingAppName
+                            )
                         } else {
-                            resources.getString(R.string.atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies,
-                                trackersCount, trackingCompanies, trackingAppName)
+                            resources.getString(
+                                R.string.atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies,
+                                trackersCount, trackingCompanies, trackingAppName
+                            )
                         }
                     } else {
                         if (trackingCompanies == 1) {
-                            resources.getString(R.string.atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany,
-                                trackersCount, trackingCompanies, trackingAppName)
+                            resources.getString(
+                                R.string.atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany,
+                                trackersCount, trackingCompanies, trackingAppName
+                            )
                         } else {
-                            resources.getString(R.string.atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies,
-                                trackersCount, trackingCompanies, trackingAppName)
+                            resources.getString(
+                                R.string.atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies,
+                                trackersCount, trackingCompanies, trackingAppName
+                            )
                         }
                     }
                     val styledText = HtmlCompat.fromHtml(textToStyle, FROM_HTML_MODE_COMPACT)

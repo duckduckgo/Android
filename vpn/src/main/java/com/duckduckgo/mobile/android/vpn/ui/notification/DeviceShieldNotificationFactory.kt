@@ -22,7 +22,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.text.HtmlCompat
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastDay
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
-import com.duckduckgo.app.global.view.html
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
@@ -110,13 +109,13 @@ class DeviceShieldNotificationFactory @Inject constructor(
         ): DeviceShieldNotification {
 
             val textToStyle = if (totalTrackersCount == 1) {
-                if (apps == 0){
+                if (apps == 0) {
                     resources.getString(R.string.atp_DailyTrackersNotificationOneTrackingZeroApps, totalTrackersCount)
                 } else {
                     resources.getString(R.string.atp_DailyTrackersNotificationOneTrackingOneApps, totalTrackersCount, firstAppName)
                 }
             } else {
-                if (apps == 0){
+                if (apps == 0) {
                     resources.getString(R.string.atp_DailyTrackersNotificationOtherTrackingZeroApps, totalTrackersCount)
                 } else {
                     resources.getString(R.string.atp_DailyTrackersNotificationOtherTrackingOtherApps, totalTrackersCount, apps, firstAppName)
@@ -133,7 +132,10 @@ class DeviceShieldNotificationFactory @Inject constructor(
             val topOffender = getTopOffender(trackers)
             val numberApps = getNumberOfAppsContainingTopOffender(trackers, topOffender).size
 
-            val textToStyle = resources.getQuantityString(R.plurals.atp_DailyTopCompanyNotification, numberApps, topOffender.companyDisplayName, numberApps)
+            val textToStyle = resources.getQuantityString(
+                R.plurals.atp_DailyTopCompanyNotification,
+                numberApps, topOffender.companyDisplayName, numberApps
+            )
 
             Timber.v("createDailyTopTrackerCompanyNotification: $textToStyle")
             return DeviceShieldNotification(
@@ -166,16 +168,34 @@ class DeviceShieldNotificationFactory @Inject constructor(
             val otherApps = (appsContainingLatestTracker.size - 1).coerceAtLeast(0)
 
             val textToStyle = if (timesBlocked == 1) {
-                when(otherApps) {
-                    0 -> resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps, lastCompany.companyDisplayName, timesBlocked, latestApp)
-                    1 -> resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp, lastCompany.companyDisplayName, timesBlocked, latestApp)
-                    else -> resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps, lastCompany.companyDisplayName, timesBlocked, latestApp, otherApps)
+                when (otherApps) {
+                    0 -> resources.getString(
+                        R.string.atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps,
+                        lastCompany.companyDisplayName, timesBlocked, latestApp
+                    )
+                    1 -> resources.getString(
+                        R.string.atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp,
+                        lastCompany.companyDisplayName, timesBlocked, latestApp
+                    )
+                    else -> resources.getString(
+                        R.string.atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps,
+                        lastCompany.companyDisplayName, timesBlocked, latestApp, otherApps
+                    )
                 }
             } else {
-                when(otherApps) {
-                    0 -> resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps, lastCompany.companyDisplayName, timesBlocked, latestApp)
-                    1 -> resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp, lastCompany.companyDisplayName, timesBlocked, latestApp)
-                    else -> resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps, lastCompany.companyDisplayName, timesBlocked, latestApp, otherApps)
+                when (otherApps) {
+                    0 -> resources.getString(
+                        R.string.atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps,
+                        lastCompany.companyDisplayName, timesBlocked, latestApp
+                    )
+                    1 -> resources.getString(
+                        R.string.atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp,
+                        lastCompany.companyDisplayName, timesBlocked, latestApp
+                    )
+                    else -> resources.getString(
+                        R.string.atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps,
+                        lastCompany.companyDisplayName, timesBlocked, latestApp, otherApps
+                    )
                 }
             }
 
@@ -222,16 +242,34 @@ class DeviceShieldNotificationFactory @Inject constructor(
             val latestApp = perApp.first().first.appDisplayName
 
             val textToStyle = if (trackerCount == 1) {
-                when(otherAppsSize) {
-                    0 -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps, trackerCount, latestApp)
-                    1 -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp, trackerCount, latestApp)
-                    else -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps, trackerCount, latestApp, otherAppsSize)
+                when (otherAppsSize) {
+                    0 -> resources.getString(
+                        R.string.atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps,
+                        trackerCount, latestApp
+                    )
+                    1 -> resources.getString(
+                        R.string.atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp,
+                        trackerCount, latestApp
+                    )
+                    else -> resources.getString(
+                        R.string.atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps,
+                        trackerCount, latestApp, otherAppsSize
+                    )
                 }
             } else {
-                when(otherAppsSize) {
-                    0 -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps, trackerCount, latestApp)
-                    1 -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp, trackerCount, latestApp)
-                    else -> resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps, trackerCount, latestApp, otherAppsSize)
+                when (otherAppsSize) {
+                    0 -> resources.getString(
+                        R.string.atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps,
+                        trackerCount, latestApp
+                    )
+                    1 -> resources.getString(
+                        R.string.atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp,
+                        trackerCount, latestApp
+                    )
+                    else -> resources.getString(
+                        R.string.atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps,
+                        trackerCount, latestApp, otherAppsSize
+                    )
                 }
             }
 

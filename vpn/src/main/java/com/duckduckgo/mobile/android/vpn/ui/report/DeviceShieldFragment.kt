@@ -20,7 +20,6 @@ import android.app.ActivityOptions
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +38,6 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
-import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel.PrivacyReportView.ViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import dagger.android.support.AndroidSupportInjection
@@ -149,22 +147,34 @@ class DeviceShieldFragment : Fragment() {
         val otherApps = trackerBlocked.otherAppsSize
 
         val textToStyle = if (trackersBlocked == 1) {
-            when(otherApps) {
-                0 -> resources.getString(R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps,
-                    trackersBlocked, lastTrackingApp)
-                1 -> resources.getString(R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp,
-                    trackersBlocked, lastTrackingApp)
-                else -> resources.getString(R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps,
-                    trackersBlocked, lastTrackingApp, otherApps)
+            when (otherApps) {
+                0 -> resources.getString(
+                    R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps,
+                    trackersBlocked, lastTrackingApp
+                )
+                1 -> resources.getString(
+                    R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp,
+                    trackersBlocked, lastTrackingApp
+                )
+                else -> resources.getString(
+                    R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps,
+                    trackersBlocked, lastTrackingApp, otherApps
+                )
             }
         } else {
-            when(otherApps) {
-                0 -> resources.getString(R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps,
-                    trackersBlocked, lastTrackingApp)
-                1 -> resources.getString(R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp,
-                    trackersBlocked, lastTrackingApp)
-                else -> resources.getString(R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps,
-                    trackersBlocked, lastTrackingApp, otherApps)
+            when (otherApps) {
+                0 -> resources.getString(
+                    R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps,
+                    trackersBlocked, lastTrackingApp
+                )
+                1 -> resources.getString(
+                    R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp,
+                    trackersBlocked, lastTrackingApp
+                )
+                else -> resources.getString(
+                    R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps,
+                    trackersBlocked, lastTrackingApp, otherApps
+                )
             }
         }
 
