@@ -40,8 +40,8 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementEditModeBinding
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialModeState.Editing
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialModeState.Viewing
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Editing
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
 import dagger.android.support.AndroidSupportInjection
@@ -65,7 +65,6 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
     }
 
     private lateinit var binding: FragmentAutofillManagementEditModeBinding
-    private lateinit var credentials: LoginCredentials
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -83,11 +82,11 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
     }
 
     override fun onPrepareMenu(menu: Menu) {
-        if (viewModel.viewState.value.credentialModeState == Editing) {
+        if (viewModel.viewState.value.credentialMode is Editing) {
             menu.findItem(R.id.view_menu_save).isVisible = true
             menu.findItem(R.id.view_menu_delete).isVisible = false
             menu.findItem(R.id.view_menu_edit).isVisible = false
-        } else if (viewModel.viewState.value.credentialModeState is Viewing) {
+        } else if (viewModel.viewState.value.credentialMode is Viewing) {
             menu.findItem(R.id.view_menu_save).isVisible = false
             menu.findItem(R.id.view_menu_delete).isVisible = true
             menu.findItem(R.id.view_menu_edit).isVisible = true
@@ -108,7 +107,7 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
                 true
             }
             R.id.view_menu_delete -> {
-                viewModel.onDeleteCredentials(credentials)
+                viewModel.onDeleteCredentials()
                 true
             }
             R.id.view_menu_save -> {
@@ -124,11 +123,8 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
         savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
-        credentials = requireArguments().getParcelable(EXTRA_KEY_CREDENTIALS)!!
         observeViewModel()
-        populateFields()
         configureUiEventHandlers()
-        loadDomainFavicon()
     }
 
     override fun onDestroyView() {
@@ -155,19 +151,18 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
     }
 
     private fun saveCredentials() {
-        val updatedCredentials = credentials.copy(
+        val updatedCredentials = LoginCredentials(
             username = binding.usernameEditText.text.convertBlankToNull(),
             password = binding.passwordEditText.text.convertBlankToNull(),
             domain = binding.domainEditText.text.convertBlankToNull(),
             domainTitle = binding.domainTitleEditText.text.convertBlankToNull(),
             notes = binding.notesEditText.text.convertBlankToNull()
         )
-        credentials = updatedCredentials
         viewModel.updateCredentials(updatedCredentials)
-        viewModel.onExitEditMode(false)
     }
 
-    private fun populateFields() {
+    private fun populateFields(credentials: LoginCredentials) {
+        loadDomainFavicon(credentials)
         binding.apply {
             domainTitleEditText.setText(credentials.domainTitle)
             usernameEditText.setText(credentials.username)
@@ -180,8 +175,8 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
         }
     }
 
-    private fun showViewMode() {
-        updateToolbarForView()
+    private fun showViewMode(credentials: LoginCredentials) {
+        updateToolbarForView(credentials)
         binding.apply {
             domainTitleEditText.visibility = View.GONE
             domainTitleEditText.isEditable = false
@@ -212,12 +207,12 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.viewState.collect { state ->
-                    when (state.credentialModeState) {
+                    when (state.credentialMode) {
                         is Viewing -> {
-                            if (state.credentialModeState.reset) populateFields()
-                            showViewMode()
+                            populateFields(state.credentialMode.credentialsViewed)
+                            showViewMode(state.credentialMode.credentialsViewed)
                         }
-                        Editing -> showEditMode()
+                        is Editing -> showEditMode()
                         else -> {
                         }
                     }
@@ -237,7 +232,7 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
         invalidateMenu()
     }
 
-    private fun updateToolbarForView() {
+    private fun updateToolbarForView(credentials: LoginCredentials) {
         getActionBar()?.apply {
             setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_back_24)
             title = credentials.domainTitle ?: credentials.domain
@@ -246,7 +241,7 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
         invalidateMenu()
     }
 
-    private fun loadDomainFavicon() {
+    private fun loadDomainFavicon(credentials: LoginCredentials) {
         lifecycleScope.launch {
             credentials.domain?.let {
                 getActionBar()?.setLogo(
@@ -270,13 +265,6 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
 
     companion object {
 
-        private const val EXTRA_KEY_CREDENTIALS = "credentials"
-
-        fun instance(credentials: LoginCredentials) =
-            AutofillManagementCredentialsMode().apply {
-                arguments = Bundle().apply {
-                    putParcelable(EXTRA_KEY_CREDENTIALS, credentials)
-                }
-            }
+        fun instance() = AutofillManagementCredentialsMode()
     }
 }

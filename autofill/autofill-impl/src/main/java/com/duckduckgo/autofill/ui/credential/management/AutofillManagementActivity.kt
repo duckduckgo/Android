@@ -31,8 +31,8 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialModeState.Editing
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialModeState.Viewing
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Editing
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementCredentialsMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementLockedMode
@@ -153,7 +153,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             title = credentials.domainTitle ?: credentials.domain
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                replace(R.id.fragment_container_view, AutofillManagementCredentialsMode.instance(credentials))
+                replace(R.id.fragment_container_view, AutofillManagementCredentialsMode.instance())
             }
         }
     }
@@ -184,8 +184,8 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
-        when (viewModel.viewState.value.credentialModeState) {
-            Editing -> viewModel.onExitEditMode(true)
+        when (viewModel.viewState.value.credentialMode) {
+            is Editing -> viewModel.onCancelEditMode()
             is Viewing -> viewModel.onExitViewMode()
             else -> super.onBackPressed()
         }
