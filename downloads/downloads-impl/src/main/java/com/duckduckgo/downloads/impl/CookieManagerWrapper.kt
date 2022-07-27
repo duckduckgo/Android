@@ -24,7 +24,7 @@ import javax.inject.Inject
 // This class is basically a convenience wrapper for easier testing
 interface CookieManagerWrapper {
     /**
-     * @return the cooke stored for the given [url] if any, null otherwise
+     * @return the cookie stored for the given [url] if any, null otherwise
      */
     fun getCookie(url: String): String?
 }

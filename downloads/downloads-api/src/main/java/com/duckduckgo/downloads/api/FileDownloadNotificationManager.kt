@@ -30,7 +30,7 @@ interface FileDownloadNotificationManager {
 
     /**
      * Call this method to show the "download complete" notification.
-     * Takes as parameters the [downloadId] and the [filename].
+     * Takes as parameters the [downloadId], the downloaded [file] and optionally the file [mimeType]
      * Safe to call from any thread.
      */
     @AnyThread

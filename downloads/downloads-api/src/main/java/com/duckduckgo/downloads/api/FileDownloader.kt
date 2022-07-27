@@ -24,8 +24,7 @@ import androidx.annotation.AnyThread
 /** Interface for the starting point of a download. */
 interface FileDownloader {
 
-    /** Starts a download. Takes as parameters a [PendingFileDownload] containing all details about the file to be downloaded and
-     * a [DownloadCallback]. */
+    /** Starts a download. Takes as parameters a [PendingFileDownload] containing all details about the file to be downloaded. */
     @AnyThread
     fun enqueueDownload(pending: PendingFileDownload)
 
