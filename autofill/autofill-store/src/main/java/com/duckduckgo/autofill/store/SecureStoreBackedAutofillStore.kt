@@ -35,7 +35,8 @@ import timber.log.Timber
 class SecureStoreBackedAutofillStore(
     private val secureStorage: SecureStorage,
     private val applicationContext: Context,
-    private val internalTestUserChecker: InternalTestUserChecker
+    private val internalTestUserChecker: InternalTestUserChecker,
+    private val lastUpdatedTimeProvider: LastUpdatedTimeProvider
 ) : AutofillStore {
 
     private val prefs: SharedPreferences by lazy {
@@ -60,6 +61,9 @@ class SecureStoreBackedAutofillStore(
         return storedCredentials.map { it.toLoginCredentials() }
     }
 
+    override suspend fun getCredentialsWithId(id: Int): LoginCredentials? =
+        secureStorage.getWebsiteLoginDetailsWithCredentials(id)?.toLoginCredentials()
+
     override suspend fun saveCredentials(
         rawUrl: String,
         credentials: LoginCredentials
@@ -72,7 +76,13 @@ class SecureStoreBackedAutofillStore(
 
         Timber.i("Saving login credentials for %s. username=%s", url, credentials.username)
 
-        val loginDetails = WebsiteLoginDetails(domain = url, username = credentials.username)
+        val loginDetails = WebsiteLoginDetails(
+            domain = url,
+            username = credentials.username,
+            domainTitle = credentials.domainTitle,
+            notes = credentials.notes,
+            lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis()
+        )
         val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(loginDetails, password = credentials.password)
 
         secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)
@@ -100,7 +110,7 @@ class SecureStoreBackedAutofillStore(
         Timber.i("Updating %d saved login credentials for %s. username=%s", matchingCredentials.size, url, credentials.username)
 
         matchingCredentials.forEach {
-            val modifiedDetails = it.details.copy(username = credentials.username)
+            val modifiedDetails = it.details.copy(username = credentials.username, lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis())
             val modified = it.copy(password = credentials.password, details = modifiedDetails)
             secureStorage.updateWebsiteLoginDetailsWithCredentials(modified)
         }
@@ -118,7 +128,10 @@ class SecureStoreBackedAutofillStore(
     }
 
     override suspend fun updateCredentials(credentials: LoginCredentials) {
-        secureStorage.updateWebsiteLoginDetailsWithCredentials(credentials.toWebsiteLoginCredentials())
+        secureStorage.updateWebsiteLoginDetailsWithCredentials(
+            credentials.copy(lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis())
+                .toWebsiteLoginCredentials()
+        )
     }
 
     override suspend fun containsCredentials(
@@ -160,13 +173,23 @@ class SecureStoreBackedAutofillStore(
             id = details.id,
             domain = details.domain,
             username = details.username,
-            password = password
+            password = password,
+            domainTitle = details.domainTitle,
+            notes = details.notes,
+            lastUpdatedMillis = details.lastUpdatedMillis
         )
     }
 
     private fun LoginCredentials.toWebsiteLoginCredentials(): WebsiteLoginDetailsWithCredentials {
         return WebsiteLoginDetailsWithCredentials(
-            details = WebsiteLoginDetails(domain = domain, username = username, id = id),
+            details = WebsiteLoginDetails(
+                domain = domain,
+                username = username,
+                id = id,
+                domainTitle = domainTitle,
+                notes = notes,
+                lastUpdatedMillis = lastUpdatedMillis
+            ),
             password = password
         )
     }

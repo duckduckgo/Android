@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -44,13 +45,16 @@ class SecureStoreBackedAutofillStoreTest {
 
     private val context: Context = getApplicationContext()
     private val secureStore = FakeSecureStore()
+    private val lastUpdatedTimeProvider = object : LastUpdatedTimeProvider {
+        override fun getInMillis(): Long = UPDATED_INITIAL_LAST_UPDATED
+    }
     private lateinit var testee: SecureStoreBackedAutofillStore
     private lateinit var internalTestUserChecker: FakeInternalTestUserChecker
 
     @Before
     fun setUp() {
         internalTestUserChecker = FakeInternalTestUserChecker(true)
-        testee = SecureStoreBackedAutofillStore(secureStore, context, internalTestUserChecker)
+        testee = SecureStoreBackedAutofillStore(secureStore, context, internalTestUserChecker, lastUpdatedTimeProvider)
     }
 
     @Test
@@ -132,7 +136,7 @@ class SecureStoreBackedAutofillStoreTest {
         testee.updateCredentials(url, credentials)
 
         testee.getCredentials(url).run {
-            this.assertHasLoginCredentials(url, "username1", "newpassword")
+            this.assertHasLoginCredentials(url, "username1", "newpassword", UPDATED_INITIAL_LAST_UPDATED)
             this.assertHasLoginCredentials(url, "username2", "password456")
             this.assertHasLoginCredentials(url, "username3", "password789")
         }
@@ -154,7 +158,7 @@ class SecureStoreBackedAutofillStoreTest {
         testee.updateCredentials(credentials)
 
         testee.getCredentials(url).run {
-            this.assertHasLoginCredentials(url, "username1", "newpassword")
+            this.assertHasLoginCredentials(url, "username1", "newpassword", UPDATED_INITIAL_LAST_UPDATED)
             this.assertHasLoginCredentials(url, "username2", "password456")
             this.assertHasLoginCredentials(url, "username3", "password789")
         }
@@ -170,7 +174,7 @@ class SecureStoreBackedAutofillStoreTest {
         )
         testee.saveCredentials(url, credentials)
 
-        assertEquals(credentials, testee.getCredentials(url).get(0))
+        assertEquals(credentials.copy(lastUpdatedMillis = UPDATED_INITIAL_LAST_UPDATED), testee.getCredentials(url)[0])
     }
 
     @Test
@@ -188,13 +192,37 @@ class SecureStoreBackedAutofillStoreTest {
         }
     }
 
+    @Test
+    fun whenCredentialWithIdIsStoredTheReturnCredentialsOnGetCredentialsWithId() = runTest {
+        val url = "https://example.com"
+        storeCredentials(1, url, "username1", "password123")
+        storeCredentials(2, url, "username2", "password456")
+
+        assertEquals(
+            LoginCredentials(
+                id = 1,
+                domain = url,
+                username = "username1",
+                password = "password123",
+                lastUpdatedMillis = DEFAULT_INITIAL_LAST_UPDATED
+            ),
+            testee.getCredentialsWithId(1)
+        )
+    }
+
+    @Test
+    fun whenNoCredentialStoredTheReturnNullOnGetCredentialsWithId() = runTest {
+        assertNull(testee.getCredentialsWithId(1))
+    }
+
     private fun List<LoginCredentials>.assertHasNoLoginCredentials(
         url: String,
         username: String,
-        password: String
+        password: String,
+        lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED
     ) {
         val result = this.filter {
-            it.domain == url && it.username == username && it.password == password
+            it.domain == url && it.username == username && it.password == password && it.lastUpdatedMillis == lastUpdatedTimeMillis
         }
         assertEquals(0, result.size)
     }
@@ -202,22 +230,23 @@ class SecureStoreBackedAutofillStoreTest {
     private fun List<LoginCredentials>.assertHasLoginCredentials(
         url: String,
         username: String,
-        password: String
+        password: String,
+        lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED
     ) {
         val result = this.filter {
-            it.domain == url && it.username == username && it.password == password
+            it.domain == url && it.username == username && it.password == password && it.lastUpdatedMillis == lastUpdatedTimeMillis
         }
         assertEquals(1, result.size)
     }
 
     private fun setupTesteeWithInternalTestUserTrue() {
         internalTestUserChecker = FakeInternalTestUserChecker(true)
-        testee = SecureStoreBackedAutofillStore(secureStore, context, internalTestUserChecker)
+        testee = SecureStoreBackedAutofillStore(secureStore, context, internalTestUserChecker, lastUpdatedTimeProvider)
     }
 
     private fun setupTesteeWithInternalTestUserFalse() {
         internalTestUserChecker = FakeInternalTestUserChecker(false)
-        testee = SecureStoreBackedAutofillStore(secureStore, context, internalTestUserChecker)
+        testee = SecureStoreBackedAutofillStore(secureStore, context, internalTestUserChecker, lastUpdatedTimeProvider)
     }
 
     private fun assertNotMatch(result: ContainsCredentialsResult) {
@@ -240,9 +269,10 @@ class SecureStoreBackedAutofillStoreTest {
         id: Int,
         domain: String,
         username: String,
-        password: String
+        password: String,
+        lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED
     ) {
-        val details = WebsiteLoginDetails(domain, username, id)
+        val details = WebsiteLoginDetails(domain = domain, username = username, id = id, lastUpdatedMillis = lastUpdatedTimeMillis)
         val credentials = WebsiteLoginDetailsWithCredentials(details, password)
         secureStore.addWebsiteLoginDetailsWithCredentials(credentials)
     }
@@ -273,8 +303,8 @@ class SecureStoreBackedAutofillStoreTest {
             }
         }
 
-        override suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials {
-            return credentials.first { it.details.id == id }
+        override suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials? {
+            return credentials.firstOrNull() { it.details.id == id }
         }
 
         override suspend fun websiteLoginDetailsWithCredentialsForDomain(domain: String): Flow<List<WebsiteLoginDetailsWithCredentials>> {
@@ -313,5 +343,10 @@ class SecureStoreBackedAutofillStoreTest {
         override fun verifyVerificationErrorReceived(url: String) {}
 
         override fun verifyVerificationCompleted(url: String) {}
+    }
+
+    companion object {
+        private const val DEFAULT_INITIAL_LAST_UPDATED = 200L
+        private const val UPDATED_INITIAL_LAST_UPDATED = 10000L
     }
 }

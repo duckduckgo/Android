@@ -21,6 +21,7 @@ import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.store.InternalTestUserStore
 import com.duckduckgo.autofill.store.RealInternalTestUserStore
+import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.SecureStoreBackedAutofillStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
@@ -43,6 +44,6 @@ class AutofillModule {
         context: Context,
         internalTestUserChecker: InternalTestUserChecker
     ): AutofillStore {
-        return SecureStoreBackedAutofillStore(secureStorage, context, internalTestUserChecker)
+        return SecureStoreBackedAutofillStore(secureStorage, context, internalTestUserChecker, RealLastUpdatedTimeProvider())
     }
 }
