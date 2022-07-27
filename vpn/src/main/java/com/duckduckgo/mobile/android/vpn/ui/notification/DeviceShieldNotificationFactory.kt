@@ -19,8 +19,10 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 import android.content.res.Resources
 import android.text.SpannableStringBuilder
 import androidx.annotation.VisibleForTesting
+import androidx.core.text.HtmlCompat
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastDay
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
+import com.duckduckgo.app.global.view.html
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
@@ -60,18 +62,11 @@ class DeviceShieldNotificationFactory @Inject constructor(
         if (trackersBlocked.isEmpty() || numberOfApps.isEmpty())
             return DeviceShieldNotification(SpannableStringBuilder(resources.getString(R.string.atp_OnNoTrackersNotificationHeader)))
 
-        val prefix = resources.getString(R.string.atp_OnNotificationPrefix)
-        val numberOfAppsString = resources.getQuantityString(R.plurals.atp_NotificationNumberOfApps, numberOfApps.size, numberOfApps.size)
-        val suffixTime = resources.getString(R.string.atp_OnNoTrackersNotificationMessageTimeSuffix)
-        val notificationText = "$prefix $numberOfAppsString $suffixTime"
+        val notificationText = resources.getQuantityString(R.plurals.atp_OnNotification, numberOfApps.size, numberOfApps.size)
 
         Timber.v("createTrackersCountDeviceShieldNotification [$notificationText]")
         return DeviceShieldNotification(
-            notificationText.applyBoldSpanTo(
-                listOf(
-                    numberOfAppsString
-                )
-            )
+            SpannableStringBuilder(HtmlCompat.fromHtml(notificationText, HtmlCompat.FROM_HTML_MODE_LEGACY))
         )
     }
 
@@ -113,31 +108,37 @@ class DeviceShieldNotificationFactory @Inject constructor(
             apps: Int,
             firstAppName: String
         ): DeviceShieldNotification {
-            val totalTrackers = resources.getQuantityString(R.plurals.atp_TrackingAttempts, totalTrackersCount, totalTrackersCount)
-            val textPrefix = resources.getString(R.string.atp_DailyTrackersNotificationPrefix)
-            val numberTrackers = resources.getQuantityString(R.plurals.atp_TrackingAttempts, totalTrackersCount, totalTrackersCount)
-            val optionalNumberApps = if (apps == 0) "" else {
-                resources.getQuantityString(R.plurals.atp_DailyTrackersNotificationSuffixNumApps, apps, apps, firstAppName)
-            }
-            val textSuffix = resources.getString(R.string.atp_DailyNotificationPastDaySuffix)
-            val textToStyle = "$textPrefix $numberTrackers $optionalNumberApps $textSuffix"
 
-            Timber.v("createDailyTotalTrackersNotification. Trackers=$totalTrackers. Apps=$apps. Output=[$textToStyle]")
-            return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(totalTrackers, numberTrackers, optionalNumberApps)))
+            val textToStyle = if (totalTrackersCount == 1) {
+                if (apps == 0){
+                    resources.getString(R.string.atp_DailyTrackersNotificationOneTrackingZeroApps, totalTrackersCount)
+                } else {
+                    resources.getString(R.string.atp_DailyTrackersNotificationOneTrackingOneApps, totalTrackersCount, firstAppName)
+                }
+            } else {
+                if (apps == 0){
+                    resources.getString(R.string.atp_DailyTrackersNotificationOtherTrackingZeroApps, totalTrackersCount)
+                } else {
+                    resources.getString(R.string.atp_DailyTrackersNotificationOtherTrackingOtherApps, totalTrackersCount, apps, firstAppName)
+                }
+            }
+
+            Timber.v("createDailyTotalTrackersNotification. Trackers=$totalTrackersCount. Apps=$apps. Output=[$textToStyle]")
+            return DeviceShieldNotification(
+                SpannableStringBuilder(HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY))
+            )
         }
 
         private fun createDailyTopTrackerCompanyNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
             val topOffender = getTopOffender(trackers)
             val numberApps = getNumberOfAppsContainingTopOffender(trackers, topOffender).size
 
-            val prefix = resources.getString(R.string.atp_DailyTopCompanyNotificationPrefix, topOffender.companyDisplayName)
-            val numAppsText = resources.getQuantityString(R.plurals.atp_NotificationNumberOfApps, numberApps, numberApps)
-            val pastDaySuffix = resources.getString(R.string.atp_NotificationPastDaySuffix)
-            val seeMoreSuffix = resources.getString(R.string.atp_NotificationSeeMoreSuffix)
-            val fullString = "$prefix $numAppsText $pastDaySuffix $seeMoreSuffix"
+            val textToStyle = resources.getQuantityString(R.plurals.atp_DailyTopCompanyNotification, numberApps, topOffender.companyDisplayName, numberApps)
 
-            Timber.v("createDailyTopTrackerCompanyNotification: $fullString")
-            return DeviceShieldNotification(fullString.applyBoldSpanTo(listOf(topOffender.companyDisplayName, numAppsText, seeMoreSuffix)))
+            Timber.v("createDailyTopTrackerCompanyNotification: $textToStyle")
+            return DeviceShieldNotification(
+                SpannableStringBuilder(HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY))
+            )
         }
 
         private fun createDailyNotificationTopAppsContainingTrackers(apps: List<Pair<TrackingApp, List<VpnTracker>>>): DeviceShieldNotification {
@@ -146,26 +147,14 @@ class DeviceShieldNotificationFactory @Inject constructor(
             }
 
             val firstAppName = apps.first().first.appDisplayName
-            val second: TrackingApp? = apps.getOrNull(1)?.first
+            val secondAppName = apps.getOrNull(1)?.first?.appDisplayName ?: ""
 
-            val prefix = resources.getString(R.string.atp_DailyCompanyBlockedNotificationPrefix, firstAppName)
-            val optionalSecondApp =
-                if (second != null) resources.getString(R.string.atp_DailyCompanyBlockedNotificationOptionalSecondApp, second.appDisplayName) else ""
+            val textToStyle = resources.getQuantityString(R.plurals.atp_DailyCompanyBlockedNotification, apps.size, firstAppName, secondAppName)
 
-            val suffix = resources.getString(R.string.atp_DailyNotificationPastDaySuffix)
-
-            val textToStyle = "$prefix$optionalSecondApp $suffix"
-            val wordsToBold = mutableListOf(firstAppName)
-            if (second != null) wordsToBold.add(second.appDisplayName)
-
-            Timber.v(
-                "createDailyNotificationTopAppsContainingTrackers. Text to style: [$textToStyle] Words to bold: ${
-                wordsToBold.joinToString(
-                    separator = ", "
-                )
-                }}"
+            Timber.v("createDailyNotificationTopAppsContainingTrackers. Text to style: [$textToStyle]")
+            return DeviceShieldNotification(
+                SpannableStringBuilder(HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY))
             )
-            return DeviceShieldNotification(textToStyle.applyBoldSpanTo(wordsToBold))
         }
 
         private fun createDailyLastCompanyAttemptNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
@@ -174,30 +163,25 @@ class DeviceShieldNotificationFactory @Inject constructor(
             val filteredForLatestTrackerCompany = trackers.filter { it.trackerCompanyId == lastCompany.trackerCompanyId }
             val timesBlocked = filteredForLatestTrackerCompany.size
             val appsContainingLatestTracker = filteredForLatestTrackerCompany.groupBy { it.trackingApp }
-
-            val prefix = resources.getString(R.string.atp_DailyLastCompanyBlockedNotification, lastCompany.companyDisplayName)
-            val numberOfTimesString = resources.getQuantityString(R.plurals.atp_NumberTimes, timesBlocked, timesBlocked)
-            val latestAppString = resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationInApp, latestApp)
             val otherApps = (appsContainingLatestTracker.size - 1).coerceAtLeast(0)
 
-            val otherAppsCount = if (otherApps == 0) "" else resources.getQuantityString(
-                R.plurals.atp_DailyLastCompanyBlockedNotificationOptionalOtherApps,
-                otherApps,
-                otherApps
-            )
-            val pastDaySuffix = resources.getString(R.string.atp_DailyNotificationPastDaySuffix)
+            val textToStyle = if (timesBlocked == 1) {
+                when(otherApps) {
+                    0 -> resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps, lastCompany.companyDisplayName, timesBlocked, latestApp)
+                    1 -> resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp, lastCompany.companyDisplayName, timesBlocked, latestApp)
+                    else -> resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps, lastCompany.companyDisplayName, timesBlocked, latestApp, otherApps)
+                }
+            } else {
+                when(otherApps) {
+                    0 -> resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps, lastCompany.companyDisplayName, timesBlocked, latestApp)
+                    1 -> resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp, lastCompany.companyDisplayName, timesBlocked, latestApp)
+                    else -> resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps, lastCompany.companyDisplayName, timesBlocked, latestApp, otherApps)
+                }
+            }
 
-            val textToStyle = "$prefix $numberOfTimesString $latestAppString$otherAppsCount $pastDaySuffix"
             Timber.v("createDailyLastCompanyAttemptNotification. [$textToStyle]")
             return DeviceShieldNotification(
-                textToStyle.applyBoldSpanTo(
-                    listOf(
-                        lastCompany.companyDisplayName,
-                        latestAppString,
-                        numberOfTimesString,
-                        otherAppsCount
-                    )
-                )
+                SpannableStringBuilder(HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY))
             )
         }
 

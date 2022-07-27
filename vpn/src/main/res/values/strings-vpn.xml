@@ -43,45 +43,36 @@
     <string name="atp_ReportIssue">Having problems with an app?</string>
     <string name="atp_OnInitialNotification">"App Tracking Protection is enabled and blocking tracking attempts across your apps"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Scanning for tracking activity… beep… boop"</string>
-    <string name="atp_OnNotificationPrefix">Tracking attempts blocked</string>
-    <string name="atp_OnNoTrackersNotificationMessageTimeSuffix">(past hour).</string>
+    <plurals name="atp_OnNotification">
+        <item quantity="one"><![CDATA[ Tracking attempts blocked <b>in %d app</b> (past hour).]]></item>
+        <item quantity="other"><![CDATA[ Tracking attempts blocked <b>across %d apps</b> (past hour).]]></item>
+    </plurals>
     <string name="atp_DisabledNotification">App Tracking Protection disabled. Tap to continue blocking tracking attempts.</string>
     <string name="atp_RevokedNotification">A VPN app on your device disabled App Tracking Protection. Tap to re-enable.</string>
 
     <!-- App Tracking Protection Daily Notification -->
-    <string name="atp_DailyTrackersNotificationPrefix">App Tracking Protection blocked</string>
-    <plurals name="atp_TrackingAttempts">
-        <item quantity="one">%d tracking attempt</item>
-        <item quantity="other">%d tracking attempts</item>
-    </plurals>
-    <plurals name="atp_DailyTrackersNotificationSuffixNumApps">
-        <item quantity="one">in 1 app, %2$s</item>
-        <item quantity="other">across %1$d apps, including %2$s</item>
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ App Tracking Protection blocked <b>%1$d tracking attempt</b> (past day).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ App Tracking Protection blocked <b>%1$d tracking attempt in 1 app, %2$s</b> (past day).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ App Tracking Protection blocked <b>%1$d tracking attempts</b> (past day).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ App Tracking Protection blocked <b>%1$d tracking attempts across %2$d apps, including %3$s</b> (past day).]]></string>
+
+    <plurals name="atp_DailyTopCompanyNotification">
+        <item quantity="one"><![CDATA[%1$s tried to track you <b>in %2$d app</b> (past day). <b>See More</b>]]></item>
+        <item quantity="other"><![CDATA[%1$s tried to track you <b>across %2$d apps</b> (past day). <b>See More</b>]]></item>
     </plurals>
 
-    <string name="atp_DailyNotificationPastDaySuffix">(past day).</string>
-
-    <string name="atp_DailyTopCompanyNotificationPrefix">%s tried to track you</string>
-    <plurals name="atp_NotificationNumberOfApps">
-        <item quantity="one">"in %d app"</item>
-        <item quantity="other">"across %d apps"</item>
-    </plurals>
-    <string name="atp_NotificationPastDaySuffix">(past day).</string>
-    <string name="atp_NotificationSeeMoreSuffix">See More</string>
-    <string name="atp_DailyCompanyBlockedNotificationPrefix">App Tracking Protection blocked the most tracking attempts in %s</string>
-    <string name="atp_DailyCompanyBlockedNotificationOptionalSecondApp">\u0020and %s</string>
-
-    <plurals name="atp_NumberTimes">
-        <item quantity="one">%d time</item>
-        <item quantity="other">%d times</item>
+    <plurals name="atp_DailyCompanyBlockedNotification">
+        <item quantity="one"><![CDATA[App Tracking Protection blocked the most tracking attempts in <b>%1$s</b> (past day).]]></item>
+        <item quantity="other"><![CDATA[App Tracking Protection blocked the most tracking attempts in <b>%1$s</b> and <b>%2$s</b> (past day).]]></item>
     </plurals>
 
-    <string name="atp_DailyLastCompanyBlockedNotification">App Tracking Protection blocked %s</string>
-    <string name="atp_DailyLastCompanyBlockedNotificationInApp">in %s</string>
-    <plurals name="atp_DailyLastCompanyBlockedNotificationOptionalOtherApps">
-        <item quantity="one">"\u0020and 1 other app"</item>
-        <item quantity="other">"\u0020and %d other apps"</item>
-    </plurals>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[App Tracking Protection blocked <b>%s %d time in %s</b> (past day).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[App Tracking Protection blocked <b>%s %d time in %s and 1 other app</b> (past day).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[App Tracking Protection blocked <b>%s %d time in %s and %d other apps</b> (past day).]]></string>
+
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[App Tracking Protection blocked <b>%s %d times in %s</b> (past day).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[App Tracking Protection blocked <b>%s %d times in %s and 1 other app</b> (past day).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection blocked <b>%s %d times in %s and %d other apps</b> (past day).]]></string>
 
     <!-- App Tracking Protection Weekly Notification -->
     <string name="atp_EnableCTA">Enable App Tracking Protection</string>
