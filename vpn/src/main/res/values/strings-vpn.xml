@@ -75,6 +75,18 @@
     <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection blocked <b>%s %d times in %s and %d other apps</b> (past day).]]></string>
 
     <!-- App Tracking Protection Weekly Notification -->
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[App Tracking Protection blocked <b>%d tracking attempt in %s</b> (past week).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[App Tracking Protection blocked <b>%d tracking attempt in %s</b> and 1 other app (past week).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[App Tracking Protection blocked <b>%d tracking attempt in %s</b> and %d other apps (past week).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[App Tracking Protection blocked <b>%d tracking attempts in %s</b> (past week).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[App Tracking Protection blocked <b>%d tracking attempts in %s</b> and 1 other app (past week).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection blocked <b>%d tracking attempts in %s</b> and %d other apps (past week).]]></string>
+
+    <plurals name="atp_WeeklyCompanyTeaserNotification">
+        <item quantity="one"><![CDATA[App Tracking Protection blocked <b>%s in %d app, %s</b> (past week).]]></item>
+        <item quantity="other"><![CDATA[App Tracking Protection blocked <b>%s across %d apps, including %s</b> (past week).]]></item>
+    </plurals>
+
     <string name="atp_EnableCTA">Enable App Tracking Protection</string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotification">"App Tracking Protection blocked %1s and %2s (past week)"</string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationPrefix">"App Tracking Protection blocked"</string>
