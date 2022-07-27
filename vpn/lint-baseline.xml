@@ -16,7 +16,7 @@
         id="BadPeriodicWorkRequestEnqueue"
         message="Use `enqueueUniquePeriodicWork()` instead of `enqueue()`">
         <location
-            file="../../../.gradle/caches/transforms-3/ef67ec9586a44db65ea24675dc335605/transformed/work-runtime-2.7.1/jars/classes.jar!/androidx/work/WorkManager.class"/>
+            file="../../../../.gradle/caches/transforms-3/ef67ec9586a44db65ea24675dc335605/transformed/work-runtime-2.7.1/jars/classes.jar!/androidx/work/WorkManager.class"/>
     </issue>
 
     <issue
@@ -65,34 +65,12 @@
 
     <issue
         id="PluralsCandidate"
-        message="Formatting %d followed by words (&quot;others&quot;): This should probably be a plural rather than a string"
-        errorLine1="    &lt;string name=&quot;atp_ActivityTrackersCountMany&quot;>from %1$s and %2$d others&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="210"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="PluralsCandidate"
-        message="Formatting %d followed by words (&quot;days&quot;): This should probably be a plural rather than a string"
-        errorLine1="    &lt;string name=&quot;atp_ActivityDaysAgo&quot;>%d days ago&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="213"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="PluralsCandidate"
         message="Formatting %d followed by words (&quot;more&quot;): This should probably be a plural rather than a string"
         errorLine1="    &lt;string name=&quot;atp_CompanyDetailsTrackingShowMore&quot;>Show %d more&lt;/string>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="287"
+            line="276"
             column="5"/>
     </issue>
 
@@ -371,34 +349,12 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.atp_WeeklyCompanyTrackersBlockedNotification` appears to be unused"
-        errorLine1="    &lt;string name=&quot;atp_WeeklyCompanyTrackersBlockedNotification&quot;>&quot;App Tracking Protection blocked %1s and %2s (past week)&quot;&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="88"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.plurals.atp_DailyCompany` appears to be unused"
-        errorLine1="    &lt;plurals name=&quot;atp_DailyCompany&quot;>"
-        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="90"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.string.atp_OnboardingMaybeLater` appears to be unused"
         errorLine1="    &lt;string name=&quot;atp_OnboardingMaybeLater&quot;>Maybe Later&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="114"
+            line="112"
             column="13"/>
     </issue>
 
@@ -409,7 +365,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="117"
+            line="115"
             column="13"/>
     </issue>
 
@@ -420,7 +376,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="118"
+            line="116"
             column="13"/>
     </issue>
 
@@ -431,7 +387,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="119"
+            line="117"
             column="13"/>
     </issue>
 
@@ -442,7 +398,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="120"
+            line="118"
             column="13"/>
     </issue>
 
@@ -453,7 +409,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="126"
+            line="124"
             column="13"/>
     </issue>
 
@@ -464,7 +420,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="136"
+            line="133"
             column="13"/>
     </issue>
 
@@ -475,7 +431,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="138"
+            line="135"
             column="13"/>
     </issue>
 
@@ -486,7 +442,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="139"
+            line="136"
             column="13"/>
     </issue>
 
@@ -497,7 +453,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="153"
+            line="150"
             column="13"/>
     </issue>
 
@@ -508,7 +464,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="154"
+            line="151"
             column="13"/>
     </issue>
 
@@ -519,7 +475,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="155"
+            line="152"
             column="13"/>
     </issue>
 
@@ -530,7 +486,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="158"
+            line="155"
             column="13"/>
     </issue>
 
@@ -541,7 +497,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="173"
+            line="170"
             column="13"/>
     </issue>
 
@@ -552,73 +508,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="200"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.atp_ActivityTrackersCountOne` appears to be unused"
-        errorLine1="    &lt;string name=&quot;atp_ActivityTrackersCountOne&quot;>from %1$s&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="208"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.atp_ActivityTrackersCountTwo` appears to be unused"
-        errorLine1="    &lt;string name=&quot;atp_ActivityTrackersCountTwo&quot;>from %1$s and 1 other&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="209"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.atp_ActivityTrackersCountMany` appears to be unused"
-        errorLine1="    &lt;string name=&quot;atp_ActivityTrackersCountMany&quot;>from %1$s and %2$d others&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="210"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.atp_ActivityToday` appears to be unused"
-        errorLine1="    &lt;string name=&quot;atp_ActivityToday&quot;>Today&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="211"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.atp_ActivityYesterday` appears to be unused"
-        errorLine1="    &lt;string name=&quot;atp_ActivityYesterday&quot;>Yesterday&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="212"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.atp_ActivityDaysAgo` appears to be unused"
-        errorLine1="    &lt;string name=&quot;atp_ActivityDaysAgo&quot;>%d days ago&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="213"
+            line="197"
             column="13"/>
     </issue>
 
@@ -629,7 +519,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="253"
+            line="242"
             column="13"/>
     </issue>
 
@@ -640,7 +530,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="254"
+            line="243"
             column="13"/>
     </issue>
 
@@ -651,7 +541,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="255"
+            line="244"
             column="13"/>
     </issue>
 
@@ -662,7 +552,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="256"
+            line="245"
             column="13"/>
     </issue>
 
@@ -673,7 +563,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="257"
+            line="246"
             column="13"/>
     </issue>
 
@@ -684,7 +574,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="258"
+            line="247"
             column="13"/>
     </issue>
 
@@ -695,7 +585,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="259"
+            line="248"
             column="13"/>
     </issue>
 
@@ -706,7 +596,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="260"
+            line="249"
             column="13"/>
     </issue>
 
@@ -717,7 +607,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="261"
+            line="250"
             column="13"/>
     </issue>
 
@@ -728,7 +618,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="262"
+            line="251"
             column="13"/>
     </issue>
 
@@ -739,7 +629,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="263"
+            line="252"
             column="13"/>
     </issue>
 
@@ -750,7 +640,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="264"
+            line="253"
             column="13"/>
     </issue>
 
@@ -761,7 +651,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="265"
+            line="254"
             column="13"/>
     </issue>
 
@@ -772,7 +662,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="266"
+            line="255"
             column="13"/>
     </issue>
 
@@ -783,7 +673,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="267"
+            line="256"
             column="13"/>
     </issue>
 
@@ -794,7 +684,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="268"
+            line="257"
             column="13"/>
     </issue>
 
@@ -805,7 +695,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="269"
+            line="258"
             column="13"/>
     </issue>
 
@@ -816,7 +706,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="270"
+            line="259"
             column="13"/>
     </issue>
 
@@ -827,7 +717,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="271"
+            line="260"
             column="13"/>
     </issue>
 
@@ -838,7 +728,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="272"
+            line="261"
             column="13"/>
     </issue>
 
@@ -849,7 +739,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="273"
+            line="262"
             column="13"/>
     </issue>
 
@@ -860,7 +750,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="274"
+            line="263"
             column="13"/>
     </issue>
 
@@ -871,7 +761,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="286"
+            line="275"
             column="13"/>
     </issue>
 
@@ -882,7 +772,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="298"
+            line="287"
             column="13"/>
     </issue>
 
