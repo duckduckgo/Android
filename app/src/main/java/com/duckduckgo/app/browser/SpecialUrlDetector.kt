@@ -132,7 +132,6 @@ class SpecialUrlDetectorImpl(
         return UrlType.Web(uriString)
     }
 
-    @SuppressLint("WrongConstant")
     @Throws(URISyntaxException::class)
     private fun queryActivities(uriString: String): MutableList<ResolveInfo> {
         val browsableIntent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME)
@@ -146,7 +145,6 @@ class SpecialUrlDetectorImpl(
         }
     }
 
-    @SuppressLint("WrongConstant")
     @Throws(URISyntaxException::class)
     private fun buildNonBrowserIntent(
         nonBrowserActivity: ResolveInfo,
@@ -178,7 +176,6 @@ class SpecialUrlDetectorImpl(
         return UrlType.SearchQuery(uriString)
     }
 
-    @SuppressLint("WrongConstant")
     private fun buildIntent(uriString: String): UrlType {
         return try {
             val intent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME)
@@ -191,7 +188,6 @@ class SpecialUrlDetectorImpl(
         }
     }
 
-    @SuppressLint("WrongConstant")
     private fun buildFallbackIntent(fallbackUrl: String?): Intent? {
         if (determineType(fallbackUrl) is UrlType.NonHttpAppLink) {
             return Intent.parseUri(fallbackUrl, URI_ANDROID_APP_SCHEME)
