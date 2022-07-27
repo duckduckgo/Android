@@ -60,7 +60,7 @@ class UserAgentProviderTest {
     @Before
     fun before() {
         whenever(deviceInfo.majorAppVersion).thenReturn("5")
-        whenever(toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName)).thenReturn(true)
+        whenever(toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName.value)).thenReturn(true)
         whenever(userAgentRepository.defaultExceptions).thenReturn(defaultExceptions)
         whenever(userAgentRepository.omitApplicationExceptions).thenReturn(applicationExceptions)
         whenever(userAgentRepository.omitVersionExceptions).thenReturn(versionExceptions)
@@ -174,7 +174,7 @@ class UserAgentProviderTest {
 
     @Test
     fun whenFeatureIsDisabledThenUaIsDefault() {
-        whenever(toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName)).thenReturn(false)
+        whenever(toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName.value)).thenReturn(false)
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.default.matches(actual))

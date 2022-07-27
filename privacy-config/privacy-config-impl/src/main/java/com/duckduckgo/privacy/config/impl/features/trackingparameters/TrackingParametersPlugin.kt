@@ -17,7 +17,6 @@
 package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
@@ -34,10 +33,9 @@ class TrackingParametersPlugin @Inject constructor(
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
-    override fun store(name: FeatureName, jsonString: String): Boolean {
-        @Suppress("NAME_SHADOWING")
-        val name = privacyFeatureValueOf(name.value)
-        if (name == featureName) {
+    override fun store(featureName: String, jsonString: String): Boolean {
+        val privacyFeature = privacyFeatureValueOf(featureName) ?: return false
+        if (privacyFeature.value == this.featureName) {
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<TrackingParametersFeature> =
                 moshi.adapter(TrackingParametersFeature::class.java)
@@ -57,11 +55,11 @@ class TrackingParametersPlugin @Inject constructor(
 
             trackingParametersRepository.updateAll(exceptions, parameters)
             val isEnabled = trackingParametersFeature?.state == "enabled"
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled, trackingParametersFeature?.minSupportedVersion))
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(this.featureName, isEnabled, trackingParametersFeature?.minSupportedVersion))
             return true
         }
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.TrackingParametersFeatureName
+    override val featureName: String = PrivacyFeatureName.TrackingParametersFeatureName.value
 }

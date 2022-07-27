@@ -19,7 +19,6 @@ package com.duckduckgo.privacy.config.impl
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfig
@@ -58,8 +57,8 @@ class RealPrivacyConfigPersister @Inject constructor(
                 unprotectedTemporaryRepository.updateAll(jsonPrivacyConfig.unprotectedTemporary)
                 jsonPrivacyConfig.features.forEach { feature ->
                     feature.value?.let { jsonObject ->
-                        privacyFeaturePluginPoint.getPlugins().firstOrNull { feature.key == it.featureName.value }?.let { featurePlugin ->
-                            featurePlugin.store(FeatureName { feature.key }, jsonObject.toString())
+                        privacyFeaturePluginPoint.getPlugins().firstOrNull { feature.key == it.featureName }?.let { featurePlugin ->
+                            featurePlugin.store(featurePlugin.featureName, jsonObject.toString())
                         }
                     }
                 }

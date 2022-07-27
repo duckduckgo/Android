@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.feature
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import com.duckduckgo.mobile.android.vpn.store.AppTpFeatureToggleRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -29,10 +28,11 @@ class AppTpFeatureTogglesPlugin @Inject constructor(
     private val appTpFeatureToggleRepository: AppTpFeatureToggleRepository,
     private val appBuildConfig: AppBuildConfig
 ) : FeatureTogglesPlugin {
-    override fun isEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean? {
-        return if (featureName is AppTpFeatureName) {
-            return appTpFeatureToggleRepository.get(featureName, defaultValue) &&
-                appBuildConfig.versionCode >= appTpFeatureToggleRepository.getMinSupportedVersion(featureName)
+    override fun isEnabled(featureName: String, defaultValue: Boolean): Boolean? {
+        val appTpFeatureName = appTpFeatureValueOf(featureName)
+        return if (appTpFeatureName != null) {
+            return appTpFeatureToggleRepository.get(appTpFeatureName, defaultValue) &&
+                appBuildConfig.versionCode >= appTpFeatureToggleRepository.getMinSupportedVersion(appTpFeatureName)
         } else {
             null
         }
