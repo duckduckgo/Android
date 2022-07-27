@@ -88,18 +88,13 @@
     </plurals>
 
     <string name="atp_EnableCTA">Enable App Tracking Protection</string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotification">"App Tracking Protection blocked %1s and %2s (past week)"</string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationPrefix">"App Tracking Protection blocked"</string>
-    <plurals name="atp_DailyCompany">
-        <item quantity="one">%d company</item>
-        <item quantity="other">%d companies</item>
-    </plurals>
-    <string name="atp_WeeklyCompanyTeaserNotificationPrefix">App Tracking Protection blocked %s"</string>
-    <plurals name="atp_WeeklyCompanyTeaserNotificationIncludingApp">
-        <item quantity="one">", %s"</item>
-        <item quantity="other">", including %s"</item>
-    </plurals>
-    <string name="atp_WeeklyCompanyTeaserNotificationSuffix">"\u0020(past week)."</string>
+
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[App Tracking Protection blocked <b>%d tracking attempt in %s</b> (past hour).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[App Tracking Protection blocked <b>%d tracking attempt in %s and 1 other app</b> (past hour).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[App Tracking Protection blocked <b>%d tracking attempt in %s and %d other apps</b> (past hour).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[App Tracking Protection blocked <b>%d tracking attempts in %s</b> (past hour).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[App Tracking Protection blocked <b>%d tracking attempts in %s and 1 other app</b> (past hour).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection blocked <b>%d tracking attempts in %s and %d other apps</b> (past hour).]]></string>
 
     <!-- App Tracking Protection Privacy Report -->
     <string name="atp_PrivacyReportEnabledTooltip">App Tracking Protection is enabled and blocking trackers across your whole device</string>
@@ -129,7 +124,6 @@
     <string name="atp_EnabledSettings">You can access App Tracking Protection in <annotation type="settings_link">Settings.</annotation></string>
 
     <!-- New Tab Integration -->
-    <string name="atp_NewTabSuffix">"\u0020(past hour)."</string>
     <string name="atp_NewTabDisabled"><b>App Tracking Protection disabled.</b>\nTap to continue blocking tracking attempts across your apps.</string>
     <string name="atp_NewTabRevoked"><b>A VPN app on your device disabled App Tracking Protection.</b>\nTap to re-enable.</string>
     <string name="atp_NewTabEnabled"><b>App Tracking Protection is enabled</b> and blocking tracking attempts across your apps.</string>
