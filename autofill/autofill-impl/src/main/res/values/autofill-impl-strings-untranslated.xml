@@ -42,14 +42,20 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Close Autofill Dialog</string>
 
+    <string name="credentialManagementEditLoginTitleHint">Login Title</string>
     <string name="credentialManagementEditUsernameHint">Username</string>
     <string name="credentialManagementEditPasswordHint">Password</string>
-    <string name="credentialManagementEditWebsiteHint">Website</string>
+    <string name="credentialManagementEditTitle">Edit Login</string>
+    <string name="credentialManagementEditWebsiteHint">Website URL</string>
+    <string name="credentialManagementEditNotesHint">Notes</string>
     <string name="credentialManagementEditButtonDelete">Delete</string>
     <string name="credentialManagementEditButtonSaveChanges">Save Changes</string>
     <string name="credentialManagementEditButtonCopyUsername">Copy Username</string>
     <string name="credentialManagementEditButtonCopyPassword">Copy Password</string>
+    <string name="credentialManagementEditLastUpdated">Login last updated %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Save and Autofill Logins</string>
+    <string name="credentialManagementViewMenuEdit">Edit</string>
+    <string name="credentialManagementViewMenuDelete">Delete</string>
 
 </resources>

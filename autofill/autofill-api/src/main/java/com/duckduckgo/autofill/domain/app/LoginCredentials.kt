@@ -27,9 +27,13 @@ data class LoginCredentials(
     val id: Int? = null,
     val domain: String?,
     val username: String?,
-    val password: String?
+    val password: String?,
+    val domainTitle: String? = null,
+    val notes: String? = null,
+    val lastUpdatedMillis: Long? = null
 ) : Parcelable {
     override fun toString(): String {
-        return "LoginCredentials(id=$id, domain=$domain, username=$username, password=********"
+        return "LoginCredentials(id=$id, domain=$domain, username=$username, password=********," +
+            " domainTitle= $domainTitle, lastUpdatedMillis=$lastUpdatedMillis, notes=$notes"
     }
 }
