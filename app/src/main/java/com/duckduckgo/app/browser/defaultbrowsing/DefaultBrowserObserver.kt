@@ -16,9 +16,8 @@
 
 package com.duckduckgo.app.browser.defaultbrowsing
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName
@@ -28,10 +27,9 @@ class DefaultBrowserObserver(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val appInstallStore: AppInstallStore,
     private val pixel: Pixel
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun onApplicationResumed() {
+    override fun onResume(owner: LifecycleOwner) {
         val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
         if (appInstallStore.defaultBrowser != isDefaultBrowser) {
             appInstallStore.defaultBrowser = isDefaultBrowser

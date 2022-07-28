@@ -19,8 +19,5 @@
 
     <string name="notificationChannelFileDownloading">Fájl letöltése folyamatban</string>
     <string name="notificationChannelFileDownloaded">Fájl letöltve</string>
-
-    <string name="downloadComplete">Letöltés kész</string>
-    <string name="downloadFailed">A letöltés sikertelen volt</string>
     <string name="downloadInProgress">Letöltés</string>
 </resources>

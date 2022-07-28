@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.requestingapp.requestingapp
 
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.ConnectionInfo
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifier
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
@@ -29,7 +30,10 @@ class OriginatingAppPackageIdentifierStrategyTest {
 
     private val mockResolverModern: OriginatingAppPackageIdentifier = mock()
     private val mockResolverLegacy: OriginatingAppPackageIdentifier = mock()
-    private val testee = OriginatingAppPackageIdentifierStrategy(modern = mockResolverModern, legacy = mockResolverLegacy)
+    private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val testee = OriginatingAppPackageIdentifierStrategy(
+        modern = mockResolverModern, legacy = mockResolverLegacy, appBuildConfig = mockAppBuildConfig
+    )
 
     @Test
     fun whenLegacyDeviceThenLegacyResolverUsed() {

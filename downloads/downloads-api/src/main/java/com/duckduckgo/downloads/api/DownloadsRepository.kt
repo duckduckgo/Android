@@ -24,7 +24,7 @@ interface DownloadsRepository {
     suspend fun insertAll(downloadItems: List<DownloadItem>)
     suspend fun update(downloadId: Long, downloadStatus: Int, contentLength: Long)
     suspend fun update(fileName: String, downloadStatus: Int, contentLength: Long)
-    suspend fun delete(id: Long)
+    suspend fun delete(downloadId: Long)
     suspend fun delete(downloadIdList: List<Long>)
     suspend fun deleteAll()
     suspend fun getDownloads(): List<DownloadItem>

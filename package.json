@@ -14,7 +14,7 @@
     "rollup-plugin-terser": "^7.0.2"
   },
   "dependencies": {
-    "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#4.6.0",
+    "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#4.7.1",
     "@duckduckgo/autoconsent": "github:duckduckgo/autoconsent#fat-content-script"
   }
 }

@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import timber.log.Timber
 
 interface DefaultRoleBrowserDialog {
@@ -30,14 +31,16 @@ interface DefaultRoleBrowserDialog {
 }
 
 class RealDefaultRoleBrowserDialog(
-    private val appInstallStore: AppInstallStore
+    private val appInstallStore: AppInstallStore,
+    private val appBuildConfig: AppBuildConfig,
 ) : DefaultRoleBrowserDialog {
 
     /**
      * @return an Intent to launch the role browser dialog
      */
+    @Suppress("NewApi") // we use appBuildConfig
     override fun createIntent(context: Context): Intent? {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {
             val roleManager = context.getSystemService(RoleManager::class.java) ?: return null
 
             val isRoleAvailable = roleManager.isRoleAvailable(RoleManager.ROLE_BROWSER)
@@ -57,7 +60,7 @@ class RealDefaultRoleBrowserDialog(
     override fun shouldShowDialog(): Boolean {
         // The second and subsequent times the dialog is shown, the system allows the user to click on "don't show again"
         // we will get the same result as if the dialog was just dismissed.
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+        return appBuildConfig.sdkInt >= Build.VERSION_CODES.Q &&
             appInstallStore.newDefaultBrowserDialogCount < DEFAULT_BROWSER_DIALOG_MAX_ATTEMPTS
     }
 

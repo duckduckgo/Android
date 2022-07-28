@@ -16,15 +16,16 @@
 
 package com.duckduckgo.app.browser
 
-import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Intent
+import android.content.Intent.URI_ANDROID_APP_SCHEME
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.TrackingParameters
@@ -65,7 +66,8 @@ interface SpecialUrlDetector {
 class SpecialUrlDetectorImpl(
     private val packageManager: PackageManager,
     private val ampLinks: AmpLinks,
-    private val trackingParameters: TrackingParameters
+    private val trackingParameters: TrackingParameters,
+    private val appBuildConfig: AppBuildConfig
 ) : SpecialUrlDetector {
 
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
@@ -95,12 +97,13 @@ class SpecialUrlDetectorImpl(
 
     private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
 
+    @Suppress("NewApi") // we use appBuildConfig
     override fun processUrl(initiatingUrl: String?, uriString: String): UrlType {
         trackingParameters.cleanTrackingParameters(initiatingUrl = initiatingUrl, url = uriString)?.let { cleanedUrl ->
             return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             try {
                 val activities = queryActivities(uriString)
                 val nonBrowserActivities = keepNonBrowserActivities(activities)
@@ -128,10 +131,9 @@ class SpecialUrlDetectorImpl(
         return UrlType.Web(uriString)
     }
 
-    @SuppressLint("WrongConstant")
     @Throws(URISyntaxException::class)
     private fun queryActivities(uriString: String): MutableList<ResolveInfo> {
-        val browsableIntent = Intent.parseUri(uriString, URI_NO_FLAG)
+        val browsableIntent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME)
         browsableIntent.addCategory(Intent.CATEGORY_BROWSABLE)
         return packageManager.queryIntentActivities(browsableIntent, PackageManager.GET_RESOLVED_FILTER)
     }
@@ -142,13 +144,12 @@ class SpecialUrlDetectorImpl(
         }
     }
 
-    @SuppressLint("WrongConstant")
     @Throws(URISyntaxException::class)
     private fun buildNonBrowserIntent(
         nonBrowserActivity: ResolveInfo,
         uriString: String
     ): Intent {
-        val intent = Intent.parseUri(uriString, URI_NO_FLAG)
+        val intent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME)
         intent.component = ComponentName(nonBrowserActivity.activityInfo.packageName, nonBrowserActivity.activityInfo.name)
         return intent
     }
@@ -174,10 +175,9 @@ class SpecialUrlDetectorImpl(
         return UrlType.SearchQuery(uriString)
     }
 
-    @SuppressLint("WrongConstant")
     private fun buildIntent(uriString: String): UrlType {
         return try {
-            val intent = Intent.parseUri(uriString, URI_NO_FLAG)
+            val intent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME)
             val fallbackUrl = intent.getStringExtra(EXTRA_FALLBACK_URL)
             val fallbackIntent = buildFallbackIntent(fallbackUrl)
             UrlType.NonHttpAppLink(uriString = uriString, intent = intent, fallbackUrl = fallbackUrl, fallbackIntent = fallbackIntent)
@@ -187,10 +187,9 @@ class SpecialUrlDetectorImpl(
         }
     }
 
-    @SuppressLint("WrongConstant")
     private fun buildFallbackIntent(fallbackUrl: String?): Intent? {
         if (determineType(fallbackUrl) is UrlType.NonHttpAppLink) {
-            return Intent.parseUri(fallbackUrl, URI_NO_FLAG)
+            return Intent.parseUri(fallbackUrl, URI_ANDROID_APP_SCHEME)
         }
         return null
     }
@@ -217,7 +216,6 @@ class SpecialUrlDetectorImpl(
         private const val FILE_SCHEME = "file"
         private const val SITE_SCHEME = "site"
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
-        private const val URI_NO_FLAG = 0
         const val SMS_MAX_LENGTH = 400
         const val PHONE_MAX_LENGTH = 20
         const val EMAIL_MAX_LENGTH = 1000

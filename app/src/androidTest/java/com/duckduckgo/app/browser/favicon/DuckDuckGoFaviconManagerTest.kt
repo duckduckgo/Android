@@ -35,6 +35,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.autofill.store.AutofillStore
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertNull
@@ -59,6 +60,7 @@ class DuckDuckGoFaviconManagerTest {
     private val mockFireproofWebsiteDao: FireproofWebsiteDao = mock()
     private val mockLocationPermissionsDao: LocationPermissionsDao = mock()
     private val mockFaviconDownloader: FaviconDownloader = mock()
+    private val mockAutofillStore: AutofillStore = mock()
     private val mockFile: File = File("test")
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -67,6 +69,7 @@ class DuckDuckGoFaviconManagerTest {
     @Before
     fun setup() {
         whenever(mockFavoriteRepository.favoritesCountByDomain(any())).thenReturn(0)
+        mockAutofillStore.stub { onBlocking { getCredentials(any()) }.thenReturn(emptyList()) }
 
         testee = DuckDuckGoFaviconManager(
             faviconPersister = mockFaviconPersister,
@@ -75,7 +78,8 @@ class DuckDuckGoFaviconManagerTest {
             locationPermissionsRepository = LocationPermissionsRepository(mockLocationPermissionsDao, mock(), coroutineRule.testDispatcherProvider),
             favoritesRepository = mockFavoriteRepository,
             faviconDownloader = mockFaviconDownloader,
-            dispatcherProvider = coroutineRule.testDispatcherProvider
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            autofillStore = mockAutofillStore
         )
     }
 

@@ -24,6 +24,9 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
     anvil {
         generateDaggerFactories = true // default is false
     }
@@ -37,7 +40,7 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':vpn-store')
-    api project(path: ':vpn-api')
+    implementation project(path: ':vpn-api')
     implementation project(path: ':app-store')
     implementation project(path: ':di')
     implementation project(path: ':common')

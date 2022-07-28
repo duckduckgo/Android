@@ -563,10 +563,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Kapcsolat megszakadt. Ez a weboldal káros lehet az eszközödre.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Letöltéskezelő letiltva</string>
-    <string name="downloadManagerIncompatible">A letöltéskezelő nem érhető el ezen az eszközön.</string>
-    <string name="enable">Engedélyezés</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Engedélyezed az eszköz helyének elérését a DuckDuckGo adatvédelmi böngésző számára?</string>

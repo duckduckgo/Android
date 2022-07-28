@@ -54,6 +54,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -110,19 +111,17 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
-import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadCommand
+import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.AmpLinks
-import com.duckduckgo.privacy.config.api.AmpLinkInfo
+import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -172,16 +171,19 @@ class BrowserTabViewModel @Inject constructor(
     private val appLinksHandler: AppLinksHandler,
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
-    private val downloadCallback: DownloadCallback,
+    private val downloadCallback: DownloadStateListener,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
+    private val autofillStore: AutofillStore,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     HttpAuthenticationListener,
     SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener,
     UrlExtractionListener,
+    AutofillCredentialsSelectionResultHandler.AutofillCredentialSaver,
+    AutofillCredentialsSelectionResultHandler.CredentialInjector,
     ViewModel(),
     NavigationHistoryListener {
 
@@ -429,7 +431,8 @@ class BrowserTabViewModel @Inject constructor(
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
-
+        class InjectCredentials(val url: String, val credentials: LoginCredentials) : Command()
+        class CancelIncomingAutofillRequest(val url: String) : Command()
         class EditWithSelectedQuery(val query: String) : Command()
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
         class NavigateToHistory(val historyStackIndex: Int) : Command()
@@ -2595,9 +2598,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun download(pendingFileDownload: PendingFileDownload) {
-        viewModelScope.launch(dispatchers.io()) {
-            fileDownloader.download(pendingFileDownload, downloadCallback)
-        }
+        fileDownloader.enqueueDownload(pendingFileDownload)
     }
 
     fun deleteQuickAccessItem(savedSite: SavedSite) {
@@ -2654,6 +2655,26 @@ class BrowserTabViewModel @Inject constructor(
             initialUrl
         }
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
+    }
+
+    override fun shareCredentialsWithPage(originalUrl: String, credentials: LoginCredentials) {
+        command.postValue(InjectCredentials(originalUrl, credentials))
+    }
+
+    override fun returnNoCredentialsWithPage(originalUrl: String) {
+        command.postValue(CancelIncomingAutofillRequest(originalUrl))
+    }
+
+    override fun saveCredentials(url: String, credentials: LoginCredentials) {
+        viewModelScope.launch {
+            autofillStore.saveCredentials(url, credentials)
+        }
+    }
+
+    override fun updateCredentials(url: String, credentials: LoginCredentials) {
+        viewModelScope.launch {
+            autofillStore.updateCredentials(url, credentials)
+        }
     }
 
     fun onConfigurationChanged() {

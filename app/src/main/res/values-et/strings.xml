@@ -563,10 +563,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Ühendus on katkestatud. See veebileht võib kahjustada sinu seadet.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Download Manager on keelatud</string>
-    <string name="downloadManagerIncompatible">Download Manager ei ole saadaval selles seadmes</string>
-    <string name="enable">Luba</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Kas lubada seadme asukoht DuckDuckGo privaatses brauseris?</string>

@@ -23,7 +23,7 @@
 									<div id="isGiftCheck" aria-labelledby="isGiftCheckText" data-isgift="false" role="button" tabindex="0"><img id="nextgen-gift-check" src="https://subscribe.wired.com/circulation/wired/images/ng-radio-check-new.png" alt=""></div>
 									<div id="isGiftCheckText">This is a gift</div> <div class="nextgen-gift-icon"></div>
 									<div id="isGiftCheckinfocopy" class="gift-on">
-										
+
                                     </div>
                                     </div>
 								</div>
@@ -91,7 +91,7 @@
 									});
 								};
 							</script>
-			 
+
 							<style>
 								#nextgen-international-selector {display:none; width:100%;}
 							</style>
@@ -105,10 +105,10 @@
     								<div id="deliverto" class="subtext">
     									Deliver To
                                     </div>
-    
+
     								<span id="ship-country-selector-error" class="output-message">Select a location.</span>
     							</label>
-    							<select id="ship-country-selector" name="country_code" data-location="domestic" data-shipname="ship_country_code" data-billname="country_code" class="ui search selection dropdown" autocomplete="country-name">
+    							<select id="ship-country-selector" name="country_code" data-location="domestic" data-shipname="ship_country_code" data-billname="country_code" class="ui search selection dropdown" autocomplete="country-name" data-manual-scoring="addressCountryCode">
     								<option value="" style="color: #979797">Choose Location</option><option value="AF" style="color: rgb(151, 151, 151);">Afghanistan</option>
     								<option value="AL" style="color: rgb(151, 151, 151);">Albania</option>
     								<option value="DZ" style="color: rgb(151, 151, 151);">Algeria</option>
@@ -319,7 +319,7 @@
     								<option value="YE" style="color: rgb(151, 151, 151);">Yemen</option>
     								<option value="ZM" style="color: rgb(151, 151, 151);">Zambia</option>
     								<option value="ZW" style="color: rgb(151, 151, 151);">Zimbabwe</option>
-    								
+
     							</select>
                             </div>
 						</div>
@@ -327,15 +327,15 @@
                     <div class="nextgen-greyborder usonlyhide"></div>
 				<div id="chooseoffer" class="sectionbox sectionbox-full">
 					<div id="chooseofferheadtext"><span class="sectionheadfont"><h2>STEP 2. Choose Your Plan</h2></span></div>
-                    
-                        <div class="space10 ng-hide-on-dt"></div>		
-                        <div class="space15 ng-hide-on-mobile"></div>		
+
+                        <div class="space10 ng-hide-on-dt"></div>
+                        <div class="space15 ng-hide-on-mobile"></div>
                         <div id="nextgen-offer-container">
 					<span id="chooseoffermessage" class="output-message">Select an offer</span>
 					<div class="panel offer on" data-format="bundle" data-chosenoffer="1" data-issues="12" data-self-issues="12" data-gift-issues="12" id="offer1" data-patermnew="one year" data-papricenew="$29.99" tabindex="0" role="button">
 <div class="panel-popular panel-default">MOST POPULAR</div>
 
-<div class="panel-inner"> 
+<div class="panel-inner">
 <div class="offerheader heading02">Print + Digital Access</div>
 <div class="heading03"><span class="gift-on">Give </span>1 year for <span class="visually-hidden">Regular price </span><strike>$29.99</strike><span class="visually-hidden"> Sale price:</span> $5
 </div>
@@ -365,7 +365,7 @@
 					<div class="panel offer off" data-format="digital" data-chosenoffer="2" data-issues="12" data-self-issues="12" data-gift-issues="12" id="offer2" data-patermnew="one year" data-papricenew="$29.99" tabindex="0" role="button">
 <div class="panel-popular"></div>
 
-<div class="panel-inner"> 
+<div class="panel-inner">
 <div class="offerheader heading02">
 Digital Only Access
 </div>
@@ -391,12 +391,12 @@ Digital Only Access
 </div>
 <div class="panel-image-spacer"></div>
 </div>
-					
-					
+
+
                         </div>
-                        <div class="space25"></div>	
+                        <div class="space25"></div>
             <div class="nextgen-greyborder"></div>
-			
+
 		</div>
 
         <div class="giftrecipientshow" style="display: none;"></div>
@@ -407,17 +407,17 @@ Digital Only Access
             <div id="nextgen-gift-recipient"><h2>Enter Recipient Information</h2></div>
             <div class="flex">
                 <div class="ng_required">
-                    <label for="ship-first-name">First Name<input type="text" class="req" id="ship-first-name" name="ship_first_name" aria-required="true" autocomplete="given-name"></label>
+                    <label for="ship-first-name">First Name<input type="text" class="req" id="ship-first-name" name="ship_first_name" aria-required="true" autocomplete="given-name" data-manual-scoring="firstName"></label>
                     <div class="errorcontainer"><span id="ship-first-name-error" class="output-message">Please enter first name</span></div>
                 </div>
                 <div class="ng_required ng-flex-last">
-                    <label for="ship-last-name">Last Name<input type="text" class="req" id="ship-last-name" name="ship_last_name" aria-required="true" autocomplete="family-name"></label>
+                    <label for="ship-last-name">Last Name<input type="text" class="req" id="ship-last-name" name="ship_last_name" aria-required="true" autocomplete="family-name" data-manual-scoring="lastName"></label>
                     <div class="errorcontainer"><span id="ship-last-name-error" class="output-message">Please enter last name</span></div>
                 </div>
             </div>
             <div id="nextgen-gift-shipping"></div>
             <div class="ng_required">
-                <label for="ship-email">Recipient Email<input type="text" class="req" id="ship-email" name="ship_email" aria-required="true" autocomplete="email"></label>
+                <label for="ship-email">Recipient Email<input type="text" class="req" id="ship-email" name="ship_email" aria-required="true" autocomplete="email" data-manual-scoring="emailAddress"></label>
                 <div class="errorcontainer"><span id="ship-email-error" class="output-message">Email cannot be empty</span> <span id="ship-email-invaliderror" class="output-message">Please enter a valid email</span></div>
                 <div id="giftprivacytext">Will be used in accordance with our <a href="https://www.condenast.com/user-agreement" target="_blank">User Agreement</a> and <a href="https://www.condenast.com/privacy-policy" target="_blank">Privacy Policy</a>.</div>
             </div>
@@ -427,14 +427,14 @@ Digital Only Access
 	<div id="expressPayment"></div>
 		<script>
 					var hasapplepay = false;
-					
+
 						var appdisp = ['apple','amazon'];
-					
-					
+
+
 						var noappdisp = ['amazon','paypal'];
-					
-					
-					
+
+
+
 					var amazonflag = true;
 					var paypalflag = true;
                         var applepayflag = false;
@@ -442,11 +442,11 @@ Digital Only Access
 						if (hasapplepay == true || hasapplepay == false) {
 							if (hasapplepay == true) {
 								var i;
-								for (i = 0; i <= appdisp.length; i++) { 
+								for (i = 0; i <= appdisp.length; i++) {
 									if (appdisp[i] == "apple") {
 										$("#applepay_checkout_section").append($("#applePay"));
 										applepayflag = true;
-									} 
+									}
 									if (appdisp[i] == "amazon") {
 										$("#nextgen-tab-2").append($("#amazonpay-container"));
 										amazonflag = true;
@@ -459,16 +459,16 @@ Digital Only Access
 								}
 							} else {
 								var i;
-								for (i = 0; i <= noappdisp.length; i++) { 
+								for (i = 0; i <= noappdisp.length; i++) {
 									if (noappdisp[i] == "apple") {
 										$("#applepay_checkout_section").append($("#applePay"));
 										applepayflag = true;
-									} 
+									}
 									if (noappdisp[i] == "amazon") {
 										$("#nextgen-tab-2").append($("#amazonpay-container"));
 										amazonflag =  true;
 										$("#applePayform").addClass("hasamz");
-									} 
+									}
 									if (noappdisp[i] == "paypal") {
 										$("#nextgen-tab-3").append($("#ppcheckoutexpbutton"));
 										paypalflag = true;
@@ -479,12 +479,12 @@ Digital Only Access
                                 // $("#applePay").hide();
                                 $("#nextgen-tab-4").remove();
                                 $("[data-ngtab='4']").remove();
-							} 
+							}
 							if (amazonflag == false) {
 								// $("#amazonpay-container").remove();
                                 $("#nextgen-tab-2").remove();
                                 $("[data-ngtab='2']").remove();
-							} 
+							}
 							if (paypalflag == false) {
 								// $("#ppcheckoutexpbutton").remove();
                                 $("#nextgen-tab-3").remove();
@@ -501,13 +501,13 @@ Digital Only Access
 			<h2><span id="nextgen-gift-payno">STEP 3.</span> PAYMENT DETAILS</h2>
 		</div>
 		<div class="nextgen-cancel-text">
-		<p>You may cancel at any time.</p>	
+		<p>You may cancel at any time.</p>
 		</div>
                     <div class="nextgen-payment-links">
                         <div class="nextgen-payment-buttons nextgen-payment-buttons-selected" data-ngtab="1" role="button" tabindex="0">Credit Card</div>
                         <div class="nextgen-payment-buttons" data-ngtab="2" role="button" tabindex="0"><img src="https://subscribe.wired.com/circulation/wired/images/Nextgen-Amazon-Pay.png" alt="Amazon pay" width="66px" height="13px" style="margin-top:5px;"></div>
                         <div class="nextgen-payment-buttons" data-ngtab="3" role="button" tabindex="0"><img src="https://subscribe.wired.com/circulation/wired/images/Nextgen-Paypal-Pay.png" alt="Paypal pay" width="58px" height="15px"></div>
-                        
+
                     </div>
                     <div class="nextgen-payment-tab nextgen-payment-selected" id="nextgen-tab-1">
                         <!-- Start of Credit Card Info -->
@@ -515,9 +515,9 @@ Digital Only Access
 		<div class="flex">
 			<div class="ng_required">
 				<label for="creditcard">
-					
+
 						Credit/Debit Card #
-					
+
 					<input type="number" id="creditcard" name="credit_card_number" maxlength="16" pattern="[0-9]*" min="0" max="9999999999999999" oninput="maxLengthCheck(this)" aria-required="true" autocomplete="cc-number" data-manual-scoring="cardNumber">
 					<div id="cctext">This transaction is secured with SSL encryption.</div>
 					<div class="errorcontainer"> <span id="creditcard-error" class="output-message">Please enter a valid credit card</span> <span id="creditcard-invalid-error" class="output-message">Please enter a valid credit card</span> </div>
@@ -541,7 +541,7 @@ Digital Only Access
 						<option value="11" style="color: rgb(0, 0, 0);">Nov</option>
 						<option value="12" style="color: rgb(0, 0, 0);">Dec</option>
 					</select>
-					
+
 					<div class="errorcontainer"> <span id="month-error" class="output-message">Select month</span> </div>
 				</fieldset>
 			</div>
@@ -561,14 +561,14 @@ Digital Only Access
 <option value="31" style="color: rgb(0, 0, 0);">2031</option>
 <option value="32" style="color: rgb(0, 0, 0);">2032</option>
 				</select>
-				
+
 				<div class="errorcontainer"> <span id="year-error" class="output-message">Select year</span> </div>
 			</div>
 			<div class="ng_required">
 				<label for="cvv">CVV
 					<input type="number" id="cvv" class="req" name="credit_card_cvv" pattern="[0-9]*" maxlength="4" min="0" max="9999" oninput="maxLengthCheck(this)" aria-required="true" autocomplete="cc-csc" data-manual-scoring="cardSecurityCode">
 				</label>
-				
+
 				<div class="errorcontainer"><span id="cvv-error" class="output-message">Enter valid CVV</span></div>
 			</div>
 		</div>
@@ -580,10 +580,10 @@ Digital Only Access
 	#addressBookWidgetDiv {max-width:620px; height:228px; width:100%; display:none;}
 	#walletWidgetDiv {max-width:620px; height:228px; width:100%; display:none;}
 	#consentWidgetDiv {max-width:620px; height:140px; width:100%; display:none; margin-bottom: 20px;}
-    
+
 	#amazon_processing {margin:20px auto; text-align:center; display:none;}
 	#AmzPayRenew {margin-top:25px; display:none;}
-	#amazonpay-container {max-width:620px; margin:auto; display:block; box-sizing:border-box;}   
+	#amazonpay-container {max-width:620px; margin:auto; display:block; box-sizing:border-box;}
     #AmazonPayButton {text-align:center; margin-top:10px; display:none;}
 	.amazonpay-button-inner-image {
     max-width: 280px;
@@ -615,9 +615,9 @@ Digital Only Access
 		var theOrderObjtest = "";
 		var amazonState = "";
 		$(document).ready(function() {
-			$.getScript('https://code.jquery.com/jquery-3.5.1.min.js'); 
+			$.getScript('https://code.jquery.com/jquery-3.5.1.min.js');
 			$.getScript('https://static-na.payments-amazon.com/OffAmazonPayments/us/js/Widgets.js');
-			
+
 				try {
 					var urlParams = new URLSearchParams(window.location.search);
 					if (urlParams.get('SOURCE') !== null &&  urlParams.get('SOURCE') !== '') {
@@ -642,7 +642,7 @@ Digital Only Access
 					}
 				} catch(err) {
 				}
-			
+
 			var $j = jQuery.noConflict(true);
 			var $jOrig = jQuery || $j;
 			window.jQuery = window.$ = $j;
@@ -650,7 +650,7 @@ Digital Only Access
 				amazon.Login.setClientId('amzn1.application-oa2-client.87be8392a3e547f0861f97a70ef90487');
 				amazon.Login.setUseCookie(true);
 			};
- 
+
 			window.onAmazonPaymentsReady = function() {
 				var urlParams = new URLSearchParams(window.location.search);
 				var access_token = urlParams.get('access_token');
@@ -714,7 +714,7 @@ Digital Only Access
 							var addressWidget =  new OffAmazonPayments.Widgets.AddressBook({
 								sellerId: 'A3AADXX5DBORYZ',
 								agreementType: 'BillingAgreement',
-								
+
 									onReady: function(billingAgreement) {
 										console.log("on ready inside address book widget");
 										billingAgreementId = billingAgreement.getAmazonBillingAgreementId();
@@ -781,7 +781,7 @@ Digital Only Access
 											$('input[name=last_name]').val(last_name);
 										});
 									},
-								
+
 								design: {
 									designMode:'responsive'
 								},
@@ -839,7 +839,7 @@ Digital Only Access
 									// getConsentStatus returns true or false
 									// true checkbox is selected buyer has consented
 									// false checkbox is unselected  buyer has not consented
-									
+
 									// Replace this code with the action that you want to perform
 									// after the consent checkbox is selected/unselected.
 								},
@@ -857,9 +857,9 @@ Digital Only Access
                     localStorage.setItem("chosenoffer", $(".panel.offer.on").attr("data-chosenoffer"));
 					console.log("chosenoffer=" + jQuery(".panel.offer.on").attr("data-chosenoffer"));
                     $(".nextgen-progress").animate({width : "100%"});
-                    
+
 					$("#order-progress-bar ol li:nth-child(4)").removeClass("ng-disabled");
-						
+
 					var paneleventfilter = false;
 					console.log(e.handleObj.origType);
 					if (e.keyCode == '32'||  e.handleObj.origType == "click" || e.keyCode == '13') {
@@ -869,14 +869,14 @@ Digital Only Access
 						$(this).click();
 					}
 					if (paneleventfilter == true) {
-						$('#amazon_submit').hide(); 
+						$('#amazon_submit').hide();
 						$('#amazon_processing').show();
 						if (buyerBillingAgreementConsentStatus == "false") {
 							alert("Please agree to use your selected payment method to submit your order.");
 							$('html, body').animate({
 								scrollTop: $("#amazonpay-container").offset().top
 							}, 1000);
-							$('#amazon_submit').show(); 
+							$('#amazon_submit').show();
 							$('#amazon_processing').hide();
 							return false;
 						}
@@ -893,15 +893,15 @@ Digital Only Access
 							var refSource = document.getElementsByName('referral_source')[0].value;
 							var refSource = getCookieCN("cnsource");
 						} catch(err) {
-						}      
+						}
 						var nlsourceCode = "";
 						try {
 							var posName = document.getElementsByName('pos_name')[0].value;
 							var posName = getCookieCN("cnposname");
 
 						} catch(err) {
-						} 
-						
+						}
+
 						var firstName = document.getElementsByName('first_name')[0].value;
 						var lastName = document.getElementsByName('last_name')[0].value;
 						var donAdd = document.getElementsByName('address')[0].value;
@@ -915,18 +915,18 @@ Digital Only Access
 						var theOrderObj = {
 "offer_term":offerTerm, "pos_name":posName, "offer_id":offerId, "host_offer_id":hostOfferId, "parent_trans_id":parentTransId, "trans_id":transId, "trans_key":transKey, "source_code":sourceCode, "referral_source":refSource, "newsletter_source_code":nlsourceCode,  "first_name":firstName, "last_name":lastName, "address":donAdd, "address2":donAdd2, "city":donCity, "state":donState, "postal_code":donZip, "country_code":donCountry, "email":donEmail, "pt_id":ptId, "billing_agreement_id":amzpayBillId
 						};
-						
-							
-								
-							
-						
-							
-						
+
+
+
+
+
+
+
 						theOrderObjtest = theOrderObj;
 						if (donCountry  !== null) {
 							$.ajax({
 								type:"POST",
-								url:"/api/circ/js/Transaction",  
+								url:"/api/circ/js/Transaction",
 								data:theOrderObj,
 								dataType:"json",
 								error:function(jqXHR, error, errorThrown){
@@ -941,23 +941,23 @@ Digital Only Access
                                                                                    var orderFailedError = "";
 						if (typeof orderStatObj.order_failed[0] !== 'undefined' && typeof orderStatObj.order_failed[0].error !== 'undefined') {
 							orderFailedError = orderStatObj.order_failed[0].error;
-											$('#amazon_submit').show(); 
+											$('#amazon_submit').show();
 											$('#btn_processing').hide();
 						} else {
 							orderFailedError = orderStatObj.order_failed[0];
-											$('#amazon_submit').show(); 
+											$('#amazon_submit').show();
 											$('#btn_processing').hide();
 						}
 						console.log(orderFailedError);
 										if (orderStatObj.order_failed[0] !== 'undefined' && typeof orderStatObj.order_failed[0].error !== 'undefined') {
 									                orderFailed = orderStatObj.order_failed[0].error;
-											$('#amazon_submit').show(); 
+											$('#amazon_submit').show();
 											$('#btn_processing').hide();
 										} else {
 											alert(orderStatObj.order_failed);	// change this to display order failure message
 									                 orderFailed = orderStatObj.order_failed[0];
-											$('#amazon_submit').show(); 
-											$('#btn_processing').hide(); 
+											$('#amazon_submit').show();
+											$('#btn_processing').hide();
 										}
 									} else {
 										window.location = orderStatObj.order_success[0].next_offer_url;
@@ -981,16 +981,16 @@ Digital Only Access
 	<div id="walletWidgetDiv"></div>
 	<div id="consentWidgetDiv"></div>
 
-	
+
     <div id="ng_amazon_review"></div>
 	<div id="AmazonPayButton" role="button" tabindex="0" style="display: block;" data-treatment="{&quot;treatment&quot;:&quot;T6&quot;,&quot;abtestName&quot;:&quot;BUTTON_REBRANDING&quot;}"><img class="amazonpay-button-inner-image" style="cursor:pointer; max-height:90px;" alt="AmazonPay" id="OffAmazonPaymentsWidgets0" tabindex="0" src="https://d2ldlvi1yef00y.cloudfront.net/us/live/en_us/amazonpay/darkgray/x-large/button_T6.png" data-metric-tags="highres" srcset="https://d2ldlvi1yef00y.cloudfront.net/us/live/en_us/amazonpay/darkgray/x-large/button_T6_2x.png 2x"></div>
 
 	<div id="AmzPayRenew">
-		
+
 			<!-- START OF CONTINUOUS SERVICE -->
 			<div class="amazonautoRenew">
 				<div class="autoRenewText"><a name="autoRenew"></a>
-					
+
                                 <div class="paArWrap">
                                 <h2>Automatic Renewal:</h2>
                                 <p id="arcompliancecopy">
@@ -998,11 +998,11 @@ Digital Only Access
                                 </div>
                                 <br>
                                 <p class="arUaLink">By subscribing you agree to Automatic Renewal as described above, our <a href="https://www.condenast.com/user-agreement" target="_blank">User Agreement</a> (including the <a href="https://www.condenast.com/user-agreement#section-viii-g" target="_blank">class action waiver and arbitration provisions</a>) and <a href="https://www.condenast.com/privacy-policy" target="_blank">Privacy Policy &amp; Cookie Statement</a>.</p>
-					
+
 				</div>
 			</div>
 			<!-- END OF CONTINUOUS SERVICE -->
-		
+
 	</div>
 	<div id="amazon_submit" class="sectionbox" role="button" tabindex="0">
 		<div id="amazon_submit_mob">Subscribe</div>
@@ -1013,7 +1013,7 @@ Digital Only Access
 	<div id="amazon_processing"><img src="/circulation/shared/images/omn_processing.gif" alt="processing"></div>
 </div></div>
                     <div class="nextgen-payment-tab" id="nextgen-tab-3">
-                        
+
                             <div class="nextgen-pp-gift-payment">
                                 <p>Please enter your billing information below before continuing your purchase with PayPal.</p></div>
                                 <div id="nextgen-paypal-billing-address"></div>
@@ -1029,10 +1029,10 @@ Digital Only Access
             <div class="autoRenewText">
                 <div class="paArWrap">
                     <div><h3>Automatic Renewal:</h3></div>
-                    <p>After your initial <span class="paTermNew">one year </span> term, your subscription will <strong>automatically renew</strong> for one year at <span class="paPriceNew">$29.99</span>. Your subscription will continue until you cancel, and after your first renewal the term and rate may change. Before each renewal, we will send a reminder with the term and rate then in effect. If you do nothing, we will charge the payment method you selected. You can cancel at any time to get a refund for the portion remaining on your subscription by <a href="https://www.wired.com/customerservice" target="_blank">contacting customer service</a> or calling 1-800-769-4733.</p>   
-                </div> 
+                    <p>After your initial <span class="paTermNew">one year </span> term, your subscription will <strong>automatically renew</strong> for one year at <span class="paPriceNew">$29.99</span>. Your subscription will continue until you cancel, and after your first renewal the term and rate may change. Before each renewal, we will send a reminder with the term and rate then in effect. If you do nothing, we will charge the payment method you selected. You can cancel at any time to get a refund for the portion remaining on your subscription by <a href="https://www.wired.com/customerservice" target="_blank">contacting customer service</a> or calling 1-800-769-4733.</p>
+                </div>
                 <br>
-                <p class="arUaLink">By subscribing you agree to Automatic Renewal as described above, our <a href="https://www.condenast.com/user-agreement" target="_blank">User Agreement</a> (including the <a href="https://www.condenast.com/user-agreement#section-viii-g" target="_blank">class action waiver and arbitration provisions</a>) and <a href="https://www.condenast.com/privacy-policy" target="_blank">Privacy Policy &amp; Cookie Statement</a>.</p>  
+                <p class="arUaLink">By subscribing you agree to Automatic Renewal as described above, our <a href="https://www.condenast.com/user-agreement" target="_blank">User Agreement</a> (including the <a href="https://www.condenast.com/user-agreement#section-viii-g" target="_blank">class action waiver and arbitration provisions</a>) and <a href="https://www.condenast.com/privacy-policy" target="_blank">Privacy Policy &amp; Cookie Statement</a>.</p>
             </div>
         </div>
 
@@ -1058,7 +1058,7 @@ Digital Only Access
 		if (!results) return null;
 		if (!results[2]) return '';
 		return decodeURIComponent(results[2].replace(/\+/g, " "));
-		
+
 	}
 	jQuery("#ppcheckoutexpbutton").on("click.ppcheck, keypressppcheck, keydown.ppcheck", function(e) {
 		var paneleventfilter = false;
@@ -1074,7 +1074,7 @@ Digital Only Access
 			var parentTransId = document.getElementsByName('parent_trans_id')[0].value;
 			var transId = document.getElementsByName('trans_id')[0].value;
 			var transKey = document.getElementsByName('trans_key')[0].value;
-			var sourceCode = document.getElementsByName('source_code')[0].value;      
+			var sourceCode = document.getElementsByName('source_code')[0].value;
 			var refSource = document.getElementsByName('referral_source')[0].value;
 			var posName = document.getElementsByName('pos_name')[0].value;
 			var ignoredav = "1" ;
@@ -1130,17 +1130,17 @@ Digital Only Access
 			$.support.cors = true;
 			$.ajax({
 				type: "POST",
-				url: "/api/circ/js/Transaction",  
+				url: "/api/circ/js/Transaction",
 				data: theOrderObj,
 				dataType: "json",
 				error: function(e) {
-					$("#btn_submit").show(); 
+					$("#btn_submit").show();
 					$("#btn_processing").hide();
 					alert("Error in ajax post"+e.statusText);
 					paypal.checkout.closeFlow();
 				},
 				success: function(data) {
-					$("#btn_submit").show(); 
+					$("#btn_submit").show();
 					$("#btn_processing").hide();
 					var orderStatObj = data;
 					console.log(orderStatObj);
@@ -1162,13 +1162,13 @@ Digital Only Access
 							alert(orderFailedError);
 						}
 						paypal.checkout.closeFlow();
-						$('#btn_submit').show(); 
+						$('#btn_submit').show();
 						$('#btn_processing').hide();
 					}
 				}
 			});
 		}
-	});  
+	});
 
 			window.paypalCheckoutReady = function() {
                 function getParameterByName(name, url) {
@@ -1180,18 +1180,18 @@ Digital Only Access
 		if (!results) return null;
 		if (!results[2]) return '';
 		return decodeURIComponent(results[2].replace(/\+/g, " "));
-		
+
 	}
 				paypal.checkout.setup("5BZ399HNM9RUC", {
 				environment: 'production',
 				click: function(event) {
 					// if (!($('.nextgen-payment-buttons[data-ngtab="3"]').hasClass("nextgen-payment-buttons-selected"))) {
-					// 	$('#btnSubmit').show(); 
+					// 	$('#btnSubmit').show();
 					// 		$('#processing').hide();
 					// 		return false;
 					// 	if ($(".panel.impulse").hasClass("on")) {
 					// 		var addofferTerm = document.getElementsByName('offer_term_donee')[0].value;
-					// 	}					
+					// 	}
 					// }
 					var offerTerm = document.getElementsByName('offer_term')[0].value;
 					var offerId = document.getElementsByName('offer_id')[0].value;
@@ -1199,11 +1199,11 @@ Digital Only Access
 					var parentTransId = document.getElementsByName('parent_trans_id')[0].value;
 					var transId = document.getElementsByName('trans_id')[0].value;
 					var transKey = document.getElementsByName('trans_key')[0].value;
-					var sourceCode = document.getElementsByName('source_code')[0].value;      
+					var sourceCode = document.getElementsByName('source_code')[0].value;
 					// var nlsourceCode = document.getElementsByName('newsletter_source_code')[0].value;
 					var refSource = document.getElementsByName('referral_source')[0].value;
 					var posName = document.getElementsByName('pos_name')[0].value;
-					
+
 					if (!($('.nextgen-payment-buttons[data-ngtab="3"]').hasClass("nextgen-payment-buttons-selected"))) {
 						var ignoredav = document.getElementsByName('ignore_dav')[0].value;
 					}
@@ -1225,8 +1225,8 @@ Digital Only Access
 					var ptId = document.getElementsByName('pt_id')[0].value;
 					// var chargeOnShip = document.getElementsByName('charge_on_ship')[0].value;
 					var chosenOffer = jQuery('#chosenOffer').attr("value");
-					
-					
+
+
                     if ($("#isgiftholder").hasClass("isgiftholder-selected")) {
                         var doneefirstName = document.getElementsByName('ship_first_name')[0].value;
 					var doneelastName = document.getElementsByName('ship_last_name')[0].value;
@@ -1252,8 +1252,8 @@ Digital Only Access
 		         }
 					if ($('.nextgen-payment-buttons[data-ngtab="3"]').hasClass("nextgen-payment-buttons-selected")) {
 						// theOrderObj["add_offer_term"] = document.getElementsByName('offer_term_donee')[0].value;
-						
-							
+
+
 								theOrderObj["ship_first_name"] = document.getElementsByName('ship_first_name')[0].value;
 								theOrderObj["ship_last_name"] = document.getElementsByName('ship_last_name')[0].value;
 								theOrderObj["ship_address"] = document.getElementsByName('ship_address')[0].value;
@@ -1262,9 +1262,9 @@ Digital Only Access
 								theOrderObj["ship_state"] = document.getElementsByName('ship_state')[0].value;
 								theOrderObj["ship_postal_code"] = document.getElementsByName('ship_postal_code')[0].value;
 								theOrderObj["ship_country_code"] = document.getElementsByName('ship_country_code')[0].value;
-							
-						
-							
+
+
+
 								theOrderObj["ship_first_name"] = document.getElementsByName('ship_first_name')[0].value;
 								theOrderObj["ship_last_name"] = document.getElementsByName('ship_last_name')[0].value;
 								theOrderObj["ship_address"] = document.getElementsByName('ship_address')[0].value;
@@ -1273,8 +1273,8 @@ Digital Only Access
 								theOrderObj["ship_state"] = document.getElementsByName('ship_state')[0].value;
 								theOrderObj["ship_postal_code"] = document.getElementsByName('ship_postal_code')[0].value;
 								theOrderObj["ship_country_code"] = document.getElementsByName('ship_country_code')[0].value;
-							
-						
+
+
 					}
 					$("[name^='email_pref']:checked").each(function() {
 						var name = jQuery(this).attr("name");
@@ -1283,22 +1283,22 @@ Digital Only Access
 					if (!($('.nextgen-payment-buttons[data-ngtab="3"]').hasClass("nextgen-payment-buttons-selected"))) {
 						theOrderObj["ignore_dav"] = ignoredav;
 					};
-					
+
 					paypal.checkout.initXO();
 					$.support.cors = true;
 						$.ajax({
 							type: "POST",
-							url: "/api/circ/js/Transaction",  
+							url: "/api/circ/js/Transaction",
 							data: theOrderObj,
 							dataType: "json",
 							error: function(e) {
-								$("#btnSubmit").show(); 
+								$("#btnSubmit").show();
 								$("#processing").hide();
 								alert("Error in ajax post"+e.statusText);
 								paypal.checkout.closeFlow();
 							},
 							success: function(data) {
-								$("#btnSubmit").show(); 
+								$("#btnSubmit").show();
 								$("#processing").hide();
 								var orderStatObj = data;
 								console.log(orderStatObj);
@@ -1314,7 +1314,7 @@ Digital Only Access
 										alert(orderStatObj.order_failed[0]);
 									}
 									paypal.checkout.closeFlow();
-									$("#btnSubmit").show(); 
+									$("#btnSubmit").show();
 									$("#processing").hide();
 								}
 							}
@@ -1327,52 +1327,52 @@ Digital Only Access
 				});
 			}
 </script>
-				
+
                     <div id="ppcheckoutexpbutton" role="button" tabindex="0" class="haspaypalon"><span id="paypaldecription">Check out with</span><img src="/circulation/architecturaldigest/images/paypal-checkout_ADA_Style.png" alt="paypal" aria-describedby="paypaldecription"></div></div>
-                    
+
                 </div>
 				<script>
 					jQuery(document).ready(function(){
 						if (amazonflag == false) {
 							$("#amazonpay-container").remove();
-						} 
+						}
 						if (paypalflag == false) {
 							$("#ppcheckoutexpbutton").remove();
 						}
-						
-							
+
+
 						if (paypalflag == false && applepayflag == false) {
 							$(".autoRenew").hide();
 						}
 					});
                 </script>
-                <div class="space15 ng-amazon-hide"></div>	
+                <div class="space15 ng-amazon-hide"></div>
                 <div class="nextgen-greyborder nextgen-epc-hide"></div>
             <div id="nextgen-step-4">
                 <div class="sectionheadfont"><h2>STEP 4. <span>SHIPPING ADDRESS</span></h2></div>
                 </div>
                     <!-- Gift Impulse Start-->
-                    
+
 <!-- FMC Donation Impulse beginning unless -->
-		
-			
+
+
 				<div id="shippingaddressimpulse" class="sectionbox impulseOn">
                     <input type="hidden" name="add_offer_term" id="impulseofferterm" data-ngimptype="bundle" value="167247_1" disabled="" style="display: none;">
-                        
+
 					<div id="isImpulseholder">
 						<div id="isImpulseCheck" aria-labelledby="isImpulseCheckText" data-isimpulse="false" role="button" tabindex="0" aria-pressed="false"><img id="nextgen-gift-impulse-check" src="https://subscribe.wired.com/circulation/wired/images/ng-radio-check-new.png" alt="" style="display: none;"></div>
 						<div id="isImpulseCheckText">
-								
-									
+
+
 										Yes, I would like to <span>gift one year of WIRED</span> <span class="int-digital-only" style="display:none;">digital only access</span> for just $<span id="giPrice">5</span>.
                                          <br>
                                         <p id="non_ar_gift" style="display:none; font-size: 14px;">Gift order will not automatically renew.</p>
-									
-							
+
+
 						</div>
 					</div>
 				</div>
-				
+
 					<div id="impulseFields" class="sectionbox" style="display: none;">
 						<div id="giftaddressheadImpulse">
 							<h2>Enter Recipient Information</h2>
@@ -1381,39 +1381,39 @@ Digital Only Access
 							<div class="flex">
 								<div class="impulse-field-fn ng_required">
 									<label for="impulse-ship-first-name">First Name
-										<input type="text" class="req" id="impulse-ship-first-name" name="ship_first_name" aria-required="true" disabled="" autocomplete="given-name" style="display: none;">
+										<input type="text" class="req" id="impulse-ship-first-name" name="ship_first_name" aria-required="true" disabled="" autocomplete="given-name" style="display: none;" data-manual-scoring="firstName">
                                     </label>
                                     <div class="errorcontainer" style="display:none;">
-							            <span id="impulse-ship-first-name-error" class="output-message">First name cannot be empty.</span> 
+							            <span id="impulse-ship-first-name-error" class="output-message">First name cannot be empty.</span>
 						            </div>
 								</div>
 								<div class="impulse-field-top ng_required">
 									<label for="impulse-ship-last-name">Last Name
-										<input type="text" class="req" id="impulse-ship-last-name" name="ship_last_name" aria-required="true" disabled="" autocomplete="family-name" style="display: none;">
+										<input type="text" class="req" id="impulse-ship-last-name" name="ship_last_name" aria-required="true" disabled="" autocomplete="family-name" style="display: none;" data-manual-scoring="lastName">
                                     </label>
-						<div class="errorcontainer" style="display:none;"><span id="impulse-ship-last-name-error" class="output-message">Last name cannot be empty.</span></div>        
+						<div class="errorcontainer" style="display:none;"><span id="impulse-ship-last-name-error" class="output-message">Last name cannot be empty.</span></div>
 								</div>
 							</div>
                         </div>
                         <div id="impulseaddress">
 							<div class="addressbox">
 
-								
+
 								<div class="ng_required">
 									<label for="impulse-ship-address">Street Address
-										<input type="text" class="req" id="impulse-ship-address" name="ship_address" aria-required="true" disabled="" autocomplete="address-line1" style="display: none;">
+										<input type="text" class="req" id="impulse-ship-address" name="ship_address" aria-required="true" disabled="" autocomplete="address-line1" style="display: none;" data-manual-scoring="addressStreet">
                                     </label>
                                     <div class="errorcontainer" style="display:none;"><span id="impulse-ship-address-error" class="output-message">Address cannot be empty.</span></div>
 								</div>
 								<div>
-									<label for="impulse-ship-address2">Apt, Floor, Unit, etc. (optional) 
-										<input type="text" id="impulse-ship-address2" name="ship_address2" aria-required="true" disabled="" autocomplete="address-line2" style="display: none;">
+									<label for="impulse-ship-address2">Apt, Floor, Unit, etc. (optional)
+										<input type="text" id="impulse-ship-address2" name="ship_address2" aria-required="true" disabled="" autocomplete="address-line2" style="display: none;" data-manual-scoring="addressStreet2">
 									</label>
 								</div>
 
 											<div class="nextgen-impulse-country ng_required" id="impulse-country-container" style="display:none;">
 											<label for="impulse-deliverto">Location</label>
-											<select id="impulse-ship-country" name="ship_country_code" class="ui search selection dropdown" disabled="" autocomplete="country-name" style="display: none;">
+											<select id="impulse-ship-country" name="ship_country_code" class="ui search selection dropdown" disabled="" autocomplete="country-name" style="display: none;" data-manual-scoring="addressCountryCode">
 												<option value=""></option><option value="AF">Afghanistan</option>
 													<option value="AL">Albania</option>
 													<option value="DZ">Algeria</option>
@@ -1624,543 +1624,543 @@ Digital Only Access
 													<option value="YE">Yemen</option>
 													<option value="ZM">Zambia</option>
 													<option value="ZW">Zimbabwe</option>
-													
+
 											</select>
 											<div class="errorcontainer" style="display:none;"><span id="impulse-ship-country-error" class="output-message">Choose a location.</span></div>
 											</div>
 								<div class="flex flex-nowrap">
 									<div class="ng_required">
 										<label for="impulse-ship-city">City</label>
-											<input type="text" class="req" id="impulse-ship-city" name="ship_city" aria-required="true" disabled="" autocomplete="address-level2" style="display: none;">
+											<input type="text" class="req" id="impulse-ship-city" name="ship_city" aria-required="true" disabled="" autocomplete="address-level2" style="display: none;" data-manual-scoring="addressCity">
                                         <div class="errorcontainer" style="display:none;"><span id="impulse-ship-city-error" class="output-message">City cannot be empty.</span></div>
 									</div>
 									<div class="ng_required" id="ng_imp_state">
 										<label for="impulse-state-domestic" id="impulse-state-domestic-label"><span class="impulsestatelabel">State</span></label>
-										<select type="text" class="req ui search selection dropdown" id="impulse-state-domestic" name="ship_state" disabled="" autocomplete="address-level1" style="display: none;">
+										<select type="text" class="req ui search selection dropdown" id="impulse-state-domestic" name="ship_state" disabled="" autocomplete="address-level1" style="display: none;" data-manual-scoring="addressProvince">
 											<option value="">
-											
-												
+
+
 													</option><option value="AL">
 														AL
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="AK">
 														AK
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="AZ">
 														AZ
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="AR">
 														AR
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="CA">
 														CA
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="CO">
 														CO
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="CT">
 														CT
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="DE">
 														DE
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="DC">
 														DC
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="FL">
 														FL
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="GA">
 														GA
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="HI">
 														HI
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="ID">
 														ID
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="IL">
 														IL
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="IN">
 														IN
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="IA">
 														IA
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="KS">
 														KS
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="KY">
 														KY
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="LA">
 														LA
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="ME">
 														ME
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="MD">
 														MD
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="MA">
 														MA
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="MI">
 														MI
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="MN">
 														MN
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="MS">
 														MS
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="MO">
 														MO
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="MT">
 														MT
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="NE">
 														NE
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="NV">
 														NV
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="NH">
 														NH
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="NJ">
 														NJ
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="NM">
 														NM
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="NY">
 														NY
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="NC">
 														NC
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="ND">
 														ND
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="OH">
 														OH
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="OK">
 														OK
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="OR">
 														OR
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="PA">
 														PA
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="RI">
 														RI
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="SC">
 														SC
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="SD">
 														SD
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="TN">
 														TN
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="TX">
 														TX
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="UT">
 														UT
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="VT">
 														VT
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="VA">
 														VA
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="WA">
 														WA
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="WV">
 														WV
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="WI">
 														WI
 													</option>
-												
-												
-												
-											
-												
+
+
+
+
+
 													<option value="WY">
 														WY
 													</option>
-												
-												
-												
-											
-												
-												
-												
+
+
+
+
+
+
+
 													<option value="AA">AA</option>
-												
-											
-												
-												
-												
+
+
+
+
+
 													<option value="AE">AE</option>
-												
-											
-												
-												
-												
+
+
+
+
+
 													<option value="AP">AP</option>
-												
-											
-												
-												
-													
-												
-												
-											
-												
-												
-													
-												
-												
-											
-												
-												
-													
-												
-												
-											
-												
-												
-													
-												
-												
-											
-												
-												
-													
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 														<option value="PR">
 															PR
 														</option>
-													
-												
-												
-											
-												
-												
-													
-												
-												
-											
-												
-												
-												
-											
-												
-												
-												
-											
-												
-												
-												
-											
-												
-												
-												
-											
-												
-												
-												
-											
-												
-												
-												
-											
-												
-												
-												
-											
-												
-												
-												
-											
-												
-												
-												
-											
-												
-												
-												
-											
-												
-												
-												
-											
-												
-												
-												
-											
-												
-												
-												
-											
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                         </select>
-				
+
 									<label for="impulse-state-canada" id="impulse-state-canada-label" style="display:none;"> <span class="impulsestatelabel">Province</span> </label>
-									<select type="text" class="req ui search selection dropdown" id="impulse-state-canada" name="ship_state" disabled="" style="display:none" autocomplete="address-level1">
+									<select type="text" class="req ui search selection dropdown" id="impulse-state-canada" name="ship_state" disabled="" style="display:none" autocomplete="address-level1" data-manual-scoring="addressProvince">
 										<option value=""></option>
 										<option value="AB">AB</option>
 										<option value="BC">BC</option>
@@ -2177,34 +2177,34 @@ Digital Only Access
 										<option value="YT">YT</option>
 									</select>
 									<label for="impulse-state-international" id="impulse-state-international-label" style="display:none;"> <span class="impulsestatelabel">Province</span> </label>
-									<input type="text" id="impulse-state-international" class="countryform" name="ship_state" disabled="" style="display:none;" autocomplete="address-level1">
-							
+									<input type="text" id="impulse-state-international" class="countryform" name="ship_state" disabled="" style="display:none;" autocomplete="address-level1" data-manual-scoring="addressProvince">
+
                                         <div class="errorcontainer" style="display:none;"><span id="impulse-ship-state-error" class="output-message">State cannot be empty.</span></div>
 									</div>
 									<div class="ng_required">
 										<label for="impulse-ship-postal-code">Zip</label>
-											<input type="text" class="req" id="impulse-ship-postal-code" name="ship_postal_code" disabled="" autocomplete="postal-code" style="display: none;">
+											<input type="text" class="req" id="impulse-ship-postal-code" name="ship_postal_code" disabled="" autocomplete="postal-code" style="display: none;" data-manual-scoring="addressPostalCode">
                                         <div class="errorcontainer" style="display:none;"><span id="impulse-ship-postal-code-error" class="output-message">Zip cannot be empty.</span></div>
                                     </div>
                                     </div>
                         <div class="impulse-field-top ng_required">
 								<label for="impulse-ship-email">Recipient Email
-									<input type="text" class="req" id="impulse-ship-email" name="ship_email" aria-required="true" disabled="" autocomplete="email">
+									<input type="text" class="req" id="impulse-ship-email" name="ship_email" aria-required="true" disabled="" autocomplete="email" data-manual-scoring="emailAddress">
                                 </label>
                                 <div class="errorcontainer" style="display:none;">
-							<span id="impulse-ship-email-error" class="output-message">Email cannot be empty</span> 
-							<span id="impulse-ship-email-invaliderror" class="output-message">Please enter a valid email</span> 
+							<span id="impulse-ship-email-error" class="output-message">Email cannot be empty</span>
+							<span id="impulse-ship-email-invaliderror" class="output-message">Please enter a valid email</span>
 						    </div>
 								<div id="impulse-giftprivacytext" style="margin-bottom:20px;">Will be used in accordance with our <a href="https://www.condenast.com/user-agreement" target="_blank">User Agreement</a> and <a href="https://www.condenast.com/privacy-policy" target="_blank">Privacy Policy</a>.</div>
                         </div>
                         </div>
                     </div>
 					</div>
-				
-			
-		
-			
-		
+
+
+
+
+
 <!-- FMC Donation Impulse End unless -->
 
 <!-- Gift Impulse End-->
@@ -2224,10 +2224,10 @@ Digital Only Access
                 <div id="nextgen-self-shipping"><div id="shippingaddress" class="sectionbox">
 				<div id="ng-addressbox" class="addressbox">
 					<div id="shipcountrycontainer" style="display: none;">
-                        <label for="ship-country">Location<input type="text" id="ship-country" class="req" readonly="" value="United States" autocomplete="off"></label>
+                        <label for="ship-country">Location<input type="text" id="ship-country" class="req" readonly="" value="United States" autocomplete="off" data-manual-scoring="addressCountryCode"></label>
                         <div class="ng-change-ship-country">Change</div>
 					</div>
-					
+
 					<div class="ng_required">
 						<label for="ship-address">Street Address<input type="text" class="req" id="ship-address" name="address" data-shipname="ship_address" data-billname="address" aria-required="true" autocomplete="address-line1" data-manual-scoring="addressStreet"></label>
 						<div class="errorcontainer"><span id="ship-address-error" class="output-message">Please enter a valid address</span></div>
@@ -2245,418 +2245,418 @@ Digital Only Access
 								<label for="ship-state-domestic" id="ship-state-domestic-label" style=""><span class="shipstatelabel">State</span></label>
 								<select type="text" class="req ui search selection dropdown" id="ship-state-domestic" name="state" data-shipname="ship_state" data-billname="state" autocomplete="address-level1" style="" data-manual-scoring="addressProvince">
 									<option value="">
-									
-										
+
+
 											</option><option value="AL">AL</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="AK">AK</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="AZ">AZ</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="AR">AR</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="CA">CA</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="CO">CO</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="CT">CT</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="DE">DE</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="DC">DC</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="FL">FL</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="GA">GA</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="HI">HI</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="ID">ID</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="IL">IL</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="IN">IN</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="IA">IA</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="KS">KS</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="KY">KY</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="LA">LA</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="ME">ME</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="MD">MD</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="MA">MA</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="MI">MI</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="MN">MN</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="MS">MS</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="MO">MO</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="MT">MT</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="NE">NE</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="NV">NV</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="NH">NH</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="NJ">NJ</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="NM">NM</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="NY">NY</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="NC">NC</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="ND">ND</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="OH">OH</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="OK">OK</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="OR">OR</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="PA">PA</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="RI">RI</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="SC">SC</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="SD">SD</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="TN">TN</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="TX">TX</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="UT">UT</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="VT">VT</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="VA">VA</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="WA">WA</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="WV">WV</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="WI">WI</option>
-										
-										
-										
-									
-										
+
+
+
+
+
 											<option value="WY">WY</option>
-										
-										
-										
-									
-										
-										
+
+
+
+
+
+
 										<option value="AA">AA</option>
-									
-										
-										
+
+
+
 										<option value="AE">AE</option>
-									
-										
-										
+
+
+
 										<option value="AP">AP</option>
-									
-										
-										
-											
-										
-										
-									
-										
-										
-											
-										
-										
-									
-										
-										
-											
-										
-										
-									
-										
-										
-											
-										
-										
-									
-										
-										
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 											<option value="PR">PR</option>
-										
-										
-									
-										
-										
-											
-										
-										
-									
-										
-										
-										
-									
-										
-										
-										
-									
-										
-										
-										
-									
-										
-										
-										
-									
-										
-										
-										
-									
-										
-										
-										
-									
-										
-										
-										
-									
-										
-										
-										
-									
-										
-										
-										
-									
-										
-										
-										
-									
-										
-										
-										
-									
-										
-										
-										
-									
-										
-										
-										
-									
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 								</select>
 							</div>
 							<div style="display: none;">
 								<label for="ship-state-canada" id="ship-state-canada-label" style="display:none;"><span class="shipstatelabel">State</span></label>
-								<select type="text" class="req ui search selection dropdown" id="ship-state-canada" name="state" disabled="" data-shipname="ship_state" data-billname="state" style="display:none !important;" autocomplete="address-level1">
+								<select type="text" class="req ui search selection dropdown" id="ship-state-canada" name="state" disabled="" data-shipname="ship_state" data-billname="state" style="display:none !important;" autocomplete="address-level1" data-manual-scoring="addressProvince">
 									<option value=""></option>
 									<option value="AB">AB</option>
 									<option value="BC">BC</option>
@@ -2675,7 +2675,7 @@ Digital Only Access
 							</div>
 							<div>
 								<label for="ship-state-international" id="ship-state-international-label" style="display:none;"> <span class="shipstatelabel">State</span></label>
-								<input type="text" id="ship-state-international" class="countryform" name="state" disabled="" data-shipname="ship_state" data-billname="state" style="display:none;" autocomplete="address-level1">
+								<input type="text" id="ship-state-international" class="countryform" name="state" disabled="" data-shipname="ship_state" data-billname="state" style="display:none;" autocomplete="address-level1" data-manual-scoring="addressProvince">
                         </div>
                         <div class="errorcontainer"> <span id="ship-state-error" class="output-message">Please select state</span></div>
 					</div>
@@ -2694,877 +2694,877 @@ Digital Only Access
 					<div class="errorcontainer"><span id="bill-email-error" class="output-message">Email cannot be empty</span> <span id="bill-email-invaliderror" class="output-message">Please enter a valid email</span> </div>
 					<div id="privacytext">Will be used in accordance with our <a href="https://www.condenast.com/user-agreement" target="_blank">User Agreement</a> and <a href="https://www.condenast.com/privacy-policy" target="_blank">Privacy Policy</a>.</div>
 
-				
-					
+
+
                 </div>
-                
+
 				<fieldset id="billingaddress" disabled="" style="display: none;">
 					<div class="addressbox">
 						<div class="ship-country-dropdown ng_required">
 							<label for="bill-country">Location</label>
-							<select id="bill-country" class="ui search selection dropdown" name="country_code" autocomplete="country-name">
+							<select id="bill-country" class="ui search selection dropdown" name="country_code" autocomplete="country-name" data-manual-scoring="addressCountryCode">
 								<option>Select Location</option>
-								
+
 									<option value="AF">Afghanistan</option>
-								
+
 									<option value="AL">Albania</option>
-								
+
 									<option value="DZ">Algeria</option>
-								
+
 									<option value="AD">Andorra</option>
-								
+
 									<option value="AO">Angola</option>
-								
+
 									<option value="AI">Anguilla</option>
-								
+
 									<option value="AQ">Antarctica</option>
-								
+
 									<option value="AG">Antigua and Barbuda</option>
-								
+
 									<option value="AR">Argentina</option>
-								
+
 									<option value="AM">Armenia</option>
-								
+
 									<option value="AW">Aruba</option>
-								
+
 									<option value="AU">Australia</option>
-								
+
 									<option value="AT">Austria</option>
-								
+
 									<option value="AZ">Azerbaijan</option>
-								
+
 									<option value="BS">Bahamas</option>
-								
+
 									<option value="BH">Bahrain</option>
-								
+
 									<option value="BD">Bangladesh</option>
-								
+
 									<option value="BB">Barbados</option>
-								
+
 									<option value="BY">Belarus</option>
-								
+
 									<option value="BE">Belgium</option>
-								
+
 									<option value="BZ">Belize</option>
-								
+
 									<option value="BJ">Benin</option>
-								
+
 									<option value="BM">Bermuda</option>
-								
+
 									<option value="BT">Bhutan</option>
-								
+
 									<option value="BO">Bolivia</option>
-								
+
 									<option value="BA">Bosnia-Herzegovina</option>
-								
+
 									<option value="BW">Botswana</option>
-								
+
 									<option value="BR">Brazil</option>
-								
+
 									<option value="VG">British Virgin Islands</option>
-								
+
 									<option value="BN">Brunei Darussalam</option>
-								
+
 									<option value="BG">Bulgaria</option>
-								
+
 									<option value="BF">Burkina Faso</option>
-								
+
 									<option value="BI">Burundi</option>
-								
+
 									<option value="KH">Cambodia</option>
-								
+
 									<option value="CM">Cameroon</option>
-								
+
 									<option value="CA">Canada</option>
-								
+
 									<option value="C3">Canary Islands</option>
-								
+
 									<option value="CV">Cape Verde</option>
-								
+
 									<option value="KY">Cayman Islands</option>
-								
+
 									<option value="CF">Central African Rep</option>
-								
+
 									<option value="TD">Chad</option>
-								
+
 									<option value="CL">Chile</option>
-								
+
 									<option value="CN">China Peoples Republic</option>
-								
+
 									<option value="CO">Colombia</option>
-								
+
 									<option value="KM">Comoros</option>
-								
+
 									<option value="CG">Congo</option>
-								
+
 									<option value="CD">Congo, The Democratic Republic of the</option>
-								
+
 									<option value="CK">Cook Islands</option>
-								
+
 									<option value="CR">Costa Rica</option>
-								
+
 									<option value="CI">Cote dIvoire</option>
-								
+
 									<option value="HR">Croatia</option>
-								
+
 									<option value="CY">Cyprus</option>
-								
+
 									<option value="CZ">Czech Republic</option>
-								
+
 									<option value="DK">Denmark</option>
-								
+
 									<option value="DJ">Djibouti</option>
-								
+
 									<option value="DM">Dominica</option>
-								
+
 									<option value="DO">Dominican Republic</option>
-								
+
 									<option value="EA">Easter Island</option>
-								
+
 									<option value="EC">Ecuador</option>
-								
+
 									<option value="EG">Egypt</option>
-								
+
 									<option value="SV">El Salvador</option>
-								
+
 									<option value="GQ">Equatorial Guinea</option>
-								
+
 									<option value="ER">Eritrea</option>
-								
+
 									<option value="EE">Estonia</option>
-								
+
 									<option value="ET">Ethiopia</option>
-								
+
 									<option value="FO">Faeroe Islands</option>
-								
+
 									<option value="FK">Falkland Islands</option>
-								
+
 									<option value="FJ">Fiji</option>
-								
+
 									<option value="FI">Finland</option>
-								
+
 									<option value="FR">France</option>
-								
+
 									<option value="PF">French Polynesia</option>
-								
+
 									<option value="GA">Gabon</option>
-								
+
 									<option value="GM">Gambia</option>
-								
+
 									<option value="GE">Georgia</option>
-								
+
 									<option value="DE">Germany</option>
-								
+
 									<option value="GI">Gibraltar</option>
-								
+
 									<option value="GR">Greece</option>
-								
+
 									<option value="GL">Greenland</option>
-								
+
 									<option value="GD">Grenada</option>
-								
+
 									<option value="GT">Guatemala</option>
-								
+
 									<option value="GN">Guinea</option>
-								
+
 									<option value="GW">Guinea-Bissau</option>
-								
+
 									<option value="GY">Guyana</option>
-								
+
 									<option value="HT">Haiti</option>
-								
+
 									<option value="HN">Honduras</option>
-								
+
 									<option value="HK">Hong Kong</option>
-								
+
 									<option value="HU">Hungary</option>
-								
+
 									<option value="IS">Iceland</option>
-								
+
 									<option value="IN">India</option>
-								
+
 									<option value="IE">Ireland</option>
-								
+
 									<option value="IM">Isle of Man</option>
-								
+
 									<option value="IL">Israel</option>
-								
+
 									<option value="IT">Italy</option>
-								
+
 									<option value="JM">Jamaica</option>
-								
+
 									<option value="JP">Japan</option>
-								
+
 									<option value="JO">Jordan</option>
-								
+
 									<option value="KZ">Kazakhstan</option>
-								
+
 									<option value="KE">Kenya</option>
-								
+
 									<option value="KI">Kiribati</option>
-								
+
 									<option value="KW">Kuwait</option>
-								
+
 									<option value="KG">Kyrgyzstan</option>
-								
+
 									<option value="LA">Laos</option>
-								
+
 									<option value="LV">Latvia</option>
-								
+
 									<option value="LB">Lebanon</option>
-								
+
 									<option value="LS">Lesotho</option>
-								
+
 									<option value="LR">Liberia</option>
-								
+
 									<option value="LI">Liechtenstein</option>
-								
+
 									<option value="LT">Lithuania</option>
-								
+
 									<option value="LU">Luxembourg</option>
-								
+
 									<option value="MO">Macao</option>
-								
+
 									<option value="MK">Macedonia</option>
-								
+
 									<option value="MG">Madagascar</option>
-								
+
 									<option value="MW">Malawi</option>
-								
+
 									<option value="MY">Malaysia</option>
-								
+
 									<option value="MV">Maldives</option>
-								
+
 									<option value="ML">Mali</option>
-								
+
 									<option value="MT">Malta</option>
-								
+
 									<option value="MH">Marshall Islands</option>
-								
+
 									<option value="MR">Mauritania</option>
-								
+
 									<option value="MU">Mauritius</option>
-								
+
 									<option value="MX">Mexico</option>
-								
+
 									<option value="FM">Micronesia</option>
-								
+
 									<option value="MD">Moldova, Republic of</option>
-								
+
 									<option value="MC">Monaco</option>
-								
+
 									<option value="MN">Mongolia</option>
-								
+
 									<option value="MS">Monserrat</option>
-								
+
 									<option value="ME">Montenegro</option>
-								
+
 									<option value="MA">Morocco</option>
-								
+
 									<option value="MZ">Mozambique</option>
-								
+
 									<option value="MM">Myanmar</option>
-								
+
 									<option value="NA">Namibia</option>
-								
+
 									<option value="NR">Nauru</option>
-								
+
 									<option value="NP">Nepal</option>
-								
+
 									<option value="NL">Netherlands</option>
-								
+
 									<option value="AN">Netherlands Antilles</option>
-								
+
 									<option value="NC">New Caledonia</option>
-								
+
 									<option value="NZ">New Zealand</option>
-								
+
 									<option value="NI">Nicaragua</option>
-								
+
 									<option value="NE">Niger</option>
-								
+
 									<option value="NF">Norfolk Island</option>
-								
+
 									<option value="NO">Norway</option>
-								
+
 									<option value="OM">Oman</option>
-								
+
 									<option value="PK">Pakistan</option>
-								
+
 									<option value="PA">Panama</option>
-								
+
 									<option value="PG">Papua New Guinea</option>
-								
+
 									<option value="PY">Paraguay</option>
-								
+
 									<option value="PE">Peru</option>
-								
+
 									<option value="PH">Philippines</option>
-								
+
 									<option value="PN">Pitcairn Islands</option>
-								
+
 									<option value="PL">Poland</option>
-								
+
 									<option value="PT">Portugal</option>
-								
+
 									<option value="QA">Qatar</option>
-								
+
 									<option value="KR">Repl of Korea</option>
-								
+
 									<option value="RE">Reunion</option>
-								
+
 									<option value="RO">Romania</option>
-								
+
 									<option value="RU">Russia</option>
-								
+
 									<option value="RW">Rwanda</option>
-								
+
 									<option value="SM">San Marino</option>
-								
+
 									<option value="ST">Sao Tome and Principe</option>
-								
+
 									<option value="SA">Saudi Arabia</option>
-								
+
 									<option value="SN">Senegal</option>
-								
+
 									<option value="RS">Serbia</option>
-								
+
 									<option value="SC">Seychelles</option>
-								
+
 									<option value="SL">Sierra Leone</option>
-								
+
 									<option value="SG">Singapore</option>
-								
+
 									<option value="SK">Slovak Republic</option>
-								
+
 									<option value="SI">Slovenia</option>
-								
+
 									<option value="SB">Solomon Islands</option>
-								
+
 									<option value="SO">Somalia</option>
-								
+
 									<option value="ZA">South Africa</option>
-								
+
 									<option value="ES">Spain</option>
-								
+
 									<option value="LK">Sri Lanka</option>
-								
+
 									<option value="SH">St Helena</option>
-								
+
 									<option value="KN">St Kitts-Nevis</option>
-								
+
 									<option value="LC">St Lucia</option>
-								
+
 									<option value="PM">St Pierre &amp; Miquelon</option>
-								
+
 									<option value="VC">St Vincent &amp; Grenadines</option>
-								
+
 									<option value="SR">Suriname</option>
-								
+
 									<option value="SZ">Swaziland</option>
-								
+
 									<option value="SE">Sweden</option>
-								
+
 									<option value="CH">Switzerland</option>
-								
+
 									<option value="TW">Taiwan</option>
-								
+
 									<option value="TJ">Tajikistan</option>
-								
+
 									<option value="TZ">Tanzania</option>
-								
+
 									<option value="TH">Thailand</option>
-								
+
 									<option value="TG">Togo</option>
-								
+
 									<option value="TO">Tonga</option>
-								
+
 									<option value="TT">Trinidad and Tobago</option>
-								
+
 									<option value="TN">Tunisia</option>
-								
+
 									<option value="TR">Turkey</option>
-								
+
 									<option value="TM">Turkmenistan</option>
-								
+
 									<option value="TC">Turks-Caicos Islands</option>
-								
+
 									<option value="TV">Tuvalu</option>
-								
+
 									<option value="UG">Uganda</option>
-								
+
 									<option value="UA">Ukraine</option>
-								
+
 									<option value="AE">United Arab Emirates</option>
-								
+
 									<option value="GB">United Kingdom</option>
-								
+
 									<option value="US" selected="">United States</option>
-								
+
 									<option value="UY">Uruguay</option>
-								
+
 									<option value="UZ">Uzbekistan</option>
-								
+
 									<option value="VU">Vanuatu</option>
-								
+
 									<option value="VA">Vatican City</option>
-								
+
 									<option value="VE">Venezuela</option>
-								
+
 									<option value="VI">Virgin Islands</option>
-								
+
 									<option value="WF">Wallis Futuna Islands</option>
-								
+
 									<option value="EH">Western Sahara</option>
-								
+
 									<option value="WS">Western Samoa</option>
-								
+
 									<option value="YE">Yemen</option>
-								
+
 									<option value="ZM">Zambia</option>
-								
+
 									<option value="ZW">Zimbabwe</option>
-								
+
 							</select>
 							<div class="errorcontainer"><span id="bill-country-error" class="output-message">Please select a location</span></div>
 						</div>
 						<div class="ng_required">
-							<label for="bill-address">Street Address<input type="text" class="req" id="bill-address" name="address" aria-required="true" autocomplete="address-line1"></label>
+							<label for="bill-address">Street Address<input type="text" class="req" id="bill-address" name="address" aria-required="true" autocomplete="address-line1" data-manual-scoring="addressStreet"></label>
 							<div class="errorcontainer"> <span id="bill-address-error" class="output-message">Please enter a valid address</span> </div>
 						</div>
 						<div>
-							<label for="bill-address2">Apt, Floor, Unit, etc. (optional)<input type="text" id="bill-address2" name="address2" autocomplete="address-line2"></label>
+							<label for="bill-address2">Apt, Floor, Unit, etc. (optional)<input type="text" id="bill-address2" name="address2" autocomplete="address-line2" data-manual-scoring="addressStreet2"></label>
 						</div>
 						<div class="flex nextgen-yourinfo-flex">
 							<div class="ng_required">
-								<label for="bill-city">City<input type="text" class="req" id="bill-city" name="city" aria-required="true" autocomplete="address-level2"></label>
+								<label for="bill-city">City<input type="text" class="req" id="bill-city" name="city" aria-required="true" autocomplete="address-level2" data-manual-scoring="addressCity"></label>
 								<div class="errorcontainer"><span id="bill-city-error" class="output-message">Please enter city</span></div>
 							</div>
 							<div class="ng_required">
 								<div>
 									<label for="bill-state-domestic" id="bill-state-domestic-label" style=""><span class="billstatelabel">State</span> </label>
-									<select type="text" class="req ui search selection dropdown" id="bill-state-domestic" name="state" data-billname="bill_state" aria-required="true" autocomplete="address-level1" style="">
+									<select type="text" class="req ui search selection dropdown" id="bill-state-domestic" name="state" data-billname="bill_state" aria-required="true" autocomplete="address-level1" style="" data-manual-scoring="addressProvince">
 										<option value="">
-										
-											
+
+
 												</option><option value="AL">AL</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="AK">AK</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="AZ">AZ</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="AR">AR</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="CA">CA</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="CO">CO</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="CT">CT</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="DE">DE</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="DC">DC</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="FL">FL</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="GA">GA</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="HI">HI</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="ID">ID</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="IL">IL</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="IN">IN</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="IA">IA</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="KS">KS</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="KY">KY</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="LA">LA</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="ME">ME</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="MD">MD</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="MA">MA</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="MI">MI</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="MN">MN</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="MS">MS</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="MO">MO</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="MT">MT</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="NE">NE</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="NV">NV</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="NH">NH</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="NJ">NJ</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="NM">NM</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="NY">NY</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="NC">NC</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="ND">ND</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="OH">OH</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="OK">OK</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="OR">OR</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="PA">PA</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="RI">RI</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="SC">SC</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="SD">SD</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="TN">TN</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="TX">TX</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="UT">UT</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="VT">VT</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="VA">VA</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="WA">WA</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="WV">WV</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="WI">WI</option>
-											
-											
-											
-										
-											
+
+
+
+
+
 												<option value="WY">WY</option>
-											
-											
-											
-										
-											
-											
-											
+
+
+
+
+
+
+
 												<option value="AA">AA</option>
-											
-										
-											
-											
-											
+
+
+
+
+
 												<option value="AE">AE</option>
-											
-										
-											
-											
-											
+
+
+
+
+
 												<option value="AP">AP</option>
-											
-										
-											
-											
-												
-											
-											
-										
-											
-											
-												
-											
-											
-										
-											
-											
-												
-											
-											
-										
-											
-											
-												
-											
-											
-										
-											
-											
-												
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 													<option value="PR">PR</option>
-												
-											
-											
-										
-											
-											
-												
-											
-											
-										
-											
-											
-											
-										
-											
-											
-											
-										
-											
-											
-											
-										
-											
-											
-											
-										
-											
-											
-											
-										
-											
-											
-											
-										
-											
-											
-											
-										
-											
-											
-											
-										
-											
-											
-											
-										
-											
-											
-											
-										
-											
-											
-											
-										
-											
-											
-											
-										
-											
-											
-											
-										
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 									</select>
 								</div>
 								<div>
 									<label for="bill-state-canada" id="bill-state-canada-label" style="display: none;"> <span class="billstatelabel">State</span> </label>
-									<select type="text" class="req ui search selection dropdown" id="bill-state-canada" name="state" disabled="" style="display:none !important;" autocomplete="address-level1">
+									<select type="text" class="req ui search selection dropdown" id="bill-state-canada" name="state" disabled="" style="display:none !important;" autocomplete="address-level1" data-manual-scoring="addressProvince">
 										<option value=""></option>
 										<option value="AB">AB</option>
 										<option value="BC">BC</option>
@@ -3583,7 +3583,7 @@ Digital Only Access
 								</div>
 								<div>
 									<label for="bill-state-international" id="bill-state-international-label" style="display:none;"> <span class="billstatelabel">State</span> </label>
-									<input type="text" id="bill-state-international" class="countryform req" name="state" disabled="" style="display:none;" autocomplete="address-level1">
+									<input type="text" id="bill-state-international" class="countryform req" name="state" disabled="" style="display:none;" autocomplete="address-level1" data-manual-scoring="addressProvince">
                                 </div>
                                 <div class="errorcontainer"><span id="bill-state-error" class="output-message" style="display: none;">Please select state</span></div>
 							</div>
@@ -3591,14 +3591,14 @@ Digital Only Access
 								<label for="bill-postal-code" id="bill-zip-domestic">Zip</label>
 								<label for="bill-postal-code" id="bill-zip-canada" style="display:none;">Postal Code</label>
 								<label for="bill-postal-code" id="bill-zip-international" style="display:none;">Postal Code</label>
-								<input type="text" class="req" id="bill-postal-code" name="postal_code" autocomplete="postal-code" maxlength="5">
+								<input type="text" class="req" id="bill-postal-code" name="postal_code" autocomplete="postal-code" maxlength="5" data-manual-scoring="addressPostalCode">
 								<div class="errorcontainer"><span id="bill-postal-code-error" class="output-message" style="display: none;">Please enter zip</span></div>
 							</div>
 						</div>
 					</div>
 				</fieldset>
             </div>
-			
+
         <div class="nextgen-greyborder nextgen-epc-hide2 ng-mobile-hide"></div>
 
 	<div id="ordersummary" class="sectionbox">
@@ -3606,25 +3606,25 @@ Digital Only Access
             <h2>STEP 5. Review and Submit</h2>
                 <div class="nextgen-cancel-text-1">
 		<p id="ngArCopy">After one year, renews automatically at one year for $29.99.</p><p>You may cancel at any time.</p>
-                    
+
 		</div>
 
-     
+
 
 		</div>
 		<div class="flex-container">
 			<div class="column" id="itemsummarydesc">1 Year – Print + Digital Access</div>
 			<div class="column" id="itemprice">$5.00</div>
 		</div>
-		
-                
-		
-		
+
+
+
+
 		<div id="impulsesummary" class="flex-container impulseOff">
 			<div class="column" id="impulseummarydesc"></div>
 			<div class="column" id="impulseprice"></div>
 		</div>
-		
+
 			<div class="flex-container">
 				<div id="shiphandtext" class="column">
 					<p>Shipping &amp; Handling</p>
@@ -3632,7 +3632,7 @@ Digital Only Access
 				<div class="column" id="shipcost">Free</div>
 			</div>
 
-		
+
 		<div id="estimatetotalborder"></div>
 		<div class="flex-container">
 			<div id="estimatetotalcol" class="column">
@@ -3646,10 +3646,10 @@ Digital Only Access
 
 
 	<div class="space10 ng-amazon-hide ng-mobile-hide"></div>
-		
+
 
     <div id="autorenewal" class="sectionbox gift-off" style="">
-            
+
 
 
 
@@ -3729,16 +3729,16 @@ jQuery("#placeorder.button").on("click.validatestate, keypress.validatestate", f
 });
 });
 </script>
-  
-	  
-
-	
 
 
 
 
 
-	
+
+
+
+
+
 
 
 
@@ -3778,8 +3778,8 @@ jQuery("#placeorder.button").on("click.validatestate, keypress.validatestate", f
 
 
 
-	
-    
+
+
 
 
 
@@ -3789,14 +3789,14 @@ jQuery("#placeorder.button").on("click.validatestate, keypress.validatestate", f
 
         <p class="ng-paypal-as-payment" style="display: none;">By subscribing you agree to our <a href="https://www.condenast.com/user-agreement" target="_blank">User Agreement</a> (including the <a href="https://www.condenast.com/user-agreement#section-viii-g" target="_blank">class action waiver and arbitration provisions</a>) and <a href="https://www.condenast.com/privacy-policy" target="_blank">Privacy Policy &amp; Cookie Statement</a>.</p>
 	<div id="orderobject-response">
-	  
+
     </div>
     <div id="ppSubmit" data-paypal-click-listener=""></div>
 	<div id="placeorder" class="sectionbox">
         <div class="button" role="button" tabindex="0" data-manual-submit="">
-			
+
 				Subscribe
-			
+
 		</div>
         <div class="paNewSalesTax">+sales tax where applicable</div>
         <div class="pbutton" role="button" tabindex="0" style="display: none;">

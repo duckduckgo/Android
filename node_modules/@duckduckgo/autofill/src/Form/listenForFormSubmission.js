@@ -8,9 +8,9 @@ const listenForGlobalFormSubmission = (forms) => {
             forms.get(e.target)?.submitHandler(),
         true)
 
-        window.addEventListener('keypress', (e) => {
+        window.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                const focusedForm = [...forms.values()].find((form) => form.hasFocus())
+                const focusedForm = [...forms.values()].find((form) => form.hasFocus(e))
                 focusedForm?.submitHandler()
             }
         })
@@ -19,7 +19,7 @@ const listenForGlobalFormSubmission = (forms) => {
             const entries = list.getEntries().filter((entry) =>
                 // @ts-ignore why does TS not know about `entry.initiatorType`?
                 ['fetch', 'xmlhttprequest'].includes(entry.initiatorType) &&
-                entry.name.match(/login|sign-in|signin/)
+                /login|sign-in|signin/.test(entry.name)
             )
 
             if (!entries.length) return

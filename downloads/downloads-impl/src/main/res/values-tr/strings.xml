@@ -19,8 +19,5 @@
 
     <string name="notificationChannelFileDownloading">Dosya İndiriliyor</string>
     <string name="notificationChannelFileDownloaded">Dosya indirildi</string>
-
-    <string name="downloadComplete">İndirme tamamlandı</string>
-    <string name="downloadFailed">İndirme başarısız</string>
     <string name="downloadInProgress">İndiriliyor</string>
 </resources>

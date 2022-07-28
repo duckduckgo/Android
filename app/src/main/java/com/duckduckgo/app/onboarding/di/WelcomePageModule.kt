@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.RealDefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModelFactory
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import dagger.Module
 import dagger.Provides
 
@@ -38,6 +39,7 @@ class WelcomePageModule {
 
     @Provides
     fun defaultRoleBrowserDialog(
-        appInstallStore: AppInstallStore
-    ): DefaultRoleBrowserDialog = RealDefaultRoleBrowserDialog(appInstallStore)
+        appInstallStore: AppInstallStore,
+        appBuildConfig: AppBuildConfig,
+    ): DefaultRoleBrowserDialog = RealDefaultRoleBrowserDialog(appInstallStore, appBuildConfig)
 }

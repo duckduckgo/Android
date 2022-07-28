@@ -45,16 +45,10 @@ export class OverlayUIController extends UIController {
     _activeTooltip = null
 
     /**
-     * @type {OverlayControllerOptions}
-     */
-    _options;
-
-    /**
      * @param {OverlayControllerOptions} options
      */
     constructor (options) {
-        super()
-        this._options = options
+        super(options)
 
         // We always register this 'pointerdown' event, regardless of
         // whether we have a tooltip currently open or not. This is to ensure

@@ -563,10 +563,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Η σύνδεση ματαιώθηκε. Ο ιστότοπος αυτός μπορεί να είναι επιβλαβής για τη συσκευή σας.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Το Πρόγραμμα διαχείρισης λήψεων είναι απενεργοποιημένο</string>
-    <string name="downloadManagerIncompatible">Το Πρόγραμμα διαχείρισης λήψεων δεν είναι διαθέσιμο σε αυτήν τη συσκευή</string>
-    <string name="enable">Ενεργοποίηση</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Ενεργοποίηση της τοποθεσίας συσκευής για το DuckDuckGo Privacy Browser;</string>

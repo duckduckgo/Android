@@ -16,15 +16,16 @@
 
 package com.duckduckgo.app.global.migrations
 
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.migrations.MigrationLifecycleObserver.Companion.CURRENT_VERSION
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.migrations.MigrationPlugin
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Test
 
 class MigrationLifecycleObserverTest {
 
@@ -32,6 +33,7 @@ class MigrationLifecycleObserverTest {
     private val pluginPoint = FakeMigrationPluginPoint()
 
     private lateinit var testee: MigrationLifecycleObserver
+    private val mockOwner: LifecycleOwner = mock()
 
     @Before
     fun before() {
@@ -42,7 +44,7 @@ class MigrationLifecycleObserverTest {
     fun whenMigrateIfStoredVersionIsLowerThanCurrentThenRunMigrations() {
         whenever(mockMigrationStore.version).thenReturn(CURRENT_VERSION - 1)
 
-        testee.migrate()
+        testee.onCreate(mockOwner)
 
         val plugin = pluginPoint.getPlugins().first() as FakeMigrationPlugin
         assertEquals(1, plugin.count)
@@ -52,7 +54,7 @@ class MigrationLifecycleObserverTest {
     fun whenMigrateIfStoredVersionIsLowerThanCurrentThenStoreCurrentVersion() {
         whenever(mockMigrationStore.version).thenReturn(CURRENT_VERSION - 1)
 
-        testee.migrate()
+        testee.onCreate(mockOwner)
 
         verify(mockMigrationStore).version = CURRENT_VERSION
     }
@@ -61,7 +63,7 @@ class MigrationLifecycleObserverTest {
     fun whenMigrateIfStoredVersionIsHigherThanCurrentThenDoNotRunMigrations() {
         whenever(mockMigrationStore.version).thenReturn(CURRENT_VERSION + 1)
 
-        testee.migrate()
+        testee.onCreate(mockOwner)
 
         val plugin = pluginPoint.getPlugins().first() as FakeMigrationPlugin
         assertEquals(0, plugin.count)
@@ -71,7 +73,7 @@ class MigrationLifecycleObserverTest {
     fun whenMigrateIfStoredVersionIsEqualsThanCurrentThenDoNotRunMigrations() {
         whenever(mockMigrationStore.version).thenReturn(CURRENT_VERSION)
 
-        testee.migrate()
+        testee.onCreate(mockOwner)
 
         val plugin = pluginPoint.getPlugins().first() as FakeMigrationPlugin
         assertEquals(0, plugin.count)
