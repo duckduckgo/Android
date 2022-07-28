@@ -44,19 +44,14 @@ class EvalMessageHandlerPlugin @Inject constructor(
         if (messageType == type) {
             appCoroutineScope.launch(dispatcherProvider.main()) {
                 try {
-                    Timber.d("MARCOS receiving init and responding")
+                    Timber.d("MARCOS receiving eval and responding")
                     val message: EvalMessage = parseMessage(jsonString) ?: return@launch
-                    var result = false
-
-                    webView.evaluateJavascript(script("42 == 42")) {
-                        result = it.toBoolean()
+                    webView.evaluateJavascript("javascript:${script(message.code)}") {
+                        val result = it.toBoolean()
+                        val evalResp = EvalResp(id = message.id, result = result)
+                        val response = ReplyHandler.constructReply(getMessage(evalResp))
+                        webView.evaluateJavascript("javascript:$response", null)
                     }
-
-                    val evalResp = EvalResp(id = message.id, result = result)
-                    val response = ReplyHandler.constructReply(getMessage(evalResp))
-
-                    Timber.d("MARCOS message is $response")
-                    webView.evaluateJavascript("javascript:$response", null)
                 } catch (e: Exception) {
                     Timber.d("MARCOS exception is ${e.localizedMessage}")
                 }
@@ -66,13 +61,13 @@ class EvalMessageHandlerPlugin @Inject constructor(
 
     private fun script(code: String): String {
         return """
-        (() => {
-        try {
-            return !!(\($code))
-        } catch (e) {
-          // ignore CSP errors
-          return;
-        }
+        (function() {
+            try {
+                return !!(($code));
+            } catch (e) {
+              // ignore CSP errors
+              return;
+            }
         })();
         """.trimIndent()
     }

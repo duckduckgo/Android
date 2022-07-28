@@ -57,17 +57,17 @@ class InitMessageHandlerPlugin @Inject constructor(
 
                     if (!uri.isHttp && !uri.isHttps) {
                         Timber.d("MARCOS ignoring special URL scheme")
-                        ReplyHandler.constructOkReply()
+                        return@launch
                     }
 
                     val isAutoconsentEnabled = true
 
                     if (isAutoconsentEnabled == false) { // ToDo is autoconsent is not enabled
-                        ReplyHandler.constructOkReply()
+                        return@launch
                     }
 
                     if (true == false) { // ToDo is autoconsent disabled for this site
-                        ReplyHandler.constructOkReply()
+                        return@launch
                     }
 
                     val disabledCmps = emptyList<String>()

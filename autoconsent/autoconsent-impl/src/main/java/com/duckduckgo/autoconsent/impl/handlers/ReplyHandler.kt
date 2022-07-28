@@ -27,12 +27,4 @@ object ReplyHandler {
             })();
         """.trimIndent()
     }
-
-    fun constructOkReply(): String {
-        return """
-            (function() {
-                window.autoconsentMessageCallback({"type": "ok"}, window.origin);
-            })();
-        """.trimIndent()
-    }
 }
