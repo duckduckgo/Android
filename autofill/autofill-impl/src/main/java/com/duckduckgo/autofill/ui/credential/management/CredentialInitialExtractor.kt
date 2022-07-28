@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.ui.credential.management
 
 import com.duckduckgo.autofill.AutofillDomainFormatter
 import com.duckduckgo.autofill.domain.app.LoginCredentials
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -26,7 +26,7 @@ interface InitialExtractor {
     fun extractInitial(loginCredentials: LoginCredentials): Char
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 class CredentialInitialExtractor @Inject constructor(
     private val domainFormatter: AutofillDomainFormatter
 ) : InitialExtractor {

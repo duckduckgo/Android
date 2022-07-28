@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.ui.credential.management
 
 import com.duckduckgo.autofill.AutofillDomainFormatter
 import com.duckduckgo.autofill.domain.app.LoginCredentials
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -26,7 +26,7 @@ interface CredentialListSorter {
     fun sort(credentials: List<LoginCredentials>): List<LoginCredentials>
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 class CredentialListSorterByTitleAndDomain @Inject constructor(
     private val domainFormatter: AutofillDomainFormatter
 ) : CredentialListSorter {
