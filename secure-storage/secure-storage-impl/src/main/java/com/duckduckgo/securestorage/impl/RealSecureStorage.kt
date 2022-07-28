@@ -63,9 +63,9 @@ class RealSecureStorage @Inject constructor(
             }
         }
 
-    override suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials =
+    override suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials? =
         withContext(dispatchers.io()) {
-            secureStorageRepository.getWebsiteLoginCredentialsForId(id).toCredentials()
+            secureStorageRepository.getWebsiteLoginCredentialsForId(id)?.toCredentials()
         }
 
     override suspend fun websiteLoginDetailsWithCredentialsForDomain(domain: String): Flow<List<WebsiteLoginDetailsWithCredentials>> =

@@ -60,7 +60,7 @@ interface SecureStorage {
      * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
     @Throws(SecureStorageException::class)
-    suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials
+    suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials?
 
     /**
      * This method returns the [WebsiteLoginDetailsWithCredentials] with the [domain] stored in the [SecureStorage].

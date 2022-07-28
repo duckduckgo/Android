@@ -40,7 +40,7 @@ interface WebsiteLoginCredentialsDao {
     fun websiteLoginCredentialsByDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
 
     @Query("select * from website_login_credentials where id = :id")
-    fun getWebsiteLoginCredentialsById(id: Int): WebsiteLoginCredentialsEntity
+    fun getWebsiteLoginCredentialsById(id: Int): WebsiteLoginCredentialsEntity?
 
     @Delete
     fun delete(loginCredentials: WebsiteLoginCredentialsEntity)
