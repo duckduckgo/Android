@@ -1,15 +1,31 @@
 import generateCMPTests from "../playwright/runner";
 
 generateCMPTests('Onetrust', [
-    'https://mailchimp.com/',
     'https://stackoverflow.com/',
     'https://www.zdf.de/',
-    "https://www.accenture.com/",
     "https://www.lovescout24.de/",
     "https://www.okcupid.com/",
     "https://doodle.com/",
-    'https://www.zoom.us',
 ]);
+
+generateCMPTests('Onetrust', [
+    'https://mailchimp.com/',
+    "https://www.accenture.com/",
+    'https://www.zoom.us',
+], {
+    testOptIn: false,
+});
+
+// opt-in is not necessary in the US on this sites
+generateCMPTests('Onetrust', [
+    'https://mailchimp.com/',
+    "https://www.accenture.com/",
+    'https://www.zoom.us',
+], {
+    testOptIn: true,
+    testOptOut: false,
+    skipRegions: ['US'],
+});
 
 generateCMPTests('Onetrust', [
     'https://arstechnica.com/',

@@ -7,5 +7,5 @@
     "detectCmp": [{"exists": "div[aria-labelledby^=pwa-consent-layer-title]"}],
     "detectPopup": [{"exists": "div[aria-labelledby^=pwa-consent-layer-title]"}],
     "optOut": [{"click": "button[data-test^=pwa-consent-layer-deny-all]"}],
-    "optIn": [{"click": "'button[data-test^=pwa-consent-layer-accept-all'"}]
+    "optIn": [{"click": "button[data-test^=pwa-consent-layer-accept-all"}]
 }

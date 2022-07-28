@@ -40,6 +40,7 @@ export default class SourcePoint extends AutoConsentCMPBase {
   }
 
   async optIn() {
+    await waitForElement(".sp_choice_type_11,.sp_choice_type_ACCEPT_ALL", 2000);
     if (click(".sp_choice_type_11")) {
       return true;
     }
@@ -56,10 +57,13 @@ export default class SourcePoint extends AutoConsentCMPBase {
 
   async optOut() {
     if (!this.isManagerOpen()) {
+      const actionable = await waitForElement('button.sp_choice_type_12,button.sp_choice_type_13');
+      if (!actionable) {
+        return false;
+      }
       if (!elementExists("button.sp_choice_type_12")) {
         // do not sell button
-        click("button.sp_choice_type_13");
-        return true;
+        return click("button.sp_choice_type_13");
       }
 
       click("button.sp_choice_type_12");
@@ -82,10 +86,9 @@ export default class SourcePoint extends AutoConsentCMPBase {
       ]);
       if (path === 0) {
         await wait(1000);
-        click(rejectSelector1);
-        return true;
+        return click(rejectSelector1);
       } else if (path === 1) {
-        click(rejectSelector2);
+        return click(rejectSelector2);
       } else if (path === 2) {
         // TODO: check if this is still working
         await waitForElement('.pm-features', 10000);
@@ -96,7 +99,6 @@ export default class SourcePoint extends AutoConsentCMPBase {
     } catch (e) {
       enableLogs && console.warn(e);
     }
-    click('.sp_choice_type_SAVE_AND_EXIT');
-    return true;
+    return click('.sp_choice_type_SAVE_AND_EXIT');
   }
 }

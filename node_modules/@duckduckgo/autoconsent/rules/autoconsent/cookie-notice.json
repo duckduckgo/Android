@@ -3,6 +3,6 @@
   "prehideSelectors": ["#cookie-notice"],
   "detectCmp": [{ "exists": "#cookie-notice" }],
   "detectPopup": [{ "visible": "#cookie-notice" }],
-  "optIn": [{ "hide": ["#cn-accept-cookie"] }],
+  "optIn": [{ "click": ["#cn-accept-cookie"] }],
   "optOut": [{ "hide": ["#cookie-notice"] }]
 }

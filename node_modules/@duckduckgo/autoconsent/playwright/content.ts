@@ -11,13 +11,7 @@ declare global {
 }
 
 if (!window.autoconsentReceiveMessage) {
-  const consent = new AutoConsent(window.autoconsentSendMessage, {
-    enabled: true,
-    autoAction: 'optOut',
-    disabledCmps: [],
-    enablePrehide: true,
-    detectRetries: 20,
-  }, <RuleBundle>rules);
+  const consent = new AutoConsent(window.autoconsentSendMessage, null, <RuleBundle>rules);
 
   window.autoconsentReceiveMessage = (message: BackgroundMessage) => {
     return Promise.resolve(consent.receiveMessageCallback(message));

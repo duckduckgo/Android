@@ -115,6 +115,11 @@ async function evaluateRuleStep(rule: AutoConsentRuleStep) {
     results.push(hide(rule.hide, rule.method));
   }
 
+  if (results.length === 0) {
+    enableLogs && console.warn('Unrecognized rule', rule);
+    return false;
+  }
+
   // boolean and of results
   const all = await Promise.all(results);
   return all.reduce((a, b) => a && b, true);

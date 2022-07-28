@@ -7,7 +7,7 @@ generateCMPTests('com_didomi.io', [
     "http://www.allocine.fr/",
     "https://www.boursorama.com/",
 ], {
-    testOptOut: false,
+    testOptIn: false,
     testSelfTest: false,
     skipRegions: ["US"],
 });

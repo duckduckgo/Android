@@ -3,7 +3,10 @@
     "prehideSelectors": [".osano-cm-window"],
     "detectCmp": [{ "exists": ".osano-cm-window" }],
     "detectPopup": [{ "visible": ".osano-cm-dialog" }],
-    "optIn": [{ "click": ".osano-cm-accept-all" }],
+    "optIn": [{
+        "click": ".osano-cm-accept-all",
+        "optional": true
+    }],
     "optOut": [
         { "hide": [".osano-cm-window"] }
     ]

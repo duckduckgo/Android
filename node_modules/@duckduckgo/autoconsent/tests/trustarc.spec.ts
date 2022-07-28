@@ -31,5 +31,6 @@ generateCMPTests('TrustArc-frame', [
 ], {
     testOptOut: true,
     testSelfTest: false,
+    testOptIn: false, // opt-in works, but is triggered by the top frame
     skipRegions: ["US"]
 });

@@ -13,7 +13,7 @@ generateCMPTests('quantcast', [
 generateCMPTests('com_quantcast2', [
     'https://www.fandom.com/',
 ], {
-    testOptOut: false,
+    testOptIn: false,
     testSelfTest: false,
     skipRegions: ["US"]
 });

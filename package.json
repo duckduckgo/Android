@@ -15,6 +15,6 @@
   },
   "dependencies": {
     "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#4.7.1",
-    "@duckduckgo/autoconsent": "github:duckduckgo/autoconsent#fat-content-script"
+    "@duckduckgo/autoconsent": "github:duckduckgo/autoconsent#b5bb2e87e07e602507ccca15db88e55702b2e351"
   }
 }

@@ -5,6 +5,6 @@ generateCMPTests('com_oil', [
     'https://www.nubert.de/',
 ], {
     skipRegions: ['GB'],
-    testOptOut: false,
+    testOptIn: false,
     testSelfTest: false,
 });

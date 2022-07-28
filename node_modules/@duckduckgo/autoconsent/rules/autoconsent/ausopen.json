@@ -3,5 +3,6 @@
   "isHidingRule": true,
   "detectCmp": [{ "exists": ".gdpr-popup__message" }],
   "detectPopup": [{ "visible": ".gdpr-popup__message" }],
-  "optOut": [{ "hide": [".gdpr-popup__message"]}]
+  "optOut": [{ "hide": [".gdpr-popup__message"]}],
+  "optIn": [{ "click": [".gdpr-popup__message button"]}]
 }

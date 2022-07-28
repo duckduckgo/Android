@@ -50,7 +50,7 @@ export default class Onetrust extends AutoConsentCMPBase {
   }
 
   async optIn() {
-    return click("onetrust-accept-btn-handler,js-accept-cookies");
+    return click("#onetrust-accept-btn-handler,.js-accept-cookies");
   }
 
   async test() {

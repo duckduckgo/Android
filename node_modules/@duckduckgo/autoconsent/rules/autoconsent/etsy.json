@@ -7,7 +7,7 @@
         {"click": "button[data-gdpr-open-full-settings]"},
         {"waitForVisible": ".gdpr-overlay-body input", "timeout": 3000},
         {"wait": 1000},
-        {"eval": "document.querySelectorAll('.gdpr-overlay-body input').forEach(toggle => { toggle.checked = false; }) || true"},
+        {"eval": "document.querySelectorAll(\".gdpr-overlay-body input\").forEach(toggle => { toggle.checked = false; }) || true"},
         {"eval": "document.querySelector('.gdpr-overlay-view button[data-wt-overlay-close]').click() || true"}
     ],
     "optIn": [{"click": "button[data-gdpr-single-choice-accept]"}]

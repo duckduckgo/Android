@@ -3,7 +3,7 @@
   "prehideSelectors": ["#cmpBanner"],
   "detectCmp": [{ "exists": "#cmpBanner" }],
   "detectPopup": [{ "visible": "#cmpBanner" }],
-  "optIn": [{ "eval": "cmpUi.allowAll()" }],
+  "optIn": [{ "eval": "cmpUi.allowAll() || true" }],
   "optOut": [
       {
           "eval": "cmpUi.showPurposes() || cmpUi.rejectAll() || true"

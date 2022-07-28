@@ -24,6 +24,9 @@ export default class AutoConsent {
     if (config) {
       this.initialize(config, declarativeRules);
     } else {
+      if (declarativeRules) {
+        this.parseRules(declarativeRules);
+      }
       const initMsg: InitMessage = {
         type: "init",
         url: window.location.href,
@@ -39,7 +42,9 @@ export default class AutoConsent {
       return;
     }
 
-    this.parseRules(declarativeRules);
+    if (declarativeRules) {
+      this.parseRules(declarativeRules);
+    }
     if (config.disabledCmps?.length > 0) {
       this.disableCMPs(config.disabledCmps);
     }
@@ -241,7 +246,7 @@ export default class AutoConsent {
       type: 'optInResult',
       cmp: this.foundCmp ? this.foundCmp.name : 'none',
       result: optInResult,
-      scheduleSelfTest: this.foundCmp && this.foundCmp.hasSelfTest,
+      scheduleSelfTest: false, // self-tests are only for opt-out at the moment
       url: location.href,
     });
 

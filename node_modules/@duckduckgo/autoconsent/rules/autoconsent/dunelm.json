@@ -3,7 +3,7 @@
   "prehideSelectors": ["div[data-testid=cookie-consent-modal-backdrop]"],
   "detectCmp": [{ "exists": "div[data-testid=cookie-consent-message-contents]"}],
   "detectPopup": [{ "visible": "div[data-testid=cookie-consent-message-contents]" }],
-  "optIn": [{ "click": "" }],
+  "optIn": [{ "click": "[data-testid=\"cookie-consent-allow-all\"]" }],
   "optOut": [
       {
           "click": "button[data-testid=cookie-consent-adjust-settings]"

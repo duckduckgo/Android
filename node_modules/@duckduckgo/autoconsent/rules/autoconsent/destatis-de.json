@@ -3,5 +3,6 @@
   "prehideSelectors": ["div[aria-labelledby=cookiebannerhead]"],
   "detectCmp": [{ "exists": ".cookiebannerbox" }],
   "detectPopup": [{ "visible": ".cookiebannerbox" }],
-  "optOut": [{ "hide": [".cookiebannerbox"] }]
+  "optOut": [{ "hide": [".cookiebannerbox"] }],
+  "optIn": [{ "click": [".cookiebannerbox .close"] }]
 }

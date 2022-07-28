@@ -22,10 +22,12 @@ export default class TrustArcTop extends AutoConsentCMPBase {
   }
 
   _shortcutButton: HTMLElement;
+  _optInDone: boolean;
 
   constructor() {
     super("TrustArc-top");
     this._shortcutButton = null; // indicates if the "reject all" button is detected
+    this._optInDone = false;
   }
 
   get hasSelfTest(): boolean {
@@ -33,6 +35,9 @@ export default class TrustArcTop extends AutoConsentCMPBase {
   }
 
   get isIntermediate(): boolean {
+    if (this._optInDone) {
+      return false;
+    }
     return !this._shortcutButton;
   }
 
@@ -76,6 +81,7 @@ export default class TrustArcTop extends AutoConsentCMPBase {
   }
 
   async optIn() {
+    this._optInDone = true; // just a hack to force autoconsentDone
     return click(shortcutOptIn);
   }
 

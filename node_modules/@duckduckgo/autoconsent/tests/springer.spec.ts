@@ -6,6 +6,6 @@ generateCMPTests('com_springer', [
     'https://www.onet.pl/',
 ], {
     skipRegions: ['GB'],
-    testOptOut: false,
+    testOptIn: false,
     testSelfTest: false,
 });
