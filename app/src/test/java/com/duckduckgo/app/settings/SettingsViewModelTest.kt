@@ -160,7 +160,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenStartIfGpcToggleDisabledAndGpcEnabledThenGpgDisabled() = runTest {
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName), any())).thenReturn(false)
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName.value), any())).thenReturn(false)
         whenever(mockGpc.isEnabled()).thenReturn(true)
 
         testee.start()
@@ -173,7 +173,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenStartIfGpcToggleEnabledAndGpcDisabledThenGpgDisabled() = runTest {
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName), any())).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName.value), any())).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(false)
         testee.start()
 
@@ -185,7 +185,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenStartIfGpcToggleEnabledAndGpcEnabledThenGpgEnabled() = runTest {
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName), any())).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName.value), any())).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(true)
         testee.start()
 

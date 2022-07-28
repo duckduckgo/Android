@@ -47,7 +47,7 @@ class EmailJavascriptInterface(
         return (url != null && urlDetector.isDuckDuckGoEmailUrl(url))
     }
 
-    private fun isFeatureEnabled() = featureToggle.isFeatureEnabled(PrivacyFeatureName.AutofillFeatureName, defaultValue = true)
+    private fun isFeatureEnabled() = featureToggle.isFeatureEnabled(PrivacyFeatureName.AutofillFeatureName.value, defaultValue = true)
 
     @JavascriptInterface
     fun isSignedIn(): String {

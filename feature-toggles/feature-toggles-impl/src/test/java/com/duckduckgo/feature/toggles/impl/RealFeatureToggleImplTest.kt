@@ -17,7 +17,6 @@
 package com.duckduckgo.feature.toggles.impl
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import org.junit.Assert.*
 import org.junit.Test
@@ -29,22 +28,22 @@ class RealFeatureToggleImplTest {
 
     @Test
     fun whenFeatureNameCanBeHandledByPluginThenReturnTheCorrectValue() {
-        val result = testee.isFeatureEnabled(TrueFeatureName(), false)
+        val result = testee.isFeatureEnabled(TrueFeatureName().value, false)
         assertNotNull(result)
         assertTrue(result)
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun whenFeatureNameCannotBeHandledByAnyPluginThenThrowException() {
-        testee.isFeatureEnabled(NullFeatureName(), false)
+        testee.isFeatureEnabled(NullFeatureName().value, false)
     }
 
     class FakeTruePlugin : FeatureTogglesPlugin {
         override fun isEnabled(
-            featureName: FeatureName,
+            featureName: String,
             defaultValue: Boolean
         ): Boolean? {
-            return if (featureName is TrueFeatureName) {
+            return if (featureName == TrueFeatureName().value) {
                 true
             } else {
                 null
@@ -58,6 +57,6 @@ class RealFeatureToggleImplTest {
         }
     }
 
-    data class TrueFeatureName(override val value: String = "true") : FeatureName
-    data class NullFeatureName(override val value: String = "null") : FeatureName
+    data class TrueFeatureName(val value: String = "true")
+    data class NullFeatureName(val value: String = "null")
 }

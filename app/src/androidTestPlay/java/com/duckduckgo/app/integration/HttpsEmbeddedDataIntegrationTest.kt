@@ -55,7 +55,7 @@ class HttpsEmbeddedDataIntegrationTest {
 
     @Before
     fun before() {
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName)).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName.value)).thenReturn(true)
 
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()

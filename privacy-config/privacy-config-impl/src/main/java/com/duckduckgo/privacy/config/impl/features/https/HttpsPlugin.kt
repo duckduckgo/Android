@@ -17,7 +17,6 @@
 package com.duckduckgo.privacy.config.impl.features.https
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
@@ -37,12 +36,12 @@ class HttpsPlugin @Inject constructor(
 ) : PrivacyFeaturePlugin {
 
     override fun store(
-        name: FeatureName,
+        featureName: String,
         jsonString: String
     ): Boolean {
         @Suppress("NAME_SHADOWING")
-        val name = privacyFeatureValueOf(name.value)
-        if (name == featureName) {
+        val privacyFeature = privacyFeatureValueOf(featureName) ?: return false
+        if (privacyFeature.value == this.featureName) {
             val httpsExceptions = mutableListOf<HttpsExceptionEntity>()
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<HttpsFeature> =
@@ -54,11 +53,11 @@ class HttpsPlugin @Inject constructor(
             }
             httpsRepository.updateAll(httpsExceptions)
             val isEnabled = httpsFeature?.state == "enabled"
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled, httpsFeature?.minSupportedVersion))
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(this.featureName, isEnabled, httpsFeature?.minSupportedVersion))
             return true
         }
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.HttpsFeatureName
+    override val featureName: String = PrivacyFeatureName.HttpsFeatureName.value
 }

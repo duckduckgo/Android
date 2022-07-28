@@ -43,40 +43,40 @@ class UserAgentPluginTest {
     @Test
     fun whenFeatureNameDoesNotMatchUserAgentThenReturnFalse() {
         PrivacyFeatureName.values().filter { it != FEATURE_NAME }.forEach {
-            assertFalse(testee.store(it, EMPTY_JSON_STRING))
+            assertFalse(testee.store(it.value, EMPTY_JSON_STRING))
         }
     }
 
     @Test
     fun whenFeatureNameMatchesUserAgentThenReturnTrue() {
-        assertTrue(testee.store(FEATURE_NAME, EMPTY_JSON_STRING))
+        assertTrue(testee.store(FEATURE_NAME_VALUE, EMPTY_JSON_STRING))
     }
 
     @Test
     fun whenFeatureNameMatchesUserAgentAndIsEnabledThenStoreFeatureEnabled() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/useragent.json")
 
-        testee.store(FEATURE_NAME, jsonString)
+        testee.store(FEATURE_NAME_VALUE, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, null))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME_VALUE, true, null))
     }
 
     @Test
     fun whenFeatureNameMatchesUserAgentAndIsNotEnabledThenStoreFeatureDisabled() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/useragent_disabled.json")
 
-        testee.store(FEATURE_NAME, jsonString)
+        testee.store(FEATURE_NAME_VALUE, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false, null))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME_VALUE, false, null))
     }
 
     @Test
     fun whenFeatureNameMatchesUserAgentAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/useragent_min_supported_version.json")
 
-        testee.store(FEATURE_NAME, jsonString)
+        testee.store(FEATURE_NAME_VALUE, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, 1234))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME_VALUE, true, 1234))
     }
 
     @Test
@@ -84,7 +84,7 @@ class UserAgentPluginTest {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/useragent.json")
         val exceptionsCaptor = argumentCaptor<List<UserAgentExceptionEntity>>()
 
-        testee.store(FEATURE_NAME, jsonString)
+        testee.store(FEATURE_NAME_VALUE, jsonString)
 
         verify(mockUserAgentRepository).updateAll(exceptionsCaptor.capture())
 
@@ -118,6 +118,7 @@ class UserAgentPluginTest {
 
     companion object {
         private val FEATURE_NAME = PrivacyFeatureName.UserAgentFeatureName
+        private val FEATURE_NAME_VALUE = FEATURE_NAME.value
         private const val EMPTY_JSON_STRING = "{}"
     }
 }
