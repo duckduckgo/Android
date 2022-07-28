@@ -28,11 +28,14 @@ class AutoconsentInterface(
 ) {
     @JavascriptInterface
     fun process(message: String) {
-        val parsedMessage = JSONObject(message)
-        val type: String = parsedMessage.getString("type")
-
-        messageHandlerPlugins.getPlugins().firstOrNull { type == it.type }?.let { plugin ->
-            plugin.process(type, message, webView)
+        try {
+            val parsedMessage = JSONObject(message)
+            val type: String = parsedMessage.getString("type")
+            messageHandlerPlugins.getPlugins().firstOrNull { type == it.type }?.let { plugin ->
+                plugin.process(type, message, webView)
+            }
+        } catch (e: Exception) {
+            Timber.d("MARCOS exception is ${e.localizedMessage}")
         }
     }
 
