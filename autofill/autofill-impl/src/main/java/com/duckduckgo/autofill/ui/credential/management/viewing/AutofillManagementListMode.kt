@@ -35,6 +35,7 @@ import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListMo
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel
 import com.duckduckgo.autofill.ui.credential.management.CredentialGrouper
+import com.duckduckgo.autofill.ui.credential.management.LoginCredentialTitleExtractor
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import dagger.android.support.AndroidSupportInjection
@@ -53,6 +54,9 @@ class AutofillManagementListMode : Fragment() {
 
     @Inject
     lateinit var credentialGrouper: CredentialGrouper
+
+    @Inject
+    lateinit var titleExtractor: LoginCredentialTitleExtractor
 
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
@@ -129,6 +133,7 @@ class AutofillManagementListMode : Fragment() {
             this,
             faviconManager = faviconManager,
             grouper = credentialGrouper,
+            titleExtractor = titleExtractor,
             onCredentialSelected = this::onCredentialsSelected,
             onCopyUsername = this::onCopyUsername,
             onCopyPassword = this::onCopyPassword,
