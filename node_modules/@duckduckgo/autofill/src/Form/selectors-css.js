@@ -1,5 +1,5 @@
 const FORM_INPUTS_SELECTOR = `
-input:not([type=submit]):not([type=button]):not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=file]):not([name^=fake i]):not([data-description^=dummy i]),
+input:not([type=submit]):not([type=button]):not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=file]):not([type=search]):not([name^=fake i]):not([data-description^=dummy i]),
 select`
 
 const SUBMIT_BUTTON_SELECTOR = `

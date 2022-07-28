@@ -3,6 +3,7 @@ plugins {
 }
 
 include ':app'
+include ':lint-rules'
 
 "feature-toggles".with {
     include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
@@ -91,6 +92,23 @@ include ':app'
     include ":$it-store"; project(":$it-store").projectDir = new File("$it-store")
     include ":$it-api"; project(":$it-api").projectDir = new File("$it-api")
     include ":$it-internal"; project(":$it-internal").projectDir = new File("$it-internal")
+}
+
+"secure-storage".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
+}
+
+"autofill".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
+}
+
+"device-auth".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
 }
 
 rootProject.children.each { subproject ->

@@ -13,54 +13,10 @@
     </issue>
 
     <issue
-        id="InlinedApi"
-        message="Field requires API level 26 (current min is 23): `android.content.pm.ApplicationInfo#CATEGORY_UNDEFINED`"
-        errorLine1="        CATEGORY_UNDEFINED"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/mobile/android/vpn/apps/ApplicationInfoExtensions.kt"
-            line="48"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 26 (current min is 23): `android.content.pm.ApplicationInfo#CATEGORY_GAME`"
-        errorLine1="    return getAppCategoryCompat() == ApplicationInfo.CATEGORY_GAME"
-        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/mobile/android/vpn/apps/ApplicationInfoExtensions.kt"
-            line="53"
-            column="38"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 23): `android.provider.Settings#ACTION_VPN_SETTINGS`"
-        errorLine1="        val intent = Intent(Settings.ACTION_VPN_SETTINGS)"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/mobile/android/vpn/ui/tracker_activity/DeviceShieldTrackerActivity.kt"
-            line="309"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="InlinedApi"
-        message="Field requires API level 24 (current min is 23): `android.provider.Settings#ACTION_VPN_SETTINGS`"
-        errorLine1="        val intent = Intent(Settings.ACTION_VPN_SETTINGS)"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/mobile/android/vpn/ui/onboarding/VpnOnboardingActivity.kt"
-            line="261"
-            column="29"/>
-    </issue>
-
-    <issue
         id="BadPeriodicWorkRequestEnqueue"
         message="Use `enqueueUniquePeriodicWork()` instead of `enqueue()`">
         <location
-            file="../../../.gradle/caches/transforms-3/33f394e4e3a6f953f3d7a3d4123949c6/transformed/work-runtime-2.7.1/jars/classes.jar!/androidx/work/WorkManager.class"/>
+            file="../../../.gradle/caches/transforms-3/ef67ec9586a44db65ea24675dc335605/transformed/work-runtime-2.7.1/jars/classes.jar!/androidx/work/WorkManager.class"/>
     </issue>
 
     <issue
@@ -141,79 +97,13 @@
     </issue>
 
     <issue
-        id="ExportedReceiver"
-        message="Exported receiver does not require permission"
-        errorLine1="        &lt;receiver"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="131"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise."
-        errorLine1="        &lt;service"
-        errorLine2="         ~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="108"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise."
-        errorLine1="        &lt;service"
-        errorLine2="         ~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="120"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise."
-        errorLine1="        &lt;receiver"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="131"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise."
-        errorLine1="        &lt;receiver"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="140"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="IntentFilterExportedReceiver"
-        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise."
-        errorLine1="        &lt;receiver android:name=&quot;com.duckduckgo.mobile.android.vpn.appupdates.AppUpdateReceiver&quot;>"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="151"
-            column="10"/>
-    </issue>
-
-    <issue
         id="UnspecifiedImmutableFlag"
         message="Missing `PendingIntent` mutability flag"
         errorLine1="            PendingIntent.getBroadcast(context, 0, intent, 0)"
         errorLine2="                                                           ~">
         <location
             file="src/main/java/com/duckduckgo/mobile/android/vpn/ui/notification/DeviceShieldAlertNotificationBuilder.kt"
-            line="101"
+            line="107"
             column="60"/>
     </issue>
 
@@ -224,7 +114,7 @@
         errorLine2="                                                           ~">
         <location
             file="src/main/java/com/duckduckgo/mobile/android/vpn/ui/notification/DeviceShieldAlertNotificationBuilder.kt"
-            line="141"
+            line="147"
             column="60"/>
     </issue>
 

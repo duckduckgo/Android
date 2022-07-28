@@ -575,10 +575,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Соединение прервано. Этот сайт может навредить вашему устройству.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Диспетчер загрузок отключен</string>
-    <string name="downloadManagerIncompatible">Диспетчер загрузок недоступен на этом устройстве</string>
-    <string name="enable">Включить</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Включить определение местоположения устройства для браузера DuckDuckGo с защитой данных?</string>

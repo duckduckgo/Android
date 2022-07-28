@@ -496,7 +496,7 @@ class Matching {
         if (hasCCAttribute) return true
 
         // Match form textContent against common cc fields (includes hidden labels)
-        const textMatches = formEl.textContent?.match(/(credit)?card(.?number)?|ccv|security.?code|cvv|cvc|csc/ig)
+        const textMatches = formEl.textContent?.match(/(credit|payment).?card(.?number)?|ccv|security.?code|cvv|cvc|csc/ig)
 
         // We check for more than one to minimise false positives
         return Boolean(textMatches && textMatches.length > 1)

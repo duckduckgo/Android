@@ -19,29 +19,28 @@ package com.duckduckgo.app.widget
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.SearchAndFavoritesWidget
-import kotlinx.coroutines.*
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class FavoritesObserver @Inject constructor(
     context: Context,
     private val favoritesRepository: FavoritesRepository,
     private val appCoroutineScope: CoroutineScope
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
     private val instance = AppWidgetManager.getInstance(context)
     private val componentName = ComponentName(context, SearchAndFavoritesWidget::class.java)
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun notifyWidgets() {
+    override fun onStart(owner: LifecycleOwner) {
         appCoroutineScope.launch {
             favoritesRepository.favorites().collect {
                 instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.favoritesGrid)

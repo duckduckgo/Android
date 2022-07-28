@@ -16,18 +16,11 @@
 
 package com.duckduckgo.downloads.api
 
-import android.net.Uri
-
 /** Each failed download has a specific reason represented by a [DownloadFailReason] object. */
 sealed class DownloadFailReason {
 
-    object DownloadManagerDisabled : DownloadFailReason()
     object UnsupportedUrlType : DownloadFailReason()
     object Other : DownloadFailReason()
     object DataUriParseException : DownloadFailReason()
     object ConnectionRefused : DownloadFailReason()
-
-    companion object {
-        val DOWNLOAD_MANAGER_SETTINGS_URI: Uri = Uri.parse("package:com.android.providers.downloads")
-    }
 }

@@ -124,7 +124,7 @@ class DownloadsDaoTest {
         val downloadItem = oneItem()
         dao.insert(downloadItem)
 
-        dao.delete(downloadItem.id)
+        dao.delete(downloadItem.downloadId)
 
         val list = dao.getDownloads()
         assertTrue(list.isEmpty())
