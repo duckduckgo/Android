@@ -17,12 +17,11 @@
 package com.duckduckgo.mobile.android.vpn.feature.settings
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.mobile.android.vpn.dao.AppHealthTriggersDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.feature.SettingName
 import com.duckduckgo.mobile.android.vpn.model.HealthTriggerEntity
-import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
+import com.duckduckgo.mobile.android.vpn.store.AppHealthTriggersRepository
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -35,8 +34,7 @@ class BadHealthMitigationSettingPluginTest {
     private lateinit var featureConfig: BadHealthMitigationSettingPlugin
     private val appTpFeatureConfig: AppTpFeatureConfig = mock()
     private val appTpFeatureConfigEditor: AppTpFeatureConfig.Editor = mock()
-    private val appHealthDatabase: AppHealthDatabase = mock()
-    private val thresholdsTable = FakeAppHealthTriggersDao()
+    private val thresholdsTable = FakeAppHealthTriggersRepository()
     private val jsonEnabled = """
         {
           "state": "enabled",
@@ -129,9 +127,8 @@ class BadHealthMitigationSettingPluginTest {
 
     @Before
     fun setup() {
-        whenever(appHealthDatabase.appHealthTriggersDao()).thenReturn(thresholdsTable)
         whenever(appTpFeatureConfig.edit()).thenReturn(appTpFeatureConfigEditor)
-        featureConfig = BadHealthMitigationSettingPlugin(appTpFeatureConfig, appHealthDatabase)
+        featureConfig = BadHealthMitigationSettingPlugin(appTpFeatureConfig, thresholdsTable)
     }
 
     @Test
@@ -185,7 +182,7 @@ class BadHealthMitigationSettingPluginTest {
         assertTrue(result)
     }
 
-    private class FakeAppHealthTriggersDao : AppHealthTriggersDao {
+    private class FakeAppHealthTriggersRepository : AppHealthTriggersRepository {
         private val triggers = mutableMapOf<String, HealthTriggerEntity>()
         override fun insert(thresholds: HealthTriggerEntity) {
             triggers[thresholds.name] = thresholds

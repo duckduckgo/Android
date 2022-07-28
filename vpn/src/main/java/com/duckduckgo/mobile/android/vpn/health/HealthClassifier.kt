@@ -19,14 +19,12 @@ package com.duckduckgo.mobile.android.vpn.health
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.*
 import com.duckduckgo.mobile.android.vpn.model.HealthTriggerEntity
-import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
+import com.duckduckgo.mobile.android.vpn.store.AppHealthTriggersRepository
 import javax.inject.Inject
 
 class HealthClassifier @Inject constructor(
-    appHealthDatabase: AppHealthDatabase,
+    private val appHealthTriggersRepository: AppHealthTriggersRepository,
 ) {
-
-    private val thresholdsDao = appHealthDatabase.appHealthTriggersDao()
 
     fun determineHealthTunInputQueueReadRatio(
         tunInputs: Long,
@@ -41,7 +39,7 @@ class HealthClassifier @Inject constructor(
         val percentage = percentage(queueReads.queueReads, tunInputs)
         val failureRate = 100 - percentage
 
-        val trigger = thresholdsDao.triggers().trigger(name, failureRate.toLong(), defaultThreshold = 70)
+        val trigger = appHealthTriggersRepository.triggers().trigger(name, failureRate.toLong(), defaultThreshold = 70)
         rawMetrics["tunInputsQueueReadRate"] = Metric(percentage.toString(), badHealthIf { trigger.evaluate() })
         rawMetrics["tunInputs"] = Metric(tunInputs.toString())
         rawMetrics["unknownPackets"] = Metric(queueReads.unknownPackets.toString())
@@ -56,7 +54,7 @@ class HealthClassifier @Inject constructor(
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("vpn-no-connectivity-events", rawMetrics)
 
-        val trigger = thresholdsDao.triggers().trigger(name, connectivityEvents, defaultThreshold = 2)
+        val trigger = appHealthTriggersRepository.triggers().trigger(name, connectivityEvents, defaultThreshold = 2)
         rawMetrics["events"] = Metric(connectivityEvents.toString(), badHealthIf { trigger.evaluate() }, isCritical = true)
 
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
@@ -67,7 +65,7 @@ class HealthClassifier @Inject constructor(
         val metricSummary = RawMetricsSubmission("socket-readExceptions", rawMetrics, informational = true)
 
         // Default value Int.MAX_VALUE disables the bad health trigger
-        val trigger = thresholdsDao.triggers().trigger(name, readExceptions)
+        val trigger = appHealthTriggersRepository.triggers().trigger(name, readExceptions)
         rawMetrics["numberExceptions"] = Metric(readExceptions.toString(), badHealthIf { trigger.evaluate() })
 
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
@@ -77,7 +75,7 @@ class HealthClassifier @Inject constructor(
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("socket-writeExceptions", rawMetrics)
 
-        val trigger = thresholdsDao.triggers().trigger(name, writeExceptions, defaultThreshold = 20)
+        val trigger = appHealthTriggersRepository.triggers().trigger(name, writeExceptions, defaultThreshold = 20)
         rawMetrics["numberExceptions"] = Metric(writeExceptions.toString(), badHealthIf { trigger.evaluate() })
 
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
@@ -87,7 +85,7 @@ class HealthClassifier @Inject constructor(
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("socket-connectExceptions", rawMetrics)
 
-        val trigger = thresholdsDao.triggers().trigger(name, connectExceptions, defaultThreshold = 20)
+        val trigger = appHealthTriggersRepository.triggers().trigger(name, connectExceptions, defaultThreshold = 20)
         rawMetrics["numberExceptions"] = Metric(connectExceptions.toString(), badHealthIf { trigger.evaluate() })
 
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
@@ -97,7 +95,7 @@ class HealthClassifier @Inject constructor(
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("tun-ioReadExceptions", rawMetrics)
 
-        val trigger = thresholdsDao.triggers().trigger(name, numberExceptions, defaultThreshold = 10)
+        val trigger = appHealthTriggersRepository.triggers().trigger(name, numberExceptions, defaultThreshold = 10)
         rawMetrics["numberExceptions"] = Metric(numberExceptions.toString(), badHealthIf { trigger.evaluate() })
 
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
@@ -107,7 +105,7 @@ class HealthClassifier @Inject constructor(
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("tun-ioWriteExceptions", rawMetrics)
 
-        val trigger = thresholdsDao.triggers().trigger(name, numberExceptions, defaultThreshold = 1)
+        val trigger = appHealthTriggersRepository.triggers().trigger(name, numberExceptions, defaultThreshold = 1)
         rawMetrics["numberExceptions"] = Metric(numberExceptions.toString(), badHealthIf { trigger.evaluate() })
 
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
@@ -118,7 +116,7 @@ class HealthClassifier @Inject constructor(
         val metricSummary = RawMetricsSubmission("tun-ioWriteMemoryExceptions", rawMetrics)
 
         // this is marked as isCritical because we may want to take extreme measures when bad health happens here
-        val trigger = thresholdsDao.triggers().trigger(name, numberExceptions, defaultThreshold = 1)
+        val trigger = appHealthTriggersRepository.triggers().trigger(name, numberExceptions, defaultThreshold = 1)
         rawMetrics["numberExceptions"] = Metric(numberExceptions.toString(), badHealthIf { trigger.evaluate() }, isCritical = true)
 
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)

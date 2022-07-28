@@ -16,11 +16,10 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
-import com.duckduckgo.mobile.android.vpn.dao.AppHealthTriggersDao
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.*
 import com.duckduckgo.mobile.android.vpn.model.HealthTriggerEntity
-import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
+import com.duckduckgo.mobile.android.vpn.store.AppHealthTriggersRepository
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -29,16 +28,13 @@ import org.mockito.kotlin.whenever
 
 class HealthClassifierTest {
 
-    private val appHealthDatabase: AppHealthDatabase = mock()
-    private val thresholds: AppHealthTriggersDao = mock()
+    private val thresholds: AppHealthTriggersRepository = mock()
 
     private lateinit var testee: HealthClassifier
 
     @Before
     fun setup() {
-        whenever(appHealthDatabase.appHealthTriggersDao()).thenReturn(thresholds)
-
-        testee = HealthClassifier(appHealthDatabase)
+        testee = HealthClassifier(thresholds)
     }
 
     @Test

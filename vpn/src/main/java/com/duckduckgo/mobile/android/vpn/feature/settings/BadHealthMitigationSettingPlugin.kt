@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.feature.settings
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.model.HealthTriggerEntity
-import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
+import com.duckduckgo.mobile.android.vpn.store.AppHealthTriggersRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import org.json.JSONObject
@@ -32,10 +32,9 @@ import javax.inject.Inject
 )
 class BadHealthMitigationSettingPlugin @Inject constructor(
     private val appTpFeatureConfig: AppTpFeatureConfig,
-    appHealthDatabase: AppHealthDatabase
+    private val healthTriggersRepository: AppHealthTriggersRepository
 ) : AppTpSettingPlugin {
     private val jsonAdapter = Moshi.Builder().add(JSONObjectAdapter()).build().adapter(JsonConfigModel::class.java)
-    private val thresholdsDao = appHealthDatabase.appHealthTriggersDao()
 
     override fun store(name: SettingName, jsonString: String): Boolean {
         @Suppress("NAME_SHADOWING")
@@ -64,7 +63,7 @@ class BadHealthMitigationSettingPlugin @Inject constructor(
                 }
             }
         }
-        thresholdsDao.insertAll(healthTriggers.map { it.toEntity() })
+        healthTriggersRepository.insertAll(healthTriggers.map { it.toEntity() })
     }
 
     private data class JsonConfigModel(
