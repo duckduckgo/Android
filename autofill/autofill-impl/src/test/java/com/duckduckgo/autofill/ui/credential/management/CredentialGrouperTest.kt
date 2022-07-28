@@ -29,16 +29,12 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class CredentialGrouperTest {
 
-    private val initialExtractor: InitialExtractor = object : InitialExtractor {
-        override fun extractInitial(loginCredentials: LoginCredentials): Char {
-            val data = loginCredentials.domainTitle ?: loginCredentials.domain
-            return data?.firstOrNull() ?: '#'
-        }
-    }
+    private val initialExtractor = CredentialInitialExtractor(AutofillDomainFormatterDomainNameOnly())
 
-    private val domainFormatter = AutofillDomainFormatterDomainNameOnly()
-
-    private val testee = CredentialGrouper(initialExtractor, CredentialListSorterByTitleAndDomain(domainFormatter))
+    private val testee = CredentialGrouper(
+        initialExtractor = initialExtractor,
+        sorter = CredentialListSorterByTitleAndDomain(initialExtractor)
+    )
 
     @Test
     fun whenEmptyListInThenEmptyListOut() {
@@ -56,7 +52,7 @@ class CredentialGrouperTest {
 
         grouped.assertTotalSize(expected = 2)
         grouped.assertNumberOfHeadings(expected = 1)
-        grouped[0].assertIsGroupHeading('e')
+        grouped[0].assertIsGroupHeading('E')
         grouped[1].assertIsCredential("example.com")
     }
 
@@ -71,7 +67,7 @@ class CredentialGrouperTest {
 
         grouped.assertNumberOfHeadings(expected = 1)
         grouped.assertTotalSize(expected = 4)
-        grouped[0].assertIsGroupHeading('e')
+        grouped[0].assertIsGroupHeading('E')
     }
 
     @Test
@@ -86,9 +82,29 @@ class CredentialGrouperTest {
 
         grouped.assertNumberOfHeadings(expected = 3)
         grouped.assertTotalSize(expected = 7)
-        grouped[0].assertIsGroupHeading('b')
-        grouped[2].assertIsGroupHeading('e')
-        grouped[5].assertIsGroupHeading('f')
+        grouped[0].assertIsGroupHeading('B')
+        grouped[2].assertIsGroupHeading('E')
+        grouped[5].assertIsGroupHeading('F')
+    }
+
+    @Test
+    fun whenTrickyThen() {
+        val credentials = listOf(
+            creds(domain = "energy.com"),
+            creds(domain = "amazon.com", title = "Smile Amazon"),
+            creds(domain = "example.com", title = "C"),
+            creds(domain = "amazon.com"),
+            creds(domain = "bar.com"),
+        )
+        val grouped = testee.group(credentials)
+
+        grouped.assertNumberOfHeadings(expected = 5)
+        grouped.assertTotalSize(expected = 10)
+        grouped[0].assertIsGroupHeading('A')
+        grouped[2].assertIsGroupHeading('B')
+        grouped[4].assertIsGroupHeading('C')
+        grouped[6].assertIsGroupHeading('E')
+        grouped[8].assertIsGroupHeading('S')
     }
 
     private fun List<ListItem>.assertNumberOfHeadings(expected: Int) {

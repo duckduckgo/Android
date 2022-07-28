@@ -16,7 +16,6 @@
 
 package com.duckduckgo.autofill.ui.credential.management
 
-import com.duckduckgo.autofill.AutofillDomainFormatter
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -28,19 +27,40 @@ interface CredentialListSorter {
 
 @ContributesBinding(FragmentScope::class)
 class CredentialListSorterByTitleAndDomain @Inject constructor(
-    private val domainFormatter: AutofillDomainFormatter
+    private val initialExtractor: InitialExtractor
 ) : CredentialListSorter {
 
     override fun sort(credentials: List<LoginCredentials>): List<LoginCredentials> {
-        return credentials.sortedWith(
-            compareBy(
-                titleSort(),
-                domainSort()
-            )
-        )
+        return credentials.sortedWith(compareBy(titleOrDomainSort()))
     }
 
-    private fun titleSort(): (LoginCredentials) -> Comparable<*>? = { it.domainTitle }
-    private fun domainSort(): (LoginCredentials) -> Comparable<*>? = { domainFormatter.extractDomain(it.domain) }
+    private fun titleOrDomainSort(): (LoginCredentials) -> Comparable<String>? = {
+        val sb = StringBuilder()
 
+        // if we don't have a usable title or domain, return the placeholder so it's sorted first
+        if (!it.canUseDomainInSort() && !it.canUseTitleInSort()) {
+            sb.append("#")
+        }
+
+        // if we can use the title, use it
+        if (it.canUseTitleInSort()) {
+            sb.append(initialExtractor.extractInitialFromTitle(it).toString())
+            sb.append(Char(0))
+            sb.append(Char(0))
+            sb.append(Char(0))
+            sb.append(Char(0))
+        }
+
+        sb.append(initialExtractor.extractInitialFromDomain(it).toString())
+
+        sb.toString()
+    }
+
+    private fun LoginCredentials.canUseTitleInSort(): Boolean {
+        return initialExtractor.extractInitialFromTitle(this) != null
+    }
+
+    private fun LoginCredentials.canUseDomainInSort(): Boolean {
+        return initialExtractor.extractInitialFromDomain(this) != null
+    }
 }

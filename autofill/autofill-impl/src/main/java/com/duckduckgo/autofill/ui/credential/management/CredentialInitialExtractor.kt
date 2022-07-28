@@ -24,6 +24,8 @@ import javax.inject.Inject
 
 interface InitialExtractor {
     fun extractInitial(loginCredentials: LoginCredentials): Char
+    fun extractInitialFromTitle(loginCredentials: LoginCredentials): Char?
+    fun extractInitialFromDomain(loginCredentials: LoginCredentials): Char?
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -32,7 +34,7 @@ class CredentialInitialExtractor @Inject constructor(
 ) : InitialExtractor {
 
     override fun extractInitial(loginCredentials: LoginCredentials): Char {
-        val initial = loginCredentials.extractTitleInitial() ?: loginCredentials.extractDomainInitial()
+        val initial = extractInitialFromTitle(loginCredentials) ?: extractInitialFromDomain(loginCredentials)
 
         if (initial == null || !initial.isLetter()) {
             return INITIAL_CHAR_FOR_NON_LETTERS
@@ -41,12 +43,12 @@ class CredentialInitialExtractor @Inject constructor(
         return initial.uppercaseChar()
     }
 
-    private fun LoginCredentials.extractTitleInitial(): Char? {
-        return this.domainTitle?.firstOrNull()
+    override fun extractInitialFromTitle(loginCredentials: LoginCredentials): Char? {
+        return loginCredentials.domainTitle?.firstOrNull()?.uppercaseChar()
     }
 
-    private fun LoginCredentials.extractDomainInitial(): Char? {
-        return domainFormatter.extractDomain(this.domain)?.firstOrNull()
+    override fun extractInitialFromDomain(loginCredentials: LoginCredentials): Char? {
+        return domainFormatter.extractDomain(loginCredentials.domain)?.firstOrNull()?.uppercaseChar()
     }
 
     private fun Char.isLetter(): Boolean {

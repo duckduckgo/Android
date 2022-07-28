@@ -26,7 +26,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class CredentialListSorterTest {
 
-    private val testee = CredentialListSorterByTitleAndDomain(AutofillDomainFormatterDomainNameOnly())
+    private val domainFormatter = AutofillDomainFormatterDomainNameOnly()
+    private val testee = CredentialListSorterByTitleAndDomain(CredentialInitialExtractor(domainFormatter))
     private val list = mutableListOf<LoginCredentials>()
 
     @Test
@@ -170,6 +171,21 @@ class CredentialListSorterTest {
         sorted.assertDomainOrder("an invalid domain", "http://b.com", "c.com", "invalid domain",)
     }
 
+    @Test
+    fun whenThen() {
+        val credentials = listOf(
+            creds(domain = "energy.com"),
+            creds(domain = "amazon.co.uk", title = "Smile Amazon"),
+            creds(domain = "example.com", title = "c"),
+            creds(domain = "aaa.com"),
+            creds(domain = "bar.com"),
+        )
+
+        val sorted = testee.sort(credentials)
+        sorted.assertDomainOrder("aaa.com", "bar.com", "example.com", "energy.com", "amazon.co.uk")
+        sorted.assertTitleOrder(null, null, "c", null, "Smile Amazon")
+    }
+
     private fun List<LoginCredentials>.assertTitleOrder(vararg titles: String?) {
         assertEquals("Wrong number of titles", titles.size, this.size)
         titles.forEachIndexed { index, title ->
@@ -184,7 +200,7 @@ class CredentialListSorterTest {
         }
     }
 
-    private fun creds(domain: String?, title: String?): LoginCredentials {
+    private fun creds(domain: String? = null, title: String? = null): LoginCredentials {
         return LoginCredentials(domainTitle = title, domain = domain, username = null, password = null)
     }
 
