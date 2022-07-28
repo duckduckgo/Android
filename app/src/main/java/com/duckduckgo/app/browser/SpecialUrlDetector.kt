@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser
 
-import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Intent
 import android.content.Intent.URI_ANDROID_APP_SCHEME
