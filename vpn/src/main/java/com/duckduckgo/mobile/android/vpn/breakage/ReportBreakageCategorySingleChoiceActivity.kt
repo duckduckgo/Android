@@ -91,7 +91,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        val categories = shuffleNonOtherCategories(viewModel.categories)
+        val categories = viewModel.shuffledCategories.map { getString(it) }.toTypedArray()
 
         binding.categoriesSelection.setOnClickListener {
             AlertDialog.Builder(this)
@@ -111,13 +111,6 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         }
 
         binding.ctaNextFormSubmit.setOnClickListener { viewModel.onSubmitPressed() }
-    }
-
-    private fun shuffleNonOtherCategories(categoryList: List<ReportBreakageCategory>): Array<String> {
-        val categories = categoryList.map { getString(it.category) }.toMutableList()
-        val shuffledFirstEight = categories.slice(0..7).shuffled().toMutableList()
-        shuffledFirstEight.add(categories[8])
-        return shuffledFirstEight.toTypedArray()
     }
 
     private fun configureObservers() {
@@ -166,6 +159,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         if (viewState.indexSelected == 8) {
             breakageTextInputForm.somethingElseDescription.isVisible
         }
+
         binding.ctaNextFormSubmit.isEnabled = viewState.submitAllowed
     }
 

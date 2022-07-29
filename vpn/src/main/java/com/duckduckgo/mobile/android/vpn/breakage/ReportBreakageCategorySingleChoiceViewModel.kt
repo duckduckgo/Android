@@ -55,7 +55,7 @@ constructor() : ViewModel() {
     val viewState = MutableStateFlow(ViewState())
     val command = Channel<Command>(1, DROP_OLDEST)
     var indexSelected = -1
-    val categories: List<ReportBreakageCategory> =
+    private val categories: List<ReportBreakageCategory> =
         listOf(
             ConnectionCategory,
             DownloadsCategory,
@@ -68,8 +68,11 @@ constructor() : ViewModel() {
             OtherCategory
         )
 
+    var shuffledCategories: MutableList<Int>
+
     init {
         viewState.value = ViewState()
+        shuffledCategories = shuffleNonOtherCategories(categories)
     }
 
     fun viewState(): Flow<ViewState> {
@@ -78,6 +81,13 @@ constructor() : ViewModel() {
 
     fun commands(): Flow<Command> {
         return command.receiveAsFlow()
+    }
+
+    private fun shuffleNonOtherCategories(categoryList: List<ReportBreakageCategory>): MutableList<Int> {
+        val categories = categoryList.map { it.category }.toMutableList()
+        val shuffledFirstEight = categories.slice(0..7).shuffled().toMutableList()
+        shuffledFirstEight.add(categories[8])
+        return shuffledFirstEight
     }
 
     fun onCategoryIndexChanged(newIndex: Int) {
