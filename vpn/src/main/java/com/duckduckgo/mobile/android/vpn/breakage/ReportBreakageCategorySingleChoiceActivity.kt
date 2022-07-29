@@ -21,9 +21,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle.State.STARTED
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -36,6 +37,7 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleCh
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageCategorySingleChoiceBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import dagger.WrongScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -119,11 +121,19 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(this) { it?.let { processCommand(it) } }
-        viewModel.viewState.observe(this) { it?.let { render(it) } }
+        lifecycleScope.launch {
+            viewModel.commands()
+                .flowWithLifecycle(lifecycle, STARTED)
+                .collectLatest { processCommand(it) }
+        }
+        lifecycleScope.launch {
+            viewModel.viewState()
+                .flowWithLifecycle(lifecycle, STARTED)
+                .collectLatest { render(it) }
+        }
     }
 
-    private fun processCommand(command: ReportBreakageCategorySingleChoiceViewModel.Command) {
+    private fun processCommand(command: Command) {
         when (command) {
             Command.ConfirmAndFinish -> confirmAndFinish()
         }
@@ -133,18 +143,18 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             val issue =
                 IssueReport(
-                    appName = brokenApp?.appName,
-                    appPackageId = brokenApp?.appPackageId,
+                    appName = brokenApp.appName,
+                    appPackageId = brokenApp.appPackageId,
                     description = breakageTextInputForm.appBreakageFormFeedbackInput.text.toString(),
-                    category = viewModel.viewState.value?.categorySelected.toString(),
+                    category = viewModel.viewState.value.categorySelected.toString(),
                     customMetadata =
                     Base64.encodeToString(
-                        metadataReporter.getVpnStateMetadata(brokenApp?.appPackageId).toByteArray(),
+                        metadataReporter.getVpnStateMetadata(brokenApp.appPackageId).toByteArray(),
                         Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE
                     )
                 )
             deviceShieldPixels.sendAppBreakageReport(issue.toMap())
-            setResult(AppCompatActivity.RESULT_OK, Intent().apply { issue.addToIntent(this) })
+            setResult(RESULT_OK, Intent().apply { issue.addToIntent(this) })
             finish()
         }
     }

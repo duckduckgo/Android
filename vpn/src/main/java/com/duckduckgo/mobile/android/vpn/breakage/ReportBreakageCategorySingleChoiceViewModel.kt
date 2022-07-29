@@ -16,13 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.breakage
 
-import androidx.annotation.MainThread
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.CallsCategory
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.ConnectionCategory
@@ -33,14 +29,18 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.IotCate
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.MessagesCategory
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.OtherCategory
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.UploadsCategory
-import timber.log.Timber
-import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesViewModel(VpnScope::class)
 class ReportBreakageCategorySingleChoiceViewModel
 @Inject
-constructor(private val dispatcherProvider: DispatcherProvider) : ViewModel() {
+constructor() : ViewModel() {
 
     data class ViewState(
         val indexSelected: Int = -1,
@@ -52,8 +52,8 @@ constructor(private val dispatcherProvider: DispatcherProvider) : ViewModel() {
         object ConfirmAndFinish : Command()
     }
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
-    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    val viewState = MutableStateFlow(ViewState())
+    val command = Channel<Command>(1, DROP_OLDEST)
     var indexSelected = -1
     val categories: List<ReportBreakageCategory> =
         listOf(
@@ -72,17 +72,25 @@ constructor(private val dispatcherProvider: DispatcherProvider) : ViewModel() {
         viewState.value = ViewState()
     }
 
+    fun viewState(): Flow<ViewState> {
+        return viewState
+    }
+
+    fun commands(): Flow<Command> {
+        return command.receiveAsFlow()
+    }
+
     fun onCategoryIndexChanged(newIndex: Int) {
         indexSelected = newIndex
     }
 
     fun onCategorySelectionCancelled() {
-        indexSelected = viewState.value?.indexSelected ?: -1
+        indexSelected = viewState.value.indexSelected
     }
 
     fun onCategoryAccepted() {
         viewState.value =
-            viewState.value?.copy(
+            viewState.value.copy(
                 indexSelected = indexSelected,
                 categorySelected = categories.elementAtOrNull(indexSelected),
                 submitAllowed = canSubmit()
@@ -90,40 +98,8 @@ constructor(private val dispatcherProvider: DispatcherProvider) : ViewModel() {
     }
 
     fun onSubmitPressed() {
-        command.value = Command.ConfirmAndFinish
+        viewModelScope.launch { command.send(Command.ConfirmAndFinish) }
     }
 
     private fun canSubmit(): Boolean = categories.elementAtOrNull(indexSelected) != null
-
-    class SingleLiveEvent<T> : MutableLiveData<T>() {
-
-        private val pending = AtomicBoolean(false)
-
-        @MainThread
-        override fun observe(owner: LifecycleOwner, observer: Observer<in T>) {
-
-            if (hasActiveObservers()) {
-                Timber.w("Multiple observers registered but only one will be notified of changes.")
-            }
-
-            // Observe the internal MutableLiveData
-            super.observe(owner) { t ->
-                if (pending.compareAndSet(true, false)) {
-                    observer.onChanged(t)
-                }
-            }
-        }
-
-        @MainThread
-        override fun setValue(t: T?) {
-            pending.set(true)
-            super.setValue(t)
-        }
-
-        /** Used for cases where T is Void, to make calls cleaner. */
-        @MainThread
-        fun call() {
-            value = null
-        }
-    }
 }
