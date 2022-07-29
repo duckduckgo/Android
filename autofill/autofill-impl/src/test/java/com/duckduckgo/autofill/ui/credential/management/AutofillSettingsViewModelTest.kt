@@ -86,21 +86,9 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenUserDeletesCredentialsThenIsReturnedToListMode() = runTest {
-        testee.onDeleteCredentials()
-
-        testee.commands.test {
-            awaitItem().first().assertCommandType(ShowListMode::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenUserDeletesViewedCredentialsThenStoreDeletionCalled() = runTest {
         val credentials = someCredentials()
-        testee.onViewCredentials(credentials)
-
-        testee.onDeleteCredentials()
+        testee.onDeleteCredentials(credentials)
         verify(mockStore).deleteCredentials(credentials.id!!)
     }
 
@@ -122,9 +110,8 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenOnEditCredentialsCalledThenShowCredentialEditingMode() = runTest {
         val credentials = someCredentials()
-        testee.onViewCredentials(credentials)
 
-        testee.onEditCredentials()
+        testee.onEditCredentials(credentials)
 
         testee.viewState.test {
             assertEquals(CredentialMode.Editing(credentials), this.awaitItem().credentialMode)
@@ -186,8 +173,7 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenUpdateCredentialsCalledThenUpdateAutofillStore() = runTest {
         val credentials = someCredentials()
-        testee.onViewCredentials(credentials)
-        testee.onEditCredentials()
+        testee.onEditCredentials(credentials)
 
         val updatedCredentials = credentials.copy(username = "helloworld123")
         whenever(mockStore.getCredentialsWithId(-1)).thenReturn(updatedCredentials)
@@ -203,8 +189,7 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenOnExitEditModeThenUpdateCredentialModeStateToViewing() = runTest {
         val credentials = someCredentials()
-        testee.onViewCredentials(credentials)
-        testee.onEditCredentials()
+        testee.onEditCredentials(credentials)
 
         testee.onCancelEditMode()
 
@@ -230,7 +215,7 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenInEditModeAndChangedToDisabledThenUpdateNotInCredentialModeAndShowDisabledMode() = runTest {
-        testee.onEditCredentials()
+        testee.onEditCredentials(someCredentials())
         testee.disabled()
 
         testee.viewState.test {

@@ -103,11 +103,16 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.view_menu_edit -> {
-                viewModel.onEditCredentials()
+                viewModel.viewState.value.credentialMode.credentialsViewed?.let {
+                    viewModel.onEditCredentials(it)
+                }
                 true
             }
             R.id.view_menu_delete -> {
-                viewModel.onDeleteCredentials()
+                viewModel.viewState.value.credentialMode.credentialsViewed?.let {
+                    viewModel.onDeleteCredentials(it)
+                }
+                viewModel.onExitViewMode()
                 true
             }
             R.id.view_menu_save -> {
