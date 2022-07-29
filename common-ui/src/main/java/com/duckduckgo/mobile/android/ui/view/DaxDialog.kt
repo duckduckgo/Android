@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.view
+package com.duckduckgo.mobile.android.ui.view
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -26,9 +26,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
-import com.duckduckgo.app.browser.databinding.ContentDaxDialogBinding
+import com.duckduckgo.app.global.extensions.html
+import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.databinding.ViewDaxDialogBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 interface DaxDialog {
@@ -46,13 +46,14 @@ interface DaxDialogListener {
     fun onDaxDialogHideClick()
 }
 
-class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDialog {
+class TypewriterDaxDialog : DialogFragment(R.layout.view_dax_dialog), DaxDialog {
 
-    private val binding: ContentDaxDialogBinding by viewBinding()
+    private val binding: ViewDaxDialogBinding by viewBinding()
 
     private var daxText: String = ""
     private var primaryButtonText: String = ""
     private var secondaryButtonText: String = ""
+    private var hideButtonText: String = ""
     private var toolbarDimmed: Boolean = true
     private var dismissible: Boolean = false
     private var typingDelayInMs: Long = DEFAULT_TYPING_DELAY
@@ -84,6 +85,9 @@ class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDial
             if (containsKey(ARG_PRIMARY_CTA_TEXT)) {
                 getString(ARG_PRIMARY_CTA_TEXT)?.let { primaryButtonText = it }
             }
+            if (containsKey(ARG_HIDE_CTA_TEXT)) {
+                getString(ARG_HIDE_CTA_TEXT)?.let { hideButtonText = it }
+            }
             if (containsKey(ARG_SECONDARY_CTA_TEXT)) {
                 getString(ARG_SECONDARY_CTA_TEXT)?.let { secondaryButtonText = it }
             }
@@ -103,7 +107,7 @@ class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDial
     }
 
     override fun getTheme(): Int {
-        return CommonR.style.DaxDialogFragment
+        return R.style.DaxDialogFragment
     }
 
     override fun onStart() {
@@ -185,9 +189,10 @@ class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDial
         }
 
         context?.let {
-            val toolbarColor = if (toolbarDimmed) getColor(it, CommonR.color.dimmed) else getColor(it, android.R.color.transparent)
+            val toolbarColor = if (toolbarDimmed) getColor(it, R.color.dimmed) else getColor(it, android.R.color.transparent)
             with(binding) {
                 toolbarDialogLayout.setBackgroundColor(toolbarColor)
+                hideText.text = hideButtonText
                 hiddenText.text = daxText.html(it)
                 primaryCta.text = primaryButtonText
                 secondaryCta.text = secondaryButtonText
@@ -204,6 +209,7 @@ class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDial
             daxText: String,
             primaryButtonText: String,
             secondaryButtonText: String? = "",
+            hideButtonText: String,
             toolbarDimmed: Boolean = true,
             dismissible: Boolean = false,
             typingDelayInMs: Long = DEFAULT_TYPING_DELAY,
@@ -213,6 +219,7 @@ class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDial
                 arguments = Bundle().apply {
                     putString(ARG_DAX_TEXT, daxText)
                     putString(ARG_PRIMARY_CTA_TEXT, primaryButtonText)
+                    putString(ARG_HIDE_CTA_TEXT, hideButtonText)
                     putString(ARG_SECONDARY_CTA_TEXT, secondaryButtonText)
                     putBoolean(ARG_TOOLBAR_DIMMED, toolbarDimmed)
                     putBoolean(ARG_DISMISSIBLE, dismissible)
@@ -225,6 +232,7 @@ class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDial
         private const val DEFAULT_TYPING_DELAY: Long = 20
         private const val ARG_DAX_TEXT = "daxText"
         private const val ARG_PRIMARY_CTA_TEXT = "primaryCtaText"
+        private const val ARG_HIDE_CTA_TEXT = "hideCtaText"
         private const val ARG_SECONDARY_CTA_TEXT = "secondaryCtaText"
         private const val ARG_TOOLBAR_DIMMED = "toolbarDimmed"
         private const val ARG_DISMISSIBLE = "isDismissible"

@@ -31,7 +31,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignInBinding
 import com.duckduckgo.app.email.EmailManager.WaitlistState
 import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
-import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
