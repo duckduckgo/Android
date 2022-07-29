@@ -27,8 +27,9 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -82,16 +83,18 @@ class DeviceShieldStatusReporting(
 
 @ContributesWorker(AppScope::class)
 class DeviceShieldStatusReportingWorker(
-    private val context: Context,
+    context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
     @Inject
     lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
+    @Inject
+    lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     override suspend fun doWork(): Result {
-        if (TrackerBlockingVpnService.isServiceRunning(context)) {
+        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
             deviceShieldPixels.reportEnabled()
         } else {
             deviceShieldPixels.reportDisabled()

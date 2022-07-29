@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.settings
 
-import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
@@ -41,6 +40,7 @@ import com.duckduckgo.macos_api.MacOsWaitlist
 import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
@@ -85,9 +85,6 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockFireAnimationLoader: FireAnimationLoader
 
-    @Mock
-    lateinit var mockContext: Context
-
     private lateinit var appTPRepository: AtpWaitlistStateRepository
 
     @Mock
@@ -110,6 +107,9 @@ class SettingsViewModelTest {
 
     @Mock
     private lateinit var internalTestUserChecker: InternalTestUserChecker
+
+    @Mock
+    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     private lateinit var appTrackingProtectionWaitlistDataStore: FakeAppTrackingProtectionWaitlistDataStore
 
@@ -134,7 +134,6 @@ class SettingsViewModelTest {
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)
 
         testee = SettingsViewModel(
-            mockContext,
             mockThemeSettingsDataStore,
             mockAppSettingsDataStore,
             mockDefaultBrowserDetector,
@@ -148,7 +147,8 @@ class SettingsViewModelTest {
             mockAppBuildConfig,
             mockEmailManager,
             mockMacOsWaitlist,
-            internalTestUserChecker
+            internalTestUserChecker,
+            vpnFeaturesRegistry,
         )
     }
 

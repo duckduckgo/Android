@@ -21,9 +21,10 @@ import android.content.Context
 import android.content.Intent
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ReceiverScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService.Companion.ACTION_VPN_REMINDER_RESTART
-import com.duckduckgo.mobile.android.vpn.ui.notification.ReminderNotificationPressedHandler
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,11 +39,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
-    @Inject
-    lateinit var notificationPressedHandler: ReminderNotificationPressedHandler
-
-    @Inject
-    lateinit var reminderManager: VpnReminderReceiverManager
+    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     override fun onReceive(
         context: Context,
@@ -57,7 +54,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
             Timber.v("Vpn will restart because the user asked it")
             deviceShieldPixels.enableFromReminderNotification()
             goAsync(pendingResult) {
-                TrackerBlockingVpnService.startService(context)
+                vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
             }
         } else {
             Timber.w("VpnReminderReceiver: unknown action")

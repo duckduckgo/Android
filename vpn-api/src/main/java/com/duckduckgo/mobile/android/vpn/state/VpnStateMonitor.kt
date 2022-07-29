@@ -15,12 +15,18 @@
  */
 
 package com.duckduckgo.mobile.android.vpn.state
+import com.duckduckgo.mobile.android.vpn.VpnFeature
 import kotlinx.coroutines.flow.Flow
 
 interface VpnStateMonitor {
-    fun getStateFlow(): Flow<VpnState>
-    fun getState(): VpnState
 
+    /**
+     * Returns a flow of VPN changes for the given [vpnFeature]
+     * It follows the following truth table:
+     * * when the VPN is disabled the flow will emit a [VpnState.DISABLED]
+     * * else it will return the state of the feature
+     */
+    fun getStateFlow(vpnFeature: VpnFeature): Flow<VpnState>
     data class VpnState(
         val state: VpnRunningState,
         val stopReason: VpnStopReason? = null
