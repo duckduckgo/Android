@@ -43,6 +43,12 @@ interface AutofillStore {
     suspend fun getCredentials(rawUrl: String): List<LoginCredentials>
 
     /**
+     * Find saved credential for the given id
+     * @param id of the saved credential
+     */
+    suspend fun getCredentialsWithId(id: Int): LoginCredentials?
+
+    /**
      * Save the given credentials for the given URL
      * @param rawUrl Can be a full, unmodified URL taken from the URL bar (containing subdomains, query params etc...)
      * @param credentials The credentials to be saved. The ID can be null.

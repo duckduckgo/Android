@@ -24,35 +24,7 @@ interface FeatureToggle {
      * @throws [IllegalArgumentException] if the feature is not implemented
      */
     fun isFeatureEnabled(
-        featureName: FeatureName,
+        featureName: String,
         defaultValue: Boolean = true
     ): Boolean
-}
-
-/**
- * Each feature toggle created needs a [FeatureName] which can be implemented using this interface
- */
-interface FeatureName {
-    val value: String
-
-    companion object {
-        /**
-         * Utility function to create a [FeatureName] from the passed in [block] lambda
-         * instead of using the anonymous `object : FeatureName` syntax.
-         *
-         * Usage:
-         *
-         * ```kotlin
-         * val feature = FeatureName {
-         *
-         * }
-         * ```
-         */
-        inline operator fun invoke(crossinline block: () -> String): FeatureName {
-            return object : FeatureName {
-                override val value: String
-                    get() = block()
-            }
-        }
-    }
 }

@@ -26,16 +26,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import javax.inject.Inject
 
-interface VpnSharedPreferencesProvider {
-    /**
-     * Returns an instance of Shared preferences
-     * @param name Name of the shared preferences
-     * @param multiprocess `true` if the shared preferences will be accessed from several processes else `false`
-     * @param migrate `true` if the shared preferences existed prior to use the [VpnSharedPreferencesProvider], else `false`
-     */
-    fun getSharedPreferences(name: String, multiprocess: Boolean = false, migrate: Boolean = false): SharedPreferences
-}
-
 private const val MIGRATED_TO_HARMONY = "migrated_to_harmony"
 
 @ContributesBinding(AppScope::class)

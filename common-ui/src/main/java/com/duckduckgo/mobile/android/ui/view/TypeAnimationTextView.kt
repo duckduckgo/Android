@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.view
+package com.duckduckgo.mobile.android.ui.view
 
 import android.content.Context
 import android.text.Spanned
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
+import com.duckduckgo.app.global.extensions.html
 import kotlinx.coroutines.*
 import java.text.BreakIterator
 import java.text.StringCharacterIterator

@@ -23,7 +23,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExclusionListMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverrideListMetadata
@@ -43,6 +44,7 @@ class AppTrackerExclusionListUpdateWorker(
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
     @Inject
     lateinit var vpnDatabase: VpnDatabase
+    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
@@ -79,7 +81,7 @@ class AppTrackerExclusionListUpdateWorker(
                     sysAppsOverrides.overridePackages, AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag)
                 )
 
-                TrackerBlockingVpnService.restartVpnService(applicationContext)
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
 
                 return Result.success()
             }
@@ -108,7 +110,7 @@ class AppTrackerExclusionListUpdateWorker(
                 vpnDatabase.vpnAppTrackerBlockingDao()
                     .updateExclusionList(exclusionList.excludedPackages, AppTrackerExclusionListMetadata(eTag = exclusionList.etag.value))
 
-                TrackerBlockingVpnService.restartVpnService(applicationContext)
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
 
                 return Result.success()
             }

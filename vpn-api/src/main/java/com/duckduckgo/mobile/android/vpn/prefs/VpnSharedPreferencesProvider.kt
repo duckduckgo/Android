@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.extensions
+package com.duckduckgo.mobile.android.vpn.prefs
 
-import java.util.*
+import android.content.SharedPreferences
 
-fun String.capitalizeFirstLetter() = this.replaceFirstChar {
-    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+interface VpnSharedPreferencesProvider {
+    /**
+     * Returns an instance of Shared preferences
+     * @param name Name of the shared preferences
+     * @param multiprocess `true` if the shared preferences will be accessed from several processes else `false`
+     * @param migrate `true` if the shared preferences existed prior to use the [VpnSharedPreferencesProvider], else `false`
+     */
+    fun getSharedPreferences(name: String, multiprocess: Boolean = false, migrate: Boolean = false): SharedPreferences
 }

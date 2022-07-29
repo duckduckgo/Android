@@ -26,9 +26,10 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
@@ -61,6 +62,8 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appTrackerRepository: AppTrackerRepository
+
+    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var transparencyModeDebugReceiver: TransparencyModeDebugReceiver? = null
@@ -149,20 +152,20 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 for (excludedPackage in appTrackerRepository.getAppExclusionList()) {
                     appTrackerRepository.manuallyEnabledApp(excludedPackage.packageId)
                 }
-                TrackerBlockingVpnService.restartVpnService(this@VpnInternalSettingsActivity)
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             }
         }
 
         binding.restoreDefaultAppProtections.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 appTrackerRepository.restoreDefaultProtectedList()
-                TrackerBlockingVpnService.restartVpnService(this@VpnInternalSettingsActivity)
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             }
         }
     }
 
     private fun setupUiElementsState() {
-        vpnStateMonitor.getStateFlow()
+        vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN)
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .map { it.state == VpnStateMonitor.VpnRunningState.ENABLED }
             .onEach { isEnabled ->

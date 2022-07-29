@@ -78,7 +78,7 @@ class HttpsUpgraderImpl @Inject constructor(
     override fun shouldUpgrade(uri: Uri): Boolean {
         val host = uri.host ?: return false
 
-        if (!toggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName)) {
+        if (!toggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName.value)) {
             Timber.d("https is disabled in the remote config and so $host is not upgradable")
             return false
         }

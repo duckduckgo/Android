@@ -41,13 +41,14 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActivity
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldActivityBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
@@ -80,6 +81,8 @@ class DeviceShieldTrackerActivity :
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
@@ -377,12 +380,12 @@ class DeviceShieldTrackerActivity :
 
     private fun startVPN() {
         quietlyToggleAppTpSwitch(true)
-        TrackerBlockingVpnService.startService(this)
+        vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
     }
 
     private fun stopDeviceShield() {
         quietlyToggleAppTpSwitch(false)
-        TrackerBlockingVpnService.stopService(this)
+        vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
     }
 
     private fun quietlyToggleAppTpSwitch(state: Boolean) {

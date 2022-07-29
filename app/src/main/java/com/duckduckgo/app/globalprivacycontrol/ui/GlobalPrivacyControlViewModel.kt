@@ -52,7 +52,7 @@ class GlobalPrivacyControlViewModel @Inject constructor(
     init {
         _viewState.value = ViewState(
             globalPrivacyControlEnabled = gpc.isEnabled(),
-            globalPrivacyControlFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName, true)
+            globalPrivacyControlFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value, true)
         )
         pixel.fire(SETTINGS_DO_NOT_SELL_SHOWN)
     }

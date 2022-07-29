@@ -495,7 +495,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         // For backwards compatibility, it will still return the caller's own services.
         // So for us it's still valid because we don't need to know third party services, just ours.
         @Suppress("DEPRECATION")
-        fun isServiceRunning(context: Context): Boolean {
+        internal fun isServiceRunning(context: Context): Boolean {
             val manager = kotlin.runCatching {
                 context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
             }.getOrElse {
@@ -513,7 +513,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             return false
         }
 
-        fun startService(context: Context) {
+        internal fun startService(context: Context) {
             val applicationContext = context.applicationContext
 
             if (isServiceRunning(applicationContext)) return
@@ -523,7 +523,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             }
         }
 
-        fun stopService(context: Context) {
+        internal fun stopService(context: Context) {
             val applicationContext = context.applicationContext
 
             if (!isServiceRunning(applicationContext)) return
@@ -533,7 +533,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             }
         }
 
-        suspend fun restartVpnService(
+        internal suspend fun restartVpnService(
             context: Context,
             forceGc: Boolean = false
         ) = withContext(Dispatchers.Default) {
