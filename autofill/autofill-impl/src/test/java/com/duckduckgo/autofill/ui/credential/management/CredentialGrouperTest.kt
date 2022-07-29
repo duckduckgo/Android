@@ -112,6 +112,25 @@ class CredentialGrouperTest {
         grouped[8].assertIsGroupHeading('S')
     }
 
+    @Test
+    fun whenListContainsAnEntryWithAMissingDomainAndTitleThenGroupedIntoPlaceholder() {
+        val credentials = listOf(
+            creds(domain = "amazon.com", title = "Smile Amazon"),
+            creds(domain = "example.com"),
+            creds(domain = null, title = null),
+            creds(domain = "null", title = "Title"),
+        )
+        val grouped = testee.group(credentials)
+
+        grouped.assertNumberOfHeadings(expected = 4)
+        grouped.assertTotalSize(expected = 8)
+        grouped[0].assertIsGroupHeading('#')
+        grouped[1].assertIsCredential(expectedDomain = null)
+        grouped[2].assertIsGroupHeading('E')
+        grouped[4].assertIsGroupHeading('S')
+        grouped[6].assertIsGroupHeading('T')
+    }
+
     private fun List<ListItem>.assertNumberOfHeadings(expected: Int) {
         assertEquals(expected, this.count { it is GroupHeading })
     }
@@ -125,7 +144,7 @@ class CredentialGrouperTest {
         assertEquals(expectedInitial, (this as GroupHeading).initial)
     }
 
-    private fun ListItem.assertIsCredential(expectedDomain: String) {
+    private fun ListItem.assertIsCredential(expectedDomain: String?) {
         assertTrue(this is Credential)
         assertEquals(expectedDomain, (this as Credential).credentials.domain)
     }

@@ -18,6 +18,7 @@ package com.duckduckgo.autofill
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -61,8 +62,27 @@ class AutofillDomainFormatterDomainNameOnlyTest {
         assertEquals("example.com", result)
     }
 
-    fun whenDomainContainsSubdomainThatIsNotWwwThenSubdomainStripped() {
+    @Test
+    fun whenDomainContainsSubdomainThatIsNotWwwThenSubdomainNotStripped() {
         val result = testee.extractDomain("login.example.com")
-        assertEquals("example.com", result)
+        assertEquals("login.example.com", result)
+    }
+
+    @Test
+    fun whenDomainIsNullThenThenFormattedAsNull() {
+        val result = testee.extractDomain(null)
+        assertNull(result)
+    }
+
+    @Test
+    fun whenDomainIsEmptyStringThenThenFormattedAsNull() {
+        val result = testee.extractDomain("")
+        assertNull(result)
+    }
+
+    @Test
+    fun whenDomainIsBlankStringThenThenFormattedAsNull() {
+        val result = testee.extractDomain("  ")
+        assertNull(result)
     }
 }

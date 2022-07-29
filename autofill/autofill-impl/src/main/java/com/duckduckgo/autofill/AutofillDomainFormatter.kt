@@ -29,6 +29,11 @@ interface AutofillDomainFormatter {
 @ContributesBinding(FragmentScope::class)
 class AutofillDomainFormatterDomainNameOnly @Inject constructor() : AutofillDomainFormatter {
     override fun extractDomain(domain: String?): String? {
-        return domain?.toUri()?.baseHost
+        val domain = domain?.toUri()?.baseHost
+        return if (domain.isNullOrBlank()) {
+            null
+        } else {
+            domain
+        }
     }
 }
