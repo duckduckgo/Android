@@ -108,69 +108,7 @@
     <string name="tabClosedUndo">Vrátit</string>
     <string name="downloadsMenuItemTitle">Stahování</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Ochrana osobních údajů na webových stránkách</string>
-    <string name="privacyProtectionEnabled">OCHRANA STRÁNKY ZAPNUTÁ</string>
-    <string name="privacyProtectionDisabled">OCHRANA STRÁNKY VYPNUTA</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VYLEPŠENO Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Hodnocení ochrany soukromí</string>
-    <string name="privacyProtectionTemporarilyDisabled">Dočasně jsme zakázali ochranu osobních údajů, protože se zdá, že porušuje podmínky této stránky.</string>
-
-    <string name="httpsGood">Šifrované připojení</string>
-    <string name="httpsMixed">Smíšené šifrovací připojení</string>
-    <string name="httpsBad">Nešifrované připojení</string>
-
-    <string name="networksActivityTitle">Sledovací sítě</string>
-    <string name="networksContentDescription">Sledovací sítě</string>
-    <string name="networksOverview">Sledovací sítě agregují vaši webovou historii do datového profilu o vás. Hlavní sledovací sítě jsou nebezpečnější, protože vás mohou sledovat a zaměřit přes více internetových stránek.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">Nalezen %1$s tracker</item>
-        <item quantity="few">Nalezeny %1$s trackery</item>
-        <item quantity="many">Nalezeno %1$s trackerů</item>
-        <item quantity="other">Nalezeno %1$s trackerů</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">Zablokován %1$s tracker</item>
-        <item quantity="few">Zablokovány %1$s trackery</item>
-        <item quantity="many">Zablokováno %1$s trackerů</item>
-        <item quantity="other">Zablokováno %1$s trackerů</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">Nalezena %1$s hlavní sledovací síť</item>
-        <item quantity="few">Nalezeny %1$s hlavní sledovací sítě</item>
-        <item quantity="many">Nalezeno %1$s hlavních sledovacích sítí</item>
-        <item quantity="other">Nalezeno %1$s hlavních sledovacích sítí</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">Zablokována %1$s hlavní sledovací síť</item>
-        <item quantity="few">Zablokovány %1$s hlavní sledovací sítě</item>
-        <item quantity="many">Zablokováno %1$s hlavních sledovacích sítí</item>
-        <item quantity="other">Zablokováno %1$s hlavních sledovacích sítí</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Hodnocení ochrany soukromí</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Stránky jsou hlavní sledovací sítí</string>
-    <string name="scorecardPrivacyGrade">Hodnocení ochrany soukromí</string>
-    <string name="scorecardEnhancedGrade">Rozšířené hodnocení</string>
-
-    <string name="privacyTermsActivityTitle">Zásady ochrany soukromí</string>
-    <string name="practicesGood">Správné postupy ochrany soukromí</string>
-    <string name="practicesMixed">Smíšené postupy ochrany soukromí</string>
-    <string name="practicesBad">Nesprávné postupy ochrany soukromí</string>
-    <string name="practicesUnknown">Neznámé postupy ochrany soukromí</string>
-    <string name="practicesOverview">Postupy ochrany soukromí ukazují, do jaké míry jsou osobní údaje, které sdílíte s webovými stránkami, chráněny.</string>
-    <string name="practicesTosdrLink">Zásady ochrany osobních údajů z <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Ikona správného postupu</string>
-    <string name="practicesIconContentBad">Ikona nesprávného postupu</string>
-
-    <string name="networkTrackerSummaryHeader">NEJČASTĚJŠÍ DELIKVENTI SLEDOVACÍ SÍTĚ</string>
-    <string name="networkTrackerSummaryNotReady">Stále shromažďujeme data, abychom zjistili, kolik sledovacích zařízení jsme zablokovali.</string>
-
-    <!-- Fire -->
+   <!-- Fire -->
     <string name="fireMenu">Vymazat data</string>
     <string name="fireClearAll">Vymazat všechny karty a data</string>
     <string name="fireCancel">Zrušit</string>

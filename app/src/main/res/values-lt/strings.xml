@@ -108,68 +108,6 @@
     <string name="tabClosedUndo">Anuliuoti</string>
     <string name="downloadsMenuItemTitle">Atsisiuntimai</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Svetainės privatumo apsauga</string>
-    <string name="privacyProtectionEnabled">SVETAINĖS APSAUGA ĮJUNGTA</string>
-    <string name="privacyProtectionDisabled">SVETAINĖS APSAUGA IŠJUNGTA</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">PATOBULINTA NUO &lt;img src=\"%1$d\" /&gt; IKI &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Privatumo laipsnis</string>
-    <string name="privacyProtectionTemporarilyDisabled">Laikinai išjungiame privatumo apsaugą, kadangi atrodo, kad ji trukdo šios svetainės veikimui.</string>
-
-    <string name="httpsGood">Šifruotas ryšys</string>
-    <string name="httpsMixed">Ryšys su mišriu šifravimu</string>
-    <string name="httpsBad">Nešifruotas ryšys</string>
-
-    <string name="networksActivityTitle">Sekiklių tinklai</string>
-    <string name="networksContentDescription">Sekiklių tinklai</string>
-    <string name="networksOverview">Sekiklių tinklai stebi jūsų naršymo tinkle istoriją ir iš jos sudaro jūsų duomenų profilį. Daugelis sekiklių tinklų yra pavojingesni, nes jie gali sekti ir rasti jus didesnėje interneto erdvėje.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">Rasta %1$s stebėjimo priemonė</item>
-        <item quantity="few">Rastos %1$s stebėjimo priemonės</item>
-        <item quantity="many">Rasta %1$s stebėjimo priemonės</item>
-        <item quantity="other">Rasta %1$s stebėjimo priemonių</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">Užblokuota %1$s stebėjimo priemonė</item>
-        <item quantity="few">Užblokuotos %1$s stebėjimo priemonės</item>
-        <item quantity="many">Užblokuota %1$s stebėjimo priemonė</item>
-        <item quantity="other">Užblokuota %1$s stebėjimo priemonių</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">Rastas %1$s pagrindinis stebėjimo priemonės tinklas</item>
-        <item quantity="few">Rasti %1$s pagrindiniai stebėjimo priemonės tinklai</item>
-        <item quantity="many">Rasta %1$s pagrindinio stebėjimo priemonės tinklo</item>
-        <item quantity="other">Rasta %1$s pagrindinių stebėjimo priemonės tinklų</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">Užblokuotas %1$s pagrindinis stebėjimo priemonės tinklas</item>
-        <item quantity="few">Užblokuoti %1$s pagrindiniai stebėjimo priemonės tinklai</item>
-        <item quantity="many">Užblokuota %1$s pagrindinio stebėjimo priemonės tinklo</item>
-        <item quantity="other">Užblokuota %1$s pagrindinių stebėjimo priemonės tinklų</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Privatumo laipsnis</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Svetainė yra didelis stebėjimo priemonių tinklas</string>
-    <string name="scorecardPrivacyGrade">Privatumo laipsnis</string>
-    <string name="scorecardEnhancedGrade">Pagerintas laipsnis</string>
-
-    <string name="privacyTermsActivityTitle">Privatumo praktika</string>
-    <string name="practicesGood">Gera privatumo praktika</string>
-    <string name="practicesMixed">Mišri privatumo praktika</string>
-    <string name="practicesBad">Prasta privatumo praktika</string>
-    <string name="practicesUnknown">Nežinoma privatumo praktika</string>
-    <string name="practicesOverview">Privatumo praktika nurodo, kiek asmeninės informacijos, kuria dalinatės svetainėje, yra apsaugota.</string>
-    <string name="practicesTosdrLink">Privatumo praktikos iš <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Geros praktikos piktograma</string>
-    <string name="practicesIconContentBad">Prastos praktikos piktograma</string>
-
-    <string name="networkTrackerSummaryHeader">DAŽNIAUSI PAŽEIDĖJAI SEKIKLIŲ TINKLE</string>
-    <string name="networkTrackerSummaryNotReady">Renkame duomenis, kad galėtumėme pranešti apie tai, kiek sekiklių užblokavome.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>
     <string name="fireClearAll">Valyti visas korteles ir duomenis</string>

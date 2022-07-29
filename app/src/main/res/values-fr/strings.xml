@@ -108,60 +108,6 @@
     <string name="tabClosedUndo">Annuler</string>
     <string name="downloadsMenuItemTitle">Téléchargements</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Protection de la confidentialité du site</string>
-    <string name="privacyProtectionEnabled">PROTECTION DU SITE ACTIVÉE</string>
-    <string name="privacyProtectionDisabled">PROTECTION DU SITE DÉSACTIVÉE</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">AMÉLIORÉ DE &lt;img src=\"%1$d\" /&gt; À &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Degré de confidentialité</string>
-    <string name="privacyProtectionTemporarilyDisabled">Nous avons temporairement désactivé la protection de la confidentialité car elle semble perturber ce site.</string>
-
-    <string name="httpsGood">Connexion chiffrée</string>
-    <string name="httpsMixed">Connexion à chiffrement mixte</string>
-    <string name="httpsBad">Connexion non chiffrée</string>
-
-    <string name="networksActivityTitle">Réseaux de trackers</string>
-    <string name="networksContentDescription">Réseaux de trackers</string>
-    <string name="networksOverview">Les réseaux de traqueurs regroupent votre historique Web dans un profil de données vous concernant. Les réseaux majeurs de traqueurs sont plus nuisibles, car ils peuvent vous suivre et vous cibler sur une plus grande partie du Web.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s Tracker trouvé</item>
-        <item quantity="other">%1$s Trackers trouvés</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s Tracker bloqué</item>
-        <item quantity="other">%1$s Trackers bloqués</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s réseau majeur de trackers trouvé</item>
-        <item quantity="other">%1$s réseaux majeurs de trackers trouvés</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s réseau majeur de trackers bloqué</item>
-        <item quantity="other">%1$s réseaux majeurs de trackers bloqués</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Degré de confidentialité</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Le site est un réseau majeur de traqueurs</string>
-    <string name="scorecardPrivacyGrade">Degré de confidentialité</string>
-    <string name="scorecardEnhancedGrade">Degré amélioré</string>
-
-    <string name="privacyTermsActivityTitle">Pratiques de confidentialité</string>
-    <string name="practicesGood">Bonnes pratiques de confidentialité</string>
-    <string name="practicesMixed">Pratiques de confidentialité mixtes</string>
-    <string name="practicesBad">Mauvaises pratiques de confidentialité</string>
-    <string name="practicesUnknown">Pratiques de confidentialité inconnues</string>
-    <string name="practicesOverview">Les pratiques de confidentialité indiquent dans quelle mesure les informations personnelles que vous partagez avec un site Web sont protégées.</string>
-    <string name="practicesTosdrLink">Les pratiques de confidentialité de <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Icône de bonne pratique</string>
-    <string name="practicesIconContentBad">Icône de mauvaise pratique</string>
-
-    <string name="networkTrackerSummaryHeader">PRINCIPAUX COUPABLES DES RÉSEAUX DE TRACKER</string>
-    <string name="networkTrackerSummaryNotReady">Nous recueillons toujours des données pour indiquer le nombre de trackers que nous avons bloqués.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Effacer les données</string>
     <string name="fireClearAll">Effacer tous les onglets et données</string>

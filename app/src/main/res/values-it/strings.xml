@@ -108,60 +108,6 @@
     <string name="tabClosedUndo">Annulla</string>
     <string name="downloadsMenuItemTitle">Download</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Protezione della privacy del sito</string>
-    <string name="privacyProtectionEnabled">PROTEZIONE DEL SITO ABILITATA</string>
-    <string name="privacyProtectionDisabled">PROTEZIONE DEL SITO DISATTIVATA</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MIGLIORATO DA &lt;img src=\"%1$d\" /&gt; A &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Punteggio sulla privacy</string>
-    <string name="privacyProtectionTemporarilyDisabled">Abbiamo temporaneamente disabilitato la Tutela della privacy poiché sembra che stia interrompendo il funzionamento del sito.</string>
-
-    <string name="httpsGood">Connessione crittografata</string>
-    <string name="httpsMixed">Connessione a crittografia mista</string>
-    <string name="httpsBad">Connessione non crittografata</string>
-
-    <string name="networksActivityTitle">Reti di tracciamento</string>
-    <string name="networksContentDescription">Reti di tracciamento</string>
-    <string name="networksOverview">Le reti di tracciamento aggregano la tua cronologia di navigazione per creare un profilo dati su di te. Le reti di tracciamento principali sono le più pericolose, in quanto possono monitorarti e individuarti anche al di là di Internet.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s sistema di tracciamento rilevato</item>
-        <item quantity="other">%1$s sistemi di tracciamento rilevati</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s sistema di tracciamento bloccato</item>
-        <item quantity="other">%1$s sistemi di tracciamento bloccati</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s rete di tracciamento principale rilevata</item>
-        <item quantity="other">%1$s reti di tracciamento principali rilevate</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s rete di tracciamento principale bloccata</item>
-        <item quantity="other">%1$s reti di tracciamento principali bloccate</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Punteggio sulla privacy</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Il sito è una rete di tracciamento principale</string>
-    <string name="scorecardPrivacyGrade">Punteggio sulla privacy</string>
-    <string name="scorecardEnhancedGrade">Punteggio migliorato</string>
-
-    <string name="privacyTermsActivityTitle">Pratiche sulla privacy</string>
-    <string name="practicesGood">Buone pratiche sulla privacy</string>
-    <string name="practicesMixed">Pratiche sulla privacy miste</string>
-    <string name="practicesBad">Pratiche sulla privacy insufficienti</string>
-    <string name="practicesUnknown">Pratiche sulla privacy sconosciute</string>
-    <string name="practicesOverview">Le pratiche sulla privacy indicano il livello di protezione delle informazioni personali che hai condiviso con un sito web.</string>
-    <string name="practicesTosdrLink">Pratiche di privacy da <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Icona buone pratiche</string>
-    <string name="practicesIconContentBad">Icona cattive pratiche</string>
-
-    <string name="networkTrackerSummaryHeader">PRINCIPALI MINACCE DELLE RETI DI TRACCIAMENTO</string>
-    <string name="networkTrackerSummaryNotReady">Stiamo raccogliendo dati per mostrarti quanti sistemi di tracciamento abbiamo bloccato.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Elimina dati</string>
     <string name="fireClearAll">Elimina tutte le schede e i dati</string>

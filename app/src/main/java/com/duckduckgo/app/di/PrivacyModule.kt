@@ -20,7 +20,13 @@ import android.content.Context
 import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
-import com.duckduckgo.app.fire.*
+import com.duckduckgo.app.fire.AndroidAppCacheClearer
+import com.duckduckgo.app.fire.AppCacheClearer
+import com.duckduckgo.app.fire.BackgroundTimeKeeper
+import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
+import com.duckduckgo.app.fire.DataClearerTimeKeeper
+import com.duckduckgo.app.fire.DuckDuckGoCookieManager
+import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
@@ -29,9 +35,6 @@ import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.GeoLocationPermissionsManager
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.model.PrivacyPracticesImpl
-import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
@@ -41,19 +44,11 @@ import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.IntoSet
 import dagger.SingleInstanceIn
+import dagger.multibindings.IntoSet
 
 @Module
 object PrivacyModule {
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun privacyPractices(
-        termsOfServiceStore: TermsOfServiceStore,
-        entityLookup: EntityLookup
-    ): PrivacyPractices =
-        PrivacyPracticesImpl(termsOfServiceStore, entityLookup)
 
     @Provides
     @SingleInstanceIn(AppScope::class)

@@ -108,68 +108,6 @@
     <string name="tabClosedUndo">Poništi</string>
     <string name="downloadsMenuItemTitle">Preuzimanja</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Zaštita privatnosti web stranice</string>
-    <string name="privacyProtectionEnabled">ZAŠTITA STRANICE UKLJUČENA</string>
-    <string name="privacyProtectionDisabled">ZAŠTITA STRANICE JE ISKLJUČENA</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">POBOLJŠANO OD &lt;img src=\"%1$d\" /&gt; DO &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Ocjena zaštite privatnosti</string>
-    <string name="privacyProtectionTemporarilyDisabled">Privremeno smo onemogućili zaštitu privatnosti jer se čini da narušava ovo web-mjesto.</string>
-
-    <string name="httpsGood">Šifrirana veza</string>
-    <string name="httpsMixed">Veza s miješanim šifriranjem</string>
-    <string name="httpsBad">Nešifrirana veza</string>
-
-    <string name="networksActivityTitle">Mreže za praćenje</string>
-    <string name="networksContentDescription">Mreže za praćenje</string>
-    <string name="networksOverview">Mreže za praćenje tvoju povijest pregledavanja internetskih stranica objedinjuju u obliku podatkovnog profila o tebi. Velike mreže za praćenje štetnije su jer te mogu ciljano pratiti na većem dijelu interneta.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">Pronađen je %1$s alat za praćenje</item>
-        <item quantity="few">Pronađena su %1$s alata za praćenje</item>
-        <item quantity="many">Pronađeno je %1$s alata za praćenje</item>
-        <item quantity="other">Pronađeno je %1$s alata za praćenje</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">Blokiran je %1$s alat za praćenje</item>
-        <item quantity="few">Blokirana su %1$s alata za praćenje</item>
-        <item quantity="many">Blokirano je %1$s alata za praćenje</item>
-        <item quantity="other">Blokirano je %1$s alata za praćenje</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">Pronađena je %1$s veća mreža za praćenje</item>
-        <item quantity="few">Pronađene su %1$s veće mreže za praćenje</item>
-        <item quantity="many">Pronađeno je %1$s većih mreža za praćenje</item>
-        <item quantity="other">Pronađeno je %1$s većih mreža za praćenje</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">Blokirana je %1$s veća mreža za praćenje</item>
-        <item quantity="few">Blokirane su %1$s veće mreže za praćenje</item>
-        <item quantity="many">Blokirano je %1$s većih mreža za praćenje</item>
-        <item quantity="other">Blokirano je %1$s većih mreža za praćenje</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Ocjena zaštite privatnosti</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Web-mjesto glavna je mreža za praćenje</string>
-    <string name="scorecardPrivacyGrade">Ocjena zaštite privatnosti</string>
-    <string name="scorecardEnhancedGrade">Poboljšana ocjena</string>
-
-    <string name="privacyTermsActivityTitle">Prakse zaštite privatnosti</string>
-    <string name="practicesGood">Dobre prakse zaštite privatnosti</string>
-    <string name="practicesMixed">Miješane prakse zaštite privatnosti</string>
-    <string name="practicesBad">Loše prakse zaštite privatnosti</string>
-    <string name="practicesUnknown">Nepoznata praksa zaštite privatnosti</string>
-    <string name="practicesOverview">Prakse zaštite privatnosti pokazuju koliko su zaštićeni osobni podaci koje dijelite s web-mjestom.</string>
-    <string name="practicesTosdrLink">Prakse zaštite privatnosti iz <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Ikona za dobru praksu</string>
-    <string name="practicesIconContentBad">Ikona za lošu praksu</string>
-
-    <string name="networkTrackerSummaryHeader">NAJVEĆI PREKRŠITELJI OD MREŽA ZA PRAĆENJE</string>
-    <string name="networkTrackerSummaryNotReady">Još uvijek prikupljamo podatke kako bismo pokazali koliko smo alata za praćenje blokirali.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>
     <string name="fireClearAll">Obriši sve kartice i podatke</string>

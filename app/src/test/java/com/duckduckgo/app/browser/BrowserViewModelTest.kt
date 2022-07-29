@@ -28,10 +28,10 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridActivity.Companion.RELOAD_RESULT_CODE
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -159,7 +159,7 @@ class BrowserViewModelTest {
 
     @Test
     fun whenReloadDashboardResultReceivedThenRefreshTriggered() {
-        testee.receivedDashboardResult(PrivacyDashboardActivity.RELOAD_RESULT_CODE)
+        testee.receivedDashboardResult(RELOAD_RESULT_CODE)
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.Refresh, commandCaptor.lastValue)
     }

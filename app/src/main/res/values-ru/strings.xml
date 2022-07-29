@@ -108,69 +108,7 @@
     <string name="tabClosedUndo">Отменить</string>
     <string name="downloadsMenuItemTitle">Загрузки</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Защита конфиденциальности сайта</string>
-    <string name="privacyProtectionEnabled">ЗАЩИТА САЙТА ВКЛЮЧЕНА</string>
-    <string name="privacyProtectionDisabled">ЗАЩИТА САЙТА ОТКЛЮЧЕНА</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">УРОВЕНЬ КОНФИДЕНЦИАЛЬНОСТИ ПОВЫШЕН С &lt;img src=\"%1$d\" /&gt; ДО &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Рейтинг конфиденциальности</string>
-    <string name="privacyProtectionTemporarilyDisabled">Мы временно отключили функцию защиты конфиденциальности, так как она мешала работе сайта.</string>
-
-    <string name="httpsGood">Зашифрованное соединение</string>
-    <string name="httpsMixed">Соединение со смешанным шифрованием</string>
-    <string name="httpsBad">Незашифрованное соединение</string>
-
-    <string name="networksActivityTitle">Трекерные сети</string>
-    <string name="networksContentDescription">Трекерные сети</string>
-    <string name="networksOverview">Сети трекеров собирают историю вашей активности в Интернете и формируют ваш информационный профиль. Крупные сети трекеров более опасны, так как могут отслеживать вас и показывать адресную рекламу на большем количестве сайтов.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">Найден %1$s трекер</item>
-        <item quantity="few">Найдено %1$s трекера</item>
-        <item quantity="many">Найдено %1$s трекеров</item>
-        <item quantity="other">Найдены %1$s трекеры</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">Заблокирован %1$s трекер</item>
-        <item quantity="few">Заблокировано %1$s трекера</item>
-        <item quantity="many">Заблокировано %1$s трекеров</item>
-        <item quantity="other">Заблокированы %1$s трекеры</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">Обнаружена %1$s крупная сеть отслеживания</item>
-        <item quantity="few">Обнаружено %1$s крупные сети отслеживания</item>
-        <item quantity="many">Обнаружено %1$s крупных сетей отслеживания</item>
-        <item quantity="other">Обнаружено %1$s крупные сети отслеживания</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">Заблокирована %1$s крупная сеть отслеживания</item>
-        <item quantity="few">Заблокировано %1$s крупные сети отслеживания</item>
-        <item quantity="many">Заблокировано %1$s крупных сетей отслеживания</item>
-        <item quantity="other">Заблокированы %1$s крупные сети отслеживания</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Рейтинг конфиденциальности</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Этот сайт — крупная сеть трекеров</string>
-    <string name="scorecardPrivacyGrade">Рейтинг конфиденциальности</string>
-    <string name="scorecardEnhancedGrade">Повышенный рейтинг конфиденциальности</string>
-
-    <string name="privacyTermsActivityTitle">Уровень защиты конфиденциальности</string>
-    <string name="practicesGood">Высокий уровень защиты конфиденциальности</string>
-    <string name="practicesMixed">Средний уровень защиты конфиденциальности</string>
-    <string name="practicesBad">Низкий уровень защиты конфиденциальности</string>
-    <string name="practicesUnknown">Уровень защиты конфиденциальности неизвестен</string>
-    <string name="practicesOverview">Уровень защиты конфиденциальности показывает, насколько защищены персональные данные, которые вы передаёте на сайт.</string>
-    <string name="practicesTosdrLink">Стандарты конфиденциальности <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Значок высокого уровня защиты конфиденциальности</string>
-    <string name="practicesIconContentBad">Значок низкого уровня защиты конфиденциальности</string>
-
-    <string name="networkTrackerSummaryHeader">ОСНОВНЫЕ ТРЕКЕРНЫЕ СЕТИ, ПРЕДСТАВЛЯЮЩИЕ УГРОЗУ КОНФИДЕНЦИАЛЬНОСТИ</string>
-    <string name="networkTrackerSummaryNotReady">Мы продолжаем собирать данные, чтобы показать, сколько трекеров мы заблокировали.</string>
-
-    <!-- Fire -->
+   <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
     <string name="fireClearAll">Закрыть вкладки и удалить данные</string>
     <string name="fireCancel">Отменить</string>

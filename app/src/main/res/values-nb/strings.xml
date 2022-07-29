@@ -108,60 +108,6 @@
     <string name="tabClosedUndo">Angre</string>
     <string name="downloadsMenuItemTitle">Nedlastinger</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Personvern for side</string>
-    <string name="privacyProtectionEnabled">BESKYTTELSE AV STEDET ER AKTIVERT</string>
-    <string name="privacyProtectionDisabled">BESKYTTELSE AV NETTSIDEN DEAKTIVERT</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FORBEDRET FRA &lt;img src=\"%1$d\" /&gt; TIL &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Grad av personvern</string>
-    <string name="privacyProtectionTemporarilyDisabled">Vi har midlertidig deaktivert personvernbeskyttelse, da det ser ut til å få nettstedet til å slutte å fungere.</string>
-
-    <string name="httpsGood">Kryptert tilkobling</string>
-    <string name="httpsMixed">Tilkobling med blandet kryptering</string>
-    <string name="httpsBad">Ukryptert tilkobling</string>
-
-    <string name="networksActivityTitle">Sporingsnettverk</string>
-    <string name="networksContentDescription">Sporingsnettverk</string>
-    <string name="networksOverview">Sporingsnettverk samler netthistorikken din i en dataprofil om deg. Større sporingsnettverk gjør mer skade fordi de kan spore og peile seg inn på deg på flere steder på Internett.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%% sporing oppdaget</item>
-        <item quantity="other">%% sporinger oppdaget</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s sporing blokkert</item>
-        <item quantity="other">%1$s sporinger blokkert</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s stort sporingsnettverk oppdaget</item>
-        <item quantity="other">%1$s store sporingsnettverk oppdaget</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s stort sporingsnettverk blokkert</item>
-        <item quantity="other">%1$s store sporingsnettverk blokkert</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Grad av personvern</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Nettstedet er et stort sporingsnettverk</string>
-    <string name="scorecardPrivacyGrade">Grad av personvern</string>
-    <string name="scorecardEnhancedGrade">Forsterket grad</string>
-
-    <string name="privacyTermsActivityTitle">Personvernpraksis</string>
-    <string name="practicesGood">God personvernpraksis</string>
-    <string name="practicesMixed">Blandet personvernpraksis</string>
-    <string name="practicesBad">Dårlig personvernpraksis</string>
-    <string name="practicesUnknown">Ukjent personvernpraksis</string>
-    <string name="practicesOverview">Personvernpraksis indikerer hvor mye av den personlige informasjonen du deler med et nettsted som er beskyttet.</string>
-    <string name="practicesTosdrLink">Personvernpraksis fra <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Ikon for god praksis</string>
-    <string name="practicesIconContentBad">Ikon for dårlig praksis</string>
-
-    <string name="networkTrackerSummaryHeader">DE VERSTE SPORINGSNETTVERKENE</string>
-    <string name="networkTrackerSummaryNotReady">Vi samler fortsatt data for å vise deg hvor mange sporinger vi har blokkert.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Tøm data</string>
     <string name="fireClearAll">Lukk alle faner og slett data</string>

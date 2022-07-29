@@ -37,8 +37,6 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
-import com.duckduckgo.app.privacy.model.PrivacyGrade
-import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -697,10 +695,7 @@ class CtaViewModelTest {
         events: List<TrackingEvent> = emptyList(),
         majorNetworkCount: Int = 0,
         allTrackersBlocked: Boolean = true,
-        privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN,
-        entity: Entity? = null,
-        grade: PrivacyGrade = PrivacyGrade.UNKNOWN,
-        improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN
+        entity: Entity? = null
     ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
@@ -711,8 +706,6 @@ class CtaViewModelTest {
         whenever(site.trackerCount).thenReturn(trackerCount)
         whenever(site.majorNetworkCount).thenReturn(majorNetworkCount)
         whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)
-        whenever(site.privacyPractices).thenReturn(privacyPractices)
-        whenever(site.calculateGrades()).thenReturn(Site.SiteGrades(grade, improvedGrade))
         return site
     }
 }

@@ -108,64 +108,6 @@
     <string name="tabClosedUndo">Anulează</string>
     <string name="downloadsMenuItemTitle">Descărcări</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Protecția confidențialității site-ului</string>
-    <string name="privacyProtectionEnabled">PROTECȚIE SITE ACTIVATĂ</string>
-    <string name="privacyProtectionDisabled">PROTECȚIE SITE DEZACTIVATĂ</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MĂRIT DE LA &lt;img src=\"%1$d\" /&gt; LA &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Grad de confidențialitate</string>
-    <string name="privacyProtectionTemporarilyDisabled">Am dezactivat temporar protecția confidențialității, deoarece pare să strice acest site.</string>
-
-    <string name="httpsGood">Conexiune criptată</string>
-    <string name="httpsMixed">Conexiune cu criptare mixtă</string>
-    <string name="httpsBad">Conexiune necriptată</string>
-
-    <string name="networksActivityTitle">Rețele de cookie-uri de urmărire</string>
-    <string name="networksContentDescription">Rețele de cookie-uri de urmărire</string>
-    <string name="networksOverview">Rețelele de cookie-uri de urmărire vă adună istoricul web într-un profil de date despre dvs. Rețelele mari de cookie-uri de urmărire sunt mai dăunătoare, deoarece vă pot urmări și vă pot viza pe mai multe site-uri de pe internet.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s Urmăritor Găsit</item>
-        <item quantity="few">%1$s Urmăritori Găsiți</item>
-        <item quantity="other">%1$s Urmăritori Găsiți</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s Urmăritor Blocat</item>
-        <item quantity="few">%1$s Urmăritori Blocați</item>
-        <item quantity="other">%1$s Urmăritori Blocați</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s Rețea Principală Urmăritoare Găsită</item>
-        <item quantity="few">%1$s Rețele Principale Urmăritoare Găsite</item>
-        <item quantity="other">%1$s Rețele Principale Urmăritoare Găsite</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s Rețea Principală Urmăritoare Blocată</item>
-        <item quantity="few">%1$s Rețele Principale Urmpritoare Blocate</item>
-        <item quantity="other">%1$s Rețele Principale Urmpritoare Blocate</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Grad de confidențialitate</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Site-ul este o rețea mare de instrumente de urmărire</string>
-    <string name="scorecardPrivacyGrade">Grad de confidențialitate</string>
-    <string name="scorecardEnhancedGrade">Grad mărit</string>
-
-    <string name="privacyTermsActivityTitle">Practici privind confidențialitatea</string>
-    <string name="practicesGood">Bune practici privind confidențialitatea</string>
-    <string name="practicesMixed">Practici mixte privind confidențialitatea</string>
-    <string name="practicesBad">Practici inadecvate privind confidențialitatea</string>
-    <string name="practicesUnknown">Practici necunoscute privind confidențialitatea</string>
-    <string name="practicesOverview">Practicile privind confidențialitatea indică în ce măsură datele cu caracter personal pe care le partajați cu un site web sunt protejate.</string>
-    <string name="practicesTosdrLink">Practici de confidențialitate de la <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Pictogramă „Bune practici”</string>
-    <string name="practicesIconContentBad">Pictogramă „Practici inadecvate”</string>
-
-    <string name="networkTrackerSummaryHeader">CEI MAI MARI INFRACTORI PRIVIND REȚELELE DE COOKIE-URI DE URMĂRIRE</string>
-    <string name="networkTrackerSummaryNotReady">Continuă să colectăm date pentru a arăta câte cookie-uri de urmărire am blocat.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
     <string name="fireClearAll">Șterge toate filele și datele</string>

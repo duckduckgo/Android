@@ -21,15 +21,11 @@ import android.net.http.SslCertificate
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.global.model.Site.SiteGrades
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
-import com.duckduckgo.app.privacy.model.HttpsStatus
-import com.duckduckgo.app.privacy.model.PrivacyGrade
-import com.duckduckgo.app.privacy.model.PrivacyGrade.B
-import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -68,8 +64,6 @@ class SiteMonitor(
         get() = httpsStatus()
 
     override var hasHttpResources = false
-
-    override var privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN
 
     override var entity: Entity? = null
 
@@ -125,11 +119,6 @@ class SiteMonitor(
 
     override fun trackerDetected(event: TrackingEvent) {
         trackingEvents.add(event)
-    }
-
-    // TODO: remove when privacy dashboard is migrated
-    override fun calculateGrades(): SiteGrades {
-        return SiteGrades(PrivacyGrade.C, B)
     }
 
     override fun privacyProtection(): PrivacyShield {

@@ -108,61 +108,7 @@
     <string name="tabClosedUndo">Отмяна</string>
     <string name="downloadsMenuItemTitle">Изтеглени файлове</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Защита на поверителността на сайта</string>
-    <string name="privacyProtectionEnabled">ЗАЩИТА НА САЙТА АКТИВИРАНА</string>
-    <string name="privacyProtectionDisabled">ЗАЩИТА НА САЙТА ДЕАКТИВИРАНА</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ПОДОБРЕН ОТ &lt;img src=\"%1$d\" /&gt; ДО &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Клас на поверителност</string>
-    <string name="privacyProtectionTemporarilyDisabled">Деактивирахме временно защитата на поверителността, защото изглежда, че пречи на зареждането на този сайт.</string>
-
-    <string name="httpsGood">Шифрована връзка</string>
-    <string name="httpsMixed">Смесена връзка за шифроване</string>
-    <string name="httpsBad">Нешифрована връзка</string>
-
-    <string name="networksActivityTitle">Проследяващи мрежи</string>
-    <string name="networksContentDescription">Проследяващи мрежи</string>
-    <string name="networksOverview">Проследяващите мрежи обединяват историята на мрежата ви в профил с данни за вас. Основните проследяващи мрежи са по-вредни, защото могат да ви проследяват и насочват през по-голяма част от интернет.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s открит тракер</item>
-        <item quantity="other">%1$s открити проследяващи устройства</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s блокирани тракера</item>
-        <item quantity="other">%1$s блокирани проследяващи устройства</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s открита основна проследяваща мрежа</item>
-        <item quantity="other">%1$s открити основни проследяващи мрежи</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s блокирана основна проследяваща мрежа</item>
-        <item quantity="other">%1$s блокирани основни проследяващи мрежи</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Клас на поверителност</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Сайтът е основна проследяваща мрежа</string>
-    <string name="scorecardPrivacyGrade">Клас на поверителност</string>
-    <string name="scorecardEnhancedGrade">Засилена степен</string>
-
-    <string name="privacyTermsActivityTitle">Практики за защита на поверителността</string>
-    <string name="practicesGood">Добри практики за защита на поверителността</string>
-    <string name="practicesMixed">Смесени практики за защита на поверителността</string>
-    <string name="practicesBad">Лоши практики за защита на поверителността</string>
-    <string name="practicesUnknown">Неизвестни практики за защита на поверителността</string>
-    <string name="practicesOverview">Практиките за защита на поверителността показват каква част от личната информация, която споделяте с уебсайт, е защитена.</string>
-    <string name="practicesTosdrLink">Практики за защита на поверителността от <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Иконка за добра практика</string>
-    <string name="practicesIconContentBad">Иконка за лоша практика</string>
-
-    <string name="networkTrackerSummaryHeader">ОСНОВНИ НАРУШИТЕЛИ В ПРОСЛЕДЯВАЩАТА МРЕЖА</string>
-    <string name="networkTrackerSummaryNotReady">Все още събираме данни, за да покажем колко проследяващи елемента сме блокирали.</string>
-
-    <!-- Fire -->
+   <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
     <string name="fireClearAll">Изчистване на всички раздели и данни</string>
     <string name="fireCancel">Отмени</string>

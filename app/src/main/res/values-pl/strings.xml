@@ -108,68 +108,6 @@
     <string name="tabClosedUndo">Cofnij</string>
     <string name="downloadsMenuItemTitle">Pobrane</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Ochrona prywatności witryny</string>
-    <string name="privacyProtectionEnabled">WŁĄCZONA OCHRONA STRONY</string>
-    <string name="privacyProtectionDisabled">WYŁĄCZONA OCHRONA STRONY</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">USPRAWNIONY OD &lt;img src=\"%1$d\" /&gt; DO &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Poziom prywatności</string>
-    <string name="privacyProtectionTemporarilyDisabled">Tymczasowo wyłączyliśmy ochronę prywatności, ponieważ wygląda na to, że zniekształca tę witrynę.</string>
-
-    <string name="httpsGood">Połączenie zaszyfrowane</string>
-    <string name="httpsMixed">Połączenie częściowo zaszyfrowane</string>
-    <string name="httpsBad">Połączenie niezaszyfrowane</string>
-
-    <string name="networksActivityTitle">Sieci skryptów śledzących</string>
-    <string name="networksContentDescription">Sieci skryptów śledzących</string>
-    <string name="networksOverview">Sieci skryptów śledzących tworzą historię wyszukiwania w formie profilu informacyjnego na Twój temat. Największe sieci skryptów śledzących są bardziej szkodliwe, ponieważ mogą śledzić i namierzać Cię na większym obszarze Internetu.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s Znaleziono tracker</item>
-        <item quantity="few">%1$s Znaleziono trackery</item>
-        <item quantity="many">%1$s Znaleziono trackerów</item>
-        <item quantity="other">%1$s Znaleziono trackery</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s Zablokowany tracker</item>
-        <item quantity="few">%1$s Zablokowane trackery</item>
-        <item quantity="many">%1$s Zablokowanych trackerów</item>
-        <item quantity="other">%1$s Zablokowane trackery</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s Znaleziono główną sieć śledzenia</item>
-        <item quantity="few">%1$s Znaleziono główne sieci śledzenia</item>
-        <item quantity="many">%1$s Znaleziono główne sieci śledzenia</item>
-        <item quantity="other">%1$s Znaleziono główne sieci śledzenia</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s Zablokowana główna sieć śledząca</item>
-        <item quantity="few">%1$s Zablokowano główne sieci śledzenia</item>
-        <item quantity="many">%1$s Zablokowano główne sieci śledzenia</item>
-        <item quantity="other">%1$s Zablokowano główne sieci śledzenia</item>
-    </plurals>
-
-    <string name="scorecardActivityTitle">Poziom prywatności</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Strona stanowi główną sieć skryptów śledzących</string>
-    <string name="scorecardPrivacyGrade">Poziom prywatności</string>
-    <string name="scorecardEnhancedGrade">Podwyższony poziom</string>
-
-    <string name="privacyTermsActivityTitle">Polityka prywatności</string>
-    <string name="practicesGood">Dobra polityka prywatności</string>
-    <string name="practicesMixed">Zróżnicowana polityka prywatności</string>
-    <string name="practicesBad">Słaba polityka prywatności</string>
-    <string name="practicesUnknown">Nieznana polityka prywatności</string>
-    <string name="practicesOverview">Polityka prywatności wskazuje, jak wiele informacji osobowych udostępnianych danej stronie podlega ochronie.</string>
-    <string name="practicesTosdrLink">Polityka prywatności od <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Ikona dobrej polityki prywatności</string>
-    <string name="practicesIconContentBad">Ikona złej polityki prywatności</string>
-
-    <string name="networkTrackerSummaryHeader">SIECI SKRYPTÓW ŚLEDZĄCYCH – NAJWIĘKSI ZŁOCZYŃCY</string>
-    <string name="networkTrackerSummaryNotReady">Nadal gromadzimy dane, aby pokazać, jak wiele skryptów śledzących zablokowaliśmy.</string>
-
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
     <string name="fireClearAll">Wyczyść wszystkie karty i dane</string>
