@@ -34,6 +34,6 @@ data class LoginCredentials(
 ) : Parcelable {
     override fun toString(): String {
         return "LoginCredentials(id=$id, domain=$domain, username=$username, password=********," +
-            " domainTitle= $domainTitle, lastUpdatedMillis=$lastUpdatedMillis, notes=$notes"
+            " domainTitle=$domainTitle, lastUpdatedMillis=$lastUpdatedMillis, notes=$notes"
     }
 }
