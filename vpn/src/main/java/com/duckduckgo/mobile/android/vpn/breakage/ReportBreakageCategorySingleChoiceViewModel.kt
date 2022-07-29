@@ -23,12 +23,21 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.CallsCategory
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.ConnectionCategory
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.ContentCategory
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.CrashesCategory
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.DownloadsCategory
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.IotCategory
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.MessagesCategory
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.OtherCategory
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.UploadsCategory
+import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import timber.log.Timber
 
-@ContributesViewModel(ActivityScope::class)
+@ContributesViewModel(VpnScope::class)
 class ReportBreakageCategorySingleChoiceViewModel
 @Inject
 constructor(private val dispatcherProvider: DispatcherProvider) : ViewModel() {

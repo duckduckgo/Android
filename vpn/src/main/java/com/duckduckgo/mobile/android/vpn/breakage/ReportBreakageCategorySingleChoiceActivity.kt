@@ -31,11 +31,13 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.Command
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.ViewState
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageCategorySingleChoiceBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import dagger.WrongScope
-import javax.inject.Inject
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @WrongScope(
     comment = "To use the right scope we first need to enable dagger component nesting",
@@ -121,7 +123,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         viewModel.viewState.observe(this) { it?.let { render(it) } }
     }
 
-    private fun processCommand(command: Command) {
+    private fun processCommand(command: ReportBreakageCategorySingleChoiceViewModel.Command) {
         when (command) {
             Command.ConfirmAndFinish -> confirmAndFinish()
         }
