@@ -139,6 +139,7 @@
 
         <item name="sectionDividerColor">@color/gray80</item>
         <item name="bottomShadowBackground">@null</item>
+        <item name="appTPHeaderBackground">@color/darkThemePrimaryDark</item>
 
         <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorDark</item>
         <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorDark</item>
@@ -268,6 +269,7 @@
 
         <item name="autofillDialogTitleColor">@color/gray90</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray70</item>
+        <item name="appTPHeaderBackground">@color/light_blue</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
