@@ -30,13 +30,14 @@ interface InitialExtractor {
 
 @ContributesBinding(FragmentScope::class)
 class CredentialInitialExtractor @Inject constructor(
-    private val domainFormatter: AutofillDomainFormatter
+    private val domainFormatter: AutofillDomainFormatter,
+    private val characterValidator: AutofillCharacterValidator
 ) : InitialExtractor {
 
     override fun extractInitial(loginCredentials: LoginCredentials): Char {
         val initial = extractInitialFromTitle(loginCredentials) ?: extractInitialFromDomain(loginCredentials)
 
-        if (initial == null || !initial.isLetter()) {
+        if (initial == null || !characterValidator.isLetter(initial)) {
             return INITIAL_CHAR_FOR_NON_LETTERS
         }
 
@@ -49,10 +50,6 @@ class CredentialInitialExtractor @Inject constructor(
 
     override fun extractInitialFromDomain(loginCredentials: LoginCredentials): Char? {
         return domainFormatter.extractDomain(loginCredentials.domain)?.firstOrNull()?.uppercaseChar()
-    }
-
-    private fun Char.isLetter(): Boolean {
-        return this in 'a'..'z' || this in 'A'..'Z'
     }
 
     companion object {

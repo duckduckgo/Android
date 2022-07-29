@@ -27,7 +27,10 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class CredentialInitialExtractorTest {
 
-    private val testee = CredentialInitialExtractor(AutofillDomainFormatterDomainNameOnly())
+    private val testee = CredentialInitialExtractor(
+        domainFormatter = AutofillDomainFormatterDomainNameOnly(),
+        characterValidator = LatinCharacterValidator()
+    )
 
     @Test
     fun whenMissingTitleAndDomainThenPlaceholderChar() {

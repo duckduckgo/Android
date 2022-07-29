@@ -27,7 +27,12 @@ import org.junit.runner.RunWith
 class CredentialListSorterTest {
 
     private val domainFormatter = AutofillDomainFormatterDomainNameOnly()
-    private val testee = CredentialListSorterByTitleAndDomain(CredentialInitialExtractor(domainFormatter))
+    private val characterValidator = LatinCharacterValidator()
+
+    private val testee = CredentialListSorterByTitleAndDomain(
+        initialExtractor = CredentialInitialExtractor(domainFormatter, characterValidator),
+        characterValidator = characterValidator
+    )
     private val list = mutableListOf<LoginCredentials>()
 
     @Test
@@ -168,11 +173,11 @@ class CredentialListSorterTest {
                 it.add(credsWithDomain("invalid domain"))
             }
         )
-        sorted.assertDomainOrder("an invalid domain", "http://b.com", "c.com", "invalid domain",)
+        sorted.assertDomainOrder("an invalid domain", "http://b.com", "c.com", "invalid domain")
     }
 
     @Test
-    fun whenThen() {
+    fun whenCombinationOfDomainsAndTitlesThenTitlesTakePreferenceWhenTheyExist() {
         val credentials = listOf(
             creds(domain = "energy.com"),
             creds(domain = "amazon.co.uk", title = "Smile Amazon"),
@@ -184,6 +189,30 @@ class CredentialListSorterTest {
         val sorted = testee.sort(credentials)
         sorted.assertDomainOrder("aaa.com", "bar.com", "example.com", "energy.com", "amazon.co.uk")
         sorted.assertTitleOrder(null, null, "c", null, "Smile Amazon")
+    }
+
+    @Test
+    fun whenSpecialCharactersInDomainThenSortedBeforeLetters() {
+        val sorted = testee.sort(
+            list.also {
+                it.add(credsWithDomain("a.com"))
+                it.add(credsWithDomain("b.com"))
+                it.add(credsWithDomain("ć.com"))
+            }
+        )
+        sorted.assertDomainOrder("ć.com", "a.com", "b.com")
+    }
+
+    @Test
+    fun whenSpecialCharactersInTitleThenSortedBeforeLetters() {
+        val sorted = testee.sort(
+            list.also {
+                it.add(credsWithTitle("a"))
+                it.add(credsWithTitle("b"))
+                it.add(credsWithTitle("ć"))
+            }
+        )
+        sorted.assertTitleOrder("ć", "a", "b")
     }
 
     private fun List<LoginCredentials>.assertTitleOrder(vararg titles: String?) {

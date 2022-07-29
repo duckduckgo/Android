@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.ui.credential.management
 
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.ui.credential.management.CredentialInitialExtractor.Companion.INITIAL_CHAR_FOR_NON_LETTERS
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -27,7 +28,8 @@ interface CredentialListSorter {
 
 @ContributesBinding(FragmentScope::class)
 class CredentialListSorterByTitleAndDomain @Inject constructor(
-    private val initialExtractor: InitialExtractor
+    private val initialExtractor: InitialExtractor,
+    private val characterValidator: AutofillCharacterValidator
 ) : CredentialListSorter {
 
     override fun sort(credentials: List<LoginCredentials>): List<LoginCredentials> {
@@ -39,21 +41,28 @@ class CredentialListSorterByTitleAndDomain @Inject constructor(
 
         // if we don't have a usable title or domain, return the placeholder so it's sorted first
         if (!it.canUseDomainInSort() && !it.canUseTitleInSort()) {
-            sb.append("#")
+            sb.append(INITIAL_CHAR_FOR_NON_LETTERS)
         }
 
         // if we can use the title, use it
         if (it.canUseTitleInSort()) {
-            sb.append(initialExtractor.extractInitialFromTitle(it).toString())
-            sb.append(Char(0))
-            sb.append(Char(0))
-            sb.append(Char(0))
-            sb.append(Char(0))
+            addLetterOrPlaceholder(initialExtractor.extractInitialFromTitle(it), sb)
         }
 
-        sb.append(initialExtractor.extractInitialFromDomain(it).toString())
+        addLetterOrPlaceholder(initialExtractor.extractInitialFromDomain(it), sb)
 
         sb.toString()
+    }
+
+    private fun addLetterOrPlaceholder(initial: Char?, sb: StringBuilder) {
+        if (initial == null) return
+
+        if (characterValidator.isLetter(initial)) {
+            sb.append(initial.toString())
+        } else {
+            sb.append(INITIAL_CHAR_FOR_NON_LETTERS)
+            sb.append(initial.toString())
+        }
     }
 
     private fun LoginCredentials.canUseTitleInSort(): Boolean {

@@ -29,11 +29,16 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class CredentialGrouperTest {
 
-    private val initialExtractor = CredentialInitialExtractor(AutofillDomainFormatterDomainNameOnly())
+    private val characterValidator = LatinCharacterValidator()
+
+    private val initialExtractor = CredentialInitialExtractor(
+        domainFormatter = AutofillDomainFormatterDomainNameOnly(),
+        characterValidator = characterValidator
+    )
 
     private val testee = CredentialGrouper(
         initialExtractor = initialExtractor,
-        sorter = CredentialListSorterByTitleAndDomain(initialExtractor)
+        sorter = CredentialListSorterByTitleAndDomain(initialExtractor, characterValidator)
     )
 
     @Test
@@ -88,7 +93,7 @@ class CredentialGrouperTest {
     }
 
     @Test
-    fun whenTrickyThen() {
+    fun whenCombinationOfDomainsAndTitlesThenGroupsTakenFromTitlesWhenTheyExist() {
         val credentials = listOf(
             creds(domain = "energy.com"),
             creds(domain = "amazon.com", title = "Smile Amazon"),
