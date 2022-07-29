@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.ui.credential.management
 
 import com.duckduckgo.autofill.AutofillDomainFormatter
 import com.duckduckgo.autofill.domain.app.LoginCredentials
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -26,7 +26,7 @@ interface LoginCredentialTitleExtractor {
     fun extract(credential: LoginCredentials): String
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 class TitleOrDomainExtractor @Inject constructor(private val domainExtractor: AutofillDomainFormatter) : LoginCredentialTitleExtractor {
 
     override fun extract(credential: LoginCredentials): String {
