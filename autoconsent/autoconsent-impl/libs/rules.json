@@ -102,6 +102,13 @@
             ".gdpr-popup__message"
           ]
         }
+      ],
+      "optIn": [
+        {
+          "click": [
+            ".gdpr-popup__message button"
+          ]
+        }
       ]
     },
     {
@@ -310,7 +317,7 @@
       ],
       "optIn": [
         {
-          "click": "[data-cli_action=\"accept\"]"
+          "click": "[data-cli_action=\"accept_all\"]"
         }
       ],
       "optOut": [
@@ -346,7 +353,7 @@
       ],
       "optIn": [
         {
-          "hide": [
+          "click": [
             "#cn-accept-cookie"
           ]
         }
@@ -463,6 +470,13 @@
             ".cookiebannerbox"
           ]
         }
+      ],
+      "optIn": [
+        {
+          "click": [
+            ".cookiebannerbox .close"
+          ]
+        }
       ]
     },
     {
@@ -505,7 +519,7 @@
       ],
       "optIn": [
         {
-          "click": ""
+          "click": "[data-testid=\"cookie-consent-allow-all\"]"
         }
       ],
       "optOut": [
@@ -550,7 +564,7 @@
           "wait": 1000
         },
         {
-          "eval": "document.querySelectorAll('.gdpr-overlay-body input').forEach(toggle => { toggle.checked = false; }) || true"
+          "eval": "document.querySelectorAll(\".gdpr-overlay-body input\").forEach(toggle => { toggle.checked = false; }) || true"
         },
         {
           "eval": "document.querySelector('.gdpr-overlay-view button[data-wt-overlay-close]').click() || true"
@@ -844,6 +858,13 @@
             ".navigation-cookiebbanner"
           ]
         }
+      ],
+      "optIn": [
+        {
+          "click": [
+            ".navigation-cookiebbanner__submit"
+          ]
+        }
       ]
     },
     {
@@ -869,7 +890,7 @@
       ],
       "optIn": [
         {
-          "click": "'button[data-test^=pwa-consent-layer-accept-all'"
+          "click": "button[data-test^=pwa-consent-layer-accept-all"
         }
       ]
     },
@@ -921,7 +942,7 @@
       ],
       "optIn": [
         {
-          "eval": "Array.from(document.querySelectorAll('div > button')).filter(el => el.innerText.match('Accept|Annehmen'))[0].click()"
+          "eval": "Array.from(document.querySelectorAll('div > button')).filter(el => el.innerText.match('Accept|Annehmen'))[0].click() || true"
         }
       ],
       "test": [
@@ -1138,7 +1159,8 @@
       ],
       "optIn": [
         {
-          "click": ".osano-cm-accept-all"
+          "click": ".osano-cm-accept-all",
+          "optional": true
         }
       ],
       "optOut": [
@@ -1274,6 +1296,11 @@
       "test": [
         {
           "eval": "!!document.cookie.match('snconsent')"
+        }
+      ],
+      "optIn": [
+        {
+          "click": ".snigel-cmp-framework #accept-choices"
         }
       ]
     },
@@ -1438,7 +1465,7 @@
       ],
       "optIn": [
         {
-          "eval": "cmpUi.allowAll()"
+          "eval": "cmpUi.allowAll() || true"
         }
       ],
       "optOut": [

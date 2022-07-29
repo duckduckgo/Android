@@ -118,5 +118,6 @@ class InitMessageHandlerPlugin @Inject constructor(
         val detectRetries: Int
     )
 
-    data class InitResp(val type: String = "initResp", val config: Config, val rules: JSONObject?)
+    // rules can actually be null but we will always pass them through
+    data class InitResp(val type: String = "initResp", val config: Config, val rules: JSONObject)
 }
