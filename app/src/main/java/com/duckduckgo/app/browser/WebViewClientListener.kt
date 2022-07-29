@@ -36,7 +36,7 @@ interface WebViewClientListener {
     fun willOverrideUrl(newUrl: String)
     fun redirectTriggeredByGpc()
 
-    fun onSitePermissionRequested(request: PermissionRequest)
+    fun onSitePermissionRequested(request: PermissionRequest, sitePermissionsAllowedToAsk: Array<String>)
     fun onSiteLocationPermissionRequested(
         origin: String,
         callback: GeolocationPermissions.Callback

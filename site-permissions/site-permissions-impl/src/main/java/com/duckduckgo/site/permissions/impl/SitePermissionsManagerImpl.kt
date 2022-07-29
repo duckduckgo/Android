@@ -27,30 +27,17 @@ class SitePermissionsManagerImpl @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository
 ) : SitePermissionsManager {
 
-    override fun getSitePermissionsFromRequest(url: String, resources: Array<String>): Array<String> =
+    override fun getSitePermissionsGranted(url: String, tabId: String, resources: Array<String>): Array<String> =
+        resources
+            .filter { sitePermissionsRepository.isDomainGranted(url, tabId, it) }
+            .toTypedArray()
+
+    override fun getSitePermissionsAllowedToAsk(url: String, resources: Array<String>): Array<String> =
         resources
             .filter { isPermissionSupported(it) }
             .filter { sitePermissionsRepository.isDomainAllowedToAsk(url, it) }
             .toTypedArray()
 
-    override fun getPermissionsAllowedToAsk(request: PermissionRequest): Array<String> {
-        val permissionsAllowToAsk: MutableList<String> = mutableListOf()
-        request.resources.forEach { permission ->
-            when (permission) {
-                PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
-                    // TODO if (!always deny) {
-                    permissionsAllowToAsk.add(permission)
-                    // }
-                }
-                PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
-                    // TODO if (!always deny) {
-                    permissionsAllowToAsk.add(permission)
-                    // }
-                }
-            }
-        }
-        return permissionsAllowToAsk.toTypedArray()
-    }
 
     private fun isPermissionSupported(permission: String): Boolean =
         permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE || permission == PermissionRequest.RESOURCE_VIDEO_CAPTURE

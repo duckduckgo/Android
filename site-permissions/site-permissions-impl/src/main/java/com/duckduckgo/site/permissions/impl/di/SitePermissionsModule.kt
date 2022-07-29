@@ -16,10 +16,39 @@
 
 package com.duckduckgo.site.permissions.impl.di
 
+import android.content.Context
+import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
+import com.duckduckgo.site.permissions.store.SitePermissionsDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
+import dagger.Provides
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-object SitePermissionsModule
+class SitePermissionsModule {
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesSitePermissionsDatabase(context: Context): SitePermissionsDatabase {
+        return Room.databaseBuilder(context, SitePermissionsDatabase::class.java, "site_permissions.db")
+            .enableMultiInstanceInvalidation()
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesSitePermissionsDao(sitePermissionsDatabase: SitePermissionsDatabase): SitePermissionsDao {
+        return sitePermissionsDatabase.sitePermissionsDao()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesSitePermissionsAllowedDao(sitePermissionsDatabase: SitePermissionsDatabase): SitePermissionsAllowedDao {
+        return sitePermissionsDatabase.sitePermissionsAllowedDao()
+    }
+}

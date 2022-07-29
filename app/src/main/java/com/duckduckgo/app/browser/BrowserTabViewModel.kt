@@ -1409,10 +1409,14 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun onSitePermissionRequested(request: PermissionRequest) {
-        val permissionsToRequest = sitePermissionsManager.getPermissionsAllowedToAsk(request)
-        if (permissionsToRequest.isNotEmpty()) {
-            command.value = ShowSitePermissionsDialog(permissionsToRequest, request)
+    override fun onSitePermissionRequested(request: PermissionRequest, sitePermissionsAllowedToAsk: Array<String>) {
+        val sitePermissionsGranted = sitePermissionsManager.getSitePermissionsGranted(request.origin.toString(), tabId, sitePermissionsAllowedToAsk)
+        val sitePermissionsToAsk = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }.toTypedArray()
+        if (sitePermissionsGranted.isNotEmpty()) {
+            request.grant(sitePermissionsGranted)
+        }
+        if (sitePermissionsToAsk.isNotEmpty()) {
+            command.value = ShowSitePermissionsDialog(sitePermissionsToAsk, request)
         }
     }
 

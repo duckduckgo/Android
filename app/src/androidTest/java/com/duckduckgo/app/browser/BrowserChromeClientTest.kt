@@ -222,7 +222,7 @@ class BrowserChromeClientTest {
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://open.spotify.com".toUri())
         whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(permissions)
-        whenever(mockSitePermissionsManager.getSitePermissionsFromRequest(any(), any())).thenReturn(arrayOf())
+        whenever(mockSitePermissionsManager.getSitePermissionsAllowedToAsk(any(), any())).thenReturn(arrayOf())
 
         testee.onPermissionRequest(mockPermission)
 
@@ -236,7 +236,7 @@ class BrowserChromeClientTest {
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://www.example.com".toUri())
         whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(arrayOf())
-        whenever(mockSitePermissionsManager.getSitePermissionsFromRequest(any(), any())).thenReturn(arrayOf())
+        whenever(mockSitePermissionsManager.getSitePermissionsAllowedToAsk(any(), any())).thenReturn(arrayOf())
 
         testee.onPermissionRequest(mockPermission)
 

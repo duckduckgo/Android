@@ -38,6 +38,7 @@ dependencies {
     implementation AndroidX.appCompat
     implementation AndroidX.core.ktx
     implementation Google.dagger
+    implementation AndroidX.room.ktx
 
     testImplementation project(path: ':common-test')
     testImplementation CashApp.turbine

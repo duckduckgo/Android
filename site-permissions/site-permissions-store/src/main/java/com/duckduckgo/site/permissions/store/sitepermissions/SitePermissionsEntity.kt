@@ -14,11 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.site.permissions.api
+package com.duckduckgo.site.permissions.store
 
-interface SitePermissionsManager {
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.duckduckgo.site.permissions.store.SitePermissionAskSettingType.ASK_EVERY_TIME
 
-    fun getSitePermissionsGranted(url: String, tabId: String, resources: Array<String>): Array<String>
+@Entity(tableName = "site_permissions")
+data class SitePermissionsEntity(
+    @PrimaryKey val domain: String,
+    val askCameraEnabled: Boolean = true,
+    val askMicEnabled: Boolean = true,
+    val askCameraSetting: String = ASK_EVERY_TIME.name,
+    val askMicSetting: String = ASK_EVERY_TIME.name
+)
 
-    fun getSitePermissionsAllowedToAsk(url: String, resources: Array<String>): Array<String>
+enum class SitePermissionAskSettingType {
+    ASK_EVERY_TIME,
+    DENY_ALWAYS,
+    ALLOW_ALWAYS
 }
+
+

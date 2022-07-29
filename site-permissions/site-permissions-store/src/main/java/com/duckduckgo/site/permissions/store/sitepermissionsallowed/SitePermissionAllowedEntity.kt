@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.site.permissions.api
+package com.duckduckgo.site.permissions.store.sitepermissionsallowed
 
-interface SitePermissionsManager {
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-    fun getSitePermissionsGranted(url: String, tabId: String, resources: Array<String>): Array<String>
-
-    fun getSitePermissionsAllowedToAsk(url: String, resources: Array<String>): Array<String>
+@Entity(tableName = "site_permission_allowed")
+data class SitePermissionAllowedEntity(
+    @PrimaryKey val id: String,
+    val domain: String,
+    val tabId: String,
+    val permissionAllowed: String,
+    val allowedAt: Long
+) {
+    companion object {
+        fun getPermissionAllowedId(domain: String, tabId: String, permissionAllowed: String): String {
+            return "$domain$tabId$permissionAllowed"
+        }
+    }
 }
