@@ -31,6 +31,7 @@ interface AppTPOnboardingResourceHelper {
 }
 
 @ContributesBinding(AppScope::class)
+// TODO: Remove this class when we can rely on the platform day/night/system theme
 class AppThemeAppTPOnboardingResourceHelper @Inject constructor(val appTheme: AppTheme) : AppTPOnboardingResourceHelper {
 
     override fun getHeaderRes(
