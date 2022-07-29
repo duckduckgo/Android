@@ -563,10 +563,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Connexion interrompue. Ce site Web pourrait nuire à votre appareil.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Le gestionnaire de téléchargement est désactivé</string>
-    <string name="downloadManagerIncompatible">Le gestionnaire de téléchargement est indisponible sur cet appareil</string>
-    <string name="enable">Activer</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Voulez-vous activer la localisation de l\'appareil pour le navigateur de confidentialité DuckDuckGo ?</string>

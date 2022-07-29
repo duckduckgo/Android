@@ -43,6 +43,12 @@ interface AutofillStore {
     suspend fun getCredentials(rawUrl: String): List<LoginCredentials>
 
     /**
+     * Find saved credential for the given id
+     * @param id of the saved credential
+     */
+    suspend fun getCredentialsWithId(id: Int): LoginCredentials?
+
+    /**
      * Save the given credentials for the given URL
      * @param rawUrl Can be a full, unmodified URL taken from the URL bar (containing subdomains, query params etc...)
      * @param credentials The credentials to be saved. The ID can be null.
@@ -78,7 +84,7 @@ interface AutofillStore {
      *
      * @return The match type, which might indicate there was an exact match, a partial match etc...
      */
-    suspend fun containsCredentials(rawUrl: String, username: String, password: String): ContainsCredentialsResult
+    suspend fun containsCredentials(rawUrl: String, username: String?, password: String?): ContainsCredentialsResult
 
     /**
      * Possible match types returned when searching for the presence of credentials

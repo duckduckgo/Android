@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.downloads
 
-import android.app.DownloadManager
-import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -53,7 +51,6 @@ class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
-    applicationContext: Context
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
@@ -72,7 +69,6 @@ class DownloadsViewModel @Inject constructor(
 
     private val viewState = MutableStateFlow(ViewState())
     private val command = Channel<Command>(1, DROP_OLDEST)
-    private val downloadManager = applicationContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
 
     fun downloads() {
         viewModelScope.launch(dispatcher.io()) {
@@ -105,7 +101,7 @@ class DownloadsViewModel @Inject constructor(
 
     fun delete(item: DownloadItem) {
         viewModelScope.launch(dispatcher.io()) {
-            downloadsRepository.delete(item.id)
+            downloadsRepository.delete(item.downloadId)
             command.send(DisplayMessage(R.string.downloadsFileNotFoundErrorMessage))
         }
     }
@@ -121,14 +117,14 @@ class DownloadsViewModel @Inject constructor(
             File(it.filePath).delete()
         }
 
-        if (downloadManager == null) return
-
         // Remove all unfinished downloads from DownloadManager.
         items.filter { it.downloadStatus != DownloadStatus.FINISHED }.forEach { removeFromDownloadManager(it.downloadId) }
     }
 
     fun removeFromDownloadManager(downloadId: Long) {
-        downloadManager?.remove(downloadId)
+        viewModelScope.launch(dispatcher.io()) {
+            downloadsRepository.delete(downloadId)
+        }
     }
 
     fun onQueryTextChange(newText: String) {
@@ -177,14 +173,14 @@ class DownloadsViewModel @Inject constructor(
 
     override fun onDeleteItemClicked(item: DownloadItem) {
         viewModelScope.launch(dispatcher.io()) {
-            downloadsRepository.delete(item.id)
+            downloadsRepository.delete(item.downloadId)
             command.send(DisplayUndoMessage(messageId = R.string.downloadsFileDeletedMessage, arg = item.fileName, items = listOf(item)))
         }
     }
 
     override fun onCancelItemClicked(item: DownloadItem) {
         viewModelScope.launch(dispatcher.io()) {
-            downloadsRepository.delete(item.id)
+            downloadsRepository.delete(item.downloadId)
             command.send(CancelDownload(item))
         }
     }

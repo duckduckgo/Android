@@ -16,8 +16,11 @@
 
 package com.duckduckgo.autofill.ui.credential.saving
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
@@ -31,4 +34,45 @@ class AutofillSavingCredentialsViewModel @Inject constructor() : ViewModel() {
     fun showOnboarding(): Boolean {
         return autofillStore.showOnboardingWhenOfferingToSaveLogin
     }
+
+    fun determineTextResources(credentials: LoginCredentials): DisplayStringResourceIds {
+        val title: Int = determineTitle(credentials)
+        val ctaButton: Int = determineCtaButtonText(credentials)
+
+        return DisplayStringResourceIds(
+            title = title,
+            ctaButton = ctaButton
+        )
+    }
+
+    @StringRes
+    private fun determineTitle(credentials: LoginCredentials): Int {
+        if (showOnboarding()) {
+            return R.string.saveLoginDialogFirstTimeOnboardingExplanationTitle
+        }
+
+        return if (credentials.username == null) {
+            R.string.saveLoginMissingUsernameDialogTitle
+        } else {
+            R.string.saveLoginDialogTitle
+        }
+    }
+
+    @StringRes
+    private fun determineCtaButtonText(credentials: LoginCredentials): Int {
+        if (showOnboarding()) {
+            return R.string.saveLoginDialogButtonSave
+        }
+
+        return if (credentials.username == null) {
+            R.string.saveLoginMissingUsernameDialogButtonSave
+        } else {
+            R.string.saveLoginDialogButtonSave
+        }
+    }
+
+    data class DisplayStringResourceIds(
+        @StringRes val title: Int,
+        @StringRes val ctaButton: Int
+    )
 }

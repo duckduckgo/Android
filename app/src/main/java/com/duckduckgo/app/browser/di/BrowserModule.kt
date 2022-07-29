@@ -20,6 +20,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.lifecycle.LifecycleObserver
+import androidx.work.WorkManager
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -84,7 +85,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
 import com.duckduckgo.downloads.impl.DataUriDownloader
 import com.duckduckgo.downloads.impl.DownloadFileService
-import com.duckduckgo.downloads.impl.NetworkFileDownloader
+import com.duckduckgo.downloads.impl.FileDownloadCallback
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -391,9 +392,12 @@ class BrowserModule {
     @Provides
     fun fileDownloader(
         dataUriDownloader: DataUriDownloader,
-        networkFileDownloader: NetworkFileDownloader
+        callback: FileDownloadCallback,
+        workManager: WorkManager,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
     ): FileDownloader {
-        return AndroidFileDownloader(dataUriDownloader, networkFileDownloader)
+        return AndroidFileDownloader(dataUriDownloader, callback, workManager, coroutineScope, dispatcherProvider)
     }
 
     @Provides

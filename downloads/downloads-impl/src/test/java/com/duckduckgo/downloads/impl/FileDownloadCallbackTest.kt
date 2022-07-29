@@ -16,7 +16,6 @@
 
 package com.duckduckgo.downloads.impl
 
-import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
@@ -34,19 +33,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyString
-import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 import org.robolectric.annotation.Config
 import java.io.File
 
@@ -86,11 +78,10 @@ class FileDownloadCallbackTest {
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_STARTED)
         verify(mockDownloadsRepository).insert(downloadItem = item)
-        verify(mockFileDownloadNotificationManager, never()).showDownloadInProgressNotification()
+        verify(mockFileDownloadNotificationManager).showDownloadInProgressNotification(any(), eq(item.fileName), eq(0))
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadStartedMessage)
-            assertFalse(actualItem.showNotification)
             assertEquals(R.string.downloadsDownloadStartedMessage, actualItem.messageId)
             assertEquals(item.fileName, (actualItem as ShowDownloadStartedMessage).fileName)
         }
@@ -102,7 +93,8 @@ class FileDownloadCallbackTest {
         val updatedContentLength = 20L
         whenever(mockDownloadsRepository.getDownloadItem(item.downloadId)).thenReturn(item.copy(contentLength = updatedContentLength))
 
-        callback.onSuccess(downloadId = item.downloadId, contentLength = updatedContentLength)
+        val file: File = mock()
+        callback.onSuccess(item.downloadId, updatedContentLength, file, "type")
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
         verify(mockDownloadsRepository).update(
@@ -110,11 +102,10 @@ class FileDownloadCallbackTest {
             downloadStatus = FINISHED,
             contentLength = updatedContentLength
         )
-        verify(mockFileDownloadNotificationManager, never()).showDownloadFinishedNotification(anyString(), any(), anyOrNull())
+        verify(mockFileDownloadNotificationManager).showDownloadFinishedNotification(item.downloadId, file, "type")
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadSuccessMessage)
-            assertFalse(actualItem.showNotification)
             assertEquals(R.string.downloadsDownloadFinishedMessage, actualItem.messageId)
             assertEquals(item.fileName, (actualItem as ShowDownloadSuccessMessage).fileName)
             assertEquals(item.filePath, actualItem.filePath)
@@ -135,11 +126,10 @@ class FileDownloadCallbackTest {
             downloadStatus = FINISHED,
             contentLength = file.length()
         )
-        verify(mockFileDownloadNotificationManager).showDownloadFinishedNotification(file.name, file.absolutePath.toUri(), mimeType)
+        verify(mockFileDownloadNotificationManager).showDownloadFinishedNotification(0, file, mimeType)
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadSuccessMessage)
-            assertTrue(actualItem.showNotification)
             assertEquals(R.string.downloadsDownloadFinishedMessage, actualItem.messageId)
             assertEquals(item.fileName, (actualItem as ShowDownloadSuccessMessage).fileName)
             assertEquals(item.filePath, actualItem.filePath)
@@ -190,30 +180,11 @@ class FileDownloadCallbackTest {
         callback.onError(url = "url", reason = failReason)
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
-        verify(mockFileDownloadNotificationManager, never()).showDownloadFinishedNotification(anyString(), any(), anyOrNull())
+        verify(mockFileDownloadNotificationManager, never()).showDownloadFinishedNotification(any(), any(), anyOrNull())
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadFailedMessage)
-            assertTrue(actualItem.showNotification)
             assertEquals(R.string.downloadsErrorMessage, actualItem.messageId)
-            assertFalse((actualItem as ShowDownloadFailedMessage).showEnableDownloadManagerAction)
-        }
-    }
-
-    @Test
-    fun whenOnErrorCalledForDownloadManagerDisabledThenPixelFiredAndDownloadFailedCommandSent() = runTest {
-        val failReason = DownloadFailReason.DownloadManagerDisabled
-
-        callback.onError(url = "url", reason = failReason)
-
-        verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
-        verify(mockFileDownloadNotificationManager, never()).showDownloadFinishedNotification(anyString(), any(), anyOrNull())
-        callback.commands().test {
-            val actualItem = awaitItem()
-            assertTrue(actualItem is ShowDownloadFailedMessage)
-            assertTrue(actualItem.showNotification)
-            assertEquals(R.string.downloadsDownloadManagerDisabledErrorMessage, actualItem.messageId)
-            assertTrue((actualItem as ShowDownloadFailedMessage).showEnableDownloadManagerAction)
         }
     }
 
@@ -222,19 +193,16 @@ class FileDownloadCallbackTest {
         callback.onError(url = "url", reason = DownloadFailReason.UnsupportedUrlType)
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
-        verify(mockFileDownloadNotificationManager).showDownloadFailedNotification()
+        verify(mockFileDownloadNotificationManager).showDownloadFailedNotification(any(), eq("url"))
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadFailedMessage)
-            assertTrue(actualItem.showNotification)
             assertEquals(R.string.downloadsDownloadGenericErrorMessage, actualItem.messageId)
-            assertFalse((actualItem as ShowDownloadFailedMessage).showEnableDownloadManagerAction)
         }
     }
 
     private fun oneItem() =
         DownloadItem(
-            id = 1L,
             downloadId = 10L,
             downloadStatus = FINISHED,
             fileName = "file.jpg",

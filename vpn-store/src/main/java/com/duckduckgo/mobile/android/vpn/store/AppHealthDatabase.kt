@@ -23,15 +23,18 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.duckduckgo.mobile.android.vpn.dao.AppHealthDao
+import com.duckduckgo.mobile.android.vpn.dao.AppHealthTriggersDao
 import com.duckduckgo.mobile.android.vpn.model.AppHealthState
+import com.duckduckgo.mobile.android.vpn.model.HealthTriggerEntity
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
 @Database(
-    exportSchema = true, version = 5,
+    exportSchema = true, version = 6,
     entities = [
-        AppHealthState::class
+        AppHealthState::class,
+        HealthTriggerEntity::class,
     ]
 )
 @TypeConverters(
@@ -41,6 +44,7 @@ import com.squareup.moshi.Types
 abstract class AppHealthDatabase : RoomDatabase() {
 
     abstract fun appHealthDao(): AppHealthDao
+    abstract fun appHealthTriggersDao(): AppHealthTriggersDao
 
     companion object {
         fun create(context: Context): AppHealthDatabase {

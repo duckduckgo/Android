@@ -78,7 +78,7 @@ class UserAgentProvider constructor(
 
         val isDomainInUserAllowList = isHostInUserAllowedList(host)
 
-        if (isDomainInUserAllowList || !toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName) || shouldUseDefaultUserAgent) {
+        if (isDomainInUserAllowList || !toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName.value) || shouldUseDefaultUserAgent) {
             return if (isDesktop) {
                 defaultUserAgent.get().replace(AgentRegex.platform, desktopPrefix)
             } else {

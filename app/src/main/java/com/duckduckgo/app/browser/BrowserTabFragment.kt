@@ -25,7 +25,6 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.*
-import android.provider.Settings
 import android.text.Editable
 import android.view.*
 import android.view.View.*
@@ -200,7 +199,6 @@ import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.downloads.api.DownloadCommand
-import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -429,13 +427,8 @@ class BrowserTabFragment :
             val username = credentials.username
             val password = credentials.password
 
-            if (username == null) {
-                Timber.w("Not saving credentials with null username")
-                return
-            }
-
-            if (password == null) {
-                Timber.w("Not saving credentials with null password")
+            if (username == null && password == null) {
+                Timber.w("Not saving credentials with null username and password")
                 return
             }
 
@@ -712,16 +705,7 @@ class BrowserTabFragment :
     }
 
     private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
-        val downloadFailedSnackbar = when {
-            command.showEnableDownloadManagerAction ->
-                view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
-                    ?.apply {
-                        this.setAction(R.string.enable) {
-                            showDownloadManagerAppSettings()
-                        }
-                    }
-            else -> view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
-        }
+        val downloadFailedSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
         view?.postDelayed({ downloadFailedSnackbar ?.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
@@ -1984,7 +1968,6 @@ class BrowserTabFragment :
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,
-            userAgent = userAgentProvider.userAgent(),
             subfolder = Environment.DIRECTORY_DOWNLOADS
         )
 
@@ -2001,7 +1984,6 @@ class BrowserTabFragment :
     ) {
         pendingFileDownload = PendingFileDownload(
             url = url,
-            userAgent = userAgentProvider.userAgent(),
             subfolder = Environment.DIRECTORY_PICTURES
         )
 
@@ -2888,17 +2870,6 @@ class BrowserTabFragment :
             omnibarInput: String?
         ) =
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
-    }
-
-    private fun showDownloadManagerAppSettings() {
-        try {
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-            intent.data = DownloadFailReason.DOWNLOAD_MANAGER_SETTINGS_URI
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            Timber.w(e, "Could not open DownloadManager settings")
-            toolbar.makeSnackbarWithNoBottomInset(R.string.downloadManagerIncompatible, Snackbar.LENGTH_INDEFINITE).show()
-        }
     }
 
     private fun launchPrint(url: String) {

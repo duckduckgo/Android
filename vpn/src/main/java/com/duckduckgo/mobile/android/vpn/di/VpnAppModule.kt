@@ -22,9 +22,7 @@ import android.net.ConnectivityManager
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.remote_config.*
-import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabaseCallbackProvider
+import com.duckduckgo.mobile.android.vpn.store.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.RealAppTrackerRepository
 import com.squareup.anvil.annotations.ContributesTo
@@ -93,5 +91,10 @@ object VpnAppModule {
     @SingleInstanceIn(AppScope::class)
     fun providesResources(context: Context): Resources {
         return context.resources
+    }
+
+    @Provides
+    fun provideAppHealthTriggersRepository(appHealthDatabase: AppHealthDatabase): AppHealthTriggersRepository {
+        return AppHealthTriggersRepositoryImpl(appHealthDatabase)
     }
 }

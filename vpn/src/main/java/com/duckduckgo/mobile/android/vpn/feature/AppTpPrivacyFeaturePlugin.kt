@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.feature
 
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -32,10 +31,10 @@ class AppTpPrivacyFeaturePlugin @Inject constructor(
 
     private val settings = plugins.sortedBy { it.settingName.value }
 
-    override fun store(name: FeatureName, jsonString: String): Boolean {
+    override fun store(featureName: String, jsonString: String): Boolean {
         @Suppress("NAME_SHADOWING")
-        val name = appTpFeatureValueOf(name.value)
-        if (name == featureName) {
+        val appTpFeature = appTpFeatureValueOf(featureName) ?: return false
+        if (appTpFeature.value == this.featureName) {
             val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
             val adapter: JsonAdapter<JsonAppTpFeatureConfig> = moshi.adapter(JsonAppTpFeatureConfig::class.java)
 
@@ -55,7 +54,7 @@ class AppTpPrivacyFeaturePlugin @Inject constructor(
         return false
     }
 
-    override val featureName: FeatureName = AppTpFeatureName.AppTrackerProtection
+    override val featureName: String = AppTpFeatureName.AppTrackerProtection.value
 }
 
 interface AppTpSettingPlugin {
