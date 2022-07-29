@@ -53,7 +53,7 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
 
             val success = Result.success()
             if (updateBlocklistResult != success || updateRulesResult != success) {
-                Timber.w("One of the app tracker list updates failed, scheduling a retry")
+                Timber.w("One of the app tracker list ssssupdates failed, scheduling a retry")
                 return@withContext Result.retry()
             }
 
