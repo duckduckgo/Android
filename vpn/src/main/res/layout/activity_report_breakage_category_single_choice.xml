@@ -39,26 +39,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_marginTop="26dp"
-                android:layout_marginEnd="18dp"
-                app:layout_constraintEnd_toEndOf="@id/textInputLayout"
-                app:layout_constraintTop_toTopOf="@id/textInputLayout"
-                app:srcCompat="@drawable/ic_report_breakage_down_arrow_24dp"/>
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginStart="25dp"
-                android:layout_marginTop="42dp"
+                android:layout_marginTop="25dp"
                 android:layout_marginEnd="25dp"
                 android:hint="@string/atp_ReportBreakageCategoriesHint"
-                android:textColorHint="?attr/brokenSiteOutlinedColor"
-                app:boxStrokeColor="@color/broken_sites_dropdown_selector"
+                android:textColorHint="?attr/normalTextColor"
+                app:endIconDrawable="@drawable/ic_report_breakage_down_arrow_24dp"
+                app:endIconMode="custom"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/include_toolbar">
