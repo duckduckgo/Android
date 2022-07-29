@@ -29,7 +29,7 @@ import androidx.lifecycle.flowWithLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignOutBinding
-import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding

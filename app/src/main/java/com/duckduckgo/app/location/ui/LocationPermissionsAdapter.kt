@@ -34,7 +34,7 @@ import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsSectionTitl
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsToggleBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
+import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
