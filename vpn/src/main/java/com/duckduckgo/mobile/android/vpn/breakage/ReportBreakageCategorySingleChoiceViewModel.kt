@@ -24,7 +24,6 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.*
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import timber.log.Timber
@@ -34,86 +33,88 @@ class ReportBreakageCategorySingleChoiceViewModel
 @Inject
 constructor(private val dispatcherProvider: DispatcherProvider) : ViewModel() {
 
-  data class ViewState(
-      val indexSelected: Int = -1,
-      val categorySelected: ReportBreakageCategory? = null,
-      val submitAllowed: Boolean = false,
-  )
+    data class ViewState(
+        val indexSelected: Int = -1,
+        val categorySelected: ReportBreakageCategory? = null,
+        val submitAllowed: Boolean = false,
+    )
 
-  sealed class Command {
-    object ConfirmAndFinish : Command()
-  }
+    sealed class Command {
+        object ConfirmAndFinish : Command()
+    }
 
-  val viewState: MutableLiveData<ViewState> = MutableLiveData()
-  val command: SingleLiveEvent<Command> = SingleLiveEvent()
-  var indexSelected = -1
-  val categories: List<ReportBreakageCategory> =
-      listOf(
-          ConnectionCategory,
-          DownloadsCategory,
-          CallsCategory,
-          IotCategory,
-          MessagesCategory,
-          CrashesCategory,
-          UploadsCategory,
-          ContentCategory,
-          OtherCategory)
+    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    var indexSelected = -1
+    val categories: List<ReportBreakageCategory> =
+        listOf(
+            ConnectionCategory,
+            DownloadsCategory,
+            CallsCategory,
+            IotCategory,
+            MessagesCategory,
+            CrashesCategory,
+            UploadsCategory,
+            ContentCategory,
+            OtherCategory
+        )
 
-  init {
-    viewState.value = ViewState()
-  }
+    init {
+        viewState.value = ViewState()
+    }
 
-  fun onCategoryIndexChanged(newIndex: Int) {
-    indexSelected = newIndex
-  }
+    fun onCategoryIndexChanged(newIndex: Int) {
+        indexSelected = newIndex
+    }
 
-  fun onCategorySelectionCancelled() {
-    indexSelected = viewState.value?.indexSelected ?: -1
-  }
+    fun onCategorySelectionCancelled() {
+        indexSelected = viewState.value?.indexSelected ?: -1
+    }
 
-  fun onCategoryAccepted() {
-    viewState.value =
-        viewState.value?.copy(
-            indexSelected = indexSelected,
-            categorySelected = categories.elementAtOrNull(indexSelected),
-            submitAllowed = canSubmit())
-  }
+    fun onCategoryAccepted() {
+        viewState.value =
+            viewState.value?.copy(
+                indexSelected = indexSelected,
+                categorySelected = categories.elementAtOrNull(indexSelected),
+                submitAllowed = canSubmit()
+            )
+    }
 
-  fun onSubmitPressed() {
-    command.value = Command.ConfirmAndFinish
-  }
+    fun onSubmitPressed() {
+        command.value = Command.ConfirmAndFinish
+    }
 
-  private fun canSubmit(): Boolean = categories.elementAtOrNull(indexSelected) != null
+    private fun canSubmit(): Boolean = categories.elementAtOrNull(indexSelected) != null
 
-  class SingleLiveEvent<T> : MutableLiveData<T>() {
+    class SingleLiveEvent<T> : MutableLiveData<T>() {
 
-    private val pending = AtomicBoolean(false)
+        private val pending = AtomicBoolean(false)
 
-    @MainThread
-    override fun observe(owner: LifecycleOwner, observer: Observer<in T>) {
+        @MainThread
+        override fun observe(owner: LifecycleOwner, observer: Observer<in T>) {
 
-      if (hasActiveObservers()) {
-        Timber.w("Multiple observers registered but only one will be notified of changes.")
-      }
+            if (hasActiveObservers()) {
+                Timber.w("Multiple observers registered but only one will be notified of changes.")
+            }
 
-      // Observe the internal MutableLiveData
-      super.observe(owner) { t ->
-        if (pending.compareAndSet(true, false)) {
-          observer.onChanged(t)
+            // Observe the internal MutableLiveData
+            super.observe(owner) { t ->
+                if (pending.compareAndSet(true, false)) {
+                    observer.onChanged(t)
+                }
+            }
         }
-      }
-    }
 
-    @MainThread
-    override fun setValue(t: T?) {
-      pending.set(true)
-      super.setValue(t)
-    }
+        @MainThread
+        override fun setValue(t: T?) {
+            pending.set(true)
+            super.setValue(t)
+        }
 
-    /** Used for cases where T is Void, to make calls cleaner. */
-    @MainThread
-    fun call() {
-      value = null
+        /** Used for cases where T is Void, to make calls cleaner. */
+        @MainThread
+        fun call() {
+            value = null
+        }
     }
-  }
 }

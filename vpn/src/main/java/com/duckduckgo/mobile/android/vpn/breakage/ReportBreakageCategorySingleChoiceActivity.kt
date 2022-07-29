@@ -31,7 +31,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.*
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageCategorySingleChoiceBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import dagger.WrongScope
@@ -45,125 +44,128 @@ import kotlinx.coroutines.launch
 @InjectWith(VpnScope::class)
 class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
-  @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
+    @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
 
-  @Inject lateinit var metadataReporter: ReportBreakageMetadataReporter
+    @Inject lateinit var metadataReporter: ReportBreakageMetadataReporter
 
-  private val binding: ActivityReportBreakageCategorySingleChoiceBinding by viewBinding()
-  private val viewModel: ReportBreakageCategorySingleChoiceViewModel by bindViewModel()
+    private val binding: ActivityReportBreakageCategorySingleChoiceBinding by viewBinding()
+    private val viewModel: ReportBreakageCategorySingleChoiceViewModel by bindViewModel()
 
-  private val toolbar
-    get() = binding.includeToolbar.toolbar
+    private val toolbar
+        get() = binding.includeToolbar.toolbar
 
-  private val breakageTextInputForm
-    get() = binding.contentReportBreakageTextForm
+    private val breakageTextInputForm
+        get() = binding.contentReportBreakageTextForm
 
-  private lateinit var brokenApp: BrokenApp
+    private lateinit var brokenApp: BrokenApp
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    // The value should never be "unknown" we just do this because getParcelableExtra returns
-    // nullable
-    brokenApp = intent.getParcelableExtra(APP_PACKAGE_ID_EXTRA) ?: BrokenApp("unknown", "unknown")
+        // The value should never be "unknown" we just do this because getParcelableExtra returns
+        // nullable
+        brokenApp = intent.getParcelableExtra(APP_PACKAGE_ID_EXTRA) ?: BrokenApp("unknown", "unknown")
 
-    setContentView(binding.root)
-    configureListeners()
-    configureObservers()
-    setupToolbar(toolbar)
-    setupViews()
-  }
-
-  override fun onStart() {
-    super.onStart()
-    deviceShieldPixels.didShowReportBreakageSingleChoiceForm()
-  }
-
-  private fun setupViews() {
-    binding.appBreakageFormDisclaimer.text =
-        HtmlCompat.fromHtml(
-            getString(R.string.atp_ReportBreakageFormDisclaimerText),
-            HtmlCompat.FROM_HTML_MODE_LEGACY)
-  }
-
-  private fun configureListeners() {
-    val categories = shuffleNonOtherCategories(viewModel.categories)
-
-    binding.categoriesSelection.setOnClickListener {
-      AlertDialog.Builder(this)
-          .setTitle(getString(R.string.atp_ReportBreakageCategoriesTitle))
-          .setSingleChoiceItems(categories, viewModel.indexSelected) { _, newIndex ->
-            viewModel.onCategoryIndexChanged(newIndex)
-          }
-          .setPositiveButton(getString(android.R.string.yes)) { dialog, _ ->
-            viewModel.onCategoryAccepted()
-            dialog.dismiss()
-          }
-          .setNegativeButton(getString(android.R.string.no)) { dialog, _ ->
-            viewModel.onCategorySelectionCancelled()
-            dialog.dismiss()
-          }
-          .show()
+        setContentView(binding.root)
+        configureListeners()
+        configureObservers()
+        setupToolbar(toolbar)
+        setupViews()
     }
 
-    binding.ctaNextFormSubmit.setOnClickListener { viewModel.onSubmitPressed() }
-  }
-
-  private fun shuffleNonOtherCategories(categoryList: List<ReportBreakageCategory>): Array<String> {
-    val categories = categoryList.map { getString(it.category) }.toMutableList()
-    val shuffledFirstEight = categories.slice(0..7).shuffled().toMutableList()
-    shuffledFirstEight.add(categories[8])
-    return shuffledFirstEight.toTypedArray()
-  }
-
-  private fun configureObservers() {
-    viewModel.command.observe(this) { it?.let { processCommand(it) } }
-    viewModel.viewState.observe(this) { it?.let { render(it) } }
-  }
-
-  private fun processCommand(command: Command) {
-    when (command) {
-      Command.ConfirmAndFinish -> confirmAndFinish()
+    override fun onStart() {
+        super.onStart()
+        deviceShieldPixels.didShowReportBreakageSingleChoiceForm()
     }
-  }
 
-  private fun confirmAndFinish() {
-    lifecycleScope.launch {
-      val issue =
-          IssueReport(
-              appName = brokenApp?.appName,
-              appPackageId = brokenApp?.appPackageId,
-              description = breakageTextInputForm.appBreakageFormFeedbackInput.text.toString(),
-              category = viewModel.viewState.value?.categorySelected.toString(),
-              customMetadata =
-                  Base64.encodeToString(
-                      metadataReporter.getVpnStateMetadata(brokenApp?.appPackageId).toByteArray(),
-                      Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE))
-      deviceShieldPixels.sendAppBreakageReport(issue.toMap())
-      setResult(AppCompatActivity.RESULT_OK, Intent().apply { issue.addToIntent(this) })
-      finish()
+    private fun setupViews() {
+        binding.appBreakageFormDisclaimer.text =
+            HtmlCompat.fromHtml(
+                getString(R.string.atp_ReportBreakageFormDisclaimerText),
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
     }
-  }
 
-  private fun render(viewState: ViewState) {
-    val category =
-        viewState.categorySelected?.let { getString(viewState.categorySelected.category) }.orEmpty()
-    binding.categoriesSelection.setText(category)
-    if (viewState.indexSelected == 8) {
-      breakageTextInputForm.somethingElseDescription.isVisible
+    private fun configureListeners() {
+        val categories = shuffleNonOtherCategories(viewModel.categories)
+
+        binding.categoriesSelection.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle(getString(R.string.atp_ReportBreakageCategoriesTitle))
+                .setSingleChoiceItems(categories, viewModel.indexSelected) { _, newIndex ->
+                    viewModel.onCategoryIndexChanged(newIndex)
+                }
+                .setPositiveButton(getString(android.R.string.yes)) { dialog, _ ->
+                    viewModel.onCategoryAccepted()
+                    dialog.dismiss()
+                }
+                .setNegativeButton(getString(android.R.string.no)) { dialog, _ ->
+                    viewModel.onCategorySelectionCancelled()
+                    dialog.dismiss()
+                }
+                .show()
+        }
+
+        binding.ctaNextFormSubmit.setOnClickListener { viewModel.onSubmitPressed() }
     }
-    binding.ctaNextFormSubmit.isEnabled = viewState.submitAllowed
-  }
 
-  companion object {
-
-    private const val APP_PACKAGE_ID_EXTRA = "APP_PACKAGE_ID_EXTRA"
-
-    fun intent(context: Context, brokenApp: BrokenApp): Intent {
-
-      return Intent(context, ReportBreakageCategorySingleChoiceActivity::class.java).apply {
-        putExtra(APP_PACKAGE_ID_EXTRA, brokenApp)
-      }
+    private fun shuffleNonOtherCategories(categoryList: List<ReportBreakageCategory>): Array<String> {
+        val categories = categoryList.map { getString(it.category) }.toMutableList()
+        val shuffledFirstEight = categories.slice(0..7).shuffled().toMutableList()
+        shuffledFirstEight.add(categories[8])
+        return shuffledFirstEight.toTypedArray()
     }
-  }
+
+    private fun configureObservers() {
+        viewModel.command.observe(this) { it?.let { processCommand(it) } }
+        viewModel.viewState.observe(this) { it?.let { render(it) } }
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            Command.ConfirmAndFinish -> confirmAndFinish()
+        }
+    }
+
+    private fun confirmAndFinish() {
+        lifecycleScope.launch {
+            val issue =
+                IssueReport(
+                    appName = brokenApp?.appName,
+                    appPackageId = brokenApp?.appPackageId,
+                    description = breakageTextInputForm.appBreakageFormFeedbackInput.text.toString(),
+                    category = viewModel.viewState.value?.categorySelected.toString(),
+                    customMetadata =
+                    Base64.encodeToString(
+                        metadataReporter.getVpnStateMetadata(brokenApp?.appPackageId).toByteArray(),
+                        Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE
+                    )
+                )
+            deviceShieldPixels.sendAppBreakageReport(issue.toMap())
+            setResult(AppCompatActivity.RESULT_OK, Intent().apply { issue.addToIntent(this) })
+            finish()
+        }
+    }
+
+    private fun render(viewState: ViewState) {
+        val category =
+            viewState.categorySelected?.let { getString(viewState.categorySelected.category) }.orEmpty()
+        binding.categoriesSelection.setText(category)
+        if (viewState.indexSelected == 8) {
+            breakageTextInputForm.somethingElseDescription.isVisible
+        }
+        binding.ctaNextFormSubmit.isEnabled = viewState.submitAllowed
+    }
+
+    companion object {
+
+        private const val APP_PACKAGE_ID_EXTRA = "APP_PACKAGE_ID_EXTRA"
+
+        fun intent(context: Context, brokenApp: BrokenApp): Intent {
+
+            return Intent(context, ReportBreakageCategorySingleChoiceActivity::class.java).apply {
+                putExtra(APP_PACKAGE_ID_EXTRA, brokenApp)
+            }
+        }
+    }
 }
