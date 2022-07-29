@@ -60,6 +60,9 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
     @Inject
     lateinit var lastUpdatedDateFormatter: LastUpdatedDateFormatter
 
+    @Inject
+    lateinit var saveStateWatcher: SaveStateWatcher
+
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
     }
@@ -83,7 +86,7 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
 
     override fun onPrepareMenu(menu: Menu) {
         if (viewModel.viewState.value.credentialMode is Editing) {
-            menu.findItem(R.id.view_menu_save).isVisible = true
+            menu.findItem(R.id.view_menu_save).isVisible = (viewModel.viewState.value.credentialMode as Editing).saveable
             menu.findItem(R.id.view_menu_delete).isVisible = false
             menu.findItem(R.id.view_menu_edit).isVisible = false
         } else if (viewModel.viewState.value.credentialMode is Viewing) {
@@ -124,12 +127,16 @@ class AutofillManagementCredentialsMode : Fragment(), MenuProvider {
     ) {
         super.onViewCreated(view, savedInstanceState)
         observeViewModel()
+        binding.watchSaveState(saveStateWatcher) {
+            viewModel.allowSaveInEditMode(it)
+        }
         configureUiEventHandlers()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         resetToolbarOnExit()
+        binding.removeSaveStateWatcher(saveStateWatcher)
     }
 
     private fun resetToolbarOnExit() {

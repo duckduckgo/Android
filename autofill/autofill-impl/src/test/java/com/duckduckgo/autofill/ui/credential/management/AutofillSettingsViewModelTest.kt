@@ -245,6 +245,21 @@ class AutofillSettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenAllowSaveInEditModeSetToFalseThenUpdateViewStateToEditingSaveableFalse() = runTest {
+        val credentials = someCredentials()
+        testee.onViewCredentials(credentials)
+        testee.onEditCredentials()
+
+        testee.allowSaveInEditMode(false)
+
+        testee.viewState.test {
+            val finalResult = this.expectMostRecentItem()
+            assertEquals(CredentialMode.Editing(credentials, false), finalResult.credentialMode)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun someCredentials(): LoginCredentials {
         return LoginCredentials(
             id = -1,
