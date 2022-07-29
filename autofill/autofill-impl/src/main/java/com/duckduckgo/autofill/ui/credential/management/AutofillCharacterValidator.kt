@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.ui.credential.management
 
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -24,7 +24,7 @@ interface AutofillCharacterValidator {
     fun isLetter(character: Char): Boolean
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 class LatinCharacterValidator @Inject constructor() : AutofillCharacterValidator {
 
     override fun isLetter(character: Char): Boolean {
