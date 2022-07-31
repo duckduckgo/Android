@@ -73,10 +73,46 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <include
-                android:id="@+id/contentReportBreakageTextForm"
-                layout="@layout/content_report_breakage_text_form"
-                android:visibility="gone"/>
+            <LinearLayout
+                android:id="@+id/otherCategoryDescription"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/appBreakageFormHeading"
+                    style="@style/TextAppearance.DuckDuckGo.Headline3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:fontFamily="sans-serif-medium"
+                    android:padding="@dimen/keyline_4"
+                    android:text="@string/atp_ReportBreakageFormWhatHappenedText"
+                    android:textStyle="bold"
+                    android:textColor="?attr/normalTextColor"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/appBreakageFormFeedbackContainer"
+                    style="@style/FeedbackInputBoxStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:hint="@string/atp_ReportBreakageFormInputHint"
+                    android:paddingStart="@dimen/keyline_4"
+                    android:paddingEnd="@dimen/keyline_4"
+                    app:hintTextAppearance="@android:style/TextAppearance"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/appBreakageFormFeedbackInput"
+                        style="@style/FeedbackEditTextInputStyle"
+                        android:gravity="top" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/appBreakageFormDisclaimer"
@@ -91,6 +127,14 @@
         </LinearLayout>
 
     </ScrollView>
+
+    <TextView
+        android:id="@+id/appBreakageFormConfirmationCheckbox"
+        android:padding="@dimen/keyline_4"
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/atp_ReportBreakageFormCheckboxText" />
 
     <View
         android:layout_width="match_parent"

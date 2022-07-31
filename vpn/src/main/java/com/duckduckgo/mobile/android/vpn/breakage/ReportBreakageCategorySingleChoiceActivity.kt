@@ -20,9 +20,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -58,9 +58,6 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
-    private val breakageTextInputForm
-        get() = binding.contentReportBreakageTextForm
-
     private lateinit var brokenApp: BrokenApp
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,8 +88,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        val categories = viewModel.shuffledCategories.map { getString(it) }.toTypedArray()
-
+        val categories = viewModel.shuffledCategories.map { getString(it.category) }.toTypedArray()
         binding.categoriesSelection.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle(getString(R.string.atp_ReportBreakageCategoriesTitle))
@@ -109,7 +105,6 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
                 }
                 .show()
         }
-
         binding.ctaNextFormSubmit.setOnClickListener { viewModel.onSubmitPressed() }
     }
 
@@ -138,7 +133,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
                 IssueReport(
                     appName = brokenApp.appName,
                     appPackageId = brokenApp.appPackageId,
-                    description = breakageTextInputForm.appBreakageFormFeedbackInput.text.toString(),
+                    description = binding.appBreakageFormFeedbackInput.text.toString(),
                     category = viewModel.viewState.value.categorySelected.toString(),
                     customMetadata =
                     Base64.encodeToString(
@@ -156,11 +151,9 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         val category =
             viewState.categorySelected?.let { getString(viewState.categorySelected.category) }.orEmpty()
         binding.categoriesSelection.setText(category)
-        if (viewState.indexSelected == 8) {
-            breakageTextInputForm.somethingElseDescription.isVisible
-        }
-
+        if (viewState.indexSelected == 8) binding.otherCategoryDescription.visibility = View.VISIBLE else View.GONE
         binding.ctaNextFormSubmit.isEnabled = viewState.submitAllowed
+
     }
 
     companion object {

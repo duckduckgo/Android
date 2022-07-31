@@ -68,10 +68,9 @@ constructor() : ViewModel() {
             OtherCategory
         )
 
-    var shuffledCategories: MutableList<Int>
+    var shuffledCategories: MutableList<ReportBreakageCategory>
 
     init {
-        viewState.value = ViewState()
         shuffledCategories = shuffleNonOtherCategories(categories)
     }
 
@@ -83,8 +82,8 @@ constructor() : ViewModel() {
         return command.receiveAsFlow()
     }
 
-    private fun shuffleNonOtherCategories(categoryList: List<ReportBreakageCategory>): MutableList<Int> {
-        val categories = categoryList.map { it.category }.toMutableList()
+    private fun shuffleNonOtherCategories(categoryList: List<ReportBreakageCategory>): MutableList<ReportBreakageCategory> {
+        val categories = categoryList.map { it }.toMutableList()
         val shuffledFirstEight = categories.slice(0..7).shuffled().toMutableList()
         shuffledFirstEight.add(categories[8])
         return shuffledFirstEight
@@ -102,14 +101,12 @@ constructor() : ViewModel() {
         viewState.value =
             viewState.value.copy(
                 indexSelected = indexSelected,
-                categorySelected = categories.elementAtOrNull(indexSelected),
+                categorySelected = shuffledCategories.elementAtOrNull(indexSelected),
                 submitAllowed = canSubmit()
             )
     }
 
-    fun onSubmitPressed() {
-        viewModelScope.launch { command.send(Command.ConfirmAndFinish) }
-    }
+    fun onSubmitPressed() { viewModelScope.launch { command.send(Command.ConfirmAndFinish) } }
 
-    private fun canSubmit(): Boolean = categories.elementAtOrNull(indexSelected) != null
+    private fun canSubmit(): Boolean = shuffledCategories.elementAtOrNull(indexSelected) != null
 }
