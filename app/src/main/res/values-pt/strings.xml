@@ -563,10 +563,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Ligação abortada. Este website poderá ser prejudicial ao seu dispositivo.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Gestor de transferências desativado</string>
-    <string name="downloadManagerIncompatible">Gestor de transferências não disponível neste dispositivo</string>
-    <string name="enable">Permitir</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Ativar a localização do dispositivo para o Navegador de Privacidade DuckDuckGo?</string>

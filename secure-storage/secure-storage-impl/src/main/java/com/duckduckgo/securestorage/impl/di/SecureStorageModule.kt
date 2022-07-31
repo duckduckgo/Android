@@ -60,7 +60,6 @@ object SecureStorageModule {
         ).openHelperFactory(SupportFactory(keyProvider.getl1Key()))
             .addMigrations(*ALL_MIGRATIONS)
             .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
             .build()
     }
 

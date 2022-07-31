@@ -25,5 +25,8 @@ data class WebsiteLoginCredentialsEntity(
     val domain: String?,
     val username: String?,
     val password: String?,
-    val iv: String?
+    val iv: String?,
+    val notes: String?,
+    val domainTitle: String?,
+    val lastUpdatedInMillis: Long?
 )

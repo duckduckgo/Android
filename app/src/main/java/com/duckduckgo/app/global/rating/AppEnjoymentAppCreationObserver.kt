@@ -17,9 +17,8 @@
 package com.duckduckgo.app.global.rating
 
 import androidx.annotation.UiThread
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,11 +27,10 @@ class AppEnjoymentAppCreationObserver(
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val promptTypeDecider: PromptTypeDecider,
     private val appCoroutineScope: CoroutineScope
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
     @UiThread
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun onAppStart() {
+    override fun onStart(owner: LifecycleOwner) {
         appCoroutineScope.launch(Dispatchers.Main) {
             appEnjoymentPromptEmitter.promptType.value = promptTypeDecider.determineInitialPromptType()
         }

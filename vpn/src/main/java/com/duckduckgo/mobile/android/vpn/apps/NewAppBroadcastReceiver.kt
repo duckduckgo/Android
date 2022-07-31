@@ -25,7 +25,8 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.goAsync
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -46,7 +47,8 @@ class NewAppBroadcastReceiver @Inject constructor(
     private val applicationContext: Context,
     private val appCategoryDetector: AppCategoryDetector,
     private val appTrackerRepository: AppTrackerRepository,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
 
     @MainThread
@@ -66,7 +68,7 @@ class NewAppBroadcastReceiver @Inject constructor(
         goAsync(pendingResult) {
             if (isGame(packageName) || isInExclusionList(packageName)) {
                 Timber.i("Newly installed package $packageName is in exclusion list, disabling/re-enabling vpn")
-                TrackerBlockingVpnService.restartVpnService(applicationContext)
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             } else {
                 Timber.i("Newly installed package $packageName not in exclusion list")
             }

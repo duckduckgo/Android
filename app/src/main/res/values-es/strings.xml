@@ -563,10 +563,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Conexión abortada. Esta web puede ser dañina para tu dispositivo.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">El gestor de descargas está desactivado</string>
-    <string name="downloadManagerIncompatible">El gestor de descargas no está disponible para este dispositivo</string>
-    <string name="enable">Activar</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">¿Habilitar la ubicación del dispositivo para el navegador privado de DuckDuckGo?</string>

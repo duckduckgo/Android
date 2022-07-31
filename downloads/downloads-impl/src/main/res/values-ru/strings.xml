@@ -19,8 +19,5 @@
 
     <string name="notificationChannelFileDownloading">Загрузка файла</string>
     <string name="notificationChannelFileDownloaded">Файл загружен</string>
-
-    <string name="downloadComplete">Загрузка завершена</string>
-    <string name="downloadFailed">Не удалось выполнить загрузку</string>
     <string name="downloadInProgress">Загрузка</string>
 </resources>

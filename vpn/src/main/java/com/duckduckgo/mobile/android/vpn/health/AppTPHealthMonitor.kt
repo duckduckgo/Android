@@ -189,7 +189,8 @@ class AppTPHealthMonitor @Inject constructor(
                 queueTCPReads = readFromTCPNetworkQueue,
                 queueUDPReads = readFromUDPNetworkQueue,
                 unknownPackets = unknownPackets
-            )
+            ),
+            healthAlerts.name
         )
         healthAlerts.updateAlert(state)
         return state
@@ -200,7 +201,7 @@ class AppTPHealthMonitor @Inject constructor(
         healthAlerts: HealthRule
     ): HealthState {
         val noConnectivityStats = healthMetricCounter.getStat(NO_VPN_CONNECTIVITY(), timeWindow)
-        val state = healthClassifier.determineHealthVpnConnectivity(noConnectivityStats)
+        val state = healthClassifier.determineHealthVpnConnectivity(noConnectivityStats, healthAlerts.name)
         healthAlerts.updateAlert(state)
         return state
     }
@@ -210,7 +211,7 @@ class AppTPHealthMonitor @Inject constructor(
         healthAlerts: HealthRule
     ): HealthState {
         val readExceptions = healthMetricCounter.getStat(SOCKET_CHANNEL_READ_EXCEPTION(), timeWindow)
-        val state = healthClassifier.determineHealthSocketChannelReadExceptions(readExceptions)
+        val state = healthClassifier.determineHealthSocketChannelReadExceptions(readExceptions, healthAlerts.name)
         healthAlerts.updateAlert(state)
         return state
     }
@@ -220,7 +221,7 @@ class AppTPHealthMonitor @Inject constructor(
         healthAlerts: HealthRule
     ): HealthState {
         val writeExceptions = healthMetricCounter.getStat(SOCKET_CHANNEL_WRITE_EXCEPTION(), timeWindow)
-        val state = healthClassifier.determineHealthSocketChannelWriteExceptions(writeExceptions)
+        val state = healthClassifier.determineHealthSocketChannelWriteExceptions(writeExceptions, healthAlerts.name)
         healthAlerts.updateAlert(state)
         return state
     }
@@ -230,7 +231,7 @@ class AppTPHealthMonitor @Inject constructor(
         healthAlerts: HealthRule
     ): HealthState {
         val connectExceptions = healthMetricCounter.getStat(SOCKET_CHANNEL_CONNECT_EXCEPTION(), timeWindow)
-        val state = healthClassifier.determineHealthSocketChannelConnectExceptions(connectExceptions)
+        val state = healthClassifier.determineHealthSocketChannelConnectExceptions(connectExceptions, healthAlerts.name)
         healthAlerts.updateAlert(state)
         return state
     }
@@ -240,7 +241,7 @@ class AppTPHealthMonitor @Inject constructor(
         healthAlerts: HealthRule
     ): HealthState {
         val numberExceptions = healthMetricCounter.getStat(TUN_WRITE_IO_EXCEPTION(), timeWindow)
-        val state = healthClassifier.determineHealthTunWriteExceptions(numberExceptions)
+        val state = healthClassifier.determineHealthTunWriteExceptions(numberExceptions, healthAlerts.name)
         healthAlerts.updateAlert(state)
         return state
     }
@@ -250,7 +251,7 @@ class AppTPHealthMonitor @Inject constructor(
         healthAlerts: HealthRule
     ): HealthState {
         val numberExceptions = healthMetricCounter.getStat(TUN_READ_IO_EXCEPTION(), timeWindow)
-        val state = healthClassifier.determineHealthTunReadExceptions(numberExceptions)
+        val state = healthClassifier.determineHealthTunReadExceptions(numberExceptions, healthAlerts.name)
         healthAlerts.updateAlert(state)
         return state
     }
@@ -260,7 +261,7 @@ class AppTPHealthMonitor @Inject constructor(
         healthAlerts: HealthRule
     ): HealthState {
         val numberExceptions = healthMetricCounter.getStat(TUN_WRITE_IO_MEMORY_EXCEPTION(), timeWindow)
-        val state = healthClassifier.determineHealthTunWriteMemoryExceptions(numberExceptions)
+        val state = healthClassifier.determineHealthTunWriteMemoryExceptions(numberExceptions, healthAlerts.name)
         healthAlerts.updateAlert(state)
         return state
     }

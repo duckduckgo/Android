@@ -25,7 +25,6 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.*
-import android.provider.Settings
 import android.text.Editable
 import android.view.*
 import android.view.View.*
@@ -99,18 +98,18 @@ import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.model.orderedTrackingEntities
-import com.duckduckgo.app.global.view.DaxDialog
-import com.duckduckgo.app.global.view.DaxDialogListener
+import com.duckduckgo.mobile.android.ui.view.DaxDialog
+import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.disableAnimation
 import com.duckduckgo.app.global.view.enableAnimation
-import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
-import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
+import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
@@ -193,7 +192,6 @@ import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.Compani
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.autofill.ui.ExistingCredentialMatchDetector
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -201,7 +199,6 @@ import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.downloads.api.DownloadCommand
-import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -333,9 +330,6 @@ class BrowserTabFragment :
     lateinit var printInjector: PrintInjector
 
     @Inject
-    lateinit var deviceAuthenticator: DeviceAuthenticator
-
-    @Inject
     lateinit var credentialAutofillDialogFactory: CredentialAutofillDialogFactory
 
     @Inject
@@ -433,13 +427,8 @@ class BrowserTabFragment :
             val username = credentials.username
             val password = credentials.password
 
-            if (username == null) {
-                Timber.w("Not saving credentials with null username")
-                return
-            }
-
-            if (password == null) {
-                Timber.w("Not saving credentials with null password")
+            if (username == null && password == null) {
+                Timber.w("Not saving credentials with null username and password")
                 return
             }
 
@@ -536,9 +525,8 @@ class BrowserTabFragment :
             viewModel.onViewRecreated()
         }
 
-        lifecycle.addObserver(object : LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-            fun onStop() {
+        lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStop(owner: LifecycleOwner) {
                 if (isVisible) {
                     updateOrDeleteWebViewPreview()
                 }
@@ -717,16 +705,7 @@ class BrowserTabFragment :
     }
 
     private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
-        val downloadFailedSnackbar = when {
-            command.showEnableDownloadManagerAction ->
-                view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
-                    ?.apply {
-                        this.setAction(R.string.enable) {
-                            showDownloadManagerAppSettings()
-                        }
-                    }
-            else -> view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
-        }
+        val downloadFailedSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
         view?.postDelayed({ downloadFailedSnackbar ?.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
@@ -1580,20 +1559,18 @@ class BrowserTabFragment :
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
-        if (deviceAuthenticator.hasValidDeviceAuthentication()) {
-            browserAutofill.addJsInterface(it, autofillCallback)
+        browserAutofill.addJsInterface(it, autofillCallback)
 
-            setFragmentResultListener(RESULT_KEY_CREDENTIAL_PICKER) { _, result ->
-                autofillCredentialsSelectionResultHandler.processAutofillCredentialSelectionResult(result, this, viewModel)
-            }
+        setFragmentResultListener(RESULT_KEY_CREDENTIAL_PICKER) { _, result ->
+            autofillCredentialsSelectionResultHandler.processAutofillCredentialSelectionResult(result, this, viewModel)
+        }
 
-            setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_SAVE) { _, result ->
-                autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)
-            }
+        setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_SAVE) { _, result ->
+            autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)
+        }
 
-            setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_UPDATE) { _, result ->
-                autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)
-            }
+        setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_UPDATE) { _, result ->
+            autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)
         }
     }
 
@@ -1991,7 +1968,6 @@ class BrowserTabFragment :
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,
-            userAgent = userAgentProvider.userAgent(),
             subfolder = Environment.DIRECTORY_DOWNLOADS
         )
 
@@ -2008,7 +1984,6 @@ class BrowserTabFragment :
     ) {
         pendingFileDownload = PendingFileDownload(
             url = url,
-            userAgent = userAgentProvider.userAgent(),
             subfolder = Environment.DIRECTORY_PICTURES
         )
 
@@ -2895,17 +2870,6 @@ class BrowserTabFragment :
             omnibarInput: String?
         ) =
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
-    }
-
-    private fun showDownloadManagerAppSettings() {
-        try {
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-            intent.data = DownloadFailReason.DOWNLOAD_MANAGER_SETTINGS_URI
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            Timber.w(e, "Could not open DownloadManager settings")
-            toolbar.makeSnackbarWithNoBottomInset(R.string.downloadManagerIncompatible, Snackbar.LENGTH_INDEFINITE).show()
-        }
     }
 
     private fun launchPrint(url: String) {

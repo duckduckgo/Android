@@ -36,13 +36,14 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(private val 
         credentialInjector: CredentialInjector,
     ) {
         val originalUrl = result.getString(CredentialAutofillPickerDialog.KEY_URL) ?: return
-        val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS) ?: return
 
         if (result.getBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED)) {
             Timber.v("Autofill: User cancelled credential selection")
             credentialInjector.returnNoCredentialsWithPage(originalUrl)
             return
         }
+
+        val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS) ?: return
 
         deviceAuthenticator.authenticate(AUTOFILL, browserTabFragment) {
             val successfullyAuthenticated = it is Success

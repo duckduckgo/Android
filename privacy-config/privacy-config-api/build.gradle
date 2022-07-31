@@ -27,9 +27,6 @@ java {
 }
 
 dependencies {
-
-    api project(path: ':feature-toggles-api')
-
     implementation Google.dagger
     implementation Kotlin.stdlib.jdk7
 }

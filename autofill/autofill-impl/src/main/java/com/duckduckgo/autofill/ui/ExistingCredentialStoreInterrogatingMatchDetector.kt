@@ -31,7 +31,7 @@ class ExistingCredentialStoreInterrogatingMatchDetector @Inject constructor(
 ) :
     ExistingCredentialMatchDetector {
 
-    override suspend fun determine(currentUrl: String, username: String, password: String): AutofillStore.ContainsCredentialsResult {
+    override suspend fun determine(currentUrl: String, username: String?, password: String?): AutofillStore.ContainsCredentialsResult {
         return withContext(dispatcherProvider.io()) {
             autofillStore.containsCredentials(currentUrl, username, password)
         }

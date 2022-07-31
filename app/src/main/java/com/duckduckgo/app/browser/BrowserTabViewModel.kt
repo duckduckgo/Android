@@ -88,7 +88,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.global.view.asLocationPermissionOrigin
+import com.duckduckgo.app.global.extensions.asLocationPermissionOrigin
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -114,8 +114,8 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadCommand
+import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.privacy.config.api.*
@@ -171,7 +171,7 @@ class BrowserTabViewModel @Inject constructor(
     private val appLinksHandler: AppLinksHandler,
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
-    private val downloadCallback: DownloadCallback,
+    private val downloadCallback: DownloadStateListener,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore,
@@ -2598,9 +2598,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun download(pendingFileDownload: PendingFileDownload) {
-        viewModelScope.launch(dispatchers.io()) {
-            fileDownloader.download(pendingFileDownload, downloadCallback)
-        }
+        fileDownloader.enqueueDownload(pendingFileDownload)
     }
 
     fun deleteQuickAccessItem(savedSite: SavedSite) {

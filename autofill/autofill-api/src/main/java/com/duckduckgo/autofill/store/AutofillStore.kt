@@ -30,10 +30,23 @@ interface AutofillStore {
     var autofillEnabled: Boolean
 
     /**
+     * Used to determine whether we show additional onboarding info when offering to save a login credential
+     *
+     * This will default to true, and remain true until after the first credential has been saved
+     */
+    var showOnboardingWhenOfferingToSaveLogin: Boolean
+
+    /**
      * Find saved credentials for the given URL, returning an empty list where no matches are found
      * @param rawUrl Can be a full, unmodified URL taken from the URL bar (containing subdomains, query params etc...)
      */
     suspend fun getCredentials(rawUrl: String): List<LoginCredentials>
+
+    /**
+     * Find saved credential for the given id
+     * @param id of the saved credential
+     */
+    suspend fun getCredentialsWithId(id: Int): LoginCredentials?
 
     /**
      * Save the given credentials for the given URL
@@ -71,7 +84,7 @@ interface AutofillStore {
      *
      * @return The match type, which might indicate there was an exact match, a partial match etc...
      */
-    suspend fun containsCredentials(rawUrl: String, username: String, password: String): ContainsCredentialsResult
+    suspend fun containsCredentials(rawUrl: String, username: String?, password: String?): ContainsCredentialsResult
 
     /**
      * Possible match types returned when searching for the presence of credentials

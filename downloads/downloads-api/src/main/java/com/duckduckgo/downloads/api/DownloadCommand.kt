@@ -19,24 +19,20 @@ package com.duckduckgo.downloads.api
 import androidx.annotation.StringRes
 
 /** Specific download commands used to display messages during various download stages. */
-sealed class DownloadCommand(@StringRes val messageId: Int, val showNotification: Boolean) {
+sealed class DownloadCommand(@StringRes val messageId: Int) {
     class ShowDownloadStartedMessage(
         @StringRes messageId: Int,
-        showNotification: Boolean,
         val fileName: String
-    ) : DownloadCommand(messageId, showNotification)
+    ) : DownloadCommand(messageId)
     class ShowDownloadSuccessMessage(
         @StringRes messageId: Int,
-        showNotification: Boolean,
         val fileName: String,
         val filePath: String,
         val mimeType: String? = null
-    ) : DownloadCommand(messageId, showNotification)
+    ) : DownloadCommand(messageId)
     class ShowDownloadFailedMessage(
         @StringRes messageId: Int,
-        showNotification: Boolean,
-        val showEnableDownloadManagerAction: Boolean
-    ) : DownloadCommand(messageId, showNotification)
+    ) : DownloadCommand(messageId)
 }
 
 const val DOWNLOAD_SNACKBAR_LENGTH = 750

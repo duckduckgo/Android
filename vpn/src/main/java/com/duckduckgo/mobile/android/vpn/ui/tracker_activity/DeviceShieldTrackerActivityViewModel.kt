@@ -24,6 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -56,7 +57,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private var lastVpnRequestTime = -1L
 
     internal suspend fun getRunningState(): Flow<VpnState> = withContext(dispatcherProvider.io()) {
-        return@withContext vpnStateMonitor.getStateFlow()
+        return@withContext vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN)
     }
 
     internal suspend fun getTrackingAppsCount(): Flow<TrackingAppCount> = withContext(dispatcherProvider.io()) {

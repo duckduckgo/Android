@@ -14,100 +14,73 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:hint="@string/credentialManagementEditUsernameHint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/usernameEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:hint="@string/credentialManagementEditPasswordHint"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/passwordEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textVisiblePassword" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:hint="@string/credentialManagementEditWebsiteHint"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/domainEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textUri" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginVertical="@dimen/keyline_5"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/deleteButton"
-            android:text="@string/credentialManagementEditButtonDelete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
-        <Button
-            android:id="@+id/saveButton"
-            android:text="@string/credentialManagementEditButtonSaveChanges"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
-
-        <LinearLayout
+        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+            android:id="@+id/domainTitleEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:hint="@string/credentialManagementEditLoginTitleHint"
+            android:layout_marginBottom="@dimen/keyline_5"
+            android:visibility="gone"
+            app:editable="true"
+            app:endIconContentDescription="@string/credentialManagementEditButtonCopyUsername" />
 
-            <Button
-                android:id="@+id/copyUsernameButton"
-                android:text="@string/credentialManagementEditButtonCopyUsername"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+            android:id="@+id/usernameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/credentialManagementEditUsernameHint"
+            app:editable="false"
+            app:endIcon="@drawable/ic_copy"
+            app:endIconContentDescription="@string/credentialManagementEditButtonCopyUsername" />
 
-            <Button
-                android:id="@+id/copyPasswordButton"
-                android:text="@string/credentialManagementEditButtonCopyPassword"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+            android:id="@+id/passwordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:hint="@string/credentialManagementEditPasswordHint"
+            app:editable="false"
+            app:endIcon="@drawable/ic_copy"
+            app:endIconContentDescription="@string/credentialManagementEditButtonCopyPassword"
+            app:isPassword="true" />
 
-        </LinearLayout>
+        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+            android:id="@+id/domainEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:hint="@string/credentialManagementEditWebsiteHint"
+            app:editable="false" />
+
+        <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+            android:id="@+id/notesEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:hint="@string/credentialManagementEditNotesHint"
+            app:editable="false" />
+
+        <TextView
+            android:id="@+id/lastUpdatedView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.DuckDuckGo.Caption"
+            android:textColor="?attr/secondaryTextColor"
+            android:layout_marginTop="@dimen/keyline_4"/>
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

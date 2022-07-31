@@ -46,6 +46,13 @@ data class AppHealthState(
     }
 }
 
+@Entity(tableName = "app_health_triggers")
+data class HealthTriggerEntity(
+    @PrimaryKey val name: String,
+    val enabled: Boolean = false,
+    val threshold: Int? = null,
+)
+
 enum class HealthEventType {
     BAD_HEALTH,
     GOOD_HEALTH

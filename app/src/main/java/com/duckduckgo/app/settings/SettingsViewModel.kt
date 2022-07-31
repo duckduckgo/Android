@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.settings
 
-import android.content.Context
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
@@ -43,7 +43,8 @@ import com.duckduckgo.macos_api.MacOsWaitlist
 import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
@@ -64,7 +65,6 @@ import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SettingsViewModel @Inject constructor(
-    private val appContext: Context,
     private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
@@ -78,8 +78,9 @@ class SettingsViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val emailManager: EmailManager,
     private val macOsWaitlist: MacOsWaitlist,
-    private val internalTestUserChecker: InternalTestUserChecker
-) : ViewModel(), LifecycleObserver {
+    private val internalTestUserChecker: InternalTestUserChecker,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+) : ViewModel(), DefaultLifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
 
@@ -160,9 +161,9 @@ class SettingsViewModel @Inject constructor(
                     automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
-                    globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName) == true,
+                    globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value),
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
-                    appTrackingProtectionEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
+                    appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN),
                     appTrackingProtectionWaitlistState = atpRepository.getState(),
                     emailAddress = emailManager.getEmailAddress(),
                     macOsWaitlistState = macOsWaitlist.getWaitlistState(),
@@ -179,7 +180,7 @@ class SettingsViewModel @Inject constructor(
     fun startPollingAppTpEnableState() {
         viewModelScope.launch {
             while (isActive) {
-                val isDeviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext)
+                val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
                 if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
                     viewState.value = currentViewState().copy(
                         appTrackingProtectionEnabled = isDeviceShieldEnabled
@@ -190,8 +191,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun stopPollingDeviceShieldState() {
+    override fun onStop(owner: LifecycleOwner) {
         deviceShieldStatePollingJob?.cancel()
     }
 

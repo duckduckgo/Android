@@ -36,9 +36,11 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <View
+        <com.duckduckgo.mobile.android.ui.view.SectionDivider
             android:id="@+id/settingsSectionGeneralBottomDivider"
-            style="@style/SettingsGroupDivider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/contentSettingsGeneral" />
@@ -50,12 +52,14 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/settingsSectionGeneralBottomDivider" />
 
-        <View
+        <com.duckduckgo.mobile.android.ui.view.SectionDivider
             android:id="@+id/settingsSectionPrivacyBottomDivider"
-            style="@style/SettingsGroupDivider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/contentSettingsPrivacy" />
+            app:layout_constraintTop_toBottomOf="@id/contentSettingsPrivacy"/>
 
         <include
             android:id="@+id/contentSettingsMore"
@@ -64,12 +68,14 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/settingsSectionPrivacyBottomDivider" />
 
-        <View
+        <com.duckduckgo.mobile.android.ui.view.SectionDivider
             android:id="@+id/settingsSectionMoreBottomDivider"
-            style="@style/SettingsGroupDivider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/contentSettingsMore" />
+            app:layout_constraintTop_toBottomOf="@id/contentSettingsMore"/>
 
         <include
             android:id="@+id/contentSettingsOther"

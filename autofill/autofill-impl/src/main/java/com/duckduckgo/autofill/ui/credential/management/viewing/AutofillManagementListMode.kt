@@ -23,7 +23,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
-import android.widget.RadioGroup.OnCheckedChangeListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -35,7 +34,7 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListModeBinding
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
+import com.duckduckgo.autofill.ui.credential.management.CredentialGrouper
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import dagger.android.support.AndroidSupportInjection
@@ -51,6 +50,9 @@ class AutofillManagementListMode : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var credentialGrouper: CredentialGrouper
 
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
@@ -124,7 +126,9 @@ class AutofillManagementListMode : Fragment() {
 
     private fun configureRecyclerView() {
         adapter = AutofillManagementRecyclerAdapter(
-            this, faviconManager,
+            this,
+            faviconManager = faviconManager,
+            grouper = credentialGrouper,
             onCredentialSelected = this::onCredentialsSelected,
             onCopyUsername = this::onCopyUsername,
             onCopyPassword = this::onCopyPassword,
@@ -134,7 +138,7 @@ class AutofillManagementListMode : Fragment() {
     }
 
     private fun onCredentialsSelected(credentials: LoginCredentials) {
-        viewModel.onEditCredentials(credentials)
+        viewModel.onViewCredentials(credentials)
     }
 
     private fun onCopyUsername(credentials: LoginCredentials) {

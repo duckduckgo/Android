@@ -40,8 +40,8 @@ interface DownloadsDao {
     )
     suspend fun update(fileName: String, downloadStatus: Int, contentLength: Long)
 
-    @Query("delete from downloads where id = :id")
-    suspend fun delete(id: Long)
+    @Query("delete from downloads where downloadId = :downloadId")
+    suspend fun delete(downloadId: Long)
 
     @Query("delete from downloads where downloadId in (:downloadIdList)")
     suspend fun delete(downloadIdList: List<Long>)

@@ -28,7 +28,7 @@ interface SecureStorageRepository {
 
     suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
 
-    suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity
+    suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity?
 
     suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>>
 
@@ -50,7 +50,7 @@ class RealSecureStorageRepository constructor(
     override suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>> =
         websiteLoginCredentialsDao.websiteLoginCredentials()
 
-    override suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity =
+    override suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity? =
         websiteLoginCredentialsDao.getWebsiteLoginCredentialsById(id)
 
     override suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentialsEntity) =

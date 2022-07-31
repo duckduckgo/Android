@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.feature
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.mobile.android.vpn.store.AppTpFeatureToggleRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -45,15 +44,15 @@ class AppTpFeatureTogglesPluginTest {
     @Test
     fun whenIsEnabledCalledOnAppTpFeatureNameThenReturnRepositoryValue() {
         whenever(appTpFeatureToggleRepository.get(AppTpFeatureName.AppTrackerProtection, false)).thenReturn(true)
-        assertEquals(true, plugin.isEnabled(AppTpFeatureName.AppTrackerProtection, false))
+        assertEquals(true, plugin.isEnabled(AppTpFeatureName.AppTrackerProtection.value, false))
 
         whenever(appTpFeatureToggleRepository.get(AppTpFeatureName.AppTrackerProtection, false)).thenReturn(false)
-        assertEquals(false, plugin.isEnabled(AppTpFeatureName.AppTrackerProtection, false))
+        assertEquals(false, plugin.isEnabled(AppTpFeatureName.AppTrackerProtection.value, false))
     }
 
     @Test
     fun whenIsEnabledCalledOnOtherFeatureNameThenReturnRepositoryNull() {
-        assertNull(plugin.isEnabled(TestFeatureName(), false))
+        assertNull(plugin.isEnabled(TestFeatureName().value, false))
     }
 
     @Test
@@ -61,7 +60,7 @@ class AppTpFeatureTogglesPluginTest {
         runTest {
             givenAppTpFeatureIsEnabled()
 
-            val isEnabled = plugin.isEnabled(AppTpFeatureName.AppTrackerProtection, true)
+            val isEnabled = plugin.isEnabled(AppTpFeatureName.AppTrackerProtection.value, true)
 
             assertTrue(isEnabled!!)
         }
@@ -71,7 +70,7 @@ class AppTpFeatureTogglesPluginTest {
         runTest {
             givenAppTpFeatureIsDisabled()
 
-            val isEnabled = plugin.isEnabled(AppTpFeatureName.AppTrackerProtection, true)
+            val isEnabled = plugin.isEnabled(AppTpFeatureName.AppTrackerProtection.value, true)
 
             assertFalse(isEnabled!!)
         }
@@ -83,7 +82,7 @@ class AppTpFeatureTogglesPluginTest {
             givenAppTpFeatureReturnsDefaultValue(defaultValue)
 
             val isEnabled =
-                plugin.isEnabled(AppTpFeatureName.AppTrackerProtection, defaultValue)
+                plugin.isEnabled(AppTpFeatureName.AppTrackerProtection.value, defaultValue)
 
             assertEquals(defaultValue, isEnabled)
         }
@@ -94,7 +93,7 @@ class AppTpFeatureTogglesPluginTest {
             givenAppTpFeatureIsEnabled()
             givenAppVersionIsEqualToMinSupportedVersion()
 
-            val isEnabled = plugin.isEnabled(AppTpFeatureName.AppTrackerProtection, true)
+            val isEnabled = plugin.isEnabled(AppTpFeatureName.AppTrackerProtection.value, true)
 
             assertTrue(isEnabled!!)
         }
@@ -105,7 +104,7 @@ class AppTpFeatureTogglesPluginTest {
             givenAppTpFeatureIsEnabled()
             givenAppVersionIsGreaterThanMinSupportedVersion()
 
-            val isEnabled = plugin.isEnabled(AppTpFeatureName.AppTrackerProtection, true)
+            val isEnabled = plugin.isEnabled(AppTpFeatureName.AppTrackerProtection.value, true)
 
             assertTrue(isEnabled!!)
         }
@@ -116,7 +115,7 @@ class AppTpFeatureTogglesPluginTest {
             givenAppTpFeatureIsEnabled()
             givenAppVersionIsSmallerThanMinSupportedVersion()
 
-            val isEnabled = plugin.isEnabled(AppTpFeatureName.AppTrackerProtection, true)
+            val isEnabled = plugin.isEnabled(AppTpFeatureName.AppTrackerProtection.value, true)
 
             assertFalse(isEnabled!!)
         }
@@ -176,4 +175,4 @@ class AppTpFeatureTogglesPluginTest {
     }
 }
 
-class TestFeatureName(override val value: String = "test") : FeatureName
+class TestFeatureName(val value: String = "test")

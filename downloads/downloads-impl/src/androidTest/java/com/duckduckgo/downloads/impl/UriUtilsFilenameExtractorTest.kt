@@ -301,7 +301,6 @@ class UriUtilsFilenameExtractorTest {
             contentDisposition = contentDisposition,
             mimeType = mimeType,
             subfolder = "aFolder",
-            userAgent = "aUserAgent"
         )
     }
 }
