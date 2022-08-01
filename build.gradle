@@ -43,6 +43,30 @@ allprojects {
     }
 }
 
+subprojects {
+    def projectPath = path
+    configurations.all {
+        if (name == "compileClasspath" || name.endsWith("CompileClasspath")) {
+            incoming.beforeResolve {
+                for (dependency in dependencies) {
+                    if (dependency instanceof ProjectDependency) {
+                        def dependencyPath = dependency.dependencyProject.path
+                        if (dependencyPath == projectPath) continue
+                        if (!projectPath.endsWith(":app") && dependencyPath.endsWith("impl")) {
+                            throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
+                                    "Only :app module can depend on 'impl' modules")
+                        }
+                        if (projectPath.endsWith("api") && dependencyPath.endsWith("api")) {
+                            throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
+                                    "'api' modules can't depend on other 'api' modules")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
