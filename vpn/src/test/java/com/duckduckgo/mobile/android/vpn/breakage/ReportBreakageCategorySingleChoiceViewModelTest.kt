@@ -32,7 +32,7 @@ import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
-class ReportBreakageCategorySingleChoiceFormViewModelTest {
+class ReportBreakageCategorySingleChoiceViewModelTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -123,7 +123,6 @@ class ReportBreakageCategorySingleChoiceFormViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
-
 
     private fun selectAndAcceptCategory(indexSelected: Int = 0) {
         viewModel.onCategoryIndexChanged(indexSelected)
