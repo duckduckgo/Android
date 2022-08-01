@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.global.isHttps
+import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.JsReader
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
@@ -46,7 +47,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
     private lateinit var rules: String
 
-    override fun process(messageType: String, jsonString: String, webView: WebView) {
+    override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         if (messageType == type) {
             appCoroutineScope.launch(dispatcherProvider.main()) {
                 try {
@@ -71,8 +72,8 @@ class InitMessageHandlerPlugin @Inject constructor(
                     }
 
                     val disabledCmps = emptyList<String>()
-                    val autoAction = "optOut"
-                    val enablePreHide = true
+                    val autoAction = null
+                    val enablePreHide = false
                     val detectRetries = 1
 
                     val config = Config(isAutoconsentEnabled, autoAction, disabledCmps, enablePreHide, detectRetries)
@@ -97,7 +98,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     }
 
     private fun getMessage(initResp: InitResp): String {
-        val jsonAdapter: JsonAdapter<InitResp> = moshi.adapter(InitResp::class.java)
+        val jsonAdapter: JsonAdapter<InitResp> = moshi.adapter(InitResp::class.java).serializeNulls()
         return jsonAdapter.toJson(initResp).toString()
     }
 

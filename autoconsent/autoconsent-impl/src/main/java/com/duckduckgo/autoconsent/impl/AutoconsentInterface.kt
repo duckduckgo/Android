@@ -19,21 +19,21 @@ package com.duckduckgo.autoconsent.impl
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import org.json.JSONObject
 import timber.log.Timber
 
 class AutoconsentInterface(
     private val messageHandlerPlugins: PluginPoint<MessageHandlerPlugin>,
-    private val webView: WebView
+    private val webView: WebView,
+    private val autoconsentCallback: AutoconsentCallback
 ) {
     @JavascriptInterface
     fun process(message: String) {
         try {
             val parsedMessage = JSONObject(message)
             val type: String = parsedMessage.getString("type")
-            messageHandlerPlugins.getPlugins().firstOrNull { type == it.type }?.let { plugin ->
-                plugin.process(type, message, webView)
-            }
+            messageHandlerPlugins.getPlugins().firstOrNull { type == it.type }?.process(type, message, webView, autoconsentCallback)
         } catch (e: Exception) {
             Timber.d("MARCOS exception is ${e.localizedMessage}")
         }

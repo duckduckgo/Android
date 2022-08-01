@@ -19,6 +19,7 @@ package com.duckduckgo.autoconsent.impl
 import android.webkit.WebView
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.autoconsent.api.Autoconsent
+import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -36,8 +37,8 @@ class RealAutoconsent @Inject constructor(
         webView.evaluateJavascript("javascript:${getFunctionsJS()}", null)
     }
 
-    override fun addJsInterface(webView: WebView) {
-        webView.addJavascriptInterface(AutoconsentInterface(messageHandlerPlugins, webView), "MARCOS")
+    override fun addJsInterface(webView: WebView, autoconsentCallback: AutoconsentCallback) {
+        webView.addJavascriptInterface(AutoconsentInterface(messageHandlerPlugins, webView, autoconsentCallback), "MARCOS")
     }
 
     private fun getFunctionsJS(): String {

@@ -19,6 +19,7 @@ package com.duckduckgo.autoconsent.impl.handlers
 import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.di.scopes.AppScope
@@ -40,7 +41,7 @@ class EvalMessageHandlerPlugin @Inject constructor(
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
-    override fun process(messageType: String, jsonString: String, webView: WebView) {
+    override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         if (messageType == type) {
             appCoroutineScope.launch(dispatcherProvider.main()) {
                 try {
