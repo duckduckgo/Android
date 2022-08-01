@@ -30,6 +30,7 @@ interface CredentialAutofillPickerDialog {
         const val KEY_CANCELLED = "cancelled"
         const val KEY_URL = "url"
         const val KEY_CREDENTIALS = "credentials"
+        const val IS_AUTOPROMPT = "isAutoprompt"
     }
 }
 
@@ -64,7 +65,7 @@ interface CredentialUpdateExistingCredentialsDialog {
  */
 interface CredentialAutofillDialogFactory {
 
-    fun autofillSelectCredentialsDialog(url: String, credentials: List<LoginCredentials>): DialogFragment
+    fun autofillSelectCredentialsDialog(url: String, credentials: List<LoginCredentials>, isAutoprompt: Boolean): DialogFragment
 
     fun autofillSavingCredentialsDialog(url: String, credentials: LoginCredentials): DialogFragment
 

@@ -56,7 +56,7 @@ interface BrowserAutofill {
  * Browser Autofill callbacks
  */
 interface Callback {
-    suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>)
+    suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>, isAutoprompt: Boolean)
     suspend fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials)
     fun noCredentialsAvailable(originalUrl: String)
 }

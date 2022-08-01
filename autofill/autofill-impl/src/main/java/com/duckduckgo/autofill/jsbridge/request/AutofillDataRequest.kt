@@ -20,7 +20,8 @@ import com.squareup.moshi.Json
 
 data class AutofillDataRequest(
     val mainType: SupportedAutofillInputMainType,
-    val subType: SupportedAutofillInputSubType
+    val subType: SupportedAutofillInputSubType,
+    val isAutoprompt: Boolean
 ) {
 
     data class InputType(

@@ -27,6 +27,8 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.extractDomain
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
@@ -41,6 +43,8 @@ import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialAutofillPickerDialog {
+    @Inject
+    lateinit var pixel: Pixel
 
     override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
 
@@ -107,6 +111,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, true)
             it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
         }
+        pixel.fire(AppPixelName.AUTOFILL_LOGINS_AUTOPROMPT_DISMISSED)
         parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.RESULT_KEY_CREDENTIAL_PICKER, result)
     }
 
@@ -116,7 +121,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     companion object {
 
-        fun instance(url: String, credentials: List<LoginCredentials>): AutofillSelectCredentialsDialogFragment {
+        fun instance(url: String, credentials: List<LoginCredentials>, isAutoprompt: Boolean): AutofillSelectCredentialsDialogFragment {
 
             val cr = ArrayList<LoginCredentials>(credentials)
 
@@ -125,6 +130,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
                 Bundle().also {
                     it.putString(CredentialAutofillPickerDialog.KEY_URL, url)
                     it.putParcelableArrayList(CredentialAutofillPickerDialog.KEY_CREDENTIALS, cr)
+                    it.putBoolean(CredentialAutofillPickerDialog.IS_AUTOPROMPT, isAutoprompt)
                 }
             return fragment
         }

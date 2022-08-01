@@ -419,8 +419,8 @@ class BrowserTabFragment :
     }
 
     private val autofillCallback = object : Callback {
-        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
-            showAutofillDialogChooseCredentials(credentials)
+        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>, isAutoprompt: Boolean) {
+            showAutofillDialogChooseCredentials(credentials, isAutoprompt)
         }
 
         override fun noCredentialsAvailable(originalUrl: String) {
@@ -1592,10 +1592,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showAutofillDialogChooseCredentials(credentials: List<LoginCredentials>) {
+    private fun showAutofillDialogChooseCredentials(credentials: List<LoginCredentials>, isAutoprompt: Boolean) {
         Timber.v("onCredentialsAvailable. %d creds to choose from", credentials.size)
         val url = webView?.url ?: return
-        val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(url, credentials)
+        val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(url, credentials ,isAutoprompt)
         showDialogHidingPrevious(dialog, CredentialAutofillPickerDialog.TAG)
     }
 

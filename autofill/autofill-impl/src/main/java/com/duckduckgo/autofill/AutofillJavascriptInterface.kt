@@ -102,7 +102,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
                 if (credentials.isEmpty()) {
                     callback?.noCredentialsAvailable(url)
                 } else {
-                    callback?.onCredentialsAvailableToInject(credentials)
+                    callback?.onCredentialsAvailableToInject(credentials, request.isAutoprompt)
                 }
             }
         }

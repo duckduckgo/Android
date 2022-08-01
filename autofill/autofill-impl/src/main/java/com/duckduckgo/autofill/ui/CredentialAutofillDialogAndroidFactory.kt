@@ -29,8 +29,8 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialAutofillDialogFactory {
 
-    override fun autofillSelectCredentialsDialog(url: String, credentials: List<LoginCredentials>): DialogFragment {
-        return AutofillSelectCredentialsDialogFragment.instance(url, credentials)
+    override fun autofillSelectCredentialsDialog(url: String, credentials: List<LoginCredentials>, isAutoprompt: Boolean): DialogFragment {
+        return AutofillSelectCredentialsDialogFragment.instance(url, credentials, isAutoprompt)
     }
 
     override fun autofillSavingCredentialsDialog(url: String, credentials: LoginCredentials): DialogFragment {

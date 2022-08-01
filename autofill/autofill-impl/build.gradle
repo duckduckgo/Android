@@ -33,6 +33,9 @@ dependencies {
     implementation project(path: ':device-auth-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':autofill-store')
+    implementation project(path: ':statistics')
+    implementation project(path: ':app')
+    implementation project(path: ':app')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
