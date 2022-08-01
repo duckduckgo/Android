@@ -22,6 +22,9 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.Credential
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.GroupHeading
+import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGrouper
+import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialInitialExtractor
+import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialListSorterByTitleAndDomain
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,16 +32,13 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class CredentialGrouperTest {
 
-    private val characterValidator = LatinCharacterValidator()
+    private val domainFormatter = AutofillDomainFormatterDomainNameOnly()
 
-    private val initialExtractor = CredentialInitialExtractor(
-        domainFormatter = AutofillDomainFormatterDomainNameOnly(),
-        characterValidator = characterValidator
-    )
+    private val initialExtractor = CredentialInitialExtractor(domainFormatter = domainFormatter)
 
     private val testee = CredentialGrouper(
         initialExtractor = initialExtractor,
-        sorter = CredentialListSorterByTitleAndDomain(initialExtractor, characterValidator)
+        sorter = CredentialListSorterByTitleAndDomain(domainFormatter)
     )
 
     @Test
@@ -57,8 +57,8 @@ class CredentialGrouperTest {
 
         grouped.assertTotalSize(expected = 2)
         grouped.assertNumberOfHeadings(expected = 1)
-        grouped[0].assertIsGroupHeading('E')
-        grouped[1].assertIsCredential("example.com")
+        grouped[0].assertIsGroupHeading("E")
+        grouped[1].assertIsCredentialWithDomain("example.com")
     }
 
     @Test
@@ -72,7 +72,7 @@ class CredentialGrouperTest {
 
         grouped.assertNumberOfHeadings(expected = 1)
         grouped.assertTotalSize(expected = 4)
-        grouped[0].assertIsGroupHeading('E')
+        grouped[0].assertIsGroupHeading("E")
     }
 
     @Test
@@ -87,9 +87,9 @@ class CredentialGrouperTest {
 
         grouped.assertNumberOfHeadings(expected = 3)
         grouped.assertTotalSize(expected = 7)
-        grouped[0].assertIsGroupHeading('B')
-        grouped[2].assertIsGroupHeading('E')
-        grouped[5].assertIsGroupHeading('F')
+        grouped[0].assertIsGroupHeading("B")
+        grouped[2].assertIsGroupHeading("E")
+        grouped[5].assertIsGroupHeading("F")
     }
 
     @Test
@@ -105,11 +105,11 @@ class CredentialGrouperTest {
 
         grouped.assertNumberOfHeadings(expected = 5)
         grouped.assertTotalSize(expected = 10)
-        grouped[0].assertIsGroupHeading('A')
-        grouped[2].assertIsGroupHeading('B')
-        grouped[4].assertIsGroupHeading('C')
-        grouped[6].assertIsGroupHeading('E')
-        grouped[8].assertIsGroupHeading('S')
+        grouped[0].assertIsGroupHeading("A")
+        grouped[2].assertIsGroupHeading("B")
+        grouped[4].assertIsGroupHeading("C")
+        grouped[6].assertIsGroupHeading("E")
+        grouped[8].assertIsGroupHeading("S")
     }
 
     @Test
@@ -124,11 +124,109 @@ class CredentialGrouperTest {
 
         grouped.assertNumberOfHeadings(expected = 4)
         grouped.assertTotalSize(expected = 8)
-        grouped[0].assertIsGroupHeading('#')
-        grouped[1].assertIsCredential(expectedDomain = null)
-        grouped[2].assertIsGroupHeading('E')
-        grouped[4].assertIsGroupHeading('S')
-        grouped[6].assertIsGroupHeading('T')
+        grouped[0].assertIsGroupHeading("#")
+        grouped[1].assertIsCredentialWithDomain(expectedDomain = null)
+        grouped[2].assertIsGroupHeading("E")
+        grouped[4].assertIsGroupHeading("S")
+        grouped[6].assertIsGroupHeading("T")
+    }
+
+    @Test
+    fun whenCharactersCanBeDeconstructedThenTheyDoNotGetTheirOwnGroup() {
+        val credentials = listOf(
+            creds(title = "ä"),
+            creds(title = "A"),
+            creds(title = "Ğ"),
+            creds(title = "G")
+
+        )
+        val grouped = testee.group(credentials)
+
+        val expectedNumberOfHeadings = 2
+        grouped.assertNumberOfHeadings(expected = expectedNumberOfHeadings)
+        grouped.assertTotalSize(expected = expectedNumberOfHeadings + credentials.size)
+        grouped[0].assertIsGroupHeading("A")
+        grouped[3].assertIsGroupHeading("G")
+    }
+
+    @Test
+    fun whenNonEnglishAlphabetCharactersThenTheyDoGetTheirOwnGroup() {
+        val credentials = listOf(
+            creds(title = "ß")
+        )
+        val grouped = testee.group(credentials)
+
+        val expectedNumberOfHeadings = 1
+        grouped.assertNumberOfHeadings(expected = expectedNumberOfHeadings)
+        grouped.assertTotalSize(expected = expectedNumberOfHeadings + credentials.size)
+        grouped[0].assertIsGroupHeading("ß")
+    }
+
+    @Test
+    fun whenEmojiThenTheTheyAreInPlaceholder() {
+        val credentials = listOf(
+            creds(title = "😅")
+        )
+        val grouped = testee.group(credentials)
+
+        val expectedNumberOfHeadings = 1
+        grouped.assertNumberOfHeadings(expected = expectedNumberOfHeadings)
+        grouped.assertTotalSize(expected = expectedNumberOfHeadings + credentials.size)
+        grouped[0].assertIsGroupHeading("#")
+    }
+
+    @Test
+    fun whenNumberThenTheTheyAreInTheirOwnGroup() {
+        val credentials = listOf(
+            creds(title = "5")
+        )
+        val grouped = testee.group(credentials)
+
+        val expectedNumberOfHeadings = 1
+        grouped.assertNumberOfHeadings(expected = expectedNumberOfHeadings)
+        grouped.assertTotalSize(expected = expectedNumberOfHeadings + credentials.size)
+        grouped[0].assertIsGroupHeading("5")
+    }
+
+    @Test
+    fun whenListMixtureOfAccentedCharactersThenAccentedCharactersDoNotGetTheirOwnGroups() {
+        val credentials = listOf(
+            creds(title = "A"),
+            creds(title = "Ab"),
+            creds(title = "ab"),
+            creds(title = "B"),
+            creds(title = "Bc"),
+            creds(title = "bc"),
+            creds(title = "C"),
+            creds(title = "Ca"),
+            creds(title = "ca"),
+            creds(title = "Ç"),
+            creds(title = "Ça"),
+            creds(title = "ça"),
+            creds(title = "D"),
+        )
+        val grouped = testee.group(credentials)
+
+        val expectedNumberOfHeadings = 4
+        grouped.assertNumberOfHeadings(expected = expectedNumberOfHeadings)
+        grouped.assertTotalSize(expected = expectedNumberOfHeadings + credentials.size)
+        grouped[0].assertIsGroupHeading("A")
+        grouped[1].assertIsCredentialWithTitle("A")
+        grouped[2].assertIsCredentialWithTitle("Ab")
+        grouped[3].assertIsCredentialWithTitle("ab")
+        grouped[4].assertIsGroupHeading("B")
+        grouped[5].assertIsCredentialWithTitle("B")
+        grouped[6].assertIsCredentialWithTitle("Bc")
+        grouped[7].assertIsCredentialWithTitle("bc")
+        grouped[8].assertIsGroupHeading("C")
+        grouped[9].assertIsCredentialWithTitle("C")
+        grouped[10].assertIsCredentialWithTitle("Ç")
+        grouped[11].assertIsCredentialWithTitle("Ca")
+        grouped[12].assertIsCredentialWithTitle("ca")
+        grouped[13].assertIsCredentialWithTitle("Ça")
+        grouped[14].assertIsCredentialWithTitle("ça")
+        grouped[15].assertIsGroupHeading("D")
+        grouped[16].assertIsCredentialWithTitle("D")
     }
 
     private fun List<ListItem>.assertNumberOfHeadings(expected: Int) {
@@ -139,14 +237,19 @@ class CredentialGrouperTest {
         assertEquals(expected, this.size)
     }
 
-    private fun ListItem.assertIsGroupHeading(expectedInitial: Char) {
+    private fun ListItem.assertIsGroupHeading(expectedInitial: String) {
         assertTrue(this is GroupHeading)
         assertEquals(expectedInitial, (this as GroupHeading).initial)
     }
 
-    private fun ListItem.assertIsCredential(expectedDomain: String?) {
+    private fun ListItem.assertIsCredentialWithDomain(expectedDomain: String?) {
         assertTrue(this is Credential)
         assertEquals(expectedDomain, (this as Credential).credentials.domain)
+    }
+
+    private fun ListItem.assertIsCredentialWithTitle(expectedTitle: String?) {
+        assertTrue(this is Credential)
+        assertEquals(expectedTitle, (this as Credential).credentials.domainTitle)
     }
 
     private fun creds(domain: String? = null, title: String? = null): LoginCredentials {

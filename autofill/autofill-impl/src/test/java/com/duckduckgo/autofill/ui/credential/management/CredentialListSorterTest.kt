@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.ui.credential.management
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.AutofillDomainFormatterDomainNameOnly
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialListSorterByTitleAndDomain
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,12 +28,8 @@ import org.junit.runner.RunWith
 class CredentialListSorterTest {
 
     private val domainFormatter = AutofillDomainFormatterDomainNameOnly()
-    private val characterValidator = LatinCharacterValidator()
 
-    private val testee = CredentialListSorterByTitleAndDomain(
-        initialExtractor = CredentialInitialExtractor(domainFormatter, characterValidator),
-        characterValidator = characterValidator
-    )
+    private val testee = CredentialListSorterByTitleAndDomain(domainFormatter = domainFormatter)
     private val list = mutableListOf<LoginCredentials>()
 
     @Test
@@ -192,27 +189,59 @@ class CredentialListSorterTest {
     }
 
     @Test
-    fun whenSpecialCharactersInDomainThenSortedBeforeLetters() {
+    fun whenSpecialCharactersInDomainThenSortedAmongLetters() {
         val sorted = testee.sort(
             list.also {
                 it.add(credsWithDomain("a.com"))
                 it.add(credsWithDomain("b.com"))
-                it.add(credsWithDomain("ć.com"))
+                it.add(credsWithDomain("ç.com"))
+                it.add(credsWithDomain("c.com"))
             }
         )
-        sorted.assertDomainOrder("ć.com", "a.com", "b.com")
+        sorted.assertDomainOrder("a.com", "b.com", "c.com", "ç.com")
     }
 
     @Test
-    fun whenSpecialCharactersInTitleThenSortedBeforeLetters() {
+    fun whenSpecialCharactersInTitleThenSortedAmongLetters() {
         val sorted = testee.sort(
             list.also {
                 it.add(credsWithTitle("a"))
+                it.add(credsWithTitle("c"))
                 it.add(credsWithTitle("b"))
                 it.add(credsWithTitle("ć"))
             }
         )
-        sorted.assertTitleOrder("ć", "a", "b")
+        sorted.assertTitleOrder("a", "b", "c", "ć")
+    }
+
+    @Test
+    fun whenMultipleSimilarCharactersInTitleThenSortingCorrect() {
+        val sorted = testee.sort(
+            list.also {
+                it.add(credsWithTitle("a"))
+                it.add(credsWithTitle("CNN"))
+                it.add(credsWithTitle("cello"))
+                it.add(credsWithTitle("b"))
+                it.add(credsWithTitle("ć"))
+                it.add(credsWithTitle("d"))
+            }
+        )
+        sorted.assertTitleOrder("a", "b", "ć", "cello", "CNN", "d")
+    }
+
+    @Test
+    fun whenMultipleSimilarCharactersInDomainThenSortingCorrect() {
+        val sorted = testee.sort(
+            list.also {
+                it.add(credsWithDomain("a"))
+                it.add(credsWithDomain("CNN"))
+                it.add(credsWithDomain("cello"))
+                it.add(credsWithDomain("b"))
+                it.add(credsWithDomain("ć"))
+                it.add(credsWithDomain("d"))
+            }
+        )
+        sorted.assertDomainOrder("a", "b", "ć", "cello", "CNN", "d")
     }
 
     private fun List<LoginCredentials>.assertTitleOrder(vararg titles: String?) {

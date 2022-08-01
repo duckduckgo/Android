@@ -19,7 +19,8 @@ package com.duckduckgo.autofill.ui.credential.management
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.AutofillDomainFormatterDomainNameOnly
 import com.duckduckgo.autofill.domain.app.LoginCredentials
-import com.duckduckgo.autofill.ui.credential.management.CredentialInitialExtractor.Companion.INITIAL_CHAR_FOR_NON_LETTERS
+import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialInitialExtractor
+import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialInitialExtractor.Companion.INITIAL_CHAR_FOR_NON_LETTERS
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,10 +28,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class CredentialInitialExtractorTest {
 
-    private val testee = CredentialInitialExtractor(
-        domainFormatter = AutofillDomainFormatterDomainNameOnly(),
-        characterValidator = LatinCharacterValidator()
-    )
+    private val testee = CredentialInitialExtractor(domainFormatter = AutofillDomainFormatterDomainNameOnly())
 
     @Test
     fun whenMissingTitleAndDomainThenPlaceholderChar() {
@@ -48,38 +46,47 @@ class CredentialInitialExtractorTest {
     fun whenMissingTitleThenDomainInitialUsed() {
         val loginCredentials = creds(title = null, domain = "example.com")
         val result = testee.extractInitial(loginCredentials)
-        assertEquals('E', result)
+        assertEquals("E", result)
     }
 
     @Test
     fun whenTitleIsPresentThenTitleInitialIsUsedAndDomainIsIgnored() {
         val loginCredentials = creds(title = "A website", domain = "example.com")
         val result = testee.extractInitial(loginCredentials)
-        assertEquals('A', result)
+        assertEquals("A", result)
     }
 
     @Test
-    fun whenTitleStartsWithANumberThenPlaceholderChar() {
+    fun whenTitleStartsWithANumberThenNumberUsed() {
         val loginCredentials = creds(title = "123 website")
-        val result = testee.extractInitial(loginCredentials)
-        result.assertIsPlaceholder()
+        assertEquals("1", testee.extractInitial(loginCredentials))
     }
 
     @Test
-    fun whenTitleStartsWithASpecialCharacterThenPlaceholderChar() {
+    fun whenTitleStartsWithASpecialCharacterThenPlaceholderUsed() {
         val loginCredentials = creds(title = "$123 website")
-        val result = testee.extractInitial(loginCredentials)
-        result.assertIsPlaceholder()
+        testee.extractInitial(loginCredentials).assertIsPlaceholder()
+    }
+
+    @Test()
+    fun whenTitleStartsWithANonLatinLetterThatCannotBeDecomposedThenOriginalLetterIsUsed() {
+        val loginCredentials = creds(title = "ß website")
+        assertEquals("ß", testee.extractInitial(loginCredentials))
     }
 
     @Test
-    fun whenTitleStartsWithANonLatinLetterThenPlaceholderChar() {
-        val loginCredentials = creds(title = "À website")
-        val result = testee.extractInitial(loginCredentials)
-        result.assertIsPlaceholder()
+    fun whenTitleStartsWithAnAccentedLetterThenThatBaseLetterIsUsed() {
+        val loginCredentials = creds(title = "Ça va website")
+        assertEquals("C", testee.extractInitial(loginCredentials))
     }
 
-    private fun Char.assertIsPlaceholder() {
+    @Test
+    fun whenTitleStartsWithANonLatinLetterThenThatLetterIsUsed() {
+        val loginCredentials = creds(title = "あ")
+        assertEquals("あ", testee.extractInitial(loginCredentials))
+    }
+
+    private fun String.assertIsPlaceholder() {
         assertEquals(INITIAL_CHAR_FOR_NON_LETTERS, this)
     }
 
