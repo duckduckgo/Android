@@ -2021,13 +2021,13 @@ class BrowserTabFragment :
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
     }
 
-    private fun minSdk29(): Boolean {
-        return appBuildConfig.sdkInt >= Build.VERSION_CODES.Q
+    private fun minSdk30(): Boolean {
+        return appBuildConfig.sdkInt >= Build.VERSION_CODES.R
     }
 
     @Suppress("NewApi") // we use appBuildConfig
     private fun hasWriteStoragePermission(): Boolean {
-        return minSdk29() ||
+        return minSdk30() ||
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 
