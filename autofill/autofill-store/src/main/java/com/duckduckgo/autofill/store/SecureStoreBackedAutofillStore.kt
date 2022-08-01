@@ -51,13 +51,17 @@ class SecureStoreBackedAutofillStore(
         set(value) = prefs.edit { putBoolean(SHOW_SAVE_LOGIN_ONBOARDING, value) }
 
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
-        Timber.i("Querying secure store for stored credentials. rawUrl: %s, extractedDomain:%s", rawUrl, rawUrl.extractSchemeAndDomain())
-        val url = rawUrl.extractSchemeAndDomain() ?: return emptyList()
+        return if (autofillEnabled) {
+            Timber.i("Querying secure store for stored credentials. rawUrl: %s, extractedDomain:%s", rawUrl, rawUrl.extractSchemeAndDomain())
+            val url = rawUrl.extractSchemeAndDomain() ?: return emptyList()
 
-        val storedCredentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: emptyList()
-        Timber.v("Found %d credentials for %s", storedCredentials.size, url)
+            val storedCredentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: emptyList()
+            Timber.v("Found %d credentials for %s", storedCredentials.size, url)
 
-        return storedCredentials.map { it.toLoginCredentials() }
+            storedCredentials.map { it.toLoginCredentials() }
+        } else {
+            emptyList()
+        }
     }
 
     override suspend fun saveCredentials(

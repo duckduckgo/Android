@@ -66,6 +66,15 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     @Test
+    fun whenInternalTestUserFalseThenGetCredentialsWithDomainReturnsEmpty() = runTest {
+        setupTesteeWithInternalTestUserFalse()
+        val url = "example.com"
+        storeCredentials(1, url, "username", "password")
+
+        assertTrue(testee.getCredentials(url).isEmpty())
+    }
+
+    @Test
     fun whenStoreEmptyThenNoMatch() = runTest {
         setupTesteeWithInternalTestUserTrue()
         val result = testee.containsCredentials("example.com", "username", "password")
