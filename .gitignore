@@ -58,3 +58,13 @@ build-cache
 report
 
 .DS_Store
+/node_modules/@duckduckgo/autofill/.eslintrc
+/node_modules/@duckduckgo/autofill/docs
+/node_modules/@duckduckgo/autofill/Gruntfile.js
+/node_modules/@duckduckgo/autofill/integration-test
+/node_modules/@duckduckgo/autofill/package.json
+/node_modules/@duckduckgo/autofill/packages
+/node_modules/@duckduckgo/autofill/playwright.config.js
+/node_modules/@duckduckgo/autofill/scripts
+/node_modules/@duckduckgo/autofill/src
+/node_modules/@duckduckgo/autofill/swift-package
