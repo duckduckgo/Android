@@ -29,7 +29,8 @@ interface SecureStorage {
     fun canAccessSecureStorage(): Boolean
 
     /**
-     * This method adds a raw plaintext [WebsiteLoginDetailsWithCredentials] into the [SecureStorage].
+     * This method adds a raw plaintext [WebsiteLoginDetailsWithCredentials] into the [SecureStorage]. If [canAccessSecureStorage] is false when
+     * this is invoked, nothing will be done.
      *
      * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
@@ -39,6 +40,7 @@ interface SecureStorage {
     /**
      * This method returns all [WebsiteLoginDetails] with the [domain] stored in the [SecureStorage].
      * Only L1 encrypted data is returned by these function. This is best use when the need is only to access non-sensitive data.
+     * If [canAccessSecureStorage] is false when this is invoked, an empty flow will be emitted.
      *
      * @return Flow<List<WebsiteLoginDetails>> a flow emitting a List of plain text WebsiteLoginDetails stored in SecureStorage.
      */
@@ -47,6 +49,7 @@ interface SecureStorage {
     /**
      * This method returns all [WebsiteLoginDetails] stored in the [SecureStorage].
      * Only L1 encrypted data is returned by these function. This is best use when the need is only to access non-sensitive data.
+     * If [canAccessSecureStorage] is false when this is invoked, an empty flow will be emitted.
      *
      * @return Flow<List<WebsiteLoginDetails>> a flow containing a List of plain text WebsiteLoginDetails stored in SecureStorage.
      */
@@ -55,6 +58,7 @@ interface SecureStorage {
     /**
      * This method returns the [WebsiteLoginDetailsWithCredentials] with the [id] stored in the [SecureStorage].
      * This returns decrypted sensitive data (encrypted in L2). Use this only when sensitive data is needed to be accessed.
+     * If [canAccessSecureStorage] is false when this is invoked, null will be returned.
      *
      * @return [WebsiteLoginDetailsWithCredentials] containing the plaintext password
      * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
@@ -65,6 +69,7 @@ interface SecureStorage {
     /**
      * This method returns the [WebsiteLoginDetailsWithCredentials] with the [domain] stored in the [SecureStorage].
      * This returns decrypted sensitive data (encrypted in L2). Use this only when sensitive data is needed to be accessed.
+     * If [canAccessSecureStorage] is false when this is invoked, an empty flow will be emitted.
      *
      * @return Flow<List<WebsiteLoginDetailsWithCredentials>> a flow emitting a List of plain text WebsiteLoginDetailsWithCredentials stored
      * in SecureStorage containing the plaintext password
@@ -76,6 +81,7 @@ interface SecureStorage {
     /**
      * This method returns all the [WebsiteLoginDetailsWithCredentials] stored in the [SecureStorage].
      * This returns decrypted sensitive data (encrypted in L2). Use this only when sensitive data is needed to be accessed.
+     * If [canAccessSecureStorage] is false when this is invoked, an empty flow will be emitted.
      *
      * @return Flow<List<WebsiteLoginDetailsWithCredentials>>  a flow emitting a List of plain text WebsiteLoginDetailsWithCredentials stored
      * in SecureStorage containing the plaintext password
@@ -86,6 +92,7 @@ interface SecureStorage {
 
     /**
      * This method updates an existing [WebsiteLoginDetailsWithCredentials] in the [SecureStorage].
+     * If [canAccessSecureStorage] is false when this is invoked, nothing will be done.
      *
      * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
@@ -94,6 +101,7 @@ interface SecureStorage {
 
     /**
      * This method removes an existing [WebsiteLoginDetailsWithCredentials] associated with an [id] from the [SecureStorage].
+     * If [canAccessSecureStorage] is false when this is invoked, nothing will be done.
      */
     suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Int)
 }

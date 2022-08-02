@@ -36,6 +36,7 @@ dependencies {
 
     implementation "net.zetetic:android-database-sqlcipher:_"
 
+    testImplementation CashApp.turbine
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
