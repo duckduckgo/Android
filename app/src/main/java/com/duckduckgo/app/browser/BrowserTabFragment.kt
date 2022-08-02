@@ -194,6 +194,8 @@ import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.ui.ExistingCredentialMatchDetector
+import com.duckduckgo.autoconsent.api.Autoconsent
+import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -344,6 +346,9 @@ class BrowserTabFragment :
     lateinit var existingCredentialMatchDetector: ExistingCredentialMatchDetector
 
     @Inject
+    lateinit var autoconsent: Autoconsent
+
+    @Inject
     lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
@@ -419,6 +424,16 @@ class BrowserTabFragment :
     private val omnibarInputTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), omnibarTextInput.hasFocus(), true)
+        }
+    }
+
+    private val autoconsentCallback = object : AutoconsentCallback {
+        override fun onFirstPopUpHandled(dialogFragment: DialogFragment, tag: String) {
+            showDialogHidingPrevious(dialogFragment, tag)
+        }
+
+        override fun onPopUpHandled() {
+            TODO("Not yet implemented")
         }
     }
 
@@ -1566,6 +1581,7 @@ class BrowserTabFragment :
             emailInjector.addJsInterface(it) { viewModel.showEmailTooltip() }
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
+            autoconsent.addJsInterface(it, autoconsentCallback)
         }
 
         if (appBuildConfig.isDebug) {
