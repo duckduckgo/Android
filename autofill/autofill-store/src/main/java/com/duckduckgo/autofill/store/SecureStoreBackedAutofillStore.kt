@@ -53,7 +53,7 @@ class SecureStoreBackedAutofillStore(
         }
 
     override val autofillAvailable: Boolean
-        get() = internalTestUserChecker.isInternalTestUser
+        get() = internalTestUserChecker.isInternalTestUser && secureStorage.canAccessSecureStorage()
 
     override var showOnboardingWhenOfferingToSaveLogin: Boolean
         get() = prefs.getBoolean(SHOW_SAVE_LOGIN_ONBOARDING, true)
