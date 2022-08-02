@@ -44,15 +44,23 @@ class SecureStoreBackedAutofillStore(
     }
 
     override var autofillEnabled: Boolean
-        get() = internalTestUserChecker.isInternalTestUser && prefs.getBoolean(AUTOFILL_ENABLED, true)
-        set(value) = prefs.edit { putBoolean(AUTOFILL_ENABLED, value && internalTestUserChecker.isInternalTestUser) }
+        get() = prefs.getBoolean(AUTOFILL_ENABLED, true)
+        set(value) = prefs.edit {
+            putBoolean(
+                AUTOFILL_ENABLED,
+                value && internalTestUserChecker.isInternalTestUser && secureStorage.canAccessSecureStorage()
+            )
+        }
+
+    override val autofillAvailable: Boolean
+        get() = internalTestUserChecker.isInternalTestUser
 
     override var showOnboardingWhenOfferingToSaveLogin: Boolean
         get() = prefs.getBoolean(SHOW_SAVE_LOGIN_ONBOARDING, true)
         set(value) = prefs.edit { putBoolean(SHOW_SAVE_LOGIN_ONBOARDING, value) }
 
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
-        return if (autofillEnabled) {
+        return if (autofillEnabled && autofillAvailable) {
             Timber.i("Querying secure store for stored credentials. rawUrl: %s, extractedDomain:%s", rawUrl, rawUrl.extractSchemeAndDomain())
             val url = rawUrl.extractSchemeAndDomain() ?: return emptyList()
 

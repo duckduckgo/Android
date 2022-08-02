@@ -36,7 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.InternalTestUserChecker
+import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.macos_api.MacOsWaitlist
@@ -78,7 +78,7 @@ class SettingsViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val emailManager: EmailManager,
     private val macOsWaitlist: MacOsWaitlist,
-    private val internalTestUserChecker: InternalTestUserChecker,
+    private val autofillStore: AutofillStore,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -167,7 +167,7 @@ class SettingsViewModel @Inject constructor(
                     appTrackingProtectionWaitlistState = atpRepository.getState(),
                     emailAddress = emailManager.getEmailAddress(),
                     macOsWaitlistState = macOsWaitlist.getWaitlistState(),
-                    showAutofill = internalTestUserChecker.isInternalTestUser
+                    showAutofill = autofillStore.autofillAvailable
                 )
             )
         }

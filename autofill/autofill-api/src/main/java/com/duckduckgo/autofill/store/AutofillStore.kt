@@ -30,6 +30,11 @@ interface AutofillStore {
     var autofillEnabled: Boolean
 
     /**
+     * Determines if the autofill feature is available for the user
+     */
+    val autofillAvailable: Boolean
+
+    /**
      * Used to determine whether we show additional onboarding info when offering to save a login credential
      *
      * This will default to true, and remain true until after the first credential has been saved
