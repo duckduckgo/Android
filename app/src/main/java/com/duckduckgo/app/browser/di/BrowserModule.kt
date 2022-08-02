@@ -78,6 +78,7 @@ import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.di.scopes.AppScope
@@ -134,7 +135,8 @@ class BrowserModule {
         ampLinks: AmpLinks,
         printInjector: PrintInjector,
         internalTestUserChecker: InternalTestUserChecker,
-        adClickManager: AdClickManager
+        adClickManager: AdClickManager,
+        autoconsent: Autoconsent,
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -156,7 +158,8 @@ class BrowserModule {
             ampLinks,
             printInjector,
             internalTestUserChecker,
-            adClickManager
+            adClickManager,
+            autoconsent,
         )
     }
 
