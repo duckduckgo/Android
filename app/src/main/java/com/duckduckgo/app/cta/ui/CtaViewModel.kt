@@ -248,9 +248,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private fun canShowWidgetCta(): Boolean {
-        return widgetCapabilities.supportsStandardWidgetAdd &&
-            !widgetCapabilities.hasInstalledWidgets &&
-            !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
+        return !widgetCapabilities.hasInstalledWidgets && !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
 
     @WorkerThread

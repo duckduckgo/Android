@@ -27,7 +27,6 @@ import com.duckduckgo.widget.SearchWidgetLight
 import javax.inject.Inject
 
 interface WidgetCapabilities {
-    val supportsStandardWidgetAdd: Boolean
     val supportsAutomaticWidgetAdd: Boolean
     val hasInstalledWidgets: Boolean
 }
@@ -36,8 +35,6 @@ class AppWidgetCapabilities @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
 ) : WidgetCapabilities {
-
-    override val supportsStandardWidgetAdd = true
 
     override val supportsAutomaticWidgetAdd: Boolean
         @Suppress("NewApi") // we use appBuildConfig
