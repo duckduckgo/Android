@@ -111,6 +111,11 @@ include ':lint-rules'
     include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
 }
 
+"autoconsent".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+}
+
 rootProject.children.each { subproject ->
 
     if (subproject.name == "vpn") {

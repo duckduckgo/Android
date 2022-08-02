@@ -42,6 +42,7 @@ import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.privacy.config.api.Gpc
@@ -92,6 +93,7 @@ class BrowserWebViewClientTest {
     private val ampLinks: AmpLinks = mock()
     private val printInjector: PrintInjector = mock()
     private val internalTestUserChecker: InternalTestUserChecker = mock()
+    private val autoconsent: Autoconsent = mock()
 
     @UiThreadTest
     @Before
@@ -116,7 +118,8 @@ class BrowserWebViewClientTest {
             accessibilitySettings,
             ampLinks,
             printInjector,
-            internalTestUserChecker
+            internalTestUserChecker,
+            autoconsent,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -185,6 +188,13 @@ class BrowserWebViewClientTest {
     fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() = runTest {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(thirdPartyCookieManager).processUriForThirdPartyCookies(webView, EXAMPLE_URL.toUri())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledThenInjectAutoconsentCalled() = runTest {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(autoconsent).injectAutoconsent(webView)
     }
 
     @UiThreadTest
