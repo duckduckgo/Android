@@ -16,17 +16,14 @@
 
 package com.duckduckgo.autofill.ui.credential.management
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.AutofillDomainFormatter
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
-@RunWith(AndroidJUnit4::class)
 class TitleOrDomainExtractorTest {
 
     private val domainFormatter: AutofillDomainFormatter = mock()
