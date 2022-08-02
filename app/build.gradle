@@ -212,6 +212,9 @@ dependencies {
     implementation project(':ad-click-impl')
     implementation project(':ad-click-store')
 
+    implementation project(':autoconsent-api')
+    implementation project(':autoconsent-impl')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
