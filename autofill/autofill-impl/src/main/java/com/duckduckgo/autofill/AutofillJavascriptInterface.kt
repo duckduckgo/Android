@@ -159,7 +159,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private fun determineIfAutofillEnabled(): Boolean = autofillStore.autofillEnabled && deviceAuthenticator.hasValidDeviceAuthentication()
 
     private suspend fun determineIfCredentialsAvailable(url: String?): Boolean {
-        return if (url == null) {
+        return if (url == null || !determineIfAutofillEnabled()) {
             false
         } else {
             val savedCredentials = autofillStore.getCredentials(url)

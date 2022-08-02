@@ -263,6 +263,8 @@ class AutofillStoredBackJavascriptInterfaceTest {
     @Test
     fun whenNoCredentialsForUrlThenConfigurationInputTypeCredentialsIsFalse() = runTest {
         val url = "example.com"
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
         whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
 
         testee.getRuntimeConfiguration("", url)
@@ -273,6 +275,8 @@ class AutofillStoredBackJavascriptInterfaceTest {
     @Test
     fun whenWithCredentialsForUrlThenConfigurationInputTypeCredentialsIsTrue() = runTest {
         val url = "example.com"
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
         whenever(autofillStore.getCredentials(url)).thenReturn(
             listOf(
                 LoginCredentials(
@@ -287,6 +291,48 @@ class AutofillStoredBackJavascriptInterfaceTest {
         testee.getRuntimeConfiguration("", url)
 
         verify(autofillResponseWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = true, emailAvailable = false)
+    }
+
+    @Test
+    fun whenWithCredentialsForUrlButNoDeviceAuthThenConfigurationInputTypeCredentialsIsFalse() = runTest {
+        val url = "example.com"
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(false)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.getCredentials(url)).thenReturn(
+            listOf(
+                LoginCredentials(
+                    id = 1,
+                    domain = url,
+                    username = "username",
+                    password = "password"
+                )
+            )
+        )
+
+        testee.getRuntimeConfiguration("", url)
+
+        verify(autofillResponseWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = false, emailAvailable = false)
+    }
+
+    @Test
+    fun whenWithCredentialsForUrlButAutofillDisabledThenConfigurationInputTypeCredentialsIsFalse() = runTest {
+        val url = "example.com"
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(false)
+        whenever(autofillStore.getCredentials(url)).thenReturn(
+            listOf(
+                LoginCredentials(
+                    id = 1,
+                    domain = url,
+                    username = "username",
+                    password = "password"
+                )
+            )
+        )
+
+        testee.getRuntimeConfiguration("", url)
+
+        verify(autofillResponseWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = false, emailAvailable = false)
     }
 
     @Test

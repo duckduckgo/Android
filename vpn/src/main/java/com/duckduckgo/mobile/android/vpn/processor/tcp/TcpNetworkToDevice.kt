@@ -97,6 +97,7 @@ class TcpNetworkToDevice(
         val channelsReady = selector.select()
 
         if (channelsReady == 0) {
+            Thread.sleep(5)
             return
         }
 
