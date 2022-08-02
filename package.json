@@ -3,9 +3,18 @@
   "version": "1.0.0",
   "description": "android project",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "rebuild-autoconsent": "rollup -c"
+  },
+  "devDependencies": {
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.0.6",
+    "rollup": "^2.61.0",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-terser": "^7.0.2"
   },
   "dependencies": {
-    "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#5.0.1"
+    "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#5.0.1",
+    "@duckduckgo/autoconsent": "2.1.1"
   }
 }
