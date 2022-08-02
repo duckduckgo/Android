@@ -165,6 +165,14 @@
                     android:text="Delete Tracking History"
             />
 
+            <TextView
+                    android:id="@+id/force_update_blocklist"
+                    style="@style/SettingsItemClickable"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:text="🔄 Force Update Blocklist"
+            />
+
             <!-- Section Protection -->
             <com.duckduckgo.mobile.android.ui.view.SectionDivider
                 android:layout_width="match_parent"
