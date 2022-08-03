@@ -28,9 +28,9 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.AutofillPixelNames
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSelectCredentialsTooltipBinding
 import com.duckduckgo.autofill.ui.credential.dialog.animateClosed
@@ -111,7 +111,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, true)
             it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
         }
-        pixel.fire(AppPixelName.AUTOFILL_LOGINS_AUTOPROMPT_DISMISSED)
+        pixel.fire(AutofillPixelNames.AUTOFILL_LOGINS_AUTOPROMPT_DISMISSED)
         parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.RESULT_KEY_CREDENTIAL_PICKER, result)
     }
 
