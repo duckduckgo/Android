@@ -27,6 +27,7 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+    namespace 'com.duckduckgo.downloads.impl'
 }
 
 dependencies {

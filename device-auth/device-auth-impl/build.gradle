@@ -39,4 +39,5 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+  namespace 'com.duckduckgo.deviceauth.impl'
 }
