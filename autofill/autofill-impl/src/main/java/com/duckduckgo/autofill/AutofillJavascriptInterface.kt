@@ -36,6 +36,7 @@ import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -47,10 +48,7 @@ interface AutofillJavascriptInterface {
     @JavascriptInterface
     fun getAutofillData(requestString: String)
 
-    suspend fun getRuntimeConfiguration(
-        rawJs: String,
-        url: String?
-    ): String
+    suspend fun getRuntimeConfiguration(rawJs: String, url: String?): String
 
     fun injectCredentials(credentials: LoginCredentials)
     fun injectNoCredentials()
@@ -83,7 +81,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     @JavascriptInterface
     override fun getAutofillData(requestString: String) {
         Timber.v("BrowserAutofill: getAutofillData called:\n%s", requestString)
-        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
+        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default() + handler) {
             val url = currentUrlProvider.currentUrl(webView)
             if (url == null) {
                 Timber.w("Can't autofill as can't retrieve current URL")
@@ -175,10 +173,17 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     fun storeFormData(data: String) {
         Timber.i("storeFormData called, credentials provided to be persisted")
 
-        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
+        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default() + handler) {
+
             val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
 
             val request = requestParser.parseStoreFormDataRequest(data).credentials
+
+            if (request.username == null && request.password == null) {
+                Timber.w("Invalid data from storeFormData; username and password can't both be null")
+                return@launch
+            }
+
             val jsCredentials = JavascriptCredentials(request.username, request.password)
             val credentials = jsCredentials.asLoginCredentials(currentUrl)
 
@@ -190,7 +195,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
     override fun injectCredentials(credentials: LoginCredentials) {
         Timber.v("Informing JS layer with credentials selected")
-        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
+        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default() + handler) {
             val jsCredentials = credentials.asJsCredentials()
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateResponseGetAutofillData(jsCredentials))
         }
@@ -198,9 +203,13 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
     override fun injectNoCredentials() {
         Timber.v("No credentials selected; informing JS layer")
-        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
+        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default() + handler) {
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateEmptyResponseGetAutofillData())
         }
+    }
+
+    val handler = CoroutineExceptionHandler { _, exception ->
+        Timber.e(exception, "Autofill exception caught.")
     }
 
     private fun LoginCredentials.asJsCredentials(): JavascriptCredentials {

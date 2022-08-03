@@ -26,6 +26,8 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
+import com.duckduckgo.autofill.jsbridge.request.AutofillStoreFormDataCredentialsRequest
+import com.duckduckgo.autofill.jsbridge.request.AutofillStoreFormDataRequest
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputMainType.CREDENTIALS
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.USERNAME
@@ -62,6 +64,8 @@ class AutofillStoredBackJavascriptInterfaceTest {
     private val testWebView = WebView(getApplicationContext())
     private lateinit var testee: AutofillStoredBackJavascriptInterface
 
+    private val testCallback = TestCallback()
+
     @Before
     fun setUp() = runTest {
         testee = AutofillStoredBackJavascriptInterface(
@@ -75,7 +79,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             deviceAuthenticator = deviceAuthenticator
         )
-        testee.callback = TestCallback
+        testee.callback = testCallback
         testee.webView = testWebView
 
         whenever(currentUrlProvider.currentUrl(testWebView)).thenReturn("https://example.com")
@@ -173,8 +177,8 @@ class AutofillStoredBackJavascriptInterfaceTest {
     @Test
     fun whenRequestSpecifiesSubtypePasswordAndNoEntriesThenNoCredentialsCallbackInvoked() = runTest {
         setupRequestForSubTypePassword()
-        initiateGetAutofillDataRequest()
         whenever(autofillStore.getCredentials(any())).thenReturn(emptyList())
+        initiateGetAutofillDataRequest()
         assertCredentialsUnavailable()
     }
 
@@ -388,12 +392,40 @@ class AutofillStoredBackJavascriptInterfaceTest {
         verify(autofillResponseWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = false, emailAvailable = true)
     }
 
+    @Test
+    fun whenStoreFormDataCalledWithNoUsernameThenCallbackInvoked() = runTest {
+        configureRequestParserToReturn(username = null, password = "password")
+        testee.storeFormData("")
+        assertNotNull(testCallback.credentialsToSave)
+    }
+
+    @Test
+    fun whenStoreFormDataCalledWithNoPasswordThenCallbackInvoked() = runTest {
+        configureRequestParserToReturn(username = "dax@duck.com", password = null)
+        testee.storeFormData("")
+        assertNotNull(testCallback.credentialsToSave)
+        assertEquals("dax@duck.com", testCallback.credentialsToSave!!.username)
+    }
+
+    @Test
+    fun whenStoreFormDataCalledWithNoUsernameOrPasswordThenCallbackNotInvoked() = runTest {
+        configureRequestParserToReturn(username = null, password = null)
+        testee.storeFormData("")
+        assertNull(testCallback.credentialsToSave)
+    }
+
+    private suspend fun configureRequestParserToReturn(username: String?, password: String?) {
+        val credentials = AutofillStoreFormDataCredentialsRequest(username = username, password = password)
+        val topLevelRequest = AutofillStoreFormDataRequest(credentials)
+        whenever(requestParser.parseStoreFormDataRequest(any())).thenReturn(topLevelRequest)
+    }
+
     private fun assertCredentialsContains(
         property: (LoginCredentials) -> String?,
         vararg expected: String?
     ) {
         val numberExpected = expected.size
-        val numberMatched = TestCallback.credentials?.filter { expected.contains(property(it)) }?.count()
+        val numberMatched = testCallback.credentialsToInject?.filter { expected.contains(property(it)) }?.count()
         assertEquals("Wrong number of matched properties. Expected $numberExpected but found $numberMatched", numberExpected, numberMatched)
     }
 
@@ -411,13 +443,13 @@ class AutofillStoredBackJavascriptInterfaceTest {
     }
 
     private fun assertCredentialsUnavailable() {
-        assertNotNull("Callback has not been called", TestCallback.credentialsAvailable)
-        assertFalse(TestCallback.credentialsAvailable!!)
+        assertNotNull("Callback has not been called", testCallback.credentialsAvailableToInject)
+        assertFalse(testCallback.credentialsAvailableToInject!!)
     }
 
     private fun assertCredentialsAvailable() {
-        assertNotNull("Callback has not been called", TestCallback.credentialsAvailable)
-        assertTrue(TestCallback.credentialsAvailable!!)
+        assertNotNull("Callback has not been called", testCallback.credentialsAvailableToInject)
+        assertTrue(testCallback.credentialsAvailableToInject!!)
     }
 
     private fun initiateGetAutofillDataRequest() {
@@ -428,24 +460,29 @@ class AutofillStoredBackJavascriptInterfaceTest {
         verify(autofillMessagePoster).postMessage(any(), anyOrNull())
     }
 
-    object TestCallback : Callback {
+    class TestCallback : Callback {
 
-        var credentials: List<LoginCredentials>? = null
-        var credentialsAvailable: Boolean? = null
+        // for injection
+        var credentialsToInject: List<LoginCredentials>? = null
+        var credentialsAvailableToInject: Boolean? = null
+
+        // for saving
+        var credentialsToSave: LoginCredentials? = null
 
         override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
-            credentialsAvailable = true
-            this.credentials = credentials
+            credentialsAvailableToInject = true
+            this.credentialsToInject = credentials
         }
 
         override suspend fun onCredentialsAvailableToSave(
             currentUrl: String,
             credentials: LoginCredentials
         ) {
+            credentialsToSave = credentials
         }
 
         override fun noCredentialsAvailable(originalUrl: String) {
-            credentialsAvailable = false
+            credentialsAvailableToInject = false
         }
     }
 }
