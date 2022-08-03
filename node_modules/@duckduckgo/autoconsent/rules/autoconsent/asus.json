@@ -1,0 +1,7 @@
+{
+  "name": "asus",
+  "detectCmp": [{ "exists": "#cookie-policy-info" }],
+  "detectPopup": [{ "visible": "#cookie-policy-info" }],
+  "optIn": [{ "click": ".btn-read-ck" }],
+  "optOut": [{ "click": ".btn-setting" }, { "click": ".btn-save" }]
+}

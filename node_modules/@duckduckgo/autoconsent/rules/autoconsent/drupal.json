@@ -1,0 +1,7 @@
+{
+  "name": "Drupal",
+  "detectCmp": [{ "exists": "#drupalorg-crosssite-gdpr" }],
+  "detectPopup": [{ "visible": "#drupalorg-crosssite-gdpr" }],
+  "optOut": [{ "click": ".no" }],
+  "optIn": [{ "click": ".yes" }]
+}

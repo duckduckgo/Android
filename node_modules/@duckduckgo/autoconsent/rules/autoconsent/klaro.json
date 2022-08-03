@@ -1,0 +1,10 @@
+{
+  "name": "klaro",
+  "detectCmp": [{ "exists": ".klaro > .cookie-notice" }],
+  "detectPopup": [{ "visible": ".klaro > .cookie-notice" }],
+  "optIn": [{ "click": ".cm-btn-success" }],
+  "optOut": [{ "click": ".cn-decline" }],
+  "test": [
+    { "eval": "Object.values(klaro.getManager().consents).every(c => !c)" }
+  ]
+}

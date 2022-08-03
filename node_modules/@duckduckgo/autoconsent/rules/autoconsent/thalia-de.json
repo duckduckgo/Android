@@ -1,0 +1,24 @@
+{
+	"name": "thalia.de",
+    "prehideSelectors": [".consent-banner-box"],
+	"detectCmp": [
+		{
+			"exists": "consent-banner[component=consent-banner]"
+		}
+	],
+	"detectPopup": [
+		{
+			"visible": ".consent-banner-box"
+		}
+	],
+	"optIn": [
+		{
+			"click": ".button-zustimmen"
+		}
+	],
+	"optOut": [
+		{
+			"click": "button[data-consent=disagree]"
+		}
+	]
+}
