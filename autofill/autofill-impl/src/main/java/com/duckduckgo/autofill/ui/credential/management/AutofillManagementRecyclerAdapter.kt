@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenBinding
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenHeaderBinding
+import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGrouper
 import kotlinx.coroutines.launch
 
 class AutofillManagementRecyclerAdapter(
@@ -109,7 +110,7 @@ class AutofillManagementRecyclerAdapter(
 
     sealed class ListItem {
         data class Credential(val credentials: LoginCredentials) : ListItem()
-        data class GroupHeading(val initial: Char) : ListItem()
+        data class GroupHeading(val initial: String) : ListItem()
     }
 
     companion object {
