@@ -1,0 +1,12 @@
+{
+  "name": "obi.de",
+  "prehideSelectors": [".disc-cp--active"],
+  "detectCmp": [{ "exists": ".disc-cp-modal__modal" }],
+  "detectPopup": [{ "visible": ".disc-cp-modal__modal" }],
+  "optIn": [{ "click": ".js-disc-cp-accept-all" }],
+  "optOut": [
+      {
+          "click": ".js-disc-cp-deny-all"
+      }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "192.com",
+  "detectCmp": [{ "exists": ".ont-cookies"}],
+  "detectPopup": [{ "visible": ".ont-cookies" }],
+  "optIn": [{ "click": ".ont-btn-main.ont-cookies-btn.js-ont-btn-ok2" }],
+  "optOut": [
+      {
+          "click": ".ont-cookes-btn-manage"
+      },
+      {
+          "click": ".ont-btn-main.ont-cookies-btn.js-ont-btn-choose"
+      }
+  ],
+  "test": [
+      {"eval": "document.cookie.includes('CC_ADVERTISING=NO') && document.cookie.includes('CC_ANALYTICS=NO')"}
+  ]
+}
