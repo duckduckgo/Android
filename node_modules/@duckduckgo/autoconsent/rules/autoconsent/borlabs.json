@@ -1,0 +1,12 @@
+{
+  "name": "borlabs",
+  "prehideSelectors": ["#BorlabsCookieBox"],
+  "detectCmp": [{ "exists": "._brlbs-block-content"}],
+  "detectPopup": [{ "visible": "._brlbs-bar-wrap,._brlbs-box-wrap" }],
+  "optIn": [{ "click": "a[data-cookie-accept-all]" }],
+  "optOut": [
+      {
+          "click": "a[data-cookie-refuse]"
+      }
+  ]
+}
