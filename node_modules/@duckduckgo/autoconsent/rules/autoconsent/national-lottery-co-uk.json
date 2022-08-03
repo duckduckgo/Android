@@ -1,0 +1,11 @@
+{
+    "name": "national-lottery.co.uk",
+    "detectCmp": [{"exists": ".cuk_cookie_consent"}],
+    "detectPopup": [{"visible": ".cuk_cookie_consent", "check": "any"}],
+    "optOut": [
+        {"click": ".cuk_cookie_consent_manage_pref"}, 
+        {"click": ".cuk_cookie_consent_save_pref"}, 
+        {"click": ".cuk_cookie_consent_close"}
+    ],
+    "optIn": [{"click": ".cuk_cookie_consent_accept_all"}]
+}

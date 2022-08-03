@@ -1,0 +1,24 @@
+{
+	"name": "motor-talk.de",
+    "prehideSelectors": [".mt-cc-bnnr__wrapper"],
+	"detectCmp": [
+		{
+			"exists": ".mt-cc-bnnr"
+		}
+	],
+	"detectPopup": [
+		{
+			"visible": ".mt-cc-bnnr__wrapper"
+		}
+	],
+	"optIn": [
+		{
+			"click": ".mt-cc-bnnr__button-main"
+		}
+	],
+	"optOut": [
+		{
+			"click": ".mt-cc-bnnr__decline-link"
+		}
+	]
+}
