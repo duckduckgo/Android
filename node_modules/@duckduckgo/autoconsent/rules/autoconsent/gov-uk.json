@@ -1,0 +1,10 @@
+{
+  "name": "gov.uk",
+  "detectCmp": [{ "exists": "#global-cookie-message"}],
+  "detectPopup": [{ "exists": "#global-cookie-message" }],
+  "optIn": [{ "click": "button[data-accept-cookies=true]" }],
+  "optOut": [
+      {"click": "button[data-reject-cookies=true],#reject-cookies"}, 
+      {"click": "button[data-hide-cookie-banner=true],#hide-cookie-decision"}
+  ]
+}

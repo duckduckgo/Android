@@ -1,0 +1,7 @@
+{
+  "name": "wetransfer.com",
+  "detectCmp": [{ "exists": ".welcome__cookie-notice"}],
+  "detectPopup": [{ "visible": ".welcome__cookie-notice" }],
+  "optIn": [{ "click": ".welcome__button--accept" }],
+  "optOut": [{ "click": ".welcome__button--decline"}]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "ionos.de",
+  "prehideSelectors": [".privacy-consent--backdrop", ".privacy-consent--modal"],
+  "detectCmp": [{ "exists": ".privacy-consent--modal"}],
+  "detectPopup": [{ "visible": ".privacy-consent--modal" }],
+  "optIn": [{ "click": "#selectAll" }],
+  "optOut": [
+      {
+          "click": ".footer-config-link"
+      },
+      {
+          "click": "#confirmSelection"
+      }
+  ]
+}
