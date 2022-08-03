@@ -1,0 +1,14 @@
+{
+  "name": "quantcast",
+  "prehideSelectors": ["#qc-cmp2-main,#qc-cmp2-container"],
+  "detectCmp": [{ "exists": "#qc-cmp2-container" }],
+  "detectPopup": [{ "visible": "#qc-cmp2-ui" }],
+  "optOut": [
+    { "click": ".qc-cmp2-summary-buttons > button[mode=\"secondary\"]" },
+    { "waitFor": "#qc-cmp2-ui" },
+    { "click": ".qc-cmp2-toggle-switch > button[aria-checked=\"true\"]", "all": true, "optional": true },
+    { "click": ".qc-cmp2-main button[aria-label=\"REJECT ALL\"]", "optional": true },
+    { "waitForThenClick": ".qc-cmp2-main button[aria-label=\"SAVE & EXIT\"],.qc-cmp2-buttons-desktop > button[mode=\"primary\"]", "timeout": 5000 }
+  ],
+  "optIn": [{ "click": ".qc-cmp2-summary-buttons > button[mode=\"primary\"]" }]
+}
