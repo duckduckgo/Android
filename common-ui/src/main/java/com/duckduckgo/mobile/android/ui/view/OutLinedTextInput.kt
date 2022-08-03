@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.ui.view
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.text.TextWatcher
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
 import android.view.View
@@ -35,6 +36,9 @@ import com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
 interface OutlinedTextInput {
     var text: String
     var isEditable: Boolean
+
+    fun addTextChangedListener(textWatcher: TextWatcher)
+    fun removeTextChangedListener(textWatcher: TextWatcher)
 
     fun onAction(actionHandler: (Action) -> Unit)
 
@@ -113,6 +117,14 @@ class OutLinedTextInputView @JvmOverloads constructor(
                 }
             }
         }
+    }
+
+    override fun addTextChangedListener(textWatcher: TextWatcher) {
+        binding.internalEditText.addTextChangedListener(textWatcher)
+    }
+
+    override fun removeTextChangedListener(textWatcher: TextWatcher) {
+        binding.internalEditText.removeTextChangedListener(textWatcher)
     }
 
     override fun onAction(actionHandler: (Action) -> Unit) {

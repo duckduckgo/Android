@@ -155,6 +155,14 @@ class AutofillSettingsViewModel @Inject constructor(
         addCommand(ShowListMode)
     }
 
+    fun allowSaveInEditMode(saveable: Boolean) {
+        _viewState.value.credentialMode.let { credentialMode ->
+            if (credentialMode is Editing) {
+                _viewState.value = _viewState.value.copy(credentialMode = credentialMode.copy(saveable = saveable))
+            }
+        }
+    }
+
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val logins: List<LoginCredentials> = emptyList(),
@@ -164,7 +172,11 @@ class AutofillSettingsViewModel @Inject constructor(
 
     sealed class CredentialMode(open val credentialsViewed: LoginCredentials?) {
         data class Viewing(override val credentialsViewed: LoginCredentials) : CredentialMode(credentialsViewed)
-        data class Editing(override val credentialsViewed: LoginCredentials) : CredentialMode(credentialsViewed)
+        data class Editing(
+            override val credentialsViewed: LoginCredentials,
+            val saveable: Boolean = true
+        ) : CredentialMode(credentialsViewed)
+
         object NotInCredentialMode : CredentialMode(null)
     }
 
