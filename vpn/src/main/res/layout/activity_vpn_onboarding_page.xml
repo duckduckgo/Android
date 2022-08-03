@@ -34,7 +34,7 @@
             android:id="@+id/onboarding_page_header"
             android:layout_width="match_parent"
             android:layout_height="260dp"
-            android:background="@color/light_blue"
+            android:background="?attr/appTPHeaderBackground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">

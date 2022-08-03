@@ -27,6 +27,9 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.AppThemeAppTPOnboardingResourceHelper.AppTPOnboadingResource.TRACKERS_COUNT
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.AppThemeAppTPOnboardingResourceHelper.AppTPOnboadingResource.TRACKING_APPS
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.AppThemeAppTPOnboardingResourceHelper.AppTPOnboadingResource.VPN
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -41,6 +44,7 @@ class VpnOnboardingViewModel @Inject constructor(
     private val vpnStore: VpnStore,
     private val vpnDetector: VpnDetector,
     private val vpnStateMonitor: VpnStateMonitor,
+    private val appTPOnboardingAnimationHelper: AppTPOnboardingResourceHelper,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
@@ -58,19 +62,19 @@ class VpnOnboardingViewModel @Inject constructor(
 
     val pages = listOf(
         OnboardingPage(
-            R.raw.device_shield_tracker_count,
+            appTPOnboardingAnimationHelper.getHeaderRes(TRACKERS_COUNT),
             R.string.atp_OnboardingLastPageOneTitle, R.string.atp_OnboardingLatsPageOneSubtitle
         ),
         OnboardingPage(
-            R.raw.device_shield_tracking_apps,
+            appTPOnboardingAnimationHelper.getHeaderRes(TRACKING_APPS),
             R.string.atp_OnboardingLastPageTwoTitle, R.string.atp_OnboardingLastPageTwoSubTitle
         ),
         OnboardingPage(
-            R.drawable.device_shield_onboarding_page_three_header,
+            appTPOnboardingAnimationHelper.getHeaderRes(VPN),
             R.string.atp_OnboardingLastPageThreeTitle, R.string.atp_OnboardingLastPageThreeSubTitle
         ),
         OnboardingPage(
-            R.raw.device_shield_tracking_apps,
+            appTPOnboardingAnimationHelper.getHeaderRes(TRACKING_APPS),
             R.string.atp_EnabledTitle, R.string.atp_EnabledMessage
         )
     )
