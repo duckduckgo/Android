@@ -191,6 +191,7 @@ import com.duckduckgo.autofill.Callback
 import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.Companion.RESULT_KEY_CREDENTIAL_RESULT_UPDATE
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
+import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.ui.ExistingCredentialMatchDetector
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -285,6 +286,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserAutofill: BrowserAutofill
+
+    @Inject
+    lateinit var autofillSettingsLauncher: AutofillSettingsActivityLauncher
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -915,6 +919,7 @@ class BrowserTabFragment :
             is Command.ShowEmailTooltip -> showEmailTooltip(it.address)
             is Command.InjectCredentials -> injectAutofillCredentials(it.url, it.credentials)
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
+            is Command.LaunchAutofillSettings -> startActivity(autofillSettingsLauncher.intent(requireContext()))
             is Command.EditWithSelectedQuery -> {
                 omnibarTextInput.setText(it.query)
                 omnibarTextInput.setSelection(it.query.length)
@@ -2358,6 +2363,9 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(view.printPageMenuItem) {
                     viewModel.onPrintSelected()
+                }
+                onMenuItemClicked(view.autofillMenuItem) {
+                    viewModel.onAutofillMenuSelected()
                 }
             }
             view.menuScrollableContent.setOnScrollChangeListener { _, _, _, _, _ ->

@@ -117,6 +117,7 @@ class BrowserPopupMenu(
             browserOptionsMenuDivider.isVisible = viewState.browserShowing
             settingsMenuDivider.isVisible = viewState.browserShowing
             printPageMenuItem?.isVisible = viewState.canPrintPage
+            autofillMenuItem?.isVisible = viewState.showAutofill
         }
     }
 }

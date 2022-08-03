@@ -175,7 +175,7 @@ class BrowserTabViewModel @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore,
-    private val autofillStore: AutofillStore,
+    private val autofillStore: AutofillStore
 ) : WebViewClientListener,
     EditSavedSiteListener,
     HttpAuthenticationListener,
@@ -235,7 +235,8 @@ class BrowserTabViewModel @Inject constructor(
         var previousAppLink: AppLink? = null,
         val canFindInPage: Boolean = false,
         val forceRenderingTicker: Long = System.currentTimeMillis(),
-        val canPrintPage: Boolean = false
+        val canPrintPage: Boolean = false,
+        val showAutofill: Boolean = false
     )
 
     sealed class HighlightableButton {
@@ -433,6 +434,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         class InjectCredentials(val url: String, val credentials: LoginCredentials) : Command()
         class CancelIncomingAutofillRequest(val url: String) : Command()
+        object LaunchAutofillSettings : Command()
         class EditWithSelectedQuery(val query: String) : Command()
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
         class NavigateToHistory(val historyStackIndex: Int) : Command()
@@ -2119,7 +2121,8 @@ class BrowserTabViewModel @Inject constructor(
     private fun initializeViewStates() {
         globalLayoutState.value = Browser()
         browserViewState.value = BrowserViewState().copy(
-            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported()
+            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+            showAutofill = autofillStore.autofillAvailable
         )
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
@@ -2689,6 +2692,10 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun linkOpenedInNewTab(): Boolean {
         return isLinkOpenedInNewTab
+    }
+
+    fun onAutofillMenuSelected() {
+        command.value = LaunchAutofillSettings
     }
 
     @VisibleForTesting
