@@ -52,7 +52,7 @@ class CredentialListSorterByTitleAndDomain @Inject constructor(
             if (o2 == null) return 1
 
             val collator = buildCollator()
-            var title1 = (o1.domainTitle)?.uppercase()
+            val title1 = (o1.domainTitle)?.uppercase()
             val title2 = (o2.domainTitle)?.uppercase()
             val domain1 = domainFormatter.extractDomain(o1.domain)
             val domain2 = domainFormatter.extractDomain(o2.domain)

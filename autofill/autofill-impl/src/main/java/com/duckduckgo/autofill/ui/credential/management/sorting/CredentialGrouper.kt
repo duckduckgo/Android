@@ -52,15 +52,12 @@ class CredentialGrouper @Inject constructor(
 
     private fun buildGroups(unsortedCredentials: List<LoginCredentials>): MutableMap<String, MutableList<LoginCredentials>> {
         val groups = mutableMapOf<String, MutableList<LoginCredentials>>()
-        for (credential in unsortedCredentials) {
-            val initial = initialExtractor.extractInitial(credential).toString() ?: continue
+        unsortedCredentials.forEach { credential ->
+            val initial = initialExtractor.extractInitial(credential)
             val list = groups.getOrPut(initial) { mutableListOf() }
             list.add(credential)
         }
         return groups
     }
 
-    private fun shouldAddNewGroup(groups: List<ListItem>, initial: String): Boolean {
-        return !groups.contains(ListItem.GroupHeading(initial))
-    }
 }

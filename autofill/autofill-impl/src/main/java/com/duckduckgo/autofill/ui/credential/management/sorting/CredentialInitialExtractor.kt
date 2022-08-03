@@ -46,7 +46,7 @@ class CredentialInitialExtractor @Inject constructor(
             OTHER_LETTER,
             DECIMAL_DIGIT_NUMBER
             -> {
-                Normalizer.normalize(rawInitial, Normalizer.Form.NFKD).firstOrNull().toString()
+                Normalizer.normalize(rawInitial, Normalizer.Form.NFKD).firstOrNull()?.toString() ?: INITIAL_CHAR_FOR_NON_LETTERS
             }
             else -> {
                 Timber.v("Rejecting type %d for %s", type, rawInitial)
