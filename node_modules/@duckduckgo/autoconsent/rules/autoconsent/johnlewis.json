@@ -1,0 +1,17 @@
+{
+    "name": "johnlewis.com",
+    "prehideSelectors": ["div[class^=pecr-cookie-banner-]"],
+    "detectCmp": [{ "exists": "div[class^=pecr-cookie-banner-]" }],
+    "detectPopup": [{ "exists": "div[class^=pecr-cookie-banner-]" }],
+    "optOut": [
+        {"click": "button[data-test^=manage-cookies]"},
+        {"wait": "500"},
+        {
+            "click": "label[data-test^=toggle][class*=checked]:not([class*=disabled])",
+            "all": true,
+            "optional": true
+        },
+        {"click": "button[data-test=save-preferences]"}
+    ],
+    "optIn": [{ "click": "button[data-test=allow-all]"}]
+  }
