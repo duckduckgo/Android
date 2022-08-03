@@ -1,0 +1,28 @@
+{
+  "name": "waitrose.com",
+  "prehideSelectors": [
+      "div[aria-labelledby=CookieAlertModalHeading]",
+      "section[data-test=initial-waitrose-cookie-consent-banner]",
+      "section[data-test=cookie-consent-modal]"
+  ],
+  "detectCmp": [{ "exists": "section[data-test=initial-waitrose-cookie-consent-banner]"}],
+  "detectPopup": [{ "visible": "section[data-test=initial-waitrose-cookie-consent-banner]" }],
+  "optIn": [{ "click": "button[data-test=accept-all]" }],
+  "optOut": [
+      {
+          "click": "button[data-test=manage-cookies]"
+      },
+      {
+          "wait": 200
+      },
+      {
+          "eval": "Array.from(document.querySelectorAll('label[id$=cookies-deny-label]')).forEach(e => e.click()) || true"
+      },
+      {
+          "click": "button[data-test=submit]"
+      }
+  ],
+  "test": [
+      {"eval": "document.cookie.includes('wtr_cookies_advertising=0') && document.cookie.includes('wtr_cookies_analytics=0')"}
+  ]
+}
