@@ -35,7 +35,7 @@ package com.duckduckgo.vpn.internal.feature.remote
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -89,7 +89,7 @@ class VpnRemoteFeatureReceiver(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(VpnScope::class)
 class VpnRemoteFeatureReceiverRegister @Inject constructor(
     private val context: Context,
     private val appTpFeatureConfig: AppTpFeatureConfig,

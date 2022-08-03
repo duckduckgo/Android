@@ -19,7 +19,7 @@ package com.duckduckgo.vpn.internal.feature.trackers
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -50,7 +50,7 @@ class DeleteTrackersDebugReceiver(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(VpnScope::class)
 class DeleteTrackersDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,

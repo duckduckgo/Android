@@ -22,9 +22,9 @@ import javax.inject.Inject
 
 abstract class DaggerActivity : AppCompatActivity(), HasDaggerInjector {
     @Inject
-    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*>>
+    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*, *>>
 
-    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*> {
+    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
         return injectorFactoryMap[key]
             ?: throw RuntimeException(
                 """

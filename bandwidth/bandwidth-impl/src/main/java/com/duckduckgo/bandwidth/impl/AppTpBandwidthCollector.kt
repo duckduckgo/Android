@@ -21,7 +21,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.bandwidth.impl.BandwidthPixelName.APPTP_BANDWIDTH
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -32,10 +32,10 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesMultibinding(
-    scope = AppScope::class,
+    scope = VpnScope::class,
     boundType = VpnServiceCallbacks::class
 )
-@SingleInstanceIn(AppScope::class)
+@SingleInstanceIn(VpnScope::class)
 class AppTpBandwidthCollector @Inject constructor(
     private val context: Context,
     private val bandwidthRepository: BandwidthRepository,
