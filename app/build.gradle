@@ -195,6 +195,7 @@ dependencies {
 
     implementation project(path: ':autoconsent-api')
     implementation project(path: ':autoconsent-impl')
+    implementation project(path: ':autoconsent-store')
 
     internalImplementation project(path: ':traces-api')
     internalImplementation project(path: ':traces-impl')
