@@ -32,6 +32,7 @@ class AutofillManagementRecyclerAdapter(
     val lifecycleOwner: LifecycleOwner,
     val faviconManager: FaviconManager,
     val grouper: CredentialGrouper,
+    val titleExtractor: LoginCredentialTitleExtractor,
     val onCredentialSelected: (credentials: LoginCredentials) -> Unit,
     val onCopyUsername: (credentials: LoginCredentials) -> Unit,
     val onCopyPassword: (credentials: LoginCredentials) -> Unit
@@ -66,8 +67,8 @@ class AutofillManagementRecyclerAdapter(
     private fun onBindViewHolderCredential(position: Int, viewHolder: CredentialsViewHolder) {
         val item = listItems[position] as ListItem.Credential
         with(viewHolder.binding) {
-            username.text = item.credentials.username
-            domain.text = item.credentials.domain
+            title.text = item.credentials.username
+            subtitle.text = titleExtractor.extract(item.credentials)
             root.setOnClickListener { onCredentialSelected(item.credentials) }
             updateFavicon(item.credentials)
         }

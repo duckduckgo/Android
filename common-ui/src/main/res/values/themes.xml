@@ -146,6 +146,7 @@
 
         <item name="autofillDialogTitleColor">@color/white</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
+        <item name="autofillCredentialListSubtitleColor">@color/paleBrownishGray</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -269,6 +270,7 @@
 
         <item name="autofillDialogTitleColor">@color/gray90</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray70</item>
+        <item name="autofillCredentialListSubtitleColor">@color/brownishGrayTwo</item>
         <item name="appTPHeaderBackground">@color/light_blue</item>
     </style>
 

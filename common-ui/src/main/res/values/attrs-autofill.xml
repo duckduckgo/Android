@@ -17,4 +17,5 @@
 <resources>
     <attr name="autofillDialogTitleColor" format="color" />
     <attr name="autofillDialogOnboardingExplanationColor" format="color" />
+    <attr name="autofillCredentialListSubtitleColor" format="color" />
 </resources>
