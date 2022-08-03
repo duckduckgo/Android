@@ -47,7 +47,11 @@ interface AutofillJavascriptInterface {
     @JavascriptInterface
     fun getAutofillData(requestString: String)
 
-    suspend fun getRuntimeConfiguration(rawJs: String, url: String?): String
+    suspend fun getRuntimeConfiguration(
+        rawJs: String,
+        url: String?
+    ): String
+
     fun injectCredentials(credentials: LoginCredentials)
     fun injectNoCredentials()
 
@@ -57,7 +61,6 @@ interface AutofillJavascriptInterface {
     companion object {
         const val INTERFACE_NAME = "BrowserAutofill"
     }
-
 }
 
 @ContributesBinding(AppScope::class)
@@ -156,7 +159,8 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()
 
     // in the future, we'll also tie this into feature toggles and remote config
-    private fun determineIfAutofillEnabled(): Boolean = autofillStore.autofillEnabled && deviceAuthenticator.hasValidDeviceAuthentication()
+    private fun determineIfAutofillEnabled(): Boolean =
+        autofillStore.autofillAvailable && autofillStore.autofillEnabled && deviceAuthenticator.hasValidDeviceAuthentication()
 
     private suspend fun determineIfCredentialsAvailable(url: String?): Boolean {
         return if (url == null || !determineIfAutofillEnabled()) {
