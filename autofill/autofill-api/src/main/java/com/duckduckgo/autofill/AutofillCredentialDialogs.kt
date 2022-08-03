@@ -18,6 +18,7 @@ package com.duckduckgo.autofill
 
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
 
 /**
  * Dialog which can be shown when user is required to select which saved credential to autofill
@@ -30,7 +31,7 @@ interface CredentialAutofillPickerDialog {
         const val KEY_CANCELLED = "cancelled"
         const val KEY_URL = "url"
         const val KEY_CREDENTIALS = "credentials"
-        const val IS_AUTOPROMPT = "isAutoprompt"
+        const val KEY_TRIGGER_TYPE = "triggerType"
     }
 }
 
@@ -65,7 +66,7 @@ interface CredentialUpdateExistingCredentialsDialog {
  */
 interface CredentialAutofillDialogFactory {
 
-    fun autofillSelectCredentialsDialog(url: String, credentials: List<LoginCredentials>, isAutoprompt: Boolean): DialogFragment
+    fun autofillSelectCredentialsDialog(url: String, credentials: List<LoginCredentials>, triggerType: LoginTriggerType): DialogFragment
 
     fun autofillSavingCredentialsDialog(url: String, credentials: LoginCredentials): DialogFragment
 

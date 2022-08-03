@@ -30,6 +30,8 @@ import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
+import com.duckduckgo.autofill.domain.app.LoginTriggerType.AUTOPROMPT
 import com.duckduckgo.autofill.impl.AutofillPixelNames
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSelectCredentialsTooltipBinding
@@ -43,6 +45,7 @@ import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialAutofillPickerDialog {
+
     @Inject
     lateinit var pixel: Pixel
 
@@ -111,17 +114,22 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, true)
             it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
         }
-        pixel.fire(AutofillPixelNames.AUTOFILL_LOGINS_AUTOPROMPT_DISMISSED)
+
+        when (getTriggerType()) {
+            AUTOPROMPT -> pixel.fire(AutofillPixelNames.AUTOFILL_LOGINS_AUTOPROMPT_DISMISSED)
+            else -> {}
+        }
+
         parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.RESULT_KEY_CREDENTIAL_PICKER, result)
     }
 
     private fun getAvailableCredentials() = arguments?.getParcelableArrayList<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS)!!
-
     private fun getOriginalUrl() = arguments?.getString(CredentialAutofillPickerDialog.KEY_URL)!!
+    private fun getTriggerType() = arguments?.getSerializable(CredentialAutofillPickerDialog.KEY_TRIGGER_TYPE) as LoginTriggerType
 
     companion object {
 
-        fun instance(url: String, credentials: List<LoginCredentials>, isAutoprompt: Boolean): AutofillSelectCredentialsDialogFragment {
+        fun instance(url: String, credentials: List<LoginCredentials>, triggerType: LoginTriggerType): AutofillSelectCredentialsDialogFragment {
 
             val cr = ArrayList<LoginCredentials>(credentials)
 
@@ -130,7 +138,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
                 Bundle().also {
                     it.putString(CredentialAutofillPickerDialog.KEY_URL, url)
                     it.putParcelableArrayList(CredentialAutofillPickerDialog.KEY_CREDENTIALS, cr)
-                    it.putBoolean(CredentialAutofillPickerDialog.IS_AUTOPROMPT, isAutoprompt)
+                    it.putSerializable(CredentialAutofillPickerDialog.KEY_TRIGGER_TYPE, triggerType)
                 }
             return fragment
         }
