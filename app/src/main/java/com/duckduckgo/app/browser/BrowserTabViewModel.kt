@@ -620,8 +620,6 @@ class BrowserTabViewModel @Inject constructor(
                     )
                 }
             }.launchIn(viewModelScope)
-
-        browserViewState.value = currentBrowserViewState().copy(showAutofill = autofillStore.autofillAvailable)
     }
 
     fun loadData(
@@ -2123,7 +2121,8 @@ class BrowserTabViewModel @Inject constructor(
     private fun initializeViewStates() {
         globalLayoutState.value = Browser()
         browserViewState.value = BrowserViewState().copy(
-            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported()
+            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+            showAutofill = autofillStore.autofillAvailable
         )
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
