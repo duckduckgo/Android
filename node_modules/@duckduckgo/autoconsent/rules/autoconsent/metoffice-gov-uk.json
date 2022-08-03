@@ -1,8 +1,0 @@
-{
-    "name": "metoffice.gov.uk",
-    "prehideSelectors": ["#ccc-module"],
-    "detectCmp": [{"exists": "#ccc-module"}],
-    "detectPopup": [{"exists": "#ccc-module"}],
-    "optOut": [{"click": "#ccc-reject-settings"}],
-    "optIn": [{"click": "#ccc-recommended-settings"}]
-}
