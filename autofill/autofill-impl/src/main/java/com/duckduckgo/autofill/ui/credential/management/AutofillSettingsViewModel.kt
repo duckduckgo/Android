@@ -60,10 +60,8 @@ class AutofillSettingsViewModel @Inject constructor(
         addCommand(ShowCredentialMode(credentials))
     }
 
-    fun onEditCredentials() {
-        viewState.value.credentialMode.credentialsViewed?.let {
-            _viewState.value = viewState.value.copy(credentialMode = Editing(credentialsViewed = it))
-        }
+    fun onEditCredentials(loginCredentials: LoginCredentials) {
+        _viewState.value = viewState.value.copy(credentialMode = Editing(credentialsViewed = loginCredentials))
     }
 
     fun launchDeviceAuth() {
@@ -113,16 +111,12 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteCredentials() {
-        _viewState.value.credentialMode.credentialsViewed?.let {
-            val credentialsId = it.id ?: return
+    fun onDeleteCredentials(loginCredentials: LoginCredentials) {
+        val credentialsId = loginCredentials.id ?: return
 
-            viewModelScope.launch {
-                autofillStore.deleteCredentials(credentialsId)
-            }
+        viewModelScope.launch {
+            autofillStore.deleteCredentials(credentialsId)
         }
-
-        onExitViewMode()
     }
 
     fun updateCredentials(updatedCredentials: LoginCredentials) {
