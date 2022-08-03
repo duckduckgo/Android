@@ -1,8 +1,0 @@
-{
-    "name": "cookieconsent",
-    "prehideSelectors": ["[aria-label=\"cookieconsent\"][aria-describedby=\"cookieconsent:desc\"]"],
-    "detectCmp": [{ "exists": "[aria-label=\"cookieconsent\"][aria-describedby=\"cookieconsent:desc\"]" }],
-    "detectPopup": [{ "visible": "[aria-label=\"cookieconsent\"][aria-describedby=\"cookieconsent:desc\"]" }],
-    "optIn": [{ "click": ".cc-dismiss" }],
-    "optOut": [{ "hide": ["[aria-label=\"cookieconsent\"][aria-describedby=\"cookieconsent:desc\"]"] }]
-}
