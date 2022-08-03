@@ -215,6 +215,13 @@
                 android:layout_marginEnd="@dimen/keyline_5"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
+                android:id="@+id/autofillMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_key_16"
+                app:labelText="@string/managementScreenTitle" />
+
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/downloadsMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
