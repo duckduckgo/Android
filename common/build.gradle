@@ -27,6 +27,11 @@ android {
     lintOptions {
         baseline file("lint-baseline.xml")
     }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -61,5 +66,8 @@ dependencies {
 
     // Testing dependencies
     testImplementation Testing.junit4
+    testImplementation AndroidX.test.ext.junit
+    testImplementation "androidx.test:runner:_"
+    testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
 }

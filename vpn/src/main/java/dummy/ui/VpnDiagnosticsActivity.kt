@@ -452,7 +452,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         } else {
             return getString(
                 R.string.vpnTimeRunning,
-                TimePassed.fromMilliseconds(timeRunningMillis).format(),
+                TimePassed.fromMilliseconds(timeRunningMillis).format(resources = resources),
             )
         }
     }

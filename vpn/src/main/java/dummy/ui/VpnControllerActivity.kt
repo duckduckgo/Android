@@ -246,7 +246,7 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
             getString(R.string.vpnNotRunYet)
         } else {
             return getString(
-                R.string.vpnTimeRunning, TimePassed.fromMilliseconds(timeRunningMillis).format()
+                R.string.vpnTimeRunning, TimePassed.fromMilliseconds(timeRunningMillis).format(resources = resources)
             )
         }
     }
@@ -257,7 +257,7 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
         val timestamp = LocalDateTime.parse(lastTracker.timestamp)
         val timeDifference = timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
         val timeRunning = TimePassed.fromMilliseconds(timeDifference)
-        return "Latest tracker blocked ${timeRunning.format()} ago\n${lastTracker.domain}\n(owned by ${lastTracker.company})"
+        return "Latest tracker blocked ${timeRunning.format(resources = resources)} ago\n${lastTracker.domain}\n(owned by ${lastTracker.company})"
     }
 
     private fun generateLastWebTrackerBlocked(lastTracker: WebTrackerBlocked?): String {
@@ -266,7 +266,8 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
         val timestamp = LocalDateTime.parse(lastTracker.timestamp)
         val timeDifference = timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
         val timeRunning = TimePassed.fromMilliseconds(timeDifference)
-        return "Latest tracker blocked ${timeRunning.format()} ago\n${lastTracker.trackerUrl}\n(owned by ${lastTracker.trackerCompany})"
+        return "Latest tracker blocked ${timeRunning.format(resources = resources)} ago\n" +
+            "${lastTracker.trackerUrl}\n(owned by ${lastTracker.trackerCompany})"
     }
 
     private fun generateTrackerCompaniesBlocked(
