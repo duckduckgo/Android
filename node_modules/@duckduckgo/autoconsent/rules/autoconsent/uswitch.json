@@ -1,0 +1,8 @@
+{
+  "name": "uswitch.com",
+  "prehideSelectors": ["#cookie-banner-wrapper"],
+  "detectCmp": [{ "exists": "#cookie-banner-wrapper"}],
+  "detectPopup": [{ "visible": "#cookie-banner-wrapper" }],
+  "optIn": [{ "click": "#cookie_banner_accept_mobile" }],
+  "optOut": [{ "click": "#cookie_banner_save"}]
+}

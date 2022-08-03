@@ -1,0 +1,12 @@
+{
+  "name": "otto.de",
+  "prehideSelectors": [".cookieBanner--visibility"],
+  "detectCmp": [{ "exists": ".cookieBanner--visibility"}],
+  "detectPopup": [{ "visible": ".cookieBanner__wrapper" }],
+  "optIn": [{ "click": ".js_cookieBannerPermissionButton" }],
+  "optOut": [
+      {
+          "click": ".js_cookieBannerProhibitionButton"
+      }
+  ]
+}
