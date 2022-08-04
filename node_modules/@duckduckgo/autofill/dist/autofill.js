@@ -4943,14 +4943,7 @@ class Form {
     this.execOnInputs(input => {
       if (input.value === '' && (0, _autofillUtils.isVisible)(input)) isThereAnEmptyVisibleField = true;
     }, 'all', false);
-    if (isThereAnEmptyVisibleField) return;
-
-    if (this.form instanceof HTMLFormElement && this.form.requestSubmit !== undefined) {
-      // Not supported in Safari/webview 15 and lower
-      this.form.requestSubmit();
-      return;
-    } // We're not using .submit() to minimise breakage with client-side forms
-
+    if (isThereAnEmptyVisibleField) return; // We're not using .submit() to minimise breakage with client-side forms
 
     this.submitButtons.forEach(button => {
       if ((0, _autofillUtils.isVisible)(button)) {
