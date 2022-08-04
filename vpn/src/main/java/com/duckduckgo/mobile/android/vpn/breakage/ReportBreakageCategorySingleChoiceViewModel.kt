@@ -38,9 +38,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesViewModel(VpnScope::class)
-class ReportBreakageCategorySingleChoiceViewModel
-@Inject
-constructor() : ViewModel() {
+class ReportBreakageCategorySingleChoiceViewModel @Inject constructor() : ViewModel() {
 
     data class ViewState(
         val indexSelected: Int = -1,

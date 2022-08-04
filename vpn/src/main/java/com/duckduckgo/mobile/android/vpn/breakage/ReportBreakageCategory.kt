@@ -42,14 +42,14 @@ sealed class ReportBreakageCategory(@StringRes val category: Int, val key: Strin
         ReportBreakageCategory(R.string.atp_ReportBreakageCategoryOther, OTHER_CATEGORY_KEY)
 
     companion object {
-        const val CRASHES_CATEGORY_KEY = "crashes"
-        const val MESSAGES_CATEGORY_KEY = "messages"
-        const val CALLS_CATEGORY_KEY = "calls"
-        const val UPLOADS_CATEGORY_KEY = "uploads"
-        const val DOWNLOADS_CATEGORY_KEY = "downloads"
-        const val CONTENT_CATEGORY_KEY = "content"
-        const val CONNECTION_CATEGORY_KEY = "connection"
-        const val IOT_CATEGORY_KEY = "iot"
-        const val OTHER_CATEGORY_KEY = "other"
+        private const val CRASHES_CATEGORY_KEY = "crashes"
+        private const val MESSAGES_CATEGORY_KEY = "messages"
+        private const val CALLS_CATEGORY_KEY = "calls"
+        private const val UPLOADS_CATEGORY_KEY = "uploads"
+        private const val DOWNLOADS_CATEGORY_KEY = "downloads"
+        private const val CONTENT_CATEGORY_KEY = "content"
+        private const val CONNECTION_CATEGORY_KEY = "connection"
+        private const val IOT_CATEGORY_KEY = "iot"
+        private const val OTHER_CATEGORY_KEY = "other"
     }
 }
