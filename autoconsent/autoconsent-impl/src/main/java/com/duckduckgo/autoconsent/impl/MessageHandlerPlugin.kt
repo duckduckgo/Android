@@ -21,14 +21,12 @@ import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.di.scopes.AppScope
 
-interface MessageHandlerPlugin {
-    fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback)
-    val type: String
-}
-
 @ContributesPluginPoint(
     scope = AppScope::class,
     boundType = MessageHandlerPlugin::class
 )
 @Suppress("unused")
-interface MessageHandlerPluginPoint
+interface MessageHandlerPlugin {
+    fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback)
+    val type: String
+}
