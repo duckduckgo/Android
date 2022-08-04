@@ -58,15 +58,10 @@ build-cache
 report
 
 .DS_Store
-/node_modules/@duckduckgo/autofill/.eslintrc
-/node_modules/@duckduckgo/autofill/docs
-/node_modules/@duckduckgo/autofill/Gruntfile.js
-/node_modules/@duckduckgo/autofill/integration-test
-/node_modules/@duckduckgo/autofill/package.json
-/node_modules/@duckduckgo/autofill/packages
-/node_modules/@duckduckgo/autofill/playwright.config.js
-/node_modules/@duckduckgo/autofill/scripts
-/node_modules/@duckduckgo/autofill/src
-/node_modules/@duckduckgo/autofill/swift-package
-/node_modules/seedrandom
-/node_modules/sjcl
+
+# Ignore everything in node_modules...
+/node_modules/
+# ...except autofill dist, license and readme
+!/node_modules/@duckduckgo/autofill/dist
+!/node_modules/@duckduckgo/autofill/LICENSE.md
+!/node_modules/@duckduckgo/autofill/README.md
