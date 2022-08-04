@@ -32,11 +32,14 @@ interface Autoconsent {
     fun addJsInterface(webView: WebView, autoconsentCallback: AutoconsentCallback)
 }
 
-/** Public interface for the Autoconsent callback */
+/**
+ * Public interface for the Autoconsent callback.
+ * It is required to be implemented and passed when calling addJsInterface and provides a useful set of callbacks.
+ */
 interface AutoconsentCallback {
     /**
      * This method is called whenever a popup is handled for the first time.
-     * It requires a [DialogFragment] and a [String] which will be used as a tag to show the [DialogFragment].
+     * It passes a [DialogFragment] and a [String] to be used as a dialog tag.
      */
     fun onFirstPopUpHandled(dialogFragment: DialogFragment, tag: String)
 
