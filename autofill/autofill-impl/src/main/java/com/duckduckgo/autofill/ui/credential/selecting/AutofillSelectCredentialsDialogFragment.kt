@@ -22,7 +22,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -114,8 +113,6 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     private fun getAvailableCredentials() = arguments?.getParcelableArrayList<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS)!!
 
     private fun getOriginalUrl() = arguments?.getString(CredentialAutofillPickerDialog.KEY_URL)!!
-
-    override fun asDialogFragment(): DialogFragment = this
 
     companion object {
 

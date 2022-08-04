@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -118,8 +117,6 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     private fun getOriginalUrl() = arguments?.getString(CredentialSavePickerDialog.KEY_URL)!!
 
     private fun showOnboarding() = viewModel.showOnboarding()
-
-    override fun asDialogFragment(): DialogFragment = this
 
     companion object {
 

@@ -22,7 +22,7 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 /**
  * Dialog which can be shown when user is required to select which saved credential to autofill
  */
-interface CredentialAutofillPickerDialog : DialogFragmentType {
+interface CredentialAutofillPickerDialog {
 
     companion object {
         const val TAG = "CredentialAutofillPickerDialog"
@@ -36,7 +36,7 @@ interface CredentialAutofillPickerDialog : DialogFragmentType {
 /**
  * Dialog which can be shown to prompt user to save credentials or not
  */
-interface CredentialSavePickerDialog : DialogFragmentType {
+interface CredentialSavePickerDialog {
 
     companion object {
         const val TAG = "CredentialSavePickerDialog"
@@ -49,7 +49,7 @@ interface CredentialSavePickerDialog : DialogFragmentType {
 /**
  * Dialog which can be shown to prompt user to update existing saved credentials or not
  */
-interface CredentialUpdateExistingCredentialsDialog : DialogFragmentType {
+interface CredentialUpdateExistingCredentialsDialog {
 
     companion object {
         const val TAG = "CredentialUpdateExistingCredentialsDialog"
@@ -60,22 +60,14 @@ interface CredentialUpdateExistingCredentialsDialog : DialogFragmentType {
 }
 
 /**
- * A workaround caused by modularization:
- * clients using these dialogs will know them by their interface but will also need to know they are DialogFragments to show them
- */
-interface DialogFragmentType {
-    fun asDialogFragment(): DialogFragment
-}
-
-/**
  * Factory used to get instances of the various autofill dialogs
  */
 interface CredentialAutofillDialogFactory {
 
-    fun autofillSelectCredentialsDialog(url: String, credentials: List<LoginCredentials>): CredentialAutofillPickerDialog
+    fun autofillSelectCredentialsDialog(url: String, credentials: List<LoginCredentials>): DialogFragment
 
-    fun autofillSavingCredentialsDialog(url: String, credentials: LoginCredentials): CredentialSavePickerDialog
+    fun autofillSavingCredentialsDialog(url: String, credentials: LoginCredentials): DialogFragment
 
-    fun autofillSavingUpdateCredentialsDialog(url: String, credentials: LoginCredentials): CredentialUpdateExistingCredentialsDialog
+    fun autofillSavingUpdateCredentialsDialog(url: String, credentials: LoginCredentials): DialogFragment
 
 }

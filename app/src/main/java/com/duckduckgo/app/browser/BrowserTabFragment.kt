@@ -1593,7 +1593,7 @@ class BrowserTabFragment :
         Timber.v("onCredentialsAvailable. %d creds to choose from", credentials.size)
         val url = webView?.url ?: return
         val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(url, credentials)
-        showDialogHidingPrevious(dialog.asDialogFragment(), CredentialAutofillPickerDialog.TAG)
+        showDialogHidingPrevious(dialog, CredentialAutofillPickerDialog.TAG)
     }
 
     private fun showAutofillDialogSaveCredentials(currentUrl: String, credentials: LoginCredentials) {
@@ -1601,7 +1601,7 @@ class BrowserTabFragment :
         if (url != currentUrl) return
 
         val dialog = credentialAutofillDialogFactory.autofillSavingCredentialsDialog(url, credentials)
-        showDialogHidingPrevious(dialog.asDialogFragment(), CredentialSavePickerDialog.TAG)
+        showDialogHidingPrevious(dialog, CredentialSavePickerDialog.TAG)
     }
 
     private fun showAutofillDialogUpdateCredentials(currentUrl: String, credentials: LoginCredentials) {
@@ -1609,7 +1609,7 @@ class BrowserTabFragment :
         if (url != currentUrl) return
 
         val dialog = credentialAutofillDialogFactory.autofillSavingUpdateCredentialsDialog(url, credentials)
-        showDialogHidingPrevious(dialog.asDialogFragment(), CredentialUpdateExistingCredentialsDialog.TAG)
+        showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
     }
 
     private fun showDialogHidingPrevious(dialog: DialogFragment, tag: String) {
