@@ -41,6 +41,10 @@ sealed class ReportBreakageCategory(@StringRes val category: Int, val key: Strin
     object OtherCategory :
         ReportBreakageCategory(R.string.atp_ReportBreakageCategoryOther, OTHER_CATEGORY_KEY)
 
+    override fun toString(): String {
+        return key
+    }
+
     companion object {
         private const val CRASHES_CATEGORY_KEY = "crashes"
         private const val MESSAGES_CATEGORY_KEY = "messages"
