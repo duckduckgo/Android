@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.themepreview.ui.dialogs
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +27,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
 
 /** Fragment to display a list of dialogs. */
+@SuppressLint("NoFragment") // we don't use DI here
 class DialogsFragment : Fragment() {
 
     override fun onCreateView(

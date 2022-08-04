@@ -16,11 +16,14 @@
 
 package dagger.android
 
-import androidx.appcompat.app.AppCompatActivity
+import android.annotation.SuppressLint
+import androidx.annotation.LayoutRes
+import androidx.fragment.app.Fragment
 import com.duckduckgo.di.DaggerMap
 import javax.inject.Inject
 
-abstract class DaggerActivity : AppCompatActivity(), HasDaggerInjector {
+@SuppressLint("NoFragment") // this is base fragment class to be used instead of Fragment
+abstract class DaggerFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId), HasDaggerInjector {
     @Inject
     lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*>>
 

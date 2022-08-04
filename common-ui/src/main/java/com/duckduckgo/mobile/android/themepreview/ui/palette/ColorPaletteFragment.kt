@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.themepreview.ui.palette
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,7 @@ import androidx.fragment.app.Fragment
 import com.duckduckgo.mobile.android.R
 
 /** Fragment to display a list of subsystems that show the values of this app's theme. */
+@SuppressLint("NoFragment") // we don't use DI here
 class ColorPaletteFragment : Fragment() {
 
     override fun onCreateView(

@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding.ui.page
 
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -40,7 +39,6 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
 import kotlinx.android.synthetic.main.include_default_browser_buttons.*
 import timber.log.Timber
@@ -68,11 +66,6 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     }
 
     override fun layoutResource(): Int = R.layout.content_onboarding_default_browser
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
