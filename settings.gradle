@@ -3,7 +3,9 @@ plugins {
 }
 
 rootDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
-    if (!parent.name.startsWith(".") && parent.name != "buildSrc") { // Ignore . and buildSrc dirs
+
+    String[] ignoreFolders = ["buildSrc", "fastlane", "submodules", "node_modules", "gradle", "build"]
+    if (!parent.name.startsWith(".") && !ignoreFolders.contains(parent.name)) {
         Boolean shouldAddProject = false
         parent.eachFile {
             if (it.name.contains("build.gradle")) {
