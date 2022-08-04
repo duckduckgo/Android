@@ -68,3 +68,5 @@ report
 /node_modules/@duckduckgo/autofill/scripts
 /node_modules/@duckduckgo/autofill/src
 /node_modules/@duckduckgo/autofill/swift-package
+/node_modules/seedrandom
+/node_modules/sjcl
