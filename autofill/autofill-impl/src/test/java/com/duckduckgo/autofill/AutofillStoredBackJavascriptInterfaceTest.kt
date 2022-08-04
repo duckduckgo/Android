@@ -23,6 +23,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.autofill.AutofillStoredBackJavascriptInterface.UrlProvider
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
@@ -495,7 +496,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
         // for saving
         var credentialsToSave: LoginCredentials? = null
 
-        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
+        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
             credentialsAvailableToInject = true
             this.credentialsToInject = credentials
         }
