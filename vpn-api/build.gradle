@@ -26,3 +26,6 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
 }
+android {
+  namespace 'com.duckduckgo.mobile.android.vpn.api'
+}

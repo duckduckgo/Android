@@ -29,3 +29,7 @@ dependencies {
     implementation AndroidX.constraintLayout
 }
 
+
+android {
+  namespace 'com.duckduckgo.autofill.api'
+}

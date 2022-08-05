@@ -85,3 +85,6 @@ fulladleModuleConfig {
 tasks.register('androidTestsBuild') {
     dependsOn 'assembleDebugAndroidTest'
 }
+android {
+  namespace 'com.duckduckgo.downloads.store'
+}
