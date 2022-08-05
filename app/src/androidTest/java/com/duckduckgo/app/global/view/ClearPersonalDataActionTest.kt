@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.view
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
@@ -48,6 +49,7 @@ class ClearPersonalDataActionTest {
     private val mockAppCacheClearer: AppCacheClearer = mock()
     private val mockGeoLocationPermissions: GeoLocationPermissions = mock()
     private val mockThirdPartyCookieManager: ThirdPartyCookieManager = mock()
+    private val mockAdClickManager: AdClickManager = mock()
 
     @Before
     fun setup() {
@@ -60,7 +62,8 @@ class ClearPersonalDataActionTest {
             mockCookieManager,
             mockAppCacheClearer,
             mockGeoLocationPermissions,
-            mockThirdPartyCookieManager
+            mockThirdPartyCookieManager,
+            mockAdClickManager
         )
     }
 

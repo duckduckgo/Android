@@ -600,6 +600,14 @@ class BrowserTabFragment :
         super.onStop()
     }
 
+    override fun onDestroyView() {
+        swipeRefreshContainer.removeCanChildScrollUpCallback()
+        webView?.removeEnableSwipeRefreshCallback()
+        webView?.stopNestedScroll()
+        webView?.stopLoading()
+        super.onDestroyView()
+    }
+
     private fun dismissAuthenticationDialog() {
         if (isAdded) {
             val fragment = parentFragmentManager.findFragmentByTag(AUTHENTICATION_DIALOG_TAG) as? HttpAuthenticationDialogFragment

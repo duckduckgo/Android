@@ -121,30 +121,6 @@
     <string name="httpsMixed">Connessione a crittografia mista</string>
     <string name="httpsBad">Connessione non crittografata</string>
 
-    <string name="networksActivityTitle">Reti di tracciamento</string>
-    <string name="networksContentDescription">Reti di tracciamento</string>
-    <string name="networksOverview">Le reti di tracciamento aggregano la tua cronologia di navigazione per creare un profilo dati su di te. Le reti di tracciamento principali sono le più pericolose, in quanto possono monitorarti e individuarti anche al di là di Internet.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s sistema di tracciamento rilevato</item>
-        <item quantity="other">%1$s sistemi di tracciamento rilevati</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s sistema di tracciamento bloccato</item>
-        <item quantity="other">%1$s sistemi di tracciamento bloccati</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s rete di tracciamento principale rilevata</item>
-        <item quantity="other">%1$s reti di tracciamento principali rilevate</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s rete di tracciamento principale bloccata</item>
-        <item quantity="other">%1$s reti di tracciamento principali bloccate</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Punteggio sulla privacy</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Il sito è una rete di tracciamento principale</string>
     <string name="scorecardPrivacyGrade">Punteggio sulla privacy</string>
@@ -162,6 +138,45 @@
 
     <string name="networkTrackerSummaryHeader">PRINCIPALI MINACCE DELLE RETI DI TRACCIAMENTO</string>
     <string name="networkTrackerSummaryNotReady">Stiamo raccogliendo dati per mostrarti quanti sistemi di tracciamento abbiamo bloccato.</string>
+
+    <string name="trackersActivityTitle">Richieste di tracciamento bloccate</string>
+    <string name="trackersContentDescription">Richieste di tracciamento bloccate</string>
+    <string name="trackersOverview">Il caricamento delle richieste da parte dei seguenti domini di terze parti è stato bloccato perché si trattava di richieste di tracciamento. Il caricamento delle richieste da parte delle aziende può consentire loro di tracciare un profilo dell\'utente.</string>
+    <string name="trackersOverviewProtectionsOff">Il caricamento delle richieste di tracciamento non è stato bloccato perché le protezioni per questo sito sono disattivate. Il caricamento delle richieste da parte delle aziende può consentire loro di tracciare un profilo dell\'utente.</string>
+
+    <string name="domainsLoadedActivityTitle">Richieste di terze parti caricate</string>
+    <string name="domainsLoadedContentDescription">Richieste di terze parti caricate</string>
+    <string name="domainsLoadedOverview">Le richieste dei seguenti domini di terze parti sono state caricate. Il caricamento delle richieste da parte delle aziende può consentire loro di tracciare un profilo dell\'utente, sebbene le nostre ulteriori protezioni per il tracciamento sul web restino comunque valide.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Il caricamento delle richieste di terze parti non è stato bloccato perché le protezioni per questo sito sono disattivate. Il caricamento delle richieste da parte delle aziende può consentire loro di tracciare un profilo dell\'utente.</string>
+    <string name="domainsLoadedOverviewEmpty">Non sono state rilevate richieste derivanti da domini di terze parti.</string>
+    <string name="domainsLoadedHeadingText">Nessun dominio di terze parti caricato</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Informazioni sulle nostre protezioni dal tracciamento web</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Sono state caricate le richieste dei seguenti domini.</string>
+
+    <string name="adLoadedSectionDescription">Le richieste provenienti dal seguente dominio sono state caricate perché è stato appena cliccato un annuncio di %1$s su DuckDuckGo. Tali richieste contribuiscono a valutare l\'efficacia degli annunci. Tutti gli annunci presenti su DuckDuckGo non sono caratterizzati da profilazione.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">In che modo i nostri annunci della rete di ricerca influiscono sulle nostre protezioni</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Sono state caricate anche le richieste del seguente dominio.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Sono state caricate le richieste di tracciamento da parte dei seguenti domini.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Non sono state rilevate richieste derivanti da domini di terze parti.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Le richieste provenienti dal seguente dominio sono state caricate per evitare che il sito smetta di funzionare.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Le richieste provenienti dal seguente dominio sono state caricate perché sono associate a %1$s.</string>
+
+    <string name="trackersBlockedText">Caricamento delle richieste bloccato</string>
+    <string name="trackersNotBlockedText">Nessuna richiesta di tracciamento bloccata</string>
+    <string name="trackersNoFoundText">Nessuna richiesta di tracciamento trovata</string>
+    <string name="trackersFoundText">Richieste di tracciamento trovate</string>
+
+    <string name="domainsLoadedText">Richieste di terze parti caricate</string>
+    <string name="domainsNotLoadedText">Non è stata caricata alcuna richiesta da parte di terzi</string>
+
+    <string name="majorNetworksNoFound">Nessuna rete del sistema di tracciamento principale rilevata</string>
+    <string name="majorNetworksFound">Rete di sistemi di tracciamento principale rilevata</string>
 
     <!-- Fire -->
     <string name="fireMenu">Elimina dati</string>
@@ -563,8 +578,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Connessione interrotta. Questo sito Web potrebbe essere pericoloso per il tuo dispositivo.</string>
 
-
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Consentire la localizzazione del dispositivo per DuckDuckGo Privacy Browser?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s sta richiedendo la posizione del tuo dispositivo. Prima di tutto devi consentire all\'app di inviare la posizione del tuo dispositivo, poi %2$s potrà chiedere l\'autorizzazione.</string>
@@ -596,7 +609,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blocca automaticamente molti sistemi di tracciamento. Con la funzione Global Privacy Control (GPC), puoi anche chiedere ai siti web aderenti di impedire la vendita o la condivisione dei tuoi dati personali con altre aziende. <u><a href="">Ulteriori informazioni</a><u/>]]>
+        <![CDATA[DuckDuckGo blocca automaticamente molti sistemi di tracciamento. Con la funzione Global Privacy Control (GPC), puoi anche chiedere ai siti web aderenti di impedire la vendita o la condivisione dei tuoi dati personali con altre aziende. <u><a href=\"\">Ulteriori informazioni</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -651,16 +664,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Tutelare la privacy delle e-mail, ora è semplice.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blocca il sistema di tracciamento email e nascondi il tuo indirizzo, senza cambiare il provider di posta elettronica.<a href=""><b>Ulteriori informazioni</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blocca il sistema di tracciamento email e nascondi il tuo indirizzo, senza cambiare il provider di posta elettronica.<a href=\"\"><b>Ulteriori informazioni</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Sei sulla lista.</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Ti invieremo una notifica quando la funzione Protezione<br/> e-mail sarà pronta per te. <a href=""><b>Ulteriori informazioni</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vedrai il tuo invito qui quando saremo pronti per te. Vuoi <a href=""><b>ricevere una notifica</b></a> quando arriva?<br/><a href=""><b>Ulteriori informazioni</b></a> sulla protezione e-mail.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Ti invieremo una notifica quando la funzione Protezione<br/> e-mail sarà pronta per te. <a href=\"\"><b>Ulteriori informazioni</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vedrai il tuo invito qui quando saremo pronti per te. Vuoi <a href=\"\"><b>ricevere una notifica</b></a> quando arriva?<br/><a href=\"\"><b>Ulteriori informazioni</b></a> sulla protezione e-mail.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Hai ricevuto un invito.</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blocca il sistema di tracciamento email e nascondi il tuo indirizzo, senza cambiare il provider di posta elettronica.<a href=""><b>Ulteriori informazioni</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blocca il sistema di tracciamento email e nascondi il tuo indirizzo, senza cambiare il provider di posta elettronica.<a href=\"\"><b>Ulteriori informazioni</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Crea indirizzo Duck</string>

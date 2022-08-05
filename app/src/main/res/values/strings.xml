@@ -120,30 +120,6 @@
     <string name="httpsMixed">Mixed Encryption Connection</string>
     <string name="httpsBad">Unencrypted Connection</string>
 
-    <string name="networksActivityTitle">Tracker Networks</string>
-    <string name="networksContentDescription">Tracker Networks</string>
-    <string name="networksOverview">Tracker networks aggregate your web history into a data profile about you. Major tracker networks are more harmful because they can track and target you across more of the Internet.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%s Tracker Found</item>
-        <item quantity="other">%s Trackers Found</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%s Tracker Blocked</item>
-        <item quantity="other">%s Trackers Blocked</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%s Major Tracker Network Found</item>
-        <item quantity="other">%s Major Tracker Networks Found</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%s Major Tracker Network Blocked</item>
-        <item quantity="other">%s Major Tracker Networks Blocked</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Privacy Grade</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Site Is a Major Tracker Network</string>
     <string name="scorecardPrivacyGrade">Privacy Grade</string>
@@ -161,6 +137,45 @@
 
     <string name="networkTrackerSummaryHeader">TRACKER NETWORK TOP OFFENDERS</string>
     <string name="networkTrackerSummaryNotReady">We\'re still collecting data to show how many trackers we\'ve blocked.</string>
+
+    <string name="trackersActivityTitle">Tracking Requests Blocked</string>
+    <string name="trackersContentDescription">Tracking Requests Blocked</string>
+    <string name="trackersOverview">The following third-party domains\' requests were blocked from loading because they were identified as tracking requests. If a company\'s requests are loaded, it can allow them to profile you.</string>
+    <string name="trackersOverviewProtectionsOff">No tracking requests were blocked from loading because Protections are turned off for this site. If a company\'s requests are loaded, it can allow them to profile you.</string>
+
+    <string name="domainsLoadedActivityTitle">Third-Party Requests Loaded</string>
+    <string name="domainsLoadedContentDescription">Third-Party Requests Loaded</string>
+    <string name="domainsLoadedOverview">The following third-party domains\' requests were loaded. If a company\'s requests are loaded, it can allow them to profile you, though our other web tracking protections still apply.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">No third-party requests were blocked from loading because Protections are turned off for this site. If a company\'s requests are loaded, it can allow them to profile you.</string>
+    <string name="domainsLoadedOverviewEmpty">We did not detect requests from any third-party domains.</string>
+    <string name="domainsLoadedHeadingText">No third-party domains loaded</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">About our Web Tracking Protections</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">The following domains\' requests were loaded.</string>
+
+    <string name="adLoadedSectionDescription">The following domain\'s requests were loaded because a %s ad on DuckDuckGo was recently clicked. These requests help evaluate ad effectiveness. All ads on DuckDuckGo are non-profiling.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">How our search ads impact our protections</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">The following domain\'s requests were also loaded.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">The following domains\' tracking requests were loaded.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">We did not detect requests from any third-party domains.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">The following domain\'s requests were loaded to prevent site breakage.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">The following domain\'s requests were loaded because they\'re associated with %s.</string>
+
+    <string name="trackersBlockedText">Requests Blocked from Loading</string>
+    <string name="trackersNotBlockedText">No Tracking Requests Blocked</string>
+    <string name="trackersNoFoundText">No Tracking Requests Found</string>
+    <string name="trackersFoundText">Tracking Requests Found</string>
+
+    <string name="domainsLoadedText">Third-Party Requests Loaded</string>
+    <string name="domainsNotLoadedText">No Third-Party Requests Loaded</string>
+
+    <string name="majorNetworksNoFound">No Major Tracker Networks Found</string>
+    <string name="majorNetworksFound">Major Tracker Networks Found</string>
 
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>

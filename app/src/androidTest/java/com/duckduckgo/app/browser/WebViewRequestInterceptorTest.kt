@@ -22,6 +22,7 @@ import android.net.Uri
 import android.webkit.*
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
@@ -33,7 +34,9 @@ import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.UserAgent
@@ -63,6 +66,7 @@ class WebViewRequestInterceptorTest {
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val mockGpc: Gpc = mock()
     private val mockWebBackForwardList: WebBackForwardList = mock()
+    private val mockAdClickManager: AdClickManager = mock()
     private val fakeUserAgent: UserAgent = UserAgentFake()
     private val fakeToggle: FeatureToggle = FeatureToggleFake()
     private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
@@ -90,7 +94,8 @@ class WebViewRequestInterceptorTest {
             resourceSurrogates = mockResourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             gpc = mockGpc,
-            userAgentProvider = userAgentProvider
+            userAgentProvider = userAgentProvider,
+            adClickManager = mockAdClickManager
         )
     }
 
@@ -552,13 +557,29 @@ class WebViewRequestInterceptorTest {
         assertNull(testee.shouldInterceptFromServiceWorker(request = mockRequest, documentUrl = null))
     }
 
+    @Test
+    fun whenIsAppUrlPixelThenShouldContinueToLoad() = runTest {
+        whenever(mockRequest.url).thenReturn(
+            "https://improving.duckduckgo.com/t/m_nav_nt_p_android_phone?atb=v336-7&appVersion=5.131.0&test=1".toUri()
+        )
+        val response = testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = "foo.com",
+            webView = webView,
+            webViewClientListener = null
+        )
+
+        assertRequestCanContinueToLoad(response)
+    }
+
     private fun assertRequestCanContinueToLoad(response: WebResourceResponse?) {
         assertNull(response)
     }
 
     private fun configureShouldBlock() {
         val blockTrackingEvent = TrackingEvent(
-            blocked = true,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER,
             documentUrl = "",
             trackerUrl = "",
             entity = null,

@@ -29,6 +29,7 @@ import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -92,6 +93,7 @@ class BrowserWebViewClientTest {
     private val ampLinks: AmpLinks = mock()
     private val printInjector: PrintInjector = mock()
     private val internalTestUserChecker: InternalTestUserChecker = mock()
+    private val adClickManager: AdClickManager = mock()
 
     @UiThreadTest
     @Before
@@ -116,7 +118,8 @@ class BrowserWebViewClientTest {
             accessibilitySettings,
             ampLinks,
             printInjector,
-            internalTestUserChecker
+            internalTestUserChecker,
+            adClickManager
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)

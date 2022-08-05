@@ -21,9 +21,12 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.surrogates.SurrogateResponse
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.TrackerType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -39,6 +42,9 @@ class SiteMonitorTest {
         private const val trackerA = "http://standalonetrackerA.com/script.js"
         private const val trackerB = "http://standalonetrackerB.com/script.js"
         private const val trackerC = "http://standalonetrackerC.com/script.js"
+        private const val trackerD = "http://standalonetrackerD.com/script.js"
+        private const val trackerE = "http://standalonetrackerE.com/script.js"
+        private const val trackerF = "http://standalonetrackerF.com/script.js"
 
         private const val majorNetworkTracker = "http://majorNetworkTracker.com/script.js"
 
@@ -92,32 +98,181 @@ class SiteMonitorTest {
     }
 
     @Test
-    fun whenTrackersAreDetectedThenTrackerCountIsIncremented() {
+    fun whenTrackersBlockedOrAllowedByUserAreDetectedThenTrackerCountIsIncremented() {
         val testee = SiteMonitor(document, null)
-        testee.trackerDetected(TrackingEvent(document, trackerA, null, null, true, null))
-        testee.trackerDetected(TrackingEvent(document, trackerB, null, null, true, null))
-        assertEquals(2, testee.trackerCount)
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerA,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerB,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.USER_ALLOWED,
+                type = TrackerType.OTHER
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerC,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.ALLOWED,
+                type = TrackerType.OTHER
+            )
+        )
+        assertEquals(1, testee.trackerCount)
+    }
+
+    @Test
+    fun whenNoTrackersAllowedByUserAreDetectedThenAllTrackersBlockedIsTrue() {
+        val testee = SiteMonitor(document, null)
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerA,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerB,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerC,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.ALLOWED,
+                type = TrackerType.OTHER
+            )
+        )
+        assertTrue(testee.allTrackersBlocked)
+    }
+
+    @Test
+    fun whenAtLeastOneTrackersAllowedByUserIsDetectedThenAllTrackersBlockedIsFalse() {
+        val testee = SiteMonitor(document, null)
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerA,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerB,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.USER_ALLOWED,
+                type = TrackerType.OTHER
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerC,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.ALLOWED,
+                type = TrackerType.OTHER
+            )
+        )
+        assertFalse(testee.allTrackersBlocked)
     }
 
     @Test
     fun whenNonMajorNetworkTrackerIsDetectedThenMajorNetworkCountIsZero() {
         val testee = SiteMonitor(document, null)
-        testee.trackerDetected(TrackingEvent(document, trackerA, null, network, true, null))
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerA,
+                categories = null,
+                entity = network,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER
+            )
+        )
         assertEquals(0, testee.majorNetworkCount)
     }
 
     @Test
     fun whenMajorNetworkTrackerIsDetectedThenMajorNetworkCountIsOne() {
         val testee = SiteMonitor(document, null)
-        testee.trackerDetected(TrackingEvent(document, majorNetworkTracker, null, majorNetwork, true, null))
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = majorNetworkTracker,
+                categories = null,
+                entity = majorNetwork,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER
+            )
+        )
         assertEquals(1, testee.majorNetworkCount)
     }
 
     @Test
     fun whenDuplicateMajorNetworkIsDetectedThenMajorNetworkCountIsStillOne() {
         val testee = SiteMonitor(document, null)
-        testee.trackerDetected(TrackingEvent(document, trackerA, null, majorNetwork, true, null))
-        testee.trackerDetected(TrackingEvent(document, trackerB, null, majorNetwork, true, null))
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerA,
+                categories = null,
+                entity = majorNetwork,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerB,
+                categories = null,
+                entity = majorNetwork,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER
+            )
+        )
         assertEquals(1, testee.majorNetworkCount)
     }
 
@@ -138,5 +293,116 @@ class SiteMonitorTest {
         val testee = SiteMonitor(document, null)
         testee.surrogateDetected(SurrogateResponse())
         assertEquals(1, testee.surrogates.size)
+    }
+
+    @Test
+    fun whenOtherDomainsAreLoadedThenOtherDomainsLoadedCountIsIncremented() {
+        val testee = SiteMonitor(document, null)
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerA,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.ALLOWED,
+                type = TrackerType.AD
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerB,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.ALLOWED,
+                type = TrackerType.OTHER
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerC,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER
+            )
+        )
+        assertEquals(2, testee.otherDomainsLoadedCount)
+    }
+
+    @Test
+    fun whenSpecialDomainsAreLoadedThenSpecialDomainsLoadedCountIsIncremented() {
+        val testee = SiteMonitor(document, null)
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerA,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.AD_ALLOWED,
+                type = TrackerType.AD
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerB,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.SITE_BREAKAGE_ALLOWED,
+                type = TrackerType.OTHER
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerC,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.SAME_ENTITY_ALLOWED,
+                type = TrackerType.OTHER
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerD,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.USER_ALLOWED,
+                type = TrackerType.OTHER
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerE,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER
+            )
+        )
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = document,
+                trackerUrl = trackerF,
+                categories = null,
+                entity = null,
+                surrogateId = null,
+                status = TrackerStatus.ALLOWED,
+                type = TrackerType.OTHER
+            )
+        )
+        assertEquals(4, testee.specialDomainsLoadedCount)
     }
 }

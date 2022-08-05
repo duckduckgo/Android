@@ -30,7 +30,9 @@ import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.TrackerType
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -298,17 +300,19 @@ class CtaTest {
     fun whenTrackersBlockedReturnThemSortingByPrevalence() {
         val trackers = listOf(
             TrackingEvent(
-                "facebook.com",
-                "facebook.com",
-                blocked = true,
+                documentUrl = "facebook.com",
+                trackerUrl = "facebook.com",
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER,
                 entity = TestingEntity("Facebook", "Facebook", 3.0),
                 categories = null,
                 surrogateId = null
             ),
             TrackingEvent(
-                "other.com",
-                "other.com",
-                blocked = true,
+                documentUrl = "other.com",
+                trackerUrl = "other.com",
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER,
                 entity = TestingEntity("Other", "Other", 9.0),
                 categories = null,
                 surrogateId = null
@@ -327,22 +331,70 @@ class CtaTest {
     fun whenTrackersBlockedReturnOnlyTrackersWithDisplayName() {
         val trackers = listOf(
             TrackingEvent(
-                "facebook.com",
-                "facebook.com",
-                blocked = true,
+                documentUrl = "facebook.com",
+                trackerUrl = "facebook.com",
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER,
                 entity = TestingEntity("Facebook", "Facebook", 3.0),
                 categories = null,
                 surrogateId = null
             ),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestingEntity("Other", "", 9.0), categories = null, surrogateId = null)
+            TrackingEvent(
+                documentUrl = "other.com",
+                trackerUrl = "other.com",
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER,
+                entity = TestingEntity("Other", "", 9.0),
+                categories = null,
+                surrogateId = null
+            )
         )
         val site = site(events = trackers)
 
-        val testee =
-            DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, site.orderedTrackingEntities(), "http://www.trackers.com")
+        val testee = DaxDialogCta.DaxTrackersBlockedCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            site.orderedTrackingEntities(),
+            "http://www.trackers.com"
+        )
         val value = testee.getDaxText(mockActivity)
 
         assertEquals("<b>Facebook</b>withZero", value)
+    }
+
+    @Test
+    fun whenTrackersBlockedReturnOnlyTrackersBlocked() {
+        val trackers = listOf(
+            TrackingEvent(
+                documentUrl = "facebook.com",
+                trackerUrl = "facebook.com",
+                status = TrackerStatus.ALLOWED,
+                type = TrackerType.OTHER,
+                entity = TestingEntity("Facebook", "Facebook", 3.0),
+                categories = null,
+                surrogateId = null
+            ),
+            TrackingEvent(
+                documentUrl = "other.com",
+                trackerUrl = "other.com",
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER,
+                entity = TestingEntity("Other", "Other", 9.0),
+                categories = null,
+                surrogateId = null
+            )
+        )
+        val site = site(events = trackers)
+
+        val testee = DaxDialogCta.DaxTrackersBlockedCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            site.orderedTrackingEntities(),
+            "http://www.trackers.com"
+        )
+        val value = testee.getDaxText(mockActivity)
+
+        assertEquals("<b>Other</b>withZero", value)
     }
 
     @Test
