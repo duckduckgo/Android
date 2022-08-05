@@ -214,6 +214,7 @@ dependencies {
 
     implementation project(':autoconsent-api')
     implementation project(':autoconsent-impl')
+    implementation project(':autoconsent-store')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
