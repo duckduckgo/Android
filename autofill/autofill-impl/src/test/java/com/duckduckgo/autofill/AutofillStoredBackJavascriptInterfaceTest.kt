@@ -408,8 +408,31 @@ class AutofillStoredBackJavascriptInterfaceTest {
     }
 
     @Test
-    fun whenStoreFormDataCalledWithNoUsernameOrPasswordThenCallbackNotInvoked() = runTest {
+    fun whenStoreFormDataCalledWithNullUsernameAndPasswordThenCallbackNotInvoked() = runTest {
         configureRequestParserToReturn(username = null, password = null)
+        testee.storeFormData("")
+        assertNull(testCallback.credentialsToSave)
+    }
+
+    @Test
+    fun whenStoreFormDataCalledWithBlankUsernameThenCallbackInvoked() = runTest {
+        configureRequestParserToReturn(username = " ", password = "password")
+        testee.storeFormData("")
+        assertEquals(" ", testCallback.credentialsToSave!!.username)
+        assertEquals("password", testCallback.credentialsToSave!!.password)
+    }
+
+    @Test
+    fun whenStoreFormDataCalledWithBlankPasswordThenCallbackInvoked() = runTest {
+        configureRequestParserToReturn(username = "username", password = " ")
+        testee.storeFormData("")
+        assertEquals("username", testCallback.credentialsToSave!!.username)
+        assertEquals(" ", testCallback.credentialsToSave!!.password)
+    }
+
+    @Test
+    fun whenStoreFormDataCalledWithBlankUsernameAndBlankPasswordThenCallbackNotInvoked() = runTest {
+        configureRequestParserToReturn(username = " ", password = " ")
         testee.storeFormData("")
         assertNull(testCallback.credentialsToSave)
     }

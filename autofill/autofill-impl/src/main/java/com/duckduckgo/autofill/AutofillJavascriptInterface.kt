@@ -178,8 +178,8 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
             val request = requestParser.parseStoreFormDataRequest(data).credentials
 
-            if (request.username == null && request.password == null) {
-                Timber.w("Invalid data from storeFormData; username and password can't both be null")
+            if (request.username.isNullOrBlank() && request.password.isNullOrBlank()) {
+                Timber.w("Invalid data from storeFormData; username and password can't both be blank")
                 return@launch
             }
 
