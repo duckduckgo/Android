@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
+import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
 import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
@@ -35,15 +36,17 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class PopUpFoundMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val repository: AutoconsentSettingsRepository,
 ) : MessageHandlerPlugin {
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         if (messageType == type) {
-            if (true == false) { // ToDo if autoconsent already enabled do nothing
+            if (repository.userSetting) {
                 return
             }
             appCoroutineScope.launch(dispatcherProvider.main()) {
+                repository.firstPopupHandled = true
                 autoconsentCallback.onFirstPopUpHandled(getDialogFragment(webView), TAG)
             }
         }
@@ -66,11 +69,12 @@ class PopUpFoundMessageHandlerPlugin @Inject constructor(
             }
 
             override fun onDaxDialogPrimaryCtaClick() {
+                repository.userSetting = true
                 webView.evaluateJavascript("javascript:${ReplyHandler.constructReply("""{ "type": "optOut" }""")}", null)
             }
 
             override fun onDaxDialogSecondaryCtaClick() {
-                // NOOP
+                repository.userSetting = false
             }
 
             override fun onDaxDialogHideClick() {

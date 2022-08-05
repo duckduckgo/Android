@@ -30,6 +30,16 @@ interface Autoconsent {
      * It requires a [WebView] instance and an [AutoconsentCallback].
      */
     fun addJsInterface(webView: WebView, autoconsentCallback: AutoconsentCallback)
+
+    /**
+     * This method enables or disables autoconsent setting depending on the value passed.
+     */
+    fun changeSetting(setting: Boolean)
+
+    /**
+     * @return `true` if autoconsent was enabled by the user, `false` otherwise.
+     */
+    fun isSettingEnabled(): Boolean
 }
 
 /**
