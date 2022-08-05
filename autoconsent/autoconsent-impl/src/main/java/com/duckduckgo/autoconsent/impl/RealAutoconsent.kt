@@ -21,6 +21,7 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.AutoconsentInterface.Companion.AUTOCONSENT_INTERFACE
+import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -28,16 +29,34 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealAutoconsent @Inject constructor(
     private val messageHandlerPlugins: PluginPoint<MessageHandlerPlugin>,
+    private val repository: AutoconsentSettingsRepository,
 ) : Autoconsent {
 
     private lateinit var autoconsentJs: String
 
     override fun injectAutoconsent(webView: WebView) {
-        webView.evaluateJavascript("javascript:${getFunctionsJS()}", null)
+        if (canBeInjected()) {
+            webView.evaluateJavascript("javascript:${getFunctionsJS()}", null)
+        }
     }
 
     override fun addJsInterface(webView: WebView, autoconsentCallback: AutoconsentCallback) {
-        webView.addJavascriptInterface(AutoconsentInterface(messageHandlerPlugins, webView, autoconsentCallback), AUTOCONSENT_INTERFACE)
+        webView.addJavascriptInterface(
+            AutoconsentInterface(messageHandlerPlugins, webView, autoconsentCallback),
+            AUTOCONSENT_INTERFACE
+        )
+    }
+
+    override fun changeSetting(setting: Boolean) {
+        repository.userSetting = setting
+    }
+
+    override fun isSettingEnabled(): Boolean {
+        return repository.userSetting
+    }
+
+    private fun canBeInjected(): Boolean {
+        return repository.userSetting || !repository.firstPopupHandled
     }
 
     private fun getFunctionsJS(): String {
