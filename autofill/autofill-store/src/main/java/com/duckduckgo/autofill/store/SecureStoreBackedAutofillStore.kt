@@ -73,17 +73,17 @@ class SecureStoreBackedAutofillStore(
         }
     }
 
-    override suspend fun getCredentialsWithId(id: Int): LoginCredentials? =
+    override suspend fun getCredentialsWithId(id: Long): LoginCredentials? =
         secureStorage.getWebsiteLoginDetailsWithCredentials(id)?.toLoginCredentials()
 
     override suspend fun saveCredentials(
         rawUrl: String,
         credentials: LoginCredentials
-    ) {
+    ): Long? {
         val url = rawUrl.extractSchemeAndDomain()
         if (url == null) {
             Timber.w("Cannot save credentials as given url was in an unexpected format. Original url: %s", rawUrl)
-            return
+            return null
         }
 
         Timber.i("Saving login credentials for %s. username=%s", url, credentials.username)
@@ -97,9 +97,11 @@ class SecureStoreBackedAutofillStore(
         )
         val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(loginDetails, password = credentials.password)
 
-        secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)
+        val newId = secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)
 
         showOnboardingWhenOfferingToSaveLogin = false
+
+        return newId
     }
 
     override suspend fun updateCredentials(
@@ -135,7 +137,7 @@ class SecureStoreBackedAutofillStore(
             }
     }
 
-    override suspend fun deleteCredentials(id: Int) {
+    override suspend fun deleteCredentials(id: Long) {
         secureStorage.deleteWebsiteLoginDetailsWithCredentials(id)
     }
 
