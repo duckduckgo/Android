@@ -18,7 +18,6 @@ package com.duckduckgo.autoconsent.impl
 
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import org.junit.Assert.*
 import org.junit.Before
@@ -32,50 +31,28 @@ class AutoconsentInterfaceTest {
     private val mockAutoconsentCallback: AutoconsentCallback = mock()
     private val pluginPoint = FakePluginPoint()
 
-    lateinit var testee: AutoconsentInterface
+    lateinit var autoconsentInterface: AutoconsentInterface
 
     @Before
     fun setup() {
-        testee = AutoconsentInterface(pluginPoint, mockWebView, mockAutoconsentCallback)
+        autoconsentInterface = AutoconsentInterface(pluginPoint, mockWebView, mockAutoconsentCallback)
     }
 
     @Test
     fun whenMessagedParsedIfTypeMatchesThenCallProcess() {
         val message = """{"type":"fake"}"""
 
-        testee.process(message)
+        autoconsentInterface.process(message)
 
         assertEquals(1, pluginPoint.plugin.count)
     }
 
     @Test
-    fun whenMessagedParsedIfTypeDoesNotMatcheThenDoNotCallProcess() {
+    fun whenMessagedParsedIfTypeDoesNotMatchThenDoNotCallProcess() {
         val message = """{"type":"noMatchingType"}"""
 
-        testee.process(message)
+        autoconsentInterface.process(message)
 
         assertEquals(0, pluginPoint.plugin.count)
     }
-}
-
-class FakePluginPoint : PluginPoint<MessageHandlerPlugin> {
-    val plugin = FakeMessageHandlerPlugin()
-    override fun getPlugins(): Collection<MessageHandlerPlugin> {
-        return listOf(plugin)
-    }
-}
-
-class FakeMessageHandlerPlugin : MessageHandlerPlugin {
-    var count = 0
-
-    override fun process(
-        messageType: String,
-        jsonString: String,
-        webView: WebView,
-        autoconsentCallback: AutoconsentCallback
-    ) {
-        count++
-    }
-
-    override val type: String = "fake"
 }

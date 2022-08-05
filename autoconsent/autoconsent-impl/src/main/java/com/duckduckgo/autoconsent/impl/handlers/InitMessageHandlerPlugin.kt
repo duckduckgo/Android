@@ -26,6 +26,7 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.JsReader
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
+import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -41,7 +42,8 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class InitMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val repository: AutoconsentSettingsRepository,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -59,9 +61,9 @@ class InitMessageHandlerPlugin @Inject constructor(
                         return@launch
                     }
 
-                    val isAutoconsentEnabled = true // ToDo
+                    val isAutoconsentDisabled = !repository.userSetting && repository.firstPopupHandled
 
-                    if (!isAutoconsentEnabled) {
+                    if (isAutoconsentDisabled) {
                         return@launch
                     }
 
@@ -70,11 +72,11 @@ class InitMessageHandlerPlugin @Inject constructor(
                     }
 
                     val disabledCmps = emptyList<String>() // ToDo
-                    val autoAction = null // ToDo
-                    val enablePreHide = false // ToDo
+                    val autoAction = getAutoAction()
+                    val enablePreHide = repository.userSetting
                     val detectRetries = 1 // ToDo
 
-                    val config = Config(isAutoconsentEnabled, autoAction, disabledCmps, enablePreHide, detectRetries)
+                    val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries)
                     val initResp = InitResp(rules = getRules(), config = config)
 
                     val response = ReplyHandler.constructReply(getMessage(initResp))
@@ -88,6 +90,10 @@ class InitMessageHandlerPlugin @Inject constructor(
     }
 
     override val type: String = "init"
+
+    private fun getAutoAction(): String? {
+        return if (!repository.firstPopupHandled) null else "optOut"
+    }
 
     private fun parseMessage(jsonString: String): InitMessage? {
         val jsonAdapter: JsonAdapter<InitMessage> = moshi.adapter(InitMessage::class.java)
