@@ -51,14 +51,14 @@ interface AutofillStore {
      * Find saved credential for the given id
      * @param id of the saved credential
      */
-    suspend fun getCredentialsWithId(id: Int): LoginCredentials?
+    suspend fun getCredentialsWithId(id: Long): LoginCredentials?
 
     /**
      * Save the given credentials for the given URL
      * @param rawUrl Can be a full, unmodified URL taken from the URL bar (containing subdomains, query params etc...)
      * @param credentials The credentials to be saved. The ID can be null.
      */
-    suspend fun saveCredentials(rawUrl: String, credentials: LoginCredentials)
+    suspend fun saveCredentials(rawUrl: String, credentials: LoginCredentials): Long?
 
     /**
      * Updates the credentials saved for the given URL
@@ -75,7 +75,7 @@ interface AutofillStore {
     /**
      * Deletes the credential with the given ID
      */
-    suspend fun deleteCredentials(id: Int)
+    suspend fun deleteCredentials(id: Long)
 
     /**
      * Updates the given login credentials, replacing what was saved before for the credentials with the specified ID

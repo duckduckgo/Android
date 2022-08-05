@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.Flow
 interface WebsiteLoginCredentialsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(loginCredentials: WebsiteLoginCredentialsEntity)
+    fun insert(loginCredentials: WebsiteLoginCredentialsEntity): Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(loginCredentials: WebsiteLoginCredentialsEntity)
@@ -40,11 +40,11 @@ interface WebsiteLoginCredentialsDao {
     fun websiteLoginCredentialsByDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
 
     @Query("select * from website_login_credentials where id = :id")
-    fun getWebsiteLoginCredentialsById(id: Int): WebsiteLoginCredentialsEntity?
+    fun getWebsiteLoginCredentialsById(id: Long): WebsiteLoginCredentialsEntity?
 
     @Delete
     fun delete(loginCredentials: WebsiteLoginCredentialsEntity)
 
     @Query("DELETE FROM website_login_credentials WHERE id = :id")
-    fun delete(id: Int)
+    fun delete(id: Long)
 }

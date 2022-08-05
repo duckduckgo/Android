@@ -38,7 +38,7 @@ data class WebsiteLoginDetailsWithCredentials(
 data class WebsiteLoginDetails(
     val domain: String?,
     val username: String?,
-    val id: Int? = null,
+    val id: Long? = null,
     val domainTitle: String? = null,
     val notes: String? = null,
     val lastUpdatedMillis: Long? = null

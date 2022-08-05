@@ -24,7 +24,7 @@ import kotlinx.android.parcel.Parcelize
  */
 @Parcelize
 data class LoginCredentials(
-    val id: Int? = null,
+    val id: Long? = null,
     val domain: String?,
     val username: String?,
     val password: String?,
