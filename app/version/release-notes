@@ -1,1 +1,2 @@
-Bug fixes and other improvements
+We've expanded our 3rd-Party Tracker Loading Protection to block more tracking requests. 
+We also updated the Privacy Dashboard — you can now see additional information about which 3rd-party requests were blocked from loading, which other 3rd-party requests loaded, and the reasons for both when available.
