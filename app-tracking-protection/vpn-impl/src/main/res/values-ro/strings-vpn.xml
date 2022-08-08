@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="atp_name">Protecția la urmărirea aplicațiilor</string>
+    <string name="refresh">Reîncărcare</string>
+
+    <!-- Debug Screens -->
+    <string name="atp_DiagnosticsMenuLabel">Diagnosticare</string>
+    <string name="atp_DataMenuLabel">Statistici de date</string>
+    <string name="atp_MeteredConnection">"Măsurat: %1$s"</string>
+    <string name="atp_ConnectionStatus">"VPN conectat: %1$s"</string>
+    <string name="atp_NetworkAvailable">"Conectat la internet: %1$s"</string>
+    <string name="atp_DnsServers">"Rețea activă DNS: %1$s"</string>
+    <string name="atp_AppExitsReasonsTitle">Motive de ieșire din aplicație</string>
+    <string name="atp_AppRestartsTitle">Reporniri ale aplicației</string>
+
+    <!-- Diagnostics -->
+    <string name="vpnTimeRunning">Timp de funcționare: %1$s</string>
+    <string name="vpnTrackerCompaniesBlockedToday">Firme de urmărire blocate astăzi: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek">Firme de urmărire blocate în această săptămână: %1$d</string>
+    <string name="vpnTrackerCompaniesNone">"Nicio firmă de urmărire nu a fost blocată încă"</string>
+    <string name="vpnTrackersBlockedToday">Tehnologii de urmărire blocate astăzi: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek">Tehnologii de urmărire blocate în această săptămână: %1$d</string>
+    <string name="vpnTrackersNone">"Nicio tehnologie de urmărire nu a fost blocată încă"</string>
+    <string name="vpnNotRunYet">"VPN nu a fost încă executat"</string>
+    <string name="vpnDataTransferred">"%1$1s\n%2$2s pachete"</string>
+
+    <!-- App Tracking Protection Ongoing Notification -->
+    <string name="atp_ReportIssue">Ai probleme cu o aplicație?</string>
+    <string name="atp_OnInitialNotification">"Protecția împotriva monitorizării de către aplicații este activată și blochează încercările de urmărire în aplicațiile tale"</string>
+    <string name="atp_OnNoTrackersNotificationHeader">"Se scanează activitatea de urmărire... bip... pac"</string>
+    <plurals name="atp_OnNotification">
+        <item quantity="one"><![CDATA[ Încercările de urmărire blocate <b>în %1$d aplicație</b> (ultima oră).]]></item>
+        <item quantity="few"><![CDATA[ Încercările de urmărire blocate <b>în %1$d aplicații</b> (ultima oră).]]></item>
+        <item quantity="other"><![CDATA[ Încercările de urmărire blocate <b>în %1$d aplicații</b> (ultima oră).]]></item>
+    </plurals>
+    <string name="atp_DisabledNotification">Protecția împotriva urmăririi de către aplicație este dezactivată. Atinge pentru a continua blocarea încercărilor de urmărire.</string>
+    <string name="atp_RevokedNotification">O aplicație VPN de pe dispozitivul tău a dezactivat Protecția împotriva urmăririi de către aplicație. Atinge pentru a reactiva.</string>
+
+    <!-- App Tracking Protection Daily Notification -->
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercarea de urmărire</b> (ziua trecută).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercare de urmărire în 1 aplicație, %2$s</b> (ziua trecută).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire</b> (ziua trecută).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b> %1$d tentative de urmărire din %2$d aplicații, inclusiv %3$s</b> (ziua trecută).]]></string>
+
+    <plurals name="atp_DailyTopCompanyNotification">
+        <item quantity="one"><![CDATA[%1$s a încercat să te urmărească <b>în %2$d aplicație</b> (ziua trecută). <b>Vezi mai mult</b>]]></item>
+        <item quantity="few"><![CDATA[%1$s a încercat să te urmărească <b>în %2$d aplicații</b> (ziua trecută). <b>Vezi mai mult</b>]]></item>
+        <item quantity="other"><![CDATA[%1$s a încercat să te urmărească <b>în %2$d aplicații</b> (ziua trecută). <b>Vezi mai mult</b>]]></item>
+    </plurals>
+
+    <plurals name="atp_DailyCompanyBlockedNotification">
+        <item quantity="one"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat cele mai multe încercări de urmărire în <b>%1$s</b> (ziua trecută).]]></item>
+        <item quantity="few"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat cele mai multe încercări de urmărire în <b>%1$s</b> și <b>%2$s</b> (ziua trecută).]]></item>
+        <item quantity="other"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat cele mai multe încercări de urmărire în <b>%1$s</b> și <b>%2$s</b> (ziua trecută).]]></item>
+    </plurals>
+
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s %2$d dată în %3$s</b> (ultima zi).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s %2$d dată în %3$s și 1 altă aplicație</b> (ziua trecută).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s %2$d dată în %3$s și alte %4$d aplicații</b> (ziua trecută).]]></string>
+
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s de %2$d ori în %3$s</b> (ziua trecută).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s de %2$d ori în %3$s și 1 altă aplicație</b> (ziua trecută).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s de %2$d ori în %3$s și alte %4$d aplicații</b> (ziua trecută).]]></string>
+
+    <!-- App Tracking Protection Weekly Notification -->
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s</b> (săptămâna trecută).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercare de urmărire în %2$s</b> și 1 altă aplicație (săptămâna trecută).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercare de urmărire în %2$s</b> și alte %3$d aplicații (săptămâna trecută).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s</b> (săptămâna trecută).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s</b> și 1 altă aplicație (săptămâna trecută).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s</b> și alte %3$d aplicații (săptămâna trecută).]]></string>
+
+    <plurals name="atp_WeeklyCompanyTeaserNotification">
+        <item quantity="one"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b> %1$s în %2$d aplicație, %3$s</b> (săptămâna trecută).]]></item>
+        <item quantity="few"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s în %2$d aplicații, inclusiv %3$s</b> (săptămâna trecută).]]></item>
+        <item quantity="other"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s în %2$d aplicații, inclusiv %3$s</b> (săptămâna trecută).]]></item>
+    </plurals>
+
+    <string name="atp_EnableCTA">Activează Protecția împotriva urmăririi de către aplicație</string>
+
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercare de urmărire în %2$s</b> (ultima oră).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b> %1$d încercare de urmărire în %2$s și 1 altă aplicație </b>(ultima oră).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercare de urmărire în %2$s și alte %3$d aplicații</b> (ultima oră).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s</b> (ora trecută).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b> %1$d încercări de urmărire în %2$s și 1 altă aplicație </b>(ultima oră).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s și alte %3$d aplicații</b> (ultima oră).]]></string>
+
+    <!-- App Tracking Protection Privacy Report -->
+    <string name="atp_PrivacyReportEnabledTooltip">Protecția împotriva urmăririi de către aplicație este activată și blochează tehnologiile de urmărire pe întregul dispozitiv</string>
+
+    <!-- App Tracking Protection Onboarding -->
+    <string name="atp_OnboardingLogoDescription">Activează Protecția împotriva urmăririi de către aplicație</string>
+    <string name="atp_OnboardingLastPageOneTitle">Un pas ușor pentru o mai bună confidențialitate a aplicațiilor!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Am descoperit că <b>peste 96% dintre aplicațiile gratuite populare</b> permit altor companii să îți urmărească informațiile personale, chiar și atunci când dormi.\n\nVezi ce aplicații <b>depistăm, care permit altor companii să te urmărească</b>, și preia controlul!</string>
+    <string name="atp_OnboardingLastPageTwoTitle">Cum funcționează?</string>
+    <string name="atp_OnboardingLastPageTwoSubTitle">Protecția împotriva urmăririi de către aplicație <b>detectează și blochează tehnologiile de urmărire din aplicațiile altor companii</b>, cum ar fi atunci când Facebook încearcă să te urmărească într-o aplicație de sănătate.\n\n<b> Este gratuit</b> și te poți bucura de aplicațiile tale ca de obicei. Lucrând în fundal, te ajută <b> să te protejezi zi și noapte. </b></string>
+    <string name="atp_OnboardingLastPageThreeTitle">Cine îți vede datele?</string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b> App Tracking Protection nu este un VPN. </b> Cu toate acestea, dispozitivul tău îl va recunoaște ca atare. Acest lucru se datorează faptului că utilizează o conexiune VPN locală pentru a funcționa.\n\nProtecția urmăririi aplicației este diferită. <b> Nu direcționează niciodată datele aplicației prin intermediul unui server extern. </b><annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="atp_FAQCta">Întrebări frecvente - Protecția împotriva urmăririi de către aplicație</string>
+    <string name="atp_OnboardingContinue">Continuă</string>
+    <string name="atp_OnboardingMaybeLater">Poate mai târziu</string>
+
+    <!-- App Tracking Protection Dax Onboarding -->
+    <string name="atp_daxOnboardingIntroTitle">Protecția la urmărirea aplicațiilor</string>
+    <string name="atp_daxOnboardingIntroMessage">Peste 96% dintre aplicațiile gratuite populare permit altor companii să te urmărească, chiar și atunci când nu îți folosești telefonul. Protecția împotriva urmăririi de către aplicație detectează și blochează aceste încercări de urmărire.</string>
+    <string name="atp_daxOnboardingPermissionTitle">Cum funcționează?</string>
+    <string name="atp_daxOnboardingPermissionMessage">Protecția împotriva urmăririi de către aplicație nu este un VPN. Cu toate acestea, dispozitivul tău îl va recunoaște ca atare. Acest lucru se datorează faptului că utilizează o conexiune VPN locală pentru a funcționa. Nu direcționează niciodată datele aplicației prin intermediul unui server extern. <annotation type="learn_more_link">Află mai multe</annotation></string>
+
+    <!--  App Tracking Protection Enabled Activity -->
+    <string name="atp_EnabledTitle">Ura! Totul este pregătit!</string>
+    <string name="atp_EnabledMessage">Protecția împotriva urmăririi de către aplicație afișează <b>o listă în timp real a aplicațiilor de pe dispozitiv</b> pe care le surprindem încercând să te urmărească.</string>
+    <string name="atp_EnabledActivityCTA">Vezi rezumatul urmăririi de către aplicație</string>
+    <string name="atp_EnabledSettings">Poți accesa Protecția împotriva urmăririi de către aplicație în <annotation type="settings_link">Setări.</annotation></string>
+
+    <!-- New Tab Integration -->
+    <string name="atp_NewTabDisabled"><b> Protecția împotriva urmăririi de către aplicație a fost dezactivată. </b>\nAtinge pentru a continua să blochezi încercările de urmărire în toate aplicațiile tale.</string>
+    <string name="atp_NewTabRevoked"><b>O aplicație VPN de pe dispozitivul tău a dezactivat Protecția împotriva urmăririi de către aplicație.</b>\nAtinge pentru a reactiva.</string>
+    <string name="atp_NewTabEnabled"><b>Protecția împotriva urmăririi de către aplicație este activată</b> și blochează încercările de urmărire în aplicațiile tale.</string>
+
+    <!-- Exclusion List -->
+    <string name="atp_ExclusionListActivityTitle">Toate aplicațiile</string>
+    <string name="atp_ExcludedAppsFeature">Protecția împotriva urmăririi de către aplicație detectează și blochează tehnologiile de urmărire a aplicațiilor de la alte companii, cum ar fi atunci când Facebook încearcă să te urmărească într-o aplicație de sănătate. Companiile te pot urmări în continuare în aplicațiile pe care le dețin.\n\nDacă o aplicație nu funcționează conform așteptărilor, încearcă să dezactivezi protecția pentru aplicația respectivă.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">În timpul versiunii beta, DuckDuckGo poate dezactiva protecția pentru unele aplicații pentru a rezolva probleme cunoscute de încărcare a conținutului. Setările tale personalizate nu se vor schimba decât dacă restaurezi setările implicite.</string>
+    <string name="atp_ExcludedAppsDisabledLabel"><b>Protecția împotriva urmăririi de către aplicație este dezactivată</b> Protecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale <annotation type="report_issues_link">Raportează problemele</annotation></string>
+    <string name="atp_ExcludedAppsReport">Raportează o problemă cu o altă aplicație</string>
+    <string name="atp_ExcludedReasonLoadsWebsites">Încarcă site-uri</string>
+    <string name="atp_ExcludedReasonKnownIssues">Probleme cunoscute</string>
+    <string name="atp_ExcludedReasonManuallyDisabled">Dezactivat manual</string>
+    <string name="atp_ExcludedReasonManuallyEnabled">Activat manual</string>
+    <string name="atp_ExcludeAppsManuallyCTACancel">Anulează</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnable">Activare</string>
+    <string name="atp_ExcludeAppsManuallyCTARestore">Restaurează</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName">Activezi manual protecția pentru aplicația %1$s?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Această aplicație este cunoscută pentru faptul că întâmpină probleme atunci când încercările de urmărire nu reușesc.</string>
+    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Este posibil să nu apară corect conținutul site-ului din această aplicație atunci când protecția este activată.</string>
+    <string name="atp_ExcludeAppsManuallyEnableFooter">Activarea protecției trimite numele aplicației către DuckDuckGo.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppName">Protecția confidențialității dezactivată</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Dacă ai dezactivat protecția pentru a remedia o problemă, verifică dacă aplicația funcționează acum înainte de a raporta problema către DuckDuckGo.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Nu mai funcționează așa cum era de așteptat</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Sunt de acord să fiu urmărit în această aplicație</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Din alt motiv</string>
+    <string name="atp_ExcludeAppsManuallyCTAReport">Raportează</string>
+    <string name="atp_ExcludeAppsManuallyCTASkip">Ignorare</string>
+    <string name="atp_ExcludeAppsManuallyMenuRestore">Restaurează aplicațiile protejate implicite</string>
+    <string name="atp_ExcludeAppsManuallyMenuReport">Raportează o problemă cu o aplicație</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsTitle">Restabilești protecția implicită?</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsMessage">Setările tale de protecție personalizate se vor actualiza la cele mai recente protecții implicite. Poți oricând să îți modifici din nou setările de protecție mai târziu.</string>
+    <string name="atp_ExcludeAppsRestoreDefaultSnackbar">Protecția a fost restabilită la setările implicite</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsDisclaimer">Activarea protecției trimite numele aplicației către DuckDuckGo.</string>
+
+    <!--  Breakage report app list  -->
+    <string name="atp_ReportBreakageAppListActivityTitle">Raportează o problemă</string>
+    <string name="atp_ReportBreakageAppFeature"><b> Selectează aplicația care se confruntă cu problema </b> . Feedbackul tău ne ajută cu adevărat să ne îmbunătățim!\n\nAi un feedback general despre Protecția împotriva urmăririi de către aplicație? Folosește în schimb <annotation type="use_this_form_link"> acest formular </annotation>.</string>
+    <string name="atp_ReportBreakageAppEntry">%1$s aplicație</string>
+    <string name="atp_ReportBreakageAppSubmitCta">Trimite</string>
+    <string name="atp_ReportBreakageAppNextCta">Următorul</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Descrie ce s-a întâmplat, la ce te așteptai și care au fost pașii care au dus la această problemă.</string>
+    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Erai autentificat(ă) în aplicație când ai observat problema?</string>
+    <string name="atp_ReportBreakageChoiceLoggedIn">Da, eram autentificat(ă) în aplicație</string>
+    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Problema s-a întâmplat la autentificare</string>
+    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Am întâmpinat o problemă la crearea unui cont nou</string>
+    <string name="atp_ReportBreakageChoiceNoLogging">Aplicația nu necesită conectare</string>
+    <string name="atp_ReportBreakageChoiceHeadingText"><b>Erai autentificat(ă) în aplicație când ai observat problema?</b></string>
+    <string name="atp_ReportBreakageFormInputHint">Descrie ce s-a întâmplat (opțional)</string>
+    <string name="atp_ReportBreakageFormCheckboxText">Făcând clic pe „Trimite”, sunt de acord că DuckDuckGo poate utiliza informațiile din acest raport în scopul îmbunătățirii Protecția împotriva urmăririi de către aplicație.
+    </string>
+    <string name="atp_ReportBreakageFormDisclaimerText">
+        <![CDATA[În plus față de detaliile introduse în acest formular, raportul cu problemele aplicației tale va conține:<br/>• Numele pachetului aplicației<br/>• O listă a tehnologiilor de urmărire blocate în aplicație<br/>• Dacă Protecția împotriva urmăririi de către aplicații este activată<br/>• Diagnostice agregate ale aplicației DuckDuckGo<br/>]]>
+    </string>
+    <string name="atp_ReportBreakageSent">Raport trimis, mulțumim! Feedbackul tău ne ajută să îmbunătățim Protecția împotriva urmăririi de către aplicație pentru toată lumea.</string>
+    <string name="atp_ThanksForTheFeedback">Îți mulțumim pentru feedback!</string>
+
+    <!--  Tracker Profiling Info -->
+    <string name="atp_ProfilingActivityTitle">Despre tehnologiile de urmărire ale aplicațiilor</string>
+    <string name="atp_ProfilingInfoTitle">Ce sunt tehnologiile de urmărire ale aplicațiilor?</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Ai auzit, probabil, despre faptul că unele companii, precum Google și Facebook, te urmăresc în fundal pe site-uri terțe. Dar știai că îți urmăresc și informațiile personale prin intermediul aplicațiilor de pe dispozitivul tău?\n\n<b>Peste 96% dintre cele mai populare 100 de aplicații gratuite pentru Android pe care</b> le-am testat conțineau tehnologii de urmărire terțe ascunse. Dintre acestea, 87% au trimis date către Google și 68% au trimis date către Facebook. Acest lucru se întâmplă chiar și atunci când nu îți utilizai dispozitivul.\n\n<b>Tehnologiile de urmărire din aplicații pot avea acces la mult mai multe informații</b> decât verișorii lor de urmărire a site-urilor, cum ar fi locația ta, până la etajul unei clădiri în care te afli, cât de des joci jocuri în timp ce lucrezi și când și cât timp dormi în fiecare zi. <b>Chiar dacă nu ai un cont Google sau Facebook, de exemplu, aceste companii pot colecta în continuare date despre tine din aplicațiile tale.</b>\n\nRețelele de urmărire precum Facebook și Google folosesc aceste mici informații <b>pentru a construi un profil digital despre tine.</b> Cu ajutorul acestuia, rețelele de urmărire pot manipula ceea ce vezi online și pot permite agențiilor de publicitate să liciteze pentru a avea acces la tine, pe baza datelor tale.\n\nTehnologiile de urmărire din aplicații reprezintă o MARE problemă pentru confidențialitate. <b>Însă DuckDuckGo are o soluție care te poate ajuta. </b>\n\nCând este activată în aplicația Privacy Browser a DuckDuckGo, Protecția împotriva urmăririi de către aplicație blochează multe tehnologii de urmărire din alte aplicații de pe dispozitiv, în același timp în care aplicația DuckDuckGo blochează tehnologiile de urmărire pe care le găsim pe site-uri atunci când navighezi. <b>Aceste niveluri duble de protecție reduc ceea ce află companiile de urmărire despre tine, în general</b>, astfel încât să poți utiliza aplicațiile cu mai multă liniște sufletească, știind că ești mai protejat.</string>
+
+    <!--  App Tracking Protection Activity -->
+    <string name="atp_ActivityPastWeek">Ultimele 7 zile</string>
+    <string name="atp_ActivityTitle">Protecția la urmărirea aplicațiilor</string>
+    <string name="atp_MostRecentActivityTitle">Toate activitățile recente</string>
+    <string name="atp_ActivityRecentActivity">Activitate recentă</string>
+    <string name="atp_ActivityCtaShowAll">Vezi toate activitățile recente</string>
+    <string name="atp_ActivityAppTrackersFAQ">Ce sunt tehnologiile de urmărire din aplicații?</string>
+    <string name="atp_ActivityReportProblem">Raportează o problemă cu o aplicație</string>
+    <string name="atp_ActivityBetaInstructions">Instrucțiuni beta</string>
+    <string name="atp_ActivityManageProtection">Aveți probleme cu o aplicație?</string>
+
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d încercare de urmărire blocată de la compania %2$d în aplicația <b>%3$s</b>]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d încercare de urmărire blocată de la %2$d companii în aplicația <b>%3$s</b>]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d încercări de urmărire blocate de la %2$d companie în aplicația <b>%3$s</b>]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d încercări de urmărire blocate de la %2$d companii în aplicația <b>%3$s</b>]]></string>
+
+    <string name="atp_ActivityEmptyListTitle">Nicio activitate nouă</string>
+    <string name="atp_ActivityEmptyListMessage">Continuă să îți folosești dispozitivul. Încercările de urmărire pe care Protecția împotriva urmăririi de către aplicație le blochează apar aici.</string>
+    <string name="atp_ActivityPastWeekBlocked">Blocat</string>
+    <string name="atp_ActivityPastWeekAcross">Din</string>
+
+    <plurals name="atp_ActivityPastWeekTrackerCount">
+        <item quantity="one">Încercare de urmărire</item>
+        <item quantity="few">Încercări de urmărire</item>
+        <item quantity="other">Încercări de urmărire</item>
+    </plurals>
+    <plurals name="atp_ActivityPastWeekAppCount">
+        <item quantity="one">Aplicație</item>
+        <item quantity="few">Aplicații</item>
+        <item quantity="other">Aplicații</item>
+    </plurals>
+    <string name="atp_ActivityEnabledLabel">Această funcție este în versiune beta. <annotation type="app_settings_link">Ai probleme cu o aplicație?</annotation></string>
+    <string name="atp_ActivityDisabledLabel">Protecția împotriva urmăririi de către aplicație <b>este dezactivată</b>\nProtecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale? <annotation type="report_issues_link">Raportează probleme</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>O aplicație VPN de pe dispozitivul tău a dezactivat Protecția împotriva urmăririi de către aplicație.</b>\nProtecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale? <annotation type="report_issues_link">Raportează probleme</annotation></string>
+    <string name="atp_ActivityAbout">Despre</string>
+    <string name="atp_ActivityManage">Gestionează</string>
+    <string name="atp_ActivityRemoveFeature">Dezactivează și șterge date</string>
+
+    <!--  App Tracking Protection FAQ -->
+    <string name="atp_FAQActivityTitle">ÎNTREBĂRI FRECVENTE</string>
+    <string name="atp_FAQFirstHeader">Cum funcționează Protecția împotriva urmăririi de către aplicație?</string>
+    <string name="atp_FAQFirstText"><b>Protecția împotriva urmăririi de către aplicație blochează tehnologiile de urmărire din aplicație cunoscute, de la alte companii, cum ar fi atunci când Facebook încearcă să te urmărească într-o aplicație de sănătate.</b> Companiile te pot urmări în continuare în aplicațiile pe care le dețin.</string>
+    <string name="atp_FAQSecondHeader">Protecția împotriva urmăririi de către aplicație blochează tehnologiile de urmărire din toate aplicațiile mele?</string>
+    <string name="atp_FAQSecondText"><b>Protecția poate fi dezactivată automat pentru anumite aplicații, cum ar fi cele care încarcă site-uri, astfel încât conținutul să apară în mod normal</b>. Pentru aplicațiile cu probleme cunoscute, acest lucru este în mare parte temporar, deoarece lucrăm la îmbunătățirea Protecției împotriva urmăririi de către aplicație. Poți gestiona această protecție pentru fiecare aplicație de pe dispozitiv, din setările acestuia.\n\nÎn plus, este posibil ca unele tehnologii de urmărire să nu fie blocate, deoarece nu le-am detectat încă și nu le-am adăugat pe lista noastră de blocare. Lucrăm în permanență pentru a identifica și a ne proteja împotriva noilor tehnologii de urmărire, astfel încât să poți fi liniștit, știind că beneficiezi de cea mai recentă protecție.\n\nTe poți aștepta la actualizări ale listei noastre de tehnologii de urmărire la fiecare câteva luni. Aceste actualizări vor fi aplicate automat pe dispozitivul tău</string>
+    <string name="atp_FAQThirdHeader">De ce Protecția împotriva urmăririi de către aplicație folosește o conexiune VPN?</string>
+    <string name="atp_FAQThirdText">Ți se va cere să configurezi o conexiune de rețea privată virtuală (VPN), <b>dar nu este nevoie să instalezi o aplicație VPN pentru ca Protecția împotriva urmăririi de către aplicație să funcționeze.</b>\n\nAceastă permisiune permite Protecției împotriva urmăririi de către aplicație, care funcționează la nivel local pe dispozitivul tău, să monitorizeze traficul de rețea <b> pentru a putea bloca tehnologiile de urmărire cunoscute.</b></string>
+    <string name="atp_FAQFourthHeader">Va funcționa Protecția împotriva urmăririi de către aplicație dacă folosesc și o aplicație VPN?</string>
+    <string name="atp_FAQFourthText">""<b>"<![CDATA[Android permite doar o singură conexiune VPN activă la un moment dat.]]>"</b>"<![CDATA[ Acest lucru înseamnă că nu poți utiliza Protecția împotriva urmăririi de către aplicație în timp ce o aplicație VPN de pe dispozitivul tău rulează sau este setată în modul „Mereu pornit”.\n\n]]>"<b>"<![CDATA[Îți recomandăm să activezi Protecția împotriva urmăririi de către aplicație atunci când nu folosești o aplicație VPN]]>"</b>"<![CDATA[. Trebuie doar să te asiguri că aplicația VPN nu este setată în modul „Mereu pornit”. Accesează Setările rețelei Android > VPN. Apoi, verifică pictograma cu unelte pentru toate aplicațiile VPN listate și dezactivează „Mereu pornit”. Unele aplicații VPN pot avea, de asemenea, o setare de conectare automată care trebuie dezactivată.]]>"</string>
+    <string name="atp_FAQFifthHeader">Cum diferă protecția de urmărire a aplicațiilor de un VPN?</string>
+    <string name="atp_FAQFifthText">Un VPN îți trimite datele de pe dispozitiv către propriul server, unde îți protejează și anonimizează datele de ochii curioșilor. Totuși, acest lucru permite companiei VPN să vadă traficul tău în rețea.\n\n<b> Protecția împotriva urmăririi de către aplicație este diferită. </b> În loc să trimită datele tale către un server VPN, <b>Protecția împotriva urmăririi de către aplicație funcționează la nivel local pe dispozitivul tău</b>, aflându-se între aplicațiile tale și serverele cu care acestea interacționează.\n\nOri de câte ori Protecția împotriva urmăririi de către aplicație recunoaște o tehnologie de urmărire cunoscută, <b> acesta blochează trimiterea de către aceasta de de informații personale (cum ar fi adresa IP, activitatea și detaliile dispozitivului) de pe dispozitiv.</b> Restul traficului ajunge la destinație, astfel încât aplicațiile tale funcționează normal.</string>
+    <string name="atp_FAQSixthHeader">Sunt datele mele private?</string>
+    <string name="atp_FAQSixthText">Protecția împotriva urmăririi de către aplicație funcționează pe dispozitivul tău și nu trimite datele tale personale de pe dispozitiv către DuckDuckGo.</string>
+
+    <!--  App Tracking Protection Waitlist -->
+    <string name="atp_WaitlistActivityTitle">Protecția la urmărirea aplicațiilor</string>
+    <string name="atp_WaitlistActivityWaitlistTitle">Lista de așteptare pentru Protecția împotriva urmăririi de către aplicație</string>
+    <string name="atp_WaitlistNotificationTitle">Invitația ta pentru Protecția împotriva urmăririi de către aplicație este aici!</string>
+    <string name="atp_WaitlistNotificationDescription">Te-ai alăturat listei de așteptare și ne-ai solicitat să te anunțăm când este rândul tău să încerci funcția noastră de protecție a comunicațiilor prin e-mail. Atinge pentru a vizualiza invitația ta.</string>
+    <string name="atp_WaitlistStatusNotJoined">Un pas ușor pentru o mai bună confidențialitate a aplicațiilor!</string>
+    <string name="atp_WaitlistStatusJoined">Ești pe listă!</string>
+    <string name="atp_WaitlistStatusInBeta">Ești invitat(ă)!</string>
+    <string name="atp_WaitlistDescription">Blochează tehnologiile de urmărire pe care le găsim ascunse în alte aplicații și vezi cine a încercat să te urmărească.\n<annotation type="beta_link">Află mai multe</annotation></string>
+    <string name="atp_WaitlistInBetaDescription">Blochează tehnologiile de urmărire pe care le găsim ascunse în alte aplicații și vezi cine a încercat să te urmărească.\n<annotation type="beta_link"> Află mai multe despre versiunea beta </annotation></string>
+    <string name="atp_WaitlistJoin">Alătură-te listei de așteptare private</string>
+    <string name="atp_WaitlistCodeCta">Am un cod de invitație</string>
+    <string name="atp_WaitlistGetStartedCta">Să începem</string>
+    <string name="atp_WaitlistRedeemCodeCta">Continuă</string>
+    <string name="atp_WaitlistRedeemCodeLabel">Codul de invitație</string>
+    <string name="atp_WaitlistRedeemCodeTitle">Mai e puțin...</string>
+    <string name="atp_WaitlistRedeemCodeError">Nu am recunoscut acest cod de invitație.</string>
+    <string name="atp_WaitlistFooterDescription">Nu va trebui să comunici informații personale, pentru a te înscrie pe lista de așteptare. Îți vei asigura locul la coadă, folosind o marcă de timp care există numai pe dispozitivul tău, astfel încât să te putem înștiința când ți-a sosit rândul.</string>
+    <string name="atp_WaitlistErrorJoining">A apărut o eroare la aderarea la lista de așteptare, încearcă din nou mai târziu</string>
+    <string name="atp_WaitlistJoinedWithNotification">Îți vom trimite o notificare când Protecția împotriva urmăririi de către aplicație este pregătită pentru tine.\n\n<annotation type="beta_link"> Află mai multe despre versiunea beta </annotation></string>
+    <string name="atp_WaitlistJoinedWithoutNotification">Invitația ta de a încerca Protecția împotriva urmăririi de către aplicație va sosi aici. Revino în curând, sau îți putem trimite o notificare când va fi rândul tău\n\n<annotation type="notify_me_link">Înștiințează-mă</annotation>\n\n<annotation type="beta_link">Află mai multe despre beta</annotation></string>
+    <string name="atp_WaitlistRedeemCodeActivityTitle">Introdu codul de invitație</string>
+    <string name="atp_WaitlistRedeemedCodeStatus">Succes! Ai intrat!</string>
+    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
+
+    <!--  App Tracking Company Details -->
+    <plurals name="atp_CompanyDetailsTrackingAttempts">
+        <item quantity="one">%1$d încercare. Cunoscut pentru a colecta:</item>
+        <item quantity="few">%1$d încercări. Cunoscute pentru a colecta:</item>
+        <item quantity="other">%1$d încercări. Cunoscute pentru a colecta:</item>
+    </plurals>
+    <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
+        <item quantity="one">A fost blocată %1$d încercare de urmărire</item>
+        <item quantity="few">Au fost blocate %1$d încercări de urmărire</item>
+        <item quantity="other">Au fost blocate %1$d încercări de urmărire</item>
+    </plurals>
+    <string name="atp_CompanyDetailsTrackingMenuReport">Raportează o problemă cu această aplicație</string>
+    <string name="atp_CompanyDetailsTrackingShowMore">Arată încă %1$d</string>
+    <string name="atp_CompanyDetailsTrackingLearnMore">Aplicațiile pot include dispozitive de urmărire de la alte companii, de exemplu pentru analiză și marketing. Dacă nu le blocăm, aceste dispozitive de urmărire ar putea crea profiluri digitale și mai detaliate despre tine. <annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="atp_CompanyDetailsTrackingShowLess">Arată mai Puțin</string>
+    <string name="atp_CompanyDetailsAppInfoPanel">Protecția este în prezent dezactivată pentru această aplicație. Dacă Protecția împotriva urmăririi de către aplicație a cauzat o problemă, te rugăm să <annotation type="report_issues_link">raportezi problema</annotation></string>
+
+    <!--  App Tracking Company Signals -->
+    <string name="atp_TrackingSignalAAID">ID-ul de publicitate Android</string>
+    <string name="atp_TrackingSignalUniqueIdentifier">Identificator unic</string>
+    <string name="atp_TrackingSignalCookies">Module cookie</string>
+    <string name="atp_TrackingSignalOsVersion">Versiunea SO</string>
+    <string name="atp_TrackingSignalOsBuildNumber">Numărul versiunii SO</string>
+    <string name="atp_TrackingSignalPlatform">Platforma dispozitivului</string>
+    <string name="atp_TrackingSignalDeviceBrand">Marca dispozitivului</string>
+    <string name="atp_TrackingSignalDeviceLanguage">Limba dispozitivului</string>
+    <string name="atp_TrackingSignalDeviceModel">Modelul dispozitivului</string>
+    <string name="atp_TrackingSignalCPUData">Date CPU</string>
+    <string name="atp_TrackingSignalScreenResolution">Rezoluția ecranului</string>
+    <string name="atp_TrackingSignalInternalStorage">Memorie internă</string>
+    <string name="atp_TrackingSignalExternalStorage">Memorie externă</string>
+    <string name="atp_TrackingSignalDeviceMemory">Memoria dispozitivului</string>
+    <string name="atp_TrackingSignalDeviceName">Numele dispozitivului</string>
+    <string name="atp_TrackingSignalWifiNetworkName">Numele rețelei Wi Fi</string>
+    <string name="atp_TrackingSignalAppName">Numele aplicației</string>
+    <string name="atp_TrackingSignalAppVersion">Versiunea aplicației</string>
+    <string name="atp_TrackingSignalLocalIPAddress">Adresa IP locală</string>
+    <string name="atp_TrackingSignalISP">Furnizor de servicii de internet</string>
+    <string name="atp_TrackingSignalDeviceBootTime">Timpul de pornire a dispozitivului</string>
+    <string name="atp_TrackingSignalNetworkConnectionType">Tip de conexiune la rețea</string>
+    <string name="atp_TrackingSignalSystemVolume">Volumul sistemului</string>
+    <string name="atp_TrackingSignalBatteryLevel">Nivelul bateriei</string>
+    <string name="atp_TrackingSignalChargingStatus">Starea încărcării</string>
+    <string name="atp_TrackingSignalBrightness">Luminozitate</string>
+    <string name="atp_TrackingSignalHeadphoneStatus">Starea căștilor</string>
+    <string name="atp_TrackingSignalAccelerometerData">Date de la accelerometru</string>
+    <string name="atp_TrackingSignalRotationData">Date de rotație</string>
+    <string name="atp_TrackingSignalDeviceOrientation">Orientarea dispozitivului</string>
+    <string name="atp_TrackingSignalMagnetometerData">Date magnetometrice</string>
+    <string name="atp_TrackingSignalAvailableInternalStorage">Memorie internă disponibilă</string>
+    <string name="atp_TrackingSignalAvailableExternalStorage">Memorie externă disponibilă</string>
+    <string name="atp_TrackingSignalDeviceTotalMemory">Memoria totală a dispozitivului</string>
+    <string name="atp_TrackingSignalAvailableDeviceMemory">Memoria disponibilă a dispozitivului</string>
+    <string name="atp_TrackingSignalScreenMargins">Marginile ecranului</string>
+    <string name="atp_TrackingSignalScreenDensity">Densitatea ecranului</string>
+    <string name="atp_TrackingSignalFontSize">Dimensiunea fontului</string>
+    <string name="atp_TrackingSignalNetworkCarrier">Operator de rețea</string>
+    <string name="atp_TrackingSignalAppInstallDate">Data instalării aplicației</string>
+    <string name="atp_TrackingSignalFirstAppLaunchDate">Data primei lansări a aplicației</string>
+    <string name="atp_TrackingSignalGPSCoordinates">Coordonate GPS</string>
+    <string name="atp_TrackingSignalPostalCode">Cod poștal</string>
+    <string name="atp_TrackingSignalNeighbourhood">Cartier</string>
+    <string name="atp_TrackingSignalCity">Oraș</string>
+    <string name="atp_TrackingSignalState">Stat</string>
+    <string name="atp_TrackingSignalCountry">Țară</string>
+    <string name="atp_TrackingSignalTimezone">Fus orar</string>
+    <string name="atp_TrackingSignalEmailAddress">Adresa de e-mail</string>
+    <string name="atp_TrackingSignalBirthday">Ziua de naștere</string>
+    <string name="atp_TrackingSignalGender">Gen</string>
+    <string name="atp_TrackingSignalFirstName">Prenume</string>
+    <string name="atp_TrackingSignalLastName">Nume de familie</string>
+
+    <!--  App Tracking Protection Disable VPN Dialog -->
+    <string name="atp_DisableConfirmationDialogTitle">Dezactivezi Protecția împotriva urmăririi de către aplicație?</string>
+    <string name="atp_DisableConfirmationDialogMessage">Dacă ai observat o problemă cu o anumită aplicație, poți gestiona în schimb protecția pentru aplicația respectivă.</string>
+    <string name="atp_DisableConfirmationDisableApp">Dezactivează pentru o aplicație</string>
+    <string name="atp_DisableConfirmationDisableAllApps">Dezactivează pentru toate aplicațiile</string>
+    <string name="atp_DisableConfirmationCancel">Anulează</string>
+
+    <!--  App Tracking Protection VPN Conflict Dialog -->
+    <string name="atp_VpnConflictDialogTitle">Aplicația VPN poate fi deconectată</string>
+    <string name="atp_VpnConflictAlwaysOnDialogTitle">Aplicația ta VPN blochează Protecția împotriva urmăririi de către aplicație</string>
+    <string name="atp_VpnConflictDialogMessage">Android permite doar o singură conexiune VPN activă în același timp. Activarea funcției Protecția împotriva urmăririi de către aplicație poate deconecta orice VPN activ pe dispozitivul tău.</string>
+    <string name="atp_VpnConflictDialogAlwaysOnMessage">Android permite doar o singură conexiune VPN activă în același timp. Deschide Setări de rețea &gt; VPN. Găsește aplicația VPN care este „Mereu pornită” și dezactiveaz-o pentru a continua.</string>
+    <string name="atp_VpnConflictDialogCancel">Anulează</string>
+    <string name="atp_VpnConflictDialogOpenSettings">Deschide Setări</string>
+    <string name="atp_VpnConflictDialogGotIt">Am înțeles</string>
+
+    <!-- Manage Recent Apps Protection -->
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Dacă ai probleme cu o aplicație (cum ar fi faptul că nu se încarcă conținutul), încearcă să dezactivezi protecția pentru aplicația respectivă și <annotation type="report_issues_link">transmite un raport.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Aplicații recente</string>
+    <string name="atp_ManageRecentAppsProtectionShowAll">Afișează toate aplicațiile</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Încă nu există aplicații recente</string>
+
+    <!--  App Tracking Protection Remove Feature Dialog -->
+    <string name="atp_RemoveFeatureDialogTitle">Dezactivează și șterge datele?</string>
+    <string name="atp_RemoveFeatureDialogMessage">Protecția împotriva urmăririi de către aplicație va fi dezactivată, iar toate setările și istoricul încercărilor de urmărire vor fi șterse. O poți activa din nou oricând din Setări.</string>
+    <string name="atp_RemoveFeatureDialogCancel">Anulează</string>
+    <string name="atp_RemoveFeatureDialogRemove">Dezactivează</string>
+
+    <!--  App Tracking Protection Promote Always On -->
+    <string name="atp_PromoteAlwaysOnDialogTitle">Setat în modul „Mereu pornit”?</string>
+    <string name="atp_PromoteAlwaysOnDialogMessage">Pentru a împiedica Android să dezactiveze periodic Protecția împotriva urmăririi de către aplicație:\n\naccesează Setări Android\ndeschide Setări VPN pentru DuckDuckGo\nactivează „VPN activat permanent”</string>
+    <string name="atp_PromoteAlwaysOnDialogSettings">Mergi la Setări</string>
+    <string name="atp_PromoteAlwaysOnDialogLater">Amintește-mi mai târziu</string>
+    <string name="atp_PromoteAlwaysOnDialogForget">Nu, mulțumesc</string>
+
+</resources>

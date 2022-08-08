@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="atp_name">Блокировка отслеживания приложениями</string>
+    <string name="refresh">Обновить</string>
+
+    <!-- Debug Screens -->
+    <string name="atp_DiagnosticsMenuLabel">Диагностика</string>
+    <string name="atp_DataMenuLabel">Статистика данных</string>
+    <string name="atp_MeteredConnection">"Лимит: %1$s"</string>
+    <string name="atp_ConnectionStatus">"Подключение по VPN: %1$s"</string>
+    <string name="atp_NetworkAvailable">"Подключение к Интернету: %1$s"</string>
+    <string name="atp_DnsServers">"DNS активной сети: %1$s"</string>
+    <string name="atp_AppExitsReasonsTitle">Причины выхода из приложения</string>
+    <string name="atp_AppRestartsTitle">Перезапуски приложения</string>
+
+    <!-- Diagnostics -->
+    <string name="vpnTimeRunning">Время работы: %1$s</string>
+    <string name="vpnTrackerCompaniesBlockedToday">Заблокировано отслеживающих компаний сегодня: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek">Заблокировано отслеживающих компаний на этой неделе: %1$d</string>
+    <string name="vpnTrackerCompaniesNone">"Ни одной отслеживающей компании пока не заблокировано"</string>
+    <string name="vpnTrackersBlockedToday">Заблокировано трекеров сегодня: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek">Заблокировано трекеров на этой неделе: %1$d</string>
+    <string name="vpnTrackersNone">"Ни одного трекера пока не заблокировано"</string>
+    <string name="vpnNotRunYet">"VPN еще не запускался"</string>
+    <string name="vpnDataTransferred">"%1$1s\nПакетов: %2$2s"</string>
+
+    <!-- App Tracking Protection Ongoing Notification -->
+    <string name="atp_ReportIssue">Возникли проблемы с приложением?</string>
+    <string name="atp_OnInitialNotification">"Защита от слежки включена и блокирует попытки отслеживания во всех приложениях"</string>
+    <string name="atp_OnNoTrackersNotificationHeader">"Выполняется поиск трекеров... бип-бип"</string>
+    <plurals name="atp_OnNotification">
+        <item quantity="one"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложении</b> (за последний час).]]></item>
+        <item quantity="few"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложениях</b> (за последний час).]]></item>
+        <item quantity="many"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложениях</b> (за последний час).]]></item>
+        <item quantity="other"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложении</b> (за последний час).]]></item>
+    </plurals>
+    <string name="atp_DisabledNotification">Защита от слежки выключена. Нажмите для возобновления защиты.</string>
+    <string name="atp_RevokedNotification">Приложение VPN отключило защиту от слежки. Нажмите, чтобы включить ее.</string>
+
+    <!-- App Tracking Protection Daily Notification -->
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Функция App Tracking Protection пресекла <b>%1$d попытку отслеживания</b> (за последний день).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Пресечена <b>%1$d попытка отслеживания в 1 приложении — %2$s</b> (за последний день).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Функция App Tracking Protection пресекла <b>попытки отслеживания: %1$d</b> (за последний день).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Пресечены <b>попытки отслеживания (%1$d) в %2$d приложениях, включая %3$s</b> (за последний день).]]></string>
+
+    <plurals name="atp_DailyTopCompanyNotification">
+        <item quantity="one"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложение</b> (за последний день). <b>Подробнее...</b>]]></item>
+        <item quantity="few"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложения</b> (за последний день). <b>Подробнее...</b>]]></item>
+        <item quantity="many"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложений</b> (за последний день). <b>Подробнее...</b>]]></item>
+        <item quantity="other"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложения</b> (за последний день). <b>Подробнее...</b>]]></item>
+    </plurals>
+
+    <plurals name="atp_DailyCompanyBlockedNotification">
+        <item quantity="one"><![CDATA[Пресечено большинство попыток отслеживания в <b>%1$s</b> (за последний день).]]></item>
+        <item quantity="few"><![CDATA[Пресечено большинство попыток отслеживания в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
+        <item quantity="many"><![CDATA[Пресечено большинство попыток отслеживания в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
+        <item quantity="other"><![CDATA[Пресечено большинство попыток отслеживания в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
+    </plurals>
+
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Заблокировано <b>%1$s %2$d раз в %3$s</b> (за последний день).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Заблокировано <b>%1$s %2$d раз в %3$s и еще 1 приложении</b> (за последний день).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Функция App Tracking Protection заблокировала <b>%1$s %2$d раз в %3$s и %4$d других приложениях</b> (за последний день).]]></string>
+
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Функция App Tracking Protection заблокировала <b>%1$s %2$d раз(а) в %3$s</b> (за последний день).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Функция App Tracking Protection заблокировала <b>%1$s %2$d раз(а) в %3$s и еще 1 приложении</b> (за последний день).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Функция App Tracking Protection заблокировала <b>%1$s %2$d раз(а) в %3$s и %4$d других приложениях</b> (за последний день).]]></string>
+
+    <!-- App Tracking Protection Weekly Notification -->
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Заблокировано <b>%1$d попытку отслеживания в %2$s</b> (за последнюю неделю).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Заблокировано <b>%1$d попытку отслеживания в %2$s</b> и еще 1 приложении (за последнюю неделю).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Функция App Tracking Protection пресекла <b>%1$d попытку отслеживания в %2$s</b> и %3$d других приложениях (за последнюю неделю).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> (за последнюю неделю).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> и еще 1 приложении (за последнюю неделю).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> и %3$d других приложениях (за последнюю неделю).]]></string>
+
+    <plurals name="atp_WeeklyCompanyTeaserNotification">
+        <item quantity="one"><![CDATA[Заблокировано <b>%1$s в %2$d приложении — %3$s</b> (за последнюю неделю).]]></item>
+        <item quantity="few"><![CDATA[Заблокировано <b>%1$s в %2$d приложениях, включая %3$s</b> (за последнюю неделю).]]></item>
+        <item quantity="many"><![CDATA[Заблокировано <b>%1$s в %2$d приложениях, включая %3$s</b> (за последнюю неделю).]]></item>
+        <item quantity="other"><![CDATA[Заблокировано <b>%1$s в %2$d приложениях, включая %3$s</b> (за последнюю неделю).]]></item>
+    </plurals>
+
+    <string name="atp_EnableCTA">Включить защиту от слежки</string>
+
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Пресечена <b>%1$d попытка отслеживания в %2$s</b> (за последний час).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Функция App Tracking Protection пресекла <b>%1$d попытку отслеживания в %2$s и еще 1 приложении</b> (за последний час).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Функция App Tracking Protection пресекла <b>%1$d попытку отслеживания в %2$s и %3$d других приложениях</b> (за последний час).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> (за последний час).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s и еще 1 приложении</b> (за последний час).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s и %3$d других приложениях</b> (за последний час).]]></string>
+
+    <!-- App Tracking Protection Privacy Report -->
+    <string name="atp_PrivacyReportEnabledTooltip">Защита от слежки включена и блокирует трекеры во всех приложениях</string>
+
+    <!-- App Tracking Protection Onboarding -->
+    <string name="atp_OnboardingLogoDescription">Включить защиту от слежки</string>
+    <string name="atp_OnboardingLastPageOneTitle">Простой способ надежно защитить данные!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle"><b>Более 96% популярных бесплатных приложений</b> позволяют сторонним компаниям отслеживать ваши личные данные, даже когда вы спите.\n\nТеперь вы можете увидеть, <b>какие это приложения</b>, и вернуть контроль над своими данными!</string>
+    <string name="atp_OnboardingLastPageTwoTitle">Как это работает?</string>
+    <string name="atp_OnboardingLastPageTwoSubTitle">Защита от слежки <b>блокирует трекеры сторонних компаний</b> (например, Facebook) при попытке следить за вами в таких приложениях как «Здоровье».\n\n<b>Это бесплатная функция</b>, которая никак не влияет на работу других приложений. Работая в фоновом режиме, она <b>обеспечивает круглосуточную защиту</b>.</string>
+    <string name="atp_OnboardingLastPageThreeTitle">Кто видит ваши данные?</string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Защита от слежки не относится к VPN</b>, хотя ваше устройство определит ее как таковую, так как она использует локальное VPN-соединение.\n\nОднако при блокировке <b>данные приложения не отсылаются через внешний сервер. </b><annotation type="learn_more_link">Подробнее...</annotation></string>
+    <string name="atp_FAQCta">Защита от слежки — вопросы и ответы</string>
+    <string name="atp_OnboardingContinue">Продолжить</string>
+    <string name="atp_OnboardingMaybeLater">Позже</string>
+
+    <!-- App Tracking Protection Dax Onboarding -->
+    <string name="atp_daxOnboardingIntroTitle">Блокировка отслеживания приложениями</string>
+    <string name="atp_daxOnboardingIntroMessage">Более 96% популярных бесплатных приложений позволяют другим компаниям отслеживать вас, даже когда вы не пользуетесь телефоном. Защита от слежки выявляет и блокирует подобные действия.</string>
+    <string name="atp_daxOnboardingPermissionTitle">Как это работает?</string>
+    <string name="atp_daxOnboardingPermissionMessage">App Tracking Protection не VPN-сервис. Но ваше устройство примет эту функцию именно за VPN, а всё потому, что она использует локальное VPN-соединение. App Tracking Protection ни в коем случае не направляет данные приложения через внешний сервер. <annotation type="learn_more_link">Подробнее...</annotation></string>
+
+    <!--  App Tracking Protection Enabled Activity -->
+    <string name="atp_EnabledTitle">Ура! Все готово.</string>
+    <string name="atp_EnabledMessage">Защита от слежки отображает <b>актуальный список приложений на вашем устройстве</b>, которые пытаются отслеживать вас.</string>
+    <string name="atp_EnabledActivityCTA">Сводка по отслеживающим приложениям</string>
+    <string name="atp_EnabledSettings">Доступ к защите от слежки можно получить в <annotation type="settings_link">«Настройках».</annotation></string>
+
+    <!-- New Tab Integration -->
+    <string name="atp_NewTabDisabled"><b>Защита от слежки выключена.</b>\nНажмите, чтобы продолжить блокировку отслеживания в приложениях.</string>
+    <string name="atp_NewTabRevoked"><b>VPN-приложение на вашем устройстве отключило защиту от слежки.</b>\nНажмите, чтобы включить ее.</string>
+    <string name="atp_NewTabEnabled"><b>Защита от слежки включена</b> и блокирует попытки отслеживания в приложениях.</string>
+
+    <!-- Exclusion List -->
+    <string name="atp_ExclusionListActivityTitle">Все приложения</string>
+    <string name="atp_ExcludedAppsFeature">Защита от слежки блокирует трекеры сторонних компаний (например, Facebook) при попытке следить за вами в таких приложениях как «Здоровье». Однако компании могут отслеживать вас в собственных приложениях.\n\nЕсли приложение сбоит, отключите для него защиту.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">Чтобы устранить проблемы с загрузкой контента, DuckDuckGo может отключить защиту для некоторых приложений при тестировании бета-версий. Ваши собственные настройки не изменятся, если вы сами не сбросите их на значения по умолчанию.</string>
+    <string name="atp_ExcludedAppsDisabledLabel"><b>Защита от слежки отключена</b> Она нарушает работу приложений? <annotation type="report_issues_link">Сообщите о проблемах</annotation></string>
+    <string name="atp_ExcludedAppsReport">Сообщить о проблеме с другим приложением</string>
+    <string name="atp_ExcludedReasonLoadsWebsites">Загружает сайты</string>
+    <string name="atp_ExcludedReasonKnownIssues">Известные проблемы</string>
+    <string name="atp_ExcludedReasonManuallyDisabled">Выключено вручную</string>
+    <string name="atp_ExcludedReasonManuallyEnabled">Включено вручную</string>
+    <string name="atp_ExcludeAppsManuallyCTACancel">Отменить</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnable">Включить</string>
+    <string name="atp_ExcludeAppsManuallyCTARestore">Восстановить</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName">Включить защиту приложения %1$s вручную?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppLabel">При неудачных попытках отслеживания в этом приложении часто возникают сбои.</string>
+    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Если включена защита, содержимое сайта в этом приложении может отображаться некорректно.</string>
+    <string name="atp_ExcludeAppsManuallyEnableFooter">При включении защиты название приложения передается в DuckDuckGo.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppName">Защита конфиденциальности выключена</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Прежде чем сообщать о проблеме в DuckDuckGo, проверьте, не заработало ли приложение после выключения защиты для устранения неполадки.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Приложение перестало корректно работать</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Я не против отслеживания в этом приложении</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Другая причина</string>
+    <string name="atp_ExcludeAppsManuallyCTAReport">Сообщить</string>
+    <string name="atp_ExcludeAppsManuallyCTASkip">Пропустить</string>
+    <string name="atp_ExcludeAppsManuallyMenuRestore">Восстановить список приложений по умолчанию</string>
+    <string name="atp_ExcludeAppsManuallyMenuReport">Сообщить о проблеме с приложением</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsTitle">Восстановить параметры защиты по умолчанию?</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsMessage">Пользовательские настройки будут заменены на настройки по умолчанию последней версии. Их можно изменить позднее.</string>
+    <string name="atp_ExcludeAppsRestoreDefaultSnackbar">Восстановлены настройки защиты по умолчанию</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsDisclaimer">При включении защиты название приложения передается в DuckDuckGo.</string>
+
+    <!--  Breakage report app list  -->
+    <string name="atp_ReportBreakageAppListActivityTitle">Сообщить о проблеме</string>
+    <string name="atp_ReportBreakageAppFeature"><b>Выберите приложение, с которым возникла проблема</b>. Ваши отзывы помогают нам совершенствовать защиту!\n\nУ вас отзыв общего характера? Воспользуйтесь <annotation type="use_this_form_link">этой формой</annotation>.</string>
+    <string name="atp_ReportBreakageAppEntry">Приложение %1$s</string>
+    <string name="atp_ReportBreakageAppSubmitCta">Подтвердить</string>
+    <string name="atp_ReportBreakageAppNextCta">Далее</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Опишите, что произошло, что ожидалось и какие действия привели к неполадке.</string>
+    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Неполадка возникла после входа в учетную запись?</string>
+    <string name="atp_ReportBreakageChoiceLoggedIn">Да</string>
+    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Сбой возник при входе в учетную запись</string>
+    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">У меня возникли трудности при создании учетной записи</string>
+    <string name="atp_ReportBreakageChoiceNoLogging">Приложение не требует входа</string>
+    <string name="atp_ReportBreakageChoiceHeadingText"><b>Неполадка возникла после входа в учетную запись?</b></string>
+    <string name="atp_ReportBreakageFormInputHint">Опишите, что произошло (необязательно)</string>
+    <string name="atp_ReportBreakageFormCheckboxText">Нажимая кнопку «Отправить», я тем самым соглашаюсь, что DuckDuckGo может использовать полученную информацию в целях улучшения защиты от слежки.
+    </string>
+    <string name="atp_ReportBreakageFormDisclaimerText">
+        <![CDATA[Помимо сведений, внесенных в форме, в отчет о сбоях приложения также войдет следующая информация:<br/>• имя пакета приложения<br/>• список заблокированных в приложении трекеров<br/>• была ли включена защита от слежки<br/>• сводная диагностика приложения DuckDuckGo<br/>]]>
+    </string>
+    <string name="atp_ReportBreakageSent">Отчет отправлен. Спасибо! Ваши отзывы помогают нам улучшать защиту от слежки для всех.</string>
+    <string name="atp_ThanksForTheFeedback">Спасибо за отзыв!</string>
+
+    <!--  Tracker Profiling Info -->
+    <string name="atp_ProfilingActivityTitle">О трекерах в приложениях</string>
+    <string name="atp_ProfilingInfoTitle">Что такое трекеры в приложениях?</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Вы, вероятно, слышали, что Google, Facebook и многие другие компании незаметно отслеживают ваши действия на сторонних сайтах. Однако не всем известно, что они также собирают личные данные через приложения.\n\nМы протестировали 100 популярных бесплатных приложений для Android, и <b>как минимум 96</b> из них содержали трекеры. 87 из них отправляли данные в Google, а 68 — в Facebook, причем даже когда не использовалось устройство.\n\nБолее того, <b>трекеры в приложениях могут извлекать намного больше информации</b>, чем на сайтах — например, определить, на каком этаже вы живете, как часто играете в игры на работе, когда и сколько вы спите. <b>Даже если у вас нет учетной записи Google или Facebook, они все равно могут собирать о вас данные через приложения.</b>\n\nИспользуя полученные крупицы информации, сети отслеживания (Facebook, Google и подобные) <b>составляют на вас цифровое досье</b>. Опираясь на него, они могут управлять тем, что вы видите в Интернете, а доступ к досье также продается рекламщикам, которые готовы за него заплатить.\n\nТрекеры в приложениях — СЕРЬЕЗНАЯ угроза конфиденциальности. <b>Но у DuckDuckGo есть решение.</b>Включите в конфиденциальном браузере приложения DuckDuckGo защиту от слежки, которая будет блокировать множество трекеров в других программах на вашем устройстве. Кроме того, приложение DuckDuckGo одновременно блокирует трекеры на сайтах. <b>Эта двойная защита существенно уменьшит объем данных, собранных о вас сторонними компаниями</b>, пока вы пользуетесь привычными приложениями.</string>
+
+    <!--  App Tracking Protection Activity -->
+    <string name="atp_ActivityPastWeek">За последние 7 дней</string>
+    <string name="atp_ActivityTitle">Блокировка отслеживания приложениями</string>
+    <string name="atp_MostRecentActivityTitle">Вся недавняя активность</string>
+    <string name="atp_ActivityRecentActivity">Недавняя активность</string>
+    <string name="atp_ActivityCtaShowAll">Просмотреть всю недавнюю активность</string>
+    <string name="atp_ActivityAppTrackersFAQ">Что такое трекеры в приложениях?</string>
+    <string name="atp_ActivityReportProblem">Сообщить о проблеме с приложением</string>
+    <string name="atp_ActivityBetaInstructions">Инструкции к бета-версии</string>
+    <string name="atp_ActivityManageProtection">Возникли проблемы с приложением?</string>
+
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[Пресечена %1$d попытка отслеживания %2$d компанией в приложении <b>%3$s</b>]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[Пресечена %1$d попытка отслеживания %2$d компаниями в приложении <b>%3$s</b>]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[Пресечены попытки отслеживания (%1$d) компанией %2$d в приложении <b>%3$s</b>]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[Пресечены попытки отслеживания (%1$d) компаниями %2$d в приложении <b>%3$s</b>]]></string>
+
+    <string name="atp_ActivityEmptyListTitle">Новой активности нет</string>
+    <string name="atp_ActivityEmptyListMessage">Продолжайте пользоваться устройством. Попытки отслеживания, блокированные защитой от слежки, отобразятся здесь.</string>
+    <string name="atp_ActivityPastWeekBlocked">Заблокировано</string>
+    <string name="atp_ActivityPastWeekAcross">в</string>
+
+    <plurals name="atp_ActivityPastWeekTrackerCount">
+        <item quantity="one">попытка отслеживания</item>
+        <item quantity="few">попытки отслеживания</item>
+        <item quantity="many">попыток отслеживания</item>
+        <item quantity="other">попытки отслеживания</item>
+    </plurals>
+    <plurals name="atp_ActivityPastWeekAppCount">
+        <item quantity="one">приложении</item>
+        <item quantity="few">приложениях</item>
+        <item quantity="many">приложениях</item>
+        <item quantity="other">приложения</item>
+    </plurals>
+    <string name="atp_ActivityEnabledLabel">Эта функция доступна в бета-версии. <annotation type="app_settings_link">Возникли проблемы с приложением?</annotation></string>
+    <string name="atp_ActivityDisabledLabel"><b>Функция App Tracking Protection отключена</b> \nИз-за нее возникли сбои в приложениях? <annotation type="report_issues_link">Сообщить о проблемах</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>VPN-приложение на вашем устройстве отключило защиту от слежки.</b>\nЗащите от слежки вызывает сбои в приложениях? <annotation type="report_issues_link">Сообщить о проблемах</annotation></string>
+    <string name="atp_ActivityAbout">О нас</string>
+    <string name="atp_ActivityManage">Настроить</string>
+    <string name="atp_ActivityRemoveFeature">Отключить и удалить данные</string>
+
+    <!--  App Tracking Protection FAQ -->
+    <string name="atp_FAQActivityTitle">Вопросы и ответы</string>
+    <string name="atp_FAQFirstHeader">Как работает защита от слежки?</string>
+    <string name="atp_FAQFirstText"><b>Защита от слежки блокирует трекеры сторонних компаний (например, Facebook) при попытке следить за вами в таких приложениях как «Здоровье».</b> Однако компании могут следить за вами в собственных приложениях.\n\n</string>
+    <string name="atp_FAQSecondHeader">Блокирует ли защита от слежки трекеры во всех приложениях?</string>
+    <string name="atp_FAQSecondText"><b>Можно автоматически отключать защиту в определенных приложениях, например, тех, которые работают с сайтами (чтобы корректно отображался контент)</b>. Что касается приложений с известными сбоями, их отключение — лишь временная мера, пока не будет устранена причина. Управлять защитой для каждого приложения можно отдельно в «Настройках».\n\nПримите во внимание, что некоторые трекеры не выявляются, так как они еще не внесены в список блокировки. Вместе с тем, мы постоянно определяем новые трекеры и блокируем их, обеспечивая тем самым наиболее надежную защиту.\n\nСписок трекеров обновляется каждые несколько месяцев. Обновления применяются на вашем устройстве автоматически.</string>
+    <string name="atp_FAQThirdHeader">Зачем для защиты от слежки применяется VPN-соединение?</string>
+    <string name="atp_FAQThirdText">Система предложит вам настроить подключение к виртуальной частной сети (VPN), однако <b>для работы защиты от слежки не требуется устанавливать VPN-приложение.</b>\n\nДоступ к VPN позволяет этой функции (работая локально) отслеживать сетевой трафик <b>для блокирования известных нам трекеров</b>.</string>
+    <string name="atp_FAQFourthHeader">Будет ли работать защита от слежки, если я также использую VPN-приложение?</string>
+    <string name="atp_FAQFourthText">""<b>"<![CDATA[Android позволяет запустить только одно активное VPN-подключение за раз.]]>"</b>"<![CDATA[ Поэтому вы не сможете пользоваться защитой от слежки, если запущено VPN-приложение и если оно всегда включено.\n\n]]>"<b>"<![CDATA[Рекомендуем включать защиту от слежки, когда вы не пользуетесь VPN-приложением.]]>"</b>"<![CDATA[ (Проверьте, чтобы в нем не был задан режим «Всегда включено».) Для этого откройте на Android «Настройки сети > VPN». Затем нажмите шестерню рядом с VPN-приложением и выключите режим «Всегда включено». Некоторые VPN-приложения позволяют подключаться автоматически. Эту опцию тоже необходимо отключить.]]>"</string>
+    <string name="atp_FAQFifthHeader">Чем защита от слежки отличается от VPN?</string>
+    <string name="atp_FAQFifthText">VPN передает ваши данные с устройства на собственный сервер, где они анонимизируются и сохраняются вдали от посторонних глаз. Однако при этом ваш сетевой трафик все равно виден компании, предоставляющей VPN.\n\n<b>Защита от слежки работает иначе.</b> Она предотвращает передачу определенных данных из приложений на сервера, <b>работая локально</b>.\nВсякий раз, обнаружив трекер, <b>защита от слежки не дает ему отправить с вашего устройства информацию личного характера (например, IP-адрес или сведения об устройстве и вашей активности).</b> Весь остальной трафик достигает места назначения, чтобы ваши приложения могли нормально работать.</string>
+    <string name="atp_FAQSixthHeader">Надежно ли защищены мои данные?</string>
+    <string name="atp_FAQSixthText">Защита от слежки работает на вашем устройстве и не передает ваши личные данные в DuckDuckGo.</string>
+
+    <!--  App Tracking Protection Waitlist -->
+    <string name="atp_WaitlistActivityTitle">Блокировка отслеживания приложениями</string>
+    <string name="atp_WaitlistActivityWaitlistTitle">Очередь на защиту от слежки</string>
+    <string name="atp_WaitlistNotificationTitle">Вы получили приглашение воспользоваться защитой от слежки!</string>
+    <string name="atp_WaitlistNotificationDescription">Ранее вы просили добавить вас в список ожидания, чтобы мы сообщили, когда вам станет доступна защита от слежки. Нажмите, чтобы открыть приглашение.</string>
+    <string name="atp_WaitlistStatusNotJoined">Один простой шаг для надежной защиты данных!</string>
+    <string name="atp_WaitlistStatusJoined">Теперь вы в списке!</string>
+    <string name="atp_WaitlistStatusInBeta">Приглашение</string>
+    <string name="atp_WaitlistDescription">Защита блокирует трекеры в других приложениях и показывает, кто пытался за вами следить.\n<annotation type="beta_link">Подробнее...</annotation></string>
+    <string name="atp_WaitlistInBetaDescription">Защита блокирует трекеры в других приложениях и показывает, кто пытался за вами следить.\n<annotation type="beta_link">Подробнее о бета-версии</annotation></string>
+    <string name="atp_WaitlistJoin">Приглашаем встать в очередь</string>
+    <string name="atp_WaitlistCodeCta">У меня есть пригласительный код</string>
+    <string name="atp_WaitlistGetStartedCta">Приступим!</string>
+    <string name="atp_WaitlistRedeemCodeCta">Продолжить</string>
+    <string name="atp_WaitlistRedeemCodeLabel">Код приглашения</string>
+    <string name="atp_WaitlistRedeemCodeTitle">Все почти готово…</string>
+    <string name="atp_WaitlistRedeemCodeError">Не удалось распознать код приглашения.</string>
+    <string name="atp_WaitlistFooterDescription">Чтобы записаться в список ожидания, не нужно делиться личной информацией. Временная метка, хранящаяся только на вашем устройстве, позволит нам определить, когда подойдет ваша очередь, о чем мы сообщим вам дополнительно.</string>
+    <string name="atp_WaitlistErrorJoining">При постановке в очередь произошла ошибка. Пожалуйста, повторите попытку позже.</string>
+    <string name="atp_WaitlistJoinedWithNotification">Когда защита от слежки станет доступна, мы отправим вам уведомление.\n\n<annotation type="beta_link">Подробнее о бета-версии</annotation></string>
+    <string name="atp_WaitlistJoinedWithoutNotification">Приглашение тестировать защиту от слежки придет сюда. Загляните сюда позже либо дождитесь нашего уведомления, когда подойдет ваша очередь\n\n<annotation type="notify_me_link">Получить уведомление</annotation>\n\n<annotation type="beta_link">Подробнее о бета-версии...</annotation></string>
+    <string name="atp_WaitlistRedeemCodeActivityTitle">Введите код приглашения</string>
+    <string name="atp_WaitlistRedeemedCodeStatus">Готово! Вы приняты.</string>
+    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
+
+    <!--  App Tracking Company Details -->
+    <plurals name="atp_CompanyDetailsTrackingAttempts">
+        <item quantity="one">%1$d попытка. Обычно собирает:</item>
+        <item quantity="few">%1$d попытки. Обычно собирает:</item>
+        <item quantity="many">%1$d попыток. Обычно собирает:</item>
+        <item quantity="other">Попыток: %1$d. Обычно собирает:</item>
+    </plurals>
+    <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
+        <item quantity="one">Пресечена %1$d попытка отслеживания</item>
+        <item quantity="few">Пресечено %1$d попытки отслеживания</item>
+        <item quantity="many">Пресечено %1$d попыток отслеживания</item>
+        <item quantity="other">Пресечено попыток отслеживания: %1$d</item>
+    </plurals>
+    <string name="atp_CompanyDetailsTrackingMenuReport">Сообщить о проблеме с приложением</string>
+    <string name="atp_CompanyDetailsTrackingShowMore">Показать еще %1$d</string>
+    <string name="atp_CompanyDetailsTrackingLearnMore">Приложения могут задействовать трекеры других компаний для аналитики, маркетинга и подобных целей. Если эти трекеры не блокировать, постепенно они могут составить о вас подробное досье. <annotation type="learn_more_link">Подробнее...</annotation></string>
+    <string name="atp_CompanyDetailsTrackingShowLess">Показать меньше результатов</string>
+    <string name="atp_CompanyDetailsAppInfoPanel">В настоящее время в этом приложении отключена защита. Если защита от слежки вызвала сбой, <annotation type="report_issues_link">сообщите нам</annotation></string>
+
+    <!--  App Tracking Company Signals -->
+    <string name="atp_TrackingSignalAAID">Рекламный идентификатор Android</string>
+    <string name="atp_TrackingSignalUniqueIdentifier">Уникальный идентификатор</string>
+    <string name="atp_TrackingSignalCookies">Куки-файлы</string>
+    <string name="atp_TrackingSignalOsVersion">Версия ОС</string>
+    <string name="atp_TrackingSignalOsBuildNumber">Номер сборки ОС</string>
+    <string name="atp_TrackingSignalPlatform">Платформа устройства</string>
+    <string name="atp_TrackingSignalDeviceBrand">Марка устройства</string>
+    <string name="atp_TrackingSignalDeviceLanguage">Язык устройства</string>
+    <string name="atp_TrackingSignalDeviceModel">Модель устройства</string>
+    <string name="atp_TrackingSignalCPUData">Сведения о процессоре</string>
+    <string name="atp_TrackingSignalScreenResolution">Разрешение экрана</string>
+    <string name="atp_TrackingSignalInternalStorage">Внутренняя память</string>
+    <string name="atp_TrackingSignalExternalStorage">Внешняя память</string>
+    <string name="atp_TrackingSignalDeviceMemory">Память устройства</string>
+    <string name="atp_TrackingSignalDeviceName">Имя устройства</string>
+    <string name="atp_TrackingSignalWifiNetworkName">Имя сети Wi-Fi</string>
+    <string name="atp_TrackingSignalAppName">Название приложения</string>
+    <string name="atp_TrackingSignalAppVersion">Версия приложения</string>
+    <string name="atp_TrackingSignalLocalIPAddress">Локальный IP-адрес</string>
+    <string name="atp_TrackingSignalISP">Интернет-провайдер</string>
+    <string name="atp_TrackingSignalDeviceBootTime">Время загрузки устройства</string>
+    <string name="atp_TrackingSignalNetworkConnectionType">Тип сетевого подключения</string>
+    <string name="atp_TrackingSignalSystemVolume">Системный том</string>
+    <string name="atp_TrackingSignalBatteryLevel">Уровень заряда батареи</string>
+    <string name="atp_TrackingSignalChargingStatus">Состояние зарядки</string>
+    <string name="atp_TrackingSignalBrightness">Яркость</string>
+    <string name="atp_TrackingSignalHeadphoneStatus">Состояние наушников</string>
+    <string name="atp_TrackingSignalAccelerometerData">Данные акселерометра</string>
+    <string name="atp_TrackingSignalRotationData">Данные вращения</string>
+    <string name="atp_TrackingSignalDeviceOrientation">Ориентация устройства</string>
+    <string name="atp_TrackingSignalMagnetometerData">Данные магнитного датчика</string>
+    <string name="atp_TrackingSignalAvailableInternalStorage">Доступная внутренняя память</string>
+    <string name="atp_TrackingSignalAvailableExternalStorage">Доступная внешняя память</string>
+    <string name="atp_TrackingSignalDeviceTotalMemory">Общая память устройства</string>
+    <string name="atp_TrackingSignalAvailableDeviceMemory">Доступная память устройства</string>
+    <string name="atp_TrackingSignalScreenMargins">Поля экрана</string>
+    <string name="atp_TrackingSignalScreenDensity">Плотность дисплея</string>
+    <string name="atp_TrackingSignalFontSize">Размер шрифта</string>
+    <string name="atp_TrackingSignalNetworkCarrier">Оператор связи</string>
+    <string name="atp_TrackingSignalAppInstallDate">Дата установки приложения</string>
+    <string name="atp_TrackingSignalFirstAppLaunchDate">Дата первого запуска приложения</string>
+    <string name="atp_TrackingSignalGPSCoordinates">GPS-координаты</string>
+    <string name="atp_TrackingSignalPostalCode">Почтовый индекс</string>
+    <string name="atp_TrackingSignalNeighbourhood">Район</string>
+    <string name="atp_TrackingSignalCity">Город</string>
+    <string name="atp_TrackingSignalState">Штат или регион</string>
+    <string name="atp_TrackingSignalCountry">Страна</string>
+    <string name="atp_TrackingSignalTimezone">Часовой пояс</string>
+    <string name="atp_TrackingSignalEmailAddress">Адрес эл. почты</string>
+    <string name="atp_TrackingSignalBirthday">Дата рождения</string>
+    <string name="atp_TrackingSignalGender">Пол</string>
+    <string name="atp_TrackingSignalFirstName">Имя</string>
+    <string name="atp_TrackingSignalLastName">Фамилия</string>
+
+    <!--  App Tracking Protection Disable VPN Dialog -->
+    <string name="atp_DisableConfirmationDialogTitle">Отключить защиту от слежки?</string>
+    <string name="atp_DisableConfirmationDialogMessage">Если сбой возник в отдельно взятом приложении, вы можете изменить настройки защиты только для него.</string>
+    <string name="atp_DisableConfirmationDisableApp">Отключить для одного приложения</string>
+    <string name="atp_DisableConfirmationDisableAllApps">Отключить для всех приложений</string>
+    <string name="atp_DisableConfirmationCancel">Отменить</string>
+
+    <!--  App Tracking Protection VPN Conflict Dialog -->
+    <string name="atp_VpnConflictDialogTitle">Возможно, отключено VPN-приложение</string>
+    <string name="atp_VpnConflictAlwaysOnDialogTitle">VPN-приложение блокирует защиту от слежки</string>
+    <string name="atp_VpnConflictDialogMessage">Android допускает только одно активное VPN-подключение за раз. Запуск защиты от слежки может привести к отключению VPN.</string>
+    <string name="atp_VpnConflictDialogAlwaysOnMessage">Android допускает только одно активное VPN-подключение за раз. Чтобы продолжить, откройте «Настройки сети &gt; VPN». Найдите приложение VPN, которое «всегда включено», и отключите его.</string>
+    <string name="atp_VpnConflictDialogCancel">Отменить</string>
+    <string name="atp_VpnConflictDialogOpenSettings">Откройте Настройки</string>
+    <string name="atp_VpnConflictDialogGotIt">Понятно</string>
+
+    <!-- Manage Recent Apps Protection -->
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Если вы столкнулись со сбоями в приложении (например, не грузится содержимое), попробуйте отключить его защиту и <annotation type="report_issues_link">сообщите нам о проблеме</annotation>.</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Недавние приложения</string>
+    <string name="atp_ManageRecentAppsProtectionShowAll">Показать все приложения</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Недавних приложений пока нет</string>
+
+    <!--  App Tracking Protection Remove Feature Dialog -->
+    <string name="atp_RemoveFeatureDialogTitle">Отключить и удалить данные?</string>
+    <string name="atp_RemoveFeatureDialogMessage">Защита от слежки будет отключена, а все настройки и история попыток отслеживания будут удалены. Вы в любой момент можете заново включить эту функцию в «Настройках».</string>
+    <string name="atp_RemoveFeatureDialogCancel">Отменить</string>
+    <string name="atp_RemoveFeatureDialogRemove">Выключить</string>
+
+    <!--  App Tracking Protection Promote Always On -->
+    <string name="atp_PromoteAlwaysOnDialogTitle">Включить режим «Всегда включено»?</string>
+    <string name="atp_PromoteAlwaysOnDialogMessage">Что делать, чтобы Android периодически не отключал защиту от слежки?\n\nПерейдите в «Настройки» Android.\nОткройте «Настройки VPN» для DuckDuckGo.\nВыберите режим VPN «Всегда включено».</string>
+    <string name="atp_PromoteAlwaysOnDialogSettings">Открыть «Настройки»</string>
+    <string name="atp_PromoteAlwaysOnDialogLater">Напомнить позже</string>
+    <string name="atp_PromoteAlwaysOnDialogForget">Нет, спасибо</string>
+
+</resources>

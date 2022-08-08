@@ -152,7 +152,6 @@
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">For other reason</string>
     <string name="atp_ExcludeAppsManuallyCTAReport">Report</string>
     <string name="atp_ExcludeAppsManuallyCTASkip">Skip</string>
-    <string name="atp_ExcludeAppsManuallyDisableAnswerExplanation">Submissions are 100\% anonymous and only include your selection above and the app name.</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Restore Default Protected Apps</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Report an Issue With an App</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Restore default protection?</string>
