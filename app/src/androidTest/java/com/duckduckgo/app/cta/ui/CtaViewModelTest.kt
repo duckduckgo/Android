@@ -48,7 +48,9 @@ import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -418,7 +420,15 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingThenReturnTrackersBlockedCta() = runTest {
         givenDaxOnboardingActive()
-        val trackingEvent = TrackingEvent("test.com", "test.com", null, TestEntity("test", "test", 9.0), true, null)
+        val trackingEvent = TrackingEvent(
+            documentUrl = "test.com",
+            trackerUrl = "test.com",
+            categories = null,
+            entity = TestEntity("test", "test", 9.0),
+            surrogateId = null,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER
+        )
         val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
@@ -428,7 +438,15 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingAndTrackersAreNotMajorThenReturnTrackersBlockedCta() = runTest {
         givenDaxOnboardingActive()
-        val trackingEvent = TrackingEvent("test.com", "test.com", null, TestEntity("test", "test", 0.123), true, null)
+        val trackingEvent = TrackingEvent(
+            documentUrl = "test.com",
+            trackerUrl = "test.com",
+            categories = null,
+            entity = TestEntity("test", "test", 0.123),
+            surrogateId = null,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER
+        )
         val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 

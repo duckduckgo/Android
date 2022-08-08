@@ -21,6 +21,7 @@ import android.webkit.WebStorage
 import android.webkit.WebView
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
@@ -58,7 +59,8 @@ class ClearPersonalDataAction(
     private val cookieManager: DuckDuckGoCookieManager,
     private val appCacheClearer: AppCacheClearer,
     private val geoLocationPermissions: GeoLocationPermissions,
-    private val thirdPartyCookieManager: ThirdPartyCookieManager
+    private val thirdPartyCookieManager: ThirdPartyCookieManager,
+    private val adClickManager: AdClickManager
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean) {
@@ -94,6 +96,7 @@ class ClearPersonalDataAction(
         Timber.i("Clearing tabs")
         dataManager.clearWebViewSessions()
         tabRepository.deleteAll()
+        adClickManager.clearAll()
         setAppUsedSinceLastClearFlag(appInForeground)
         Timber.d("Finished clearing tabs")
     }

@@ -206,6 +206,10 @@ dependencies {
     implementation project(path: ':device-auth-api')
     implementation project(path: ':device-auth-impl')
 
+    implementation project(path: ':ad-click-api')
+    implementation project(path: ':ad-click-impl')
+    implementation project(path: ':ad-click-store')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android

@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.model
 
 import android.net.Uri
 import androidx.core.net.toUri
+import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.model.Site.SiteGrades
 import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
@@ -27,6 +28,7 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -66,13 +68,27 @@ class SiteMonitor(
     override val surrogates = CopyOnWriteArrayList<SurrogateResponse>()
 
     override val trackerCount: Int
-        get() = trackingEvents.size
+        get() = trackingEvents.count { it.status == TrackerStatus.BLOCKED }
+
+    override val otherDomainsLoadedCount: Int
+        get() = trackingEvents.asSequence()
+            .filter { it.status == TrackerStatus.ALLOWED }
+            .map { UriString.host(it.trackerUrl) }
+            .distinct()
+            .count()
+
+    override val specialDomainsLoadedCount: Int
+        get() = trackingEvents.asSequence()
+            .filter { specialDomainTypes.contains(it.status) }
+            .map { UriString.host(it.trackerUrl) }
+            .distinct()
+            .count()
 
     override val majorNetworkCount: Int
         get() = trackingEvents.distinctBy { it.entity?.name }.count { it.entity?.isMajor ?: false }
 
     override val allTrackersBlocked: Boolean
-        get() = trackingEvents.none { !it.blocked }
+        get() = trackingEvents.none { it.status == TrackerStatus.USER_ALLOWED }
 
     private val gradeCalculator: Grade
 
@@ -108,9 +124,10 @@ class SiteMonitor(
         trackingEvents.add(event)
 
         val entity = event.entity ?: return
-        if (event.blocked) {
+
+        if (event.status == TrackerStatus.BLOCKED) {
             gradeCalculator.addEntityBlocked(entity)
-        } else {
+        } else if (allowedDomainTypes.contains(event.status)) {
             gradeCalculator.addEntityNotBlocked(entity)
         }
     }
@@ -149,5 +166,19 @@ class SiteMonitor(
             Grade.Grading.D_MINUS -> PrivacyGrade.D
             Grade.Grading.UNKNOWN -> PrivacyGrade.UNKNOWN
         }
+    }
+
+    companion object {
+        private val specialDomainTypes = setOf(
+            TrackerStatus.AD_ALLOWED,
+            TrackerStatus.SITE_BREAKAGE_ALLOWED,
+            TrackerStatus.SAME_ENTITY_ALLOWED,
+            TrackerStatus.USER_ALLOWED
+        )
+
+        private val allowedDomainTypes = setOf(
+            TrackerStatus.USER_ALLOWED,
+            TrackerStatus.SAME_ENTITY_ALLOWED
+        )
     }
 }

@@ -197,6 +197,10 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         enableSwipeRefreshCallback = callback
     }
 
+    fun removeEnableSwipeRefreshCallback() {
+        enableSwipeRefreshCallback = null
+    }
+
     private fun enableSwipeRefresh(enable: Boolean) {
         enableSwipeRefreshCallback?.invoke(enable && contentAllowsSwipeToRefresh)
     }

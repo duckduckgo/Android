@@ -45,6 +45,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PRIVACY_DASHBOARD_GLOBAL_STATS("mp_s"),
     PRIVACY_DASHBOARD_PRIVACY_PRACTICES("mp_p"),
     PRIVACY_DASHBOARD_NETWORKS("mp_n"),
+    PRIVACY_DASHBOARD_OTHER_DOMAINS_LOADED_CLICKED("m_privacy_dashboard_other_domains_loaded_clicked"),
     PRIVACY_DASHBOARD_WHITELIST_ADD("mp_wla"),
     PRIVACY_DASHBOARD_WHITELIST_REMOVE("mp_wlr"),
     PRIVACY_DASHBOARD_MANAGE_WHITELIST("mp_mw"),

@@ -27,6 +27,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyScorecardBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -36,6 +37,7 @@ import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.tabs.tabId
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
@@ -64,7 +66,7 @@ class ScorecardActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             viewModel.scoreCard(intent.tabId!!)
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect { render(it) }
+                .collectLatest { render(it) }
         }
     }
 
@@ -78,9 +80,16 @@ class ScorecardActivity : DuckDuckGoActivity() {
             practices.setDrawableEnd(viewState.practices.successFailureIcon())
             beforeGrade.setDrawableEnd(viewState.beforeGrade.smallIcon())
             afterGrade.setDrawableEnd(viewState.afterGrade.smallIcon())
-            trackers.text = trackersRenderer.trackersText(context, viewState.trackerCount, viewState.allTrackersBlocked)
-            trackers.setDrawableEnd(trackersRenderer.successFailureIcon(viewState.trackerCount))
-            majorNetworks.text = trackersRenderer.majorNetworksText(context, viewState.majorNetworkCount, viewState.allTrackersBlocked)
+
+            val trackersText = if (viewState.trackerCount + viewState.specialDomainsLoadedCount > 0) {
+                R.string.trackersFoundText
+            } else {
+                R.string.trackersNoFoundText
+            }
+
+            trackers.text = context.resources.getString(trackersText)
+            trackers.setDrawableEnd(trackersRenderer.successFailureIcon(viewState.trackerCount + viewState.specialDomainsLoadedCount))
+            majorNetworks.text = trackersRenderer.majorNetworksText(context, viewState.majorNetworkCount)
             majorNetworks.setDrawableEnd(trackersRenderer.successFailureIcon(viewState.majorNetworkCount))
             showIsMemberOfMajorNetwork(viewState.showIsMemberOfMajorNetwork)
             showEnhancedGrade(viewState.showEnhancedGrade)

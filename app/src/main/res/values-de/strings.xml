@@ -121,30 +121,6 @@
     <string name="httpsMixed">Verschlüsselte und unverschlüsselte Verbindung</string>
     <string name="httpsBad">Unverschlüsselte Verbindung</string>
 
-    <string name="networksActivityTitle">Tracker-Netzwerke</string>
-    <string name="networksContentDescription">Tracker-Netzwerke</string>
-    <string name="networksOverview">Tracker-Netzwerke fassen deinen Browserverlauf in einem Datenprofil über dich zusammen. Große Tracker-Netzwerke sind schädlicher, da sie dich weiter im Internet verfolgen und gezielt ansprechen können.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s Tracker gefunden</item>
-        <item quantity="other">%1$s Tracker gefunden</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s Tracker blockiert</item>
-        <item quantity="other">%1$s Tracker blockiert</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s Großes Tracker-Netzwerk gefunden</item>
-        <item quantity="other">%1$s Große Tracker-Netzwerke gefunden</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s Großes Tracker-Netzwerk blockiert</item>
-        <item quantity="other">%1$s Große Tracker-Netzwerke blockiert</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Datenschutzstufe</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Diese Website gehört zu einem großen Tracker-Netzwerk</string>
     <string name="scorecardPrivacyGrade">Datenschutzstufe</string>
@@ -162,6 +138,45 @@
 
     <string name="networkTrackerSummaryHeader">HARTNÄCKIGSTE TRACKER-NETZWERKE</string>
     <string name="networkTrackerSummaryNotReady">Wir sammeln immer noch Daten, um anzuzeigen, wie viele Tracker wir blockiert haben.</string>
+
+    <string name="trackersActivityTitle">Tracking-Anfragen blockiert</string>
+    <string name="trackersContentDescription">Tracking-Anfragen blockiert</string>
+    <string name="trackersOverview">Das Laden folgender Anfragen von Drittanbieter-Domains wurde blockiert, da sie als Tracking-Anfragen identifiziert wurden. Wenn die Anfragen eines Unternehmens geladen werden, kann ihm dies ermöglichen, ein Profil von dir zu erstellen.</string>
+    <string name="trackersOverviewProtectionsOff">Das Laden von Tracking-Anfragen wurde nicht blockiert, da der Schutz für diese Website deaktiviert ist. Wenn die Anfragen eines Unternehmens geladen werden, kann ihm dies ermöglichen, ein Profil von dir zu erstellen.</string>
+
+    <string name="domainsLoadedActivityTitle">Anfragen von Drittanbietern geladen</string>
+    <string name="domainsLoadedContentDescription">Anfragen von Drittanbietern geladen</string>
+    <string name="domainsLoadedOverview">Die Anfragen der folgenden Drittanbieter-Domains wurden geladen. Wenn die Anfragen eines Unternehmens geladen werden, kann dies ihm erlauben, ein Profil von dir zu erstellen, obwohl unsere anderen Schutzmaßnahmen für das Web-Tracking weiterhin gelten.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Das Laden von Anfragen von Drittanbietern wurde nicht blockiert, da der Schutz für diese Website deaktiviert ist. Wenn die Anfragen eines Unternehmens geladen werden, kann ihm dies ermöglichen, ein Profil von dir zu erstellen.</string>
+    <string name="domainsLoadedOverviewEmpty">Wir haben keine Anfragen von Drittanbieter-Domains erkannt.</string>
+    <string name="domainsLoadedHeadingText">Keine Drittanbieter-Domains geladen</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Über unseren Web-Tracking-Schutz</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Die Anfragen der folgenden Domain wurden geladen.</string>
+
+    <string name="adLoadedSectionDescription">Die Anfragen der folgenden Domain wurden geladen, da kürzlich eine %1$s-Werbung auf DuckDuckGo angeklickt wurde. Diese Anfragen helfen bei der Bewertung der Effektivität von Werbung. Werbung auf DuckDuckGo erstellt keine Profile von dir.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Wie sich unsere Suchanzeigen auf unseren Schutz auswirken</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Die Anfragen der folgenden Domain wurden ebenfalls geladen.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Die Tracking-Anfragen der folgenden Domains wurden geladen.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Wir haben keine Anfragen von Drittanbieter-Domains erkannt.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Die Anfragen der folgenden Domain wurden geladen, um eine Störung der Website zu verhindern.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Die Anfragen der folgenden Domain wurden geladen, da sie mit %1$s verknüpft sind.</string>
+
+    <string name="trackersBlockedText">Blockierte Anfragen</string>
+    <string name="trackersNotBlockedText">Keine Tracking-Anfragen blockiert</string>
+    <string name="trackersNoFoundText">Keine Tracking-Anfragen gefunden</string>
+    <string name="trackersFoundText">Tracking-Anfragen gefunden</string>
+
+    <string name="domainsLoadedText">Anfragen von Drittanbietern geladen</string>
+    <string name="domainsNotLoadedText">Keine Anfragen von Drittanbietern geladen</string>
+
+    <string name="majorNetworksNoFound">Keine große Tracker-Netzwerke gefunden</string>
+    <string name="majorNetworksFound">Große Tracker-Netzwerke gefunden</string>
 
     <!-- Fire -->
     <string name="fireMenu">Daten löschen</string>
@@ -563,8 +578,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Verbindung getrennt. Diese Website könnte schädlich für dein Gerät sein.</string>
 
-
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Gerätestandort für DuckDuckGo Privacy Browser freigeben?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s erfragt Ihren Gerätestandort. Zuerst müssen Sie der App die Befugnis geben, den Standort Ihres Geräts weiterzugeben, erst dann kann %2$s um Erlaubnis bitten.</string>
@@ -596,7 +609,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blockiert viele Tracker automatisch. Mit Global Privacy Control (GPC) können Sie auch teilnehmende Websites bitten, das Verkaufen oder Teilen Ihrer personenbezogenen Daten mit anderen Unternehmen einzuschränken. <u><a href="">Mehr erfahren</a><u/>]]>
+        <![CDATA[DuckDuckGo blockiert viele Tracker automatisch. Mit Global Privacy Control (GPC) können Sie auch teilnehmende Websites bitten, das Verkaufen oder Teilen Ihrer personenbezogenen Daten mit anderen Unternehmen einzuschränken. <u><a href=\"\">Mehr erfahren</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -651,16 +664,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-Mail-Datenschutz, vereinfacht.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen, ohne den E-Mail-Anbieter zu wechseln.<br/><a href=""><b>Mehr erfahren</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen, ohne den E-Mail-Anbieter zu wechseln.<br/><a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Du stehst jetzt auf der Warteliste.</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Du erhältst eine Benachrichtigung,<br/> wenn du die E-Mail-Schutzfunktion testen kannst. <a href=""><b>Mehr erfahren</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Deine Einladung wird hier angezeigt, wenn es soweit ist. Möchtest du <a href=""><b>eine Benachrichtigung erhalten</b></a>, wenn die Einladung eintrifft?<a href=""><b>Mehr erfahren</b></a> über den E-Mail-Schutz.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Du erhältst eine Benachrichtigung,<br/> wenn du die E-Mail-Schutzfunktion testen kannst. <a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Deine Einladung wird hier angezeigt, wenn es soweit ist. Möchtest du <a href=\"\"><b>eine Benachrichtigung erhalten</b></a>, wenn die Einladung eintrifft?<a href=\"\"><b>Mehr erfahren</b></a> über den E-Mail-Schutz.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Du hast eine Einladung erhalten!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen,<br/>ohne den E-Mail-Anbieter zu wechseln.<br/><a href=""><b>Mehr erfahren</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen,<br/>ohne den E-Mail-Anbieter zu wechseln.<br/><a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Persönliche Duck-Adresse</string>
