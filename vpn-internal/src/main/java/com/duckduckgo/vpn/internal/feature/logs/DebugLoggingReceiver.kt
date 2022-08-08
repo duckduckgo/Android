@@ -18,7 +18,7 @@ package com.duckduckgo.vpn.internal.feature.logs
 
 import android.content.Context
 import android.content.Intent
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
@@ -59,7 +59,7 @@ class DebugLoggingReceiver(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(VpnScope::class)
 class DebugLoggingReceiverRegister @Inject constructor(
     private val context: Context
 ) : VpnServiceCallbacks {

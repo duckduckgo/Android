@@ -19,7 +19,7 @@ package com.duckduckgo.vpn.internal.feature.transparency
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.utils.ConflatedJob
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
@@ -68,7 +68,7 @@ class TransparencyModeDebugReceiver(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(VpnScope::class)
 class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val trackerDetectorInterceptor: TransparencyTrackerDetectorInterceptor

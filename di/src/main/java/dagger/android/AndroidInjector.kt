@@ -33,7 +33,7 @@ interface HasDaggerInjector {
      *  1. creating the dagger component
      *  2. inject the dependencies in the Android type (eg. Activity)
      */
-    fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*>
+    fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *>
 }
 
 interface AndroidInjector<T> {
@@ -45,12 +45,12 @@ interface AndroidInjector<T> {
      *
      * @param <T> the concrete type to be injected
      */
-    interface Factory<T> {
+    interface Factory<T, SubComponentType : AndroidInjector<T>> {
         /**
          * Creates an {@link AndroidInjector} for {@code instance}. This should be the same instance
          * that will be passed to {@link #inject(Object)}.
          */
-        fun create(@BindsInstance instance: T): AndroidInjector<T>
+        fun create(@BindsInstance instance: T): SubComponentType
     }
 
     companion object {
@@ -61,13 +61,13 @@ interface AndroidInjector<T> {
          *  2. Use the factory to create the dagger component that relates to an Android type, eg. Activity
          *  3. Inject any dependency requested by the Android type
          */
-        inline fun <reified T> inject(
+        inline fun <reified T, R : AndroidInjector<T>> inject(
             injector: Any,
             instance: T,
             mapKey: Class<*>? = null
         ) {
             if ((injector is HasDaggerInjector)) {
-                (injector.daggerFactoryFor(mapKey ?: instance!!::class.java) as Factory<T>)
+                (injector.daggerFactoryFor(mapKey ?: instance!!::class.java) as Factory<T, R>)
                     .create(instance)
                     .inject(instance)
             } else {

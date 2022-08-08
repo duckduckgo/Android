@@ -25,9 +25,9 @@ import javax.inject.Inject
 @SuppressLint("NoFragment") // this is base fragment class to be used instead of Fragment
 abstract class DaggerFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId), HasDaggerInjector {
     @Inject
-    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*>>
+    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*, *>>
 
-    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*> {
+    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
         return injectorFactoryMap[key]
             ?: throw RuntimeException(
                 """
