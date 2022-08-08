@@ -88,17 +88,10 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageTextFormActivity"
+            android:name="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceActivity"
             android:exported="false"
             android:label="@string/atp_ReportBreakageAppListActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageAppListActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageSingleChoiceFormActivity"
-            android:exported="false"
-            android:label="@string/atp_ReportBreakageAppListActivityTitle"
-            android:parentActivityName="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageTextFormActivity"
             android:screenOrientation="portrait" />
 
         <activity

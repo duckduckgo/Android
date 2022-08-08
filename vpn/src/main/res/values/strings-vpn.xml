@@ -166,14 +166,19 @@
     <string name="atp_ReportBreakageAppEntry">%s app</string>
     <string name="atp_ReportBreakageAppSubmitCta">Submit</string>
     <string name="atp_ReportBreakageAppNextCta">Next</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Please describe what happened, what you expected, and what steps led to the issue.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Were you logged in to the app when you noticed the issue?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Yes, I was logged in to the app</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">The problem happened when logging in</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">I had a problem creating a new account</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">The app doesn\’t require log in</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Were you logged in to the app when you noticed the issue?</b></string>
-    <string name="atp_ReportBreakageFormInputHint">Describe what happened (optional)</string>
+    <string name="atp_ReportBreakageCategoriesTitle">What\'s happening?</string>
+    <string name="atp_ReportBreakageCategoriesHint">What\'s happening?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">App freezes or crashes</string>
+    <string name="atp_ReportBreakageCategoryMessages">Message delivery fails</string>
+    <string name="atp_ReportBreakageCategoryCalls">Voice calls don\'t work</string>
+    <string name="atp_ReportBreakageCategoryUploads">Can\'t upload or share files</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Can\'t download files</string>
+    <string name="atp_ReportBreakageCategoryContent">Content loads slowly</string>
+    <string name="atp_ReportBreakageCategoryConnection">App has no connection</string>
+    <string name="atp_ReportBreakageCategoryIot">Can\'t connect local device</string>
+    <string name="atp_ReportBreakageCategoryOther">Something else</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Please describe what\'s happening, what you expected to happen, and steps that led to the issue.</string>
+    <string name="atp_ReportBreakageFormInputHint">Tell us more about the issue you\'re experiencing</string>
     <string name="atp_ReportBreakageFormCheckboxText">By clicking “Submit” I agree that DuckDuckGo may use the information in this report for purposes of improving App Tracking Protection.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
