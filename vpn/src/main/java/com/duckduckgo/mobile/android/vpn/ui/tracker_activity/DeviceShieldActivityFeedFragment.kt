@@ -21,22 +21,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayoutManager
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
-import dagger.android.AndroidInjection
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class DeviceShieldActivityFeedFragment : Fragment() {
+class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -62,7 +61,6 @@ class DeviceShieldActivityFeedFragment : Fragment() {
         view: View,
         savedInstanceState: Bundle?
     ) {
-        AndroidInjection.inject(this)
         with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
             val stickyHeadersLayoutManager =
                 StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())

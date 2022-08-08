@@ -127,7 +127,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.google.android.material.snackbar.Snackbar
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -180,6 +179,7 @@ import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.asMessage
+import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
@@ -208,7 +208,7 @@ import javax.inject.Provider
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
-    Fragment(),
+    DuckDuckGoFragment(),
     FindListener,
     CoroutineScope,
     DaxDialogListener,
@@ -465,11 +465,6 @@ class BrowserTabFragment :
     private var emailAutofillTooltipDialog: EmailAutofillTooltipFragment? = null
 
     private val pulseAnimation: PulseAnimation = PulseAnimation(this)
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

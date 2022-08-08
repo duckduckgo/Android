@@ -17,33 +17,26 @@
 package com.duckduckgo.autofill.ui.credential.management.viewing
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementDisabledBinding
 import com.duckduckgo.di.scopes.FragmentScope
-import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class AutofillManagementDisabledMode : Fragment() {
+class AutofillManagementDisabledMode : DuckDuckGoFragment() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
     private lateinit var binding: FragmentAutofillManagementDisabledBinding
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

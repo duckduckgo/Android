@@ -27,10 +27,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.os.postDelayed
 import androidx.core.text.HtmlCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
@@ -40,13 +40,12 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel.PrivacyReportView.ViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class DeviceShieldFragment : Fragment() {
+class DeviceShieldFragment : DuckDuckGoFragment() {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -68,7 +67,6 @@ class DeviceShieldFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        AndroidSupportInjection.inject(this)
         val view = inflater.inflate(R.layout.fragment_device_shield_cta, container, false)
 
         configureViewReferences(view)

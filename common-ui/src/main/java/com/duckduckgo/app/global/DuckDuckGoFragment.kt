@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.themepreview.ui.component.system
+package com.duckduckgo.app.global
 
-import com.duckduckgo.mobile.android.themepreview.ui.component.Component
-import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
+import android.content.Context
+import androidx.annotation.LayoutRes
+import dagger.android.DaggerFragment
+import dagger.android.support.AndroidSupportInjection
 
-class ComponentCardsFragment : ComponentFragment() {
-    override fun getComponents(): List<Component> {
-        return listOf(Component.SNACKBAR)
+abstract class DuckDuckGoFragment(@LayoutRes contentLayoutId: Int = 0) : DaggerFragment(contentLayoutId) {
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
     }
 }
