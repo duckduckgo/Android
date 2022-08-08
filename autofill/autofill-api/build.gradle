@@ -23,13 +23,13 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(path: ':di')
-    implementation project(path: ':common')
-    implementation project(path: ':common-ui')
-
     implementation KotlinX.coroutines.core
     implementation Google.android.material
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
 }
 
+
+android {
+  namespace 'com.duckduckgo.autofill.api'
+}

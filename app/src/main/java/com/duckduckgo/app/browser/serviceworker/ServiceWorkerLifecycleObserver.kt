@@ -23,18 +23,15 @@ import androidx.webkit.WebViewFeature
 import androidx.webkit.WebViewFeature.SERVICE_WORKER_BASIC_USAGE
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.di.scopes.AppScope
 import timber.log.Timber
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 
-@SingleInstanceIn(AppScope::class)
 class ServiceWorkerLifecycleObserver @Inject constructor(
     private val requestInterceptor: RequestInterceptor,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
 ) : DefaultLifecycleObserver {
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
 
         if (WebViewFeature.isFeatureSupported(SERVICE_WORKER_BASIC_USAGE)) {
             try {

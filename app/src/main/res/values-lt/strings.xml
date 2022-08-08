@@ -121,38 +121,6 @@
     <string name="httpsMixed">Ryšys su mišriu šifravimu</string>
     <string name="httpsBad">Nešifruotas ryšys</string>
 
-    <string name="networksActivityTitle">Sekiklių tinklai</string>
-    <string name="networksContentDescription">Sekiklių tinklai</string>
-    <string name="networksOverview">Sekiklių tinklai stebi jūsų naršymo tinkle istoriją ir iš jos sudaro jūsų duomenų profilį. Daugelis sekiklių tinklų yra pavojingesni, nes jie gali sekti ir rasti jus didesnėje interneto erdvėje.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">Rasta %1$s stebėjimo priemonė</item>
-        <item quantity="few">Rastos %1$s stebėjimo priemonės</item>
-        <item quantity="many">Rasta %1$s stebėjimo priemonės</item>
-        <item quantity="other">Rasta %1$s stebėjimo priemonių</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">Užblokuota %1$s stebėjimo priemonė</item>
-        <item quantity="few">Užblokuotos %1$s stebėjimo priemonės</item>
-        <item quantity="many">Užblokuota %1$s stebėjimo priemonė</item>
-        <item quantity="other">Užblokuota %1$s stebėjimo priemonių</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">Rastas %1$s pagrindinis stebėjimo priemonės tinklas</item>
-        <item quantity="few">Rasti %1$s pagrindiniai stebėjimo priemonės tinklai</item>
-        <item quantity="many">Rasta %1$s pagrindinio stebėjimo priemonės tinklo</item>
-        <item quantity="other">Rasta %1$s pagrindinių stebėjimo priemonės tinklų</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">Užblokuotas %1$s pagrindinis stebėjimo priemonės tinklas</item>
-        <item quantity="few">Užblokuoti %1$s pagrindiniai stebėjimo priemonės tinklai</item>
-        <item quantity="many">Užblokuota %1$s pagrindinio stebėjimo priemonės tinklo</item>
-        <item quantity="other">Užblokuota %1$s pagrindinių stebėjimo priemonės tinklų</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Privatumo laipsnis</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Svetainė yra didelis stebėjimo priemonių tinklas</string>
     <string name="scorecardPrivacyGrade">Privatumo laipsnis</string>
@@ -170,6 +138,45 @@
 
     <string name="networkTrackerSummaryHeader">DAŽNIAUSI PAŽEIDĖJAI SEKIKLIŲ TINKLE</string>
     <string name="networkTrackerSummaryNotReady">Renkame duomenis, kad galėtumėme pranešti apie tai, kiek sekiklių užblokavome.</string>
+
+    <string name="trackersActivityTitle">Sekimo užklausos užblokuotos</string>
+    <string name="trackersContentDescription">Sekimo užklausos užblokuotos</string>
+    <string name="trackersOverview">Toliau nurodytų trečiųjų šalių domenų užklausų įkėlimas buvo užblokuotas, nes jos buvo identifikuotos kaip sekimo užklausos. Jei įmonės užklausos įkeliamos, ji gali leisti joms rinkti informaciją apie jus.</string>
+    <string name="trackersOverviewProtectionsOff">Nebuvo užblokuotas jokių sekimo užklausų įkėlimas, nes šioje svetainėje apsauga yra išjungta. Jei įmonės užklausos įkeliamos, ji gali leisti joms rinkti informaciją apie jus.</string>
+
+    <string name="domainsLoadedActivityTitle">Įkeltos trečiųjų šalių užklausos</string>
+    <string name="domainsLoadedContentDescription">Įkeltos trečiųjų šalių užklausos</string>
+    <string name="domainsLoadedOverview">Buvo įkeltos šios trečiųjų šalių domenų užklausos. Jei įmonės užklausos įkeliamos, ji gali leisti joms rinkti informaciją apie jus, nors kitos mūsų žiniatinklio sekimo apsaugos priemonės tebegalioja.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Nebuvo užblokuotas jokių trečiųjų šalių užklausų įkėlimas, nes šios svetainės apsaugos priemonės yra išjungtos. Jei įmonės užklausos įkeliamos, ji gali leisti joms rinkti informaciją apie jus.</string>
+    <string name="domainsLoadedOverviewEmpty">Užklausų iš trečiųjų šalių domenų neaptikome.</string>
+    <string name="domainsLoadedHeadingText">Nėra įkeltų trečiųjų šalių domenų</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Apie žiniatinklio stebėjimo apsaugos priemones</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Buvo įkeltos šios domenų užklausos.</string>
+
+    <string name="adLoadedSectionDescription">Šio domeno užklausos buvo įkeltos, nes neseniai buvo spustelėta %1$s „DuckDuckGo“ reklama. Šios užklausos padeda įvertinti reklamų efektyvumą. Visos „DuckDuckGo“ reklamos nerenka informacijos apie naudotoją.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Kaip paieškos skelbimai veikia mūsų apsaugą</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Taip pat buvo įkeltos šios domeno užklausos.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Buvo įkeltos šios domenų stebėjimo užklausos.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Užklausų iš trečiųjų šalių domenų neaptikome.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Siekiant išvengti svetainės sutrikimų, buvo įkeltos šios domeno užklausos.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Šios domeno užklausos buvo įkeltos, nes jos susijusios su %1$s.</string>
+
+    <string name="trackersBlockedText">Užklausos užblokuotos įkelti</string>
+    <string name="trackersNotBlockedText">Neužblokuota jokių sekimo užklausų</string>
+    <string name="trackersNoFoundText">Sekimo užklausų nerasta</string>
+    <string name="trackersFoundText">Rastos sekimo užklausos</string>
+
+    <string name="domainsLoadedText">Įkeltos trečiųjų šalių užklausos</string>
+    <string name="domainsNotLoadedText">Nėra įkeltų trečiųjų šalių užklausų</string>
+
+    <string name="majorNetworksNoFound">Nerasta jokių pagrindinių sekimo priemonės tinklų</string>
+    <string name="majorNetworksFound">Rasti pagrindiniai stebėjimo priemonės tinklai</string>
 
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>
@@ -575,8 +582,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Prisijungimas nutrauktas. Ši svetainė gali pakenkti jūsų įrenginiui.</string>
 
-
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Įgalinti įrenginio vietą „DuckDuckGo“ privatumo naršyklėje?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s prašo jūsų įrenginio vietos. Pirmiausia turėsite leisti programai siųsti jūsų įrenginio vietą, tuomet %2$s gali prašyti leidimo.</string>
@@ -608,7 +613,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[„DuckDuckGo“ automatiškai blokuoja daugelį stebėjimo priemonių. Pasirinkę visuotinę privatumo kontrolę (VPK), taip pat galite paprašyti dalyvaujančių svetainių apriboti jūsų asmeninių duomenų prekybą ir bendrinimą su kitomis įmonėmis. <u><a href="">Sužinoti daugiau</a><u/>]]>
+        <![CDATA[„DuckDuckGo“ automatiškai blokuoja daugelį stebėjimo priemonių. Pasirinkę visuotinę privatumo kontrolę (VPK), taip pat galite paprašyti dalyvaujančių svetainių apriboti jūsų asmeninių duomenų prekybą ir bendrinimą su kitomis įmonėmis. <u><a href=\"\">Sužinoti daugiau</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="globalPrivacyControlToggle">Visuotinė privatumo kontrolė (VPK)</string>
@@ -663,16 +668,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Supaprastintas el. pašto privatumas.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href="">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Jūs jau sąraše!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Atsiųsime jums pranešimą, kai<br/> el. pašto apsauga bus parengta. <b><a href="">Sužinoti daugiau</a></b>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Jūsų kvietimas pasirodys čia, kai bus parengtas. Ar norite <a href=""><b>gauti pranešimą,</b></a> kai jis pasirodys?<br/><a href=""><b>Sužinokite daugiau</b></a> apie el. pašto apsaugą.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Atsiųsime jums pranešimą, kai<br/> el. pašto apsauga bus parengta. <b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Jūsų kvietimas pasirodys čia, kai bus parengtas. Ar norite <a href=\"\"><b>gauti pranešimą,</b></a> kai jis pasirodys?<br/><a href=\"\"><b>Sužinokite daugiau</b></a> apie el. pašto apsaugą.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Esate pakviesti!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href="">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Asmeninis „Duck“ adresas</string>

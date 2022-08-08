@@ -21,7 +21,6 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
-import com.duckduckgo.feature.toggles.api.FeatureName
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import dagger.SingleInstanceIn
@@ -32,14 +31,14 @@ class RealFeatureToggleImpl @Inject constructor(private val featureTogglesPlugin
     FeatureToggle {
 
     override fun isFeatureEnabled(
-        featureName: FeatureName,
+        featureName: String,
         defaultValue: Boolean
     ): Boolean {
         featureTogglesPluginPoint.getPlugins().forEach { plugin ->
             plugin.isEnabled(featureName, defaultValue)?.let { return it }
         }
 
-        throw IllegalArgumentException("Unknown feature: ${featureName.value}")
+        throw IllegalArgumentException("Unknown feature: $featureName")
     }
 }
 

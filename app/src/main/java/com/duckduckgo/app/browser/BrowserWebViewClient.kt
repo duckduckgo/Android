@@ -26,6 +26,7 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -68,7 +69,8 @@ class BrowserWebViewClient(
     private val accessibilityManager: AccessibilityManager,
     private val ampLinks: AmpLinks,
     private val printInjector: PrintInjector,
-    private val internalTestUserChecker: InternalTestUserChecker
+    private val internalTestUserChecker: InternalTestUserChecker,
+    private val adClickManager: AdClickManager
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -242,7 +244,10 @@ class BrowserWebViewClient(
     ) {
         try {
             Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
+
             url?.let {
+                adClickManager.detectAdDomain(url)
+
                 appCoroutineScope.launch(dispatcherProvider.default()) {
                     thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
                 }

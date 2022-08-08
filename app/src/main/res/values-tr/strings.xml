@@ -121,30 +121,6 @@
     <string name="httpsMixed">Karma Şifreleme Bağlantısı</string>
     <string name="httpsBad">Şifrelenmemiş Bağlantı</string>
 
-    <string name="networksActivityTitle">İzleyici Ağları</string>
-    <string name="networksContentDescription">İzleyici Ağları</string>
-    <string name="networksOverview">İzleyici ağları, web geçmişinizi sizinle ilgili bir veri profilinde toplar. Büyük izleyici ağları daha zararlıdır, çünkü sizi İnternet\'te izleyebilir ve hedefleyebilirler.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s İzleyici Bulundu</item>
-        <item quantity="other">%1$s İzleyici Bulundu</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s İzleyici Engellendi</item>
-        <item quantity="other">%1$s İzleyici Engellendi</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s Ana İzleyici Ağı Bulundu</item>
-        <item quantity="other">%1$s Başlıca İzleyici Ağları Bulundu</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s Başlıca İzleyici Ağı Engellendi</item>
-        <item quantity="other">%1$s Başlıca İzleyici Ağları Engellendi</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Gizlilik Derecesi</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Site Önemli İzleyici Ağlarından Biri</string>
     <string name="scorecardPrivacyGrade">Gizlilik Derecesi</string>
@@ -162,6 +138,45 @@
 
     <string name="networkTrackerSummaryHeader">İZLEYİCİ AĞ ÜSTÜ TEKLİFLER</string>
     <string name="networkTrackerSummaryNotReady">Kaç izleyiciyi engellediğimizi göstermek için hala veri topluyoruz.</string>
+
+    <string name="trackersActivityTitle">İzleme İstekleri Engellendi</string>
+    <string name="trackersContentDescription">İzleme İstekleri Engellendi</string>
+    <string name="trackersOverview">Aşağıdaki üçüncü taraf alan adlarının isteklerinin yüklenmesi, izleme istekleri olarak tanımlandıkları için engellendi. Bir şirketin istekleri yüklenirse profilinizi oluşturmaları mümkün olabilir.</string>
+    <string name="trackersOverviewProtectionsOff">Bu site için Korumalar kapalı olduğundan hiçbir izleme isteğinin yüklenmesi engellenmedi. Bir şirketin istekleri yüklenirse profilinizi oluşturmaları mümkün olabilir.</string>
+
+    <string name="domainsLoadedActivityTitle">Üçüncü Taraf İstekleri Yüklendi</string>
+    <string name="domainsLoadedContentDescription">Üçüncü Taraf İstekleri Yüklendi</string>
+    <string name="domainsLoadedOverview">Aşağıdaki üçüncü taraf alan adlarının istekleri yüklendi. Bir şirketin istekleri yüklenirse, diğer web izleme korumalarımıza rağmen profilinizi oluşturmaları mümkün olabilir.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Bu site için Korumalar kapalı olduğundan hiçbir üçüncü taraf isteğin yüklenmesi engellenmedi. Bir şirketin istekleri yüklenirse profilinizi oluşturmaları mümkün olabilir.</string>
+    <string name="domainsLoadedOverviewEmpty">Herhangi bir üçüncü taraf alan adından gelen istek algılanmadı.</string>
+    <string name="domainsLoadedHeadingText">Yüklenen üçüncü taraf alan adı yok</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Web İzleme Korumalarımız hakkında</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Aşağıdaki alanların istekleri yüklendi.</string>
+
+    <string name="adLoadedSectionDescription">Aşağıdaki alan adından gelen istekler, yakın zamanda DuckDuckGo\'daki bir %1$s reklamı tıklandığı için yüklendi. Bu istekler, reklamların ne kadar etkili olduğunun değerlendirilmesine yardımcı olur. DuckDuckGo\'daki reklamlar profil oluşturma için kullanılmaz.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Arama ağı reklamlarımız korumalarımızı nasıl etkiler?</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Aşağıdaki alan adlarının istekleri de yüklendi.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Aşağıdaki alan adlarının izleme istekleri yüklendi.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Herhangi bir üçüncü taraf alan adından gelen istek algılanmadı.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Site kırılmasını önlemek için aşağıdaki alan adının istekleri yüklendi.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Aşağıdaki alan adının istekleri %1$s ile ilişkili oldukları için yüklendi.</string>
+
+    <string name="trackersBlockedText">Yüklenmesi Engellenen İstekler</string>
+    <string name="trackersNotBlockedText">Hiçbir İzleme İsteği Engellenmedi</string>
+    <string name="trackersNoFoundText">İzleme İsteği Bulunamadı</string>
+    <string name="trackersFoundText">İzleme İstekleri Bulundu</string>
+
+    <string name="domainsLoadedText">Üçüncü Taraf İstekleri Yüklendi</string>
+    <string name="domainsNotLoadedText">Yüklenen Üçüncü Taraf İsteği Yok</string>
+
+    <string name="majorNetworksNoFound">Başlıca İzleyici Ağı Tespit Edilmedi</string>
+    <string name="majorNetworksFound">Başlıca İzleyici Ağları Bulundu</string>
 
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
@@ -563,8 +578,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Bağlantı iptal edildi. Bu web sitesi cihazınıza zarar verebilir.</string>
 
-
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">DuckDuckGo Gizlilik Tarayıcısı için cihaz konumu etkinleştirilsin mi?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s cihazınızın konumunu öğrenmek istiyor. %2$s tarafından izin istenebilmesi için ilk olarak uygulamanın cihazınızın konumunu göndermesine izin vermeniz gerekir.</string>
@@ -596,7 +609,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Küresel Gizlilik Kontrolü (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo birçok izleyiciyi otomatik olarak engeller. Küresel Gizlilik Kontrolü (GPC) ile, katılımcı web sitelerinden kişisel verilerinizin satışını veya diğer şirketlerle paylaşımını kısıtlamalarını da isteyebilirsiniz. <u><a href="">Daha Fazla Bilgi</a><u/>]]>
+        <![CDATA[DuckDuckGo birçok izleyiciyi otomatik olarak engeller. Küresel Gizlilik Kontrolü (GPC) ile, katılımcı web sitelerinden kişisel verilerinizin satışını veya diğer şirketlerle paylaşımını kısıtlamalarını da isteyebilirsiniz. <u><a href=\"\">Daha Fazla Bilgi</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Küresel Gizlilik Kontrolü (GPC)</string>
     <string name="globalPrivacyControlToggle">Küresel Gizlilik Kontrolü (GPC)</string>
@@ -651,16 +664,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-posta gizliliğinin basitleştirilmiş hâli.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[E-posta sağlayıcınızı değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin.<a href=""><b>Daha fazla bilgi</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[E-posta sağlayıcınızı değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin.<a href=\"\"><b>Daha fazla bilgi</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Listedesiniz!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[<br/> E-posta Koruması hazır olduğunda size bildirim gönderilecektir. <a href=""><b>Daha fazla bilgi</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Özellik hazır olduğunda davetiye burada gösterilecek. Bunun için <a href=""><b>bildirim almak</b></a> ister misiniz?<br/>E-posta Koruma hakkında<a href=""><b>daha fazla bilgi edinin</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[<br/> E-posta Koruması hazır olduğunda size bildirim gönderilecektir. <a href=\"\"><b>Daha fazla bilgi</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Özellik hazır olduğunda davetiye burada gösterilecek. Bunun için <a href=\"\"><b>bildirim almak</b></a> ister misiniz?<br/>E-posta Koruma hakkında<a href=\"\"><b>daha fazla bilgi edinin</b></a>.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Davetlisiniz!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-posta sağlayıcınızı değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin.<a href=""><b>Daha fazla bilgi</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-posta sağlayıcınızı değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin.<a href=\"\"><b>Daha fazla bilgi</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Kişisel Duck Adresi</string>

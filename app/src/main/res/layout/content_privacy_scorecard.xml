@@ -46,7 +46,7 @@
                 style="@style/ScorecardText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableEnd="@drawable/icon_success"
+                app:drawableEndCompat="@drawable/icon_success"
                 tools:text="Encrypted Connection" />
 
             <TextView
@@ -54,24 +54,24 @@
                 style="@style/ScorecardText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableEnd="@drawable/icon_fail"
-                tools:text="8 Trackers Blocked" />
-
+                app:drawableEndCompat="@drawable/icon_fail"
+                tools:text="8 Trackers Blocked from Loading" />
 
             <TextView
                 android:id="@+id/majorNetworks"
                 style="@style/ScorecardText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableEnd="@drawable/icon_fail"
-                tools:text="3 Major Networks Blocked" />
+                app:drawableEndCompat="@drawable/icon_fail"
+                android:text="@string/majorNetworksNoFound"
+                tools:text="Major Networks Found" />
 
             <TextView
                 android:id="@+id/siteIsMajorNetworkMember"
                 style="@style/ScorecardText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableEnd="@drawable/icon_fail"
+                app:drawableEndCompat="@drawable/icon_fail"
                 android:text="@string/scorecardSiteIsMemberOfMajorNetwork" />
 
             <TextView
@@ -79,7 +79,7 @@
                 style="@style/ScorecardText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableEnd="@drawable/icon_success"
+                app:drawableEndCompat="@drawable/icon_success"
                 tools:text="Good Privacy Practices" />
 
             <View
@@ -96,7 +96,7 @@
                 style="@style/ScorecardText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableEnd="@drawable/privacygrade_icon_small_d"
+                app:drawableEndCompat="@drawable/privacygrade_icon_small_d"
                 android:text="@string/scorecardPrivacyGrade" />
 
             <TextView
@@ -104,7 +104,7 @@
                 style="@style/ScorecardSpecialText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableEnd="@drawable/privacygrade_icon_small_a"
+                app:drawableEndCompat="@drawable/privacygrade_icon_small_a"
                 android:text="@string/scorecardEnhancedGrade" />
 
         </LinearLayout>

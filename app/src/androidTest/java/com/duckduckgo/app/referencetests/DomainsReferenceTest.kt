@@ -25,6 +25,7 @@ import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.browser.WebViewRequestInterceptor
@@ -110,6 +111,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
         coroutinesTestRule.testDispatcherProvider
     )
     private val mockGpc: Gpc = mock()
+    private val mockAdClickManager: AdClickManager = mock()
 
     companion object {
         private val moshi = Moshi.Builder().add(ActionJsonAdapter()).build()
@@ -161,7 +163,8 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             resourceSurrogates = resourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             gpc = mockGpc,
-            userAgentProvider = userAgentProvider
+            userAgentProvider = userAgentProvider,
+            adClickManager = mockAdClickManager
         )
     }
 
@@ -199,7 +202,14 @@ class DomainsReferenceTest(private val testCase: TestCase) {
 
         entityLookup = TdsEntityLookup(tdsEntityDao, tdsDomainEntityDao)
         trackerDetector =
-            TrackerDetectorImpl(entityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
+            TrackerDetectorImpl(
+                entityLookup,
+                mockUserWhitelistDao,
+                mockContentBlocking,
+                mockTrackerAllowlist,
+                mockWebTrackersBlockedDao,
+                mockAdClickManager
+            )
 
         val json = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/tracker_radar_reference.json")
         val adapter = moshi.adapter(TdsJson::class.java)

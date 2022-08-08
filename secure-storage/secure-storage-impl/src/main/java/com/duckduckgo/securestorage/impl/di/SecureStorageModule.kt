@@ -17,25 +17,17 @@
 package com.duckduckgo.securestorage.impl.di
 
 import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.impl.DerivedKeySecretFactory
 import com.duckduckgo.securestorage.impl.LegacyDerivedKeySecretFactory
 import com.duckduckgo.securestorage.impl.RealDerivedKeySecretFactory
-import com.duckduckgo.securestorage.impl.SecureStorageKeyProvider
 import com.duckduckgo.securestorage.store.RealSecureStorageKeyRepository
-import com.duckduckgo.securestorage.store.RealSecureStorageRepository
 import com.duckduckgo.securestorage.store.SecureStorageKeyRepository
-import com.duckduckgo.securestorage.store.SecureStorageRepository
-import com.duckduckgo.securestorage.store.db.ALL_MIGRATIONS
-import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
-import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsDao
 import com.duckduckgo.securestorage.store.keys.RealSecureStorageKeyStore
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import net.sqlcipher.database.SupportFactory
 import javax.inject.Named
 
 @Module
@@ -46,31 +38,6 @@ object SecureStorageModule {
     @SingleInstanceIn(AppScope::class)
     fun providesSecureStorageKeyStore(context: Context): SecureStorageKeyRepository =
         RealSecureStorageKeyRepository(RealSecureStorageKeyStore(context))
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providesSecureStorageDatabase(
-        context: Context,
-        keyProvider: SecureStorageKeyProvider
-    ): SecureStorageDatabase {
-        return Room.databaseBuilder(
-            context,
-            SecureStorageDatabase::class.java,
-            "secure_storage_database_encrypted.db"
-        ).openHelperFactory(SupportFactory(keyProvider.getl1Key()))
-            .addMigrations(*ALL_MIGRATIONS)
-            .enableMultiInstanceInvalidation()
-            .build()
-    }
-
-    @Provides
-    fun providesWebsiteLoginCredentialsDao(db: SecureStorageDatabase): WebsiteLoginCredentialsDao {
-        return db.websiteLoginCredentialsDao()
-    }
-
-    @Provides
-    fun providesSecureStorageRepository(websiteLoginCredentialsDao: WebsiteLoginCredentialsDao): SecureStorageRepository =
-        RealSecureStorageRepository(websiteLoginCredentialsDao)
 }
 
 @Module
@@ -83,5 +50,4 @@ object SecureStorageKeyModule {
     @Provides
     @Named("DerivedKeySecretFactoryForLegacy")
     fun provideDerivedKeySecretFactoryForLegacy(): DerivedKeySecretFactory = LegacyDerivedKeySecretFactory()
-
 }

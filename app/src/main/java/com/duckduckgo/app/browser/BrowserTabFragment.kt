@@ -98,18 +98,18 @@ import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.model.orderedTrackingEntities
-import com.duckduckgo.app.global.view.DaxDialog
-import com.duckduckgo.app.global.view.DaxDialogListener
+import com.duckduckgo.mobile.android.ui.view.DaxDialog
+import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.disableAnimation
 import com.duckduckgo.app.global.view.enableAnimation
-import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
-import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
+import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
@@ -191,6 +191,7 @@ import com.duckduckgo.autofill.Callback
 import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.Companion.RESULT_KEY_CREDENTIAL_RESULT_UPDATE
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
+import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.ui.ExistingCredentialMatchDetector
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -285,6 +286,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserAutofill: BrowserAutofill
+
+    @Inject
+    lateinit var autofillSettingsLauncher: AutofillSettingsActivityLauncher
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -594,6 +598,14 @@ class BrowserTabFragment :
     override fun onStop() {
         alertDialog?.dismiss()
         super.onStop()
+    }
+
+    override fun onDestroyView() {
+        swipeRefreshContainer.removeCanChildScrollUpCallback()
+        webView?.removeEnableSwipeRefreshCallback()
+        webView?.stopNestedScroll()
+        webView?.stopLoading()
+        super.onDestroyView()
     }
 
     private fun dismissAuthenticationDialog() {
@@ -915,6 +927,7 @@ class BrowserTabFragment :
             is Command.ShowEmailTooltip -> showEmailTooltip(it.address)
             is Command.InjectCredentials -> injectAutofillCredentials(it.url, it.credentials)
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
+            is Command.LaunchAutofillSettings -> startActivity(autofillSettingsLauncher.intent(requireContext()))
             is Command.EditWithSelectedQuery -> {
                 omnibarTextInput.setText(it.query)
                 omnibarTextInput.setSelection(it.query.length)
@@ -2358,6 +2371,9 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(view.printPageMenuItem) {
                     viewModel.onPrintSelected()
+                }
+                onMenuItemClicked(view.autofillMenuItem) {
+                    viewModel.onAutofillMenuSelected()
                 }
             }
             view.menuScrollableContent.setOnScrollChangeListener { _, _, _, _, _ ->

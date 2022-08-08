@@ -25,75 +25,91 @@ import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedSt
 import com.duckduckgo.securestorage.store.SecureStorageRepository
 import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealSecureStorage @Inject constructor(
-    private val secureStorageRepository: SecureStorageRepository,
+    private val secureStorageRepositoryFactory: SecureStorageRepository.Factory,
     private val dispatchers: DispatcherProvider,
     private val l2DataTransformer: L2DataTransformer
 ) : SecureStorage {
 
-    override fun canAccessSecureStorage(): Boolean = l2DataTransformer.canProcessData()
+    private val secureStorageRepository by lazy {
+        secureStorageRepositoryFactory.get()
+    }
+
+    override fun canAccessSecureStorage(): Boolean = l2DataTransformer.canProcessData() && secureStorageRepository != null
 
     override suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials) {
         withContext(dispatchers.io()) {
-            secureStorageRepository.addWebsiteLoginCredential(websiteLoginDetailsWithCredentials.toDataEntity())
+            secureStorageRepository?.addWebsiteLoginCredential(websiteLoginDetailsWithCredentials.toDataEntity())
         }
     }
 
-    override suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> =
-        withContext(dispatchers.io()) {
-            secureStorageRepository.websiteLoginCredentialsForDomain(domain).map { list ->
-                list.map {
-                    it.toDetails()
+    override suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> {
+        return if (secureStorageRepository != null) {
+            withContext(dispatchers.io()) {
+                secureStorageRepository!!.websiteLoginCredentialsForDomain(domain).map { list ->
+                    list.map {
+                        it.toDetails()
+                    }
                 }
             }
-        }
+        } else emptyFlow()
+    }
 
     override suspend fun websiteLoginDetails(): Flow<List<WebsiteLoginDetails>> =
-        withContext(dispatchers.io()) {
-            secureStorageRepository.websiteLoginCredentials().map { list ->
-                list.map {
-                    it.toDetails()
+        if (secureStorageRepository != null) {
+            withContext(dispatchers.io()) {
+                secureStorageRepository!!.websiteLoginCredentials().map { list ->
+                    list.map {
+                        it.toDetails()
+                    }
                 }
             }
-        }
+        } else emptyFlow()
 
-    override suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials =
+    override suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials? =
         withContext(dispatchers.io()) {
-            secureStorageRepository.getWebsiteLoginCredentialsForId(id).toCredentials()
+            secureStorageRepository?.getWebsiteLoginCredentialsForId(id)?.toCredentials()
         }
 
     override suspend fun websiteLoginDetailsWithCredentialsForDomain(domain: String): Flow<List<WebsiteLoginDetailsWithCredentials>> =
-        withContext(dispatchers.io()) {
-            secureStorageRepository.websiteLoginCredentialsForDomain(domain).map { list ->
-                list.map {
-                    it.toCredentials()
+        if (secureStorageRepository != null) {
+            withContext(dispatchers.io()) {
+                secureStorageRepository!!.websiteLoginCredentialsForDomain(domain).map { list ->
+                    list.map {
+                        it.toCredentials()
+                    }
                 }
             }
-        }
+        } else emptyFlow()
 
     override suspend fun websiteLoginDetailsWithCredentials(): Flow<List<WebsiteLoginDetailsWithCredentials>> =
-        withContext(dispatchers.io()) {
-            secureStorageRepository.websiteLoginCredentials().map { list ->
-                list.map {
-                    it.toCredentials()
+        if (secureStorageRepository != null) {
+            withContext(dispatchers.io()) {
+                secureStorageRepository!!.websiteLoginCredentials().map { list ->
+                    list.map {
+                        it.toCredentials()
+                    }
                 }
             }
+        } else emptyFlow()
+
+    override suspend fun updateWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials): Unit =
+        withContext(dispatchers.io()) {
+            secureStorageRepository?.updateWebsiteLoginCredentials(websiteLoginDetailsWithCredentials.toDataEntity())
         }
 
-    override suspend fun updateWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials) =
+    override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Int): Unit =
         withContext(dispatchers.io()) {
-            secureStorageRepository.updateWebsiteLoginCredentials(websiteLoginDetailsWithCredentials.toDataEntity())
-        }
-
-    override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Int) =
-        withContext(dispatchers.io()) {
-            secureStorageRepository.deleteWebsiteLoginCredentials(id)
+            secureStorageRepository?.deleteWebsiteLoginCredentials(id)
         }
 
     private fun WebsiteLoginDetailsWithCredentials.toDataEntity(): WebsiteLoginCredentialsEntity {

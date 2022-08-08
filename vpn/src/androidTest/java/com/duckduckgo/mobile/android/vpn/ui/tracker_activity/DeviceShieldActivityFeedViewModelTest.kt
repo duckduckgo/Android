@@ -97,7 +97,7 @@ class DeviceShieldActivityFeedViewModelTest {
                             TrackerCompanyBadge.Company(dummyTrackers[1].company, dummyTrackers[1].companyDisplayName),
                         ),
                         timestamp = TEST_TIMESTAMP,
-                        displayTimestamp = "just now",
+                        displayTimestamp = "Just Now",
                         trackersTotalCount = 2
                     ),
                     TrackerFeedItem.TrackerFeedData(
@@ -108,7 +108,7 @@ class DeviceShieldActivityFeedViewModelTest {
                             TrackerCompanyBadge.Company(dummyTrackers[2].company, dummyTrackers[2].companyDisplayName),
                         ),
                         timestamp = TEST_TIMESTAMP,
-                        displayTimestamp = "just now",
+                        displayTimestamp = "Just Now",
                         trackersTotalCount = 1
                     ),
                 ),

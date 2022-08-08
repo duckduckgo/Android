@@ -20,12 +20,16 @@ import com.android.tools.lint.client.api.IssueRegistry
 import com.android.tools.lint.client.api.Vendor
 import com.android.tools.lint.detector.api.CURRENT_API
 import com.android.tools.lint.detector.api.Issue
+import com.duckduckgo.lint.NoLifecycleObserverDetector.Companion.NO_LIFECYCLE_OBSERVER_ISSUE
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 
 @Suppress("UnstableApiUsage")
 class DuckDuckGoIssueRegistry : IssueRegistry() {
     override val issues: List<Issue>
-        get() = listOf(NO_SINGLETON_ISSUE)
+        get() = listOf(
+            NO_SINGLETON_ISSUE,
+            NO_LIFECYCLE_OBSERVER_ISSUE,
+        )
 
     override val api: Int
         get() = CURRENT_API

@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import androidx.lifecycle.LifecycleObserver
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.*
@@ -73,7 +74,8 @@ object PrivacyModule {
         cookieManager: DuckDuckGoCookieManager,
         appCacheClearer: AppCacheClearer,
         geoLocationPermissions: GeoLocationPermissions,
-        thirdPartyCookieManager: ThirdPartyCookieManager
+        thirdPartyCookieManager: ThirdPartyCookieManager,
+        adClickManager: AdClickManager
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -84,7 +86,8 @@ object PrivacyModule {
             cookieManager,
             appCacheClearer,
             geoLocationPermissions,
-            thirdPartyCookieManager
+            thirdPartyCookieManager,
+            adClickManager
         )
     }
 

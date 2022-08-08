@@ -30,6 +30,11 @@ interface AutofillStore {
     var autofillEnabled: Boolean
 
     /**
+     * Determines if the autofill feature is available for the user
+     */
+    val autofillAvailable: Boolean
+
+    /**
      * Used to determine whether we show additional onboarding info when offering to save a login credential
      *
      * This will default to true, and remain true until after the first credential has been saved
@@ -41,6 +46,12 @@ interface AutofillStore {
      * @param rawUrl Can be a full, unmodified URL taken from the URL bar (containing subdomains, query params etc...)
      */
     suspend fun getCredentials(rawUrl: String): List<LoginCredentials>
+
+    /**
+     * Find saved credential for the given id
+     * @param id of the saved credential
+     */
+    suspend fun getCredentialsWithId(id: Int): LoginCredentials?
 
     /**
      * Save the given credentials for the given URL

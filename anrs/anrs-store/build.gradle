@@ -50,3 +50,7 @@ dependencies {
     testImplementation project(path: ':common-test')
 }
 
+
+android {
+  namespace 'com.duckduckgo.app.anrs.store'
+}

@@ -31,7 +31,9 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.Command
 import com.duckduckgo.mobile.android.vpn.apps.ManageAppsProtectionViewModel
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
@@ -39,7 +41,6 @@ import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityTrackingProtectionExclusionListBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
@@ -62,6 +63,8 @@ class TrackingProtectionExclusionListActivity :
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
+
+    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     private val binding: ActivityTrackingProtectionExclusionListBinding by viewBinding()
 
@@ -198,7 +201,7 @@ class TrackingProtectionExclusionListActivity :
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
         appCoroutineScope.launch {
-            TrackerBlockingVpnService.restartVpnService(applicationContext)
+            vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
         }
     }
 

@@ -38,6 +38,7 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
+import com.duckduckgo.app.browser.serviceworker.ServiceWorkerLifecycleObserver
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -108,6 +109,9 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     lateinit var userEventsStore: UserEventsStore
 
     @Inject
+    lateinit var serviceWorkerLifecycleObserver: ServiceWorkerLifecycleObserver
+
+    @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
 
@@ -141,6 +145,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
+        lifecycle.addObserver(serviceWorkerLifecycleObserver)
         toolbarMockupBinding = IncludeOmnibarToolbarMockupBinding.bind(binding.root)
         setContentView(binding.root)
         viewModel.viewState.observe(this) {

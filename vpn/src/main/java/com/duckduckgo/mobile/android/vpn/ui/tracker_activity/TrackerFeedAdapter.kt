@@ -184,25 +184,35 @@ class TrackerFeedAdapter @Inject constructor(
         ) {
             tracker?.let { item ->
                 with(activityMessage) {
-                    val trackingAttempts =
-                        resources.getQuantityString(
-                            R.plurals.atp_ActivityTrackersCompanyBlocked,
-                            tracker.trackersTotalCount, tracker.trackersTotalCount
-                        )
-                    val companies = resources.getQuantityString(
-                        R.plurals.atp_ActivityTrackersBlockedCompanyCount,
-                        tracker.trackingCompanyBadges.size, tracker.trackingCompanyBadges.size
-                    )
-                    val styledText = HtmlCompat
-                        .fromHtml(
-                            context.getString(
-                                R.string.atp_ActivityTrackersBlocked,
-                                trackingAttempts,
-                                companies,
-                                item.trackingApp.appDisplayName
-                            ),
-                            FROM_HTML_MODE_COMPACT
-                        )
+                    val trackersCount = tracker.trackersTotalCount
+                    val trackingCompanies = tracker.trackingCompanyBadges.size
+                    val trackingAppName = item.trackingApp.appDisplayName
+                    val textToStyle = if (trackersCount == 1) {
+                        if (trackingCompanies == 1) {
+                            resources.getString(
+                                R.string.atp_ActivityTrackersCompanyBlockedOnetimeOneCompany,
+                                trackersCount, trackingCompanies, trackingAppName
+                            )
+                        } else {
+                            resources.getString(
+                                R.string.atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies,
+                                trackersCount, trackingCompanies, trackingAppName
+                            )
+                        }
+                    } else {
+                        if (trackingCompanies == 1) {
+                            resources.getString(
+                                R.string.atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany,
+                                trackersCount, trackingCompanies, trackingAppName
+                            )
+                        } else {
+                            resources.getString(
+                                R.string.atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies,
+                                trackersCount, trackingCompanies, trackingAppName
+                            )
+                        }
+                    }
+                    val styledText = HtmlCompat.fromHtml(textToStyle, FROM_HTML_MODE_COMPACT)
                     text = styledText
                 }
 

@@ -33,6 +33,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete
@@ -88,7 +89,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.global.view.asLocationPermissionOrigin
+import com.duckduckgo.app.global.extensions.asLocationPermissionOrigin
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -176,6 +177,7 @@ class BrowserTabViewModel @Inject constructor(
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore,
     private val autofillStore: AutofillStore,
+    private val adClickManager: AdClickManager
 ) : WebViewClientListener,
     EditSavedSiteListener,
     HttpAuthenticationListener,
@@ -235,7 +237,8 @@ class BrowserTabViewModel @Inject constructor(
         var previousAppLink: AppLink? = null,
         val canFindInPage: Boolean = false,
         val forceRenderingTicker: Long = System.currentTimeMillis(),
-        val canPrintPage: Boolean = false
+        val canPrintPage: Boolean = false,
+        val showAutofill: Boolean = false
     )
 
     sealed class HighlightableButton {
@@ -433,6 +436,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         class InjectCredentials(val url: String, val credentials: LoginCredentials) : Command()
         class CancelIncomingAutofillRequest(val url: String) : Command()
+        object LaunchAutofillSettings : Command()
         class EditWithSelectedQuery(val query: String) : Command()
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
         class NavigateToHistory(val historyStackIndex: Int) : Command()
@@ -745,6 +749,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewVisible() {
+        setAdClickActiveTabData(url)
+
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
         if (!currentBrowserViewState().browserShowing) {
             viewModelScope.launch {
@@ -907,6 +913,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun removeCurrentTabFromRepository() {
         val currentTab = tabRepository.liveSelectedTab.value
         currentTab?.let {
+            adClickManager.clearTabId(it.tabId)
             tabRepository.deleteTabAndSelectSource(it.tabId)
         }
     }
@@ -1129,6 +1136,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         Timber.v("Page changed: $url")
         buildSiteFactory(url, title)
+        setAdClickActiveTabData(url)
 
         val currentOmnibarViewState = currentOmnibarViewState()
         val omnibarText = omnibarTextForUrl(url)
@@ -1201,6 +1209,12 @@ class BrowserTabViewModel @Inject constructor(
 
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
+    }
+
+    private fun setAdClickActiveTabData(url: String?) {
+        val sourceTabId = tabRepository.liveSelectedTab.value?.sourceTabId
+        val sourceTabUrl = tabRepository.liveTabs.value?.firstOrNull { it.tabId == sourceTabId }?.url
+        adClickManager.setActiveTabId(tabId, url, sourceTabId, sourceTabUrl)
     }
 
     private fun cacheAppLink(url: String?) {
@@ -2119,7 +2133,8 @@ class BrowserTabViewModel @Inject constructor(
     private fun initializeViewStates() {
         globalLayoutState.value = Browser()
         browserViewState.value = BrowserViewState().copy(
-            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported()
+            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+            showAutofill = autofillStore.autofillAvailable
         )
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
@@ -2689,6 +2704,10 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun linkOpenedInNewTab(): Boolean {
         return isLinkOpenedInNewTab
+    }
+
+    fun onAutofillMenuSelected() {
+        command.value = LaunchAutofillSettings
     }
 
     @VisibleForTesting

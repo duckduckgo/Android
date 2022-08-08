@@ -99,4 +99,5 @@
 
     <attr name="overflowMenuDividerColor" format="color" />
     <attr name="bottomShadowBackground" format="reference" />
+    <attr name="appTPHeaderBackground" format="color" />
 </resources>

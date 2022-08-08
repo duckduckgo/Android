@@ -47,7 +47,7 @@ class DeviceShieldNotificationsDebugReceiver(
     context: Context,
     intentAction: String = "notify",
     private val receiver: (Intent) -> Unit
-) : BroadcastReceiver(), LifecycleObserver {
+) : BroadcastReceiver() {
 
     init {
         context.registerReceiver(this, IntentFilter(intentAction))

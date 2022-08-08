@@ -121,30 +121,6 @@
     <string name="httpsMixed">Blandad krypteringsanslutning</string>
     <string name="httpsBad">Okrypterad anslutning</string>
 
-    <string name="networksActivityTitle">Spårningsnätverk</string>
-    <string name="networksContentDescription">Spårningsnätverk</string>
-    <string name="networksOverview">Spårningsnätverk samlar din webbhistorik i en dataprofil om dig. Större spårningsnätverk är mer skadliga eftersom de kan spåra och inrikta sig på dig över en större del av internet.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s spårare hittades</item>
-        <item quantity="other">%1$s spårare hittades</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s spårare blockerades</item>
-        <item quantity="other">%1$s spårare blockerades</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s större spårningsnätverk hittades</item>
-        <item quantity="other">%1$s större spårningsnätverk hittades</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s större spårningsnätverk blockerades</item>
-        <item quantity="other">%1$s större spårningsnätverk blockerades</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Sekretessklass</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Webbplatsen är ett större spårningsnätverk</string>
     <string name="scorecardPrivacyGrade">Sekretessklass</string>
@@ -162,6 +138,45 @@
 
     <string name="networkTrackerSummaryHeader">SPÅRARNÄTVERKETS FRÄMSTA BROTTSLINGAR</string>
     <string name="networkTrackerSummaryNotReady">Vi samlar fortfarande in data för att visa hur många spårare vi har blockerat.</string>
+
+    <string name="trackersActivityTitle">Spårningsförfrågningar blockerades</string>
+    <string name="trackersContentDescription">Spårningsförfrågningar blockerades</string>
+    <string name="trackersOverview">Följande tredjepartsdomäners förfrågningar blockerades från att läsas in eftersom de identifierades som spårningsförfrågningar. Om ett företags förfrågningar läses in kan det göra det möjligt för företaget att profilera dig.</string>
+    <string name="trackersOverviewProtectionsOff">Inga spårningsförfrågningar blockerades från att läsas in eftersom skyddet är avstängt för den här webbplatsen. Om ett företags förfrågningar läses in kan det göra det möjligt för företaget att profilera dig.</string>
+
+    <string name="domainsLoadedActivityTitle">Förfrågningar från tredje part lästes in</string>
+    <string name="domainsLoadedContentDescription">Förfrågningar från tredje part lästes in</string>
+    <string name="domainsLoadedOverview">Följande tredjepartsdomäners förfrågningar lästes in. Om ett företags förfrågningar läses in kan det göra det möjligt för företaget att profilera dig, även om våra övriga webbspårningsskydd fortfarande gäller.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Inga förfrågningar från tredje part blockerades från att läsas in eftersom skyddet är avstängt för den här webbplatsen. Om ett företags förfrågningar läses in kan det göra det möjligt för företaget att profilera dig.</string>
+    <string name="domainsLoadedOverviewEmpty">Vi upptäckte inga förfrågningar från några tredjepartsdomäner.</string>
+    <string name="domainsLoadedHeadingText">Inga tredjepartsdomäner har lästs in</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Om våra webbspårningsskydd</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Följande domäns förfrågningar lästes in.</string>
+
+    <string name="adLoadedSectionDescription">Följande domäns förfrågningar lästes in eftersom du nyligen klickade på en annons från %1$s på DuckDuckGo. Dessa förfrågningar hjälper till att utvärdera annonsens effektivitet. Alla annonser på DuckDuckGo är icke-profilerande.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Hur våra sökannonser påverkar vårt skydd</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Följande domäns förfrågningar lästes också in.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Följande domäners spårningsförfrågningar lästes in.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Vi upptäckte inga förfrågningar från några tredjepartsdomäner.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Följande domäns förfrågningar lästes in för att förhindra fel på webbplatsen.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Följande domäns förfrågningar lästes in eftersom de är kopplade till %1$s.</string>
+
+    <string name="trackersBlockedText">Förfrågningar blockerades från att läsas in</string>
+    <string name="trackersNotBlockedText">Inga spårningsförfrågningar blockerades</string>
+    <string name="trackersNoFoundText">Inga spårningsförfrågningar hittades</string>
+    <string name="trackersFoundText">Spårningsförfrågningar hittades</string>
+
+    <string name="domainsLoadedText">Förfrågningar från tredje part lästes in</string>
+    <string name="domainsNotLoadedText">Inga förfrågningar från tredje part lästes in</string>
+
+    <string name="majorNetworksNoFound">Inga större spårningsnätverk hittades</string>
+    <string name="majorNetworksFound">Större spårningsnätverk hittades</string>
 
     <!-- Fire -->
     <string name="fireMenu">Rensa data</string>
@@ -563,8 +578,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Anslutningen avbröts. Denna webbplats kan vara skadlig för din enhet.</string>
 
-
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Aktivera åtkomst till enhetsplats för DuckDuckGo Privacy Browser?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s begär åtkomst till din enhetsplats. Du måste tillåta att appen skickar din enhetsplats innan %2$s kan be om åtkomst.</string>
@@ -596,7 +609,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blockerar många spårare automatiskt. Med Global Privacy Control (GPC) kan du dessutom be deltagande webbplatser att begränsa försäljning eller delning av dina personuppgifter till andra företag. <u><a href="">Läs mer</a><u/>]]>
+        <![CDATA[DuckDuckGo blockerar många spårare automatiskt. Med Global Privacy Control (GPC) kan du dessutom be deltagande webbplatser att begränsa försäljning eller delning av dina personuppgifter till andra företag. <u><a href=\"\">Läs mer</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -651,16 +664,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Enklare E-postintegritet.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blockera e-postspårare och dölj din adress utan att byta e-postleverantör. <a href=""><b>Mer information</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blockera e-postspårare och dölj din adress utan att byta e-postleverantör. <a href=\"\"><b>Mer information</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Du står på listan!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Vi skickar dig ett meddelande när<br/>e-postskydd är redo för dig. <a href=""><b>Mer information</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Din inbjudan visas här när vi är redo att ta emot dig. Vill du <a href=""><b>få ett meddelande</b></a> när den kommer?<br/><a href=""><b>Mer information</b></a> om e-postskydd.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Vi skickar dig ett meddelande när<br/>e-postskydd är redo för dig. <a href=\"\"><b>Mer information</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Din inbjudan visas här när vi är redo att ta emot dig. Vill du <a href=\"\"><b>få ett meddelande</b></a> när den kommer?<br/><a href=\"\"><b>Mer information</b></a> om e-postskydd.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Du är inbjuden!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blockera e-postspårare och dölj din adress utan att byta e-postleverantör. <a href=""><b>Mer information</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blockera e-postspårare och dölj din adress utan att byta e-postleverantör. <a href=\"\"><b>Mer information</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Personlig Duck-adress</string>

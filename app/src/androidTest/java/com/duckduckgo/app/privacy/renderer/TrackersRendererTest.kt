@@ -29,39 +29,45 @@ class TrackersRendererTest {
     private val testee = TrackersRenderer()
 
     @Test
-    fun whenNoTrackersThenTrackersTextShowsZeroBlocked() {
-        val text = testee.trackersText(context, 0, true)
-        assertEquals("0 Trackers Blocked", text)
+    fun whenTrackersBlockedThenTrackersTextShowsRequestsBlockedFromLoading() {
+        val text = testee.trackersText(context, trackersBlockedCount = 1, specialDomainsLoadedCount = 0)
+        assertEquals("Requests Blocked from Loading", text)
     }
 
     @Test
-    fun whenTenTrackersAndAllBlockedThenTrackerTextShowsTenBlocked() {
-        val text = testee.trackersText(context, 10, true)
-        assertEquals("10 Trackers Blocked", text)
+    fun whenTrackersNoBlockedAndOneSpecialDomainLoadedThenTrackerTextShowsNoRequestsBlocked() {
+        val text = testee.trackersText(context, trackersBlockedCount = 0, specialDomainsLoadedCount = 1)
+        assertEquals("No Tracking Requests Blocked", text)
     }
 
     @Test
-    fun whenTenTrackersAndNotAllBlockedThenTrackerTextShowsTenFound() {
-        val text = testee.trackersText(context, 10, false)
-        assertEquals("10 Trackers Found", text)
+    fun whenTrackersNoBlockedAndNoDomainsLoadedThenTrackerTextShowsNoRequestsFound() {
+        val text = testee.trackersText(context, trackersBlockedCount = 0, specialDomainsLoadedCount = 0)
+        assertEquals("No Tracking Requests Found", text)
     }
 
     @Test
-    fun whenNoMajorNetworksThenNetworksTextShowsZeroBlocked() {
-        val text = testee.majorNetworksText(context, 0, true)
-        assertEquals("0 Major Tracker Networks Blocked", text)
+    fun whenDomainsLoadedThenDomainsLoadedTextShowThirdPartyRequestsLoaded() {
+        val text = testee.domainsLoadedText(context, domainsLoadedCount = 1)
+        assertEquals("Third-Party Requests Loaded", text)
     }
 
     @Test
-    fun whenTenMajorNetworksAndAllBlockedThenNetworksTextShowsTenBlocked() {
-        val text = testee.majorNetworksText(context, 10, true)
-        assertEquals("10 Major Tracker Networks Blocked", text)
+    fun whenNoDomainsLoadedThenDomainsLoadedTextShowsNoThirdPartyRequestsLoaded() {
+        val text = testee.domainsLoadedText(context, domainsLoadedCount = 0)
+        assertEquals("No Third-Party Requests Loaded", text)
     }
 
     @Test
-    fun whenTenMajorNetworksAndNotAllBlockedThenNetworksTextShowsTenFound() {
-        val text = testee.majorNetworksText(context, 10, false)
-        assertEquals("10 Major Tracker Networks Found", text)
+    fun whenNoMajorNetworksThenNetworksTextShowsNoFound() {
+        val text = testee.majorNetworksText(context, 0)
+        assertEquals("No Major Tracker Networks Found", text)
+    }
+
+    @Test
+    fun whenTenMajorNetworksAndNotAllBlockedThenNetworksTextShowsFound() {
+        val text = testee.majorNetworksText(context, 1)
+        assertEquals("Major Tracker Networks Found", text)
     }
 
     @Test
@@ -89,27 +95,67 @@ class TrackersRendererTest {
     }
 
     @Test
-    fun whenAllTrackersBlockedThenNetworksBannerIsGood() {
-        val resource = testee.networksBanner(true)
-        assertEquals(R.drawable.networks_banner_good, resource)
+    fun whenToggleDisabledAndTrackersCountMoreThanZeroThenNetworksIconIsBad() {
+        val resource = testee.networksIcon(
+            trackersBlockedCount = 1, specialDomainsLoadedCount = 0, toggleEnabled = false
+        )
+        assertEquals(R.drawable.networks_icon_bad, resource)
     }
 
     @Test
-    fun whenNotAllTrackersBlockedThenNetworksBannerIsBad() {
-        val resource = testee.networksBanner(false)
-        assertEquals(R.drawable.networks_banner_bad, resource)
+    fun whenToggleDisabledAndSpecialDomainsCountMoreThanZeroThenNetworksIconIsBad() {
+        val resource = testee.networksIcon(
+            trackersBlockedCount = 0, specialDomainsLoadedCount = 1, toggleEnabled = false
+        )
+        assertEquals(R.drawable.networks_icon_bad, resource)
     }
 
     @Test
-    fun whenAllTrackersBlockedThenNetworksIconIsGood() {
-        val resource = testee.networksIcon(true)
+    fun whenToggleDisabledAndTrackersAndSpecialDomainsCountIsZeroThenNetworksIconIsGood() {
+        val resource = testee.networksIcon(
+            trackersBlockedCount = 0, specialDomainsLoadedCount = 0, toggleEnabled = false
+        )
         assertEquals(R.drawable.networks_icon_good, resource)
     }
 
     @Test
-    fun whenNotAllTrackersBlockedThenNetworksIconIsBad() {
-        val resource = testee.networksIcon(false)
-        assertEquals(R.drawable.networks_icon_bad, resource)
+    fun whenToggleEnabledAndTrackersCountZeroAndDomainsCountMoreThanZeroThenNetworksIconIsNeutral() {
+        val resource = testee.networksIcon(
+            trackersBlockedCount = 0, specialDomainsLoadedCount = 1, toggleEnabled = true
+        )
+        assertEquals(R.drawable.networks_icon_neutral, resource)
+    }
+
+    @Test
+    fun whenToggleEnabledAndTrackersCountZeroAndDomainsCountIsZeroThenNetworksIconIsGood() {
+        val resource = testee.networksIcon(
+            trackersBlockedCount = 0, specialDomainsLoadedCount = 0, toggleEnabled = true
+        )
+        assertEquals(R.drawable.networks_icon_good, resource)
+    }
+
+    @Test
+    fun whenToggleEnabledAndTrackersCountMoreThanZeroAndDomainsCountIsZeroThenNetworksIconIsGood() {
+        val resource = testee.networksIcon(
+            trackersBlockedCount = 1, specialDomainsLoadedCount = 0, toggleEnabled = true
+        )
+        assertEquals(R.drawable.networks_icon_good, resource)
+    }
+
+    @Test
+    fun whenToggleEnabledAndTrackersCountMoreThanZeroAndDomainsCountMoreThanZeroThenNetworksIconIsGood() {
+        val resource = testee.networksIcon(
+            trackersBlockedCount = 1, specialDomainsLoadedCount = 1, toggleEnabled = true
+        )
+        assertEquals(R.drawable.networks_icon_good, resource)
+    }
+
+    @Test
+    fun whenToggleEnabledAndTrackersCountMoreThanZeroAndDomainsCountMoreThanZeroAndLargeIconNeededThenNetworksIconIsGoodAndLarge() {
+        val resource = testee.networksIcon(
+            trackersBlockedCount = 1, specialDomainsLoadedCount = 1, toggleEnabled = true, largeIcon = true
+        )
+        assertEquals(R.drawable.networks_icon_good_large, resource)
     }
 
     @Test

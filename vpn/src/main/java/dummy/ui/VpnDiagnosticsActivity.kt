@@ -39,7 +39,9 @@ import com.duckduckgo.app.global.formatters.time.model.TimePassed
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.rightDrawable
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnDiagnosticsBinding
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.Companion.SLIDING_WINDOW_DURATION_MS
@@ -64,7 +66,6 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_
 import com.duckduckgo.mobile.android.vpn.health.UserHealthSubmission
 import com.duckduckgo.mobile.android.vpn.network.util.getSystemActiveNetworkDefaultDns
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.moshi.Moshi
 import dagger.android.AndroidInjection
@@ -106,6 +107,8 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     private val moshi = Moshi.Builder().build()
 
@@ -185,9 +188,9 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
             updateStatus()
         }
 
-        binding.startVpnButton.setOnClickListener { TrackerBlockingVpnService.startService(this) }
+        binding.startVpnButton.setOnClickListener { vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN) }
 
-        binding.stopVpnButton.setOnClickListener { TrackerBlockingVpnService.stopService(this) }
+        binding.stopVpnButton.setOnClickListener { vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN) }
 
         binding.simulateGoodHealth.setOnClickListener {
             appTPHealthMonitor.simulateGoodHealthState()
@@ -449,7 +452,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         } else {
             return getString(
                 R.string.vpnTimeRunning,
-                TimePassed.fromMilliseconds(timeRunningMillis).format(),
+                TimePassed.fromMilliseconds(timeRunningMillis).format(resources = resources),
             )
         }
     }

@@ -23,7 +23,6 @@ import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -34,10 +33,11 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnOnboardingBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.CheckVPNPermission
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.LaunchVPN
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.RequestVPNPermission
@@ -60,17 +60,14 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
+    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+
     private val viewModel: VpnOnboardingViewModel by bindViewModel()
     private val binding: ActivityVpnOnboardingBinding by viewBinding()
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        window.setStatusBarColor(getResources().getColor(com.duckduckgo.mobile.android.R.color.atp_onboardingHeaderBg))
-        if (isDarkThemeEnabled()) {
-            window.decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
-        }
 
         setContentView(binding.root)
         configureUI()
@@ -243,7 +240,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
     }
 
     private fun startVpn() {
-        TrackerBlockingVpnService.startService(this)
+        vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
         showEnabledState()
         viewModel.onAppTpEnabled()
     }

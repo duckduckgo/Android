@@ -23,7 +23,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
-import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
+import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 
 class SystemLocationPermissionDialog : DialogFragment() {
 

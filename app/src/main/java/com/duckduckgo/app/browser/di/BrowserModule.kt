@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.lifecycle.LifecycleObserver
 import androidx.work.WorkManager
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -133,7 +134,8 @@ class BrowserModule {
         browserAutofill: BrowserAutofill,
         ampLinks: AmpLinks,
         printInjector: PrintInjector,
-        internalTestUserChecker: InternalTestUserChecker
+        internalTestUserChecker: InternalTestUserChecker,
+        adClickManager: AdClickManager
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -154,7 +156,8 @@ class BrowserModule {
             accessibilityManager,
             ampLinks,
             printInjector,
-            internalTestUserChecker
+            internalTestUserChecker,
+            adClickManager
         )
     }
 
@@ -272,9 +275,18 @@ class BrowserModule {
         httpsUpgrader: HttpsUpgrader,
         privacyProtectionCountDao: PrivacyProtectionCountDao,
         gpc: Gpc,
-        userAgentProvider: UserAgentProvider
+        userAgentProvider: UserAgentProvider,
+        adClickManager: AdClickManager
     ): RequestInterceptor =
-        WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao, gpc, userAgentProvider)
+        WebViewRequestInterceptor(
+            resourceSurrogates,
+            trackerDetector,
+            httpsUpgrader,
+            privacyProtectionCountDao,
+            gpc,
+            userAgentProvider,
+            adClickManager
+        )
 
     @Provides
     fun cookieManager(

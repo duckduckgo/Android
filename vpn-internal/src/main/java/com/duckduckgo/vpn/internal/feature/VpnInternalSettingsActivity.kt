@@ -24,11 +24,15 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.blocklist.AppTrackerListUpdateWorker
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
@@ -61,6 +65,10 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appTrackerRepository: AppTrackerRepository
+
+    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+
+    @Inject lateinit var workManager: WorkManager
 
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var transparencyModeDebugReceiver: TransparencyModeDebugReceiver? = null
@@ -108,6 +116,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupDebugLogging()
         setupBugReport()
         setupDeleteTrackingHistory()
+        setupForceUpdateBlocklist()
         setupViewDiagnosticsView()
         setupBadHealthMonitoring()
         setupConfigSection()
@@ -149,20 +158,20 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 for (excludedPackage in appTrackerRepository.getAppExclusionList()) {
                     appTrackerRepository.manuallyEnabledApp(excludedPackage.packageId)
                 }
-                TrackerBlockingVpnService.restartVpnService(this@VpnInternalSettingsActivity)
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             }
         }
 
         binding.restoreDefaultAppProtections.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 appTrackerRepository.restoreDefaultProtectedList()
-                TrackerBlockingVpnService.restartVpnService(this@VpnInternalSettingsActivity)
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             }
         }
     }
 
     private fun setupUiElementsState() {
-        vpnStateMonitor.getStateFlow()
+        vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN)
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .map { it.state == VpnStateMonitor.VpnRunningState.ENABLED }
             .onEach { isEnabled ->
@@ -185,6 +194,15 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         binding.deleteTrackingHistory.setOnClickListener {
             sendBroadcast(DeleteTrackersDebugReceiver.createIntent())
             Snackbar.make(binding.root, "Tracking history deleted", Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    private fun setupForceUpdateBlocklist() {
+        binding.forceUpdateBlocklist.setOnClickListener {
+            val workerRequest =
+                OneTimeWorkRequestBuilder<AppTrackerListUpdateWorker>().build()
+            workManager.enqueue(workerRequest)
+            Snackbar.make(binding.root, "Blocklist downloading...", Snackbar.LENGTH_LONG).show()
         }
     }
 

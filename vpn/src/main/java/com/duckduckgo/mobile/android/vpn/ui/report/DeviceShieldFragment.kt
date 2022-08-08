@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.os.postDelayed
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.duckduckgo.app.global.FragmentViewModelFactory
@@ -37,7 +38,6 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
-import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel.PrivacyReportView.ViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import dagger.android.support.AndroidSupportInjection
@@ -142,29 +142,43 @@ class DeviceShieldFragment : Fragment() {
     }
 
     private fun renderTrackersBlockedWhenEnabled(trackerBlocked: PrivacyReportViewModel.PrivacyReportView.TrackersBlocked) {
-        val latestAppString =
-            resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationInApp, trackerBlocked.latestApp)
-        val prefix = resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationPrefix)
-        val totalTrackers = resources.getQuantityString(
-            R.plurals.atp_TrackingAttempts,
-            trackerBlocked.trackers,
-            trackerBlocked.trackers
-        )
-        val optionalOtherAppsString = if (trackerBlocked.otherAppsSize == 0) "" else resources.getQuantityString(
-            R.plurals.atp_DailyLastCompanyBlockedNotificationOptionalOtherApps,
-            trackerBlocked.otherAppsSize,
-            trackerBlocked.otherAppsSize
-        )
-        val pastWeekSuffix = resources.getString(R.string.atp_NewTabSuffix)
-        val textToStyle = "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
+        val trackersBlocked = trackerBlocked.trackers
+        val lastTrackingApp = trackerBlocked.latestApp
+        val otherApps = trackerBlocked.otherAppsSize
 
-        deviceShieldCtaHeaderTextView.text = textToStyle.applyBoldSpanTo(
-            listOf(
-                totalTrackers,
-                latestAppString,
-                optionalOtherAppsString
-            )
-        )
+        val textToStyle = if (trackersBlocked == 1) {
+            when (otherApps) {
+                0 -> resources.getString(
+                    R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps,
+                    trackersBlocked, lastTrackingApp
+                )
+                1 -> resources.getString(
+                    R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp,
+                    trackersBlocked, lastTrackingApp
+                )
+                else -> resources.getString(
+                    R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps,
+                    trackersBlocked, lastTrackingApp, otherApps
+                )
+            }
+        } else {
+            when (otherApps) {
+                0 -> resources.getString(
+                    R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps,
+                    trackersBlocked, lastTrackingApp
+                )
+                1 -> resources.getString(
+                    R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp,
+                    trackersBlocked, lastTrackingApp
+                )
+                else -> resources.getString(
+                    R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps,
+                    trackersBlocked, lastTrackingApp, otherApps
+                )
+            }
+        }
+
+        deviceShieldCtaHeaderTextView.text = HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)
         deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_default)
     }
 }

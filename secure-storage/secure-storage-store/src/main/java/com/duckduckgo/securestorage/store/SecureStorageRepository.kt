@@ -24,11 +24,15 @@ import kotlinx.coroutines.flow.Flow
  * This class is mainly responsible only for accessing and storing data into the DB.
  */
 interface SecureStorageRepository {
+    interface Factory {
+        fun get(): SecureStorageRepository?
+    }
+
     suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity)
 
     suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
 
-    suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity
+    suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity?
 
     suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>>
 
@@ -50,7 +54,7 @@ class RealSecureStorageRepository constructor(
     override suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>> =
         websiteLoginCredentialsDao.websiteLoginCredentials()
 
-    override suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity =
+    override suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity? =
         websiteLoginCredentialsDao.getWebsiteLoginCredentialsById(id)
 
     override suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentialsEntity) =

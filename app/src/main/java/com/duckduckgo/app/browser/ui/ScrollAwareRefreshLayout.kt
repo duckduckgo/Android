@@ -38,4 +38,8 @@ class ScrollAwareRefreshLayout(
     fun setCanChildScrollUpCallback(callback: () -> Boolean) {
         canChildScrollUpCallback = callback
     }
+
+    fun removeCanChildScrollUpCallback() {
+        canChildScrollUpCallback = null
+    }
 }
