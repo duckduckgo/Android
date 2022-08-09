@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.store.InternalTestUserStore
+import com.duckduckgo.autofill.store.RealAutofillPrefsStore
 import com.duckduckgo.autofill.store.RealInternalTestUserStore
 import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.SecureStoreBackedAutofillStore
@@ -44,6 +45,11 @@ class AutofillModule {
         context: Context,
         internalTestUserChecker: InternalTestUserChecker
     ): AutofillStore {
-        return SecureStoreBackedAutofillStore(secureStorage, context, internalTestUserChecker, RealLastUpdatedTimeProvider())
+        return SecureStoreBackedAutofillStore(
+            secureStorage,
+            internalTestUserChecker,
+            RealLastUpdatedTimeProvider(),
+            RealAutofillPrefsStore(context)
+        )
     }
 }
