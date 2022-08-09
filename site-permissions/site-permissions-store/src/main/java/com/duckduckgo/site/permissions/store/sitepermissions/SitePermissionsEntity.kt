@@ -34,5 +34,3 @@ enum class SitePermissionAskSettingType {
     DENY_ALWAYS,
     ALLOW_ALWAYS
 }
-
-

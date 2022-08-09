@@ -17,7 +17,6 @@
 package com.duckduckgo.site.permissions.impl
 
 import android.webkit.PermissionRequest
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.store.SitePermissionAskSettingType
@@ -34,7 +33,7 @@ import javax.inject.Inject
 interface SitePermissionsRepository {
     fun isDomainAllowedToAsk(url: String, permission: String): Boolean
     fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
-    fun sitePermissionGranted(url: String, tabId:String, permission: String)
+    fun sitePermissionGranted(url: String, tabId: String, permission: String)
 }
 
 @ContributesBinding(ActivityScope::class)
