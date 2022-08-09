@@ -50,7 +50,7 @@ class RealPrivacyConfigPersister @Inject constructor(
         val newVersion = jsonPrivacyConfig.version
         val previousVersion = privacyConfig?.version ?: 0
 
-        if (newVersion > previousVersion) {
+        if (newVersion >= previousVersion) {
             database.runInTransaction {
                 privacyFeatureTogglesRepository.deleteAll()
                 privacyConfigRepository.insert(PrivacyConfig(version = jsonPrivacyConfig.version, readme = jsonPrivacyConfig.readme))

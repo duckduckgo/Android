@@ -128,14 +128,14 @@ class RealPrivacyConfigPersisterTest {
         }
 
     @Test
-    fun whenPersistPrivacyConfigAndVersionIsEqualsThanPreviousOneStoredThenDoNothing() =
+    fun whenPersistPrivacyConfigAndVersionIsEqualsThanPreviousOneStoredThenStoreNewConfig() =
         runTest {
             privacyRepository.insert(PrivacyConfig(version = 2, readme = "readme"))
 
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
             assertEquals(2, privacyRepository.get()!!.version)
-            verify(mockTogglesRepository, never()).deleteAll()
+            verify(mockTogglesRepository).deleteAll()
         }
 
     @Test
