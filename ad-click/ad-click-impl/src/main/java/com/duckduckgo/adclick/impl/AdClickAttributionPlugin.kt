@@ -85,7 +85,7 @@ class AdClickAttributionPlugin @Inject constructor(
 
             adClickAttributionRepository.updateAll(linkFormats, allowList, expirations, detections)
             val isEnabled = adClickAttributionFeature?.state == "enabled"
-            adClickFeatureTogglesRepository.insert(AdClickFeatureToggles(adClickFeature, isEnabled, null))
+            adClickFeatureTogglesRepository.insert(AdClickFeatureToggles(adClickFeature, isEnabled, adClickAttributionFeature?.minSupportedVersion))
             return true
         }
         return false
