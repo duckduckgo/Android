@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Zaščita pred sledenjem aplikacij</string>
     <string name="refresh">Osveži</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Imate težave z aplikacijo?</string>
     <string name="atp_OnInitialNotification">"Zaščita pred sledenjem aplikacijam App Tracking Protection je omogočena in blokira poskuse sledenja aplikacijam."</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Iskanje dejavnosti sledenja… bip… bup"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Poskusi sledenja so blokirani <b>v %1$d aplikaciji</b> (v zadnji uri).]]></item>
         <item quantity="two"><![CDATA[ Poskusi sledenja so blokirani <b>v %1$d aplikacijah</b> (v zadnji uri).]]></item>
         <item quantity="few"><![CDATA[ Poskusi sledenja so blokirani <b>v %1$d aplikacijah</b> (v zadnji uri).]]></item>
@@ -58,14 +58,14 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Zaščita pred sledenjem aplikacijam App Tracking Protection je blokirala <b>%1$d</b> poskusov sledenja (pretekli dan).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Zaščita pred sledenjem aplikacijam App Tracking Protection je blokirala <b>poskusi sledenja %1$d v aplikacijah %2$d, vključno z %3$s</b> (pretekli dan).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[%1$s vas je poskušal izslediti <b>v %2$d aplikaciji</b> (v preteklem dnevu). <b>Oglejte si več</b>]]></item>
         <item quantity="two"><![CDATA[%1$s vas je poskušal izslediti <b>v %2$d aplikacijah</b> (v preteklem dnevu). <b>Oglejte si več</b>]]></item>
         <item quantity="few"><![CDATA[%1$s vas je poskušal izslediti <b>v %2$d aplikacijah</b> (v preteklem dnevu). <b>Oglejte si več</b>]]></item>
         <item quantity="other"><![CDATA[%1$s vas je poskušal izslediti <b>v %2$d aplikacijah</b> (v preteklem dnevu). <b>Oglejte si več</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Zaščita pred sledenjem aplikacijam App Tracking Protection je blokirala največ poskusov sledenja v <b>%1$s</b> (pretekli dan).]]></item>
         <item quantity="two"><![CDATA[Zaščita pred sledenjem aplikacijam App Tracking Protection je blokirala največ poskusov sledenja v <b>%1$s</b> in <b>%2$s</b> (pretekli dan).]]></item>
         <item quantity="few"><![CDATA[Zaščita pred sledenjem aplikacijam App Tracking Protection je blokirala največ poskusov sledenja v <b>%1$s</b> in <b>%2$s</b> (pretekli dan).]]></item>
@@ -88,7 +88,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Zaščita pred sledenjem aplikacijam App Tracking Protection je blokirala <b>%1$d poskusov sledenja v aplikaciji %2$s</b> in 1 drugi aplikaciji (v preteklem tednu).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Zaščita pred sledenjem aplikacijam App Tracking Protection je blokirala <b>%1$d poskusov sledenja v %2$s</b> in %3$d drugih aplikacijah (v preteklem tednu).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Zaščita pred sledenjem aplikacijam App Tracking Protection je blokirala <b>%1$s v %2$d aplikaciji, vključno z %3$s</b> (v preteklem tednu).]]></item>
         <item quantity="two"><![CDATA[Zaščita pred sledenjem aplikacijam App Tracking Protection je blokirala <b>%1$s v %2$d aplikacijah, vključno z %3$s</b> (v preteklem tednu).]]></item>
         <item quantity="few"><![CDATA[Zaščita pred sledenjem aplikacijam App Tracking Protection je blokirala <b>%1$s v %2$d aplikacijah, vključno z %3$s</b> (v preteklem tednu).]]></item>
@@ -110,7 +110,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Omogoči zaščito pred sledenjem aplikacijam App Tracking Protection</string>
     <string name="atp_OnboardingLastPageOneTitle">En preprost korak za boljšo zasebnost aplikacije!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Ugotovili smo, da <b>več kot 96 % priljubljenih brezplačnih aplikacij</b> drugim podjetjem omogoča sledenje vašim osebnim podatkom, tudi ko spite.\n\nOglejte si, katere aplikacije <b>omogočajo drugim podjetjem, da vam sledijo, </b> in ponovno prevzemite nadzor!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Ugotovili smo, da <b>več kot 96\u0025 priljubljenih brezplačnih aplikacij</b> drugim podjetjem omogoča sledenje vašim osebnim podatkom, tudi ko spite.\n\nOglejte si, katere aplikacije <b>omogočajo drugim podjetjem, da vam sledijo, </b> in ponovno prevzemite nadzor!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Kako deluje?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Zaščita pred sledenjem aplikacijam App Tracking Protection <b>zazna in blokira sledilce aplikaciji drugih podjetij</b>, na primer, ko vas Facebook poskuša spremljati v zdravstveni aplikaciji.\n\n<b>Brezplačno</b>je in v svojih aplikacijah lahko uživate, kot običajno. Delo v ozadju vam pomaga <b>zaščititi noč in dan.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kdo vidi vaše podatke?</string>
@@ -121,7 +121,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Zaščita pred sledenjem aplikacij</string>
-    <string name="atp_daxOnboardingIntroMessage">Več kot 96 % priljubljenih brezplačnih aplikacij omogoča drugim podjetjem, da vam sledijo, tudi če ne uporabljate telefona. Zaščita pred sledenjem aplikacijam App Tracking Protection zazna in blokira te poskuse sledenja.</string>
+    <string name="atp_daxOnboardingIntroMessage">Več kot 96\u0025 priljubljenih brezplačnih aplikacij omogoča drugim podjetjem, da vam sledijo, tudi če ne uporabljate telefona. Zaščita pred sledenjem aplikacijam App Tracking Protection zazna in blokira te poskuse sledenja.</string>
     <string name="atp_daxOnboardingPermissionTitle">Kako deluje?</string>
     <string name="atp_daxOnboardingPermissionMessage">Zaščita pred sledenjem aplikacijam App Tracking Protection ni VPN. Vendar ga bo vaša naprava prepoznala kot takega. To je zato, ker za delovanje uporablja lokalno povezavo VPN. Podatkov aplikacije nikoli ne usmerja prek zunanjega strežnika. <annotation type="learn_more_link">Več</annotation></string>
 
@@ -174,12 +174,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Potrdi</string>
     <string name="atp_ReportBreakageAppNextCta">Naslednji</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Opišite, kaj se je zgodilo, kaj ste pričakovali in kateri ukrepi so pripeljali do težave.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Ste bili prijavljeni v aplikacijo, ko ste opazili težavo?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Da, bil sem prijavljen v aplikacijo</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Težava se je pojavila pri prijavi</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Imel sem težavo pri ustvarjanju novega računa</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Aplikacija ne zahteva prijave</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Ali ste bili prijavljeni v aplikacijo, ko ste opazili težavo?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Opišite, kaj se je zgodilo (neobvezno)</string>
     <string name="atp_ReportBreakageFormCheckboxText">S klikom na »Pošlji« se strinjam, da lahko DuckDuckGo uporabi informacije v tem poročilu za namene izboljšanja zaščite pred sledenjem aplikacijam.
     </string>
@@ -192,7 +186,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">O sledilnikih aplikacij</string>
     <string name="atp_ProfilingInfoTitle">Kaj so sledilniki aplikacij?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Verjetno ste slišali za podjetja, kot sta Google in Facebook, ki vas spremljata v ozadju na spletnih mestih tretjih oseb. Toda ali ste vedeli, da tudi vaše osebne podatke spremljajo prek aplikacij v vaši napravi?\n\n<b>Več kot 96 % od 100 priljubljenih brezplačnih aplikacij za Android,</b> ki smo jih testirali, je vsebovalo skrite sledilnike tretjih oseb. Od tega jih je 87 % poslalo podatke Googlu in 68 % je poslalo podatke Facebooku. To se zgodi tudi, če ne uporabljate naprave.\n\n<b>Sledilniki v aplikacijah imajo morda dostop do veliko več informacij</b> kot njihovi bratranci za sledenje spletnim mestom, kot je vaša lokacija, v katerem nadstropju stavbe ste, kako pogosto igrate igre med delom, kdaj in koliko časa spite vsak dan. <b>Tudi če nimate računa Google ali Facebook, lahko na primer še vedno zbirajo podatke o vas iz vaših aplikacij.</b>\n\nOmrežja za sledenje, kot sta Facebook in Google, uporabljajo te majhne kosce informacij <b>za izgradnjo digitalnega profila o vas.</b> Z njim lahko omrežja za sledenje manipulirajo s tem, kar vidite v spletu, in oglaševalcem omogočijo, da na podlagi vaših podatkov podajajo ponudbe za dostop do vas.\n\nSledilniki v aplikacijah so VELIK problem za zasebnost. <b>DuckDuckGo pa ima rešitev, ki vam je lahko v pomoč.</b>\n\nKo je omogočena v aplikaciji DuckDuckGo Privacy Browser, zaščita pred sledenjem aplikacijam blokira številne sledilnike v drugih aplikacijah v vaši napravi, hkrati pa aplikacija DuckDuckGo blokira sledilnike, ki jih najdemo na spletnih mestih, ko brskate. <b>Te dvojne plasti zaščite zmanjšujejo količino informacij, ki jih podjetja za sledenje poznajo o vas na splošno</b>, tako da lahko uporabite svoje aplikacije z več brezskrbnosti, vedoč, da ste bolj zaščiteni.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Verjetno ste slišali za podjetja, kot sta Google in Facebook, ki vas spremljata v ozadju na spletnih mestih tretjih oseb. Toda ali ste vedeli, da tudi vaše osebne podatke spremljajo prek aplikacij v vaši napravi?\n\n<b>Več kot 96\u0025 od 100 priljubljenih brezplačnih aplikacij za Android,</b> ki smo jih testirali, je vsebovalo skrite sledilnike tretjih oseb. Od tega jih je 87\u0025 poslalo podatke Googlu in 68\u0025 je poslalo podatke Facebooku. To se zgodi tudi, če ne uporabljate naprave.\n\n<b>Sledilniki v aplikacijah imajo morda dostop do veliko več informacij</b> kot njihovi bratranci za sledenje spletnim mestom, kot je vaša lokacija, v katerem nadstropju stavbe ste, kako pogosto igrate igre med delom, kdaj in koliko časa spite vsak dan. <b>Tudi če nimate računa Google ali Facebook, lahko na primer še vedno zbirajo podatke o vas iz vaših aplikacij.</b>\n\nOmrežja za sledenje, kot sta Facebook in Google, uporabljajo te majhne kosce informacij <b>za izgradnjo digitalnega profila o vas.</b> Z njim lahko omrežja za sledenje manipulirajo s tem, kar vidite v spletu, in oglaševalcem omogočijo, da na podlagi vaših podatkov podajajo ponudbe za dostop do vas.\n\nSledilniki v aplikacijah so VELIK problem za zasebnost. <b>DuckDuckGo pa ima rešitev, ki vam je lahko v pomoč.</b>\n\nKo je omogočena v aplikaciji DuckDuckGo Privacy Browser, zaščita pred sledenjem aplikacijam blokira številne sledilnike v drugih aplikacijah v vaši napravi, hkrati pa aplikacija DuckDuckGo blokira sledilnike, ki jih najdemo na spletnih mestih, ko brskate. <b>Te dvojne plasti zaščite zmanjšujejo količino informacij, ki jih podjetja za sledenje poznajo o vas na splošno</b>, tako da lahko uporabite svoje aplikacije z več brezskrbnosti, vedoč, da ste bolj zaščiteni.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Zadnjih 7 dni</string>
@@ -215,13 +209,13 @@
     <string name="atp_ActivityPastWeekBlocked">Blokirana stran</string>
     <string name="atp_ActivityPastWeekAcross">Na spletni strani</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Poskus sledenja</item>
         <item quantity="two">Poskusa sledenja</item>
         <item quantity="few">Poskusi sledenja</item>
         <item quantity="other">Poskusi sledenja</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Aplikacija</item>
         <item quantity="two">Aplikaciji</item>
         <item quantity="few">Aplikacije</item>

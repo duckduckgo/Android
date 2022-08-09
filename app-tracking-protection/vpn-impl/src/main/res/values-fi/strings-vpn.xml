@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Sovellusten seurantasuojaus</string>
     <string name="refresh">Päivitä</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Ongelmia sovelluksen kanssa?</string>
     <string name="atp_OnInitialNotification">"App Tracking Protection on käytössä ja estää seurantayritykset kaikissa sovelluksissasi"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Skannataan seurantatoiminnan varalta... piip... puup"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Seurantayrityksiä estetty <b>%1$d sovelluksessa</b> (viimeisen tunnin aikana).]]></item>
         <item quantity="other"><![CDATA[ Seurantayrityksiä estetty <b>kaikkiaan %1$d sovelluksessa</b> (viimeisen tunnin aikana).]]></item>
     </plurals>
@@ -56,12 +56,12 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ App Tracking Protection esti <b>%1$d seurantayritystä</b> (viimeisen päivän aikana).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ App Tracking Protection esti <b>%1$d seurantayritystä %2$d sovelluksessa, mukaan lukien %3$s</b> (viimeisen päivän aikana).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[%1$s yritti seurata sinua <b>%2$d sovelluksessa</b> (viimeisen päivän aikana). <b>Näytä lisää</b>]]></item>
         <item quantity="other"><![CDATA[%1$s yritti seurata sinua <b>kaikkiaan %2$d sovelluksessa</b> (viimeisen päivän aikana). <b>Näytä lisää</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[App Tracking Protection esti eniten seurantayrityksiä kohteessa <b>%1$s</b> (viimeisen päivän aikana).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection esti eniten seurantayrityksiä kohteissa <b>%1$s</b> ja <b>%2$s</b> (viimeisen päivän aikana).]]></item>
     </plurals>
@@ -82,7 +82,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[App Tracking Protection esti <b>%1$d seurantayritystä kohteessa %2$s</b> ja 1 muussa sovelluksessa (viime viikolla).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection esti <b>%1$d seurantayritystä %2$s</b> ja %3$d muissa sovelluksissa (viime viikolla).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[App Tracking Protection esti yrityksen <b>%1$s %2$d sovelluksessa, mukaan lukien %3$s</b> (viime viikolla).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection esti yrityksen <b>%1$s kaikkiaan %2$d sovelluksessa, mukaan lukien %3$s</b> (viime viikolla).]]></item>
     </plurals>
@@ -102,7 +102,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Ota App Tracking Protection käyttöön</string>
     <string name="atp_OnboardingLastPageOneTitle">Yksi helppo askel kohti parempaa sovellusten tietosuojaa!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Havaitsimme, että <b>yli 96 % suosituista ilmaisista sovelluksista</b> antaa muiden yritysten seurata henkilökohtaisia tietojasi, myös unen aikana.\n\nKatso, mitkä sovellukset <b> antavat muiden yritysten seurata sinua</b>, ja ota ohjat omiin käsiisi!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Havaitsimme, että <b>yli 96\u0025 suosituista ilmaisista sovelluksista</b> antaa muiden yritysten seurata henkilökohtaisia tietojasi, myös unen aikana.\n\nKatso, mitkä sovellukset <b> antavat muiden yritysten seurata sinua</b>, ja ota ohjat omiin käsiisi!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Kuinka se toimii?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>havaitsee ja estää muiden yritysten seurantalaitteet</b>, esimerkiksi kun Facebook yrittää seurata sinua terveyssovelluksessa.\n\n<b>Se on ilmainen</b>, ja voit käyttää sovelluksiasi tavalliseen tapaan. Se toimii taustalla ja auttaa <b>suojaamaan sinua yötä päivää.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kuka näkee tietosi?</string>
@@ -113,7 +113,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Sovellusten seurantasuojaus</string>
-    <string name="atp_daxOnboardingIntroMessage">Yli 96 % suosituista ilmaisista sovelluksista antaa muiden yritysten seurata sinua myös silloin, kun et käytä puhelinta. App Tracking Protection tunnistaa ja estää nämä seurantayritykset.</string>
+    <string name="atp_daxOnboardingIntroMessage">Yli 96\u0025 suosituista ilmaisista sovelluksista antaa muiden yritysten seurata sinua myös silloin, kun et käytä puhelinta. App Tracking Protection tunnistaa ja estää nämä seurantayritykset.</string>
     <string name="atp_daxOnboardingPermissionTitle">Kuinka se toimii?</string>
     <string name="atp_daxOnboardingPermissionMessage">App Tracking Protection ei ole VPN. Laitteesi kuitenkin tunnistaa sen sellaiseksi. Tämä johtuu siitä, että se käyttää toimiakseen paikallista VPN-yhteyttä.\n\n Se ei koskaan reititä sovellustietoja ulkoisen palvelimen kautta. <annotation type="learn_more_link">Lue Lisää</annotation></string>
 
@@ -166,12 +166,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Lähetä</string>
     <string name="atp_ReportBreakageAppNextCta">Seuraava</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Kerro mitä tapahtui, mitä odotit tapahtuvan ja mitkä vaiheet johtivat ongelmaan.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Olitko kirjautuneena sovellukseen, kun huomasit ongelman?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Kyllä, olin kirjautuneena sovellukseen</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Ongelma ilmeni sisäänkirjautumisen yhteydessä</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Minulla oli ongelma uuden tilin luomisessa</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Sovellus ei vaadi kirjautumista</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Olitko kirjautuneena sovellukseen, kun huomasit ongelman?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Kuvaile mitä tapahtui (valinnainen)</string>
     <string name="atp_ReportBreakageFormCheckboxText">Napsauttamalla \"Lähetä\" hyväksyn, että DuckDuckGo voi käyttää tämän ilmoituksen tietoja App Tracking Protectionin parantamiseen.
     </string>
@@ -184,7 +178,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Tietoja sovellusten seurantalaitteista</string>
     <string name="atp_ProfilingInfoTitle">Mitä ovat sovellusten seurantalaitteet?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Olet luultavasti kuullut, miten Googlen ja Facebookin kaltaiset yritykset seuraavat sinua kulissien takana kolmannen osapuolen sivustoilla. Mutta tiesitkö, että ne seuraavat myös henkilökohtaisia tietojasi laitteesi sovellusten kautta?\n\n<b>Yli 96\\% sadasta suositusta ilmaisesta Android-sovelluksesta</b>, joita testasimme sisälsi piilotettuja kolmannen osapuolen seurantalaitteita. Niistä 87\\% lähetti tietoja Googlelle ja 68\\% lähetti tietoja Facebookille. Tätä tapahtuu myös silloin, kun et käytä laitettasi.\n\n<b>Sovellusten seurantalaitteet voivat tavoittaa paljon suuremman määrän tietoa,</b> kuin verkkosivuston seurantalaitteet. Ne voivat selvittää esimerkiksi tarkan sijaintisi ja missä rakennuksen kerroksessa olet, kuinka usein pelaat pelejä töissä, ja milloin ja miten kauan nukut päivittäin. <b>Vaikka sinulla ei olisi esimerkiksi Google- tai Facebook-tiliä, ne voivat silti kerätä tietoja sinusta sovelluksistasi.</b>\n\nSeurantaverkot, kuten Facebook ja Google, käyttävät näitä pieniä tietoja <b>luodakseen sinusta digitaalisen profiilin.</b> Sen avulla seurantaverkot voivat manipuloida sitä, mitä näet verkossa ja kilpailuttaa mainostajia mahdollisuudesta tavoittaa sinut tietojesi perusteella.\n\nSovellusten seurantalaitteet ovat SUURI ongelma yksityisyydelle. <b>DuckDuckGolla on ratkaisu, joka voi auttaa.</b>\n\nKun App Tracking Protection on otettu käyttöön DuckDuckGo Privacy Browser -sovelluksessa, se estää monia muiden sovellusten sisältämiä seurantalaitteita, samalla kun DuckDuckGo-sovellus estää katsomiltasi verkkosivustoilta löytämänsä seurantalaitteet. <b>Tällaiset kaksikerroksiset suojaukset vähentävät sitä, mitä seurantayritykset tietävät sinusta</b>, joten voit käyttää sovelluksiasi rauhallisin mielin tietäen, että olet paremmin suojattu.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Olet luultavasti kuullut, miten Googlen ja Facebookin kaltaiset yritykset seuraavat sinua kulissien takana kolmannen osapuolen sivustoilla. Mutta tiesitkö, että ne seuraavat myös henkilökohtaisia tietojasi laitteesi sovellusten kautta?\n\n<b>Yli 96\u0025 sadasta suositusta ilmaisesta Android-sovelluksesta</b>, joita testasimme sisälsi piilotettuja kolmannen osapuolen seurantalaitteita. Niistä 87\u0025 lähetti tietoja Googlelle ja 68\u0025 lähetti tietoja Facebookille. Tätä tapahtuu myös silloin, kun et käytä laitettasi.\n\n<b>Sovellusten seurantalaitteet voivat tavoittaa paljon suuremman määrän tietoa,</b> kuin verkkosivuston seurantalaitteet. Ne voivat selvittää esimerkiksi tarkan sijaintisi ja missä rakennuksen kerroksessa olet, kuinka usein pelaat pelejä töissä, ja milloin ja miten kauan nukut päivittäin. <b>Vaikka sinulla ei olisi esimerkiksi Google- tai Facebook-tiliä, ne voivat silti kerätä tietoja sinusta sovelluksistasi.</b>\n\nSeurantaverkot, kuten Facebook ja Google, käyttävät näitä pieniä tietoja <b>luodakseen sinusta digitaalisen profiilin.</b> Sen avulla seurantaverkot voivat manipuloida sitä, mitä näet verkossa ja kilpailuttaa mainostajia mahdollisuudesta tavoittaa sinut tietojesi perusteella.\n\nSovellusten seurantalaitteet ovat SUURI ongelma yksityisyydelle. <b>DuckDuckGolla on ratkaisu, joka voi auttaa.</b>\n\nKun App Tracking Protection on otettu käyttöön DuckDuckGo Privacy Browser -sovelluksessa, se estää monia muiden sovellusten sisältämiä seurantalaitteita, samalla kun DuckDuckGo-sovellus estää katsomiltasi verkkosivustoilta löytämänsä seurantalaitteet. <b>Tällaiset kaksikerroksiset suojaukset vähentävät sitä, mitä seurantayritykset tietävät sinusta</b>, joten voit käyttää sovelluksiasi rauhallisin mielin tietäen, että olet paremmin suojattu.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Viimeiset 7 päivää</string>
@@ -207,11 +201,11 @@
     <string name="atp_ActivityPastWeekBlocked">Estetty</string>
     <string name="atp_ActivityPastWeekAcross">Kaikkiaan</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Seurantayritys</item>
         <item quantity="other">Seurantayritykstä</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Sovellus</item>
         <item quantity="other">Sovellukset</item>
     </plurals>

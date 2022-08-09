@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Proteção contra o rastreamento por aplicações</string>
     <string name="refresh">Atualizar</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Tens problemas com uma aplicação?</string>
     <string name="atp_OnInitialNotification">"A App Tracking Protection está ativada e a bloquear tentativas de rastreamento nas tuas aplicações"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"A procurar atividade de rastreamento… bip… bop"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Tentativas de rastreamento bloqueadas <b>em %1$d aplicação</b> (última hora).]]></item>
         <item quantity="other"><![CDATA[ Tentativas de rastreamento bloqueadas <b>em %1$d aplicações</b> (última hora).]]></item>
     </plurals>
@@ -56,12 +56,12 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento</b> (último dia).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento em %2$d aplicações, incluindo %3$s</b> (último dia).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[%1$s tentou rastrear o teu dispositivo <b>em %2$d aplicação</b> (último dia). <b>Mais informações</b>]]></item>
         <item quantity="other"><![CDATA[%1$s tentou rastrear o teu dispositivo <b>em %2$d aplicações</b> (último dia). <b>Mais informações</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+    <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[A App Tracking Protection bloqueou a maioria das tentativas de rastreamento em <b>%1$s</b> (último dia).]]></item>
         <item quantity="other"><![CDATA[A App Tracking Protection bloqueou a maioria das tentativas de rastreamento em <b>%1$s</b> e <b>%2$s</b> (último dia).]]></item>
     </plurals>
@@ -82,7 +82,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento em %2$s</b> e noutra aplicação (semana passada).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento em %2$s</b> e em mais %3$d aplicações (semana passada).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+    <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[A App Tracking Protection bloqueou <b>%1$s em %2$d aplicação, %3$s</b> (semana passada).]]></item>
         <item quantity="other"><![CDATA[A App Tracking Protection bloqueou <b>%1$s em %2$d aplicações, incluindo %3$s</b> (semana passada).]]></item>
     </plurals>
@@ -102,7 +102,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Ativar a App Tracking Protection</string>
     <string name="atp_OnboardingLastPageOneTitle">Um passo simples para melhorar a privacidade das aplicações!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Verificámos que <b>mais de 96% das aplicação grátis populares</b> permitem que outras empresas rastreiem as tuas informações pessoais, mesmo quando estás a dormir.\n\nVê quais são as aplicações que <b>permitem que outras empresas te rastreiem</b> e recupera o controlo!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Verificámos que <b>mais de 96\u0025 das aplicação grátis populares</b> permitem que outras empresas rastreiem as tuas informações pessoais, mesmo quando estás a dormir.\n\nVê quais são as aplicações que <b>permitem que outras empresas te rastreiem</b> e recupera o controlo!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Como isso funciona?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">A App Tracking Protection <b>deteta e bloqueia os rastreadores de aplicações de outras empresas</b>, por exemplo, quando o Facebook tenta rastrear-te numa aplicação de saúde.\n\n<b>É grátis</b>, e podes desfrutar das aplicações como farias normalmente. Trabalha em segundo plano e ajuda a <b>proteger-te em todos os momentos.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Quem vê os teus dados?</string>
@@ -113,7 +113,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Proteção contra o rastreamento por aplicações</string>
-    <string name="atp_daxOnboardingIntroMessage">Mais de 96% das aplicações grátis populares permitem que outras empresas te rastreiem, mesmo quando não estás a utilizar o teu telemóvel. A App Tracking Protection deteta e bloqueia essas tentativas de rastreamento.</string>
+    <string name="atp_daxOnboardingIntroMessage">Mais de 96\u0025 das aplicações grátis populares permitem que outras empresas te rastreiem, mesmo quando não estás a utilizar o teu telemóvel. A App Tracking Protection deteta e bloqueia essas tentativas de rastreamento.</string>
     <string name="atp_daxOnboardingPermissionTitle">Como isso funciona?</string>
     <string name="atp_daxOnboardingPermissionMessage">A App Tracking Protection não é uma VPN. No entanto, utiliza uma ligação VPN local, pelo que o teu dispositivo vai reconhecer esta funcionalidade como uma VPN. Nunca encaminha os dados das aplicações através de um servidor externo. <annotation type="learn_more_link">Sabe mais</annotation></string>
 
@@ -166,12 +166,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Submeter</string>
     <string name="atp_ReportBreakageAppNextCta">Seguinte</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Descreve o que aconteceu, o que esperavas e os passos que levaram ao problema.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Tinhas sessão iniciada na aplicação quando observaste o problema?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Sim, tinha sessão iniciada na aplicação</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">O problema ocorreu ao iniciar sessão</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Tive um problema ao criar uma conta nova</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">A aplicação não requer início de sessão</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Tinhas sessão iniciada na aplicação quando observaste o problema?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Descreve o que aconteceu (opcional)</string>
     <string name="atp_ReportBreakageFormCheckboxText">Ao clicar em \"Enviar\", concordo que o DuckDuckGo pode utilizar as informações neste relatório para melhorar a App Tracking Protection.
     </string>
@@ -184,7 +178,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Sobre os rastreadores de aplicações</string>
     <string name="atp_ProfilingInfoTitle">O que são os rastreadores de aplicações?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Já deves ter ouvido que empresas como a Google e o Facebook te rastreiam em segundo plano em sites de terceiros. Mas sabias que também rastreiam as tuas informações pessoais através das aplicações no teu dispositivo?\n\nTestámos <b>100 aplicações Android grátis populares e detetámos que 96%</b> incluem rastreadores de terceiros ocultos. 87% dessas aplicações enviam dados para a Google. 68% enviam dados para o Facebook. E isto acontece mesmo quando não estás a utilizar o teu dispositivo.\n\n<b>Os rastreadores em aplicações podem aceder a muito mais informações</b> do que os rastreadores de sites, por exemplo, o andar do edifício em que te encontras, a frequência com que jogas jogos no teu trabalho e as horas que dormes em cada dia. <b>Mesmo que não tenhas uma conta Google ou Facebook, por exemplo, estas empresas ainda podem recolher dados sobre ti a partir de outras aplicações.</b>\n\nAs redes de rastreamento como o Facebook e a Google utilizam estes fragmentos de informação <b>para construírem um perfil digital sobre ti.</b> Depois, as redes de rastreamento utilizam esse perfil para manipularem o que vês online e permitirem que os anunciantes te apresentem anúncios com base nos teus dados.\n\nOs rastreadores em aplicações são um ENORME problema de privacidade. <b>Mas o DuckDuckGo tem uma solução que pode ajudar.</b>Quando ativada na aplicação DuckDuckGo Privacy Browser, a App Tracking Protection bloqueia muitos rastreadores noutras aplicações no teu dispositivo, ao mesmo tempo que a aplicação DuckDuckGo bloqueia os rastreadores que encontra nos sites que visitas. <b>Estas duas camadas de proteção reduzem o que as empresas de rastreamento sabem sobre ti em geral</b>, para que possas usar as tuas aplicações com menos preocupações e mais proteção.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Já deves ter ouvido que empresas como a Google e o Facebook te rastreiam em segundo plano em sites de terceiros. Mas sabias que também rastreiam as tuas informações pessoais através das aplicações no teu dispositivo?\n\nTestámos <b>100 aplicações Android grátis populares e detetámos que 96\u0025</b> incluem rastreadores de terceiros ocultos. 87\u0025 dessas aplicações enviam dados para a Google. 68\u0025 enviam dados para o Facebook. E isto acontece mesmo quando não estás a utilizar o teu dispositivo.\n\n<b>Os rastreadores em aplicações podem aceder a muito mais informações</b> do que os rastreadores de sites, por exemplo, o andar do edifício em que te encontras, a frequência com que jogas jogos no teu trabalho e as horas que dormes em cada dia. <b>Mesmo que não tenhas uma conta Google ou Facebook, por exemplo, estas empresas ainda podem recolher dados sobre ti a partir de outras aplicações.</b>\n\nAs redes de rastreamento como o Facebook e a Google utilizam estes fragmentos de informação <b>para construírem um perfil digital sobre ti.</b> Depois, as redes de rastreamento utilizam esse perfil para manipularem o que vês online e permitirem que os anunciantes te apresentem anúncios com base nos teus dados.\n\nOs rastreadores em aplicações são um ENORME problema de privacidade. <b>Mas o DuckDuckGo tem uma solução que pode ajudar.</b>Quando ativada na aplicação DuckDuckGo Privacy Browser, a App Tracking Protection bloqueia muitos rastreadores noutras aplicações no teu dispositivo, ao mesmo tempo que a aplicação DuckDuckGo bloqueia os rastreadores que encontra nos sites que visitas. <b>Estas duas camadas de proteção reduzem o que as empresas de rastreamento sabem sobre ti em geral</b>, para que possas usar as tuas aplicações com menos preocupações e mais proteção.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Últimos 7 dias</string>
@@ -207,11 +201,11 @@
     <string name="atp_ActivityPastWeekBlocked">Bloqueios</string>
     <string name="atp_ActivityPastWeekAcross">Em</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Tentativa de rastreamento</item>
         <item quantity="other">Tentativas de rastreamento</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+     <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Aplicação</item>
         <item quantity="other">Aplicações</item>
     </plurals>
@@ -263,11 +257,11 @@
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-aplicação-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
-    <plurals name="atp_CompanyDetailsTrackingAttempts">
+    <plurals name="atp_CompanyDetailsTrackingAttempts" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d tentativa. Conhecido por recolher:</item>
         <item quantity="other">%1$d tentativas. Conhecido por recolher:</item>
     </plurals>
-    <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
+    <plurals name="atp_CompanyDetailsTrackingAttemptsTitle" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d tentativa de rastreamento bloqueada</item>
         <item quantity="other">%1$d tentativas de rastreamento bloqueadas</item>
     </plurals>

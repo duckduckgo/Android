@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Alkalmazáskövetés elleni védelem</string>
     <string name="refresh">Frissítés</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Problémáid vannak egy alkalmazással?</string>
     <string name="atp_OnInitialNotification">"Az alkalmazáskövetés elleni védelem be van kapcsolva, és letiltja a követési kísérleteket az alkalmazásokban"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Nyomkövető tevékenység keresése… bíp… búp"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Nyomkövetési kísérletek blokkolva <b>%1$d alkalmazásban</b> (az elmúlt egy órában).]]></item>
         <item quantity="other"><![CDATA[ Nyomkövetési kísérletek blokkolva <b>%1$d alkalmazásban</b> (az elmúlt egy órában).]]></item>
     </plurals>
@@ -56,12 +56,12 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt</b> (az elmúlt egy napban).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt %2$d alkalmazásban, beleértve a(z) %3$s alkalmazást is</b> (az elmúlt egy napban).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[A(z) %1$s megpróbált követni téged <b>%2$d alkalmazásban</b> (az elmúlt egy napban). <b>Továbbiak megjelenítése</b>]]></item>
         <item quantity="other"><![CDATA[A(z) %1$s megpróbált követni téged <b>%2$d alkalmazásban</b> (az elmúlt egy napban). <b>Továbbiak megjelenítése</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a legtöbb követési kísérletet a(z) <b>%1$s</b> alkalmazásban (az elmúlt egy napban).]]></item>
         <item quantity="other"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a legtöbb követési kísérletet a(z) <b>%1$s</b> és a(z) <b>%2$s</b> alkalmazásban (az elmúlt egy napban).]]></item>
     </plurals>
@@ -82,7 +82,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet a(z) %2$s és egy másik alkalmazásban</b> (az elmúlt héten).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet a(z) %2$s és egy %3$d másik alkalmazásban</b> (az elmúlt héten).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét egy %2$d alkalmazásban: %3$s</b> (az elmúlt héten).]]></item>
         <item quantity="other"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalmazásban, köztük itt: %3$s</b> (az elmúlt héten).]]></item>
     </plurals>
@@ -102,7 +102,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Alkalmazáskövetés elleni védelem bekapcsolása</string>
     <string name="atp_OnboardingLastPageOneTitle">Egy egyszerű lépés az alkalmazások jobb védelme érdekében!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Azt találtuk, hogy a <b>népszerű ingyenes alkalmazások több mint 96%-a</b> lehetővé teszi más cégeknek, hogy nyomon kövessék a személyes adataid még alvás közben is.\n\nNézd meg, hogy mely alkalmazások <b>segítségével követhetnek más cégek,</b> és vedd vissza az irányítást!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Azt találtuk, hogy a <b>népszerű ingyenes alkalmazások több mint 96\u0025-a</b> lehetővé teszi más cégeknek, hogy nyomon kövessék a személyes adataid még alvás közben is.\n\nNézd meg, hogy mely alkalmazások <b>segítségével követhetnek más cégek,</b> és vedd vissza az irányítást!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Hogyan működik?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Az alkalmazáskövetés elleni védelem <b>észleli és blokkolja más cégek alkalmazáskövetőit,</b> például amikor a Facebook megpróbál nyomon követni egy egészségügyi alkalmazásban.\n\n<b>Ingyenes</b>, és az alkalmazásokat a szokásos módon használhatod. A háttérben dolgozva <b>véd meg éjjel és nappal.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Ki látja az adataidat?</string>
@@ -113,7 +113,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Alkalmazáskövetés elleni védelem</string>
-    <string name="atp_daxOnboardingIntroMessage">A népszerű ingyenes alkalmazások több mint 96%-a lehetővé teszi más cégeknek, hogy nyomon kövessenek, még akkor is, ha éppen nem használod a telefont. Az alkalmazáskövetés elleni védelem felismeri és blokkolja ezeket a követési kísérleteket.</string>
+    <string name="atp_daxOnboardingIntroMessage">A népszerű ingyenes alkalmazások több mint 96\u0025-a lehetővé teszi más cégeknek, hogy nyomon kövessenek, még akkor is, ha éppen nem használod a telefont. Az alkalmazáskövetés elleni védelem felismeri és blokkolja ezeket a követési kísérleteket.</string>
     <string name="atp_daxOnboardingPermissionTitle">Hogyan működik?</string>
     <string name="atp_daxOnboardingPermissionMessage">Az alkalmazáskövetés elleni védelem nem VPN. Az eszköz azonban ekként ismeri fel. Ez azért van, mert a működéshez helyi VPN-kapcsolatot használ. Soha nem irányítja át az alkalmazásadatokat külső szerveren keresztül. <annotation type="learn_more_link">További információ</annotation></string>
 
@@ -166,12 +166,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Elküldés</string>
     <string name="atp_ReportBreakageAppNextCta">Következő</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Írd le, mi történt, mire számítottál, és milyen lépések vezettek a problémához.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Be voltál jelentkezve az alkalmazásba, amikor észrevetted a problémát?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Igen, be voltam jelentkezve az alkalmazásba</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">A probléma a bejelentkezéskor történt</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Problémám adódott egy új fiók létrehozásával</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Az alkalmazás nem igényel bejelentkezést</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Be voltál jelentkezve az alkalmazásba, amikor észrevetted a problémát?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Ismertesd a történteket (nem kötelező)</string>
     <string name="atp_ReportBreakageFormCheckboxText">A „Beküldés” gombra kattintva elfogadom, hogy a DuckDuckGo felhasználja a jelentésben szereplő információkat az alkalmazáskövetés elleni védelem javítása céljából.
     </string>
@@ -184,7 +178,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Az alkalmazáskövetőkről</string>
     <string name="atp_ProfilingInfoTitle">Mik az alkalmazáskövetők?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Valószínűleg hallottál már arról, hogy olyan cégek, mint a Google és a Facebook a háttérben, harmadik felek weboldalain követnek téged. De tudtad, hogy a személyes adataidat is nyomon követik a készülékeden lévő alkalmazásokon keresztül?\n\n<b>Leteszteltünk 100 népszerű ingyenes androidos alkalmazást, és több mint 96\\%-uk</b> tartalmazott rejtett, harmadik féltől származó nyomkövetőket. Ezek 87\\%-a küldött adatokat a Google-nak és 68\\%-a a Facebooknak. Ez akkor is megtörténik, ha éppen nem használod a készüléket.\n\n<b>Az alkalmazásokban lévő nyomkövetők sokkal több információhoz férhetnek hozzá,</b> mint a webhelykövető társaik, például a tartózkodási helyedhez, akár az épület emeletének megállapításával, vagy ahhoz, hogy a munkahelyeden milyen gyakran játszol, és naponta mikor, mennyi ideig alszol. <b>Még ha például nincs is Google- vagy Facebook-fiókod, akkor is gyűjthetnek rólad adatokat az alkalmazásaidon keresztül.</b>\n\nAz nyomkövető hálózatok, mint a Facebook és a Google, ezeket az apró információmorzsákat <b>arra használják, hogy digitális profilt készítsenek rólad.</b> Ezzel a nyomkövető hálózatok manipulálhatják, hogy mit látsz az interneten, és lehetővé teszik a hirdetők számára, hogy az adataid alapján árajánlatot tegyenek az elérésedre.\n\nAz alkalmazásokban lévő nyomkövetők NAGY problémát jelentenek az adatvédelem szempontjából. <b>De a DuckDuckGónak van egy megoldása, amely segíthet.</b>\n\nHa a DuckDuckGo Privacy Browser alkalmazásban engedélyezve van, akkor az alkalmazáskövetés elleni védelem számos nyomkövetőt blokkol a készülékeden lévő alkalmazásokban, miközben DuckDuckGo alkalmazás blokkolja a weboldalakon található nyomkövetőket, amikor böngészel. <b>Ez a kettős védelemmel a nyomkövető cégek összességében kevesebbet fognak tudni rólad</b>, így nagyobb nyugalommal használhatod az alkalmazásokat, tudva, hogy nagyobb védelemben részesülsz.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Valószínűleg hallottál már arról, hogy olyan cégek, mint a Google és a Facebook a háttérben, harmadik felek weboldalain követnek téged. De tudtad, hogy a személyes adataidat is nyomon követik a készülékeden lévő alkalmazásokon keresztül?\n\n<b>Leteszteltünk 100 népszerű ingyenes androidos alkalmazást, és több mint 96\u0025-uk</b> tartalmazott rejtett, harmadik féltől származó nyomkövetőket. Ezek 87\u0025-a küldött adatokat a Google-nak és 68\u0025-a a Facebooknak. Ez akkor is megtörténik, ha éppen nem használod a készüléket.\n\n<b>Az alkalmazásokban lévő nyomkövetők sokkal több információhoz férhetnek hozzá,</b> mint a webhelykövető társaik, például a tartózkodási helyedhez, akár az épület emeletének megállapításával, vagy ahhoz, hogy a munkahelyeden milyen gyakran játszol, és naponta mikor, mennyi ideig alszol. <b>Még ha például nincs is Google- vagy Facebook-fiókod, akkor is gyűjthetnek rólad adatokat az alkalmazásaidon keresztül.</b>\n\nAz nyomkövető hálózatok, mint a Facebook és a Google, ezeket az apró információmorzsákat <b>arra használják, hogy digitális profilt készítsenek rólad.</b> Ezzel a nyomkövető hálózatok manipulálhatják, hogy mit látsz az interneten, és lehetővé teszik a hirdetők számára, hogy az adataid alapján árajánlatot tegyenek az elérésedre.\n\nAz alkalmazásokban lévő nyomkövetők NAGY problémát jelentenek az adatvédelem szempontjából. <b>De a DuckDuckGónak van egy megoldása, amely segíthet.</b>\n\nHa a DuckDuckGo Privacy Browser alkalmazásban engedélyezve van, akkor az alkalmazáskövetés elleni védelem számos nyomkövetőt blokkol a készülékeden lévő alkalmazásokban, miközben DuckDuckGo alkalmazás blokkolja a weboldalakon található nyomkövetőket, amikor böngészel. <b>Ez a kettős védelemmel a nyomkövető cégek összességében kevesebbet fognak tudni rólad</b>, így nagyobb nyugalommal használhatod az alkalmazásokat, tudva, hogy nagyobb védelemben részesülsz.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Az elmúlt 7 nap</string>
@@ -207,11 +201,11 @@
     <string name="atp_ActivityPastWeekBlocked">Blokkolt</string>
     <string name="atp_ActivityPastWeekAcross">Itt:</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Követési kísérlet</item>
         <item quantity="other">Követési kísérletek</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Alkalmazás</item>
         <item quantity="other">Alkalmazások</item>
     </plurals>

@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Lietotņu pretizsekošanas aizsardzība</string>
     <string name="refresh">Atsvaidzināt</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Problēmas ar lietotni?</string>
     <string name="atp_OnInitialNotification">"Lietotņu pretizsekošanas aizsardzība ir iespējota un bloķē izsekošanas mēģinājumus tavās lietotnēs"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Notiek izsekošanas aktivitāšu skenēšana… bīp… bīp..."</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="zero"><![CDATA[ Izsekošanas mēģinājumi bloķēti <b>%1$d lietotnēs</b> (pēdējās stundas laikā).]]></item>
         <item quantity="one"><![CDATA[ Izsekošanas mēģinājumi bloķēti <b>%1$d lietotnē</b> (pēdējās stundas laikā).]]></item>
         <item quantity="other"><![CDATA[ Izsekošanas mēģinājumi bloķēti <b>%1$d lietotnēs</b> (pēdējās stundas laikā).]]></item>
@@ -57,13 +57,13 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Lietotņu pretizsekošanas aizsardzība bloķējusi <b>%1$d izsekošanas mēģinājumus</b> (pēdējās diennakts laikā).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Lietotņu pretizsekošanas aizsardzība bloķējusi <b>%1$d izsekošanas mēģinājumus %2$d lietotnēs, tostarp %3$s</b> (pēdējās diennakts laikā).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="zero"><![CDATA[%1$s mēģināja tevi izsekot <b>%2$d lietotnēs</b> (pēdējās diennakts laikā). <b>Skatīt vairāk</b>]]></item>
         <item quantity="one"><![CDATA[%1$s mēģināja tevi izsekot <b>%2$d lietotnē</b> (pēdējās diennakts laikā). <b>Skatīt vairāk</b>]]></item>
         <item quantity="other"><![CDATA[%1$s mēģināja tevi izsekot <b>%2$d lietotnēs</b> (pēdējās diennakts laikā). <b>Skatīt vairāk</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="zero"><![CDATA[Lietotņu pretizsekošanas aizsardzība visvairāk izsekošanas mēģinājumu bloķējusi lietotnēs <b>%1$s</b> un <b>%2$s</b> (pēdējās diennakts laikā).]]></item>
         <item quantity="one"><![CDATA[Lietotņu pretizsekošanas aizsardzība visvairāk izsekošanas mēģinājumu bloķējusi lietotnē <b>%1$s</b> (pēdējās diennakts laikā).]]></item>
         <item quantity="other"><![CDATA[Lietotņu pretizsekošanas aizsardzība visvairāk izsekošanas mēģinājumu bloķējusi lietotnēs <b>%1$s</b> un <b>%2$s</b> (pēdējās diennakts laikā).]]></item>
@@ -85,7 +85,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Lietotņu pretizsekošanas aizsardzība bloķēja <b>%1$d izsekošanas mēģinājumus lietotnē %2$s</b> un 1 citā lietotnē (pēdējās nedēļas laikā).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Lietotņu pretizsekošanas aizsardzība bloķējusi <b>%1$d izsekošanas mēģinājumus lietotnē %2$s</b> un %3$d citās lietotnēs (pēdējās nedēļas laikā).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="zero"><![CDATA[Lietotņu pretizsekošanas aizsardzība bloķējusi <b>%1$s %2$d lietotnēs, tostarp %3$s</b> (pēdējās nedēļas laikā).]]></item>
         <item quantity="one"><![CDATA[Lietotņu pretizsekošanas aizsardzība bloķējusi <b>%1$s %2$d lietotnē, %3$s</b> (pēdējās nedēļas laikā).]]></item>
         <item quantity="other"><![CDATA[Lietotņu pretizsekošanas aizsardzība bloķējusi <b>%1$s %2$d lietotnēs, tostarp %3$s</b> (pēdējās nedēļas laikā).]]></item>
@@ -106,7 +106,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Iespējot Lietotņu pretizsekošanas aizsardzību</string>
     <string name="atp_OnboardingLastPageOneTitle">Viens vienkāršs solis labākam lietotņu privātumam!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Esam konstatējuši, ka <b>vairāk nekā 96% populārāko bezmaksas lietotņu</b> ļauj citiem uzņēmumiem izsekot tavu personisko informāciju, pat kamēr tu guli.\n\nSkati, kuras lietotnes <b>mēs pieķersim, ļaujam citiem uzņēmumiem izsekot tevi</b>, un atgūsti kontroli!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Esam konstatējuši, ka <b>vairāk nekā 96\u0025 populārāko bezmaksas lietotņu</b> ļauj citiem uzņēmumiem izsekot tavu personisko informāciju, pat kamēr tu guli.\n\nSkati, kuras lietotnes <b>mēs pieķersim, ļaujam citiem uzņēmumiem izsekot tevi</b>, un atgūsti kontroli!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Kā tas darbojas?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Lietotņu pretizsekošanas aizsardzība <b>atklāj un bloķē citu uzņēmumu lietotņu izsekotājus</b>, piemēram, Facebook, kad tas mēģina izsekot tevi veselības lietotnē.\n\n<b>Tā ir bezmaksas</b>, un tu vari izmantot savas lietotnes kā parasti. Tā darbojas fonā un palīdz <b>aizsargāt tevi dienu un nakti.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kas redz tavus datus?</string>
@@ -117,7 +117,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Lietotņu pretizsekošanas aizsardzība</string>
-    <string name="atp_daxOnboardingIntroMessage">Vairāk nekā 96% populārāko bezmaksas lietotņu ļauj citiem uzņēmumiem tevi izsekot, pat laikā, kad tu neizmanto savu tālruni. Lietotņu pretizsekošanas aizsardzība šos izsekošanas mēģinājumus atklāj un bloķē.</string>
+    <string name="atp_daxOnboardingIntroMessage">Vairāk nekā 96\u0025 populārāko bezmaksas lietotņu ļauj citiem uzņēmumiem tevi izsekot, pat laikā, kad tu neizmanto savu tālruni. Lietotņu pretizsekošanas aizsardzība šos izsekošanas mēģinājumus atklāj un bloķē.</string>
     <string name="atp_daxOnboardingPermissionTitle">Kā tas darbojas?</string>
     <string name="atp_daxOnboardingPermissionMessage">Lietotņu pretizsekošanas aizsardzība nav VPN. Tomēr tava ierīce to atpazīs kā tādu. Tas ir tāpēc, ka tās darbībai tiek izmantots vietējs VPN savienojums.\n\n Tā nekad nenovirza lietotņu datus caur ārēju serveri. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
 
@@ -170,12 +170,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Iesniegt</string>
     <string name="atp_ReportBreakageAppNextCta">Nākamais</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Lūdzu, apraksti, kas notika, ko gaidīji un kādas darbības izraisīja problēmu.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Vai biji pieteicies lietotnē, kad pamanīji problēmu?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Jā, es biju pieteicies lietotnē</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Problēma radās piesakoties</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Problēma parādījās, veidojot jaunu kontu</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Lietotnei nav nepieciešama pieteikšanās</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Vai biji pieteicies lietotnē, kad pamanīji problēmu?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Apraksti, kas notika (neobligāti)</string>
     <string name="atp_ReportBreakageFormCheckboxText">Nospiežot \"Iesniegt\", es piekrītu, ka DuckDuckGo drīkst izmantot šajā ziņojumā sniegto informāciju, lai uzlabotu Lietotņu pretizsekošanas aizsardzību.
     </string>
@@ -188,7 +182,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Par lietotņu izsekotājiem</string>
     <string name="atp_ProfilingInfoTitle">Kas ir lietotņu izsekotāji?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Droši vien, esi dzirdējis, ka tādi uzņēmumi kā Google un Facebook tevi nemanāmi izseko trešo pušu vietnēs. Bet vai zināji, ka tie izseko tavu personisko informāciju, arī izmantojot tavas ierīces lietotnes?\n\n<b>Vairāk nekā 96\\% no 100 populārākajām bezmaksas Android lietotnēm</b>, ko testējām, saturēja slēptus trešo pušu izsekotājus. No tiem 87\\% nosūtīja datus uzņēmumam Google un 68\\% nosūtīja datus uzņēmumam Facebook. Tas notiek pat laikā, kad tu nelieto ierīci.\n\n<b>Izsekotājiem lietotnēs var būt piekļuve daudz plašākai informācijai</b> nekā izsekotājiem vietnēs, piemēram, tavai atrašanās vietai – līdz pat ēkas stāvam, kurā atrodies; cik bieži tu spēlē spēles darba laikā; un kad un cik ilgi tu guli. <b>Pat ja tev nav, piemēram, Google vai Facebook konta, tie joprojām var vākt datus par tevi no tavām lietotnēm.</b>\n\nTādi izsekošanas tīkli kā Facebook un Google izmanto šos nelielos informācijas fragmentus, <b>lai veidotu tavu digitālo profilu.</b> Izmantojot to, izsekošanas tīkli var manipulēt ar saturu, ko redzi tiešsaistē, un ļaut reklāmdevējiem solīt cenas par piekļuvi tev, pamatojoties uz taviem datiem.\n\nIzsekotāji lietotnēs ir LIELA privātuma problēma. <b>Bet DuckDuckGo ir risinājums, kas var palīdzēt.</b>\n\nIespējojot Lietotņu pretizsekošanas aizsardzību lietotnē DuckDuckGo Privacy Browser, tā bloķē daudzus izsekotājus citās lietotnēs tavā ierīcē; vienlaikus DuckDuckGo lietotne bloķē izsekotājus, ko atrodam aplūkotājās tīmekļa vietnēs. <b>Šie divi aizsardzības slāņi samazina to, ko izsekošanas uzņēmumi zina par tevi</b>, tāpēc vari izmantot savas lietotnes mierīgāk, zinot, ka esi aizsargāts labāk.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Droši vien, esi dzirdējis, ka tādi uzņēmumi kā Google un Facebook tevi nemanāmi izseko trešo pušu vietnēs. Bet vai zināji, ka tie izseko tavu personisko informāciju, arī izmantojot tavas ierīces lietotnes?\n\n<b>Vairāk nekā 96\u0025 no 100 populārākajām bezmaksas Android lietotnēm</b>, ko testējām, saturēja slēptus trešo pušu izsekotājus. No tiem 87\u0025 nosūtīja datus uzņēmumam Google un 68\u0025 nosūtīja datus uzņēmumam Facebook. Tas notiek pat laikā, kad tu nelieto ierīci.\n\n<b>Izsekotājiem lietotnēs var būt piekļuve daudz plašākai informācijai</b> nekā izsekotājiem vietnēs, piemēram, tavai atrašanās vietai – līdz pat ēkas stāvam, kurā atrodies; cik bieži tu spēlē spēles darba laikā; un kad un cik ilgi tu guli. <b>Pat ja tev nav, piemēram, Google vai Facebook konta, tie joprojām var vākt datus par tevi no tavām lietotnēm.</b>\n\nTādi izsekošanas tīkli kā Facebook un Google izmanto šos nelielos informācijas fragmentus, <b>lai veidotu tavu digitālo profilu.</b> Izmantojot to, izsekošanas tīkli var manipulēt ar saturu, ko redzi tiešsaistē, un ļaut reklāmdevējiem solīt cenas par piekļuvi tev, pamatojoties uz taviem datiem.\n\nIzsekotāji lietotnēs ir LIELA privātuma problēma. <b>Bet DuckDuckGo ir risinājums, kas var palīdzēt.</b>\n\nIespējojot Lietotņu pretizsekošanas aizsardzību lietotnē DuckDuckGo Privacy Browser, tā bloķē daudzus izsekotājus citās lietotnēs tavā ierīcē; vienlaikus DuckDuckGo lietotne bloķē izsekotājus, ko atrodam aplūkotājās tīmekļa vietnēs. <b>Šie divi aizsardzības slāņi samazina to, ko izsekošanas uzņēmumi zina par tevi</b>, tāpēc vari izmantot savas lietotnes mierīgāk, zinot, ka esi aizsargāts labāk.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Pēdējās 7 dienas</string>
@@ -211,12 +205,12 @@
     <string name="atp_ActivityPastWeekBlocked">Bloķēti</string>
     <string name="atp_ActivityPastWeekAcross">Lietotņu skaits</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="zero">izsekošanas mēģinājumu</item>
         <item quantity="one">izsekošanas mēģinājums</item>
         <item quantity="other">izsekošanas mēģinājumi</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="zero">lietotnes</item>
         <item quantity="one">lietotne</item>
         <item quantity="other">lietotnes</item>

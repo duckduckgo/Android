@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Zaštita od praćenja aplikacija</string>
     <string name="refresh">Osvježi</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Imate problema s aplikacijom?</string>
     <string name="atp_OnInitialNotification">"Zaštita od praćenja aplikacija App Tracking Protection omogućena je i blokira pokušaje praćenja u tvojim aplikacijama"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Skeniranje praćenja aktivnosti… bip… bop"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Blokiranih pokušaja praćenja <b>u %1$d aplikaciji</b> (u proteklih sat vremena).]]></item>
         <item quantity="few"><![CDATA[ Blokiranih pokušaja praćenja <b>u %1$d aplikacije</b> (u proteklih sat vremena).]]></item>
         <item quantity="many"><![CDATA[ Blokiranih pokušaja praćenja <b>u %1$d aplikacija</b> (u proteklih sat vremena).]]></item>
@@ -58,14 +58,14 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaja praćenja</b> (u protekla 24 sata).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaja praćenja u %2$d aplikacija, uključujući %3$s</b> (u protekla 24 sata).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[%1$s vas je pokušao pratiti <b>u %2$d aplikaciji</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
         <item quantity="few"><![CDATA[%1$s vas je pokušao pratiti <b>u %2$d aplikacije</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
         <item quantity="many"><![CDATA[%1$s vas je pokušao pratiti <b>u %2$d aplikacija</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
         <item quantity="other"><![CDATA[%1$s vas je pokušao pratiti <b>u %2$d aplikaciji</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Zaštita praćenja aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u <b>%1$s</b> (u protekla 24 sata).]]></item>
         <item quantity="few"><![CDATA[Zaštita praćenja aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u <b>%1$s</b> i <b>%2$s</b> (u protekla 24 sata).]]></item>
         <item quantity="many"><![CDATA[Zaštita praćenja aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u <b>%1$s</b> i <b>%2$s</b> (u protekla 24 sata).]]></item>
@@ -88,7 +88,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaja praćenja u %2$s</b> i još 1 aplikaciji (prošli tjedan).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaja praćenja u %2$s</b> i %3$d drugih aplikacija (prošli tjedan).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$s u %2$d aplikaciji, %3$s</b> (prošli tjedan).]]></item>
         <item quantity="few"><![CDATA[Zaštita od praćenja aplikacije App Tracking Protection blokirala je <b>%1$s u %2$d aplikacija/e, uključujući %3$s</b> (prošli tjedan).]]></item>
         <item quantity="many"><![CDATA[Zaštita od praćenja aplikacije App Tracking Protection blokirala je <b>%1$s u %2$d aplikacija, uključujući %3$s</b> (prošli tjedan).]]></item>
@@ -110,7 +110,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Omogući zaštitu od praćenja aplikacija App Tracking Protection</string>
     <string name="atp_OnboardingLastPageOneTitle">Jedan jednostavan korak za bolju privatnost aplikacija!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Otkrili smo da <b>više od 96% popularnih besplatnih aplikacija</b> drugim tvrtkama omogućava praćenje vaših osobnih podataka, čak i kad spavate.\n\nPogledajte koje otkrivene aplikacije <b>dopuštaju drugim tvrtkama da vas prate</b> i preuzmite kontrolu nad njima!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Otkrili smo da <b>više od 96\u0025 popularnih besplatnih aplikacija</b> drugim tvrtkama omogućava praćenje vaših osobnih podataka, čak i kad spavate.\n\nPogledajte koje otkrivene aplikacije <b>dopuštaju drugim tvrtkama da vas prate</b> i preuzmite kontrolu nad njima!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Na koji način sve funkcionira?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>otkriva i blokira aplikacije za praćenje drugih tvrtki</b>, primjerice kad vas Facebook pokuša pratiti u zdravstvenoj aplikaciji.\n\n<b>Besplatna je</b> i možeš uživati u svojim aplikacijama kao i inače. Radeći u pozadini pomaže <b>te štititi i noću i danju.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Tko vidi tvoje podatke?</string>
@@ -121,7 +121,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Zaštita od praćenja aplikacija</string>
-    <string name="atp_daxOnboardingIntroMessage">Preko 96% popularnih besplatnih aplikacija omogućuje drugim tvrtkama da te prate, čak i kad ne koristiš svoj telefon. App Tracking Protection otkriva i blokira te pokušaje praćenja.</string>
+    <string name="atp_daxOnboardingIntroMessage">Preko 96\u0025 popularnih besplatnih aplikacija omogućuje drugim tvrtkama da te prate, čak i kad ne koristiš svoj telefon. App Tracking Protection otkriva i blokira te pokušaje praćenja.</string>
     <string name="atp_daxOnboardingPermissionTitle">Na koji način sve funkcionira?</string>
     <string name="atp_daxOnboardingPermissionMessage">App Tracking Protection nije VPN. Međutim, tvoj će ga uređaj prepoznati kao takvog. To je zato što za rad koristi lokalnu VPN vezu. Nikada ne usmjerava podatke aplikacija preko vanjskog poslužitelja. <annotation type="learn_more_link">Saznaj više</annotation></string>
 
@@ -174,12 +174,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Pošalji</string>
     <string name="atp_ReportBreakageAppNextCta">Dalje</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Opiši što se dogodilo, što si očekivao i koji su koraci doveli do problema.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Jesi li li bio prijavljen u aplikaciju kad si primijetio problem?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Da, bio sam prijavljen u aplikaciju</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Problem se dogodio prilikom prijave</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Imao sam problema sa kreiranjem novog računa</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Aplikacija ne zahtijeva prijavu</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Jesi li bio prijavljen u aplikaciju kada si primijetio problem?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Opiši što se dogodilo (nije obavezno)</string>
     <string name="atp_ReportBreakageFormCheckboxText">Klikom na \"Pošalji\" slažem se da DuckDuckGo može koristiti informacije iz ove prijave u svrhu poboljšanja značajke App Tracking Protection.
     </string>
@@ -192,7 +186,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">O alatima za praćenje aplikacija</string>
     <string name="atp_ProfilingInfoTitle">Što su alati za praćenje aplikacija?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Vjerojatno si čuo za tvrtke poput Googlea i Facebooka koje te potajno prate na web stranicama trećih strana. Ali jesi li znao da oni također prate tvoje osobne podatke putem aplikacija na tvom uređaju?\n\n<b>Preko 96\\% od 100 popularnih besplatnih Android aplikacija</b> koje smo testirali sadržavalo je skrivene vanjske alate za praćenje. Od toga je 87\\% poslalo podatke Googleu, a 68\\% Facebooku. To se događa čak i kada ne koristiš svoj uređaj.\n\n<b>Alati za praćenje u aplikacijama mogu imati pristup do puno više informacija</b> od njihovih \'rođaka\' za praćenje na web stranicama, kao što su tvoja lokacija (čak i detaljno to toga na kojem se katu zgrade nalaziš), koliko često igraš igre dok si na poslu te kada i koliko dugo spavaš svaki dan. <b>Čak i ako nemaš Google ili Facebook račun, oni i dalje (primjerice) mogu prikupljati podatke o tebi iz tvojih aplikacija.</b>\n\nMreže za praćenje kao što su Facebook i Google koriste ove male komadiće informacija <b>za izradu digitalnog profila o tebi.</b> Uz to, mreže za praćenje mogu manipulirati onim što vidiš na mreži i omogućiti oglašivačima da doslovno licitiraju za pristup tebi na temelju tvojih podataka.\n\nAlati za praćenje u aplikacijama VELIKI su problem za privatnost. <b>Ali DuckDuckGo ima rješenje koje može pomoći.</b>\n\nKada je omogućena u aplikaciji DuckDuckGo Privacy Browser, App Tracking Protection (zaštita od praćenja aplikacija) blokira mnoge alate za praćenje u drugim aplikacijama na tvom uređaju, a istovremeno aplikacija DuckDuckGo blokira alate za praćenje koje nalazimo na web stranicama prilikom njihovog pregledavanja. <b>Ovi dvostruki slojevi zaštite smanjuju ono što tvrtke za praćenje znaju o tebi općenito</b>, tako da s više sigurnosti možeš koristiti svoje aplikacije, znajući da si zaštićen.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Vjerojatno si čuo za tvrtke poput Googlea i Facebooka koje te potajno prate na web stranicama trećih strana. Ali jesi li znao da oni također prate tvoje osobne podatke putem aplikacija na tvom uređaju?\n\n<b>Preko 96\u0025 od 100 popularnih besplatnih Android aplikacija</b> koje smo testirali sadržavalo je skrivene vanjske alate za praćenje. Od toga je 87\u0025 poslalo podatke Googleu, a 68\u0025 Facebooku. To se događa čak i kada ne koristiš svoj uređaj.\n\n<b>Alati za praćenje u aplikacijama mogu imati pristup do puno više informacija</b> od njihovih \'rođaka\' za praćenje na web stranicama, kao što su tvoja lokacija (čak i detaljno to toga na kojem se katu zgrade nalaziš), koliko često igraš igre dok si na poslu te kada i koliko dugo spavaš svaki dan. <b>Čak i ako nemaš Google ili Facebook račun, oni i dalje (primjerice) mogu prikupljati podatke o tebi iz tvojih aplikacija.</b>\n\nMreže za praćenje kao što su Facebook i Google koriste ove male komadiće informacija <b>za izradu digitalnog profila o tebi.</b> Uz to, mreže za praćenje mogu manipulirati onim što vidiš na mreži i omogućiti oglašivačima da doslovno licitiraju za pristup tebi na temelju tvojih podataka.\n\nAlati za praćenje u aplikacijama VELIKI su problem za privatnost. <b>Ali DuckDuckGo ima rješenje koje može pomoći.</b>\n\nKada je omogućena u aplikaciji DuckDuckGo Privacy Browser, App Tracking Protection (zaštita od praćenja aplikacija) blokira mnoge alate za praćenje u drugim aplikacijama na tvom uređaju, a istovremeno aplikacija DuckDuckGo blokira alate za praćenje koje nalazimo na web stranicama prilikom njihovog pregledavanja. <b>Ovi dvostruki slojevi zaštite smanjuju ono što tvrtke za praćenje znaju o tebi općenito</b>, tako da s više sigurnosti možeš koristiti svoje aplikacije, znajući da si zaštićen.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Proteklih 7 dana</string>
@@ -215,13 +209,13 @@
     <string name="atp_ActivityPastWeekBlocked">Blokirano</string>
     <string name="atp_ActivityPastWeekAcross">U</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">pokušaj praćenja</item>
         <item quantity="few">pokušaja praćenja</item>
         <item quantity="many">pokušaja praćenja</item>
         <item quantity="other">pokušaja praćenja</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">aplikacija</item>
         <item quantity="few">aplikacije</item>
         <item quantity="many">aplikacija</item>

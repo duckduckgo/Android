@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Schutz gegen App-Tracking</string>
     <string name="refresh">Aktualisieren</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Hast du Probleme mit einer App?</string>
     <string name="atp_OnInitialNotification">"App Tracking Protection ist aktiviert und blockiert Tracking-Versuche in allen Apps"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Suche nach Tracking-Aktivität läuft"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Tracking-Versuche wurden <b>in %1$d App</b> blockiert (letzte Stunde).]]></item>
         <item quantity="other"><![CDATA[ Tracking-Versuche wurden <b>in %1$d Apps</b> blockiert (letzte Stunde).]]></item>
     </plurals>
@@ -56,12 +56,12 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ App Tracking Protection hat <b>%1$d Tracking-Versuche</b> blockiert (vergangener Tag).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ App Tracking Protection hat <b>%1$d Tracking-Versuche in %2$d Apps, darunter %3$s</b>, blockiert (vergangener Tag).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[%1$s hat versucht, dich <b>in %2$d App</b> zu tracken (vergangener Tag). <b>Mehr anzeigen</b>]]></item>
         <item quantity="other"><![CDATA[%1$s hat versucht, dich <b>in %2$d Apps</b> zu tracken (vergangener Tag). <b>Mehr anzeigen</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[App Tracking Protection hat die meisten Tracking-Versuche in <b>%1$s</b> blockiert (vergangener Tag).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection hat die meisten Tracking-Versuche in <b>%1$s</b> und <b>%2$s</b> blockiert (vergangener Tag).]]></item>
     </plurals>
@@ -82,7 +82,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[App Tracking Protection hat <b>%1$d Tracking-Versuche in %2$s</b> und 1 weiteren App blockiert (vergangene Woche).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection hat <b>%1$d Tracking-Versuche in %2$s</b> und %3$d weiteren Apps blockiert (vergangene Woche).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[App Tracking Protection hat <b>%1$s in %2$d App, %3$s</b>, blockiert (vergangene Woche).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection hat <b>%1$s in %2$d Apps, darunter %3$s</b>, blockiert (vergangene Woche).]]></item>
     </plurals>
@@ -102,7 +102,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">App Tracking Protection aktivieren</string>
     <string name="atp_OnboardingLastPageOneTitle">Ein einfacher Schritt für mehr Datenschutz in Apps!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Wir haben herausgefunden, dass <b>über 96 % der beliebten kostenlosen Apps</b> anderen Unternehmen erlauben, deine persönlichen Daten zu tracken, selbst wenn du schläfst.\n\nFinde heraus, welche Apps <b>wir dabei erwischen, dass sie zulassen, dass andere Unternehmen dich tracken</b>, und übernimm wieder die Kontrolle!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Wir haben herausgefunden, dass <b>über 96\u0025 der beliebten kostenlosen Apps</b> anderen Unternehmen erlauben, deine persönlichen Daten zu tracken, selbst wenn du schläfst.\n\nFinde heraus, welche Apps <b>wir dabei erwischen, dass sie zulassen, dass andere Unternehmen dich tracken</b>, und übernimm wieder die Kontrolle!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Wie funktioniert das?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>erkennt und blockiert App-Tracker anderer Unternehmen</b>, z. B. wenn Facebook versucht, dich in einer Gesundheits-App zu tracken.\n\n<b>Es ist kostenlos</b> und du kannst deine Apps wie gewohnt nutzen. App Tracking Protection arbeitet im Hintergrund und hilft, <b>dich Tag und Nacht zu schützen.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Wer sieht deine Daten?</string>
@@ -113,7 +113,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Schutz gegen App-Tracking</string>
-    <string name="atp_daxOnboardingIntroMessage">Über 96 % der beliebten kostenlosen Apps erlauben es anderen Unternehmen, dich selbst dann zu tracken, wenn du dein Smartphone nicht verwendest. App Tracking Protection erkennt und blockiert diese Tracking-Versuche.</string>
+    <string name="atp_daxOnboardingIntroMessage">Über 96\u0025 der beliebten kostenlosen Apps erlauben es anderen Unternehmen, dich selbst dann zu tracken, wenn du dein Smartphone nicht verwendest. App Tracking Protection erkennt und blockiert diese Tracking-Versuche.</string>
     <string name="atp_daxOnboardingPermissionTitle">Wie funktioniert das?</string>
     <string name="atp_daxOnboardingPermissionMessage">App Tracking Protection ist kein VPN. Dein Gerät erkennt ihn jedoch als solchen. Das liegt daran, dass eine lokale VPN-Verbindung verwendet wird. App-Daten werden niemals über einen externen Server weitergeleitet. <annotation type="learn_more_link">Mehr erfahren</annotation></string>
 
@@ -166,12 +166,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Abschicken</string>
     <string name="atp_ReportBreakageAppNextCta">Weiter</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Bitte beschreibe, was passiert ist, was du erwartet hattest und welche Schritte zum Problem geführt haben.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Warst du bei der App angemeldet, als du das Problem bemerkt hast?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Ja, ich war in der App eingeloggt</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Das Problem ist beim Einloggen aufgetreten</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Beim Erstellen eines neuen Kontos ist ein Problem aufgetreten</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Die App erfordert keine Anmeldung</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Warst du bei der App angemeldet, als du das Problem bemerkt hast?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Beschreibe, was passiert ist (optional)</string>
     <string name="atp_ReportBreakageFormCheckboxText">Indem ich auf „Absenden“ klicke, stimme ich zu, dass DuckDuckGo die Informationen in diesem Bericht zur Verbesserung von App Tracking Protection verwenden darf.
     </string>
@@ -184,7 +178,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Über App-Tracker</string>
     <string name="atp_ProfilingInfoTitle">Was sind App-Tracker?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Wahrscheinlich hast du davon gehört, dass Unternehmen wie Google und Facebook dich hinter den Kulissen auf Websites von Drittanbietern tracken. Wusstest du, dass sie deine persönlichen Daten auch über Apps auf deinem Gerät tracken?\n\n<b>Mehr als 96\\% der 100 beliebtesten kostenlosen Android-Apps</b>, die wir getestet haben, enthielten verborgene Drittanbieter-Tracker. Davon haben 87\\% Daten an Google und 68 % Daten an Facebook gesendet. Das passiert sogar, wenn du dein Gerät nicht verwendest.\n\n<b>Tracker in Apps haben möglicherweise Zugriff auf viel mehr Informationen</b> als Website-Tracker, z. B. deinen Standort (sogar auf welcher Etage du dich befindest), wie oft du während der Arbeit spielst und wann und wie lange du jeden Tag schläfst. <b>Selbst wenn du kein Google- oder Facebook-Konto hast, können diese Unternehmen beispielsweise über deine Apps Daten über dich sammeln.</b>\n\nTracking-Netzwerke wie Facebook und Google verwenden diese kleinen Informationen, <b>um ein digitales Profil über dich zu erstellen.</b> Damit können Tracking-Netzwerke manipulieren, was du online siehst, und Werbetreibenden erlauben, basierend auf deinen Daten für den Zugriff auf dich zu bieten.\n\nTracker in Apps sind ein riesiges Problem für den Datenschutz. <b>Aber DuckDuckGo hat eine Lösung, die dir helfen kann.</b>\n\nWenn in der DuckDuckGo Privacy-Browser-App aktiviert, blockiert App Tracking Protection viele Tracker in anderen Apps auf deinem Gerät. Gleichzeitig blockiert die DuckDuckGo-App Tracker, die wir auf Websites finden, während du browst. <b>Dieser doppelte Schutzmechanismus reduziert die Informationen, die Tracking-Unternehmen über dich haben</b>, damit du deine Apps mit größerer Sicherheit nutzen kannst. So weißt du, dass du besser geschützt bist.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Wahrscheinlich hast du davon gehört, dass Unternehmen wie Google und Facebook dich hinter den Kulissen auf Websites von Drittanbietern tracken. Wusstest du, dass sie deine persönlichen Daten auch über Apps auf deinem Gerät tracken?\n\n<b>Mehr als 96\u0025 der 100 beliebtesten kostenlosen Android-Apps</b>, die wir getestet haben, enthielten verborgene Drittanbieter-Tracker. Davon haben 87\u0025 Daten an Google und 68\u0025 Daten an Facebook gesendet. Das passiert sogar, wenn du dein Gerät nicht verwendest.\n\n<b>Tracker in Apps haben möglicherweise Zugriff auf viel mehr Informationen</b> als Website-Tracker, z. B. deinen Standort (sogar auf welcher Etage du dich befindest), wie oft du während der Arbeit spielst und wann und wie lange du jeden Tag schläfst. <b>Selbst wenn du kein Google- oder Facebook-Konto hast, können diese Unternehmen beispielsweise über deine Apps Daten über dich sammeln.</b>\n\nTracking-Netzwerke wie Facebook und Google verwenden diese kleinen Informationen, <b>um ein digitales Profil über dich zu erstellen.</b> Damit können Tracking-Netzwerke manipulieren, was du online siehst, und Werbetreibenden erlauben, basierend auf deinen Daten für den Zugriff auf dich zu bieten.\n\nTracker in Apps sind ein riesiges Problem für den Datenschutz. <b>Aber DuckDuckGo hat eine Lösung, die dir helfen kann.</b>\n\nWenn in der DuckDuckGo Privacy-Browser-App aktiviert, blockiert App Tracking Protection viele Tracker in anderen Apps auf deinem Gerät. Gleichzeitig blockiert die DuckDuckGo-App Tracker, die wir auf Websites finden, während du browst. <b>Dieser doppelte Schutzmechanismus reduziert die Informationen, die Tracking-Unternehmen über dich haben</b>, damit du deine Apps mit größerer Sicherheit nutzen kannst. So weißt du, dass du besser geschützt bist.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Vergangene 7 Tage</string>
@@ -207,11 +201,11 @@
     <string name="atp_ActivityPastWeekBlocked">Blockiert</string>
     <string name="atp_ActivityPastWeekAcross">in</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Tracking-Versuch</item>
         <item quantity="other">Tracking-Versuche</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">App</item>
         <item quantity="other">Apps</item>
     </plurals>

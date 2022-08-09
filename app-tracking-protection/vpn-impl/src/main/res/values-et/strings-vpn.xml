@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Rakenduse jälgimise kaitse</string>
     <string name="refresh">Värskenda</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Kas rakendusega on probleeme?</string>
     <string name="atp_OnInitialNotification">"Rakenduse jälgimise kaitse on lubatud ja blokeerib jälgimiskatsed kõigis sinu rakendustes"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Jälgimitegevuste otsimine… piiks… piiks"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Jälgimiskatsed blokeeriti <b>%1$d rakenduses</b> (viimase tunni jooksul).]]></item>
         <item quantity="other"><![CDATA[ Jälgimiskatsed blokeeritud <b>%1$d rakenduses</b> (viimase tunni jooksul).]]></item>
     </plurals>
@@ -56,12 +56,12 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset</b> (viimase päeva jooksul).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset %2$d rakenduses, muu hulgas %3$s</b> (viimase päeva jooksul).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[%1$s proovis jälgida sind <b>%2$d rakenduses</b> (viimase päeva jooksul). <b>Lisateave</b>]]></item>
         <item quantity="other"><![CDATA[%1$s proovis jälgida sind <b>%2$d rakenduses</b> (viimase päeva jooksul). <b>Lisateave</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Rakenduse jälgimise kaitse blokeeris kõige rohkem jälgimiskatseid rakenduses <b>%1$s</b> (viimase päeva jooksul).]]></item>
         <item quantity="other"><![CDATA[Rakenduse jälgimise kaitse blokeeris kõige rohkem jälgimiskatseid rakendustes <b>%1$s</b> ja <b>%2$s</b> (viimase päeva jooksul).]]></item>
     </plurals>
@@ -82,7 +82,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset rakenduses %2$s</b> ja ühes muus rakenduses (viimase nädala jooksul).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimise katset rakenduses %2$s</b> ja %3$d muus rakenduses (viimase nädala jooksul).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$drakenduses, %3$s</b> (viimase nädala jooksul).]]></item>
         <item quantity="other"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s kokku %2$d rakenduses, muu hulgas %3$s</b> (viimase nädala jooksul).]]></item>
     </plurals>
@@ -102,7 +102,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Luba rakenduse jälgimise kaitse</string>
     <string name="atp_OnboardingLastPageOneTitle">Üks lihtne samm parema rakenduse privaatsuse saavutamiseks.</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Leidsime, et <b>üle 96% populaarsetest tasuta rakendustest</b> võimaldab teistel ettevõtetel jälgida sinu isikuandmeid isegi siis, kui sa magad.\n\nVaata, millised rakendused <b>me tabame, mis teistel ettevõtetel sind jälgida lubavad</b>, ja võta kontroll tagasi.</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Leidsime, et <b>üle 96\u0025 populaarsetest tasuta rakendustest</b> võimaldab teistel ettevõtetel jälgida sinu isikuandmeid isegi siis, kui sa magad.\n\nVaata, millised rakendused <b>me tabame, mis teistel ettevõtetel sind jälgida lubavad</b>, ja võta kontroll tagasi.</string>
     <string name="atp_OnboardingLastPageTwoTitle">Kuidas see töötab?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Rakenduse jälgimise kaitse <b>tuvastab ja blokeerib teiste ettevõtete rakenduste jälgurid</b>, näiteks kui Facebook üritab sind jälgida terviserakenduses.\n\n<b>See on tasuta</b> ja saad nautida oma rakendusi nagu tavaliselt. See töötab taustal ja aitab <b>kaitsta sind ööpäev läbi.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kes näeb sinu andmeid?</string>
@@ -113,7 +113,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Rakenduse jälgimise kaitse</string>
-    <string name="atp_daxOnboardingIntroMessage">Üle 96% populaarsetest tasuta rakendustest võimaldavad teistel ettevõtetel sind jälgida, isegi kui sa oma telefoni ei kasuta. Rakenduse jälgimise kaitse tuvastab ja blokeerib need jälgimiskatsed.</string>
+    <string name="atp_daxOnboardingIntroMessage">Üle 96\u0025 populaarsetest tasuta rakendustest võimaldavad teistel ettevõtetel sind jälgida, isegi kui sa oma telefoni ei kasuta. Rakenduse jälgimise kaitse tuvastab ja blokeerib need jälgimiskatsed.</string>
     <string name="atp_daxOnboardingPermissionTitle">Kuidas see töötab?</string>
     <string name="atp_daxOnboardingPermissionMessage">Rakenduse jälgimise kaitse ei ole VPN. Sinu seade tunneb selle siiski sellena ära. Selle põhjuseks on see, et see kasutab töötamiseks kohalikku VPN-ühendust. See ei suuna rakenduse andmeid kunagi välise serveri kaudu. <annotation type="learn_more_link">Lisateave</annotation></string>
 
@@ -166,12 +166,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Esita</string>
     <string name="atp_ReportBreakageAppNextCta">Järgmine</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Palun kirjelda, mis juhtus, mida ootasid ja millised sammud probleemini viisid.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Kas sa olid rakendusse sisse logitud, kui sa probleemi märkasid?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Jah, olin rakendusse sisse logitud</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Probleem tekkis sisselogimisel</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Mul oli probleem uue konto loomisel</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Rakendus ei nõua sisselogimist</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Kas olid rakendusse sisse logitud, kui probleemi märkasid?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Kirjelda, mis juhtus (valikuline)</string>
     <string name="atp_ReportBreakageFormCheckboxText">Vajutades nuppu „Saada“, nõustun, et DuckDuckGo võib kasutada selles teavituses sisalduvat teavet rakenduse jälgimise kaitse täiustamiseks.
     </string>
@@ -184,7 +178,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Rakendusejälgurite teave</string>
     <string name="atp_ProfilingInfoTitle">Mis on rakendusejälgurid?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Oled ilmselt kuulnud sellest, et ettevõtted nagu Google ja Facebook jälgivad sind kulisside taga kolmandate poolte veebisaitidel. Aga kas teadsid, et nad jälgivad sinu isiklikke andmeid ka sinu seadmes olevate rakenduste kaudu?\n\n<b>Enam kui 96\\% meie testitud 100 populaarsest tasuta Androidi rakendusest</b> sisaldas peidetud kolmanda poole jälgureid. Neist 87\\% saatis andmeid Google\'ile ja 68\\% Facebookile. See juhtub isegi siis, kui sa oma seadet ei kasuta.\n\n<b>Rakendusejälguritel võib olla juurdepääs palju rohkemale teabele</b> kui nende veebisaidijälguritest sugulastel, näiteks sinu asukoht isegi hoone korruse täpsusega, kui tihti mängid tööl olles mänge ning millal ja kui kaua sa iga päev magad. <b>Isegi kui sul ei ole näiteks Google\'i või Facebooki kontot, saavad nad ikkagi sinu rakendustest sinu kohta andmeid koguda.</b>\n\nJälgimisvõrgustikud nagu Facebook ja Google kasutavad neid väikeseid infokillukesi, <b>et luua sinu kohta digitaalne profiil.</b> Selle abil saavad jälgimisvõrgustikud manipuleerida sellega, mida sa internetis näed ja võimaldada reklaamijatel teha sinu andmete põhjal pakkumisi sinuni jõudmiseks.\n\nRakendustes peituvad jälgurid on privaatsusele SUUR probleem. <b>Kuid DuckDuckGo pakub lahendust, mis võib aidata.</b>\n\nKui see on DuckDuckGo\' privaatse brauseri rakenduses lubatud, blokeerib rakenduse jälgimise kaitse paljud sinu seadme teistes rakendustes olevad jälgurid, samal ajal kui DuckDuckGo rakendus blokeerib veebisaitidel sirvimise ajal leitud jälgurid. <b>Need kahekihilised kaitsed vähendavad seda, mida jälgimisettevõtted sinu kohta üldiselt teavad,</b> nii et saad oma rakendusi kasutada suurema meelerahuga, teades, et oled paremini kaitstud.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Oled ilmselt kuulnud sellest, et ettevõtted nagu Google ja Facebook jälgivad sind kulisside taga kolmandate poolte veebisaitidel. Aga kas teadsid, et nad jälgivad sinu isiklikke andmeid ka sinu seadmes olevate rakenduste kaudu?\n\n<b>Enam kui 96\u0025 meie testitud 100 populaarsest tasuta Androidi rakendusest</b> sisaldas peidetud kolmanda poole jälgureid. Neist 87\u0025 saatis andmeid Google\'ile ja 68\u0025 Facebookile. See juhtub isegi siis, kui sa oma seadet ei kasuta.\n\n<b>Rakendusejälguritel võib olla juurdepääs palju rohkemale teabele</b> kui nende veebisaidijälguritest sugulastel, näiteks sinu asukoht isegi hoone korruse täpsusega, kui tihti mängid tööl olles mänge ning millal ja kui kaua sa iga päev magad. <b>Isegi kui sul ei ole näiteks Google\'i või Facebooki kontot, saavad nad ikkagi sinu rakendustest sinu kohta andmeid koguda.</b>\n\nJälgimisvõrgustikud nagu Facebook ja Google kasutavad neid väikeseid infokillukesi, <b>et luua sinu kohta digitaalne profiil.</b> Selle abil saavad jälgimisvõrgustikud manipuleerida sellega, mida sa internetis näed ja võimaldada reklaamijatel teha sinu andmete põhjal pakkumisi sinuni jõudmiseks.\n\nRakendustes peituvad jälgurid on privaatsusele SUUR probleem. <b>Kuid DuckDuckGo pakub lahendust, mis võib aidata.</b>\n\nKui see on DuckDuckGo\' privaatse brauseri rakenduses lubatud, blokeerib rakenduse jälgimise kaitse paljud sinu seadme teistes rakendustes olevad jälgurid, samal ajal kui DuckDuckGo rakendus blokeerib veebisaitidel sirvimise ajal leitud jälgurid. <b>Need kahekihilised kaitsed vähendavad seda, mida jälgimisettevõtted sinu kohta üldiselt teavad,</b> nii et saad oma rakendusi kasutada suurema meelerahuga, teades, et oled paremini kaitstud.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Viimased 7 päeva</string>
@@ -207,11 +201,11 @@
     <string name="atp_ActivityPastWeekBlocked">Blokeeritud</string>
     <string name="atp_ActivityPastWeekAcross">Üle</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Jälgimiskatse</item>
         <item quantity="other">Jälgimiskatsed</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Rakendus</item>
         <item quantity="other">Rakendused</item>
     </plurals>

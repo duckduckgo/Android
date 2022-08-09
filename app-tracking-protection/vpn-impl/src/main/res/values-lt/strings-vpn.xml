@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Programų sekimo apsauga</string>
     <string name="refresh">Atnaujinti</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Turite sunkumų su programėle?</string>
     <string name="atp_OnInitialNotification">"Programėlės sekimo apsauga yra įjungta ir blokuoja sekimo bandymus visose jūsų programose"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Ieškoma sekimo veiklos… pypt… boop"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Užblokuoti bandymai sekti <b> %1$d programoje</b> (per pastarąją valandą).]]></item>
         <item quantity="few"><![CDATA[ Užblokuoti bandymai sekti <b> %1$d programose</b> (per pastarąją valandą).]]></item>
         <item quantity="many"><![CDATA[ Užblokuoti bandymai sekti <b> %1$d programose</b> (per pastarąją valandą).]]></item>
@@ -58,14 +58,14 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ <b>%1$d sekimo bandymų</b> (praėjusią dieną).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų %2$d programėlėse, įskaitant %3$s</b> (praėjusią dieną).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlėje</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
         <item quantity="few"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlėse</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
         <item quantity="many"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlėse</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
         <item quantity="other"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlių</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Apsauga nuo programėlių sekimo užblokavo daugiausia sekimo bandymų <b> %1$s</b> ir <b>%2$s</b> (praėjusią dieną).]]></item>
         <item quantity="few"><![CDATA[Apsauga nuo programėlių sekimo užblokavo daugiausia sekimo bandymų <b> %1$s</b> ir <b>%2$s</b> (praėjusią dieną).]]></item>
         <item quantity="many"><![CDATA[Apsauga nuo programėlių sekimo užblokavo daugiausia sekimo bandymų <b> %1$s</b> ir <b>%2$s</b> (praėjusią dieną).]]></item>
@@ -88,7 +88,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų %2$s</b> ir 1 kitoje programėlėje (praėjusią savaitę).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų %2$s</b> ir %3$d kitose programėlėse (per pastarąją savaitę).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d programėlėje, įskaitant %3$s</b> (praėjusią savaitę).]]></item>
         <item quantity="few"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d programėlėse, įskaitant %3$s</b> (praėjusią savaitę).]]></item>
         <item quantity="many"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d programėlėse, įskaitant %3$s</b> (praėjusią savaitę).]]></item>
@@ -110,7 +110,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Įjungti apsaugą nuo programėlių sekimo</string>
     <string name="atp_OnboardingLastPageOneTitle">Vienas paprastas žingsnis siekiant geresnio programų privatumo!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Nustatėme, kad <b>daugiau kaip 96 % populiarių nemokamų programėlių</b> leidžia kitoms bendrovėms sekti jūsų asmeninę informaciją, net kai miegate.\n\nSužinokite, kurios programėlės <b>leidžia kitoms įmonėms jus sekti</b>, ir atgaukite kontrolę!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Nustatėme, kad <b>daugiau kaip 96\u0025 populiarių nemokamų programėlių</b> leidžia kitoms bendrovėms sekti jūsų asmeninę informaciją, net kai miegate.\n\nSužinokite, kurios programėlės <b>leidžia kitoms įmonėms jus sekti</b>, ir atgaukite kontrolę!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Kaip tai veikia?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Apsauga nuo programėlių sekimo <b>aptinka ir blokuoja kitų įmonių programėlių sekimo priemones</b>, pavyzdžiui, kai „Facebook“ bando jus sekti sveikatos programėlėje.\n\n<b>Ji nemokama</b>, o programėlėmis galite naudotis kaip įprastai. Veikdama fone, ji padeda <b>apsaugoti jus dieną ir naktį.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kas mato jūsų duomenis?</string>
@@ -121,7 +121,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Programų sekimo apsauga</string>
-    <string name="atp_daxOnboardingIntroMessage">Daugiau kaip 96 % populiarių nemokamų programėlių leidžia kitoms bendrovėms jus sekti, net kai nesinaudojate telefonu. „App Tracking Protection“ aptinka ir blokuoja šiuos bandymus sekti.</string>
+    <string name="atp_daxOnboardingIntroMessage">Daugiau kaip 96\u0025 populiarių nemokamų programėlių leidžia kitoms bendrovėms jus sekti, net kai nesinaudojate telefonu. „App Tracking Protection“ aptinka ir blokuoja šiuos bandymus sekti.</string>
     <string name="atp_daxOnboardingPermissionTitle">Kaip tai veikia?</string>
     <string name="atp_daxOnboardingPermissionMessage">Apsauga nuo programėlių sekimo nėra VPN. Tačiau jūsų įrenginys atpažins ją kaipo tokią. Taip yra todėl, kad jis veikia naudodamas vietinį VPN ryšį. Ji niekada nenukreips programos duomenų per išorinį serverį. <annotation type="learn_more_link">Sužinokite daugiau</annotation>.</string>
 
@@ -174,12 +174,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Štai keletas nuorodų! Galite eiti tiesiai į:</string>
     <string name="atp_ReportBreakageAppNextCta">Kitas</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Aprašykite, kas nutiko, ko tikėjotės ir kokie veiksmai sukėlė problemą.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Ar buvote prisijungę prie programėlės, kai pastebėjote problemą?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Taip, buvau prisijungęs prie programėlės</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Problema iškilo prisijungus</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Kuriant naują paskyrą iškilo problema</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Prie programos prisijungti nereikia</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b> Ar buvote prisijungę prie programos, kai pastebėjote problemą? </b></string>
     <string name="atp_ReportBreakageFormInputHint">Aprašykite, kas atsitiko (neprivaloma)</string>
     <string name="atp_ReportBreakageFormCheckboxText">Spausdamas „Pateikti“ sutinku, kad „DuckDuckGo“ gali naudoti šioje ataskaitoje pateiktą informaciją apsaugos nuo programėlių sekimo gerinimo tikslais.
     </string>
@@ -192,7 +186,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Apie programėlių sekimo įrenginius</string>
     <string name="atp_ProfilingInfoTitle">Kas yra programėlių sekimo įrenginiai?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Tikriausiai esate girdėję, kad tokios bendrovės kaip „Google“ ir „Facebook“ stebi jus trečiųjų šalių svetainėse. Bet ar žinojote, kad jie taip pat seka jūsų asmeninę informaciją per jūsų įrenginyje esančias programėles?\n\n<b>Daugiau nei 96 % iš 100 populiarių nemokamų „Android“ programėlių</b>, kurias išbandėme, buvo slaptos trečiųjų šalių sekimo programos. Iš jų 87 % siuntė duomenis „Google“, o 68 % - „Facebook“. Tai vyksta net kai nenaudojate savo įrenginio.\n\n<b>Sekimo programos gali turėti prieigą prie daug daugiau informacijos</b> nei jų svetainės sekimo programos, pavyzdžiui, jūsų buvimo vietą iki pat pastato aukšto, kuriame esate, kaip dažnai žaidžiate žaidimus darbe, kada ir kiek laiko miegate kiekvieną dieną. <b>Pavyzdžiui, jei neturite „Google\" ar „Facebook\" paskyros, jos vis tiek gali rinkti duomenis apie jus iš jūsų programėlių.</b>\n\nTokie sekimo tinklai kaip „Facebook\" ir „Google\" naudoja šiuos mažus informacijos elementus <b> skaitmeniniam jūsų profiliui sukurti.</b> Naudodamiesi juo sekimo tinklai gali keisti tai, ką matote internete, ir leisti reklamuotojams siūlyti prieigą prie jūsų pagal jūsų duomenis.\n\nProgramų stebėjimo priemonės yra DIDELĖ privatumo problema. <b> Tačiau „DuckDuckGo“ turi sprendimą, kuris gali padėti. </b>\n\nKai „DuckDuckGo“ privatumo naršyklės programėlėje įjungta apsauga nuo programėlių sekimo blokuoja daugelį kitų jūsų prietaise esančių programėlių sekiklių, o „DuckDuckGo“ programėlė tuo pačiu metu blokuoja sekimo programas, kurias randame svetainėse, kai naršote. <b>Šie du apsaugos sluoksniai sumažina sekimo bendrovių žinomų duomenų apie jus kiekį</b>, todėl galite ramiau naudotis programėlėmis žinodami, kad esate geriau apsaugoti.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Tikriausiai esate girdėję, kad tokios bendrovės kaip „Google“ ir „Facebook“ stebi jus trečiųjų šalių svetainėse. Bet ar žinojote, kad jie taip pat seka jūsų asmeninę informaciją per jūsų įrenginyje esančias programėles?\n\n<b>Daugiau nei 96\u0025 iš 100 populiarių nemokamų „Android“ programėlių</b>, kurias išbandėme, buvo slaptos trečiųjų šalių sekimo programos. Iš jų 87\u0025 siuntė duomenis „Google“, o 68\u0025 - „Facebook“. Tai vyksta net kai nenaudojate savo įrenginio.\n\n<b>Sekimo programos gali turėti prieigą prie daug daugiau informacijos</b> nei jų svetainės sekimo programos, pavyzdžiui, jūsų buvimo vietą iki pat pastato aukšto, kuriame esate, kaip dažnai žaidžiate žaidimus darbe, kada ir kiek laiko miegate kiekvieną dieną. <b>Pavyzdžiui, jei neturite „Google\" ar „Facebook\" paskyros, jos vis tiek gali rinkti duomenis apie jus iš jūsų programėlių.</b>\n\nTokie sekimo tinklai kaip „Facebook\" ir „Google\" naudoja šiuos mažus informacijos elementus <b> skaitmeniniam jūsų profiliui sukurti.</b> Naudodamiesi juo sekimo tinklai gali keisti tai, ką matote internete, ir leisti reklamuotojams siūlyti prieigą prie jūsų pagal jūsų duomenis.\n\nProgramų stebėjimo priemonės yra DIDELĖ privatumo problema. <b> Tačiau „DuckDuckGo“ turi sprendimą, kuris gali padėti. </b>\n\nKai „DuckDuckGo“ privatumo naršyklės programėlėje įjungta apsauga nuo programėlių sekimo blokuoja daugelį kitų jūsų prietaise esančių programėlių sekiklių, o „DuckDuckGo“ programėlė tuo pačiu metu blokuoja sekimo programas, kurias randame svetainėse, kai naršote. <b>Šie du apsaugos sluoksniai sumažina sekimo bendrovių žinomų duomenų apie jus kiekį</b>, todėl galite ramiau naudotis programėlėmis žinodami, kad esate geriau apsaugoti.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Praėjusios 7 dienos</string>
@@ -215,13 +209,13 @@
     <string name="atp_ActivityPastWeekBlocked">Užblokuota</string>
     <string name="atp_ActivityPastWeekAcross">Per</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Bandymas sekti</item>
         <item quantity="few">Bandymai sekti</item>
         <item quantity="many">Bandymų sekti</item>
         <item quantity="other">Bandymų sekti</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Programa</item>
         <item quantity="few">Programos</item>
         <item quantity="many">Programų</item>

@@ -372,7 +372,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.atp_daxOnboardingIntroMessage` appears to be unused"
-        errorLine1="    &lt;string name=&quot;atp_daxOnboardingIntroMessage&quot;>Over 96% of popular free apps allow other companies to track you, even when you aren’t using your phone. App Tracking Protection detects and blocks these tracking attempts.&lt;/string>"
+        errorLine1="    &lt;string name=&quot;atp_daxOnboardingIntroMessage&quot;>Over 96\u0025 of popular free apps allow other companies to track you, even when you aren’t using your phone. App Tracking Protection detects and blocks these tracking attempts.&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"

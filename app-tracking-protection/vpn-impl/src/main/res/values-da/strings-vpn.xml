@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">App-sporingsbeskyttelse</string>
     <string name="refresh">Opdater</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Har du problemer med en app?</string>
     <string name="atp_OnInitialNotification">"App Tracking Protection er aktiveret og blokerer for sporingsforsøg i alle dine apps"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Scanner for sporingsaktivitet… bip… bop"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Sporingsforsøg blokeret <b>i %1$d app</b> (seneste time).]]></item>
         <item quantity="other"><![CDATA[ Sporingsforsøg blokeret <b>i %1$d apps</b> (seneste time).]]></item>
     </plurals>
@@ -56,12 +56,12 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ App Tracking Protection blokerede <b>%1$d sporingsforsøg</b> (seneste døgn).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ App Tracking Protection blokerede <b>%1$d sporingsforsøg i %2$d apps, inkl. %3$s</b> (seneste døgn).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[%1$s forsøgte at spore dig <b>i %2$d app</b> (seneste døgn). <b>Se mere</b>]]></item>
         <item quantity="other"><![CDATA[%1$s forsøgte at spore dig <b>i %2$d apps</b> (seneste døgn). <b>Se mere</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[App Tracking Protection blokerede flest sporingsforsøg i <b>%1$s</b> (seneste døgn).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection blokerede flest sporingsforsøg i <b>%1$s</b> og <b>%2$s</b> (seneste døgn).]]></item>
     </plurals>
@@ -82,7 +82,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[App Tracking Protection har blokeret <b>%1$d sporingsforsøg i %2$s</b> og 1 anden app (seneste uge).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection har blokeret <b>%1$d sporingsforsøg i %2$s</b> og %3$d andre apps (seneste uge).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[App Tracking Protection blokerede <b>%1$s i %2$d app, %3$s</b> (seneste uge).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection blokerede <b>%1$s i %2$d apps, inkl. %3$s</b> (seneste uge).]]></item>
     </plurals>
@@ -102,7 +102,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Aktiver App Tracking Protection</string>
     <string name="atp_OnboardingLastPageOneTitle">Et nemt skridt mod at få bedre app-privatliv!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Vi har opdaget, at <b>over 96 % af de populære gratis apps</b> giver andre virksomheder mulighed for at spore dine personlige oplysninger, selv når du sover.\n\nSe, hvilke apps <b>vi fanger i at lade andre virksomheder spore dig</b>, og tag kontrollen tilbage!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Vi har opdaget, at <b>over 96 \u0025 af de populære gratis apps</b> giver andre virksomheder mulighed for at spore dine personlige oplysninger, selv når du sover.\n\nSe, hvilke apps <b>vi fanger i at lade andre virksomheder spore dig</b>, og tag kontrollen tilbage!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Hvordan virker det?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>opdager og blokerer app-trackere fra andre virksomheder</b>, f.eks. når Facebook forsøger at spore dig i en sundhedsapp.\n\n<b>Det er gratis</b>, og du kan bruge dine apps, som du plejer. Den arbejder i baggrunden og hjælper med at <b>beskytte dig dag og nat.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Hvem ser dine data?</string>
@@ -113,7 +113,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">App-sporingsbeskyttelse</string>
-    <string name="atp_daxOnboardingIntroMessage">Over 96 % af de populære gratis apps giver andre virksomheder mulighed for at spore dig. Også npr du ikke bruger din telefon. App Tracking Protection opdager og blokerer disse sporingsforsøg.</string>
+    <string name="atp_daxOnboardingIntroMessage">Over 96 \u0025 af de populære gratis apps giver andre virksomheder mulighed for at spore dig. Også npr du ikke bruger din telefon. App Tracking Protection opdager og blokerer disse sporingsforsøg.</string>
     <string name="atp_daxOnboardingPermissionTitle">Hvordan virker det?</string>
     <string name="atp_daxOnboardingPermissionMessage">App Tracking Protection er ikke en VPN. Din enhed vil dog genkende den som en. Det skyldes, at den bruger en lokal VPN-forbindelse til at fungere. Den sender aldrig appdata gennem en ekstern server. <annotation type="learn_more_link">Læs mere</annotation></string>
 
@@ -166,12 +166,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Indsend</string>
     <string name="atp_ReportBreakageAppNextCta">Næste</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Beskriv, hvad der skete, hvad du forventede, og hvilke trin der førte til problemet.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Var du logget ind på appen, da du bemærkede problemet?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Ja, jeg var logget ind på appen</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Problemet opstod, da jeg loggede ind</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Jeg havde et problem med at oprette en ny konto</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Appen kræver ikke login</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Var du logget ind i appen, da du bemærkede problemet?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Beskriv, hvad der skete (valgfrit)</string>
     <string name="atp_ReportBreakageFormCheckboxText">Ved at klikke på \"Indsend\" accepterer jeg, at DuckDuckGo må bruge oplysningerne i denne rapport til forbedring af App Tracking Protection.
     </string>
@@ -207,11 +201,11 @@
     <string name="atp_ActivityPastWeekBlocked">Blokeret</string>
     <string name="atp_ActivityPastWeekAcross">i</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">sporingsforsøg</item>
         <item quantity="other">sporingsforsøg</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">app</item>
         <item quantity="other">apps</item>
     </plurals>

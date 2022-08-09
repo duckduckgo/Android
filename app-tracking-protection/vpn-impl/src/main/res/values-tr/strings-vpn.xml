@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Uygulama İzleme Koruması</string>
     <string name="refresh">Yenile</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</string>
     <string name="atp_OnInitialNotification">"Uygulama İzleme Koruması etkinleştirildi ve uygulamalarınızdaki izleme girişimlerini engelliyor"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"İzleme etkinliği taranıyor… bip… bop"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ <b>%1$d uygulamada</b> engellenen izleme girişimleri (son bir saat).]]></item>
         <item quantity="other"><![CDATA[ <b>%1$d uygulamada</b> engellenen izleme girişimleri (son bir saat).]]></item>
     </plurals>
@@ -56,12 +56,12 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Uygulama İzleme Koruması <b>%1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[%1$s <b>%2$d uygulamada</b> sizi izleme girişiminde bulundu (son bir gün). <b>Daha Fazla Bilgi</b>]]></item>
         <item quantity="other"><![CDATA[%1$s <b>%2$d uygulamada</b> sizi izleme girişiminde bulundu (son bir gün). <b>Daha Fazla Bilgi</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Uygulama İzleme Koruması en çok izleme girişimini <b>%1$s</b> uygulamasında engelledi (son bir gün).]]></item>
         <item quantity="other"><![CDATA[Uygulama İzleme Koruması en çok izleme girişimini <b>%1$s</b> ve <b>%2$s</b> uygulamalarında engelledi (son bir gün).]]></item>
     </plurals>
@@ -82,7 +82,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%2$s</b> ve 1 diğer uygulamada %1$d izleme girişimini engelledi (son bir hafta).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s</b> ve %3$d diğer uygulamada %1$d izleme girişimini engelledi (son bir hafta).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$s uygulamasını</b> engelledi (son bir hafta).]]></item>
         <item quantity="other"><![CDATA[Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$s uygulamasını</b> engelledi (son bir hafta).]]></item>
     </plurals>
@@ -166,12 +166,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Gönder</string>
     <string name="atp_ReportBreakageAppNextCta">Sonraki</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Lütfen ne olduğunu, ne beklediğinizi ve hangi adımların soruna yol açtığını açıklayın.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Sorunu fark ettiğinizde uygulamaya giriş yapmış mıydınız?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Evet, uygulamaya giriş yapmıştım</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Sorun, giriş yaparken meydana geldi</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Yeni hesap oluştururken sorun yaşadım</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Uygulama giriş yapmayı gerektirmiyor</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Sorunu fark ettiğinizde uygulamaya giriş yapmış mıydınız?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Ne olduğunu açıklayın (isteğe bağlı)</string>
     <string name="atp_ReportBreakageFormCheckboxText">\"Gönder\"e tıklayarak, DuckDuckGo\'nun bu rapordaki bilgileri Uygulama İzlenme Koruması\'nı iyileştirmek amacıyla kullanabileceğini kabul ediyorum.
     </string>
@@ -207,11 +201,11 @@
     <string name="atp_ActivityPastWeekBlocked">Engellendi</string>
     <string name="atp_ActivityPastWeekAcross">Uygulama Sayısı:</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">İzleme Girişimi</item>
         <item quantity="other">İzleme Girişimi</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Uygulama</item>
         <item quantity="other">Uygulama</item>
     </plurals>

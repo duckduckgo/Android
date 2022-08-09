@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Блокировка отслеживания приложениями</string>
     <string name="refresh">Обновить</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Возникли проблемы с приложением?</string>
     <string name="atp_OnInitialNotification">"Защита от слежки включена и блокирует попытки отслеживания во всех приложениях"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Выполняется поиск трекеров... бип-бип"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложении</b> (за последний час).]]></item>
         <item quantity="few"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложениях</b> (за последний час).]]></item>
         <item quantity="many"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложениях</b> (за последний час).]]></item>
@@ -58,14 +58,14 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Функция App Tracking Protection пресекла <b>попытки отслеживания: %1$d</b> (за последний день).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Пресечены <b>попытки отслеживания (%1$d) в %2$d приложениях, включая %3$s</b> (за последний день).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложение</b> (за последний день). <b>Подробнее...</b>]]></item>
         <item quantity="few"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложения</b> (за последний день). <b>Подробнее...</b>]]></item>
         <item quantity="many"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложений</b> (за последний день). <b>Подробнее...</b>]]></item>
         <item quantity="other"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложения</b> (за последний день). <b>Подробнее...</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Пресечено большинство попыток отслеживания в <b>%1$s</b> (за последний день).]]></item>
         <item quantity="few"><![CDATA[Пресечено большинство попыток отслеживания в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
         <item quantity="many"><![CDATA[Пресечено большинство попыток отслеживания в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
@@ -88,7 +88,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> и еще 1 приложении (за последнюю неделю).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> и %3$d других приложениях (за последнюю неделю).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Заблокировано <b>%1$s в %2$d приложении — %3$s</b> (за последнюю неделю).]]></item>
         <item quantity="few"><![CDATA[Заблокировано <b>%1$s в %2$d приложениях, включая %3$s</b> (за последнюю неделю).]]></item>
         <item quantity="many"><![CDATA[Заблокировано <b>%1$s в %2$d приложениях, включая %3$s</b> (за последнюю неделю).]]></item>
@@ -110,7 +110,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Включить защиту от слежки</string>
     <string name="atp_OnboardingLastPageOneTitle">Простой способ надежно защитить данные!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle"><b>Более 96% популярных бесплатных приложений</b> позволяют сторонним компаниям отслеживать ваши личные данные, даже когда вы спите.\n\nТеперь вы можете увидеть, <b>какие это приложения</b>, и вернуть контроль над своими данными!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle"><b>Более 96\u0025 популярных бесплатных приложений</b> позволяют сторонним компаниям отслеживать ваши личные данные, даже когда вы спите.\n\nТеперь вы можете увидеть, <b>какие это приложения</b>, и вернуть контроль над своими данными!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Как это работает?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Защита от слежки <b>блокирует трекеры сторонних компаний</b> (например, Facebook) при попытке следить за вами в таких приложениях как «Здоровье».\n\n<b>Это бесплатная функция</b>, которая никак не влияет на работу других приложений. Работая в фоновом режиме, она <b>обеспечивает круглосуточную защиту</b>.</string>
     <string name="atp_OnboardingLastPageThreeTitle">Кто видит ваши данные?</string>
@@ -121,7 +121,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Блокировка отслеживания приложениями</string>
-    <string name="atp_daxOnboardingIntroMessage">Более 96% популярных бесплатных приложений позволяют другим компаниям отслеживать вас, даже когда вы не пользуетесь телефоном. Защита от слежки выявляет и блокирует подобные действия.</string>
+    <string name="atp_daxOnboardingIntroMessage">Более 96\u0025 популярных бесплатных приложений позволяют другим компаниям отслеживать вас, даже когда вы не пользуетесь телефоном. Защита от слежки выявляет и блокирует подобные действия.</string>
     <string name="atp_daxOnboardingPermissionTitle">Как это работает?</string>
     <string name="atp_daxOnboardingPermissionMessage">App Tracking Protection не VPN-сервис. Но ваше устройство примет эту функцию именно за VPN, а всё потому, что она использует локальное VPN-соединение. App Tracking Protection ни в коем случае не направляет данные приложения через внешний сервер. <annotation type="learn_more_link">Подробнее...</annotation></string>
 
@@ -174,12 +174,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Подтвердить</string>
     <string name="atp_ReportBreakageAppNextCta">Далее</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Опишите, что произошло, что ожидалось и какие действия привели к неполадке.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Неполадка возникла после входа в учетную запись?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Да</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Сбой возник при входе в учетную запись</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">У меня возникли трудности при создании учетной записи</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Приложение не требует входа</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Неполадка возникла после входа в учетную запись?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Опишите, что произошло (необязательно)</string>
     <string name="atp_ReportBreakageFormCheckboxText">Нажимая кнопку «Отправить», я тем самым соглашаюсь, что DuckDuckGo может использовать полученную информацию в целях улучшения защиты от слежки.
     </string>
@@ -215,13 +209,13 @@
     <string name="atp_ActivityPastWeekBlocked">Заблокировано</string>
     <string name="atp_ActivityPastWeekAcross">в</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">попытка отслеживания</item>
         <item quantity="few">попытки отслеживания</item>
         <item quantity="many">попыток отслеживания</item>
         <item quantity="other">попытки отслеживания</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">приложении</item>
         <item quantity="few">приложениях</item>
         <item quantity="many">приложениях</item>

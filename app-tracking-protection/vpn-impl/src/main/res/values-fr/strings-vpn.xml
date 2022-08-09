@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Protection contre le suivi des applications</string>
     <string name="refresh">Actualiser</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Vous rencontrez des problèmes avec une application ?</string>
     <string name="atp_OnInitialNotification">"App Tracking Protection est activé et bloque les tentatives de suivi sur vos applications"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Analyse de l'activité de suivi… bip… boop"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Tentatives de suivi bloquées <b>dans %1$d application</b> (dernière heure).]]></item>
         <item quantity="other"><![CDATA[ Tentatives de suivi bloquées <b>dans %1$d applications</b> (dernière heure).]]></item>
     </plurals>
@@ -56,12 +56,12 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ App Tracking Protection a bloqué <b>%1$d tentatives de suivi</b> (dernières 24 heures).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ App Tracking Protection a bloqué <b>%1$d tentatives de suivi dans %2$d applications, dont %3$s</b> (dernières 24 heures).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[%1$s a essayé de vous suivre <b>dans %2$d application</b> (dernières 24 heures). <b>Voir plus</b>]]></item>
         <item quantity="other"><![CDATA[%1$s a essayé de vous suivre <b>dans %2$d applications</b> (dernières 24 heures). <b>Voir plus</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+    <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[App Tracking Protection a bloqué le plus grand nombre de tentatives de suivi dans <b>%1$s</b> (dernières 24 heures).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection a bloqué le plus grand nombre de tentatives de suivi dans <b>%1$s</b> et <b>%2$s</b>(dernières 24 heures).]]></item>
     </plurals>
@@ -82,7 +82,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[App Tracking Protection a bloqué <b>%1$d tentatives de suivi dans %2$s</b> et 1 autre application (semaine dernière).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection a bloqué <b>%1$d tentatives de suivi dans %2$s</b> et %3$d autres applications (semaine dernière).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+    <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[App Tracking Protection a bloqué <b>%1$s dans %2$d application, %3$s</b> (semaine dernière).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection a bloqué <b>%1$s dans %2$d applications, dont %3$s</b> (semaine dernière).]]></item>
     </plurals>
@@ -102,7 +102,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Activer App Tracking Protection</string>
     <string name="atp_OnboardingLastPageOneTitle">Un geste simple pour mieux préserver la confidentialité des applications !</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Nous avons constaté que <b>plus de 96 % des applications populaires gratuites</b> autorisent d\'autres entreprises à suivre vos informations personnelles, même lorsque vous dormez.\n\nDécouvrez les applications <b>qui permettent à d\'autres entreprises de vous suivre</b> et reprenez le contrôle !</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Nous avons constaté que <b>plus de 96\u0025 des applications populaires gratuites</b> autorisent d\'autres entreprises à suivre vos informations personnelles, même lorsque vous dormez.\n\nDécouvrez les applications <b>qui permettent à d\'autres entreprises de vous suivre</b> et reprenez le contrôle !</string>
     <string name="atp_OnboardingLastPageTwoTitle">Comment ça marche ?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>détecte et bloque les traqueurs d\'applications d\'autres entreprises</b>, comme lorsque Facebook tente de vous suivre dans une application de santé.\n\n<b>C\'est gratuit</b> et vous pouvez profiter de vos applications comme d\'habitude. Il fonctionne en arrière-plan pour <b>vous protéger nuit et jour.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Qui voit vos données ?</string>
@@ -113,7 +113,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Protection contre le suivi des applications</string>
-    <string name="atp_daxOnboardingIntroMessage">Plus de 96 % des applications populaires gratuites autorisent d\'autres entreprises à vous suivre, même lorsque vous n\'utilisez pas votre téléphone. App Tracking Protection détecte et bloque ces tentatives de suivi.</string>
+    <string name="atp_daxOnboardingIntroMessage">Plus de 96\u0025 des applications populaires gratuites autorisent d\'autres entreprises à vous suivre, même lorsque vous n\'utilisez pas votre téléphone. App Tracking Protection détecte et bloque ces tentatives de suivi.</string>
     <string name="atp_daxOnboardingPermissionTitle">Comment ça marche ?</string>
     <string name="atp_daxOnboardingPermissionMessage">App Tracking Protection n\'est pas un VPN. Votre appareil le reconnaîtra toutefois comme tel. Et ce, parce qu\'il se sert d\'une connexion VPN locale pour fonctionner. Il n\'achemine jamais les données des applications via un serveur externe. <annotation type="learn_more_link">En savoir plus</annotation></string>
 
@@ -166,12 +166,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Envoyer</string>
     <string name="atp_ReportBreakageAppNextCta">Suivant</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Veuillez décrire ce qui s\'est passé, ce qui aurait dû se passer et les différentes étapes qui ont précédé le problème.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Étiez-vous connecté(e) à l\'application lorsque vous avez remarqué le problème ?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Oui, j\'étais connecté(e) à l\'application</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Le problème s\'est produit lors de la connexion</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">J\'ai rencontré un problème lors de la création d\'un nouveau compte</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">L\'application ne nécessite pas de connexion</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Étiez-vous connecté(e) à l\'application lorsque vous avez remarqué le problème ?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Décrivez ce qui s\'est passé (facultatif)</string>
     <string name="atp_ReportBreakageFormCheckboxText">En cliquant sur « Envoyer », j\'accepte que DuckDuckGo puisse utiliser les informations contenues dans ce rapport afin d\'améliorer App Tracking Protection.
     </string>
@@ -184,7 +178,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">À propos des traqueurs d\'applications</string>
     <string name="atp_ProfilingInfoTitle">Les traqueurs d\'applications, c\'est quoi ?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Vous avez probablement entendu parler d\'entreprises comme Google et Facebook, qui vous suivent en arrière-plan sur des sites Web tiers. Mais saviez-vous qu\'elles suivent également vos informations personnelles à travers les applications installées sur votre appareil ?\n\n<b>Parmi les 100 applications Android populaires gratuites</b> que nous avons testées, <b>plus de 96 %</b> contenaient des traqueurs tiers cachés. 87 % d\'entre eux ont envoyé des données à Google et 68 % à Facebook. Cela peut même se produire lorsque vous n\'utilisez pas votre appareil.<b>Les traqueurs présents dans les applications peuvent avoir accès à beaucoup plus d\'informations</b> que leurs cousins traqueurs de sites Web, notamment une donnée aussi précise que l\'étage d\'un bâtiment auquel vous vous trouvez, la fréquence à laquelle vous jouez à des jeux au travail et la durée quotidienne de votre sommeil. <b>Même si vous n\'avez pas de compte Google ou Facebook, par exemple, ces sociétés peuvent malgré tout recueillir des données vous concernant à partir de vos applications.</b>\n\nLes réseaux de suivi comme Facebook et Google utilisent ces bribes d\'informations <b>pour créer votre profil numérique.</b> Grâce à lui, ils peuvent agir sur ce que vous voyez en ligne et permettre aux annonceurs de vous faire une offre d\'accès en fonction de vos données.Les traqueurs des applications constituent un problème MAJEUR pour la confidentialité. <b>Mais DuckDuckGo a une solution qui peut vous aider.</b>Lorsqu\'elle est activée dans l\'application de navigateur confidentiel DuckDuckGo, la protection App Tracking Protection bloque de nombreux traqueurs dans d\'autres applications installées sur votre appareil, en même temps que l\'application DuckDuckGo bloque les traqueurs qu\'elle trouve sur les sites Web lorsque vous naviguez. <b>Grâce à ces deux couches de protection, les informations globales recueillies sur vous par ces sociétés de suivi sont moindres</b> ; vous pouvez ainsi utiliser vos applications plus sereinement, en sachant que vous bénéficiez d\'une meilleure protection.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Vous avez probablement entendu parler d\'entreprises comme Google et Facebook, qui vous suivent en arrière-plan sur des sites Web tiers. Mais saviez-vous qu\'elles suivent également vos informations personnelles à travers les applications installées sur votre appareil ?\n\n<b>Parmi les 100 applications Android populaires gratuites</b> que nous avons testées, <b>plus de 96\u0025</b> contenaient des traqueurs tiers cachés. 87\u0025 d\'entre eux ont envoyé des données à Google et 68\u0025 à Facebook. Cela peut même se produire lorsque vous n\'utilisez pas votre appareil.<b>Les traqueurs présents dans les applications peuvent avoir accès à beaucoup plus d\'informations</b> que leurs cousins traqueurs de sites Web, notamment une donnée aussi précise que l\'étage d\'un bâtiment auquel vous vous trouvez, la fréquence à laquelle vous jouez à des jeux au travail et la durée quotidienne de votre sommeil. <b>Même si vous n\'avez pas de compte Google ou Facebook, par exemple, ces sociétés peuvent malgré tout recueillir des données vous concernant à partir de vos applications.</b>\n\nLes réseaux de suivi comme Facebook et Google utilisent ces bribes d\'informations <b>pour créer votre profil numérique.</b> Grâce à lui, ils peuvent agir sur ce que vous voyez en ligne et permettre aux annonceurs de vous faire une offre d\'accès en fonction de vos données.Les traqueurs des applications constituent un problème MAJEUR pour la confidentialité. <b>Mais DuckDuckGo a une solution qui peut vous aider.</b>Lorsqu\'elle est activée dans l\'application de navigateur confidentiel DuckDuckGo, la protection App Tracking Protection bloque de nombreux traqueurs dans d\'autres applications installées sur votre appareil, en même temps que l\'application DuckDuckGo bloque les traqueurs qu\'elle trouve sur les sites Web lorsque vous naviguez. <b>Grâce à ces deux couches de protection, les informations globales recueillies sur vous par ces sociétés de suivi sont moindres</b> ; vous pouvez ainsi utiliser vos applications plus sereinement, en sachant que vous bénéficiez d\'une meilleure protection.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">7 derniers jours</string>
@@ -207,11 +201,11 @@
     <string name="atp_ActivityPastWeekBlocked">Blocages</string>
     <string name="atp_ActivityPastWeekAcross">Dans</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Tentative de suivi</item>
         <item quantity="other">Tentatives de suivi</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Application</item>
         <item quantity="other">Applications</item>
     </plurals>

@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Ochrana pred sledovaním činnosti v aplikáciách</string>
     <string name="refresh">Obnoviť</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Máte problémy s aplikáciou?</string>
     <string name="atp_OnInitialNotification">"Ochrana pred sledovaním aplikácií je povolená a blokuje pokusy o sledovanie vo vašich aplikáciách"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Skenovanie na sledovanie aktivity... pípnutie... píp"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Sledovanie pokusov o zablokovanie <b>v %1$d aplikácii</b> (za poslednú hodinu).]]></item>
         <item quantity="few"><![CDATA[ Sledovanie pokusov o zablokovanie <b>v %1$d aplikáciách</b> (za poslednú hodinu).]]></item>
         <item quantity="many"><![CDATA[ Sledovanie pokusov o zablokovanie <b>v %1$d aplikácie </b> (za poslednú hodinu).]]></item>
@@ -58,14 +58,14 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Ochrana pred sledovaním aplikácií zablokovala <b>%1$d pokusov o sledovanie</b> (za posledný deň).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Ochrana pred sledovaním aplikácií zablokovala <b>%1$d pokusov o sledovanie v %2$d aplikáciách vrátane %3$s</b> (za posledný deň).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[%1$s sa vás pokúsil sledovať <b>v %2$d aplikácii </b>(uplynulý deň). <b>Pozri viac</b>]]></item>
         <item quantity="few"><![CDATA[%1$s sa vás pokúsil sledovať <b>v %2$d aplikáciách</b> (uplynulý deň). <b>Pozri viac</b>]]></item>
         <item quantity="many"><![CDATA[%1$s sa vás pokúsil sledovať <b>v %2$d aplikácie</b> (uplynulý deň). <b>Pozri viac</b>]]></item>
         <item quantity="other"><![CDATA[%1$s sa vás pokúsil sledovať <b>v %2$d aplikáciách</b> (uplynulý deň). <b>Pozri viac</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Ochrana pred sledovaním aplikácií zablokovala najviac pokusov o sledovanie v aplikácii <b>%1$s</b> a <b>%2$s</b> (za posledný deň).]]></item>
         <item quantity="few"><![CDATA[Ochrana pred sledovaním aplikácií zablokovala najviac pokusov o sledovanie v aplikáciách <b>%1$s</b> a <b>%2$s</b> (za posledný deň).]]></item>
         <item quantity="many"><![CDATA[Ochrana pred sledovaním aplikácií zablokovala najviac pokusov o sledovanie v aplikácie <b>%1$s</b> a <b>%2$s</b> (za posledný deň).]]></item>
@@ -88,7 +88,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Ochrana pred sledovaním aplikácií zablokovala <b>%1$d pokusov o sledovanie v %2$s</b> a 1 inej aplikácii (za posledný týždeň).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Ochrana pred sledovaním aplikácií zablokovala <b>%1$d pokusov o sledovanie v %2$s</b> a %3$d iných aplikáciách (za posledný týždeň).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Ochrana sledovania aplikácií zablokovala <b>%1$s medzi %2$d aplikáciami vrátane %3$s</b> (minulý týždeň).]]></item>
         <item quantity="few"><![CDATA[Ochrana sledovania aplikácií zablokovala <b>%1$s medzi %2$d aplikáciami vrátane %3$s</b> (minulý týždeň).]]></item>
         <item quantity="many"><![CDATA[Ochrana sledovania aplikácií zablokovala <b>%1$s medzi %2$d aplikáciami vrátane %3$s</b> (minulý týždeň).]]></item>
@@ -110,7 +110,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Povoliť ochranu pred sledovaním aplikácií</string>
     <string name="atp_OnboardingLastPageOneTitle">Jeden jednoduchý krok pre lepšie súkromie aplikácie!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Zistili sme, že <b>viac ako 96 % populárnych bezplatných aplikácií</b> umožňuje iným spoločnostiam sledovať vaše osobné údaje, dokonca aj keď spíte.\n\nPozrite sa, ktoré aplikácie <b>chytáme pri tom, ako vás sledujú iné spoločnosti</b>, a získajte späť kontrolu!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Zistili sme, že <b>viac ako 96\u0025 populárnych bezplatných aplikácií</b> umožňuje iným spoločnostiam sledovať vaše osobné údaje, dokonca aj keď spíte.\n\nPozrite sa, ktoré aplikácie <b>chytáme pri tom, ako vás sledujú iné spoločnosti</b>, a získajte späť kontrolu!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Ako to funguje?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Ochrana pred sledovaním aplikácií <b>detekuje a blokuje sledovacie aplikácie iných spoločností</b>, napríklad keď sa vás Facebook pokúša sledovať v zdravotnej aplikácii.\n\n<b> Je to zadarmo </b> a môžete si užívať svoje aplikácie ako zvyčajne. Pracuje na pozadí a pomáha <b> vás chrániť vo dne aj v noci. </b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kto vidí vaše údaje?</string>
@@ -121,7 +121,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Ochrana pred sledovaním činnosti v aplikáciách</string>
-    <string name="atp_daxOnboardingIntroMessage">Viac ako 96 % populárnych bezplatných aplikácií umožňuje iným spoločnostiam sledovať vás, aj keď telefón nepoužívate. Ochrana pred sledovaním aplikácií tieto pokusy o sledovanie rozpozná a zablokuje.</string>
+    <string name="atp_daxOnboardingIntroMessage">Viac ako 96\u0025 populárnych bezplatných aplikácií umožňuje iným spoločnostiam sledovať vás, aj keď telefón nepoužívate. Ochrana pred sledovaním aplikácií tieto pokusy o sledovanie rozpozná a zablokuje.</string>
     <string name="atp_daxOnboardingPermissionTitle">Ako to funguje?</string>
     <string name="atp_daxOnboardingPermissionMessage">App Tracking Protection nie je VPN. Vaše zariadenie ho však rozpozná ako jeden. Je to preto, že na prácu používa miestne pripojenie VPN. Nikdy nesmeruje údaje aplikácie cez externý server. <annotation type="learn_more_link">Zistiť viac</annotation></string>
 
@@ -174,12 +174,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Potvrdiť</string>
     <string name="atp_ReportBreakageAppNextCta">Ďalšie</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Opíšte, čo sa stalo, čo ste očakávali a aké kroky viedli k problému.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Boli ste prihlásení do aplikácie, keď ste si problém všimli?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Áno, bol/-a som prihlásený/-á do aplikácie</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Problém sa vyskytol pri prihlasovaní</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Mal/-a som problém s vytvorením nového účtu</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Aplikácia nevyžaduje prihlásenie</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Boli ste prihlásený/-á do aplikácie, keď ste si všimli/-a problém?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Opíšte, čo sa stalo (nepovinné)</string>
     <string name="atp_ReportBreakageFormCheckboxText">Kliknutím na tlačidlo \"Odoslať\" súhlasím s tým, že DuckDuckGo môže použiť informácie v tejto správe na účely zlepšenia ochrany sledovania aplikácií.
     </string>
@@ -192,7 +186,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">O nástrojoch na sledovanie aplikácií</string>
     <string name="atp_ProfilingInfoTitle">Čo sú sledovače aplikácií?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Pravdepodobne ste už počuli o tom, že spoločnosti ako Google a Facebook, vás sledujú na pozadí webových stránkach tretích strán. Ale vedeli ste, že sledujú aj vaše osobné údaje prostredníctvom aplikácií vo vašom zariadení?\n\n<b>Viac ako 96 % zo 100 populárnych bezplatných aplikácií pre Android</b>, ktoré sme testovali, obsahovalo skryté sledovacie programy tretích strán. Z nich 87 % odoslalo údaje spoločnosti Google a 68 % odoslalo údaje spoločnosti Facebook. Stáva sa to aj vtedy, keď zariadenie nepoužívate.\n\n<b>Sledovače v aplikáciách môžu mať prístup k oveľa väčšiemu množstvu informácií</b> ako ich príbuzní na webových stránkach, napríklad o vašej polohe až po poschodie budovy, na ktorom sa nachádzate, ako často hráte hry, keď ste v práci, a kedy a ako dlho každý deň spíte. <b>Aj keď nemáte napríklad účet na Googli alebo Facebooku, môžu o vás zhromažďovať údaje z vašich aplikácií.</b>\n\nSledovacie siete ako Facebook a Google používajú tieto malé informácie <b>na vytvorenie digitálneho profilu o vás.</b> Pomocou nej môžu sledovacie siete manipulovať s tým, čo vidíte online, a umožniť inzerentom, aby na základe vašich údajov ponúkali prístup k vám.\n\nSledovače v aplikáciách predstavujú VEĽKÝ problém pre súkromie. <b> Ale DuckDuckGo má riešenie, ktoré vám môže pomôcť. </b>\n\nKeď je v aplikácii DuckDuckGo Privacy Browser zapnutá ochrana pred sledovaním aplikácií, blokuje mnohé sledovače v iných aplikáciách vo vašom zariadení a zároveň aplikácia DuckDuckGo blokuje sledovače, ktoré nájdeme na webových stránkach pri prehliadaní. <b>Tieto dve vrstvy ochrany znižujú celkový počet informácií, ktoré o vás sledovacie spoločnosti vedia</b>, takže môžete pokojne používať svoje aplikácie s vedomím, že ste lepšie chránení.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Pravdepodobne ste už počuli o tom, že spoločnosti ako Google a Facebook, vás sledujú na pozadí webových stránkach tretích strán. Ale vedeli ste, že sledujú aj vaše osobné údaje prostredníctvom aplikácií vo vašom zariadení?\n\n<b>Viac ako 96\u0025 zo 100 populárnych bezplatných aplikácií pre Android</b>, ktoré sme testovali, obsahovalo skryté sledovacie programy tretích strán. Z nich 87\u0025 odoslalo údaje spoločnosti Google a 68\u0025 odoslalo údaje spoločnosti Facebook. Stáva sa to aj vtedy, keď zariadenie nepoužívate.\n\n<b>Sledovače v aplikáciách môžu mať prístup k oveľa väčšiemu množstvu informácií</b> ako ich príbuzní na webových stránkach, napríklad o vašej polohe až po poschodie budovy, na ktorom sa nachádzate, ako často hráte hry, keď ste v práci, a kedy a ako dlho každý deň spíte. <b>Aj keď nemáte napríklad účet na Googli alebo Facebooku, môžu o vás zhromažďovať údaje z vašich aplikácií.</b>\n\nSledovacie siete ako Facebook a Google používajú tieto malé informácie <b>na vytvorenie digitálneho profilu o vás.</b> Pomocou nej môžu sledovacie siete manipulovať s tým, čo vidíte online, a umožniť inzerentom, aby na základe vašich údajov ponúkali prístup k vám.\n\nSledovače v aplikáciách predstavujú VEĽKÝ problém pre súkromie. <b> Ale DuckDuckGo má riešenie, ktoré vám môže pomôcť. </b>\n\nKeď je v aplikácii DuckDuckGo Privacy Browser zapnutá ochrana pred sledovaním aplikácií, blokuje mnohé sledovače v iných aplikáciách vo vašom zariadení a zároveň aplikácia DuckDuckGo blokuje sledovače, ktoré nájdeme na webových stránkach pri prehliadaní. <b>Tieto dve vrstvy ochrany znižujú celkový počet informácií, ktoré o vás sledovacie spoločnosti vedia</b>, takže môžete pokojne používať svoje aplikácie s vedomím, že ste lepšie chránení.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Posledných 7 dní</string>
@@ -215,13 +209,13 @@
     <string name="atp_ActivityPastWeekBlocked">Zablokované</string>
     <string name="atp_ActivityPastWeekAcross">Cez</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Pokus o sledovanie</item>
         <item quantity="few">Pokusy o sledovanie</item>
         <item quantity="many">Pokusu o sledovanie</item>
         <item quantity="other">Pokusov o sledovanie</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Aplikácia</item>
         <item quantity="few">Aplikácie</item>
         <item quantity="many">Aplikácie</item>

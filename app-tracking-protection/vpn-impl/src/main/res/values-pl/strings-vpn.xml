@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Ochrona przed śledzeniem przez aplikacje</string>
     <string name="refresh">Odśwież</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Masz problemy z aplikacją?</string>
     <string name="atp_OnInitialNotification">"Ochrona przed śledzeniem przez aplikacje jest włączona i blokuje próby śledzenia w aplikacjach."</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Trwa wyszukiwanie śladów śledzenia..."</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Zablokowane próby śledzenia <b>w %1$d aplikacji</b> (ostatnia godzina).]]></item>
         <item quantity="few"><![CDATA[ Zablokowane próby śledzenia <b>w %1$d aplikacjach</b> (ostatnia godzina).]]></item>
         <item quantity="many"><![CDATA[ Zablokowane próby śledzenia <b>w %1$d aplikacjach</b> (ostatnia godzina).]]></item>
@@ -58,14 +58,14 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Ochrona przed śledzeniem przez aplikacje zablokowała <b>następującą liczbę prób śledzenia: %1$d</b> (ostatni dzień).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Ochrona przed śledzeniem przez aplikacje zablokowała <b>następującą liczbę prób śledzenia: %1$d w %2$d aplikacjach, w tym %3$s</b> (ostatni dzień).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Firma %1$s próbowała Cię śledzić <b>w %2$d aplikacji</b> (ostatni dzień). <b>Zobacz więcej</b>]]></item>
         <item quantity="few"><![CDATA[Firma %1$s próbowała Cię śledzić <b>w %2$d aplikacjach</b> (ostatni dzień). <b>Zobacz więcej</b>]]></item>
         <item quantity="many"><![CDATA[Firma %1$s próbowała Cię śledzić <b>w %2$d aplikacjach</b> (ostatni dzień). <b>Zobacz więcej</b>]]></item>
         <item quantity="other"><![CDATA[Firma %1$s próbowała Cię śledzić <b>w %2$d aplikacji</b> (ostatni dzień). <b>Zobacz więcej</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała najwięcej prób śledzenia w aplikacji <b>%1$s</b> (ostatni dzień).]]></item>
         <item quantity="few"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała najwięcej prób śledzenia w aplikacjach <b>%1$s</b> i <b>%2$s</b> (ostatni dzień).]]></item>
         <item quantity="many"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała najwięcej prób śledzenia w aplikacjach <b>%1$s</b> i <b>%2$s</b> (ostatni dzień).]]></item>
@@ -88,7 +88,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała <b>następującą liczbę prób śledzenia: %1$d w aplikacji %2$s</b> i 1 innej aplikacji (ostatni tydzień).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała <b>następującą liczbę prób śledzenia: %1$d w aplikacji %2$s i %3$d innych aplikacjach</b> (ostatni tydzień).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała <b>%1$s w %2$d aplikacji, w tym %3$s</b> (ostatni tydzień).]]></item>
         <item quantity="few"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała <b>%1$s w %2$d aplikacjach, w tym %3$s</b> (ostatni tydzień).]]></item>
         <item quantity="many"><![CDATA[Ochrona przed śledzeniem przez aplikacje zablokowała <b>%1$s w %2$d aplikacjach, w tym %3$s</b> (ostatni tydzień).]]></item>
@@ -110,7 +110,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Włącz ochronę przed śledzeniem przez aplikacje</string>
     <string name="atp_OnboardingLastPageOneTitle">Jeden prosty krok ku większej ochronie prywatności w aplikacjach!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Odkryliśmy, że <b>ponad 96% popularnych bezpłatnych aplikacji</b> pozwala innym firmom na śledzenie Twoich danych osobowych, nawet wtedy, gdy śpisz.\n\nDowiedz się, które aplikacje <b>przyłapaliśmy na tym, że pozwalają innym firmom Cię śledzić</b>, i przejmij nad tym kontrolę!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Odkryliśmy, że <b>ponad 96\u0025 popularnych bezpłatnych aplikacji</b> pozwala innym firmom na śledzenie Twoich danych osobowych, nawet wtedy, gdy śpisz.\n\nDowiedz się, które aplikacje <b>przyłapaliśmy na tym, że pozwalają innym firmom Cię śledzić</b>, i przejmij nad tym kontrolę!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Jak to działa?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Ochrona przed śledzeniem przez aplikacje <b>wykrywa i blokuje aplikacje śledzące innych firm</b>, na przykład w sytuacji, gdy Facebook próbuje Cię śledzić za pomocą aplikacji medycznej.\n\n<b>Jest ona bezpłatna</b>, a Ty możesz korzystać z aplikacji tak, jak dotychczas. Działając w tle, pomaga <b>chronić Cię w dzień i w nocy.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kto widzi Twoje dane?</string>
@@ -121,7 +121,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Ochrona przed śledzeniem przez aplikacje</string>
-    <string name="atp_daxOnboardingIntroMessage">Ponad 96% popularnych bezpłatnych aplikacji umożliwia innym firmom Cię śledzić, nawet jeśli nie używasz swojego telefonu. Narzędzie do ochrony przed śledzeniem przez aplikacje wykrywa i blokuje takie próby śledzenia.</string>
+    <string name="atp_daxOnboardingIntroMessage">Ponad 96\u0025 popularnych bezpłatnych aplikacji umożliwia innym firmom Cię śledzić, nawet jeśli nie używasz swojego telefonu. Narzędzie do ochrony przed śledzeniem przez aplikacje wykrywa i blokuje takie próby śledzenia.</string>
     <string name="atp_daxOnboardingPermissionTitle">Jak to działa?</string>
     <string name="atp_daxOnboardingPermissionMessage">Zabezpieczenie przed śledzeniem przez aplikację nie stanowi usługi VPN. Twoje urządzenie rozpozna je jednak jako jedną z nich. Dzieje się tak, ponieważ do działania wykorzystuje lokalne połączenie VPN.\n\n Nigdy nie przekierowuje danych aplikacji przez serwer zewnętrzny. <annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
 
@@ -174,12 +174,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Wyślij</string>
     <string name="atp_ReportBreakageAppNextCta">Dalej</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Opisz, co się wydarzyło, czego oczekiwałeś(-aś) i jakie działania doprowadziły do wystąpienia problemu.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Czy kiedy wystąpił ten problem, użytkownik był zalogowany w aplikacji?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Tak, użytkownik był zalogowany w aplikacji</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Problem pojawił się podczas logowania</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Wystąpił problem z utworzeniem nowego konta</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Aplikacja nie wymaga logowania</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Czy kiedy wystąpił ten problem, użytkownik był zalogowany w aplikacji?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Opisz, co się stało (opcjonalnie)</string>
     <string name="atp_ReportBreakageFormCheckboxText">Klikając „Prześlij”, zgadzam się na wykorzystanie przez DuckDuckGo informacji zawartych w tym raporcie w celu poprawy ochrony przed śledzeniem przez aplikacje.
     </string>
@@ -192,7 +186,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Informacje o modułach śledzących aplikacji</string>
     <string name="atp_ProfilingInfoTitle">Czym są moduły śledzące aplikacji?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Pewnie wiesz, że firmy takie jak Google czy Facebook śledzą Cię za pośrednictwem stron internetowych innych firm. Ale czy wiesz, że śledzą one również Twoje dane osobowe za pośrednictwem aplikacji zainstalowanych na Twoim urządzeniu?\n\n<b>Ponad 96% ze 100 popularnych bezpłatnych aplikacji na system Android</b>, które testowaliśmy, zawierało ukryte moduły śledzące innych firm. Spośród nich 87% wysyłało dane do firmy Google, a 68% do firmy Facebook. Dzieje się tak nawet wtedy, gdy nie korzystasz z urządzenia.\n\n<b>Moduły śledzące w aplikacjach mogą mieć dostęp do znacznie większej ilości informacji</b> niż ich odpowiedniki na stronach internetowych, np. do informacji o lokalizacji użytkownika, w tym o tym, na którym piętrze budynku się znajduje, jak często gra w gry w czasie pracy oraz kiedy i jak długo śpi każdego dnia. <b>Nawet jeśli nie masz konta Google czy Facebook, mogą one gromadzić dane o Tobie za pomocą Twoich aplikacji.</b>\n\nSieci śledzące, takie jak Facebook czy Google, wykorzystują te fragmenty informacji do <b>tworzenia cyfrowych profili o Tobie.</b> Dzięki temu sieci śledzące mogą wpływać na to, co widzisz w sieci, i umożliwiać reklamodawcom składanie ofert zakupu dostępu do Ciebie na podstawie danych o Tobie.\n\nModuły śledzące w aplikacjach stanowią POWAŻNY problem dla prywatności. <b>Jednak DuckDuckGo ma rozwiązanie, które może temu zaradzić.</b>\n\nPo włączeniu ochrony przed śledzeniem przez aplikację w przeglądarce DuckDuckGo Privacy Browser blokuje ona wiele modułów śledzących w innych aplikacjach działających na Twoim urządzeniu. W tym samym czasie aplikacja DuckDuckGo blokuje moduły śledzące, które wykrywamy na stronach internetowych, które przeglądasz. <b>Podwójna warstwa zabezpieczeń zmniejsza ilość informacji, jakie gromadzą o Tobie firmy śledzące</b>, więc możesz spokojnie korzystać z aplikacji, wiedząc, że masz lepszą ochronę.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Pewnie wiesz, że firmy takie jak Google czy Facebook śledzą Cię za pośrednictwem stron internetowych innych firm. Ale czy wiesz, że śledzą one również Twoje dane osobowe za pośrednictwem aplikacji zainstalowanych na Twoim urządzeniu?\n\n<b>Ponad 96\u0025 ze 100 popularnych bezpłatnych aplikacji na system Android</b>, które testowaliśmy, zawierało ukryte moduły śledzące innych firm. Spośród nich 87\u0025 wysyłało dane do firmy Google, a 68\u0025 do firmy Facebook. Dzieje się tak nawet wtedy, gdy nie korzystasz z urządzenia.\n\n<b>Moduły śledzące w aplikacjach mogą mieć dostęp do znacznie większej ilości informacji</b> niż ich odpowiedniki na stronach internetowych, np. do informacji o lokalizacji użytkownika, w tym o tym, na którym piętrze budynku się znajduje, jak często gra w gry w czasie pracy oraz kiedy i jak długo śpi każdego dnia. <b>Nawet jeśli nie masz konta Google czy Facebook, mogą one gromadzić dane o Tobie za pomocą Twoich aplikacji.</b>\n\nSieci śledzące, takie jak Facebook czy Google, wykorzystują te fragmenty informacji do <b>tworzenia cyfrowych profili o Tobie.</b> Dzięki temu sieci śledzące mogą wpływać na to, co widzisz w sieci, i umożliwiać reklamodawcom składanie ofert zakupu dostępu do Ciebie na podstawie danych o Tobie.\n\nModuły śledzące w aplikacjach stanowią POWAŻNY problem dla prywatności. <b>Jednak DuckDuckGo ma rozwiązanie, które może temu zaradzić.</b>\n\nPo włączeniu ochrony przed śledzeniem przez aplikację w przeglądarce DuckDuckGo Privacy Browser blokuje ona wiele modułów śledzących w innych aplikacjach działających na Twoim urządzeniu. W tym samym czasie aplikacja DuckDuckGo blokuje moduły śledzące, które wykrywamy na stronach internetowych, które przeglądasz. <b>Podwójna warstwa zabezpieczeń zmniejsza ilość informacji, jakie gromadzą o Tobie firmy śledzące</b>, więc możesz spokojnie korzystać z aplikacji, wiedząc, że masz lepszą ochronę.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Ostatnie 7 dni</string>
@@ -215,13 +209,13 @@
     <string name="atp_ActivityPastWeekBlocked">Zablokowano</string>
     <string name="atp_ActivityPastWeekAcross">W</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Próba śledzenia</item>
         <item quantity="few">Próby śledzenia</item>
         <item quantity="many">Prób śledzenia</item>
         <item quantity="other">Próby śledzenia</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Aplikacja</item>
         <item quantity="few">Aplikacje</item>
         <item quantity="many">Aplikacji</item>

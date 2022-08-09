@@ -14,7 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Protecția la urmărirea aplicațiilor</string>
     <string name="refresh">Reîncărcare</string>
 
@@ -43,7 +43,7 @@
     <string name="atp_ReportIssue">Ai probleme cu o aplicație?</string>
     <string name="atp_OnInitialNotification">"Protecția împotriva monitorizării de către aplicații este activată și blochează încercările de urmărire în aplicațiile tale"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Se scanează activitatea de urmărire... bip... pac"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ Încercările de urmărire blocate <b>în %1$d aplicație</b> (ultima oră).]]></item>
         <item quantity="few"><![CDATA[ Încercările de urmărire blocate <b>în %1$d aplicații</b> (ultima oră).]]></item>
         <item quantity="other"><![CDATA[ Încercările de urmărire blocate <b>în %1$d aplicații</b> (ultima oră).]]></item>
@@ -57,13 +57,13 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire</b> (ziua trecută).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b> %1$d tentative de urmărire din %2$d aplicații, inclusiv %3$s</b> (ziua trecută).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[%1$s a încercat să te urmărească <b>în %2$d aplicație</b> (ziua trecută). <b>Vezi mai mult</b>]]></item>
         <item quantity="few"><![CDATA[%1$s a încercat să te urmărească <b>în %2$d aplicații</b> (ziua trecută). <b>Vezi mai mult</b>]]></item>
         <item quantity="other"><![CDATA[%1$s a încercat să te urmărească <b>în %2$d aplicații</b> (ziua trecută). <b>Vezi mai mult</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat cele mai multe încercări de urmărire în <b>%1$s</b> (ziua trecută).]]></item>
         <item quantity="few"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat cele mai multe încercări de urmărire în <b>%1$s</b> și <b>%2$s</b> (ziua trecută).]]></item>
         <item quantity="other"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat cele mai multe încercări de urmărire în <b>%1$s</b> și <b>%2$s</b> (ziua trecută).]]></item>
@@ -85,7 +85,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s</b> și 1 altă aplicație (săptămâna trecută).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s</b> și alte %3$d aplicații (săptămâna trecută).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b> %1$s în %2$d aplicație, %3$s</b> (săptămâna trecută).]]></item>
         <item quantity="few"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s în %2$d aplicații, inclusiv %3$s</b> (săptămâna trecută).]]></item>
         <item quantity="other"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s în %2$d aplicații, inclusiv %3$s</b> (săptămâna trecută).]]></item>
@@ -106,7 +106,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Activează Protecția împotriva urmăririi de către aplicație</string>
     <string name="atp_OnboardingLastPageOneTitle">Un pas ușor pentru o mai bună confidențialitate a aplicațiilor!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Am descoperit că <b>peste 96% dintre aplicațiile gratuite populare</b> permit altor companii să îți urmărească informațiile personale, chiar și atunci când dormi.\n\nVezi ce aplicații <b>depistăm, care permit altor companii să te urmărească</b>, și preia controlul!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Am descoperit că <b>peste 96\u0025 dintre aplicațiile gratuite populare</b> permit altor companii să îți urmărească informațiile personale, chiar și atunci când dormi.\n\nVezi ce aplicații <b>depistăm, care permit altor companii să te urmărească</b>, și preia controlul!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Cum funcționează?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Protecția împotriva urmăririi de către aplicație <b>detectează și blochează tehnologiile de urmărire din aplicațiile altor companii</b>, cum ar fi atunci când Facebook încearcă să te urmărească într-o aplicație de sănătate.\n\n<b> Este gratuit</b> și te poți bucura de aplicațiile tale ca de obicei. Lucrând în fundal, te ajută <b> să te protejezi zi și noapte. </b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Cine îți vede datele?</string>
@@ -117,7 +117,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Protecția la urmărirea aplicațiilor</string>
-    <string name="atp_daxOnboardingIntroMessage">Peste 96% dintre aplicațiile gratuite populare permit altor companii să te urmărească, chiar și atunci când nu îți folosești telefonul. Protecția împotriva urmăririi de către aplicație detectează și blochează aceste încercări de urmărire.</string>
+    <string name="atp_daxOnboardingIntroMessage">Peste 96\u0025 dintre aplicațiile gratuite populare permit altor companii să te urmărească, chiar și atunci când nu îți folosești telefonul. Protecția împotriva urmăririi de către aplicație detectează și blochează aceste încercări de urmărire.</string>
     <string name="atp_daxOnboardingPermissionTitle">Cum funcționează?</string>
     <string name="atp_daxOnboardingPermissionMessage">Protecția împotriva urmăririi de către aplicație nu este un VPN. Cu toate acestea, dispozitivul tău îl va recunoaște ca atare. Acest lucru se datorează faptului că utilizează o conexiune VPN locală pentru a funcționa. Nu direcționează niciodată datele aplicației prin intermediul unui server extern. <annotation type="learn_more_link">Află mai multe</annotation></string>
 
@@ -170,12 +170,6 @@
     <string name="atp_ReportBreakageAppSubmitCta">Trimite</string>
     <string name="atp_ReportBreakageAppNextCta">Următorul</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Descrie ce s-a întâmplat, la ce te așteptai și care au fost pașii care au dus la această problemă.</string>
-    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Erai autentificat(ă) în aplicație când ai observat problema?</string>
-    <string name="atp_ReportBreakageChoiceLoggedIn">Da, eram autentificat(ă) în aplicație</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">Problema s-a întâmplat la autentificare</string>
-    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">Am întâmpinat o problemă la crearea unui cont nou</string>
-    <string name="atp_ReportBreakageChoiceNoLogging">Aplicația nu necesită conectare</string>
-    <string name="atp_ReportBreakageChoiceHeadingText"><b>Erai autentificat(ă) în aplicație când ai observat problema?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Descrie ce s-a întâmplat (opțional)</string>
     <string name="atp_ReportBreakageFormCheckboxText">Făcând clic pe „Trimite”, sunt de acord că DuckDuckGo poate utiliza informațiile din acest raport în scopul îmbunătățirii Protecția împotriva urmăririi de către aplicație.
     </string>
@@ -188,7 +182,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Despre tehnologiile de urmărire ale aplicațiilor</string>
     <string name="atp_ProfilingInfoTitle">Ce sunt tehnologiile de urmărire ale aplicațiilor?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Ai auzit, probabil, despre faptul că unele companii, precum Google și Facebook, te urmăresc în fundal pe site-uri terțe. Dar știai că îți urmăresc și informațiile personale prin intermediul aplicațiilor de pe dispozitivul tău?\n\n<b>Peste 96% dintre cele mai populare 100 de aplicații gratuite pentru Android pe care</b> le-am testat conțineau tehnologii de urmărire terțe ascunse. Dintre acestea, 87% au trimis date către Google și 68% au trimis date către Facebook. Acest lucru se întâmplă chiar și atunci când nu îți utilizai dispozitivul.\n\n<b>Tehnologiile de urmărire din aplicații pot avea acces la mult mai multe informații</b> decât verișorii lor de urmărire a site-urilor, cum ar fi locația ta, până la etajul unei clădiri în care te afli, cât de des joci jocuri în timp ce lucrezi și când și cât timp dormi în fiecare zi. <b>Chiar dacă nu ai un cont Google sau Facebook, de exemplu, aceste companii pot colecta în continuare date despre tine din aplicațiile tale.</b>\n\nRețelele de urmărire precum Facebook și Google folosesc aceste mici informații <b>pentru a construi un profil digital despre tine.</b> Cu ajutorul acestuia, rețelele de urmărire pot manipula ceea ce vezi online și pot permite agențiilor de publicitate să liciteze pentru a avea acces la tine, pe baza datelor tale.\n\nTehnologiile de urmărire din aplicații reprezintă o MARE problemă pentru confidențialitate. <b>Însă DuckDuckGo are o soluție care te poate ajuta. </b>\n\nCând este activată în aplicația Privacy Browser a DuckDuckGo, Protecția împotriva urmăririi de către aplicație blochează multe tehnologii de urmărire din alte aplicații de pe dispozitiv, în același timp în care aplicația DuckDuckGo blochează tehnologiile de urmărire pe care le găsim pe site-uri atunci când navighezi. <b>Aceste niveluri duble de protecție reduc ceea ce află companiile de urmărire despre tine, în general</b>, astfel încât să poți utiliza aplicațiile cu mai multă liniște sufletească, știind că ești mai protejat.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Ai auzit, probabil, despre faptul că unele companii, precum Google și Facebook, te urmăresc în fundal pe site-uri terțe. Dar știai că îți urmăresc și informațiile personale prin intermediul aplicațiilor de pe dispozitivul tău?\n\n<b>Peste 96\u0025 dintre cele mai populare 100 de aplicații gratuite pentru Android pe care</b> le-am testat conțineau tehnologii de urmărire terțe ascunse. Dintre acestea, 87\u0025 au trimis date către Google și 68\u0025 au trimis date către Facebook. Acest lucru se întâmplă chiar și atunci când nu îți utilizai dispozitivul.\n\n<b>Tehnologiile de urmărire din aplicații pot avea acces la mult mai multe informații</b> decât verișorii lor de urmărire a site-urilor, cum ar fi locația ta, până la etajul unei clădiri în care te afli, cât de des joci jocuri în timp ce lucrezi și când și cât timp dormi în fiecare zi. <b>Chiar dacă nu ai un cont Google sau Facebook, de exemplu, aceste companii pot colecta în continuare date despre tine din aplicațiile tale.</b>\n\nRețelele de urmărire precum Facebook și Google folosesc aceste mici informații <b>pentru a construi un profil digital despre tine.</b> Cu ajutorul acestuia, rețelele de urmărire pot manipula ceea ce vezi online și pot permite agențiilor de publicitate să liciteze pentru a avea acces la tine, pe baza datelor tale.\n\nTehnologiile de urmărire din aplicații reprezintă o MARE problemă pentru confidențialitate. <b>Însă DuckDuckGo are o soluție care te poate ajuta. </b>\n\nCând este activată în aplicația Privacy Browser a DuckDuckGo, Protecția împotriva urmăririi de către aplicație blochează multe tehnologii de urmărire din alte aplicații de pe dispozitiv, în același timp în care aplicația DuckDuckGo blochează tehnologiile de urmărire pe care le găsim pe site-uri atunci când navighezi. <b>Aceste niveluri duble de protecție reduc ceea ce află companiile de urmărire despre tine, în general</b>, astfel încât să poți utiliza aplicațiile cu mai multă liniște sufletească, știind că ești mai protejat.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Ultimele 7 zile</string>
@@ -211,12 +205,12 @@
     <string name="atp_ActivityPastWeekBlocked">Blocat</string>
     <string name="atp_ActivityPastWeekAcross">Din</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Încercare de urmărire</item>
         <item quantity="few">Încercări de urmărire</item>
         <item quantity="other">Încercări de urmărire</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Aplicație</item>
         <item quantity="few">Aplicații</item>
         <item quantity="other">Aplicații</item>
