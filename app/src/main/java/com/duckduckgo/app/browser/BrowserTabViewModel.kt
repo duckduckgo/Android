@@ -443,6 +443,10 @@ class BrowserTabViewModel @Inject constructor(
             val permissionsToRequest: Array<String>,
             val request: PermissionRequest
         ) : Command()
+        class GrantSitePermissionRequest(
+            val sitePermissionsToGrant: Array<String>,
+            val request: PermissionRequest
+        ) : Command()
     }
 
     sealed class NavigationCommand : Command() {
@@ -1410,13 +1414,16 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onSitePermissionRequested(request: PermissionRequest, sitePermissionsAllowedToAsk: Array<String>) {
-        val sitePermissionsGranted = sitePermissionsManager.getSitePermissionsGranted(request.origin.toString(), tabId, sitePermissionsAllowedToAsk)
-        val sitePermissionsToAsk = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }.toTypedArray()
-        if (sitePermissionsGranted.isNotEmpty()) {
-            request.grant(sitePermissionsGranted)
-        }
-        if (sitePermissionsToAsk.isNotEmpty()) {
-            command.value = ShowSitePermissionsDialog(sitePermissionsToAsk, request)
+        viewModelScope.launch(dispatchers.io()) {
+            val url = request.origin.toString()
+            val sitePermissionsGranted = sitePermissionsManager.getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
+            val sitePermissionsToAsk = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }.toTypedArray()
+            if (sitePermissionsGranted.isNotEmpty()) {
+                command.postValue(GrantSitePermissionRequest(sitePermissionsGranted, request))
+            }
+            if (sitePermissionsToAsk.isNotEmpty()) {
+                command.postValue(ShowSitePermissionsDialog(sitePermissionsToAsk, request))
+            }
         }
     }
 

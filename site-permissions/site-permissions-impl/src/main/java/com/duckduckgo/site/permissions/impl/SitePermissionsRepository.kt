@@ -17,36 +17,45 @@
 package com.duckduckgo.site.permissions.impl
 
 import android.webkit.PermissionRequest
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.store.SitePermissionAskSettingType
+import com.duckduckgo.site.permissions.store.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
+import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity.Companion.allowedWithin24h
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface SitePermissionsRepository {
     fun isDomainAllowedToAsk(url: String, permission: String): Boolean
     fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
+    fun sitePermissionGranted(url: String, tabId:String, permission: String)
 }
 
 @ContributesBinding(ActivityScope::class)
 class SitePermissionsRepositoryImpl @Inject constructor(
     private val sitePermissionsDao: SitePermissionsDao,
-    private val sitePermissionsAllowedDao: SitePermissionsAllowedDao
+    private val sitePermissionsAllowedDao: SitePermissionsAllowedDao,
+    private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider
 ) : SitePermissionsRepository {
 
     override fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
-        val sitePermissionsForDomain = sitePermissionsDao.getSitePermissionsByDomain(url)
+        val sitePermissionsForDomain = sitePermissionsDao.getSitePermissionsByDomain(url) ?: return true
         return when (permission) {
             PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
-                val askForCameraEnabled = sitePermissionsForDomain?.askCameraEnabled == true
-                val isAskCameraSettingDenied = sitePermissionsForDomain?.askCameraSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
+                val askForCameraEnabled = sitePermissionsForDomain.askCameraEnabled
+                val isAskCameraSettingDenied = sitePermissionsForDomain.askCameraSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
                 askForCameraEnabled && !isAskCameraSettingDenied
             }
             PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
-                val askForMicEnabled = sitePermissionsForDomain?.askMicEnabled == true
-                val isAskMicSettingDenied = sitePermissionsForDomain?.askMicSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
+                val askForMicEnabled = sitePermissionsForDomain.askMicEnabled
+                val isAskMicSettingDenied = sitePermissionsForDomain.askMicSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
                 askForMicEnabled && !isAskMicSettingDenied
             }
             else -> false
@@ -56,18 +65,36 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     override fun isDomainGranted(url: String, tabId: String, permission: String): Boolean {
         val sitePermissionForDomain = sitePermissionsDao.getSitePermissionsByDomain(url)
         val permissionAllowedId = SitePermissionAllowedEntity.getPermissionAllowedId(url, tabId, permission)
-        val sitePermissionGranted = sitePermissionsAllowedDao.getSitePermissionAllowed(permissionAllowedId) != null
+        val permissionAllowedEntity = sitePermissionsAllowedDao.getSitePermissionAllowed(permissionAllowedId)
+        val permissionGrantedWithin24h = permissionAllowedEntity?.allowedWithin24h() == true
 
         return when (permission) {
             PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
                 val isCameraAlwaysAllowed = sitePermissionForDomain?.askCameraSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
-                sitePermissionGranted || isCameraAlwaysAllowed
+                permissionGrantedWithin24h || isCameraAlwaysAllowed
             }
             PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
                 val isMicAlwaysAllowed = sitePermissionForDomain?.askMicSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
-                sitePermissionGranted || isMicAlwaysAllowed
+                permissionGrantedWithin24h || isMicAlwaysAllowed
             }
             else -> false
+        }
+    }
+
+    override fun sitePermissionGranted(url: String, tabId: String, permission: String) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val existingPermission = sitePermissionsDao.getSitePermissionsByDomain(url)
+            if (existingPermission == null) {
+                sitePermissionsDao.insert(SitePermissionsEntity(domain = url))
+            }
+            val sitePermissionAllowed = SitePermissionAllowedEntity(
+                SitePermissionAllowedEntity.getPermissionAllowedId(url, tabId, permission),
+                url,
+                tabId,
+                permission,
+                System.currentTimeMillis()
+            )
+            sitePermissionsAllowedDao.insert(sitePermissionAllowed)
         }
     }
 }

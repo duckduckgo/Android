@@ -9,5 +9,5 @@ interface SitePermissionsDialogLauncher {
 
     fun registerPermissionLauncher(caller: ActivityResultCaller)
 
-    fun askForSitePermission(context: Context, url: String, permissionsRequested: Array<String>, request: PermissionRequest)
+    fun askForSitePermission(context: Context, url: String, tabId: String, permissionsRequested: Array<String>, request: PermissionRequest)
 }

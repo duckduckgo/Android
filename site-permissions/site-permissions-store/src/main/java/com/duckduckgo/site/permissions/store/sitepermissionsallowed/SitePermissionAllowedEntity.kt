@@ -18,6 +18,7 @@ package com.duckduckgo.site.permissions.store.sitepermissionsallowed
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlin.math.abs
 
 @Entity(tableName = "site_permission_allowed")
 data class SitePermissionAllowedEntity(
@@ -28,8 +29,15 @@ data class SitePermissionAllowedEntity(
     val allowedAt: Long
 ) {
     companion object {
+
         fun getPermissionAllowedId(domain: String, tabId: String, permissionAllowed: String): String {
             return "$domain$tabId$permissionAllowed"
+        }
+
+        fun SitePermissionAllowedEntity.allowedWithin24h(): Boolean {
+            val now = System.currentTimeMillis()
+            val diff = abs(now - this.allowedAt) / 3600000
+            return diff <= 24
         }
     }
 }

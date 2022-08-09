@@ -27,12 +27,12 @@ class SitePermissionsManagerImpl @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository
 ) : SitePermissionsManager {
 
-    override fun getSitePermissionsGranted(url: String, tabId: String, resources: Array<String>): Array<String> =
+    override suspend fun getSitePermissionsGranted(url: String, tabId: String, resources: Array<String>): Array<String> =
         resources
             .filter { sitePermissionsRepository.isDomainGranted(url, tabId, it) }
             .toTypedArray()
 
-    override fun getSitePermissionsAllowedToAsk(url: String, resources: Array<String>): Array<String> =
+    override suspend fun getSitePermissionsAllowedToAsk(url: String, resources: Array<String>): Array<String> =
         resources
             .filter { isPermissionSupported(it) }
             .filter { sitePermissionsRepository.isDomainAllowedToAsk(url, it) }

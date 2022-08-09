@@ -27,22 +27,28 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.impl.R.layout
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
 @ContributesBinding(ActivityScope::class)
 @SingleInstanceIn(ActivityScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
-    private val systemPermissionsHelper: SystemPermissionsHelper
+    private val systemPermissionsHelper: SystemPermissionsHelper,
+    private val sitePermissionsRepository: SitePermissionsRepository,
+    private val appCoroutineScope: CoroutineScope
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
     private lateinit var context: Context
     private lateinit var permissionRequested: SitePermissionsRequestedType
+    private var siteURL: String = ""
+    private var tabId: String = ""
 
     override fun registerPermissionLauncher(caller: ActivityResultCaller) {
         systemPermissionsHelper.registerPermissionLaunchers(
@@ -55,10 +61,13 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     override fun askForSitePermission(
         context: Context,
         url: String,
+        tabId: String,
         permissionsRequested: Array<String>,
         request: PermissionRequest
     ) {
         sitePermissionRequest = request
+        siteURL = url
+        this.tabId = tabId
         this.context = context
 
         when {
@@ -159,10 +168,18 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     private fun systemPermissionGranted(permissionType: SitePermissionsRequestedType) {
         when (permissionType) {
-            SitePermissionsRequestedType.CAMERA -> sitePermissionRequest.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
-            SitePermissionsRequestedType.AUDIO -> sitePermissionRequest.grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+            SitePermissionsRequestedType.CAMERA -> {
+                sitePermissionRequest.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
+                sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+            }
+            SitePermissionsRequestedType.AUDIO -> {
+                sitePermissionRequest.grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+                sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+            }
             SitePermissionsRequestedType.CAMERA_AND_AUDIO -> {
                 sitePermissionRequest.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+                sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+                sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
             }
         }
     }
@@ -201,6 +218,13 @@ enum class SitePermissionsRequestedType {
                 Manifest.permission.CAMERA -> CAMERA
                 Manifest.permission.RECORD_AUDIO -> AUDIO
                 else -> CAMERA_AND_AUDIO
+            }
+
+        fun SitePermissionsRequestedType.convertToPermissionRequest(): Array<String> =
+            when (this) {
+                CAMERA -> arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+                AUDIO -> arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+                CAMERA_AND_AUDIO -> arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
             }
     }
 }

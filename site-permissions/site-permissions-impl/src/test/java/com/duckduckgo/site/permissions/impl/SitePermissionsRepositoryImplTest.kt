@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.site.permissions.api
+package com.duckduckgo.site.permissions.impl
 
-interface SitePermissionsManager {
+import junit.framework.TestCase
 
-    suspend fun getSitePermissionsGranted(url: String, tabId: String, resources: Array<String>): Array<String>
+class SitePermissionsRepositoryImplTest : TestCase() {
 
-    suspend fun getSitePermissionsAllowedToAsk(url: String, resources: Array<String>): Array<String>
+    fun testIsDomainAllowedToAsk() {}
+
+    fun testIsDomainGranted() {}
+
+    fun testSitePermissionGranted() {}
 }
