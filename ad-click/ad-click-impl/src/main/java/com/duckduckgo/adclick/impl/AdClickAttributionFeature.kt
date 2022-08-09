@@ -18,6 +18,7 @@ package com.duckduckgo.adclick.impl
 
 data class AdClickAttributionFeature(
     val state: String,
+    val minSupportedVersion: Int?,
     val settings: AdClickAttributionSettings,
     val exceptions: List<AdClickAttributionException>
 )

@@ -126,6 +126,15 @@ class AdClickAttributionPluginTest {
         assertEquals(ENABLED_STATE, detectionsEntity[0].domainDetection)
     }
 
+    @Test
+    fun whenFeatureNameMatchesAdClickAttributionAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/ad_click_attribution_min_supported_version.json")
+
+        testee.store(FEATURE_NAME_VALUE, jsonString)
+
+        verify(mockFeatureTogglesRepository).insert(AdClickFeatureToggles(FEATURE_NAME, true, 1234))
+    }
+
     companion object {
         private val FEATURE_NAME = AdClickFeatureName.AdClickAttributionFeatureName
         private val FEATURE_NAME_VALUE = FEATURE_NAME.value
