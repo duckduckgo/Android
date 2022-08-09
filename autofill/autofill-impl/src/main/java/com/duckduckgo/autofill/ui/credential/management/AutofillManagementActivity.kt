@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -66,6 +65,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         setTitle(R.string.managementScreenTitle)
+        showListMode()
         observeViewModel()
     }
 
@@ -81,6 +81,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun launchDeviceAuth() {
         if (deviceAuthenticator.hasValidDeviceAuthentication()) {
+            viewModel.lock()
             deviceAuthenticator.authenticate(AUTOFILL, this) {
                 if (it == AuthResult.Success) {
                     viewModel.unlock()
@@ -117,13 +118,14 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun processCommand(command: AutofillSettingsViewModel.Command) {
         var processed = true
         when (command) {
-            is ShowListMode -> showListMode()
             is ShowCredentialMode -> showCredentialMode(command.credentials)
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar("Username")
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar("Password")
             is ShowDisabledMode -> showDisabledMode()
             is ShowLockedMode -> showLockMode()
             is LaunchDeviceAuth -> launchDeviceAuth()
+            is ExitCredentialMode -> supportFragmentManager.forceExitFragment(TAG_CREDENTIAL)
+            is ExitLockedMode -> supportFragmentManager.forceExitFragment(TAG_LOCKED)
             else -> processed = false
         }
         if (processed) {
@@ -138,10 +140,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun showListMode() {
         resetToolbar()
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            replace(R.id.fragment_container_view, AutofillManagementListMode.instance())
-        }
+        supportFragmentManager.showFragment(AutofillManagementListMode.instance(), TAG_ALL_CREDENTIALS, false)
     }
 
     private fun showCredentialMode(credentials: LoginCredentials?) {
@@ -151,30 +150,19 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
                 contentInsetStartWithNavigation = 0
             }
             title = credentials.domainTitle ?: credentials.domain
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                replace(R.id.fragment_container_view, AutofillManagementCredentialsMode.instance())
-            }
+
+            supportFragmentManager.showFragment(AutofillManagementCredentialsMode.instance(), TAG_CREDENTIAL, true)
         }
     }
 
     private fun showLockMode() {
         resetToolbar()
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            replace(
-                R.id.fragment_container_view,
-                AutofillManagementLockedMode.instance()
-            )
-        }
+        supportFragmentManager.showFragment(AutofillManagementLockedMode.instance(), TAG_LOCKED, true)
     }
 
     private fun showDisabledMode() {
         resetToolbar()
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            replace(R.id.fragment_container_view, AutofillManagementDisabledMode.instance())
-        }
+        supportFragmentManager.showFragment(AutofillManagementDisabledMode.instance(), TAG_DISABLED, false)
     }
 
     private fun resetToolbar() {
@@ -192,6 +180,11 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        private const val TAG_LOCKED = "tag_fragment_locked"
+        private const val TAG_DISABLED = "tag_fragment_disabled"
+        private const val TAG_CREDENTIAL = "tag_fragment_credential"
+        private const val TAG_ALL_CREDENTIALS = "tag_fragment_all_credentials"
+
         fun intent(context: Context): Intent {
             return Intent(context, AutofillManagementActivity::class.java)
         }

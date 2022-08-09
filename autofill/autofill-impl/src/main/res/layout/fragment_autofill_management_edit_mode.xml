@@ -17,7 +17,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/colorPrimaryDark">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,8 +32,8 @@
             android:id="@+id/domainTitleEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/credentialManagementEditLoginTitleHint"
             android:layout_marginBottom="@dimen/keyline_5"
+            android:hint="@string/credentialManagementEditLoginTitleHint"
             android:visibility="gone"
             app:editable="true"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyUsername" />
@@ -77,9 +78,9 @@
             android:id="@+id/lastUpdatedView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Caption"
-            android:textColor="?attr/secondaryTextColor"
-            android:layout_marginTop="@dimen/keyline_4"/>
+            android:textColor="?attr/secondaryTextColor" />
 
     </LinearLayout>
 

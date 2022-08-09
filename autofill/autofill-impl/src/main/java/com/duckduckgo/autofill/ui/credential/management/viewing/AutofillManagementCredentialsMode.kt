@@ -100,7 +100,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(), MenuProvider {
         return when (menuItem.itemId) {
             R.id.view_menu_edit -> {
                 viewModel.viewState.value.credentialMode.credentialsViewed?.let {
-                    viewModel.onEditCredentials(it)
+                    viewModel.onEditCredentials(it, true)
                 }
                 true
             }
