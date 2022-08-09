@@ -169,8 +169,8 @@
     <string name="atp_ReportBreakageAppEntry">Lietotne %1$s</string>
     <string name="atp_ReportBreakageAppSubmitCta">Iesniegt</string>
     <string name="atp_ReportBreakageAppNextCta">Nākamais</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Lūdzu, apraksti, kas notika, ko gaidīji un kādas darbības izraisīja problēmu.</string>
-    <string name="atp_ReportBreakageFormInputHint">Apraksti, kas notika (neobligāti)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Lūdzu, apraksti, kas notiek, kādu rezultātu tu gaidīji, un darbības, kas noveda pie problēmas.</string>
+    <string name="atp_ReportBreakageFormInputHint">Pastāsti mums vairāk par problēmu, ar kuru saskaries</string>
     <string name="atp_ReportBreakageFormCheckboxText">Nospiežot \"Iesniegt\", es piekrītu, ka DuckDuckGo drīkst izmantot šajā ziņojumā sniegto informāciju, lai uzlabotu Lietotņu pretizsekošanas aizsardzību.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -178,6 +178,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Ziņojums nosūtīts, paldies! Tavas atsauksmes palīdz mums uzlabot Lietotņu pretizsekošanas aizsardzību visiem.</string>
     <string name="atp_ThanksForTheFeedback">Paldies tev par atsauksmēm!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Kas notiek?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Kas notiek?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Lietotne sastingst vai avarē</string>
+    <string name="atp_ReportBreakageCategoryMessages">Neizdodas ziņojuma piegāde</string>
+    <string name="atp_ReportBreakageCategoryCalls">Nedarbojas balss zvani</string>
+    <string name="atp_ReportBreakageCategoryUploads">Nevar augšupielādēt vai koplietot failus</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Nevar lejupielādēt failus</string>
+    <string name="atp_ReportBreakageCategoryContent">Saturs ielādējas lēni</string>
+    <string name="atp_ReportBreakageCategoryConnection">Lietotnei nav savienojuma</string>
+    <string name="atp_ReportBreakageCategoryIot">Nevar izveidot savienojumu ar vietēju ierīci</string>
+    <string name="atp_ReportBreakageCategoryOther">Kaut kas cits</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Par lietotņu izsekotājiem</string>

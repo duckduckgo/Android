@@ -174,6 +174,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Report sent, thanks! Your feedback helps us improve App Tracking Protection for everyone.</string>
     <string name="atp_ThanksForTheFeedback">Thanks for the feedback!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">What\'s happening?</string>
+    <string name="atp_ReportBreakageCategoriesHint">What\'s happening?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">App freezes or crashes</string>
+    <string name="atp_ReportBreakageCategoryMessages">Message delivery fails</string>
+    <string name="atp_ReportBreakageCategoryCalls">Voice calls don\'t work</string>
+    <string name="atp_ReportBreakageCategoryUploads">Can\'t upload or share files</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Can\'t download files</string>
+    <string name="atp_ReportBreakageCategoryContent">Content loads slowly</string>
+    <string name="atp_ReportBreakageCategoryConnection">App has no connection</string>
+    <string name="atp_ReportBreakageCategoryIot">Can\'t connect local device</string>
+    <string name="atp_ReportBreakageCategoryOther">Something else</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">About App Trackers</string>

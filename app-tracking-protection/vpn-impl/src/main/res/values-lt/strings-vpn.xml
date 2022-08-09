@@ -173,8 +173,8 @@
     <string name="atp_ReportBreakageAppEntry">%1$s programa</string>
     <string name="atp_ReportBreakageAppSubmitCta">Štai keletas nuorodų! Galite eiti tiesiai į:</string>
     <string name="atp_ReportBreakageAppNextCta">Kitas</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Aprašykite, kas nutiko, ko tikėjotės ir kokie veiksmai sukėlė problemą.</string>
-    <string name="atp_ReportBreakageFormInputHint">Aprašykite, kas atsitiko (neprivaloma)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Aprašykite, kas vyksta, ko tikėjotės, kad įvyks, ir veiksmus, dėl kurių iškilo problema.</string>
+    <string name="atp_ReportBreakageFormInputHint">Papasakokite daugiau apie problemą, su kuria susiduriate</string>
     <string name="atp_ReportBreakageFormCheckboxText">Spausdamas „Pateikti“ sutinku, kad „DuckDuckGo“ gali naudoti šioje ataskaitoje pateiktą informaciją apsaugos nuo programėlių sekimo gerinimo tikslais.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -182,6 +182,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Ataskaita išsiųsta, ačiū! Jūsų atsiliepimai padeda mums tobulinti apsaugą nuo programėlių sekimo visiems.</string>
     <string name="atp_ThanksForTheFeedback">Dėkojame už atsiliepimą!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Kas vyksta?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Kas vyksta?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Programa užstringa arba sutrinka jos veikimas</string>
+    <string name="atp_ReportBreakageCategoryMessages">Nepavyksta pristatyti pranešimo</string>
+    <string name="atp_ReportBreakageCategoryCalls">Balso skambučiai neveikia</string>
+    <string name="atp_ReportBreakageCategoryUploads">Nepavyksta įkelti ar bendrinti failų</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Nepavyksta atsisiųsti failų</string>
+    <string name="atp_ReportBreakageCategoryContent">Turinys įkeliamas lėtai</string>
+    <string name="atp_ReportBreakageCategoryConnection">Nėra ryšio su programėle</string>
+    <string name="atp_ReportBreakageCategoryIot">Nepavyksta prijungti vietinio įrenginio</string>
+    <string name="atp_ReportBreakageCategoryOther">Kažkas kito</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Apie programėlių sekimo įrenginius</string>

@@ -165,8 +165,8 @@
     <string name="atp_ReportBreakageAppEntry">%1$s alkalmazás</string>
     <string name="atp_ReportBreakageAppSubmitCta">Elküldés</string>
     <string name="atp_ReportBreakageAppNextCta">Következő</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Írd le, mi történt, mire számítottál, és milyen lépések vezettek a problémához.</string>
-    <string name="atp_ReportBreakageFormInputHint">Ismertesd a történteket (nem kötelező)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Írd le, mi történik, mire számítottál, és milyen lépések vezettek a problémához.</string>
+    <string name="atp_ReportBreakageFormInputHint">Mondj el többet a tapasztalt problémáról</string>
     <string name="atp_ReportBreakageFormCheckboxText">A „Beküldés” gombra kattintva elfogadom, hogy a DuckDuckGo felhasználja a jelentésben szereplő információkat az alkalmazáskövetés elleni védelem javítása céljából.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -174,6 +174,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Jelentés elküldve, köszönjük! A visszajelzésed segítenek nekünk, hogy mindenki számára javítsuk az alkalmazáskövetés elleni védelmet.</string>
     <string name="atp_ThanksForTheFeedback">Köszönjük a visszajelzést!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Mi történik?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Mi történik?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Az alkalmazás lefagy vagy összeomlik</string>
+    <string name="atp_ReportBreakageCategoryMessages">Az üzenet kézbesítése sikertelen</string>
+    <string name="atp_ReportBreakageCategoryCalls">A hanghívások nem működnek</string>
+    <string name="atp_ReportBreakageCategoryUploads">Nem lehet fájlokat feltölteni vagy megosztani</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Nem lehet fájlokat letölteni</string>
+    <string name="atp_ReportBreakageCategoryContent">A tartalom lassan töltődik be</string>
+    <string name="atp_ReportBreakageCategoryConnection">Az alkalmazásnak nincs kapcsolata</string>
+    <string name="atp_ReportBreakageCategoryIot">Nem lehet csatlakoztatni a helyi eszközt</string>
+    <string name="atp_ReportBreakageCategoryOther">Valami más</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Az alkalmazáskövetőkről</string>

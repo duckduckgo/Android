@@ -165,8 +165,8 @@
     <string name="atp_ReportBreakageAppEntry">%1$s-appen</string>
     <string name="atp_ReportBreakageAppSubmitCta">Skicka</string>
     <string name="atp_ReportBreakageAppNextCta">Nästa</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Beskriv vad som hände, vad du väntade dig skulle hända och vilka åtgärder som ledde till problemet.</string>
-    <string name="atp_ReportBreakageFormInputHint">Beskriv vad som hände (valfritt)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Beskriv vad som händer, vad du väntade dig skulle hända och vilka steg som ledde till problemet.</string>
+    <string name="atp_ReportBreakageFormInputHint">Berätta mer om ditt problem</string>
     <string name="atp_ReportBreakageFormCheckboxText">Genom att klicka på Skicka godkänner jag att DuckDuckGo använder informationen i den här rapporten i syfte att förbättra App Tracking Protection.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -174,6 +174,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Rapporten har skickats – tack! Din feedback hjälper oss att förbättra App Tracking Protection för alla.</string>
     <string name="atp_ThanksForTheFeedback">Tack för din återkoppling!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Vad är det som händer?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Vad är det som händer?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Appen låser sig eller kraschar</string>
+    <string name="atp_ReportBreakageCategoryMessages">Meddelanden levereras inte</string>
+    <string name="atp_ReportBreakageCategoryCalls">Röstsamtal fungerar inte</string>
+    <string name="atp_ReportBreakageCategoryUploads">Det går inte att ladda upp eller dela filer</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Det går inte att ladda ner filer</string>
+    <string name="atp_ReportBreakageCategoryContent">Innehållet läses in långsamt</string>
+    <string name="atp_ReportBreakageCategoryConnection">Appen har ingen uppkoppling</string>
+    <string name="atp_ReportBreakageCategoryIot">Det går inte att ansluta en lokal enhet</string>
+    <string name="atp_ReportBreakageCategoryOther">Övrigt</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Om appspårare</string>

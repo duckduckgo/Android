@@ -165,8 +165,8 @@
     <string name="atp_ReportBreakageAppEntry">Rakendus %1$s</string>
     <string name="atp_ReportBreakageAppSubmitCta">Esita</string>
     <string name="atp_ReportBreakageAppNextCta">Järgmine</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Palun kirjelda, mis juhtus, mida ootasid ja millised sammud probleemini viisid.</string>
-    <string name="atp_ReportBreakageFormInputHint">Kirjelda, mis juhtus (valikuline)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Palun kirjelda, mis toimub, mida sa ootasid ja mis viis probleemi tekkimiseni.</string>
+    <string name="atp_ReportBreakageFormInputHint">Räägi meile oma probleemist lähemalt</string>
     <string name="atp_ReportBreakageFormCheckboxText">Vajutades nuppu „Saada“, nõustun, et DuckDuckGo võib kasutada selles teavituses sisalduvat teavet rakenduse jälgimise kaitse täiustamiseks.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -174,6 +174,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Teavitus saadetud, aitäh. Sinu tagasiside aitab meil rakenduse jälgimise kaitset kõigi jaoks täiustada.</string>
     <string name="atp_ThanksForTheFeedback">Aitäh tagasiside eest!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Mis toimub?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Mis toimub?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Rakendus hangub või läheb krahhi</string>
+    <string name="atp_ReportBreakageCategoryMessages">Sõnumite kohaletoimetamine nurjub</string>
+    <string name="atp_ReportBreakageCategoryCalls">Häälkõned ei tööta</string>
+    <string name="atp_ReportBreakageCategoryUploads">Faile ei saa üles laadida ega jagada</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Faile ei saa alla laadida</string>
+    <string name="atp_ReportBreakageCategoryContent">Sisu laaditakse aeglaselt</string>
+    <string name="atp_ReportBreakageCategoryConnection">Rakendusel pole ühendust</string>
+    <string name="atp_ReportBreakageCategoryIot">Ei saa ühendada kohalikku seadet</string>
+    <string name="atp_ReportBreakageCategoryOther">Midagi muud</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Rakendusejälgurite teave</string>

@@ -169,8 +169,8 @@
     <string name="atp_ReportBreakageAppEntry">%1$s aplicație</string>
     <string name="atp_ReportBreakageAppSubmitCta">Trimite</string>
     <string name="atp_ReportBreakageAppNextCta">Următorul</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Descrie ce s-a întâmplat, la ce te așteptai și care au fost pașii care au dus la această problemă.</string>
-    <string name="atp_ReportBreakageFormInputHint">Descrie ce s-a întâmplat (opțional)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Te rugăm să descrii ce se întâmplă, ce te așteptai să se întâmple și pașii care au dus la apariția problemei.</string>
+    <string name="atp_ReportBreakageFormInputHint">Spune-ne mai multe despre problema cu care te confrunți</string>
     <string name="atp_ReportBreakageFormCheckboxText">Făcând clic pe „Trimite”, sunt de acord că DuckDuckGo poate utiliza informațiile din acest raport în scopul îmbunătățirii Protecția împotriva urmăririi de către aplicație.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -178,6 +178,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Raport trimis, mulțumim! Feedbackul tău ne ajută să îmbunătățim Protecția împotriva urmăririi de către aplicație pentru toată lumea.</string>
     <string name="atp_ThanksForTheFeedback">Îți mulțumim pentru feedback!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Ce se întâmplă?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Ce se întâmplă?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Aplicația se blochează sau se închide</string>
+    <string name="atp_ReportBreakageCategoryMessages">Nu reușesc să livrez mesaje</string>
+    <string name="atp_ReportBreakageCategoryCalls">Apelurile vocale nu funcționează</string>
+    <string name="atp_ReportBreakageCategoryUploads">Nu pot încărca sau distribui fișiere</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Nu pot descărca fișiere</string>
+    <string name="atp_ReportBreakageCategoryContent">Conținutul se încarcă lent</string>
+    <string name="atp_ReportBreakageCategoryConnection">Aplicația nu are conexiune</string>
+    <string name="atp_ReportBreakageCategoryIot">Nu pot conecta dispozitivul local</string>
+    <string name="atp_ReportBreakageCategoryOther">Altceva</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Despre tehnologiile de urmărire ale aplicațiilor</string>

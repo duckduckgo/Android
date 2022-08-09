@@ -165,8 +165,8 @@
     <string name="atp_ReportBreakageAppEntry">%1$s-App</string>
     <string name="atp_ReportBreakageAppSubmitCta">Abschicken</string>
     <string name="atp_ReportBreakageAppNextCta">Weiter</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Bitte beschreibe, was passiert ist, was du erwartet hattest und welche Schritte zum Problem geführt haben.</string>
-    <string name="atp_ReportBreakageFormInputHint">Beschreibe, was passiert ist (optional)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Bitte beschreibe, was passiert, was du erwartet hast und welche Schritte zu dem Problem geführt haben.</string>
+    <string name="atp_ReportBreakageFormInputHint">Erzähl uns mehr über dein Problem</string>
     <string name="atp_ReportBreakageFormCheckboxText">Indem ich auf „Absenden“ klicke, stimme ich zu, dass DuckDuckGo die Informationen in diesem Bericht zur Verbesserung von App Tracking Protection verwenden darf.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -174,6 +174,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Bericht gesendet, danke! Dein Feedback hilft uns, App Tracking Protection für alle zu verbessern.</string>
     <string name="atp_ThanksForTheFeedback">Vielen Dank für dein Feedback!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Was passiert?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Was passiert?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">App reagiert nicht oder stürzt ab</string>
+    <string name="atp_ReportBreakageCategoryMessages">Fehler bei der Nachrichtenübermittlung</string>
+    <string name="atp_ReportBreakageCategoryCalls">Sprachanrufe funktionieren nicht</string>
+    <string name="atp_ReportBreakageCategoryUploads">Dateien können nicht hochgeladen oder geteilt werden</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Dateien können nicht heruntergeladen werden</string>
+    <string name="atp_ReportBreakageCategoryContent">Inhalt wird langsam geladen</string>
+    <string name="atp_ReportBreakageCategoryConnection">App hat keine Verbindung</string>
+    <string name="atp_ReportBreakageCategoryIot">Lokales Gerät kann nicht verbunden werden</string>
+    <string name="atp_ReportBreakageCategoryOther">Etwas anderes</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Über App-Tracker</string>

@@ -165,8 +165,8 @@
     <string name="atp_ReportBreakageAppEntry">Appen %1$s</string>
     <string name="atp_ReportBreakageAppSubmitCta">Indsend</string>
     <string name="atp_ReportBreakageAppNextCta">Næste</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Beskriv, hvad der skete, hvad du forventede, og hvilke trin der førte til problemet.</string>
-    <string name="atp_ReportBreakageFormInputHint">Beskriv, hvad der skete (valgfrit)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Beskriv hvad der sker, hvad du forventede, og hvad der førte til problemet.</string>
+    <string name="atp_ReportBreakageFormInputHint">Fortæl os mere om problemet</string>
     <string name="atp_ReportBreakageFormCheckboxText">Ved at klikke på \"Indsend\" accepterer jeg, at DuckDuckGo må bruge oplysningerne i denne rapport til forbedring af App Tracking Protection.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -174,6 +174,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Rapporten er sendt. Tak! Din feedback hjælper os med at forbedre App Tracking Protection for alle.</string>
     <string name="atp_ThanksForTheFeedback">Tak for din feedback!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Hvad sker der?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Hvad sker der?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Appen fryser eller går ned</string>
+    <string name="atp_ReportBreakageCategoryMessages">Levering af meddelelser mislykkes</string>
+    <string name="atp_ReportBreakageCategoryCalls">Stemmeopkald virker ikke</string>
+    <string name="atp_ReportBreakageCategoryUploads">Kan ikke uploade eller dele filer</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Kan ikke downloade filer</string>
+    <string name="atp_ReportBreakageCategoryContent">Indholdet indlæses langsomt</string>
+    <string name="atp_ReportBreakageCategoryConnection">App har ingen forbindelse</string>
+    <string name="atp_ReportBreakageCategoryIot">Kan ikke oprette forbindelse til en lokal enhed</string>
+    <string name="atp_ReportBreakageCategoryOther">Noget andet</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Om app-trackere</string>

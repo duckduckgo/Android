@@ -173,8 +173,8 @@
     <string name="atp_ReportBreakageAppEntry">aplikacija %1$s</string>
     <string name="atp_ReportBreakageAppSubmitCta">Pošalji</string>
     <string name="atp_ReportBreakageAppNextCta">Dalje</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Opiši što se dogodilo, što si očekivao i koji su koraci doveli do problema.</string>
-    <string name="atp_ReportBreakageFormInputHint">Opiši što se dogodilo (nije obavezno)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Opiši što se događa, što si očekivao da će se dogoditi i korake koji su doveli do problema.</string>
+    <string name="atp_ReportBreakageFormInputHint">Reci nam više o svom problemu</string>
     <string name="atp_ReportBreakageFormCheckboxText">Klikom na \"Pošalji\" slažem se da DuckDuckGo može koristiti informacije iz ove prijave u svrhu poboljšanja značajke App Tracking Protection.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -182,6 +182,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Prijava poslana, hvala! Tvoje nam povratne informacije pomažu poboljšati zaštitu od praćenja aplikacija za sve.</string>
     <string name="atp_ThanksForTheFeedback">Hvala na povratnim informacijama!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Što se događa?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Što se događa?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Aplikacija se smrzava ili ruši</string>
+    <string name="atp_ReportBreakageCategoryMessages">Isporuka poruke nije uspjela</string>
+    <string name="atp_ReportBreakageCategoryCalls">Glasovni pozivi ne funkcioniraju</string>
+    <string name="atp_ReportBreakageCategoryUploads">Ne mogu učitati ili dijeliti datoteke</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Ne mogu preuzimati datoteke</string>
+    <string name="atp_ReportBreakageCategoryContent">Sadržaj se sporo učitava</string>
+    <string name="atp_ReportBreakageCategoryConnection">Aplikacija nije na mreži</string>
+    <string name="atp_ReportBreakageCategoryIot">Nije moguće povezati lokalni uređaj s mrežom</string>
+    <string name="atp_ReportBreakageCategoryOther">Nešto drugo</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">O alatima za praćenje aplikacija</string>

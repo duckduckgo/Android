@@ -182,6 +182,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Zpráva odeslána, díky! Zpětná vazba nám pomáhá zdokonalovat App Tracking Protection pro všechny.</string>
     <string name="atp_ThanksForTheFeedback">Děkujeme za zpětnou vazbu!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Co se děje?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Co se děje?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Aplikace se seká nebo padá</string>
+    <string name="atp_ReportBreakageCategoryMessages">Nejde doručit zprávu</string>
+    <string name="atp_ReportBreakageCategoryCalls">Nefungují hlasové hovory</string>
+    <string name="atp_ReportBreakageCategoryUploads">Nejde nahrávat nebo sdílet soubory</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Nejde stahovat soubory</string>
+    <string name="atp_ReportBreakageCategoryContent">Obsah se načítá pomalu</string>
+    <string name="atp_ReportBreakageCategoryConnection">Aplikace se nepřipojí k internetu</string>
+    <string name="atp_ReportBreakageCategoryIot">Místní zařízení nejde připojit</string>
+    <string name="atp_ReportBreakageCategoryOther">Něco jiného</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">O trackerech v aplikacích</string>

@@ -165,8 +165,8 @@
     <string name="atp_ReportBreakageAppEntry">%1$s uygulaması</string>
     <string name="atp_ReportBreakageAppSubmitCta">Gönder</string>
     <string name="atp_ReportBreakageAppNextCta">Sonraki</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Lütfen ne olduğunu, ne beklediğinizi ve hangi adımların soruna yol açtığını açıklayın.</string>
-    <string name="atp_ReportBreakageFormInputHint">Ne olduğunu açıklayın (isteğe bağlı)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Lütfen neler olduğunu, ne olmasını beklediğinizi ve soruna yol açan adımları açıklayın.</string>
+    <string name="atp_ReportBreakageFormInputHint">Yaşadığınız sorun hakkında daha fazla bilgi verin</string>
     <string name="atp_ReportBreakageFormCheckboxText">\"Gönder\"e tıklayarak, DuckDuckGo\'nun bu rapordaki bilgileri Uygulama İzlenme Koruması\'nı iyileştirmek amacıyla kullanabileceğini kabul ediyorum.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -174,6 +174,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Rapor gönderildi, teşekkürler! Geri bildiriminiz herkes için Uygulama İzleme Koruması\'nı geliştirmemize yardımcı oluyor.</string>
     <string name="atp_ThanksForTheFeedback">Geri dönüşünüz için teşekkür ederiz!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Ne oluyor?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Ne oluyor?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Uygulama donuyor veya çöküyor</string>
+    <string name="atp_ReportBreakageCategoryMessages">Mesaj teslimatı başarısız</string>
+    <string name="atp_ReportBreakageCategoryCalls">Sesli aramalar çalışmıyor</string>
+    <string name="atp_ReportBreakageCategoryUploads">Dosya yüklenemiyor veya paylaşılamıyor</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Dosya indirilemiyor</string>
+    <string name="atp_ReportBreakageCategoryContent">İçerik yavaş yükleniyor</string>
+    <string name="atp_ReportBreakageCategoryConnection">Uygulamanın bağlantısı yok</string>
+    <string name="atp_ReportBreakageCategoryIot">Yerel cihaza bağlanılamıyor</string>
+    <string name="atp_ReportBreakageCategoryOther">Başka bir şey</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Uygulama İzleyiciler Hakkında</string>

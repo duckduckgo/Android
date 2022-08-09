@@ -165,8 +165,8 @@
     <string name="atp_ReportBreakageAppEntry">%1$s-sovellus</string>
     <string name="atp_ReportBreakageAppSubmitCta">Lähetä</string>
     <string name="atp_ReportBreakageAppNextCta">Seuraava</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Kerro mitä tapahtui, mitä odotit tapahtuvan ja mitkä vaiheet johtivat ongelmaan.</string>
-    <string name="atp_ReportBreakageFormInputHint">Kuvaile mitä tapahtui (valinnainen)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Kuvaile, mitä tapahtuu, mitä odotit tapahtuvan ja vaiheet, jotka johtivat ongelmaan.</string>
+    <string name="atp_ReportBreakageFormInputHint">Kerro meille lisää kohtaamasi ongelmasta</string>
     <string name="atp_ReportBreakageFormCheckboxText">Napsauttamalla \"Lähetä\" hyväksyn, että DuckDuckGo voi käyttää tämän ilmoituksen tietoja App Tracking Protectionin parantamiseen.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -174,6 +174,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Ilmoitus lähetetty, kiitos! Palautteesi auttaa meitä parantamaan App Tracking Protectionia kaikille.</string>
     <string name="atp_ThanksForTheFeedback">Kiitos palautteesta!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Mitä tapahtuu?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Mitä tapahtuu?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Sovellus jumittuu tai kaatuu</string>
+    <string name="atp_ReportBreakageCategoryMessages">Viestin toimitus epäonnistuu</string>
+    <string name="atp_ReportBreakageCategoryCalls">Äänipuhelut eivät toimi</string>
+    <string name="atp_ReportBreakageCategoryUploads">Tiedostoja ei voi ladata tai jakaa</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Tiedostoja ei voi ladata</string>
+    <string name="atp_ReportBreakageCategoryContent">Sisältö latautuu hitaasti</string>
+    <string name="atp_ReportBreakageCategoryConnection">Sovelluksella ei ole yhteyttä</string>
+    <string name="atp_ReportBreakageCategoryIot">Paikallista laitetta ei voi yhdistää</string>
+    <string name="atp_ReportBreakageCategoryOther">Jotain muuta</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Tietoja sovellusten seurantalaitteista</string>

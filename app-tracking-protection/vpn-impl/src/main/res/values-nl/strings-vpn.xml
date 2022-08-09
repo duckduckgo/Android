@@ -165,8 +165,8 @@
     <string name="atp_ReportBreakageAppEntry">%1$s-app</string>
     <string name="atp_ReportBreakageAppSubmitCta">Verzend</string>
     <string name="atp_ReportBreakageAppNextCta">Volgende</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Beschrijf wat er is gebeurd, wat je verwachtte en welke stappen tot het probleem hebben geleid.</string>
-    <string name="atp_ReportBreakageFormInputHint">Beschrijf wat er is gebeurd (optioneel)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Beschrijf wat er gebeurt, wat je verwachtte dat er zou gebeuren en de stappen die tot het probleem hebben geleid.</string>
+    <string name="atp_ReportBreakageFormInputHint">Vertel ons meer over het probleem dat je ondervindt</string>
     <string name="atp_ReportBreakageFormCheckboxText">Door op \'Verzenden\' te klikken, ga ik ermee akkoord dat DuckDuckGo de informatie in dit rapport kan gebruiken om App Tracking Protection te verbeteren.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -174,6 +174,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Rapport verzonden. Bedankt! Je feedback helpt ons App Tracking Protection voor iedereen te verbeteren.</string>
     <string name="atp_ThanksForTheFeedback">Bedankt voor de feedback!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Wat gebeurt er?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Wat gebeurt er?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">App bevriest of crasht</string>
+    <string name="atp_ReportBreakageCategoryMessages">Afleveren van bericht mislukt</string>
+    <string name="atp_ReportBreakageCategoryCalls">Spraakoproepen werken niet</string>
+    <string name="atp_ReportBreakageCategoryUploads">Kan bestanden niet uploaden of delen</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Kan bestanden niet downloaden</string>
+    <string name="atp_ReportBreakageCategoryContent">Inhoud wordt langzaam geladen</string>
+    <string name="atp_ReportBreakageCategoryConnection">App heeft geen verbinding</string>
+    <string name="atp_ReportBreakageCategoryIot">Kan lokaal apparaat niet verbinden</string>
+    <string name="atp_ReportBreakageCategoryOther">Iets anders</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Over apptrackers</string>

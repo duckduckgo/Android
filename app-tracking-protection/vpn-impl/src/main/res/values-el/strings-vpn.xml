@@ -165,8 +165,8 @@
     <string name="atp_ReportBreakageAppEntry">Εφαρμογή %1$s</string>
     <string name="atp_ReportBreakageAppSubmitCta">Υποβολή</string>
     <string name="atp_ReportBreakageAppNextCta">Επόμενο</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Περιγράψτε τι συνέβη, τι περιμένατε και ποια ήταν τα βήματα που οδήγησαν στο πρόβλημα.</string>
-    <string name="atp_ReportBreakageFormInputHint">Περιγράψτε τι συνέβη (προαιρετικά)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Περιγράψτε τι συμβαίνει, τι περιμένατε να συμβεί και ποια ήταν τα βήματα που οδήγησαν στο πρόβλημα.</string>
+    <string name="atp_ReportBreakageFormInputHint">Πείτε μας περισσότερα για το πρόβλημα που αντιμετωπίζετε</string>
     <string name="atp_ReportBreakageFormCheckboxText">Κάνοντας κλικ στο κουμπί «Υποβολή» συμφωνώ ότι το DuckDuckGo μπορεί να χρησιμοποιήσει τις πληροφορίες της αναφοράς αυτής για σκοπούς βελτίωσης της Προστασίας παρακολούθησης από εφαρμογές.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -174,6 +174,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Η αναφορά στάλθηκε. Ευχαριστώ! Τα σχόλιά σας μας βοηθούν να βελτιώσουμε την Προστασία παρακολούθησης από εφαρμογές για όλους.</string>
     <string name="atp_ThanksForTheFeedback">Ευχαριστούμε για τα σχόλιά σας!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Τι συμβαίνει;</string>
+    <string name="atp_ReportBreakageCategoriesHint">Τι συμβαίνει;</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Η εφαρμογή παγώνει ή παύει να ανταποκρίνεται</string>
+    <string name="atp_ReportBreakageCategoryMessages">Η παράδοση του μηνύματος αποτυγχάνει</string>
+    <string name="atp_ReportBreakageCategoryCalls">Οι φωνητικές κλήσεις δεν λειτουργούν</string>
+    <string name="atp_ReportBreakageCategoryUploads">Δεν είναι δυνατή η μεταφόρτωση ή κοινοποίηση αρχείων</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Δεν είναι δυνατή η λήψη αρχείων</string>
+    <string name="atp_ReportBreakageCategoryContent">Το περιεχόμενο φορτώνει αργά</string>
+    <string name="atp_ReportBreakageCategoryConnection">Η εφαρμογή δεν έχει σύνδεση</string>
+    <string name="atp_ReportBreakageCategoryIot">Δεν είναι δυνατή η σύνδεση της τοπικής συσκευής</string>
+    <string name="atp_ReportBreakageCategoryOther">Κάτι άλλο</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Σχετικά με τις εφαρμογές παρακολούθησης</string>

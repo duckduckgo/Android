@@ -173,8 +173,8 @@
     <string name="atp_ReportBreakageAppEntry">%1$s aplikácia</string>
     <string name="atp_ReportBreakageAppSubmitCta">Potvrdiť</string>
     <string name="atp_ReportBreakageAppNextCta">Ďalšie</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Opíšte, čo sa stalo, čo ste očakávali a aké kroky viedli k problému.</string>
-    <string name="atp_ReportBreakageFormInputHint">Opíšte, čo sa stalo (nepovinné)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Opíšte, čo sa deje, čo ste očakávali, že sa stane, a kroky, ktoré viedli k problému.</string>
+    <string name="atp_ReportBreakageFormInputHint">Povedzte nám viac o svojom probléme</string>
     <string name="atp_ReportBreakageFormCheckboxText">Kliknutím na tlačidlo \"Odoslať\" súhlasím s tým, že DuckDuckGo môže použiť informácie v tejto správe na účely zlepšenia ochrany sledovania aplikácií.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -182,6 +182,17 @@
     </string>
     <string name="atp_ReportBreakageSent">Správa bola odoslaná. Ďakujeme! Vaša spätná väzba nám pomáha zlepšovať ochranu sledovania aplikácií pre všetkých.</string>
     <string name="atp_ThanksForTheFeedback">Ďakujeme za spätnú väzbu!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Čo sa deje?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Čo sa deje?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Aplikácia zamrzne alebo zlyhá</string>
+    <string name="atp_ReportBreakageCategoryMessages">Zlyhá doručenie správy</string>
+    <string name="atp_ReportBreakageCategoryCalls">Hlasové hovory nefungujú</string>
+    <string name="atp_ReportBreakageCategoryUploads">Nemožno nahrávať ani zdieľať súbory</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Nemožno prevziať súbory</string>
+    <string name="atp_ReportBreakageCategoryContent">Obsah sa načítava pomaly</string>
+    <string name="atp_ReportBreakageCategoryConnection">Aplikácia nemá žiadne pripojenie</string>
+    <string name="atp_ReportBreakageCategoryIot">Nie je možné pripojiť lokálne zariadenie</string>
+    <string name="atp_ReportBreakageCategoryOther">Niečo iné</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">O nástrojoch na sledovanie aplikácií</string>
