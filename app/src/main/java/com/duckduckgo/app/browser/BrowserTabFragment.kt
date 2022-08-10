@@ -343,6 +343,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var existingCredentialMatchDetector: ExistingCredentialMatchDetector
 
+    @Inject
+    lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
+
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
@@ -1578,11 +1581,19 @@ class BrowserTabFragment :
         }
 
         setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_SAVE) { _, result ->
-            autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)
+            launch {
+                autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)?.let {
+                    showAuthenticationSavedOrUpdatedSnackbar(it, R.string.autofillLoginSavedSnackbarMessage)
+                }
+            }
         }
 
         setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_UPDATE) { _, result ->
-            autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)
+            launch {
+                autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)?.let {
+                    showAuthenticationSavedOrUpdatedSnackbar(it, R.string.autofillLoginUpdatedSnackbarMessage)
+                }
+            }
         }
     }
 
@@ -1617,6 +1628,15 @@ class BrowserTabFragment :
 
         val dialog = credentialAutofillDialogFactory.autofillSavingUpdateCredentialsDialog(url, credentials)
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
+    }
+
+    private suspend fun showAuthenticationSavedOrUpdatedSnackbar(loginCredentials: LoginCredentials, @StringRes messageResourceId: Int) {
+        withContext(Dispatchers.Main) {
+            browserLayout.makeSnackbarWithNoBottomInset(messageResourceId, Snackbar.LENGTH_LONG)
+                .setAction(R.string.autofillSnackbarAction) {
+                    context?.let { startActivity(autofillSettingsActivityLauncher.intent(it, loginCredentials)) }
+                }.show()
+        }
     }
 
     private fun showDialogHidingPrevious(dialog: DialogFragment, tag: String) {

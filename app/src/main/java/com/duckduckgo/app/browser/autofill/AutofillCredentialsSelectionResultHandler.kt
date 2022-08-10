@@ -57,16 +57,16 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(private val 
         }
     }
 
-    fun processSaveCredentialsResult(result: Bundle, credentialSaver: AutofillCredentialSaver) {
-        val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialSavePickerDialog.KEY_CREDENTIALS) ?: return
-        val originalUrl = result.getString(CredentialSavePickerDialog.KEY_URL) ?: return
-        credentialSaver.saveCredentials(originalUrl, selectedCredentials)
+    suspend fun processSaveCredentialsResult(result: Bundle, credentialSaver: AutofillCredentialSaver): LoginCredentials? {
+        val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialSavePickerDialog.KEY_CREDENTIALS) ?: return null
+        val originalUrl = result.getString(CredentialSavePickerDialog.KEY_URL) ?: return null
+        return credentialSaver.saveCredentials(originalUrl, selectedCredentials)
     }
 
-    fun processUpdateCredentialsResult(result: Bundle, credentialSaver: AutofillCredentialSaver) {
-        val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS) ?: return
-        val originalUrl = result.getString(CredentialUpdateExistingCredentialsDialog.KEY_URL) ?: return
-        credentialSaver.updateCredentials(originalUrl, selectedCredentials)
+    suspend fun processUpdateCredentialsResult(result: Bundle, credentialSaver: AutofillCredentialSaver): LoginCredentials? {
+        val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS) ?: return null
+        val originalUrl = result.getString(CredentialUpdateExistingCredentialsDialog.KEY_URL) ?: return null
+        return credentialSaver.updateCredentials(originalUrl, selectedCredentials)
     }
 
     interface CredentialInjector {
@@ -75,7 +75,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(private val 
     }
 
     interface AutofillCredentialSaver {
-        fun saveCredentials(url: String, credentials: LoginCredentials)
-        fun updateCredentials(url: String, credentials: LoginCredentials)
+        suspend fun saveCredentials(url: String, credentials: LoginCredentials): LoginCredentials?
+        suspend fun updateCredentials(url: String, credentials: LoginCredentials): LoginCredentials?
     }
 }
