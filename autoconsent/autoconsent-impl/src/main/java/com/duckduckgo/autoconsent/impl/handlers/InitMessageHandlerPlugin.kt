@@ -31,7 +31,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -39,7 +38,6 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class InitMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -50,7 +48,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     private lateinit var rules: String
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
-        if (messageType == type) {
+        if (supportedTypes.contains(messageType)) {
             appCoroutineScope.launch(dispatcherProvider.main()) {
                 try {
                     val message: InitMessage = parseMessage(jsonString) ?: return@launch
@@ -89,7 +87,7 @@ class InitMessageHandlerPlugin @Inject constructor(
         }
     }
 
-    override val type: String = "init"
+    override val supportedTypes: List<String> = listOf("init")
 
     private fun getAutoAction(): String? {
         return if (!repository.firstPopupHandled) null else "optOut"

@@ -26,14 +26,12 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class EvalMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider
@@ -42,7 +40,7 @@ class EvalMessageHandlerPlugin @Inject constructor(
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
-        if (messageType == type) {
+        if (supportedTypes.contains(messageType)) {
             appCoroutineScope.launch(dispatcherProvider.main()) {
                 try {
                     val message: EvalMessage = parseMessage(jsonString) ?: return@launch
@@ -72,7 +70,7 @@ class EvalMessageHandlerPlugin @Inject constructor(
         """.trimIndent()
     }
 
-    override val type: String = "eval"
+    override val supportedTypes: List<String> = listOf("eval")
 
     private fun parseMessage(jsonString: String): EvalMessage? {
         val jsonAdapter: JsonAdapter<EvalMessage> = moshi.adapter(EvalMessage::class.java)

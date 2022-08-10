@@ -27,13 +27,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
 import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class PopUpFoundMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -41,7 +39,7 @@ class PopUpFoundMessageHandlerPlugin @Inject constructor(
 ) : MessageHandlerPlugin {
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
-        if (messageType == type) {
+        if (supportedTypes.contains(messageType)) {
             if (repository.userSetting) {
                 return
             }
@@ -52,7 +50,7 @@ class PopUpFoundMessageHandlerPlugin @Inject constructor(
         }
     }
 
-    override val type: String = "popupFound"
+    override val supportedTypes: List<String> = listOf("popupFound")
 
     private fun getDialogFragment(webView: WebView): DialogFragment {
         val dialog = TypewriterDaxDialog.newInstance(
