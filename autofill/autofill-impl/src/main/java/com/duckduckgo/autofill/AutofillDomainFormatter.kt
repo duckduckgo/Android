@@ -23,13 +23,13 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface AutofillDomainFormatter {
-    fun extractDomain(domain: String?): String?
+    fun extractDomain(url: String?): String?
 }
 
 @ContributesBinding(AppScope::class)
 class AutofillDomainFormatterDomainNameOnly @Inject constructor() : AutofillDomainFormatter {
-    override fun extractDomain(domain: String?): String? {
-        val domain = domain?.toUri()?.baseHost
+    override fun extractDomain(url: String?): String? {
+        val domain = url?.toUri()?.baseHost
         return if (domain.isNullOrBlank()) {
             null
         } else {

@@ -59,6 +59,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
     private val emailManager: EmailManager = mock()
     private val currentUrlProvider: UrlProvider = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
+    private val autofillDomainFormatter: AutofillDomainFormatter = AutofillDomainFormatterDomainNameOnly()
     private val coroutineScope: CoroutineScope = TestScope()
 
     private val testWebView = WebView(getApplicationContext())
@@ -77,7 +78,8 @@ class AutofillStoredBackJavascriptInterfaceTest {
             coroutineScope = coroutineScope,
             currentUrlProvider = currentUrlProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            deviceAuthenticator = deviceAuthenticator
+            deviceAuthenticator = deviceAuthenticator,
+            autofillDomainFormatter = autofillDomainFormatter
         )
         testee.callback = testCallback
         testee.webView = testWebView
