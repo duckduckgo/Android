@@ -93,12 +93,27 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenOnViewCredentialsCalledThenShowCredentialViewingMode() = runTest {
+    fun whenOnViewCredentialsCalledFromListThenShowCredentialViewingMode() = runTest {
         val credentials = someCredentials()
-        testee.onViewCredentials(credentials)
+        testee.onViewCredentials(credentials, false)
 
         testee.commands.test {
-            awaitItem().first().assertCommandType(ShowCredentialMode::class)
+            assertEquals(ShowCredentialMode(credentials, false), awaitItem().first())
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.viewState.test {
+            assertEquals(CredentialMode.Viewing(credentials), this.awaitItem().credentialMode)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnViewCredentialsCalledFirstThenShowCredentialViewingMode() = runTest {
+        val credentials = someCredentials()
+        testee.onViewCredentials(credentials, true)
+
+        testee.commands.test {
+            assertEquals(ShowCredentialMode(credentials, true), awaitItem().first())
             cancelAndIgnoreRemainingEvents()
         }
         testee.viewState.test {
@@ -242,8 +257,8 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenOnExitViewModeThenExitCredentialMode() = runTest {
-        testee.onExitViewMode()
+    fun whenOnExitCredentialModeThenExitCredentialMode() = runTest {
+        testee.onExitCredentialMode()
 
         testee.viewState.test {
             assertEquals(CredentialMode.NotInCredentialMode, this.awaitItem().credentialMode)
@@ -262,7 +277,6 @@ class AutofillSettingsViewModelTest {
 
         testee.viewState.test {
             val finalResult = this.expectMostRecentItem()
-            assertEquals(CredentialMode.NotInCredentialMode, finalResult.credentialMode)
             assertTrue(finalResult.isLocked)
             cancelAndIgnoreRemainingEvents()
         }
@@ -282,7 +296,7 @@ class AutofillSettingsViewModelTest {
     @Test
     fun whenAllowSaveInEditModeSetToFalseThenUpdateViewStateToEditingSaveableFalse() = runTest {
         val credentials = someCredentials()
-        testee.onViewCredentials(credentials)
+        testee.onViewCredentials(credentials, true)
         testee.onEditCredentials(credentials, true)
 
         testee.allowSaveInEditMode(false)

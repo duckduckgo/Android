@@ -108,7 +108,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(), MenuProvider {
                 viewModel.viewState.value.credentialMode.credentialsViewed?.let {
                     viewModel.onDeleteCredentials(it)
                 }
-                viewModel.onExitViewMode()
+                viewModel.onExitCredentialMode()
                 true
             }
             R.id.view_menu_save -> {

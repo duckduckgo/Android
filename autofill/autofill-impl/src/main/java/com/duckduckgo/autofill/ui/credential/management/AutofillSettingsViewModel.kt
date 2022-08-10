@@ -55,9 +55,9 @@ class AutofillSettingsViewModel @Inject constructor(
         addCommand(ShowUserPasswordCopied())
     }
 
-    fun onViewCredentials(credentials: LoginCredentials) {
+    fun onViewCredentials(credentials: LoginCredentials, isStartingMode: Boolean) {
+        addCommand(ShowCredentialMode(credentials, isStartingMode))
         _viewState.value = viewState.value.copy(credentialMode = Viewing(credentialsViewed = credentials))
-        addCommand(ShowCredentialMode(credentials))
     }
 
     fun onEditCredentials(
@@ -65,7 +65,7 @@ class AutofillSettingsViewModel @Inject constructor(
         isFromViewMode: Boolean
     ) {
         if (!isFromViewMode) {
-            addCommand(ShowCredentialMode(credentials))
+            addCommand(ShowCredentialMode(credentials, !isFromViewMode))
         }
         _viewState.value = viewState.value.copy(credentialMode = Editing(credentialsViewed = credentials, isFromViewMode = isFromViewMode))
     }
@@ -73,19 +73,19 @@ class AutofillSettingsViewModel @Inject constructor(
     fun onCancelEditMode() {
         viewState.value.let { value ->
             value.credentialMode.let {
-                // if not from view mode, it means edit mode was opened directly
+                // if not from view mode, it means edit mode was opened directly so we need to exit credential mode instead.
                 if (it is Editing && it.isFromViewMode) {
                     _viewState.value = value.copy(credentialMode = Viewing(credentialsViewed = it.credentialsViewed))
                 } else {
-                    onExitViewMode()
+                    onExitCredentialMode()
                 }
             }
         }
     }
 
-    fun onExitViewMode() {
-        _viewState.value = viewState.value.copy(credentialMode = NotInCredentialMode)
+    fun onExitCredentialMode() {
         addCommand(ExitCredentialMode)
+        _viewState.value = viewState.value.copy(credentialMode = NotInCredentialMode)
     }
 
     fun allowSaveInEditMode(saveable: Boolean) {
@@ -109,11 +109,11 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun unlock() {
         addCommand(ExitLockedMode)
-        _viewState.value = viewState.value.copy(isLocked = false, credentialMode = NotInCredentialMode)
+        _viewState.value = viewState.value.copy(isLocked = false)
     }
 
     fun disabled() {
-        _viewState.value = viewState.value.copy(isLocked = true, credentialMode = NotInCredentialMode)
+        _viewState.value = viewState.value.copy(isLocked = true)
         // Remove backstack modes if they are present
         addCommand(ExitCredentialMode)
         addCommand(ExitLockedMode)
@@ -201,7 +201,7 @@ class AutofillSettingsViewModel @Inject constructor(
     sealed class Command(val id: String = UUID.randomUUID().toString()) {
         class ShowUserUsernameCopied : Command()
         class ShowUserPasswordCopied : Command()
-        data class ShowCredentialMode(val credentials: LoginCredentials) : Command()
+        data class ShowCredentialMode(val credentials: LoginCredentials, val isStartingMode: Boolean) : Command()
         object ShowDisabledMode : Command()
         object ShowLockedMode : Command()
         object LaunchDeviceAuth : Command()
