@@ -36,7 +36,6 @@ class PixelEmailRemovalInterceptorTest {
             val removalExpected = PixelEmailRemovalInterceptor.pixels.contains(pixelName)
 
             val interceptedUrl = pixelEmailRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
-            assertEquals(removalExpected, interceptedUrl.queryParameter("atb") == null)
             assertEquals(removalExpected, interceptedUrl.queryParameter("appVersion") == null)
         }
     }

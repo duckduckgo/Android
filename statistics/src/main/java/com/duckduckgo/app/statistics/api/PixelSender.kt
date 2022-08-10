@@ -99,7 +99,6 @@ class RxPixelSender constructor(
         return api.fire(
             pixelName,
             getDeviceFactor(),
-            getAtbInfo(),
             addDeviceParametersTo(parameters),
             encodedParameters,
             devMode = shouldFirePixelsAsDev
@@ -127,7 +126,6 @@ class RxPixelSender constructor(
             return api.fire(
                 this.pixelName,
                 getDeviceFactor(),
-                this.atb,
                 this.additionalQueryParams,
                 this.encodedQueryParams,
                 devMode = shouldFirePixelsAsDev

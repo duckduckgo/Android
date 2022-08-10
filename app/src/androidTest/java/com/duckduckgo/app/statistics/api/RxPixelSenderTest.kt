@@ -23,15 +23,14 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.model.PixelEntity
-import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_DASHBOARD_OPENED
-import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import org.mockito.kotlin.*
 import io.reactivex.Completable
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -40,6 +39,13 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeoutException
 
 class RxPixelSenderTest {
@@ -98,7 +104,7 @@ class RxPixelSenderTest {
 
         testee.sendPixel(PRIVACY_DASHBOARD_OPENED.pixelName, emptyMap(), emptyMap())
 
-        verify(api).fire(eq("mp"), eq("phone"), eq("atbvariant"), any(), any(), any())
+        verify(api).fire(eq("mp"), eq("phone"), any(), any(), any())
     }
 
     @Test
@@ -108,7 +114,7 @@ class RxPixelSenderTest {
 
         testee.sendPixel(PRIVACY_DASHBOARD_OPENED.pixelName, emptyMap(), emptyMap())
 
-        verify(api).fire(eq("mp"), eq("tablet"), eq(""), any(), any(), any())
+        verify(api).fire(eq("mp"), eq("tablet"), any(), any(), any())
     }
 
     @Test
@@ -118,7 +124,7 @@ class RxPixelSenderTest {
 
         testee.sendPixel(PRIVACY_DASHBOARD_OPENED.pixelName, emptyMap(), emptyMap())
 
-        verify(api).fire(eq("mp"), eq("phone"), eq(""), any(), any(), any())
+        verify(api).fire(eq("mp"), eq("phone"), any(), any(), any())
     }
 
     @Test
@@ -133,7 +139,7 @@ class RxPixelSenderTest {
         val expectedParams = mapOf("param1" to "value1", "param2" to "value2", "appVersion" to "1.0.0")
         testee.sendPixel(PRIVACY_DASHBOARD_OPENED.pixelName, params, emptyMap())
 
-        verify(api).fire("mp", "phone", "atbvariant", expectedParams, emptyMap())
+        verify(api).fire("mp", "phone", expectedParams, emptyMap())
     }
 
     @Test
@@ -147,7 +153,7 @@ class RxPixelSenderTest {
         testee.sendPixel(PRIVACY_DASHBOARD_OPENED.pixelName, emptyMap(), emptyMap())
 
         val expectedParams = mapOf("appVersion" to "1.0.0")
-        verify(api).fire("mp", "phone", "atbvariant", expectedParams, emptyMap())
+        verify(api).fire("mp", "phone", expectedParams, emptyMap())
     }
 
     @Test
@@ -212,7 +218,7 @@ class RxPixelSenderTest {
         testee.onStart(mockLifecycleOwner)
 
         verify(api).fire(
-            pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams
+            pixelEntity.pixelName, "phone", pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams
         )
     }
 
@@ -268,7 +274,7 @@ class RxPixelSenderTest {
         testee.onStart(mockLifecycleOwner)
 
         verify(api, times(5)).fire(
-            pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams
+            pixelEntity.pixelName, "phone", pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams
         )
     }
 
@@ -288,7 +294,7 @@ class RxPixelSenderTest {
     }
 
     private fun givenApiSendPixelSucceeds() {
-        whenever(api.fire(any(), any(), any(), any(), any(), any())).thenReturn(Completable.complete())
+        whenever(api.fire(any(), any(), any(), any(), any())).thenReturn(Completable.complete())
     }
 
     private fun givenVariant(variant: Variant) {
@@ -304,11 +310,11 @@ class RxPixelSenderTest {
     }
 
     private fun givenPixelApiSucceeds() {
-        whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any())).thenReturn(Completable.complete())
+        whenever(api.fire(any(), any(), anyOrNull(), any(), any())).thenReturn(Completable.complete())
     }
 
     private fun givenPixelApiFails() {
-        whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any())).thenReturn(Completable.error(TimeoutException()))
+        whenever(api.fire(any(), any(), anyOrNull(), any(), any())).thenReturn(Completable.error(TimeoutException()))
     }
 
     private fun PendingPixelDao.insert(
