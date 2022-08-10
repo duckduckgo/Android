@@ -21,6 +21,6 @@ data class AutofillStoreFormDataRequest(
 )
 
 data class AutofillStoreFormDataCredentialsRequest(
-    val username: String,
-    val password: String
+    val username: String?,
+    val password: String?
 )

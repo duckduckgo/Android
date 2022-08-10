@@ -47,10 +47,7 @@ interface AutofillJavascriptInterface {
     @JavascriptInterface
     fun getAutofillData(requestString: String)
 
-    suspend fun getRuntimeConfiguration(
-        rawJs: String,
-        url: String?
-    ): String
+    suspend fun getRuntimeConfiguration(rawJs: String, url: String?): String
 
     fun injectCredentials(credentials: LoginCredentials)
     fun injectNoCredentials()
@@ -176,9 +173,16 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         Timber.i("storeFormData called, credentials provided to be persisted")
 
         getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
+
             val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
 
             val request = requestParser.parseStoreFormDataRequest(data).credentials
+
+            if (request.username.isNullOrBlank() && request.password.isNullOrBlank()) {
+                Timber.w("Invalid data from storeFormData; username and password can't both be blank")
+                return@launch
+            }
+
             val jsCredentials = JavascriptCredentials(request.username, request.password)
             val credentials = jsCredentials.asLoginCredentials(currentUrl)
 
