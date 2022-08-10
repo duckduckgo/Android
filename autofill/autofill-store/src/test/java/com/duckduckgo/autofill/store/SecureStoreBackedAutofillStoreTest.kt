@@ -293,7 +293,7 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     private suspend fun storeCredentials(
-        id: Int,
+        id: Long,
         domain: String,
         username: String,
         password: String,
@@ -308,8 +308,9 @@ class SecureStoreBackedAutofillStoreTest {
 
         private val credentials = mutableListOf<WebsiteLoginDetailsWithCredentials>()
 
-        override suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials) {
+        override suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials): Long {
             credentials.add(websiteLoginDetailsWithCredentials)
+            return credentials.size.toLong()
         }
 
         override suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> {
@@ -330,7 +331,7 @@ class SecureStoreBackedAutofillStoreTest {
             }
         }
 
-        override suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials? {
+        override suspend fun getWebsiteLoginDetailsWithCredentials(id: Long): WebsiteLoginDetailsWithCredentials? {
             return credentials.firstOrNull() { it.details.id == id }
         }
 
@@ -356,7 +357,7 @@ class SecureStoreBackedAutofillStoreTest {
             }
         }
 
-        override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Int) {
+        override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Long) {
             credentials.removeAll { it.details.id == id }
         }
 

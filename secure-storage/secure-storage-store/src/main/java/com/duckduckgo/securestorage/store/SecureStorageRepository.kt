@@ -28,24 +28,24 @@ interface SecureStorageRepository {
         fun get(): SecureStorageRepository?
     }
 
-    suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity)
+    suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity): Long
 
     suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
 
-    suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity?
+    suspend fun getWebsiteLoginCredentialsForId(id: Long): WebsiteLoginCredentialsEntity?
 
     suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>>
 
     suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentialsEntity)
 
-    suspend fun deleteWebsiteLoginCredentials(id: Int)
+    suspend fun deleteWebsiteLoginCredentials(id: Long)
 }
 
 class RealSecureStorageRepository constructor(
     private val websiteLoginCredentialsDao: WebsiteLoginCredentialsDao
 ) : SecureStorageRepository {
-    override suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity) {
-        websiteLoginCredentialsDao.insert(websiteLoginCredentials)
+    override suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity): Long {
+        return websiteLoginCredentialsDao.insert(websiteLoginCredentials)
     }
 
     override suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>> =
@@ -54,13 +54,13 @@ class RealSecureStorageRepository constructor(
     override suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>> =
         websiteLoginCredentialsDao.websiteLoginCredentials()
 
-    override suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity? =
+    override suspend fun getWebsiteLoginCredentialsForId(id: Long): WebsiteLoginCredentialsEntity? =
         websiteLoginCredentialsDao.getWebsiteLoginCredentialsById(id)
 
     override suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentialsEntity) =
         websiteLoginCredentialsDao.update(websiteLoginCredentials)
 
-    override suspend fun deleteWebsiteLoginCredentials(id: Int) {
+    override suspend fun deleteWebsiteLoginCredentials(id: Long) {
         websiteLoginCredentialsDao.delete(id)
     }
 }
