@@ -787,7 +787,7 @@ class BrowserTabFragment :
         viewModel.onWebViewRefreshed()
     }
 
-    private fun processCommand(it: Command?) {
+    private fun processCommand(it: Command) {
         if (it !is Command.DaxCommand) {
             renderer.cancelTrackersAnimation()
         }

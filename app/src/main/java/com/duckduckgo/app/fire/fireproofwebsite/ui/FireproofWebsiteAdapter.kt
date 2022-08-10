@@ -137,6 +137,7 @@ class FireproofWebsiteAdapter(
                     )
                 ]
             )
+            else -> {}
         }
     }
 

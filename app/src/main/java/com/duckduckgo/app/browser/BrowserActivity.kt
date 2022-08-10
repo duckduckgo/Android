@@ -347,7 +347,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         }
     }
 
-    private fun processCommand(command: Command?) {
+    private fun processCommand(command: Command) {
         Timber.i("Processing command: $command")
         when (command) {
             is Query -> currentTab?.submitQuery(command.query)

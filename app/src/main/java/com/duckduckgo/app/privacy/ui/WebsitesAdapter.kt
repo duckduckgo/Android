@@ -141,6 +141,7 @@ class WebsitesAdapter(
             is WebsiteViewHolder.WebsiteItemViewHolder -> {
                 holder.bind(entries[getWebsiteItemPosition(position)])
             }
+            else -> {}
         }
     }
 }
