@@ -65,7 +65,8 @@ class AutofillSettingsViewModel @Inject constructor(
         isFromViewMode: Boolean
     ) {
         if (!isFromViewMode) {
-            addCommand(ShowCredentialMode(credentials, !isFromViewMode))
+            // On the event that Edit mode is launched directly, we don't treat it as starting view mode since atm we will show view mode when saved.
+            addCommand(ShowCredentialMode(credentials, false))
         }
         _viewState.value = viewState.value.copy(credentialMode = Editing(credentialsViewed = credentials, isFromViewMode = isFromViewMode))
     }

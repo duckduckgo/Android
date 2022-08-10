@@ -217,7 +217,10 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(), MenuProvider {
                             populateFields(state.credentialMode.credentialsViewed)
                             showViewMode(state.credentialMode.credentialsViewed)
                         }
-                        is Editing -> showEditMode()
+                        is Editing -> {
+                            populateFields(state.credentialMode.credentialsViewed)
+                            showEditMode()
+                        }
                         else -> {
                         }
                     }

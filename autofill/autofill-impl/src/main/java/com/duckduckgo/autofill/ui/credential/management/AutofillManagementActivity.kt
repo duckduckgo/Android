@@ -191,7 +191,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         when (viewModel.viewState.value.credentialMode) {
             is Editing -> viewModel.onCancelEditMode()
             is Viewing -> if (supportFragmentManager.backStackEntryCount > 1) {
-                viewModel.viewState.value.credentialMode
+                viewModel.onExitCredentialMode()
             } else {
                 super.onBackPressed()
             }
