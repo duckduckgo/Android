@@ -16,9 +16,12 @@
 
 package com.duckduckgo.privacy.config.impl
 
+import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
@@ -40,6 +43,7 @@ import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -56,11 +60,17 @@ class RealPrivacyConfigPersisterTest {
     private lateinit var db: PrivacyConfigDatabase
     private lateinit var privacyRepository: PrivacyConfigRepository
     private lateinit var unprotectedTemporaryRepository: UnprotectedTemporaryRepository
-    private val pluginPoint = FakePrivacyFeaturePluginPoint()
+    private val pluginPoint = FakePrivacyFeaturePluginPoint(listOf(FakePrivacyFeaturePlugin()))
+    private lateinit var sharedPreferences: SharedPreferences
 
     @Before
     fun before() {
         prepareDb()
+        sharedPreferences = InMemorySharedPreferences().apply {
+            edit {
+                putInt("plugin_signature", pluginPoint.signature())
+            }
+        }
 
         testee =
             RealPrivacyConfigPersister(
@@ -68,7 +78,8 @@ class RealPrivacyConfigPersisterTest {
                 mockTogglesRepository,
                 unprotectedTemporaryRepository,
                 privacyRepository,
-                db
+                db,
+                sharedPreferences
             )
     }
 
@@ -87,6 +98,17 @@ class RealPrivacyConfigPersisterTest {
             RealUnprotectedTemporaryRepository(
                 db, TestScope(), coroutineRule.testDispatcherProvider
             )
+    }
+
+    @Test
+    fun whenPluginPointSignatureThenReturnUniqueSignature() {
+        assertEquals(pluginPoint.signature(), pluginPoint.signature())
+    }
+
+    @Test
+    fun whenDifferentPluginPointsThenReturnDifferentSignatures() {
+        val differentPluginPoint = FakePrivacyFeaturePluginPoint(listOf(FakePrivacyFeaturePlugin(), FakePrivacyFeaturePlugin()))
+        assertNotEquals(pluginPoint.signature(), differentPluginPoint.signature())
     }
 
     @Test
@@ -128,8 +150,32 @@ class RealPrivacyConfigPersisterTest {
         }
 
     @Test
-    fun whenPersistPrivacyConfigAndVersionIsEqualsThanPreviousOneStoredThenStoreNewConfig() =
+    fun whenPersistPrivacyConfigAndVersionIsLowerThanPreviousOneAndDifferentPluginsThenStoreNewConfig() =
         runTest {
+            sharedPreferences.edit().putInt("plugin_signature", 0)
+            privacyRepository.insert(PrivacyConfig(version = 3, readme = "readme"))
+
+            testee.persistPrivacyConfig(getJsonPrivacyConfig())
+
+            assertEquals(3, privacyRepository.get()!!.version)
+            verify(mockTogglesRepository, never()).deleteAll()
+        }
+
+    @Test
+    fun whenPersistPrivacyConfigAndVersionIsEqualsThanPreviousOneStoredThenDoNothing() =
+        runTest {
+            privacyRepository.insert(PrivacyConfig(version = 2, readme = "readme"))
+
+            testee.persistPrivacyConfig(getJsonPrivacyConfig())
+
+            assertEquals(2, privacyRepository.get()!!.version)
+            verify(mockTogglesRepository, never()).deleteAll()
+        }
+
+    @Test
+    fun whenPersistPrivacyConfigAndVersionIsEqualsThanPreviousOneStoredAndDifferentPluginsThenUpdateConfig() =
+        runTest {
+            sharedPreferences.edit().putInt("plugin_signature", 0)
             privacyRepository.insert(PrivacyConfig(version = 2, readme = "readme"))
 
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
@@ -148,6 +194,17 @@ class RealPrivacyConfigPersisterTest {
             assertEquals(2, privacyRepository.get()!!.version)
         }
 
+    @Test
+    fun whenPersistPrivacyConfigAndVersionIsHigherThanPreviousOneStoredAndDifferentPluginsThenStoreNewConfig() =
+        runTest {
+            sharedPreferences.edit().putInt("plugin_signature", 0)
+            privacyRepository.insert(PrivacyConfig(version = 1, readme = "readme"))
+
+            testee.persistPrivacyConfig(getJsonPrivacyConfig())
+
+            assertEquals(2, privacyRepository.get()!!.version)
+        }
+
     private fun getJsonPrivacyConfig(): JsonPrivacyConfig {
         return JsonPrivacyConfig(
             version = 2,
@@ -157,10 +214,9 @@ class RealPrivacyConfigPersisterTest {
         )
     }
 
-    class FakePrivacyFeaturePluginPoint : PluginPoint<PrivacyFeaturePlugin> {
-        val plugin = FakePrivacyFeaturePlugin()
+    class FakePrivacyFeaturePluginPoint(private val plugins: List<PrivacyFeaturePlugin>) : PluginPoint<PrivacyFeaturePlugin> {
         override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
-            return listOf(plugin)
+            return plugins
         }
     }
 

@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.impl.referencetests.privacyconfig
 import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
@@ -81,7 +82,8 @@ class PrivacyConfigDisabledReferenceTest(private val testCase: TestCase) {
             mockTogglesRepository,
             referenceTestUtilities.unprotectedTemporaryRepository,
             referenceTestUtilities.privacyRepository,
-            db
+            db,
+            InMemorySharedPreferences()
         )
     }
 
