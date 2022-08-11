@@ -17,8 +17,6 @@
 package com.duckduckgo.app.email.di
 
 import android.content.Context
-import androidx.lifecycle.LifecycleObserver
-import androidx.work.WorkManager
 import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope

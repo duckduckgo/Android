@@ -31,30 +31,9 @@ interface EmailManager {
     fun signOut()
     fun getEmailAddress(): String?
     fun getUserData(): String
-    fun waitlistState(): WaitlistState
-    fun joinWaitlist(
-        timestamp: Int,
-        token: String
-    )
 
-    fun getInviteCode(): String
-    fun doesCodeAlreadyExist(): Boolean
-    suspend fun fetchInviteCode(): FetchCodeResult
-    fun notifyOnJoinedWaitlist()
     fun getCohort(): String
     fun isEmailFeatureSupported(): Boolean
     fun getLastUsedDate(): String
     fun setNewLastUsedDate()
-
-    sealed class WaitlistState {
-        object NotJoinedQueue : WaitlistState()
-        data class JoinedQueue(val notify: Boolean = false) : WaitlistState()
-        object InBeta : WaitlistState()
-    }
-
-    sealed class FetchCodeResult {
-        object Code : FetchCodeResult()
-        object NoCode : FetchCodeResult()
-        object CodeExisted : FetchCodeResult()
-    }
 }
