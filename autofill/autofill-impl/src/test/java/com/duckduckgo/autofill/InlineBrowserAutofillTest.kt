@@ -25,6 +25,7 @@ import com.duckduckgo.autofill.InlineBrowserAutofillTest.FakeAutofillJavascriptI
 import com.duckduckgo.autofill.InlineBrowserAutofillTest.FakeAutofillJavascriptInterface.Actions.GetAutoFillData
 import com.duckduckgo.autofill.InlineBrowserAutofillTest.FakeAutofillJavascriptInterface.Actions.NoCredentialsInjected
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -54,7 +55,7 @@ class InlineBrowserAutofillTest {
     private lateinit var testWebView: WebView
     private val coroutineScope: CoroutineScope = TestScope()
     private val testCallback = object : Callback {
-        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
+        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
         }
 
         override suspend fun onCredentialsAvailableToSave(

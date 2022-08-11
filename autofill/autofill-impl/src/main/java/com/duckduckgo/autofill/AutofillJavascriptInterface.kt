@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillDataRequest
@@ -31,6 +32,9 @@ import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputMainType.CREDENTIALS
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.USERNAME
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType.AUTOPROMPT
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
@@ -89,6 +93,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
             }
 
             val request = requestParser.parseAutofillDataRequest(requestString)
+            val triggerType = convertTriggerType(request.trigger)
 
             if (request.mainType != CREDENTIALS) {
                 handleUnknownRequestMainType(request, url)
@@ -102,9 +107,16 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
                 if (credentials.isEmpty()) {
                     callback?.noCredentialsAvailable(url)
                 } else {
-                    callback?.onCredentialsAvailableToInject(credentials)
+                    callback?.onCredentialsAvailableToInject(credentials, triggerType)
                 }
             }
+        }
+    }
+
+    private fun convertTriggerType(trigger: SupportedAutofillTriggerType): LoginTriggerType {
+        return when (trigger) {
+            USER_INITIATED -> LoginTriggerType.USER_INITIATED
+            AUTOPROMPT -> LoginTriggerType.AUTOPROMPT
         }
     }
 

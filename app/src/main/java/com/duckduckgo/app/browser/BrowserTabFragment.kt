@@ -190,6 +190,7 @@ import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.Callback
 import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.Companion.RESULT_KEY_CREDENTIAL_RESULT_UPDATE
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.ui.ExistingCredentialMatchDetector
@@ -419,8 +420,8 @@ class BrowserTabFragment :
     }
 
     private val autofillCallback = object : Callback {
-        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
-            showAutofillDialogChooseCredentials(credentials)
+        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
+            showAutofillDialogChooseCredentials(credentials, triggerType)
         }
 
         override fun noCredentialsAvailable(originalUrl: String) {
@@ -1592,10 +1593,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showAutofillDialogChooseCredentials(credentials: List<LoginCredentials>) {
+    private fun showAutofillDialogChooseCredentials(credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
         Timber.v("onCredentialsAvailable. %d creds to choose from", credentials.size)
         val url = webView?.url ?: return
-        val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(url, credentials)
+        val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(url, credentials, triggerType)
         showDialogHidingPrevious(dialog, CredentialAutofillPickerDialog.TAG)
     }
 
