@@ -42,7 +42,7 @@ import com.duckduckgo.app.browser.databinding.ContentBookmarksBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.DividerAdapter
-import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.mobile.android.ui.view.SearchBar
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
@@ -215,7 +215,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         ).show()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.bookmark_activity_menu, menu)
         return true
     }
@@ -255,8 +255,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        searchMenuItem = menu?.findItem(R.id.action_search)
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        searchMenuItem = menu.findItem(R.id.action_search)
         setSearchMenuItemVisibility()
         initializeSearchBar()
         return super.onPrepareOptionsMenu(menu)

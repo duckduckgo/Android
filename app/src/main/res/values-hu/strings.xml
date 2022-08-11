@@ -121,30 +121,6 @@
     <string name="httpsMixed">Vegyes titkosítású kapcsolat</string>
     <string name="httpsBad">Titkosítatlan kapcsolat</string>
 
-    <string name="networksActivityTitle">Nyomkövető hálózatok</string>
-    <string name="networksContentDescription">Nyomkövető hálózatok</string>
-    <string name="networksOverview">A nyomkövető hálózatok gyűjtik internetes előzményeidet egy rólad szóló adatprofilban. A nagy nyomkövető hálózatok károsabbak, mert az internet több területén képesek téged nyomon követni és megcélozni.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s nyomkövető megtalálva</item>
-        <item quantity="other">%1$s nyomkövető megtalálva</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s nyomkövető letiltva</item>
-        <item quantity="other">%1$s nyomkövető letiltva</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s nagy nyomkövető-hálózat megtalálva</item>
-        <item quantity="other">%1$s nagy nyomkövető-hálózat megtalálva</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s nagy nyomkövető-hálózat letiltva</item>
-        <item quantity="other">%1$s nagy nyomkövető-hálózat letiltva</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Adatvédelmi fokozat</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">A weboldal egy nagy nyomkövető-hálózat</string>
     <string name="scorecardPrivacyGrade">Adatvédelmi fokozat</string>
@@ -162,6 +138,45 @@
 
     <string name="networkTrackerSummaryHeader">A NYOMKÖVETŐ-HÁLÓZAT LEGNAGYOBB BŰNELKÖVETŐI</string>
     <string name="networkTrackerSummaryNotReady">Folyamatosan gyűjtjük az adatokat, hogy bemutathassuk, hány követőt tiltottunk le.</string>
+
+    <string name="trackersActivityTitle">Nyomkövetési kérések blokkolva</string>
+    <string name="trackersContentDescription">Nyomkövetési kérések blokkolva</string>
+    <string name="trackersOverview">A következő harmadik fél tartományok kéréseinek betöltése blokkolva van, mivel nyomkövetési kérésként lettek beazonosítva. Ha egy cég kérései betöltődnek, az lehetővé teheti számukra, hogy profilokat készítsenek a felhasználóról.</string>
+    <string name="trackersOverviewProtectionsOff">A nyomkövető kérések betöltése nincs blokkolva, mert a végelem ki van kapcsolva ehhez a webhelyhez. Ha egy cég kérései betöltődnek, az lehetővé teheti számukra, hogy profilokat készítsenek a felhasználóról.</string>
+
+    <string name="domainsLoadedActivityTitle">A harmadik féltől származó kérések be lettek töltve</string>
+    <string name="domainsLoadedContentDescription">A harmadik féltől származó kérések be lettek töltve</string>
+    <string name="domainsLoadedOverview">A következő harmadik fél tartományok kérései kerültek betöltésre. Ha egy cég kérései betöltődnek, ez lehetővé teheti számukra, hogy profilokat készítsenek a felhasználóról, bár a többi webes nyomkövetési védelmünk továbbra is érvényben van.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">A harmadik féltől származó kérések betöltése nincs blokkolva, mert a végelem ki van kapcsolva ehhez a webhelyhez. Ha egy cég kérései betöltődnek, az lehetővé teheti számukra, hogy profilokat készítsenek a felhasználóról.</string>
+    <string name="domainsLoadedOverviewEmpty">Nem észleltünk harmadik fél tartományából származó kéréseket.</string>
+    <string name="domainsLoadedHeadingText">Nincsenek betöltve harmadik fél tartományok</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">A webes nyomkövetés elleni védelemről</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">A következő tartomány kérései kerületek betöltésre.</string>
+
+    <string name="adLoadedSectionDescription">A következő tartomány kérései azért lettek betöltve, mert a DuckDuckGo-n nemrég rákattintottak egy %1$s hirdetésre. Ezek a kérések segítenek értékelni a hirdetések hatékonyságát. A DuckDuckGo összes hirdetése nem profilozó.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Hogyan hatnak a keresési hirdetéseink a védelmünkre</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">A következő tartomány kérései is betöltésre kerültek.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">A következő tartományok követési kérelmei kerültek betöltésre.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Nem észleltünk harmadik fél tartományából származó kéréseket.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">A következő tartomány kérései a webhely összeomlásának megelőzése érdekében kerültek betöltésre.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">A következő tartomány kérései azért kerültek betöltésre, mert a következőhöz vannak társítva: %1$s.</string>
+
+    <string name="trackersBlockedText">Kérések betöltése blokkolva</string>
+    <string name="trackersNotBlockedText">Nyomkövető kérések nincsenek blokkolva</string>
+    <string name="trackersNoFoundText">Nem találhatók nyomkövetési kérések</string>
+    <string name="trackersFoundText">Nyomkövető kérések találhatók</string>
+
+    <string name="domainsLoadedText">A harmadik féltől származó kérések be lettek töltve</string>
+    <string name="domainsNotLoadedText">Harmadik féltől származó kérések nincsenek betöltve</string>
+
+    <string name="majorNetworksNoFound">Nem található nagyobb nyomkövető hálózat</string>
+    <string name="majorNetworksFound">Nagy nyomkövető hálózatok találhatók</string>
 
     <!-- Fire -->
     <string name="fireMenu">Adatok törlése</string>
@@ -563,11 +578,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Kapcsolat megszakadt. Ez a weboldal káros lehet az eszközödre.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Letöltéskezelő letiltva</string>
-    <string name="downloadManagerIncompatible">A letöltéskezelő nem érhető el ezen az eszközön.</string>
-    <string name="enable">Engedélyezés</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Engedélyezed az eszköz helyének elérését a DuckDuckGo adatvédelmi böngésző számára?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s az eszközöd helyét kéri. Először engedélyezned kell az alkalmazás számára, hogy elküldje az eszközöd helyét, majd a %2$s engedélyt kérhet.</string>
@@ -599,7 +609,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href="">További részletek</a><u/>]]>
+        <![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href=\"\">További részletek</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlToggle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>

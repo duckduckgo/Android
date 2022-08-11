@@ -121,30 +121,6 @@
     <string name="httpsMixed">Ligação com encriptação mista</string>
     <string name="httpsBad">Ligação não encriptada</string>
 
-    <string name="networksActivityTitle">Redes de rastreamento</string>
-    <string name="networksContentDescription">Redes de rastreamento</string>
-    <string name="networksOverview">As redes de rastreamento agregam o seu histórico da web num perfil de dados sobre si. As principais redes de rastreamento são mais prejudiciais porque podem rastreá-lo e segmentá-lo em mais sites da Internet.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s rastreador encontrado</item>
-        <item quantity="other">%1$s rastreadores encontrados</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s rastreador bloqueado</item>
-        <item quantity="other">%1$s rastreadores bloqueados</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s rede principal de rastreamento encontrada</item>
-        <item quantity="other">%1$s redes principais de rastreamento encontradas</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s rede principal de rastreamento bloqueada</item>
-        <item quantity="other">%1$s rede principais de rastreamento bloqueadas</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Grau de privacidade</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">O site é uma grande rede de rastreadores</string>
     <string name="scorecardPrivacyGrade">Grau de privacidade</string>
@@ -162,6 +138,45 @@
 
     <string name="networkTrackerSummaryHeader">PRINCIPAIS INFRATORES DA REDE DE RASTREAMENTO</string>
     <string name="networkTrackerSummaryNotReady">Ainda estamos a recolher dados para mostrar quantos rastreadores bloqueámos.</string>
+
+    <string name="trackersActivityTitle">Pedidos de rastreamento bloqueados</string>
+    <string name="trackersContentDescription">Pedidos de rastreamento bloqueados</string>
+    <string name="trackersOverview">Foi bloqueado o carregamento dos pedidos dos seguintes domínios de terceiros porque foram identificados como pedidos de rastreamento. Se os pedidos de uma empresa forem carregados, a empresa pode conseguir criar um perfil sobre ti.</string>
+    <string name="trackersOverviewProtectionsOff">Não foram bloqueados pedidos de terceiros porque as Proteções estão desativadas para este site. Se os pedidos de uma empresa forem carregados, a empresa pode conseguir criar um perfil sobre ti.</string>
+
+    <string name="domainsLoadedActivityTitle">Pedidos de terceiros carregados</string>
+    <string name="domainsLoadedContentDescription">Pedidos de terceiros carregados</string>
+    <string name="domainsLoadedOverview">Os pedidos dos seguintes domínios de terceiros foram carregados. Se os pedidos de uma empresa forem carregados, a empresa pode conseguir criar um perfil sobre ti, embora sejam aplicadas as nossas outras proteções contra rastreamento na internet.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Não foi bloqueado o carregamento de nenhum pedido de terceiros porque as proteções estão desativadas para este site. Se os pedidos de uma empresa forem carregados, a empresa pode conseguir criar um perfil sobre ti.</string>
+    <string name="domainsLoadedOverviewEmpty">Não detetámos pedidos de domínios de terceiros.</string>
+    <string name="domainsLoadedHeadingText">Nenhum domínio de terceiros carregado</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Sobre as nossas Proteções Contra o Rastreamento na Internet</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Os pedidos dos seguintes domínios foram carregados.</string>
+
+    <string name="adLoadedSectionDescription">Os pedidos do seguinte domínio foram carregados devido a um clique recente num anúncio de %1$s no DuckDuckGo. Estes pedidos ajudam a avaliar a eficácia dos anúncios. Nenhum anúncio no DuckDuckGo é utilizado para criação de perfis.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Como os nossos anúncios de pesquisa afetam as nossas proteções</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Os pedidos de rastreamento do seguinte domínio também foram carregados.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Os pedidos de rastreamento dos seguintes domínios foram carregados.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Não detetámos pedidos de domínios de terceiros.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Os pedidos do seguinte domínio foram carregados para impedir a falha do site.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Os pedidos do seguinte domínio foram carregados porque estão associados a %1$s.</string>
+
+    <string name="trackersBlockedText">Pedidos com carregamento bloqueado</string>
+    <string name="trackersNotBlockedText">Nenhum pedido de rastreamento bloqueado</string>
+    <string name="trackersNoFoundText">Nenhum pedido de rastreamento encontrado</string>
+    <string name="trackersFoundText">Pedidos de rastreamento encontrados</string>
+
+    <string name="domainsLoadedText">Pedidos de terceiros carregados</string>
+    <string name="domainsNotLoadedText">Nenhum pedido de terceiros carregado</string>
+
+    <string name="majorNetworksNoFound">Nenhuma rede de rastreamento principal encontrada</string>
+    <string name="majorNetworksFound">Principais redes de rastreamento encontradas</string>
 
     <!-- Fire -->
     <string name="fireMenu">Limpar dados</string>
@@ -563,11 +578,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Ligação abortada. Este website poderá ser prejudicial ao seu dispositivo.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Gestor de transferências desativado</string>
-    <string name="downloadManagerIncompatible">Gestor de transferências não disponível neste dispositivo</string>
-    <string name="enable">Permitir</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Ativar a localização do dispositivo para o Navegador de Privacidade DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s está a pedir a localização do seu dispositivo. Primeiro, precisa permitir que a aplicação envie a localização do dispositivo e, em seguida, %2$s pode pedir permissão.</string>
@@ -599,7 +609,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Controlo Global de Privacidade (CGP)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo bloqueia automaticamente muitos rastreadores. Com o Controlo de Privacidade Global (CPG), pode também solicitar aos websites participantes para restringir a venda ou a partilha dos seus dados pessoais com outras empresas. <u><a href="">Saiba mais</a><u/>]]>
+        <![CDATA[DuckDuckGo bloqueia automaticamente muitos rastreadores. Com o Controlo de Privacidade Global (CPG), pode também solicitar aos websites participantes para restringir a venda ou a partilha dos seus dados pessoais com outras empresas. <u><a href=\"\">Saiba mais</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Controlo Global de Privacidade (CGP)</string>
     <string name="globalPrivacyControlToggle">Controlo Global de Privacidade (CGP)</string>

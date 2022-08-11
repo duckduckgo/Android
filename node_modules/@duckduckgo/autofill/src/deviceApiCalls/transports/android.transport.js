@@ -14,6 +14,15 @@ export class AndroidTransport extends DeviceApiTransport {
     constructor (globalConfig) {
         super()
         this.config = globalConfig
+
+        if (this.config.isDDGTestMode) {
+            if (typeof window.BrowserAutofill?.getAutofillData !== 'function') {
+                console.warn('window.BrowserAutofill.getAutofillData missing')
+            }
+            if (typeof window.BrowserAutofill?.storeFormData !== 'function') {
+                console.warn('window.BrowserAutofill.storeFormData missing')
+            }
+        }
     }
     /**
      * @param {import("../../../packages/device-api").DeviceApiCall} deviceApiCall

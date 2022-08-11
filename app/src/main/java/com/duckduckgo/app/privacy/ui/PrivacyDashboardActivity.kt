@@ -25,19 +25,21 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyDashboardBinding
 import com.duckduckgo.app.browser.databinding.ContentPrivacyDashboardBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hide
-import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchManageWhitelist
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchTrackerNetworksActivity
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.ViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -80,24 +82,15 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.viewState.observe(
-            this,
-            {
-                it?.let { render(it) }
-            }
-        )
-        viewModel.command.observe(
-            this,
-            {
-                it?.let { processCommand(it) }
-            }
-        )
-        repository.retrieveSiteData(intent.tabId!!).observe(
-            this,
-            {
-                viewModel.onSiteChanged(it)
-            }
-        )
+        viewModel.viewState.observe(this) {
+            it?.let { render(it) }
+        }
+        viewModel.command.observe(this) {
+            it?.let { processCommand(it) }
+        }
+        repository.retrieveSiteData(intent.tabId!!).observe(this) {
+            viewModel.onSiteChanged(it)
+        }
     }
 
     private val privacyToggleListener = CompoundButton.OnCheckedChangeListener { _, enabled ->
@@ -123,8 +116,12 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
             }
 
             networksContainer.setOnClickListener {
-                pixel.fire(PRIVACY_DASHBOARD_NETWORKS)
-                startActivity(TrackerNetworksActivity.intent(this@PrivacyDashboardActivity, intent.tabId!!))
+                viewModel.onNetworksContainerClicked()
+            }
+
+            domainsLoadedContainer.setOnClickListener {
+                pixel.fire(PRIVACY_DASHBOARD_OTHER_DOMAINS_LOADED_CLICKED)
+                startActivity(TrackerNetworksActivity.intent(this@PrivacyDashboardActivity, intent.tabId!!, true))
             }
 
             practicesContainer.setOnClickListener {
@@ -152,15 +149,28 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
             renderHeading(viewState, toggle)
             httpsIcon.setImageResource(viewState.httpsStatus.icon())
             httpsText.text = viewState.httpsStatus.text(context)
-            networksIcon.setImageResource(trackersRenderer.networksIcon(viewState.allTrackersBlocked))
-            networksText.text = trackersRenderer.trackersText(context, viewState.trackerCount, viewState.allTrackersBlocked)
+            networksIcon.setImageResource(
+                trackersRenderer.networksIcon(
+                    viewState.trackerCount, viewState.specialDomainsLoadedCount, viewState.toggleEnabled
+                )
+            )
+            networksText.text = trackersRenderer.trackersText(context, viewState.trackerCount, viewState.specialDomainsLoadedCount)
+            domainsLoadedText.text = trackersRenderer.domainsLoadedText(
+                context, viewState.otherDomainsLoadedCount + viewState.specialDomainsLoadedCount
+            )
             practicesIcon.setImageResource(viewState.practices.icon())
             practicesText.text = viewState.practices.text(context)
             renderToggle(toggle, viewState.isSiteInTempAllowedList)
             renderTrackerNetworkLeaderboard(viewState)
             renderButtonContainer(viewState.isSiteInTempAllowedList)
             updateActivityResult(viewState.shouldReloadPage)
+            renderDomainsIcon(viewState.otherDomainsLoadedCount + viewState.specialDomainsLoadedCount)
         }
+    }
+
+    private fun renderDomainsIcon(count: Int) {
+        val drawable = if (count == 0) R.drawable.ic_other_domains_info_green else R.drawable.ic_other_domains_info
+        contentPrivacyDashboard.domainsLoadedIcon.setImageResource(drawable)
     }
 
     private fun renderButtonContainer(isSiteIntTempAllowedList: Boolean) {
@@ -231,6 +241,11 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         when (command) {
             is LaunchManageWhitelist -> launchWhitelistActivity()
             is LaunchReportBrokenSite -> launchReportBrokenSite(command.data)
+            is LaunchTrackerNetworksActivity -> launchTrackerNetworksActivity(
+                command.trackersBlockedCount,
+                command.specialDomainsLoadedCount,
+                command.toggleEnabled
+            )
         }
     }
 
@@ -245,6 +260,22 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     private fun launchWhitelistActivity() {
         startActivity(WhitelistActivity.intent(this))
+    }
+
+    private fun launchTrackerNetworksActivity(trackersBlockedCount: Int, specialDomainsLoadedCount: Int, toggleEnabled: Boolean) {
+        startActivity(
+            TrackerNetworksActivity.intent(
+                context = this@PrivacyDashboardActivity,
+                tabId = intent.tabId!!,
+                trackingRequestsBannerIconId = trackersRenderer.networksIcon(
+                    trackersBlockedCount = trackersBlockedCount,
+                    specialDomainsLoadedCount = specialDomainsLoadedCount,
+                    toggleEnabled = toggleEnabled,
+                    largeIcon = true
+                ),
+                protectionsDisabled = !toggleEnabled
+            )
+        )
     }
 
     private fun updateActivityResult(shouldReload: Boolean) {

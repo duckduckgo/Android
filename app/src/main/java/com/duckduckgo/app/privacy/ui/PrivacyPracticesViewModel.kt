@@ -25,6 +25,7 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.ActivityScope
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -40,16 +41,19 @@ class PrivacyPracticesViewModel @Inject constructor(
         val badTerms: List<String> = emptyList()
     )
 
+    @OptIn(InternalCoroutinesApi::class)
     fun privacyPractices(tabId: String): StateFlow<ViewState> = flow {
-        tabRepository.retrieveSiteData(tabId).asFlow().collect { site ->
-            emit(
-                ViewState(
-                    domain = site.domain ?: "",
-                    practices = site.privacyPractices.summary,
-                    goodTerms = site.privacyPractices.goodReasons,
-                    badTerms = site.privacyPractices.badReasons
+        tabRepository.retrieveSiteData(tabId).asFlow().collect(
+            FlowCollector { site ->
+                emit(
+                    ViewState(
+                        domain = site.domain ?: "",
+                        practices = site.privacyPractices.summary,
+                        goodTerms = site.privacyPractices.goodReasons,
+                        badTerms = site.privacyPractices.badReasons
+                    )
                 )
-            )
-        }
+            }
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 }

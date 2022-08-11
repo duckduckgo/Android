@@ -16,12 +16,15 @@
 
 package com.duckduckgo.privacy.config.impl
 
+import android.content.SharedPreferences
+import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
+import androidx.core.content.edit
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.di.ConfigPersisterPreferences
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
@@ -35,6 +38,8 @@ interface PrivacyConfigPersister {
     suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig)
 }
 
+private const val PRIVACY_SIGNATURE_KEY = "plugin_signature"
+
 @WorkerThread
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
@@ -43,27 +48,46 @@ class RealPrivacyConfigPersister @Inject constructor(
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
     private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository,
     private val privacyConfigRepository: PrivacyConfigRepository,
-    private val database: PrivacyConfigDatabase
+    private val database: PrivacyConfigDatabase,
+    @ConfigPersisterPreferences private val persisterPreferences: SharedPreferences,
 ) : PrivacyConfigPersister {
 
     override suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig) {
         val privacyConfig = privacyConfigRepository.get()
         val newVersion = jsonPrivacyConfig.version
         val previousVersion = privacyConfig?.version ?: 0
+        val currentPluginHashCode = privacyFeaturePluginPoint.signature()
+        val previousPluginHashCode = persisterPreferences.getSignature()
 
-        if (newVersion > previousVersion) {
+        if (newVersion > previousVersion || (newVersion == previousVersion && currentPluginHashCode != previousPluginHashCode)) {
             database.runInTransaction {
+                persisterPreferences.setSignature(currentPluginHashCode)
                 privacyFeatureTogglesRepository.deleteAll()
                 privacyConfigRepository.insert(PrivacyConfig(version = jsonPrivacyConfig.version, readme = jsonPrivacyConfig.readme))
                 unprotectedTemporaryRepository.updateAll(jsonPrivacyConfig.unprotectedTemporary)
                 jsonPrivacyConfig.features.forEach { feature ->
                     feature.value?.let { jsonObject ->
-                        privacyFeaturePluginPoint.getPlugins().firstOrNull { feature.key == it.featureName.value }?.let { featurePlugin ->
-                            featurePlugin.store(FeatureName { feature.key }, jsonObject.toString())
+                        privacyFeaturePluginPoint.getPlugins().firstOrNull { feature.key == it.featureName }?.let { featurePlugin ->
+                            featurePlugin.store(feature.key, jsonObject.toString())
                         }
                     }
                 }
             }
         }
     }
+
+    private fun SharedPreferences.getSignature(): Int {
+        return getInt(PRIVACY_SIGNATURE_KEY, 0)
+    }
+
+    private fun SharedPreferences.setSignature(value: Int) {
+        edit {
+            putInt(PRIVACY_SIGNATURE_KEY, value)
+        }
+    }
+}
+
+@VisibleForTesting
+fun PluginPoint<PrivacyFeaturePlugin>.signature(): Int {
+    return this.getPlugins().sumOf { it.featureName.hashCode() }
 }

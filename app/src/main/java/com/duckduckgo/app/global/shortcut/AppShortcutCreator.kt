@@ -26,39 +26,41 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.graphics.drawable.IconCompat
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import timber.log.Timber
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
 class AppShortcutCreatorModule {
     @Provides
     @IntoSet
-    fun provideAppShortcutCreatorObserver(appShortcutCreator: AppShortcutCreator): LifecycleObserver {
-        return AppShortcutCreatorLifecycleObserver(appShortcutCreator)
+    fun provideAppShortcutCreatorObserver(appShortcutCreator: AppShortcutCreator, appBuildConfig: AppBuildConfig): LifecycleObserver {
+        return AppShortcutCreatorLifecycleObserver(appShortcutCreator, appBuildConfig)
     }
 }
 
 class AppShortcutCreatorLifecycleObserver(
-    private val appShortcutCreator: AppShortcutCreator
-) : LifecycleObserver {
+    private val appShortcutCreator: AppShortcutCreator,
+    private val appBuildConfig: AppBuildConfig
+) : DefaultLifecycleObserver {
     @UiThread
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun configureAppShortcuts() {
+    @Suppress("NewApi") // we use appBuildConfig
+    override fun onCreate(owner: LifecycleOwner) {
         Timber.i("Configure app shortcuts")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N_MR1) {
             appShortcutCreator.configureAppShortcuts()
         }
     }

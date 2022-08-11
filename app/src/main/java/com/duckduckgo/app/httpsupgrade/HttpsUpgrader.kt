@@ -18,9 +18,9 @@ package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
@@ -65,13 +65,12 @@ class HttpsUpgraderImpl @Inject constructor(
     private val userAllowListDao: UserWhitelistDao,
     private val toggle: FeatureToggle,
     private val https: Https
-) : HttpsUpgrader, LifecycleObserver {
+) : HttpsUpgrader, DefaultLifecycleObserver {
 
     private var bloomFilter: BloomFilter? = null
     private val bloomReloadLock = ReentrantLock()
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun onApplicationCreated() {
+    override fun onCreate(owner: LifecycleOwner) {
         thread { reloadData() }
     }
 
@@ -79,7 +78,7 @@ class HttpsUpgraderImpl @Inject constructor(
     override fun shouldUpgrade(uri: Uri): Boolean {
         val host = uri.host ?: return false
 
-        if (!toggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName)) {
+        if (!toggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName.value)) {
             Timber.d("https is disabled in the remote config and so $host is not upgradable")
             return false
         }

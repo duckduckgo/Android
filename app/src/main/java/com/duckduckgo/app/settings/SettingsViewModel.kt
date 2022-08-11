@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.settings
 
-import android.content.Context
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
@@ -36,13 +36,15 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.macos_api.MacOsWaitlist
 import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
@@ -63,7 +65,6 @@ import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SettingsViewModel @Inject constructor(
-    private val appContext: Context,
     private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
@@ -76,8 +77,10 @@ class SettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     private val appBuildConfig: AppBuildConfig,
     private val emailManager: EmailManager,
-    private val macOsWaitlist: MacOsWaitlist
-) : ViewModel(), LifecycleObserver {
+    private val macOsWaitlist: MacOsWaitlist,
+    private val autofillStore: AutofillStore,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+) : ViewModel(), DefaultLifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
 
@@ -96,7 +99,8 @@ class SettingsViewModel @Inject constructor(
         val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
         val appTrackingProtectionEnabled: Boolean = false,
         val emailAddress: String? = null,
-        val macOsWaitlistState: MacWaitlistState = MacWaitlistState.NotJoinedQueue
+        val macOsWaitlistState: MacWaitlistState = MacWaitlistState.NotJoinedQueue,
+        val showAutofill: Boolean = false
     )
 
     data class AutomaticallyClearData(
@@ -111,6 +115,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchEmailProtectionNotSUpported : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
+        object LaunchAutofillSettings : Command()
         object LaunchAccessibilitySettings : Command()
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
@@ -157,12 +162,13 @@ class SettingsViewModel @Inject constructor(
                     automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
-                    globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName) == true,
+                    globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value),
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
-                    appTrackingProtectionEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
+                    appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN),
                     appTrackingProtectionWaitlistState = atpRepository.getState(),
                     emailAddress = emailManager.getEmailAddress(),
-                    macOsWaitlistState = macOsWaitlist.getWaitlistState()
+                    macOsWaitlistState = macOsWaitlist.getWaitlistState(),
+                    showAutofill = autofillStore.autofillAvailable
                 )
             )
         }
@@ -175,7 +181,7 @@ class SettingsViewModel @Inject constructor(
     fun startPollingAppTpEnableState() {
         viewModelScope.launch {
             while (isActive) {
-                val isDeviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext)
+                val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
                 if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
                     viewState.value = currentViewState().copy(
                         appTrackingProtectionEnabled = isDeviceShieldEnabled
@@ -186,8 +192,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun stopPollingDeviceShieldState() {
+    override fun onStop(owner: LifecycleOwner) {
         deviceShieldStatePollingJob?.cancel()
     }
 
@@ -232,6 +237,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onFireproofWebsitesClicked() {
         viewModelScope.launch { command.send(Command.LaunchFireproofWebsites) }
+    }
+
+    fun onAutofillSettingsClick() {
+        viewModelScope.launch { command.send(Command.LaunchAutofillSettings) }
     }
 
     fun onLocationClicked() {

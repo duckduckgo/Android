@@ -41,3 +41,7 @@ dependencies {
     testImplementation project(path: ':common-test')
 }
 
+
+android {
+  namespace 'com.duckduckgo.macos_store'
+}

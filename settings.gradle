@@ -1,96 +1,35 @@
 plugins {
-    id("de.fayard.refreshVersions") version "0.40.1"
+    id("de.fayard.refreshVersions") version "0.40.2"
 }
 
-include ':app'
+rootDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
 
-"feature-toggles".with {
-    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
-    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
-}
-
-"privacy-config".with {
-    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
-    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
-    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
-}
-
-"remote-messaging".with {
-    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
-    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
-    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
-}
-
-"voice-search".with {
-    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
-    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
-    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
-}
-
-"downloads".with {
-    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
-    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
-    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
-}
-
-"traces".with {
-    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
-    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
-}
-
-"anrs".with {
-    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
-    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
-    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
-}
-
-"macos".with {
-    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
-    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
-    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
-}
-
-"bandwidth".with {
-    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
-    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
-}
-
-"anvil".with {
-    include ":$it-compiler"; project(":$it-compiler").projectDir = new File("$it/$it-compiler")
-    include ":$it-annotations"; project(":$it-annotations").projectDir = new File("$it/$it-annotations")
-}
-
-"di".with {
-    include ":$it"; project(":$it").projectDir = new File("$it")
-}
-
-"statistics".with {
-    include ":$it"; project(":$it").projectDir = new File("$it")
-}
-
-"app-store".with {
-    include ":$it"; project(":$it").projectDir = new File("$it")
-}
-
-"browser-api".with {
-    include ":$it"; project(":$it").projectDir = new File("$it")
-}
-
-"app-build-config".with {
-    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
-}
-
-"common".with {
-    include ":$it"; project(":$it").projectDir = new File("$it")
-    include ":$it-ui"; project(":$it-ui").projectDir = new File("$it-ui")
-    include ":$it-test"; project(":$it-test").projectDir = new File("$it-test")
-}
-
-"vpn".with {
-    include ":$it"; project(":$it").projectDir = new File("$it")
-    include ":$it-store"; project(":$it-store").projectDir = new File("$it-store")
-    include ":$it-api"; project(":$it-api").projectDir = new File("$it-api")
-    include ":$it-internal"; project(":$it-internal").projectDir = new File("$it-internal")
+    String[] ignoreFolders = ["buildSrc", "fastlane", "submodules", "node_modules", "gradle", "build"]
+    if (!parent.name.startsWith(".") && !ignoreFolders.contains(parent.name)) {
+        Boolean shouldAddProject = false
+        parent.eachFile {
+            if (it.name.contains("build.gradle")) {
+                shouldAddProject = true
+                return
+            }
+        }
+        if (shouldAddProject) {
+            include ":${parent.name}"
+        } else {
+            parent.eachFile(groovy.io.FileType.DIRECTORIES) { child -> // We only one level deep
+                Boolean shouldAddSubProject = false
+                child.eachFile {
+                    if (it.name.contains("build.gradle")) {
+                        shouldAddSubProject = true
+                        return
+                    }
+                }
+                if (shouldAddSubProject) {
+                    include ":${child.name}"; project(":${child.name}").projectDir = new File("${parent.name}/${child.name}")
+                }
+            }
+        }
+    }
 }
 
 rootProject.children.each { subproject ->

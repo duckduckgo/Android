@@ -20,4 +20,10 @@
     <string name="common_DaysAgo">%d days ago</string>
     <string name="common_PastWeek">Past Week</string>
     <string name="common_PastMonth">Past Month</string>
+    <string name="common_MinutesAgo">%dm ago</string>
+    <string name="common_HoursAgo">%dh ago</string>
+    <string name="common_JustNow">Just Now</string>
+    <string name="common_hour_abbreviation">hr</string>
+    <string name="common_min_abbreviation">min</string>
+    <string name="common_seconds_abbreviation">sec</string>
 </resources>

@@ -121,30 +121,6 @@
     <string name="httpsMixed">Salaukseltaan vaihteleva yhteys</string>
     <string name="httpsBad">Salaamaton yhteys</string>
 
-    <string name="networksActivityTitle">Seurantaverkostot</string>
-    <string name="networksContentDescription">Seurantaverkostot</string>
-    <string name="networksOverview">Seurantaverkostot kokoavat verkkohistoriasi sinua koskevaksi tietoprofiiliksi. Merkittävät seurantaverkostot ovat haitallisempia, koska ne voivat seurata toimiasi ja harjoittaa kohdennusta useammassa osassa verkkoa.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s seurantapalvelin löytynyt</item>
-        <item quantity="other">%1$s seurantapalvelinta löytynyt</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s seurantapalvelin estetty</item>
-        <item quantity="other">%1$s seurantapalvelinta estetty</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s merkittävä seurantaverkosto löytynyt</item>
-        <item quantity="other">%1$s merkittävää seurantaverkostoa löytynyt</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s merkittävä seurantaverkosto estetty</item>
-        <item quantity="other">%1$s merkittävää seurantaverkostoa estetty</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Tietosuoja-arvosana</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Sivusto on merkittävä seurantaverkosto</string>
     <string name="scorecardPrivacyGrade">Tietosuoja-arvosana</string>
@@ -162,6 +138,45 @@
 
     <string name="networkTrackerSummaryHeader">PAHIMMAT SEURANTAVERKOSTOT</string>
     <string name="networkTrackerSummaryNotReady">Keräämme edelleen tietoja näyttääksemme, kuinka monta seurantapalvelinta olemme estäneet.</string>
+
+    <string name="trackersActivityTitle">Estetyt seurantapyynnöt</string>
+    <string name="trackersContentDescription">Estetyt seurantapyynnöt</string>
+    <string name="trackersOverview">Seuraavien kolmansien osapuolten verkkotunnusten pyyntöjen lataaminen estettiin, koska ne tunnistettiin seurantapyynnöiksi. Jos yrityksen pyynnöt ladataan, se voi antaa niille mahdollisuuden profiloida sinut.</string>
+    <string name="trackersOverviewProtectionsOff">Seurantapyyntöjä ei estetty latautumasta, koska suojaukset on poistettu käytöstä tältä sivustolta. Jos yrityksen pyynnöt ladataan, yritys voi mahdollisesti profiloida sinut.</string>
+
+    <string name="domainsLoadedActivityTitle">Kolmannen osapuolen pyynnöt ladattu</string>
+    <string name="domainsLoadedContentDescription">Kolmannen osapuolen pyynnöt ladattu</string>
+    <string name="domainsLoadedOverview">Seuraavat kolmannen osapuolen verkkotunnusten pyynnöt ladattiin. Jos yrityksen pyynnöt ladataan, se voi antaa heidän profiloida sinut, vaikka muut verkkoseurannan suojauksemme ovat edelleen voimassa.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Kolmannen osapuolen pyyntöjä ei estetty latautumasta, koska suojaukset on poistettu käytöstä tältä sivustolta. Jos yrityksen pyynnöt ladataan, yritys voi mahdollisesti profiloida sinut.</string>
+    <string name="domainsLoadedOverviewEmpty">Emme havainneet pyyntöjä kolmannen osapuolen verkkotunnuksilta.</string>
+    <string name="domainsLoadedHeadingText">Ei ladattuja kolmannen osapuolen verkkotunnuksia</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Tietoja verkkoseurantasuojauksistamme</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Seuraavien verkkotunnusten pyynnöt ladattiin.</string>
+
+    <string name="adLoadedSectionDescription">Seuraavat verkkotunnuksen pyynnöt ladattiin, koska %1$s-mainosta DuckDuckGossa napsautettiin äskettäin. Nämä pyynnöt auttavat arvioimaan mainosten tehokkuutta. Kaikki DuckDuckGon mainokset ovat ei-profiloivia.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Miten hakumainoksemme vaikuttavat suojauksiimme</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Myös seuraavat verkkotunnuksen pyynnöt ladattiin.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Seuraavien verkkotunnusten seurantapyynnöt ladattiin.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Emme havainneet pyyntöjä kolmannen osapuolen verkkotunnuksilta.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Seuraavan verkkotunnuksen pyynnöt ladattiin sivuston rikkoutumisen estämiseksi.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Seuraavan verkkotunnuksen pyynnöt ladattiin, koska ne liittyvät kohteeseen %1$s.</string>
+
+    <string name="trackersBlockedText">Pyynnöt, joiden lataaminen estetty</string>
+    <string name="trackersNotBlockedText">Ei estettyjä seurantapyyntöjä</string>
+    <string name="trackersNoFoundText">Seurantapyyntöjä ei löytynyt</string>
+    <string name="trackersFoundText">Löydetyt seurantapyynnöt</string>
+
+    <string name="domainsLoadedText">Kolmannen osapuolen pyynnöt ladattu</string>
+    <string name="domainsNotLoadedText">Kolmannen osapuolen pyyntöjä ei ole ladattu</string>
+
+    <string name="majorNetworksNoFound">Merkittäviä seurantaverkostoja ei löytynyt</string>
+    <string name="majorNetworksFound">Merkittäviä seurantaverkostoja löytynyt</string>
 
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
@@ -563,11 +578,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Yhteys keskeytetty. Verkkosivusto voi vahingoittaa laitettasi.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Lataustenhallinta ei ole käytössä</string>
-    <string name="downloadManagerIncompatible">Lataustenhallintaa ei ole saatavilla tällä laitteella</string>
-    <string name="enable">Ota käyttöön</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Otetaanko laitteen sijainti käyttöön DuckDuckGon yksityiselle selaimelle?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s pyytää saada tietää laitteesi sijainnin. Sinun on ensin annettava sovellukselle lupa lähettää laitteesi sijainti, jonka jälkeen %2$s voi pyytää lupaa.</string>
@@ -599,7 +609,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo estää monet seurannat automaattisesti. GPC:n (Global Privacy Control) avulla voit myös pyytää osallistuvia sivustoja rajoittamaan henkilötietojesi myyntiä tai jakamista muiden yritysten kanssa. <u><a href="">Lue lisää</a><u/>]]>
+        <![CDATA[DuckDuckGo estää monet seurannat automaattisesti. GPC:n (Global Privacy Control) avulla voit myös pyytää osallistuvia sivustoja rajoittamaan henkilötietojesi myyntiä tai jakamista muiden yritysten kanssa. <u><a href=\"\">Lue lisää</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>

@@ -30,9 +30,9 @@ import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
-import com.duckduckgo.app.global.view.DaxDialog
-import com.duckduckgo.app.global.view.TypewriterDaxDialog
-import com.duckduckgo.app.global.view.html
+import com.duckduckgo.mobile.android.ui.view.DaxDialog
+import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -87,7 +87,11 @@ sealed class DaxDialogCta(
 ) : Cta, DialogCta, DaxCta {
 
     override fun createCta(activity: FragmentActivity): DaxDialog =
-        TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
+        TypewriterDaxDialog.newInstance(
+            daxText = getDaxText(activity),
+            primaryButtonText = activity.resources.getString(okButton),
+            hideButtonText = activity.resources.getString(R.string.daxDialogHideButton),
+        )
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -133,7 +137,8 @@ sealed class DaxDialogCta(
             TypewriterDaxDialog.newInstance(
                 daxText = getDaxText(activity),
                 primaryButtonText = activity.resources.getString(okButton),
-                toolbarDimmed = false
+                toolbarDimmed = false,
+                hideButtonText = activity.resources.getString(R.string.daxDialogHideButton),
             )
 
         override fun getDaxText(context: Context): String {
@@ -189,7 +194,11 @@ sealed class DaxDialogCta(
         }
 
         override fun createCta(activity: FragmentActivity): DaxDialog =
-            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
+            TypewriterDaxDialog.newInstance(
+                daxText = getDaxText(activity),
+                primaryButtonText = activity.resources.getString(okButton),
+                hideButtonText = activity.resources.getString(R.string.daxDialogHideButton),
+            )
 
         private fun isFromSameNetworkDomain(): Boolean = mainTrackerDomains.any { siteHost.contains(it) }
     }
@@ -209,7 +218,11 @@ sealed class DaxDialogCta(
         appInstallStore
     ) {
         override fun createCta(activity: FragmentActivity): DaxDialog =
-            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
+            TypewriterDaxDialog.newInstance(
+                daxText = getDaxText(activity),
+                primaryButtonText = activity.resources.getString(okButton),
+                hideButtonText = activity.resources.getString(R.string.daxDialogHideButton),
+            )
     }
 
     companion object {

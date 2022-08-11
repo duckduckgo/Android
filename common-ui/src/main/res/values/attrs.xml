@@ -46,7 +46,7 @@
     <attr name="settingsItemTextColorDisabled" format="color" />
     <attr name="settingsMinorTextColor" format="color" />
     <attr name="settingsSwitchBackgroundColor" format="color" />
-    <attr name="settingsDividerColor" format="color" />
+    <attr name="sectionDividerColor" format="color" />
     <attr name="buttonOutlinedBorderColor" format="color" />
     <attr name="buttonOutlinedTextColor" format="color" />
     <attr name="callToActionTitleColor" format="color" />
@@ -99,4 +99,5 @@
 
     <attr name="overflowMenuDividerColor" format="color" />
     <attr name="bottomShadowBackground" format="reference" />
+    <attr name="appTPHeaderBackground" format="color" />
 </resources>

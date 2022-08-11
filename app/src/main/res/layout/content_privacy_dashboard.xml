@@ -36,7 +36,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/review"
             android:layout_width="match_parent"
-            android:layout_height="169dp"
+            android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
@@ -70,11 +70,11 @@
                 android:background="?attr/selectableItemBackground"
                 app:layout_constraintTop_toBottomOf="@id/httpsContainer">
 
-                <ImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/networksIcon"
                     style="@style/DashboardEntryIcon"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/networks_icon_good" />
+                    app:srcCompat="@drawable/networks_icon_good" />
 
                 <TextView
                     android:id="@+id/networksText"
@@ -84,11 +84,31 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/practicesContainer"
+                android:id="@+id/domainsLoadedContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 app:layout_constraintTop_toBottomOf="@id/networksContainer">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/domainsLoadedIcon"
+                    style="@style/DashboardEntryIcon"
+                    android:importantForAccessibility="no"
+                    app:srcCompat="@drawable/ic_other_domains_info" />
+
+                <TextView
+                    android:id="@+id/domainsLoadedText"
+                    style="@style/DashboardEntryText"
+                    tools:text="2 Other Domains Loaded" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/practicesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                app:layout_constraintTop_toBottomOf="@id/domainsLoadedContainer">
 
                 <ImageView
                     android:id="@+id/practicesIcon"
@@ -193,7 +213,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/trackerNetworkLeaderboard"
             android:layout_width="match_parent"
-            android:layout_height="108dp"
+            android:layout_height="wrap_content"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             app:layout_constraintTop_toBottomOf="@id/buttonContainer">

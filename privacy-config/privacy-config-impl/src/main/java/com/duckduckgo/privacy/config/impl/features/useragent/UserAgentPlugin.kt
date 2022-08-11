@@ -17,7 +17,6 @@
 package com.duckduckgo.privacy.config.impl.features.useragent
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
@@ -37,12 +36,12 @@ class UserAgentPlugin @Inject constructor(
 ) : PrivacyFeaturePlugin {
 
     override fun store(
-        name: FeatureName,
+        featureName: String,
         jsonString: String
     ): Boolean {
         @Suppress("NAME_SHADOWING")
-        val name = privacyFeatureValueOf(name.value)
-        if (name == featureName) {
+        val privacyFeature = privacyFeatureValueOf(featureName) ?: return false
+        if (privacyFeature.value == this.featureName) {
             val userAgentExceptions = mutableListOf<UserAgentExceptionEntity>()
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<UserAgentFeature> =
@@ -73,11 +72,11 @@ class UserAgentPlugin @Inject constructor(
 
             userAgentRepository.updateAll(userAgentExceptions)
             val isEnabled = userAgentFeature?.state == "enabled"
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled, userAgentFeature?.minSupportedVersion))
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(this.featureName, isEnabled, userAgentFeature?.minSupportedVersion))
             return true
         }
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.UserAgentFeatureName
+    override val featureName: String = PrivacyFeatureName.UserAgentFeatureName.value
 }

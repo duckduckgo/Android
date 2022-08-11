@@ -17,6 +17,9 @@
 package com.duckduckgo.app.email.di
 
 import android.content.Context
+import androidx.lifecycle.LifecycleObserver
+import androidx.work.WorkManager
+import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.AppEmailManager
@@ -56,9 +59,10 @@ class EmailModule {
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
         dispatcherProvider: DispatcherProvider,
         featureToggle: FeatureToggle,
+        javascriptInjector: JavascriptInjector,
         autofill: Autofill
     ): EmailInjector {
-        return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider, featureToggle, autofill)
+        return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider, featureToggle, javascriptInjector, autofill)
     }
 
     @Provides

@@ -27,3 +27,6 @@ dependencies {
     implementation Google.dagger
     implementation KotlinX.coroutines.core
 }
+android {
+  namespace 'com.duckduckgo.downloads.api'
+}

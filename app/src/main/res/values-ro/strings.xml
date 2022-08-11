@@ -121,34 +121,6 @@
     <string name="httpsMixed">Conexiune cu criptare mixtă</string>
     <string name="httpsBad">Conexiune necriptată</string>
 
-    <string name="networksActivityTitle">Rețele de cookie-uri de urmărire</string>
-    <string name="networksContentDescription">Rețele de cookie-uri de urmărire</string>
-    <string name="networksOverview">Rețelele de cookie-uri de urmărire vă adună istoricul web într-un profil de date despre dvs. Rețelele mari de cookie-uri de urmărire sunt mai dăunătoare, deoarece vă pot urmări și vă pot viza pe mai multe site-uri de pe internet.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s Urmăritor Găsit</item>
-        <item quantity="few">%1$s Urmăritori Găsiți</item>
-        <item quantity="other">%1$s Urmăritori Găsiți</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s Urmăritor Blocat</item>
-        <item quantity="few">%1$s Urmăritori Blocați</item>
-        <item quantity="other">%1$s Urmăritori Blocați</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s Rețea Principală Urmăritoare Găsită</item>
-        <item quantity="few">%1$s Rețele Principale Urmăritoare Găsite</item>
-        <item quantity="other">%1$s Rețele Principale Urmăritoare Găsite</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s Rețea Principală Urmăritoare Blocată</item>
-        <item quantity="few">%1$s Rețele Principale Urmpritoare Blocate</item>
-        <item quantity="other">%1$s Rețele Principale Urmpritoare Blocate</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Grad de confidențialitate</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Site-ul este o rețea mare de instrumente de urmărire</string>
     <string name="scorecardPrivacyGrade">Grad de confidențialitate</string>
@@ -166,6 +138,45 @@
 
     <string name="networkTrackerSummaryHeader">CEI MAI MARI INFRACTORI PRIVIND REȚELELE DE COOKIE-URI DE URMĂRIRE</string>
     <string name="networkTrackerSummaryNotReady">Continuă să colectăm date pentru a arăta câte cookie-uri de urmărire am blocat.</string>
+
+    <string name="trackersActivityTitle">Solicitări de urmărire blocate</string>
+    <string name="trackersContentDescription">Solicitări de urmărire blocate</string>
+    <string name="trackersOverview">Încărcarea cererilor următoarelor domenii terțe a fost blocată, deoarece au fost identificate ca fiind cereri de urmărire. În cazul în care cererile unei societăți sunt încărcate, aceasta îi poate permite să îți creeze un profil.</string>
+    <string name="trackersOverviewProtectionsOff">Nu a fost blocată încărcarea niciunei cereri de urmărire, deoarece protecțiile sunt dezactivate pentru acest site. În cazul în care cererile unei societăți sunt încărcate, aceasta îi poate permite să îți creeze un profil.</string>
+
+    <string name="domainsLoadedActivityTitle">Solicitări de la terți încărcate</string>
+    <string name="domainsLoadedContentDescription">Solicitări de la terți încărcate</string>
+    <string name="domainsLoadedOverview">Au fost încărcate următoarele solicitări ale domeniilor terțe. În cazul în care solicitările unei societăți sunt încărcate, aceasta îi poate permite să îți creeze un profil, deși celelalte măsuri de protecție ale noastre împotriva urmăririi pe internet se aplică în continuare.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Nu a fost blocată încărcarea niciunei cereri de la terți, deoarece protecțiile sunt dezactivate pentru acest site. În cazul în care cererile unei societăți sunt încărcate, aceasta îi poate permite să îți creeze un profil.</string>
+    <string name="domainsLoadedOverviewEmpty">Nu am detectat solicitări de la niciun domeniu terț.</string>
+    <string name="domainsLoadedHeadingText">Nu au fost încărcate domenii terțe</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Despre protecțiile noastre împotriva urmăririi pe web</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Au fost încărcate solicitările următoarelor domenii.</string>
+
+    <string name="adLoadedSectionDescription">Solicitările următorului domeniu au fost încărcate deoarece s-a făcut clic recent pe o reclamă %1$s de pe DuckDuckGo. Aceste solicitări ajută la evaluarea eficienței anunțurilor. Nicio reclamă de pe DuckDuckGo nu creează profiluri.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Cum influențează protecțiile anunțurile noastre de căutare</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Au fost încărcate și solicitările următorului domeniu.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Au fost încărcate solicitările de urmărire ale următoarelor domenii.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Nu am detectat solicitări de la niciun domeniu terț.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Solicitările următoarelor domenii au fost încărcate pentru a preveni întreruperea site-ului.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Solicitările următorului domeniu au fost încărcate deoarece sunt asociate cu %1$s.</string>
+
+    <string name="trackersBlockedText">Solicitări a căror încărcare a fost blocată</string>
+    <string name="trackersNotBlockedText">Nu a fost blocată nicio solicitare de urmărire</string>
+    <string name="trackersNoFoundText">Nu au fost găsite solicitări de urmărire</string>
+    <string name="trackersFoundText">S-au găsit solicitări de urmărire</string>
+
+    <string name="domainsLoadedText">Solicitări de la terți încărcate</string>
+    <string name="domainsNotLoadedText">Nu au fost încărcate solicitări terță parte</string>
+
+    <string name="majorNetworksNoFound">Nu s-a găsit nicio rețea de urmărire majoră</string>
+    <string name="majorNetworksFound">S-au găsit rețele de urmărire majore</string>
 
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
@@ -569,11 +580,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Conexiunea a fost anulată. Acest site web ar putea dăuna dispozitivului tău.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Managerul descărcărilor este dezactivat</string>
-    <string name="downloadManagerIncompatible">Managerul descărcărilor nu este disponibil pe acest dispozitiv</string>
-    <string name="enable">Activare</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Activezi locația dispozitivului pentru browserul de confidențialitate DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s solicită locația dispozitivului tău. Mai întâi va trebui să permiți aplicației să trimită locația dispozitivului, apoi %2$s poate cere permisiunea.</string>
@@ -605,7 +611,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href="">Află mai multe</a><u/>]]>
+        <![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href=\"\">Află mai multe</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>

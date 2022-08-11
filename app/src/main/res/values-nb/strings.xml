@@ -121,30 +121,6 @@
     <string name="httpsMixed">Tilkobling med blandet kryptering</string>
     <string name="httpsBad">Ukryptert tilkobling</string>
 
-    <string name="networksActivityTitle">Sporingsnettverk</string>
-    <string name="networksContentDescription">Sporingsnettverk</string>
-    <string name="networksOverview">Sporingsnettverk samler netthistorikken din i en dataprofil om deg. Større sporingsnettverk gjør mer skade fordi de kan spore og peile seg inn på deg på flere steder på Internett.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%% sporing oppdaget</item>
-        <item quantity="other">%% sporinger oppdaget</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s sporing blokkert</item>
-        <item quantity="other">%1$s sporinger blokkert</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s stort sporingsnettverk oppdaget</item>
-        <item quantity="other">%1$s store sporingsnettverk oppdaget</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s stort sporingsnettverk blokkert</item>
-        <item quantity="other">%1$s store sporingsnettverk blokkert</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Grad av personvern</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Nettstedet er et stort sporingsnettverk</string>
     <string name="scorecardPrivacyGrade">Grad av personvern</string>
@@ -162,6 +138,45 @@
 
     <string name="networkTrackerSummaryHeader">DE VERSTE SPORINGSNETTVERKENE</string>
     <string name="networkTrackerSummaryNotReady">Vi samler fortsatt data for å vise deg hvor mange sporinger vi har blokkert.</string>
+
+    <string name="trackersActivityTitle">Sporingsforespørsler blokkert</string>
+    <string name="trackersContentDescription">Sporingsforespørsler blokkert</string>
+    <string name="trackersOverview">Forespørslene fra følgende tredjepartsdomener ble blokkert fra lasting, fordi de ble identifisert som sporingsforespørsler. Hvis forespørslene fra et selskap blir lastet, har selskapet mulighet til å profilere deg.</string>
+    <string name="trackersOverviewProtectionsOff">Ingen sporingsforespørsler ble blokkert fra lasting, fordi beskyttelse er slått av for dette nettstedet. Hvis forespørslene fra et selskap blir lastet, har selskapet mulighet til å profilere deg.</string>
+
+    <string name="domainsLoadedActivityTitle">Tredjepartsforespørsler er lastet</string>
+    <string name="domainsLoadedContentDescription">Tredjepartsforespørsler er lastet</string>
+    <string name="domainsLoadedOverview">Forespørslene fra følgende tredjepartsdomener ble lastet. Hvis forespørslene fra et selskap blir lastet, har selskapet mulighet til å profilere deg, selv om de andre nettsporingsbeskyttelsene våre fremdeles gjelder.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Ingen tredjepartsforespørsler ble blokkert fra lasting, fordi beskyttelse er slått av for dette nettstedet. Hvis forespørslene fra et selskap blir lastet, har selskapet mulighet til å profilere deg.</string>
+    <string name="domainsLoadedOverviewEmpty">Vi oppdaget ingen forespørsler fra tredjepartsdomener.</string>
+    <string name="domainsLoadedHeadingText">Ingen tredjepartsdomener er lastet</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Om nettsporingsbeskyttelsen vår</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Forespørslene fra følgende domener ble lastet.</string>
+
+    <string name="adLoadedSectionDescription">Forespørslene fra følgende domene ble lastet fordi en %1$s-annonse på DuckDuckGo nylig ble klikket på. Disse forespørslene bidrar til å evaluere annonseeffektiviteten. Alle annonser på DuckDuckGo er ikke-profilerende.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Hvordan søkeannonsene våre påvirker beskyttelsen vår</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Forespørslene fra følgende domene ble også lastet.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Sporingsforespørslene fra følgende domener ble lastet.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Vi oppdaget ingen forespørsler fra tredjepartsdomener.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Forespørslene fra følgende domene ble lastet for å forhindre brudd på nettstedet.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Forespørslene fra følgende domene ble lastet fordi de er tilknyttet %1$s.</string>
+
+    <string name="trackersBlockedText">Forespørsler blokkert fra lasting</string>
+    <string name="trackersNotBlockedText">Ingen sporingsforespørsler er blokkert</string>
+    <string name="trackersNoFoundText">Ingen sporingsforespørsler er funnet</string>
+    <string name="trackersFoundText">Sporingsforespørsler funnet</string>
+
+    <string name="domainsLoadedText">Tredjepartsforespørsler er lastet</string>
+    <string name="domainsNotLoadedText">Ingen tredjepartsforespørsler er lastet</string>
+
+    <string name="majorNetworksNoFound">Ingen større sporingsnettverk ble oppdaget</string>
+    <string name="majorNetworksFound">Store sporingsnettverk er oppdaget</string>
 
     <!-- Fire -->
     <string name="fireMenu">Tøm data</string>
@@ -563,11 +578,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Tilkobling avbrutt. Dette nettstedet kan skade enheten din.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Nedlastingsbehandler er deaktivert</string>
-    <string name="downloadManagerIncompatible">Nedlastingsbehandler er ikke tilgjengelig på denne enheten</string>
-    <string name="enable">Aktiver</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vil du aktivere posisjonstjenester for DuckDuckGo privatnettleser?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s ber om tillatelse til å se posisjonen til enheten din. Først må du gi appen tillatelse til å sende enhetens posisjon, deretter kan %2$s be om tillatelse.</string>
@@ -599,7 +609,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blokkerer mange sporere automatisk. Med Global Privacy Control (GPC) kan du også be deltakende nettsteder om å begrense salg eller deling av dine personopplysninger med andre selskaper. <u><a href="">Finn ut mer</a><u/>]]>
+        <![CDATA[DuckDuckGo blokkerer mange sporere automatisk. Med Global Privacy Control (GPC) kan du også be deltakende nettsteder om å begrense salg eller deling av dine personopplysninger med andre selskaper. <u><a href=\"\">Finn ut mer</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>

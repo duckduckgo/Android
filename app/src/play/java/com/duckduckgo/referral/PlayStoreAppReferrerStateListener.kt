@@ -98,11 +98,16 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
         try {
             when (responseCode) {
                 OK -> {
-                    Timber.d("Successfully connected to Referrer service")
-                    val response = referralClient.installReferrer
-                    val referrer = response.installReferrer
-                    val parsedResult = appInstallationReferrerParser.parse(referrer)
-                    referralResultReceived(parsedResult)
+                    kotlin.runCatching {
+                        Timber.d("Successfully connected to Referrer service")
+                        val response = referralClient.installReferrer
+                        val referrer = response.installReferrer
+                        val parsedResult = appInstallationReferrerParser.parse(referrer)
+                        referralResultReceived(parsedResult)
+                    }.onFailure {
+                        Timber.e(it, "Error getting install referrer")
+                        referralResultFailed(UnknownError)
+                    }
                 }
                 FEATURE_NOT_SUPPORTED -> referralResultFailed(FeatureNotSupported)
                 SERVICE_UNAVAILABLE -> referralResultFailed(ServiceUnavailable)

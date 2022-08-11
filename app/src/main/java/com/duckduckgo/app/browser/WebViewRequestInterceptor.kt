@@ -21,13 +21,16 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.annotation.WorkerThread
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.Gpc
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +60,8 @@ class WebViewRequestInterceptor(
     private val httpsUpgrader: HttpsUpgrader,
     private val privacyProtectionCountDao: PrivacyProtectionCountDao,
     private val gpc: Gpc,
-    private val userAgentProvider: UserAgentProvider
+    private val userAgentProvider: UserAgentProvider,
+    private val adClickManager: AdClickManager
 ) : RequestInterceptor {
 
     /**
@@ -79,6 +83,8 @@ class WebViewRequestInterceptor(
 
         val url = request.url
 
+        adClickManager.detectAdClick(url?.toString(), request.isForMainFrame)
+
         newUserAgent(request, webView, webViewClientListener)?.let {
             withContext(Dispatchers.Main) {
                 webView.settings?.userAgentString = it
@@ -86,6 +92,8 @@ class WebViewRequestInterceptor(
             }
             return WebResourceResponse(null, null, null)
         }
+
+        if (appUrlPixel(url)) return null
 
         if (shouldUpgrade(request)) {
             val newUri = httpsUpgrader.upgrade(url)
@@ -141,7 +149,7 @@ class WebViewRequestInterceptor(
         webViewClientListener: WebViewClientListener?
     ): WebResourceResponse? {
         val trackingEvent = trackingEvent(request, documentUrl, webViewClientListener)
-        if (trackingEvent?.blocked == true) {
+        if (trackingEvent?.status == TrackerStatus.BLOCKED) {
             trackingEvent.surrogateId?.let { surrogateId ->
                 val surrogate = resourceSurrogates.get(surrogateId)
                 if (surrogate.responseAvailable) {
@@ -219,4 +227,7 @@ class WebViewRequestInterceptor(
         webViewClientListener?.trackerDetected(trackingEvent)
         return trackingEvent
     }
+
+    private fun appUrlPixel(url: Uri?): Boolean =
+        url?.toString()?.startsWith(AppUrl.Url.PIXEL) == true
 }

@@ -81,7 +81,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         )
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val addFolderFlag = intent.extras?.getBoolean(KEY_ADD_FOLDER_FLAG) ?: false
         if (addFolderFlag) menuInflater.inflate(R.menu.bookmark_folders_activity_menu, menu)
         return true

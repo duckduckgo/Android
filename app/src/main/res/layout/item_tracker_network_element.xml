@@ -29,7 +29,6 @@
         android:id="@+id/host"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
         android:fontFamily="sans-serif"
         android:letterSpacing="-0.01"
         android:lineSpacingExtra="7sp"
@@ -37,7 +36,6 @@
         android:textIsSelectable="true"
         android:textSize="14sp"
         android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/category"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -45,20 +43,22 @@
 
     <TextView
         android:id="@+id/category"
-        android:layout_width="80dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
         android:fontFamily="sans-serif"
         android:gravity="end"
         android:lineSpacingExtra="7sp"
+        android:maxLines="1"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingEnd="@dimen/keyline_empty"
+        android:singleLine="true"
         android:textColor="@color/warmerGray"
         android:textIsSelectable="true"
         android:textSize="14sp"
         android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/host"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/network_pill_facebook_inc"
         tools:text="Advertising" />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

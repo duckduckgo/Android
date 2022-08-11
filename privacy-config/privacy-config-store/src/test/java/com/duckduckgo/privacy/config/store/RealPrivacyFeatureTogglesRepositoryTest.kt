@@ -49,7 +49,7 @@ class RealPrivacyFeatureTogglesRepositoryTest {
 
     @Test
     fun whenInsertThenInsertCalled() {
-        val privacyFeatureToggle = PrivacyFeatureToggles(PrivacyFeatureName.GpcFeatureName, true, null)
+        val privacyFeatureToggle = PrivacyFeatureToggles(PrivacyFeatureName.GpcFeatureName.value, true, null)
         testee.insert(privacyFeatureToggle)
 
         verify(mockPrivacyFeatureTogglesDataStore).insert(privacyFeatureToggle)

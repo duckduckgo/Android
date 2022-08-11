@@ -16,12 +16,13 @@
 
 package com.duckduckgo.app.job
 
+import android.annotation.SuppressLint
 import androidx.annotation.CheckResult
 import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder
@@ -30,11 +31,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
@@ -56,11 +57,11 @@ class AppConfigurationSyncer(
     private val appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,
     private val workManager: WorkManager,
     private val appConfigurationDownloader: ConfigurationDownloader
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
+    @SuppressLint("CheckResult")
     @UiThread
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun configureDataDownloader() {
+    override fun onCreate(owner: LifecycleOwner) {
         scheduleImmediateSync()
             .subscribeOn(Schedulers.io())
             .doAfterTerminate {

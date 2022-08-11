@@ -121,38 +121,6 @@
     <string name="httpsMixed">Соединение со смешанным шифрованием</string>
     <string name="httpsBad">Незашифрованное соединение</string>
 
-    <string name="networksActivityTitle">Трекерные сети</string>
-    <string name="networksContentDescription">Трекерные сети</string>
-    <string name="networksOverview">Сети трекеров собирают историю вашей активности в Интернете и формируют ваш информационный профиль. Крупные сети трекеров более опасны, так как могут отслеживать вас и показывать адресную рекламу на большем количестве сайтов.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">Найден %1$s трекер</item>
-        <item quantity="few">Найдено %1$s трекера</item>
-        <item quantity="many">Найдено %1$s трекеров</item>
-        <item quantity="other">Найдены %1$s трекеры</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">Заблокирован %1$s трекер</item>
-        <item quantity="few">Заблокировано %1$s трекера</item>
-        <item quantity="many">Заблокировано %1$s трекеров</item>
-        <item quantity="other">Заблокированы %1$s трекеры</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">Обнаружена %1$s крупная сеть отслеживания</item>
-        <item quantity="few">Обнаружено %1$s крупные сети отслеживания</item>
-        <item quantity="many">Обнаружено %1$s крупных сетей отслеживания</item>
-        <item quantity="other">Обнаружено %1$s крупные сети отслеживания</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">Заблокирована %1$s крупная сеть отслеживания</item>
-        <item quantity="few">Заблокировано %1$s крупные сети отслеживания</item>
-        <item quantity="many">Заблокировано %1$s крупных сетей отслеживания</item>
-        <item quantity="other">Заблокированы %1$s крупные сети отслеживания</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Рейтинг конфиденциальности</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Этот сайт — крупная сеть трекеров</string>
     <string name="scorecardPrivacyGrade">Рейтинг конфиденциальности</string>
@@ -170,6 +138,45 @@
 
     <string name="networkTrackerSummaryHeader">ОСНОВНЫЕ ТРЕКЕРНЫЕ СЕТИ, ПРЕДСТАВЛЯЮЩИЕ УГРОЗУ КОНФИДЕНЦИАЛЬНОСТИ</string>
     <string name="networkTrackerSummaryNotReady">Мы продолжаем собирать данные, чтобы показать, сколько трекеров мы заблокировали.</string>
+
+    <string name="trackersActivityTitle">Запросы на отслеживание заблокированы</string>
+    <string name="trackersContentDescription">Запросы на отслеживание заблокированы</string>
+    <string name="trackersOverview">Мы заблокировали загрузку следующих запросов сторонних доменов, так как распознали в них трекинг-запросы. Загруженные запросы позволяют компаниям вас профилировать.</string>
+    <string name="trackersOverviewProtectionsOff">Мы не заблокировали ни одного трекинг-запроса, так как защита на этом сайте отключена. Загруженные запросы позволяют компаниям вас профилировать.</string>
+
+    <string name="domainsLoadedActivityTitle">Загружены сторонние запросы</string>
+    <string name="domainsLoadedContentDescription">Загружены сторонние запросы</string>
+    <string name="domainsLoadedOverview">Ниже приведен список загруженных запросов сторонних доменов. Благодаря этим запросам компании могут вас профилировать, однако мы по-прежнему защищаем вас от отслеживания в Сети другими способами.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Мы не заблокировали ни одной загрузки сторонних запросов, так как защита на этом сайте отключена. Загруженные запросы позволяют компаниям вас профилировать.</string>
+    <string name="domainsLoadedOverviewEmpty">Запросов от сторонних доменов не обнаружено.</string>
+    <string name="domainsLoadedHeadingText">Не загружено ни одного стороннего домена</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">О защите от веб-слежки</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Загружены запросы следующих доменов.</string>
+
+    <string name="adLoadedSectionDescription">Запросы этого домена были загружены в результате недавнего нажатия на рекламу %1$s в DuckDuckGo. Такие запросы помогают оценить эффективность рекламы. Рекламные объявления в DuckDuckGo не профилируют пользователей.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Как реклама при поиске влияет на защиту</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Также загружены запросы следующего домена.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Загружены трекинг-запросы следующих доменов.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Запросов от сторонних доменов не обнаружено.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Запросы этого домена были загружены для предотвращения неполадок в работе сайта.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Запросы этого домена были загружены, так как они связаны с %1$s.</string>
+
+    <string name="trackersBlockedText">Заблокирована загрузка запросов</string>
+    <string name="trackersNotBlockedText">Трекинг-запросы не заблокированы</string>
+    <string name="trackersNoFoundText">Трекинг-запросы не обнаружены</string>
+    <string name="trackersFoundText">Обнаружены трекинг-запросы</string>
+
+    <string name="domainsLoadedText">Загружены сторонние запросы</string>
+    <string name="domainsNotLoadedText">Не загружено ни одного стороннего запроса</string>
+
+    <string name="majorNetworksNoFound">Не обнаружено ни одной крупной сети трекеров</string>
+    <string name="majorNetworksFound">Обнаружены крупные сети трекеров</string>
 
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
@@ -575,11 +582,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Соединение прервано. Этот сайт может навредить вашему устройству.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Диспетчер загрузок отключен</string>
-    <string name="downloadManagerIncompatible">Диспетчер загрузок недоступен на этом устройстве</string>
-    <string name="enable">Включить</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Включить определение местоположения устройства для браузера DuckDuckGo с защитой данных?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s запрашивает местоположение вашего устройства. Сначала вам нужно разрешить приложению отправлять местоположение вашего устройства, затем %2$s может запрашивать разрешение.</string>
@@ -611,7 +613,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Глобальный контроль конфиденциальности (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo блокирует многие трекеры автоматически. Функция «Глобальный контроль конфиденциальности» (GPC) позволяет затребовать от участвующих в программе сайтов остановить передачу и продажу ваших личных данных другим компаниям. <u><a href="">Подробнее…</a><u/>]]>
+        <![CDATA[DuckDuckGo блокирует многие трекеры автоматически. Функция «Глобальный контроль конфиденциальности» (GPC) позволяет затребовать от участвующих в программе сайтов остановить передачу и продажу ваших личных данных другим компаниям. <u><a href=\"\">Подробнее…</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Глобальный контроль конфиденциальности (GPC)</string>
     <string name="globalPrivacyControlToggle">Глобальный контроль конфиденциальности (GPC)</string>
@@ -717,6 +719,5 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Блокируйте трекеры приложений на своем устройстве</string>
     <string name="atp_SettingsDeviceShieldEnabled">Включено</string>
     <string name="atp_SettingsDeviceShieldDisabled">Отключено</string>
-
 
 </resources>

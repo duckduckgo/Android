@@ -85,7 +85,7 @@ class DownloadsFileActions @Inject constructor(private val appBuildConfig: AppBu
             intent, applicationContext.getString(R.string.downloadsShareTitle)
         )
             .apply {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {
                     // Show a thumbnail preview of the file to be shared on Android Q and above.
                     clipData = ClipData.newRawUri(fileUri.toString(), fileUri)
                 }

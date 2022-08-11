@@ -34,7 +34,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:textColor="@color/gray90"
+            android:textColor="?attr/normalTextColor"
+            style="@style/TextAppearance.DuckDuckGo.Body1"
             android:text="@string/fireproofWebsiteSettingSelectionTitle"/>
     <TextView
             android:id="@+id/fireproofWebsiteUserSetting"

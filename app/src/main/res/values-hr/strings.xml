@@ -121,38 +121,6 @@
     <string name="httpsMixed">Veza s miješanim šifriranjem</string>
     <string name="httpsBad">Nešifrirana veza</string>
 
-    <string name="networksActivityTitle">Mreže za praćenje</string>
-    <string name="networksContentDescription">Mreže za praćenje</string>
-    <string name="networksOverview">Mreže za praćenje tvoju povijest pregledavanja internetskih stranica objedinjuju u obliku podatkovnog profila o tebi. Velike mreže za praćenje štetnije su jer te mogu ciljano pratiti na većem dijelu interneta.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">Pronađen je %1$s alat za praćenje</item>
-        <item quantity="few">Pronađena su %1$s alata za praćenje</item>
-        <item quantity="many">Pronađeno je %1$s alata za praćenje</item>
-        <item quantity="other">Pronađeno je %1$s alata za praćenje</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">Blokiran je %1$s alat za praćenje</item>
-        <item quantity="few">Blokirana su %1$s alata za praćenje</item>
-        <item quantity="many">Blokirano je %1$s alata za praćenje</item>
-        <item quantity="other">Blokirano je %1$s alata za praćenje</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">Pronađena je %1$s veća mreža za praćenje</item>
-        <item quantity="few">Pronađene su %1$s veće mreže za praćenje</item>
-        <item quantity="many">Pronađeno je %1$s većih mreža za praćenje</item>
-        <item quantity="other">Pronađeno je %1$s većih mreža za praćenje</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">Blokirana je %1$s veća mreža za praćenje</item>
-        <item quantity="few">Blokirane su %1$s veće mreže za praćenje</item>
-        <item quantity="many">Blokirano je %1$s većih mreža za praćenje</item>
-        <item quantity="other">Blokirano je %1$s većih mreža za praćenje</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Ocjena zaštite privatnosti</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Web-mjesto glavna je mreža za praćenje</string>
     <string name="scorecardPrivacyGrade">Ocjena zaštite privatnosti</string>
@@ -170,6 +138,45 @@
 
     <string name="networkTrackerSummaryHeader">NAJVEĆI PREKRŠITELJI OD MREŽA ZA PRAĆENJE</string>
     <string name="networkTrackerSummaryNotReady">Još uvijek prikupljamo podatke kako bismo pokazali koliko smo alata za praćenje blokirali.</string>
+
+    <string name="trackersActivityTitle">Zahtjevi za praćenje blokirani su</string>
+    <string name="trackersContentDescription">Zahtjevi za praćenje blokirani su</string>
+    <string name="trackersOverview">Sljedećim zahtjevima domena trećih strana blokirano je učitavanje jer su identificirani kao zahtjevi za praćenje. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju.</string>
+    <string name="trackersOverviewProtectionsOff">Učitavanje zahtjeva za praćenje nije blokirano jer su zaštite isključene za ovu stranicu. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju.</string>
+
+    <string name="domainsLoadedActivityTitle">Učitani su zahtjevi trećih strana</string>
+    <string name="domainsLoadedContentDescription">Učitani su zahtjevi trećih strana</string>
+    <string name="domainsLoadedOverview">Učitani su sljedeći zahtjevi domena trećih strana. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju, iako se i dalje primjenjuju naše druge zaštite web praćenja.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Učitavanje zahtjeva trećih strana nije blokirano jer su zaštite isključene za ovu web-lokaciju. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju.</string>
+    <string name="domainsLoadedOverviewEmpty">Nismo otkrili zahtjeve s domena trećih strana.</string>
+    <string name="domainsLoadedHeadingText">Nema učitanih domena trećih strana</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">O našoj zaštiti od praćenja na internetu</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Učitani su zahtjevi sljedećih domena.</string>
+
+    <string name="adLoadedSectionDescription">Sljedeći zahtjevi domene učitani su jer je nedavno kliknuto na %1$s oglas na DuckDuckGou. Ovi zahtjevi pomažu u procjeni učinkovitosti oglasa. Svi su oglasi na DuckDuckGou neprofilirajući.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Kako naši pretraživački oglasi utječu na našu zaštitu</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Učitani su i sljedeći zahtjevi domene.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Učitani su zahtjevi za praćenje sljedećih domena.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Nismo otkrili zahtjeve s domena trećih strana.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Sljedeći zahtjevi domene učitani su kako bi se spriječili problemi s web-lokacijom.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Zahtjevi sljedeće domene učitani su jer su povezani s %1$s.</string>
+
+    <string name="trackersBlockedText">Zahtjevi su blokirani za učitavanje</string>
+    <string name="trackersNotBlockedText">Nema blokiranih zahtjeva za praćenje</string>
+    <string name="trackersNoFoundText">Nije pronađen nijedan zahtjev za praćenje</string>
+    <string name="trackersFoundText">Pronađeni su zahtjevi za praćenjem</string>
+
+    <string name="domainsLoadedText">Učitani su zahtjevi trećih strana</string>
+    <string name="domainsNotLoadedText">Nema učitanih zahtjeva trećih strana</string>
+
+    <string name="majorNetworksNoFound">Nije pronađena nijedna veća mreža za praćenje</string>
+    <string name="majorNetworksFound">Pronađene su veće mreže za praćenje</string>
 
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>
@@ -575,11 +582,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Veza je prekinuta. Ovo mrežno mjesto može biti štetno za vaš uređaj.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Onemogućen je upravitelj preuzimanja</string>
-    <string name="downloadManagerIncompatible">Upravitelj preuzimanja nije dostupan na ovom uređaju</string>
-    <string name="enable">Omogući</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Omogućiti lokaciju uređaja za preglednik privatnosti DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s traži lokaciju vašeg uređaja. Prvo ćete trebati dopustiti aplikaciji da pošalje lokaciju vašeg uređaja, a zatim %2$s može zatražiti dopuštenje.</string>
@@ -611,7 +613,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalna kontrola privatnosti (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automatski blokira mnoge alate za indeksiranje. S globalnom kontrolom privatnosti (GPC) također možete tražiti od web-mjesta koja sudjeluju u programu da ograniče prodaju ili dijeljenje vaših osobnih podataka drugim tvrtkama. <u><a href="">Saznajte više</a><u/>]]>
+        <![CDATA[DuckDuckGo automatski blokira mnoge alate za indeksiranje. S globalnom kontrolom privatnosti (GPC) također možete tražiti od web-mjesta koja sudjeluju u programu da ograniče prodaju ili dijeljenje vaših osobnih podataka drugim tvrtkama. <u><a href=\"\">Saznajte više</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globalna kontrola privatnosti (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalna kontrola privatnosti (GPC)</string>

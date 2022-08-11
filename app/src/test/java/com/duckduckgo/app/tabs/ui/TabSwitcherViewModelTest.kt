@@ -20,6 +20,7 @@ package com.duckduckgo.app.tabs.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -61,6 +62,9 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var mockTabRepository: TabRepository
 
+    @Mock
+    private lateinit var mockAdClickManager: AdClickManager
+
     private lateinit var testee: TabSwitcherViewModel
 
     private val repoDeletableTabs = Channel<List<TabEntity>>()
@@ -73,7 +77,7 @@ class TabSwitcherViewModelTest {
             whenever(mockTabRepository.flowDeletableTabs)
                 .thenReturn(repoDeletableTabs.consumeAsFlow())
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
-            testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage())
+            testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage(), mockAdClickManager)
             testee.command.observeForever(mockCommandObserver)
         }
     }
@@ -104,6 +108,7 @@ class TabSwitcherViewModelTest {
         val entity = TabEntity("abc", "", "", position = 0)
         testee.onTabDeleted(entity)
         verify(mockTabRepository).delete(entity)
+        verify(mockAdClickManager).clearTabId(entity.tabId)
     }
 
     @Test
@@ -112,6 +117,7 @@ class TabSwitcherViewModelTest {
         testee.onMarkTabAsDeletable(entity)
 
         verify(mockTabRepository).markDeletable(entity)
+        verify(mockAdClickManager).clearTabId(entity.tabId)
     }
 
     @Test

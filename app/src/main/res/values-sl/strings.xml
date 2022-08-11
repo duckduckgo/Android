@@ -121,38 +121,6 @@
     <string name="httpsMixed">Mešana šifrirna povezava</string>
     <string name="httpsBad">Nešifrirana povezava</string>
 
-    <string name="networksActivityTitle">Sledilna omrežja</string>
-    <string name="networksContentDescription">Sledilna omrežja</string>
-    <string name="networksOverview">Sledilna omrežja združijo vašo spletno zgodovino v podatkovni profil o vas. Glavna sledilna omrežja so bolj škodljiva, ker vas lahko spremljajo in ciljajo na večjem delu interneta.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">Najden %1$s sledilnik</item>
-        <item quantity="two">Najdena %1$s sledilnika</item>
-        <item quantity="few">Najdeni %1$s sledilniki</item>
-        <item quantity="other">Najdenih %1$s sledilnikov</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">Blokiran %1$s sledilnik</item>
-        <item quantity="two">Blokirana %1$s sledilnika</item>
-        <item quantity="few">Blokiranih %1$s sledilnikov</item>
-        <item quantity="other">Blokiranih %1$s sledilnikov</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">Najdeno %1$s glavno sledilno omrežje</item>
-        <item quantity="two">Najdeni %1$s glavni omrežji</item>
-        <item quantity="few">Najdenih %1$s glavnih omrežij</item>
-        <item quantity="other">Najdenih %1$s glavnih sledilnih omrežij</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">Blokirano %1$s glavno sledilno omrežje</item>
-        <item quantity="two">Blokirani %1$s glavni omrežji</item>
-        <item quantity="few">Blokiranih %1$s glavnih omrežij</item>
-        <item quantity="other">Blokiranih %1$s glavnih sledilnih omrežij</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Ocena zasebnosti</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Spletno mesto je glavno sledilno omrežje</string>
     <string name="scorecardPrivacyGrade">Ocena zasebnosti</string>
@@ -170,6 +138,45 @@
 
     <string name="networkTrackerSummaryHeader">GLAVNI KRŠITELJI MED SLEDILNIMI OMREŽJI</string>
     <string name="networkTrackerSummaryNotReady">Še vedno zbiramo podatke za prikaz, koliko sledilnikov smo blokirali.</string>
+
+    <string name="trackersActivityTitle">Zahtevki za sledenje so blokirani</string>
+    <string name="trackersContentDescription">Zahtevki za sledenje so blokirani</string>
+    <string name="trackersOverview">Nalaganje naslednjih zahtevkov domen tretjih oseb je bilo blokirano, ker so bili prepoznani kot zahtevki za sledenje. Če so zahtevki podjetja naloženi, lahko na podlagi tega oblikujejo vaš profil.</string>
+    <string name="trackersOverviewProtectionsOff">Nalaganje zahtevkov za sledenje ni bilo blokirano, ker so zaščite za to spletno mesto izklopljene. Če so zahtevki podjetja naloženi, lahko na podlagi tega oblikujejo vaš profil.</string>
+
+    <string name="domainsLoadedActivityTitle">Nalaganje zahtevkov tretjih oseb</string>
+    <string name="domainsLoadedContentDescription">Nalaganje zahtevkov tretjih oseb</string>
+    <string name="domainsLoadedOverview">Naloženi so bili naslednji zahtevki domen tretjih oseb. Če so zahtevki podjetja izpolnjeni, lahko podjetje na podlagi tega oblikuje vaš profil, čeprav še vedno veljajo naša druga zaščitna pravila za sledenje v spletu.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Noben zahtevek tretjih oseb ni bil blokiran zaradi izklopa zaščite za to mesto. Če so zahtevki podjetja naloženi, lahko podjetje na podlagi tega oblikuje vaš profil.</string>
+    <string name="domainsLoadedOverviewEmpty">Nismo zaznali zahtevkov iz domen tretjih oseb.</string>
+    <string name="domainsLoadedHeadingText">Naložene niso nobene domene tretjih oseb</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">O naši zaščiti pred spletnim sledenjem</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Naloženi so bili naslednji zahtevki domen.</string>
+
+    <string name="adLoadedSectionDescription">Naslednji zahtevki domen so bili naloženi, ker ste pred kratkim kliknili oglas %1$s na portalu DuckDuckGo. Ti zahtevki pomagajo oceniti učinkovitost oglasa. Vsi oglasi na DuckDuckGo so neprofilirani.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Kako naši oglasi v iskalnem omrežju vplivajo na našo zaščito</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Naloženi so bili tudi naslednji zahtevki domen.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Naloženi so bili naslednji zahtevki za sledenje domenam.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Nismo zaznali zahtevkov iz domen tretjih oseb.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Naloženi so bili naslednji zahtevki domen, da se prepreči prekinitev spletnega mesta.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Naloženi so bili naslednji zahtevki domen, ker so povezani z %1$s.</string>
+
+    <string name="trackersBlockedText">Zahtevki, katerih nalaganje je blokirano</string>
+    <string name="trackersNotBlockedText">Noben zahtevek za sledenje ni blokiran</string>
+    <string name="trackersNoFoundText">Ni najdenih zahtevkov za sledenje</string>
+    <string name="trackersFoundText">Najdeni zahtevki za sledenje</string>
+
+    <string name="domainsLoadedText">Nalaganje zahtevkov tretjih oseb</string>
+    <string name="domainsNotLoadedText">Ni naloženih zahtevkov tretjih oseb</string>
+
+    <string name="majorNetworksNoFound">Glavnega sledilnega omrežja ni mogoče najti+</string>
+    <string name="majorNetworksFound">Najdeno je več sledenj omrežjem</string>
 
     <!-- Fire -->
     <string name="fireMenu">Počisti podatke</string>
@@ -575,11 +582,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Povezava prekinjena. To spletno mesto lahko škoduje vaši napravi.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Upravitelj prenosov je onemogočen</string>
-    <string name="downloadManagerIncompatible">Upravitelj prenosov ni na voljo v tej napravi</string>
-    <string name="enable">Omogoči</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Želite omogočiti lokacijo naprave za zasebnost brskalnika DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s zahteva lokacijo vaše naprave. Najprej boste morali aplikaciji dovoliti, da pošlje lokacijo vaše naprave, nato lahko %2$s zahteva dovoljenje.</string>
@@ -611,7 +613,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalni nadzor zasebnosti (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href="">Več</a><u/>]]>
+        <![CDATA[DuckDuckGo samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href=\"\">Več</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globalni nadzor zasebnosti (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalni nadzor zasebnosti (GPC)</string>

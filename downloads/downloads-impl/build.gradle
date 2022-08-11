@@ -27,15 +27,19 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+    namespace 'com.duckduckgo.downloads.impl'
 }
 
 dependencies {
+    anvil project(path: ':anvil-compiler')
+    implementation project(path: ':anvil-annotations')
     implementation project(path: ':downloads-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':di')
     implementation project(path: ':common')
     implementation project(path: ':statistics')
-    api project(path: ':downloads-store')
+    implementation project(path: ':app-build-config-api')
+    implementation project(path: ':downloads-store')
 
     implementation Kotlin.stdlib.jdk7
 
@@ -49,6 +53,7 @@ dependencies {
     implementation AndroidX.lifecycle.runtimeKtx
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.lifecycle.liveDataKtx
+    implementation AndroidX.work.runtimeKtx
 
     // Dagger
     compileOnly "org.glassfish:javax.annotation:10.0-b28"

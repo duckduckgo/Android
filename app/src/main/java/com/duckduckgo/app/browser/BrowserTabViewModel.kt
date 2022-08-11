@@ -33,6 +33,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete
@@ -54,6 +55,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -87,7 +89,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.global.view.asLocationPermissionOrigin
+import com.duckduckgo.app.global.extensions.asLocationPermissionOrigin
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -110,19 +112,17 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
-import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadCommand
+import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.AmpLinks
-import com.duckduckgo.privacy.config.api.AmpLinkInfo
+import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -172,16 +172,20 @@ class BrowserTabViewModel @Inject constructor(
     private val appLinksHandler: AppLinksHandler,
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
-    private val downloadCallback: DownloadCallback,
+    private val downloadCallback: DownloadStateListener,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
+    private val autofillStore: AutofillStore,
+    private val adClickManager: AdClickManager
 ) : WebViewClientListener,
     EditSavedSiteListener,
     HttpAuthenticationListener,
     SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener,
     UrlExtractionListener,
+    AutofillCredentialsSelectionResultHandler.AutofillCredentialSaver,
+    AutofillCredentialsSelectionResultHandler.CredentialInjector,
     ViewModel(),
     NavigationHistoryListener {
 
@@ -233,7 +237,8 @@ class BrowserTabViewModel @Inject constructor(
         var previousAppLink: AppLink? = null,
         val canFindInPage: Boolean = false,
         val forceRenderingTicker: Long = System.currentTimeMillis(),
-        val canPrintPage: Boolean = false
+        val canPrintPage: Boolean = false,
+        val showAutofill: Boolean = false
     )
 
     sealed class HighlightableButton {
@@ -429,7 +434,9 @@ class BrowserTabViewModel @Inject constructor(
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
-
+        class InjectCredentials(val url: String, val credentials: LoginCredentials) : Command()
+        class CancelIncomingAutofillRequest(val url: String) : Command()
+        object LaunchAutofillSettings : Command()
         class EditWithSelectedQuery(val query: String) : Command()
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
         class NavigateToHistory(val historyStackIndex: Int) : Command()
@@ -742,6 +749,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewVisible() {
+        setAdClickActiveTabData(url)
+
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
         if (!currentBrowserViewState().browserShowing) {
             viewModelScope.launch {
@@ -904,6 +913,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun removeCurrentTabFromRepository() {
         val currentTab = tabRepository.liveSelectedTab.value
         currentTab?.let {
+            adClickManager.clearTabId(it.tabId)
             tabRepository.deleteTabAndSelectSource(it.tabId)
         }
     }
@@ -1126,6 +1136,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         Timber.v("Page changed: $url")
         buildSiteFactory(url, title)
+        setAdClickActiveTabData(url)
 
         val currentOmnibarViewState = currentOmnibarViewState()
         val omnibarText = omnibarTextForUrl(url)
@@ -1198,6 +1209,12 @@ class BrowserTabViewModel @Inject constructor(
 
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
+    }
+
+    private fun setAdClickActiveTabData(url: String?) {
+        val sourceTabId = tabRepository.liveSelectedTab.value?.sourceTabId
+        val sourceTabUrl = tabRepository.liveTabs.value?.firstOrNull { it.tabId == sourceTabId }?.url
+        adClickManager.setActiveTabId(tabId, url, sourceTabId, sourceTabUrl)
     }
 
     private fun cacheAppLink(url: String?) {
@@ -2116,7 +2133,8 @@ class BrowserTabViewModel @Inject constructor(
     private fun initializeViewStates() {
         globalLayoutState.value = Browser()
         browserViewState.value = BrowserViewState().copy(
-            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported()
+            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+            showAutofill = autofillStore.autofillAvailable
         )
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
@@ -2595,9 +2613,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun download(pendingFileDownload: PendingFileDownload) {
-        viewModelScope.launch(dispatchers.io()) {
-            fileDownloader.download(pendingFileDownload, downloadCallback)
-        }
+        fileDownloader.enqueueDownload(pendingFileDownload)
     }
 
     fun deleteQuickAccessItem(savedSite: SavedSite) {
@@ -2656,6 +2672,26 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
     }
 
+    override fun shareCredentialsWithPage(originalUrl: String, credentials: LoginCredentials) {
+        command.postValue(InjectCredentials(originalUrl, credentials))
+    }
+
+    override fun returnNoCredentialsWithPage(originalUrl: String) {
+        command.postValue(CancelIncomingAutofillRequest(originalUrl))
+    }
+
+    override fun saveCredentials(url: String, credentials: LoginCredentials) {
+        viewModelScope.launch {
+            autofillStore.saveCredentials(url, credentials)
+        }
+    }
+
+    override fun updateCredentials(url: String, credentials: LoginCredentials) {
+        viewModelScope.launch {
+            autofillStore.updateCredentials(url, credentials)
+        }
+    }
+
     fun onConfigurationChanged() {
         browserViewState.value = currentBrowserViewState().copy(
             forceRenderingTicker = System.currentTimeMillis()
@@ -2668,6 +2704,10 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun linkOpenedInNewTab(): Boolean {
         return isLinkOpenedInNewTab
+    }
+
+    fun onAutofillMenuSelected() {
+        command.value = LaunchAutofillSettings
     }
 
     @VisibleForTesting

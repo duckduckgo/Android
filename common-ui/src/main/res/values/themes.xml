@@ -93,7 +93,6 @@
         <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
         <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
-        <item name="settingsDividerColor">@color/almostBlack</item>
         <item name="buttonOutlinedTextColor">@color/pinkishGrayThree</item>
         <item name="buttonOutlinedBorderColor">@color/brownishGrayTwo</item>
         <item name="callToActionTitleColor">@color/white</item>
@@ -138,11 +137,16 @@
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
-        <item name="overflowMenuDividerColor">@color/gray80</item>
+        <item name="sectionDividerColor">@color/gray80</item>
         <item name="bottomShadowBackground">@null</item>
+        <item name="appTPHeaderBackground">@color/darkThemePrimaryDark</item>
 
         <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorDark</item>
         <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorDark</item>
+
+        <item name="autofillDialogTitleColor">@color/white</item>
+        <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
+        <item name="autofillCredentialListSubtitleColor">@color/paleBrownishGray</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -215,7 +219,6 @@
         <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="settingsMinorTextColor">@color/warmerGray</item>
         <item name="settingsSwitchBackgroundColor">@color/brownishGrayTwo</item>
-        <item name="settingsDividerColor">@color/whiteSix</item>
         <item name="buttonOutlinedTextColor">@color/cornflowerBlue</item>
         <item name="buttonOutlinedBorderColor">@color/grayishThree</item>
         <item name="callToActionTitleColor">@color/almostBlackDark</item>
@@ -259,11 +262,16 @@
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
-        <item name="overflowMenuDividerColor">@color/gray30</item>
+        <item name="sectionDividerColor">@color/gray30</item>
         <item name="bottomShadowBackground">@drawable/divider_shadow_background</item>
 
         <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorLight</item>
         <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorLight</item>
+
+        <item name="autofillDialogTitleColor">@color/gray90</item>
+        <item name="autofillDialogOnboardingExplanationColor">@color/gray70</item>
+        <item name="autofillCredentialListSubtitleColor">@color/brownishGrayTwo</item>
+        <item name="appTPHeaderBackground">@color/light_blue</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">

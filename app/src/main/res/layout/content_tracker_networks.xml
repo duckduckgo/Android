@@ -25,8 +25,8 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_alignParentTop="true">
+        android:layout_alignParentTop="true"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -37,33 +37,34 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/networksBannerContainer"
                 android:layout_width="match_parent"
-                android:layout_height="169dp"
-                app:layout_constraintTop_toTopOf="parent"
-                android:background="@color/subtleGray">
+                android:layout_height="wrap_content"
+                android:background="@color/subtleGray"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <ImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/networksBanner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/networksContentDescription"
+                    android:contentDescription="@string/trackersContentDescription"
                     android:paddingTop="20dp"
                     android:paddingBottom="12dp"
-                    android:src="@drawable/networks_banner_good"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent" />
+                    app:srcCompat="@drawable/networks_icon_bad_large"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/domain"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
+                    android:paddingBottom="@dimen/keyline_4"
                     android:textColor="@color/almostBlackDark"
                     android:textIsSelectable="true"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/networksBanner"
                     tools:text="theatlantic.com" />
 
@@ -72,19 +73,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="14dp"
                     android:fontFamily="sans-serif"
-                    android:gravity="center_horizontal"
+                    android:gravity="center"
                     android:letterSpacing="0.14"
-                    android:textAllCaps="true"
+                    android:text="@string/domainsLoadedHeadingText"
                     android:textColor="@color/grayishTwo"
-                    android:textIsSelectable="false"
                     android:textSize="12sp"
                     android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:textAlignment="gravity"
+                    android:visibility="gone"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/domain"
-                    tools:text="8 TRACKERS BLOCKED" />
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/domain" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -92,28 +95,30 @@
                 android:id="@+id/networksOverview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="23dp"
                 android:fontFamily="sans-serif"
                 android:gravity="center_horizontal"
                 android:lineSpacingExtra="6sp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:text="@string/networksOverview"
+                android:paddingStart="@dimen/keyline_5"
+                android:paddingTop="@dimen/keyline_5"
+                android:paddingEnd="@dimen/keyline_5"
+                android:paddingBottom="@dimen/keyline_2"
+                android:text="@string/trackersOverview"
                 android:textColor="@color/almostBlackDark"
                 android:textSize="14sp"
                 android:textStyle="normal"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/networksBannerContainer" />
 
-            <View
-                android:id="@+id/topDivider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="22dp"
-                android:layout_marginEnd="20dp"
-                android:background="@color/divider"
+            <TextView
+                android:id="@+id/webTrackingProtections"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingBottom="@dimen/keyline_3"
+                android:text="@string/webTrackingProtectionsText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/networksOverview" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -123,7 +128,7 @@
                 android:nestedScrollingEnabled="false"
                 android:paddingBottom="26dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/topDivider" />
+                app:layout_constraintTop_toBottomOf="@id/webTrackingProtections" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

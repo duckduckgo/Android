@@ -17,9 +17,9 @@
 package com.duckduckgo.app.flipper
 
 import android.content.Context
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.facebook.flipper.android.AndroidFlipperClient
@@ -31,14 +31,16 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
 class FlipperInitializer @Inject constructor(
     private val context: Context,
     private val flipperPluginPoint: PluginPoint<FlipperPlugin>
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun setupFlipper() {
+    override fun onCreate(owner: LifecycleOwner) {
         Timber.v("Flipper: setup flipper")
         SoLoader.init(context, false)
 
