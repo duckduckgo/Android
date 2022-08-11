@@ -19,8 +19,9 @@ package com.duckduckgo.site.permissions.impl
 import android.webkit.PermissionRequest
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.site.permissions.store.SitePermissionAskSettingType
-import com.duckduckgo.site.permissions.store.SitePermissionsEntity
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
+import com.duckduckgo.site.permissions.store.SitePermissionsPreferencesImp
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity.Companion.allowedWithin24h
@@ -40,6 +41,7 @@ interface SitePermissionsRepository {
 class SitePermissionsRepositoryImpl @Inject constructor(
     private val sitePermissionsDao: SitePermissionsDao,
     private val sitePermissionsAllowedDao: SitePermissionsAllowedDao,
+    private val sitePermissionsPreferences: SitePermissionsPreferencesImp,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider
 ) : SitePermissionsRepository {
@@ -48,12 +50,12 @@ class SitePermissionsRepositoryImpl @Inject constructor(
         val sitePermissionsForDomain = sitePermissionsDao.getSitePermissionsByDomain(url) ?: return true
         return when (permission) {
             PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
-                val askForCameraEnabled = sitePermissionsForDomain.askCameraEnabled
+                val askForCameraEnabled = sitePermissionsPreferences.askCameraEnabled
                 val isAskCameraSettingDenied = sitePermissionsForDomain.askCameraSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
                 askForCameraEnabled && !isAskCameraSettingDenied
             }
             PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
-                val askForMicEnabled = sitePermissionsForDomain.askMicEnabled
+                val askForMicEnabled = sitePermissionsPreferences.askMicEnabled
                 val isAskMicSettingDenied = sitePermissionsForDomain.askMicSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
                 askForMicEnabled && !isAskMicSettingDenied
             }

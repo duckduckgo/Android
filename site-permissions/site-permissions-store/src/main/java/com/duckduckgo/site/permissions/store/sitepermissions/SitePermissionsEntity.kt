@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.site.permissions.store
+package com.duckduckgo.site.permissions.store.sitepermissions
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.duckduckgo.site.permissions.store.SitePermissionAskSettingType.ASK_EVERY_TIME
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.ASK_EVERY_TIME
 
 @Entity(tableName = "site_permissions")
 data class SitePermissionsEntity(
     @PrimaryKey val domain: String,
-    val askCameraEnabled: Boolean = true,
-    val askMicEnabled: Boolean = true,
     val askCameraSetting: String = ASK_EVERY_TIME.name,
     val askMicSetting: String = ASK_EVERY_TIME.name
 )
