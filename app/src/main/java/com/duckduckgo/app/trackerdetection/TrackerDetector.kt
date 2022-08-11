@@ -77,7 +77,8 @@ class TrackerDetectorImpl @Inject constructor(
 
         val result = clients
             .filter { it.name.type == BLOCKING }
-            .firstNotNullOf { it.matches(url, documentUrl) }
+            .mapNotNull { it.matches(url, documentUrl) }
+            .firstOrNull { it.matches } ?: Client.Result(matches = false, isATracker = false)
 
         val sameEntity = sameNetworkName(url, documentUrl)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
