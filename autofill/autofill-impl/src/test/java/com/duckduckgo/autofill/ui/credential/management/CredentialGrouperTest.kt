@@ -176,8 +176,9 @@ class CredentialGrouperTest {
     }
 
     @Test
-    fun whenNumberThenTheTheyAreInTheirOwnGroup() {
+    fun whenNumberThenGroupedIntoPlaceholder() {
         val credentials = listOf(
+            creds(title = "8"),
             creds(title = "5")
         )
         val grouped = testee.group(credentials)
@@ -185,7 +186,9 @@ class CredentialGrouperTest {
         val expectedNumberOfHeadings = 1
         grouped.assertNumberOfHeadings(expected = expectedNumberOfHeadings)
         grouped.assertTotalSize(expected = expectedNumberOfHeadings + credentials.size)
-        grouped[0].assertIsGroupHeading("5")
+        grouped[0].assertIsGroupHeading("#")
+        grouped[1].assertIsCredentialWithTitle("5")
+        grouped[2].assertIsCredentialWithTitle("8")
     }
 
     @Test
