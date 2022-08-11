@@ -85,6 +85,7 @@ class BrowserChromeClientTest {
         mockFileChooserParams = mock()
         testee.webViewClientListener = mockWebViewClientListener
         webView = TestWebView(getInstrumentation().targetContext)
+        mockSitePermissionsManager.stub { onBlocking { getSitePermissionsAllowedToAsk(any(), any()) }.thenReturn(arrayOf()) }
     }
 
     @Test
@@ -222,8 +223,6 @@ class BrowserChromeClientTest {
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://open.spotify.com".toUri())
         whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(permissions)
-        whenever(mockSitePermissionsManager.getSitePermissionsAllowedToAsk(any(), any())).thenReturn(arrayOf())
-
         testee.onPermissionRequest(mockPermission)
 
         verify(mockPermission).grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
@@ -236,7 +235,6 @@ class BrowserChromeClientTest {
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://www.example.com".toUri())
         whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(arrayOf())
-        whenever(mockSitePermissionsManager.getSitePermissionsAllowedToAsk(any(), any())).thenReturn(arrayOf())
 
         testee.onPermissionRequest(mockPermission)
 
