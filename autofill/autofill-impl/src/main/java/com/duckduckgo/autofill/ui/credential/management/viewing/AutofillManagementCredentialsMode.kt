@@ -18,12 +18,10 @@ package com.duckduckgo.autofill.ui.credential.management.viewing
 
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
@@ -43,11 +41,12 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class AutofillManagementCredentialsMode : DuckDuckGoFragment(), MenuProvider {
+class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_edit_mode), MenuProvider {
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -65,17 +64,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(), MenuProvider {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
     }
 
-    private lateinit var binding: FragmentAutofillManagementEditModeBinding
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentAutofillManagementEditModeBinding.inflate(inflater, container, false)
-        requireActivity().addMenuProvider(this)
-        return binding.root
-    }
+    private val binding: FragmentAutofillManagementEditModeBinding by viewBinding()
 
     override fun onPrepareMenu(menu: Menu) {
         if (viewModel.viewState.value.credentialMode is Editing) {
@@ -124,6 +113,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(), MenuProvider {
         savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().addMenuProvider(this)
         observeViewModel()
         binding.watchSaveState(saveStateWatcher) {
             viewModel.allowSaveInEditMode(it)
@@ -184,6 +174,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(), MenuProvider {
         updateToolbarForView(credentials)
         binding.apply {
             domainTitleEditText.visibility = View.GONE
+            lastUpdatedView.visibility = View.VISIBLE
             domainTitleEditText.isEditable = false
             usernameEditText.isEditable = false
             passwordEditText.isEditable = false
@@ -196,6 +187,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(), MenuProvider {
         updateToolbarForEdit()
         binding.apply {
             domainTitleEditText.visibility = View.VISIBLE
+            lastUpdatedView.visibility = View.GONE
             domainTitleEditText.isEditable = true
             usernameEditText.isEditable = true
             passwordEditText.isEditable = true
@@ -218,7 +210,9 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(), MenuProvider {
                             showViewMode(state.credentialMode.credentialsViewed)
                         }
                         is Editing -> {
-                            populateFields(state.credentialMode.credentialsViewed)
+                            if (!state.credentialMode.isFromViewMode) {
+                                populateFields(state.credentialMode.credentialsViewed)
+                            }
                             showEditMode()
                         }
                         else -> {
