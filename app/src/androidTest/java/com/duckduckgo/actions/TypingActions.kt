@@ -2,6 +2,7 @@ package com.duckduckgo.actions
 
 import androidx.annotation.IdRes
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.action.ViewActions.typeText
@@ -21,4 +22,9 @@ fun replaceTextFunction(@IdRes viewId: Int, text: String) {
 fun scrollAndEnterTextFunction(@IdRes viewId: Int, text: String) {
     onView(withId(viewId))
         .perform(scrollTo(), typeText(text), closeSoftKeyboard())
+}
+
+fun deleteTextFunction(@IdRes viewId: Int) {
+    onView(withId(viewId))
+        .perform(clearText(), closeSoftKeyboard())
 }
