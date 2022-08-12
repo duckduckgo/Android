@@ -32,6 +32,8 @@ import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListModeBinding
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter
+import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Delete
+import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel
 import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.ui.credential.management.LoginCredentialTitleExtractor
@@ -130,6 +132,12 @@ class AutofillManagementListMode : DuckDuckGoFragment() {
             onCredentialSelected = this::onCredentialsSelected,
             onCopyUsername = this::onCopyUsername,
             onCopyPassword = this::onCopyPassword,
+            onContextMenuItemClicked = {
+                when (it) {
+                    is Edit -> viewModel.onEditCredentials(it.credentials, false)
+                    is Delete -> viewModel.onDeleteCredentials(it.credentials)
+                }
+            }
         )
 
         binding.logins.adapter = adapter
