@@ -49,11 +49,12 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionDisabledConfirmation
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
+import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
+import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -1397,7 +1398,7 @@ class BrowserTabViewModelTest {
         assertFalse(findInPageViewState().visible)
         assertCommandIssued<Command.DismissFindInPage>()
 
-        val issuedCommand = commandCaptor.allValues.find { it is Command.NavigateBack }
+        val issuedCommand = commandCaptor.allValues.find { it is NavigationCommand.NavigateBack }
         assertNull(issuedCommand)
     }
 
@@ -1453,7 +1454,7 @@ class BrowserTabViewModelTest {
     fun whenUserBrowsingPressesForwardThenNavigatesForward() {
         setBrowserShowing(true)
         testee.onUserPressedForward()
-        assertTrue(captureCommands().lastValue == Command.NavigateForward)
+        assertTrue(captureCommands().lastValue == NavigationCommand.NavigateForward)
     }
 
     @Test
@@ -1461,7 +1462,7 @@ class BrowserTabViewModelTest {
         setBrowserShowing(false)
         testee.onUserPressedForward()
         assertTrue(browserViewState().browserShowing)
-        assertTrue(captureCommands().lastValue == Command.Refresh)
+        assertTrue(captureCommands().lastValue == NavigationCommand.Refresh)
     }
 
     @Test
@@ -1491,7 +1492,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenRefreshRequestedWithBrowserGlobalLayoutThenRefresh() {
         testee.onRefreshRequested()
-        assertCommandIssued<Command.Refresh>()
+        assertCommandIssued<NavigationCommand.Refresh>()
     }
 
     @Test
@@ -1550,7 +1551,7 @@ class BrowserTabViewModelTest {
         setupNavigation(isBrowsing = true, canGoBack = true, stepsToPreviousPage = 2)
         assertTrue(testee.onUserPressedBack())
 
-        val backCommand = captureCommands().lastValue as Command.NavigateBack
+        val backCommand = captureCommands().lastValue as NavigationCommand.NavigateBack
         assertNotNull(backCommand)
         assertEquals(2, backCommand.steps)
     }
@@ -1592,7 +1593,7 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == Command.Refresh)
+        assertTrue(ultimateCommand == NavigationCommand.Refresh)
     }
 
     @Test
@@ -1602,7 +1603,7 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == Command.Refresh)
+        assertTrue(ultimateCommand == NavigationCommand.Refresh)
     }
 
     @Test
@@ -1612,7 +1613,7 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == Command.Refresh)
+        assertTrue(ultimateCommand == NavigationCommand.Refresh)
     }
 
     @Test
@@ -1660,7 +1661,7 @@ class BrowserTabViewModelTest {
         testee.onPrivacyProtectionMenuClicked()
         verify(mockUserWhitelistDao).insert(UserWhitelistedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
-        verify(mockCommandObserver).onChanged(Command.Refresh)
+        verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test
@@ -1680,7 +1681,7 @@ class BrowserTabViewModelTest {
         testee.onPrivacyProtectionMenuClicked()
         verify(mockUserWhitelistDao).delete(UserWhitelistedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
-        verify(mockCommandObserver).onChanged(Command.Refresh)
+        verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test
@@ -2210,7 +2211,7 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onDaxDialogDismissed()
         val command = captureCommands().lastValue
-        assertTrue(command is Command.DaxCommand.FinishTrackerAnimation)
+        assertTrue(command is Command.DaxCommand.FinishPartialTrackerAnimation)
     }
 
     @Test
@@ -2218,7 +2219,7 @@ class BrowserTabViewModelTest {
         val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
         setCta(cta)
         testee.onDaxDialogDismissed()
-        assertCommandNotIssued<Command.DaxCommand.FinishTrackerAnimation>()
+        assertCommandNotIssued<Command.DaxCommand.FinishPartialTrackerAnimation>()
     }
 
     @Test
