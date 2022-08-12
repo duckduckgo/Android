@@ -140,6 +140,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun unlock() {
+        addCommand(ExitDisabledMode)
         addCommand(ExitLockedMode)
         _viewState.value = viewState.value.copy(isLocked = false)
     }
@@ -147,6 +148,7 @@ class AutofillSettingsViewModel @Inject constructor(
     fun disabled() {
         _viewState.value = viewState.value.copy(isLocked = true)
         // Remove backstack modes if they are present
+        addCommand(ExitListMode)
         addCommand(ExitCredentialMode)
         addCommand(ExitLockedMode)
         addCommand(ShowDisabledMode)
@@ -248,6 +250,8 @@ class AutofillSettingsViewModel @Inject constructor(
         object ShowLockedMode : Command()
         object LaunchDeviceAuth : Command()
         object ExitCredentialMode : Command()
+        object ExitListMode : Command()
         object ExitLockedMode : Command()
+        object ExitDisabledMode : Command()
     }
 }

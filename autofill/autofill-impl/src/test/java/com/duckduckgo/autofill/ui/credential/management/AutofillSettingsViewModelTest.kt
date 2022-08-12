@@ -186,7 +186,13 @@ class AutofillSettingsViewModelTest {
         testee.unlock()
 
         testee.commands.test {
-            awaitItem().first().assertCommandType(ExitLockedMode::class)
+            assertEquals(
+                listOf(
+                    ExitDisabledMode,
+                    ExitLockedMode,
+                ),
+                this.expectMostRecentItem().toList()
+            )
             cancelAndIgnoreRemainingEvents()
         }
 
@@ -203,6 +209,7 @@ class AutofillSettingsViewModelTest {
         testee.commands.test {
             assertEquals(
                 listOf(
+                    ExitListMode,
                     ExitCredentialMode,
                     ExitLockedMode,
                     ShowDisabledMode
@@ -292,6 +299,7 @@ class AutofillSettingsViewModelTest {
         testee.commands.test {
             assertEquals(
                 listOf(
+                    ExitListMode,
                     ExitCredentialMode,
                     ExitLockedMode,
                     ShowDisabledMode

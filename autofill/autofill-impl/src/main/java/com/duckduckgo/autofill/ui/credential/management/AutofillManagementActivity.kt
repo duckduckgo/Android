@@ -123,8 +123,8 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun processState(state: AutofillSettingsViewModel.ViewState) {
-        if (state.credentialMode is NotInCredentialMode) {
-            resetToolbar()
+        if (state.credentialMode is NotInCredentialMode && !state.isLocked) {
+            showListMode()
         }
     }
 
@@ -139,6 +139,8 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             is LaunchDeviceAuth -> launchDeviceAuth()
             is ExitCredentialMode -> supportFragmentManager.forceExitFragment(TAG_CREDENTIAL)
             is ExitLockedMode -> supportFragmentManager.forceExitFragment(TAG_LOCKED)
+            is ExitDisabledMode -> supportFragmentManager.forceExitFragment(TAG_DISABLED)
+            is ExitListMode -> supportFragmentManager.forceExitFragment(TAG_ALL_CREDENTIALS)
             else -> processed = false
         }
         if (processed) {
