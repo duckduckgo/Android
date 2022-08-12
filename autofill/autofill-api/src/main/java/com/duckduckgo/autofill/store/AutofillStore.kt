@@ -57,6 +57,7 @@ interface AutofillStore {
      * Save the given credentials for the given URL
      * @param rawUrl Can be a full, unmodified URL taken from the URL bar (containing subdomains, query params etc...)
      * @param credentials The credentials to be saved. The ID can be null.
+     * @return The ID of the saved credential if it saved successfully, otherwise null
      */
     suspend fun saveCredentials(rawUrl: String, credentials: LoginCredentials): Long?
 
