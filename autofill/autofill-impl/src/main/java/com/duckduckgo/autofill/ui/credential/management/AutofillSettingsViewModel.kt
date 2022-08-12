@@ -55,13 +55,46 @@ class AutofillSettingsViewModel @Inject constructor(
         addCommand(ShowUserPasswordCopied())
     }
 
-    fun onViewCredentials(credentials: LoginCredentials) {
+    fun onViewCredentials(credentials: LoginCredentials, isStartingMode: Boolean) {
+        addCommand(ShowCredentialMode(credentials, isStartingMode))
         _viewState.value = viewState.value.copy(credentialMode = Viewing(credentialsViewed = credentials))
-        addCommand(ShowCredentialMode(credentials))
     }
 
-    fun onEditCredentials(loginCredentials: LoginCredentials) {
-        _viewState.value = viewState.value.copy(credentialMode = Editing(credentialsViewed = loginCredentials))
+    fun onEditCredentials(
+        credentials: LoginCredentials,
+        isFromViewMode: Boolean
+    ) {
+        if (!isFromViewMode) {
+            // On the event that Edit mode is launched directly, we don't treat it as starting view mode since atm we will show view mode when saved.
+            addCommand(ShowCredentialMode(credentials, false))
+        }
+        _viewState.value = viewState.value.copy(credentialMode = Editing(credentialsViewed = credentials, isFromViewMode = isFromViewMode))
+    }
+
+    fun onCancelEditMode() {
+        viewState.value.let { value ->
+            value.credentialMode.let {
+                // if not from view mode, it means edit mode was opened directly so we need to exit credential mode instead.
+                if (it is Editing && it.isFromViewMode) {
+                    _viewState.value = value.copy(credentialMode = Viewing(credentialsViewed = it.credentialsViewed))
+                } else {
+                    onExitCredentialMode()
+                }
+            }
+        }
+    }
+
+    fun onExitCredentialMode() {
+        addCommand(ExitCredentialMode)
+        _viewState.value = viewState.value.copy(credentialMode = NotInCredentialMode)
+    }
+
+    fun allowSaveInEditMode(saveable: Boolean) {
+        _viewState.value.credentialMode.let { credentialMode ->
+            if (credentialMode is Editing) {
+                _viewState.value = _viewState.value.copy(credentialMode = credentialMode.copy(saveable = saveable))
+            }
+        }
     }
 
     fun launchDeviceAuth() {
@@ -70,17 +103,21 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun lock() {
         if (!viewState.value.isLocked) {
+            _viewState.value = viewState.value.copy(isLocked = true)
             addCommand(ShowLockedMode)
         }
     }
 
     fun unlock() {
-        _viewState.value = viewState.value.copy(isLocked = false, credentialMode = NotInCredentialMode)
-        addCommand(ShowListMode)
+        addCommand(ExitLockedMode)
+        _viewState.value = viewState.value.copy(isLocked = false)
     }
 
     fun disabled() {
-        _viewState.value = viewState.value.copy(isLocked = true, credentialMode = NotInCredentialMode)
+        _viewState.value = viewState.value.copy(isLocked = true)
+        // Remove backstack modes if they are present
+        addCommand(ExitCredentialMode)
+        addCommand(ExitLockedMode)
         addCommand(ShowDisabledMode)
     }
 
@@ -120,13 +157,13 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun updateCredentials(updatedCredentials: LoginCredentials) {
-        _viewState.value.credentialMode.credentialsViewed?.let {
+        _viewState.value.credentialMode.credentialsViewed?.let { originalCredentials ->
             viewModelScope.launch {
-                autofillStore.updateCredentials(updatedCredentials.copy(id = it.id))
-                autofillStore.getCredentialsWithId(it.id!!)?.let { credentials ->
+                autofillStore.updateCredentials(updatedCredentials.copy(id = originalCredentials.id))
+                autofillStore.getCredentialsWithId(originalCredentials.id!!)?.let { credentialsWithLastUpdatedTimeUpdated ->
                     _viewState.value = viewState.value.copy(
                         credentialMode = Viewing(
-                            credentialsViewed = credentials
+                            credentialsViewed = credentialsWithLastUpdatedTimeUpdated
                         )
                     )
                 }
@@ -144,25 +181,6 @@ class AutofillSettingsViewModel @Inject constructor(
         _viewState.value = viewState.value.copy(autofillEnabled = false)
     }
 
-    fun onCancelEditMode() {
-        viewState.value.credentialMode.credentialsViewed?.let {
-            _viewState.value = viewState.value.copy(credentialMode = Viewing(credentialsViewed = it))
-        }
-    }
-
-    fun onExitViewMode() {
-        _viewState.value = viewState.value.copy(credentialMode = NotInCredentialMode)
-        addCommand(ShowListMode)
-    }
-
-    fun allowSaveInEditMode(saveable: Boolean) {
-        _viewState.value.credentialMode.let { credentialMode ->
-            if (credentialMode is Editing) {
-                _viewState.value = _viewState.value.copy(credentialMode = credentialMode.copy(saveable = saveable))
-            }
-        }
-    }
-
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val logins: List<LoginCredentials> = emptyList(),
@@ -174,7 +192,8 @@ class AutofillSettingsViewModel @Inject constructor(
         data class Viewing(override val credentialsViewed: LoginCredentials) : CredentialMode(credentialsViewed)
         data class Editing(
             override val credentialsViewed: LoginCredentials,
-            val saveable: Boolean = true
+            val saveable: Boolean = true,
+            val isFromViewMode: Boolean
         ) : CredentialMode(credentialsViewed)
 
         object NotInCredentialMode : CredentialMode(null)
@@ -183,10 +202,11 @@ class AutofillSettingsViewModel @Inject constructor(
     sealed class Command(val id: String = UUID.randomUUID().toString()) {
         class ShowUserUsernameCopied : Command()
         class ShowUserPasswordCopied : Command()
-        data class ShowCredentialMode(val credentials: LoginCredentials) : Command()
-        object ShowListMode : Command()
+        data class ShowCredentialMode(val credentials: LoginCredentials, val isStartingMode: Boolean) : Command()
         object ShowDisabledMode : Command()
         object ShowLockedMode : Command()
         object LaunchDeviceAuth : Command()
+        object ExitCredentialMode : Command()
+        object ExitLockedMode : Command()
     }
 }
