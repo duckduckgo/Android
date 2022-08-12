@@ -124,14 +124,14 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun processState(state: AutofillSettingsViewModel.ViewState) {
         if (state.credentialMode is NotInCredentialMode) {
-            showListMode()
+            resetToolbar()
         }
     }
 
     private fun processCommand(command: AutofillSettingsViewModel.Command) {
         var processed = true
         when (command) {
-            is ShowCredentialMode -> showCredentialMode(command.credentials, command.isStartingMode)
+            is ShowCredentialMode -> showCredentialMode(command.credentials, command.isLaunchedDirectly)
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar("Username")
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar("Password")
             is ShowDisabledMode -> showDisabledMode()
@@ -158,7 +158,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun showCredentialMode(
         credentials: LoginCredentials?,
-        isStartingMode: Boolean
+        isLaunchedDirectly: Boolean
     ) {
         if (credentials != null) {
             binding.includeToolbar.toolbar.apply {
@@ -167,7 +167,11 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             }
             title = credentials.domainTitle ?: credentials.domain
 
-            supportFragmentManager.showFragment(AutofillManagementCredentialsMode.instance(), TAG_CREDENTIAL, !isStartingMode)
+            supportFragmentManager.showFragment(
+                fragment = AutofillManagementCredentialsMode.instance(),
+                tag = TAG_CREDENTIAL,
+                shouldAddToBackStack = !isLaunchedDirectly
+            )
         }
     }
 

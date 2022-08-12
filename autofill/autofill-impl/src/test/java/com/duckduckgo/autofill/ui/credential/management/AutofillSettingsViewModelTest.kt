@@ -129,24 +129,33 @@ class AutofillSettingsViewModelTest {
         testee.onEditCredentials(credentials, true)
 
         testee.viewState.test {
-            assertEquals(CredentialMode.Editing(credentials, isFromViewMode = true), this.awaitItem().credentialMode)
+            assertEquals(
+                CredentialMode.Editing(credentials, startedCredentialModeWithEdit = false, hasPopulatedFields = true),
+                this.awaitItem().credentialMode
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenOnEditCredentialsCalledNOtFromViewThenShowCredentialEditingMode() = runTest {
+    fun whenOnEditCredentialsCalledNotFromViewThenShowCredentialEditingMode() = runTest {
         val credentials = someCredentials()
 
         testee.onEditCredentials(credentials, false)
 
         testee.commands.test {
-            awaitItem().first().assertCommandType(ShowCredentialMode::class)
+            assertEquals(
+                ShowCredentialMode(credentials, isLaunchedDirectly = false),
+                this.awaitItem().first()
+            )
             cancelAndIgnoreRemainingEvents()
         }
 
         testee.viewState.test {
-            assertEquals(CredentialMode.Editing(credentials, isFromViewMode = false), this.awaitItem().credentialMode)
+            assertEquals(
+                CredentialMode.Editing(credentials, startedCredentialModeWithEdit = true, hasPopulatedFields = false),
+                this.awaitItem().credentialMode
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -303,7 +312,10 @@ class AutofillSettingsViewModelTest {
 
         testee.viewState.test {
             val finalResult = this.expectMostRecentItem()
-            assertEquals(CredentialMode.Editing(credentials, saveable = false, isFromViewMode = true), finalResult.credentialMode)
+            assertEquals(
+                CredentialMode.Editing(credentials, saveable = false, startedCredentialModeWithEdit = false, hasPopulatedFields = true),
+                finalResult.credentialMode
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
