@@ -120,6 +120,18 @@
                 "testURL": "http://www.example.com/test.html?a=123&fbclid&gclid&regexp&utm_tracker&b=456",
                 "expectURL": "http://www.example.com/test.html?a=123&b=456",
                 "exceptPlatforms": []
+            },
+            {
+                "name": "Unremoved parameters that are url encoded are not modified.",
+                "testURL": "http://www.example.com/test.html?utm_medium=test&c=%7B%7D&d=20220406%2Fus-east-1",
+                "expectURL": "http://www.example.com/test.html?c=%7B%7D&d=20220406%2Fus-east-1",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "A URL with no tracking parameters but contains url encoded parameters is not modified.",
+                "testURL": "http://www.example.com/test.html?c=%7B%7D&d=20220406%2Fus-east-1",
+                "expectURL": "http://www.example.com/test.html?c=%7B%7D&d=20220406%2Fus-east-1",
+                "exceptPlatforms": []
             }
         ]
     }
