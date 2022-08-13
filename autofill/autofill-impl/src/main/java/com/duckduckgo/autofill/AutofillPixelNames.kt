@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.securestorage.store.db
+package com.duckduckgo.autofill.impl
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import com.duckduckgo.app.statistics.pixels.Pixel
 
-@Entity(tableName = "website_login_credentials")
-data class WebsiteLoginCredentialsEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val domain: String?,
-    val username: String?,
-    val password: String?,
-    val iv: String?,
-    val notes: String?,
-    val domainTitle: String?,
-    val lastUpdatedInMillis: Long?
-)
+enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName {
+    AUTOFILL_LOGINS_AUTOPROMPT_DISMISSED("m_autofill_logins_autoprompt_dismissed")
+}

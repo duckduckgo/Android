@@ -63,6 +63,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.verifyNoInteractions
 
 @ExperimentalCoroutinesApi
 class BrowserWebViewClientTest {
@@ -369,8 +370,22 @@ class BrowserWebViewClientTest {
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
             whenever(webResourceRequest.isRedirect).thenReturn(false)
             whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
             assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
             verify(listener).handleNonHttpAppLink(urlType)
+        }
+    }
+
+    @Test
+    fun whenNonHttpAppLinkDetectedAndIsNotForMainframeThenOnlyReturnTrue() = runTest {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
+            whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+            whenever(webResourceRequest.isRedirect).thenReturn(false)
+            whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+            assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+            verifyNoInteractions(listener)
         }
     }
 
@@ -380,6 +395,7 @@ class BrowserWebViewClientTest {
             val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
             whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
             assertTrue(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
             verify(listener).handleNonHttpAppLink(urlType)
         }
@@ -392,6 +408,7 @@ class BrowserWebViewClientTest {
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
             whenever(webResourceRequest.isRedirect).thenReturn(false)
             whenever(listener.handleNonHttpAppLink(any())).thenReturn(false)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
             assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
             verify(listener).handleNonHttpAppLink(urlType)
         }

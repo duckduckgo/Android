@@ -46,9 +46,9 @@ class RealSecureStorage @Inject constructor(
 
     override fun canAccessSecureStorage(): Boolean = l2DataTransformer.canProcessData() && secureStorageRepository != null
 
-    override suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials) {
-        withContext(dispatchers.io()) {
-            secureStorageRepository?.addWebsiteLoginCredential(websiteLoginDetailsWithCredentials.toDataEntity())
+    override suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials): Long? {
+        return withContext(dispatchers.io()) {
+            return@withContext secureStorageRepository?.addWebsiteLoginCredential(websiteLoginDetailsWithCredentials.toDataEntity())
         }
     }
 
@@ -75,7 +75,7 @@ class RealSecureStorage @Inject constructor(
             }
         } else emptyFlow()
 
-    override suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials? =
+    override suspend fun getWebsiteLoginDetailsWithCredentials(id: Long): WebsiteLoginDetailsWithCredentials? =
         withContext(dispatchers.io()) {
             secureStorageRepository?.getWebsiteLoginCredentialsForId(id)?.toCredentials()
         }
@@ -107,7 +107,7 @@ class RealSecureStorage @Inject constructor(
             secureStorageRepository?.updateWebsiteLoginCredentials(websiteLoginDetailsWithCredentials.toDataEntity())
         }
 
-    override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Int): Unit =
+    override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Long): Unit =
         withContext(dispatchers.io()) {
             secureStorageRepository?.deleteWebsiteLoginCredentials(id)
         }

@@ -68,8 +68,8 @@ class AutofillManagementRecyclerAdapter(
     private fun onBindViewHolderCredential(position: Int, viewHolder: CredentialsViewHolder) {
         val item = listItems[position] as ListItem.Credential
         with(viewHolder.binding) {
-            title.text = item.credentials.username
-            subtitle.text = titleExtractor.extract(item.credentials)
+            title.text = titleExtractor.extract(item.credentials)
+            subtitle.text = item.credentials.username
             root.setOnClickListener { onCredentialSelected(item.credentials) }
             updateFavicon(item.credentials)
         }

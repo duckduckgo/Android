@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.securestorage.store.db
+package com.duckduckgo.autofill.domain.app
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity(tableName = "website_login_credentials")
-data class WebsiteLoginCredentialsEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val domain: String?,
-    val username: String?,
-    val password: String?,
-    val iv: String?,
-    val notes: String?,
-    val domainTitle: String?,
-    val lastUpdatedInMillis: Long?
-)
+enum class LoginTriggerType {
+    USER_INITIATED,
+    AUTOPROMPT
+}

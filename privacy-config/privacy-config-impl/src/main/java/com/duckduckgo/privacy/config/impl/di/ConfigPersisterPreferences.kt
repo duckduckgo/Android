@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.securestorage.store.db
+package com.duckduckgo.privacy.config.impl.di
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
+import javax.inject.Qualifier
 
-@Entity(tableName = "website_login_credentials")
-data class WebsiteLoginCredentialsEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val domain: String?,
-    val username: String?,
-    val password: String?,
-    val iv: String?,
-    val notes: String?,
-    val domainTitle: String?,
-    val lastUpdatedInMillis: Long?
-)
+/** Identifies a coroutine scope type that is scope to the app lifecycle */
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+annotation class ConfigPersisterPreferences
