@@ -57,4 +57,9 @@ interface AutoconsentCallback {
      * This method is called whenever a popup is handled but not for the first time.
      */
     fun onPopUpHandled()
+
+    /**
+     * This method is called whenever autoconsent has a result to be sent
+     */
+    fun onResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean?)
 }

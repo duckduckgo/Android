@@ -33,7 +33,7 @@ class AutoconsentInterface(
         try {
             val parsedMessage = JSONObject(message)
             val type: String = parsedMessage.getString("type")
-            messageHandlerPlugins.getPlugins().firstOrNull { type == it.type }?.process(type, message, webView, autoconsentCallback)
+            messageHandlerPlugins.getPlugins().firstOrNull { it.supportedTypes.contains(type) }?.process(type, message, webView, autoconsentCallback)
         } catch (e: Exception) {
             Timber.d(e.localizedMessage)
         }

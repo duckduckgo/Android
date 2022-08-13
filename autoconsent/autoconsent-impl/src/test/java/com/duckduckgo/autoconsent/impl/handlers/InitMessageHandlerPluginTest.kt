@@ -55,10 +55,10 @@ class InitMessageHandlerPluginTest {
     @Test
     fun whenProcessIfCannotParseMessageThenDoNothing() {
         val message = """
-            {"type":"${initHandlerPlugin.type}", url: "http://www.example.com"}
+            {"type":"${initHandlerPlugin.supportedTypes.first()}", url: "http://www.example.com"}
         """.trimIndent()
 
-        initHandlerPlugin.process(initHandlerPlugin.type, message, webView, mockCallback)
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message, webView, mockCallback)
 
         assertNull(shadowOf(webView).lastEvaluatedJavascript)
     }
@@ -66,10 +66,10 @@ class InitMessageHandlerPluginTest {
     @Test
     fun whenProcessIfNotUrlSchemaThenDoNothing() {
         val message = """
-            {"type":"${initHandlerPlugin.type}", "url": "ftp://www.example.com"}
+            {"type":"${initHandlerPlugin.supportedTypes.first()}", "url": "ftp://www.example.com"}
         """.trimIndent()
 
-        initHandlerPlugin.process(initHandlerPlugin.type, message, webView, mockCallback)
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message, webView, mockCallback)
 
         assertNull(shadowOf(webView).lastEvaluatedJavascript)
     }
@@ -79,7 +79,7 @@ class InitMessageHandlerPluginTest {
         repository.userSetting = false
         repository.firstPopupHandled = true
 
-        initHandlerPlugin.process(initHandlerPlugin.type, message(), webView, mockCallback)
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
         assertNull(shadowOf(webView).lastEvaluatedJavascript)
     }
@@ -89,7 +89,7 @@ class InitMessageHandlerPluginTest {
         repository.userSetting = false
         repository.firstPopupHandled = false
 
-        initHandlerPlugin.process(initHandlerPlugin.type, message(), webView, mockCallback)
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
         assertTrue(shadowOf(webView).lastEvaluatedJavascript.isNotBlank())
     }
@@ -99,7 +99,7 @@ class InitMessageHandlerPluginTest {
         repository.userSetting = false
         repository.firstPopupHandled = false
 
-        initHandlerPlugin.process(initHandlerPlugin.type, message(), webView, mockCallback)
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
         val shadow = shadowOf(webView)
         val result = shadow.lastEvaluatedJavascript
@@ -116,7 +116,7 @@ class InitMessageHandlerPluginTest {
         repository.userSetting = true
         repository.firstPopupHandled = true
 
-        initHandlerPlugin.process(initHandlerPlugin.type, message(), webView, mockCallback)
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
         val shadow = shadowOf(webView)
         val result = shadow.lastEvaluatedJavascript
@@ -130,7 +130,7 @@ class InitMessageHandlerPluginTest {
 
     private fun message(): String {
         return """
-            {"type":"${initHandlerPlugin.type}", "url": "http://www.example.com"}
+            {"type":"${initHandlerPlugin.supportedTypes.first()}", "url": "http://www.example.com"}
         """.trimIndent()
     }
 
