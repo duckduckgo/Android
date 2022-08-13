@@ -430,6 +430,11 @@ class BrowserTabFragment :
         }
 
         override fun onPopUpHandled() {
+            // ToDo Replace with a proper action
+            Toast.makeText(context?.applicationContext, "Cookie Popup Handled!", Toast.LENGTH_LONG).show()
+        }
+
+        override fun onResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean?) {
             TODO("Not yet implemented")
         }
     }

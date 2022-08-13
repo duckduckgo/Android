@@ -54,7 +54,7 @@ class PopUpFoundMessageHandlerPluginTest {
     fun whenProcessIfSettingEnabledThenDoNothing() {
         repository.userSetting = true
 
-        popupFoundHandler.process(popupFoundHandler.type, "", webView, mockCallback)
+        popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), "", webView, mockCallback)
 
         assertNull(Shadows.shadowOf(webView).lastEvaluatedJavascript)
     }
@@ -63,7 +63,7 @@ class PopUpFoundMessageHandlerPluginTest {
     fun whenProcessIfSettingDisabledThenCallCallback() {
         repository.userSetting = false
 
-        popupFoundHandler.process(popupFoundHandler.type, "", webView, mockCallback)
+        popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), "", webView, mockCallback)
 
         verify(mockCallback).onFirstPopUpHandled(any(), any())
     }
@@ -72,7 +72,7 @@ class PopUpFoundMessageHandlerPluginTest {
     fun whenProcessIfSettingDisabledThenFistPopupHandledSetToTrue() {
         repository.userSetting = false
 
-        popupFoundHandler.process(popupFoundHandler.type, "", webView, mockCallback)
+        popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), "", webView, mockCallback)
 
         assertTrue(repository.firstPopupHandled)
     }
