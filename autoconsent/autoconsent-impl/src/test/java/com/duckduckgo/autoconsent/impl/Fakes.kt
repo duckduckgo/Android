@@ -40,7 +40,7 @@ class FakeMessageHandlerPlugin : MessageHandlerPlugin {
         count++
     }
 
-    override val type: String = "fake"
+    override val supportedTypes: List<String> = listOf("fake")
 }
 
 class FakeRepository : AutoconsentSettingsRepository {
