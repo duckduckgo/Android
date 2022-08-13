@@ -56,10 +56,10 @@ class EvalMessageHandlerPluginTest {
     @Test
     fun whenProcessMessageIfDoesNotParseDoNothing() {
         val message = """
-            {"type":"${evalMessageHandlerPlugin.type}", id: "myId", "code": "42==42"}
+            {"type":"${evalMessageHandlerPlugin.supportedTypes.first()}", id: "myId", "code": "42==42"}
         """.trimIndent()
 
-        evalMessageHandlerPlugin.process(evalMessageHandlerPlugin.type, message, webView, mockCallback)
+        evalMessageHandlerPlugin.process(evalMessageHandlerPlugin.supportedTypes.first(), message, webView, mockCallback)
 
         assertNull(shadowOf(webView).lastEvaluatedJavascript)
     }
@@ -76,14 +76,14 @@ class EvalMessageHandlerPluginTest {
             }
         })();
         """.trimIndent()
-        evalMessageHandlerPlugin.process(evalMessageHandlerPlugin.type, message("42==42"), webView, mockCallback)
+        evalMessageHandlerPlugin.process(evalMessageHandlerPlugin.supportedTypes.first(), message("42==42"), webView, mockCallback)
 
         assertEquals(expected, shadowOf(webView).lastEvaluatedJavascript)
     }
 
     @Test
     fun whenProcessMessageThenAndEvalTrueThenCorrectEvalRespSent() {
-        evalMessageHandlerPlugin.process(evalMessageHandlerPlugin.type, message("42==42"), webView, mockCallback)
+        evalMessageHandlerPlugin.process(evalMessageHandlerPlugin.supportedTypes.first(), message("42==42"), webView, mockCallback)
 
         val shadow = shadowOf(webView)
         shadow.lastEvaluatedJavascriptCallback.onReceiveValue("true")
@@ -98,7 +98,7 @@ class EvalMessageHandlerPluginTest {
 
     @Test
     fun whenProcessMessageThenAndEvalFalseThenCorrectEvalRespSent() {
-        evalMessageHandlerPlugin.process(evalMessageHandlerPlugin.type, message("41==42"), webView, mockCallback)
+        evalMessageHandlerPlugin.process(evalMessageHandlerPlugin.supportedTypes.first(), message("41==42"), webView, mockCallback)
 
         val shadow = shadowOf(webView)
         shadow.lastEvaluatedJavascriptCallback.onReceiveValue("false")
@@ -113,7 +113,7 @@ class EvalMessageHandlerPluginTest {
 
     private fun message(code: String): String {
         return """
-            {"type":"${evalMessageHandlerPlugin.type}", "id": "myId", "code": "$code"}
+            {"type":"${evalMessageHandlerPlugin.supportedTypes.first()}", "id": "myId", "code": "$code"}
         """.trimIndent()
     }
 
