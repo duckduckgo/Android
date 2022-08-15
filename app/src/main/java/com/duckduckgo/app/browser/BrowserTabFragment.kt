@@ -162,13 +162,13 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.NavigateToHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
@@ -788,12 +788,12 @@ class BrowserTabFragment :
         viewModel.onWebViewRefreshed()
     }
 
-    private fun processCommand(it: Command) {
-        if (it !is Command.DaxCommand) {
+    private fun processCommand(it: Command?) {
+        if (it is NavigationCommand) {
             renderer.cancelTrackersAnimation()
         }
         when (it) {
-            is Command.Refresh -> refresh()
+            is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query, it.sourceTabId)
             }
@@ -811,15 +811,15 @@ class BrowserTabFragment :
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
             is Command.ShowPrivacyProtectionDisabledConfirmation -> privacyProtectionDisabledConfirmation(it.domain)
-            is Command.Navigate -> {
+            is NavigationCommand.Navigate -> {
                 dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
             }
-            is Command.NavigateBack -> {
+            is NavigationCommand.NavigateBack -> {
                 dismissAppLinkSnackBar()
                 webView?.goBackOrForward(-it.steps)
             }
-            is Command.NavigateForward -> {
+            is NavigationCommand.NavigateForward -> {
                 dismissAppLinkSnackBar()
                 webView?.goForward()
             }
@@ -903,7 +903,7 @@ class BrowserTabFragment :
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
-            is Command.DaxCommand.FinishTrackerAnimation -> finishTrackerAnimation()
+            is Command.DaxCommand.FinishPartialTrackerAnimation -> finishPartialTrackerAnimation()
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
@@ -929,11 +929,14 @@ class BrowserTabFragment :
                 omnibarTextInput.setSelection(it.query.length)
             }
             is ShowBackNavigationHistory -> showBackNavigationHistory(it)
-            is NavigateToHistory -> navigateBackHistoryStack(it.historyStackIndex)
+            is NavigationCommand.NavigateToHistory -> navigateBackHistoryStack(it.historyStackIndex)
             is Command.EmailSignEvent -> {
                 notifyEmailSignEvent()
             }
             is Command.PrintLink -> launchPrint(it.url)
+            else -> {
+                // NO OP
+            }
         }
     }
 
@@ -2090,7 +2093,7 @@ class BrowserTabFragment :
         }
     }
 
-    private fun finishTrackerAnimation() {
+    private fun finishPartialTrackerAnimation() {
         animatorHelper.finishTrackerAnimation(omnibarViews(), animationContainer)
     }
 
