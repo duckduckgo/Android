@@ -91,7 +91,7 @@ class BrokenSiteDataTest {
             categories = emptyList(),
             entity = null,
             surrogateId = null,
-            status = TrackerStatus.ALLOWED,
+            status = TrackerStatus.BLOCKED,
             type = TrackerType.OTHER
         )
         val anotherEvent = TrackingEvent(
@@ -105,7 +105,7 @@ class BrokenSiteDataTest {
         )
         site.trackerDetected(event)
         site.trackerDetected(anotherEvent)
-        assertEquals("www.tracker.com,www.anothertracker.com", BrokenSiteData.fromSite(site).blockedTrackers)
+        assertEquals("www.tracker.com", BrokenSiteData.fromSite(site).blockedTrackers)
     }
 
     @Test
@@ -117,7 +117,7 @@ class BrokenSiteDataTest {
             categories = emptyList(),
             entity = null,
             surrogateId = null,
-            status = TrackerStatus.ALLOWED,
+            status = TrackerStatus.BLOCKED,
             type = TrackerType.OTHER
         )
         val anotherEvent = TrackingEvent(
@@ -126,7 +126,7 @@ class BrokenSiteDataTest {
             categories = emptyList(),
             entity = null,
             surrogateId = null,
-            status = TrackerStatus.ALLOWED,
+            status = TrackerStatus.BLOCKED,
             type = TrackerType.OTHER
         )
         site.trackerDetected(event)
