@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="atp_name">Uygulama İzleme Koruması</string>
+    <string name="refresh">Yenile</string>
+
+    <!-- Debug Screens -->
+    <string name="atp_DiagnosticsMenuLabel">Teşhis</string>
+    <string name="atp_DataMenuLabel">Veri İstatistikleri</string>
+    <string name="atp_MeteredConnection">"Tarifeli: %1$s"</string>
+    <string name="atp_ConnectionStatus">"VPN bağlı: %1$s"</string>
+    <string name="atp_NetworkAvailable">"İnternete bağlı: %1$s"</string>
+    <string name="atp_DnsServers">"Etkin ağ DNS: %1$s"</string>
+    <string name="atp_AppExitsReasonsTitle">Uygulama çıkış nedenleri</string>
+    <string name="atp_AppRestartsTitle">Uygulama yeniden başlatmaları</string>
+
+    <!-- Diagnostics -->
+    <string name="vpnTimeRunning">Çalışma süresi: %1$s</string>
+    <string name="vpnTrackerCompaniesBlockedToday">Bugün engellenen izleyici şirketleri: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek">Bu hafta engellenen izleyici şirketleri: %1$d</string>
+    <string name="vpnTrackerCompaniesNone">"Henüz engellenen izleyici şirketi yok"</string>
+    <string name="vpnTrackersBlockedToday">Bugün engellenen izleyiciler: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek">Bu hafta engellenen izleyiciler: %1$d</string>
+    <string name="vpnTrackersNone">"Henüz engellenen izleyici yok"</string>
+    <string name="vpnNotRunYet">"VPN henüz çalıştırılmadı"</string>
+    <string name="vpnDataTransferred">"%1$1s\n%2$2s paket"</string>
+
+    <!-- App Tracking Protection Ongoing Notification -->
+    <string name="atp_ReportIssue">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</string>
+    <string name="atp_OnInitialNotification">"Uygulama İzleme Koruması etkinleştirildi ve uygulamalarınızdaki izleme girişimlerini engelliyor"</string>
+    <string name="atp_OnNoTrackersNotificationHeader">"İzleme etkinliği taranıyor… bip… bop"</string>
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ <b>%1$d uygulamada</b> engellenen izleme girişimleri (son bir saat).]]></item>
+        <item quantity="other"><![CDATA[ <b>%1$d uygulamada</b> engellenen izleme girişimleri (son bir saat).]]></item>
+    </plurals>
+    <string name="atp_DisabledNotification">Uygulama İzleme Koruması devre dışı. İzleme girişimlerini engellemeye devam etmek için dokunun.</string>
+    <string name="atp_RevokedNotification">Cihazınızdaki bir VPN uygulaması Uygulama İzleme Korumasını devre dışı bıraktı. Yeniden etkinleştirmek için dokunun.</string>
+
+    <!-- App Tracking Protection Daily Notification -->
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Uygulama İzleme Koruması <b>%1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Uygulama İzleme Koruması <b>1 uygulamada (%2$s) %1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Uygulama İzleme Koruması <b>%1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
+
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[%1$s <b>%2$d uygulamada</b> sizi izleme girişiminde bulundu (son bir gün). <b>Daha Fazla Bilgi</b>]]></item>
+        <item quantity="other"><![CDATA[%1$s <b>%2$d uygulamada</b> sizi izleme girişiminde bulundu (son bir gün). <b>Daha Fazla Bilgi</b>]]></item>
+    </plurals>
+
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[Uygulama İzleme Koruması en çok izleme girişimini <b>%1$s</b> uygulamasında engelledi (son bir gün).]]></item>
+        <item quantity="other"><![CDATA[Uygulama İzleme Koruması en çok izleme girişimini <b>%1$s</b> ve <b>%2$s</b> uygulamalarında engelledi (son bir gün).]]></item>
+    </plurals>
+
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s uygulamasında %2$d kez</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s ve 1 diğer uygulamada %2$d kez</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s ve %4$d diğer uygulamada %2$d kez</b> engelledi (son bir gün).]]></string>
+
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s uygulamasında %2$d kez</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s ve 1 diğer uygulamada %2$d kez</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s ve %4$d diğer uygulamada %2$d kez</b> engelledi (son bir gün).]]></string>
+
+    <!-- App Tracking Protection Weekly Notification -->
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s uygulamasında %1$d izleme girişimini</b> engelledi (son bir hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve 1 diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s</b> ve %3$d diğer uygulamada %1$d izleme girişimini engelledi (son bir hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s uygulamasında %1$d izleme girişimini</b> engelledi (son bir hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%2$s</b> ve 1 diğer uygulamada %1$d izleme girişimini engelledi (son bir hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s</b> ve %3$d diğer uygulamada %1$d izleme girişimini engelledi (son bir hafta).]]></string>
+
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$s uygulamasını</b> engelledi (son bir hafta).]]></item>
+        <item quantity="other"><![CDATA[Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$s uygulamasını</b> engelledi (son bir hafta).]]></item>
+    </plurals>
+
+    <string name="atp_EnableCTA">Uygulama İzleme Korumasını Etkinleştir</string>
+
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s uygulamasında %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve 1 diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve %3$d diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s uygulamasında %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve 1 diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve %3$d diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
+
+    <!-- App Tracking Protection Privacy Report -->
+    <string name="atp_PrivacyReportEnabledTooltip">Uygulama İzleme Koruması etkin ve cihazınızın tamamında izleyicileri engelliyor</string>
+
+    <!-- App Tracking Protection Onboarding -->
+    <string name="atp_OnboardingLogoDescription">Uygulama İzleme Korumasını Etkinleştir</string>
+    <string name="atp_OnboardingLastPageOneTitle">Daha iyi uygulama gizliliği için tek bir kolay adım!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle"><b>Popüler ücretsiz uygulamaların %96\'sından fazlasının</b> siz uyurken bile diğer şirketlerin kişisel bilgilerinizi izlemesine izin verdiğini tespit ettik.\n\n<b>Diğer şirketlerin sizi izlemesine izin veren hangi uygulamaları tespit ettiğimizi</b> görün ve kontrolü geri alın!</string>
+    <string name="atp_OnboardingLastPageTwoTitle">Nasıl çalışır?</string>
+    <string name="atp_OnboardingLastPageTwoSubTitle">Uygulama İzleme Koruması, sizi bir sağlık uygulamasında izleme girişiminde bulunan Facebook gibi <b>diğer şirketlere ait uygulama izleyicileri tespit eder ve engeller</b>.\n\n<b>Ücretsizdir</b> ve uygulamalarınızı alışılageldiği gibi keyifle kullanmaya devam edebilirsiniz. Arka planda çalışarak <b>gece gündüz korunmanızı</b> sağlar.</string>
+    <string name="atp_OnboardingLastPageThreeTitle">Verilerinizi kimler görür?</string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Uygulama İzleme Koruması bir VPN değildir.</b> Ancak cihazınız onu bir VPN olarak algılayacaktır. Bunun nedeni, çalışmak için yerel bir VPN bağlantısı kullanmasıdır.\n\nUygulama İzleme Koruması farklıdır.<b> Uygulama verilerini asla haricî bir sunucu üzerinden yönlendirmez. </b><annotation type="learn_more_link">Daha fazla bilgi edinin</annotation></string>
+    <string name="atp_FAQCta">Uygulama İzleme Koruması Hakkında SSS</string>
+    <string name="atp_OnboardingContinue">Devam et</string>
+    <string name="atp_OnboardingMaybeLater">Belki Sonra</string>
+
+    <!-- App Tracking Protection Dax Onboarding -->
+    <string name="atp_daxOnboardingIntroTitle">Uygulama İzleme Koruması</string>
+    <string name="atp_daxOnboardingIntroMessage">Popüler ücretsiz uygulamaların %96\'sından fazlası, telefonunuzu kullanmadığınız zamanlarda bile diğer şirketlerin sizi izlemesine olanak tanır. Uygulama İzleme Koruması, bu izleme girişimlerini tespit eder ve engeller.</string>
+    <string name="atp_daxOnboardingPermissionTitle">Nasıl çalışır?</string>
+    <string name="atp_daxOnboardingPermissionMessage">Uygulama İzleme Koruması bir VPN değildir. Ancak cihazınız onu bir VPN olarak algılayacaktır. Bunun nedeni, çalışmak için yerel bir VPN bağlantısı kullanmasıdır. Uygulama verilerini asla haricî bir sunucu üzerinden yönlendirmez. <annotation type="learn_more_link">Daha fazla bilgi edinin</annotation></string>
+
+    <!--  App Tracking Protection Enabled Activity -->
+    <string name="atp_EnabledTitle">Yaşasın! Her şey hazır.</string>
+    <string name="atp_EnabledMessage">Uygulama İzleme Koruması, sizi izleme girişiminde bulunurken yakaladığımız, <b>cihazınızda yer alan uygulamaların gerçek zamanlı listesini</b> gösterir.</string>
+    <string name="atp_EnabledActivityCTA">Uygulama İzleme Özetini Görüntüle</string>
+    <string name="atp_EnabledSettings">Uygulama İzleme Koruması\'na <annotation type="settings_link">Ayarlar</annotation> bölümünden erişebilirsiniz.</string>
+
+    <!-- New Tab Integration -->
+    <string name="atp_NewTabDisabled"><b>Uygulama İzleme Koruması devre dışı.</b>\nUygulamalarınızda izleme girişimlerini engellemeye devam etmek için dokunun.</string>
+    <string name="atp_NewTabRevoked"><b>Cihazınızdaki bir VPN uygulaması Uygulama İzleme Korumasını devre dışı bıraktı.</b>\nYeniden etkinleştirmek için dokunun.</string>
+    <string name="atp_NewTabEnabled"><b>Uygulama İzleme Koruması etkinleştirildi</b> ve uygulamalarınızdaki izleme girişimlerini engelliyor.</string>
+
+    <!-- Exclusion List -->
+    <string name="atp_ExclusionListActivityTitle">Tüm Uygulamalar</string>
+    <string name="atp_ExcludedAppsFeature">Uygulama İzleme Koruması, Facebook\'un sizi bir sağlık uygulamasında izlemeye çalışması gibi diğer şirketlerin uygulama izleyicilerini algılar ve engeller. Şirketler, sahip oldukları uygulamalarda sizi izlemeye devam edebilir.\n\nBir uygulama beklendiği gibi çalışmıyorsa, o uygulama için korumayı devre dışı bırakmayı deneyin.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">Beta sırasında DuckDuckGo, bilinen içerik yükleme sorunlarını çözmek üzere bazı uygulamalar için korumayı devre dışı bırakabilir. Varsayılan ayarlara geri dönmediğiniz sürece özel ayarlarınız değişmez.</string>
+    <string name="atp_ExcludedAppsDisabledLabel"><b>Uygulama İzleme Koruması devre dışı</b> Uygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
+    <string name="atp_ExcludedAppsReport">Başka Bir Uygulamayla İlgili Sorun Bildir</string>
+    <string name="atp_ExcludedReasonLoadsWebsites">Web sitelerini yükler</string>
+    <string name="atp_ExcludedReasonKnownIssues">Bilinen sorunlar</string>
+    <string name="atp_ExcludedReasonManuallyDisabled">Manuel olarak devre dışı bırakıldı</string>
+    <string name="atp_ExcludedReasonManuallyEnabled">Manuel olarak etkinleştirildi</string>
+    <string name="atp_ExcludeAppsManuallyCTACancel">İptal</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnable">Etkinleştir</string>
+    <string name="atp_ExcludeAppsManuallyCTARestore">Geri Yükle</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName">%1$s uygulaması için koruma manuel olarak etkinleştirilsin mi?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Bu uygulamanın, izleme girişimleri başarısız olduğunda sorunlarla karşılaştığı bilinmektedir.</string>
+    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Koruma etkinleştirildiğinde bu uygulamadaki site içeriği düzgün görünmeyebilir.</string>
+    <string name="atp_ExcludeAppsManuallyEnableFooter">Korumayı etkinleştirdiğinizde, uygulamanın adı DuckDuckGo\'ya gönderilir.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppName">Gizlilik Koruması Devre Dışı</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Bir sorunu çözmek için korumayı devre dışı bıraktıysanız, lütfen sorunu DuckDuckGo\'ya bildirmeden önce uygulamanın artık çalışıp çalışmadığını kontrol edin.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Beklendiği gibi çalışmayı durdurdu</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Bu uygulamada izlenmek benim için sorun değil</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Başka bir nedenden dolayı</string>
+    <string name="atp_ExcludeAppsManuallyCTAReport">Bildir</string>
+    <string name="atp_ExcludeAppsManuallyCTASkip">Atla</string>
+    <string name="atp_ExcludeAppsManuallyMenuRestore">Varsayılan Korumalı Uygulamaları Geri Yükle</string>
+    <string name="atp_ExcludeAppsManuallyMenuReport">Bir Uygulamayla İlgili Sorun Bildir</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsTitle">Varsayılan koruma geri yüklensin mi?</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsMessage">Özel koruma ayarlarınız en son varsayılan korumalarımıza güncellenecektir. Koruma ayarlarınızı daha sonra istediğiniz zaman tekrar değiştirebilirsiniz.</string>
+    <string name="atp_ExcludeAppsRestoreDefaultSnackbar">Koruma varsayılan ayarları geri yüklendi</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsDisclaimer">Korumayı etkinleştirdiğinizde, uygulamanın adı DuckDuckGo\'ya gönderilir.</string>
+
+    <!--  Breakage report app list  -->
+    <string name="atp_ReportBreakageAppListActivityTitle">Bir Sorun Bildir</string>
+    <string name="atp_ReportBreakageAppFeature"><b>Sorunun yaşandığı uygulamayı seçin</b>. Geri bildiriminiz gelişmemize gerçekten yardımcı oluyor!\n\nUygulama İzleme Koruması hakkında genel bir geri bildiriminiz mi var? Bunun yerine <annotation type="use_this_form_link">bu formu</annotation> kullanın.</string>
+    <string name="atp_ReportBreakageAppEntry">%1$s uygulaması</string>
+    <string name="atp_ReportBreakageAppSubmitCta">Gönder</string>
+    <string name="atp_ReportBreakageAppNextCta">Sonraki</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Lütfen neler olduğunu, ne olmasını beklediğinizi ve soruna yol açan adımları açıklayın.</string>
+    <string name="atp_ReportBreakageFormInputHint">Yaşadığınız sorun hakkında daha fazla bilgi verin</string>
+    <string name="atp_ReportBreakageFormCheckboxText">\"Gönder\"e tıklayarak, DuckDuckGo\'nun bu rapordaki bilgileri Uygulama İzlenme Koruması\'nı iyileştirmek amacıyla kullanabileceğini kabul ediyorum.
+    </string>
+    <string name="atp_ReportBreakageFormDisclaimerText">
+        <![CDATA[Bu forma girilen ayrıntılara ek olarak, uygulama sorun raporunuz şunları içerecektir:<br/>• Uygulama paketi adı<br/>• Uygulamada engellenen izleyicilerin bir listesi<br/>• Uygulama İzleme Koruması\'nın etkin olup olmadığı<br/>• Toplu DuckDuckGo uygulama teşhisi<br/>]]>
+    </string>
+    <string name="atp_ReportBreakageSent">Rapor gönderildi, teşekkürler! Geri bildiriminiz herkes için Uygulama İzleme Koruması\'nı geliştirmemize yardımcı oluyor.</string>
+    <string name="atp_ThanksForTheFeedback">Geri dönüşünüz için teşekkür ederiz!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Ne oluyor?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Ne oluyor?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Uygulama donuyor veya çöküyor</string>
+    <string name="atp_ReportBreakageCategoryMessages">Mesaj teslimatı başarısız</string>
+    <string name="atp_ReportBreakageCategoryCalls">Sesli aramalar çalışmıyor</string>
+    <string name="atp_ReportBreakageCategoryUploads">Dosya yüklenemiyor veya paylaşılamıyor</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Dosya indirilemiyor</string>
+    <string name="atp_ReportBreakageCategoryContent">İçerik yavaş yükleniyor</string>
+    <string name="atp_ReportBreakageCategoryConnection">Uygulamanın bağlantısı yok</string>
+    <string name="atp_ReportBreakageCategoryIot">Yerel cihaza bağlanılamıyor</string>
+    <string name="atp_ReportBreakageCategoryOther">Başka bir şey</string>
+
+    <!--  Tracker Profiling Info -->
+    <string name="atp_ProfilingActivityTitle">Uygulama İzleyiciler Hakkında</string>
+    <string name="atp_ProfilingInfoTitle">Uygulama izleyici nedir?</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Büyük olasılıkla Google ve Facebook gibi şirketlerin sizi üçüncü taraf web sitelerinde perde arkasında izlediğini duymuşsunuzdur. Ancak cihazınızdaki uygulamalar aracılığıyla kişisel bilgilerinizi de izlediklerini biliyor muydunuz?\n\nTest ettiğimiz <b>100 popüler ücretsiz Android uygulamasının %96\'sından fazlası</b> gizli üçüncü taraf izleyiciler içeriyordu. Bunların %87\'si Google\'a ve %68\'i Facebook\'a veri gönderiyordu. Bu, cihazınızı kullanmadığınızda bile gerçekleşmektedir.\n\n<b>Uygulamalardaki izleyiciler, kuzenleri sayılabilecek web sitesi izleyicilere göre çok daha fazla bilgiye erişebilir</b>. Bunlar, bir binada çıktığınız kata varana kadar konumunuz, işteyken ne sıklıkta oyun oynadığınız ve her gün ne zaman ve ne kadar uyuduğunuz gibi bilgilerdir. <b>Örneğin, bir Google veya Facebook hesabınız olmasa bile, uygulamalarınızdan sizin hakkınızda veri toplayabilirler.</b>\n\nFacebook ve Google gibi izleme ağları, <b>sizinle ilgili dijital bir profil oluşturmak için</b> bu bilgi parçacıklarını kullanır. Bu bilgiler yardımıyla, izleme ağları internette kendilerinin istediği şeyleri görmenizi sağlayabilir ve verilerinize dayalı olarak reklam verenlerin size erişmek için teklif vermelerine olanak tanıyabilir.\n\nUygulamalardaki izleyiciler gizlilik açısından BÜYÜK bir sorundur. <b>Ancak DuckDuckGo\'nun size yardımcı olabilecek bir çözümü var.</b>\n\nDuckDuckGo Gizlilik Tarayıcı uygulamasında etkinleştirildiğinde, Uygulama İzleme Koruması, DuckDuckGo uygulamasının siz internette gezinirken web sitelerinde bulduğumuz izleyicileri engellemesi gibi, cihazınızdaki diğer uygulamalarda bulunan birçok izleyiciyi engeller. <b>Bu çift koruma katmanı, izleme şirketlerinin genel olarak sizin hakkınızda bildiklerini azaltır</b>, böylece uygulamalarınızı daha fazla korunduğunuzu bilerek daha rahat kullanabilirsiniz.</string>
+
+    <!--  App Tracking Protection Activity -->
+    <string name="atp_ActivityPastWeek">Son 7 Gün</string>
+    <string name="atp_ActivityTitle">Uygulama İzleme Koruması</string>
+    <string name="atp_MostRecentActivityTitle">Tüm Son Etkinlikler</string>
+    <string name="atp_ActivityRecentActivity">Son Etkinlikler</string>
+    <string name="atp_ActivityCtaShowAll">Tüm Son Etkinlikleri Görüntüle</string>
+    <string name="atp_ActivityAppTrackersFAQ">Uygulama İzleyici Nedir?</string>
+    <string name="atp_ActivityReportProblem">Bir Uygulamayla İlgili Sorun Bildir</string>
+    <string name="atp_ActivityBetaInstructions">Beta Talimatları</string>
+    <string name="atp_ActivityManageProtection">Bir Uygulamayla İlgili Sorun mu Yaşıyorsunuz?</string>
+
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[<b>%3$s</b> uygulamasında %2$d şirkete ait %1$d izleme girişimi engellendi]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[<b>%3$s</b> uygulamasında %2$d şirkete ait %1$d izleme girişimi engellendi]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[<b>%3$s</b> uygulamasında %2$d şirketine ait %1$d izleme girişimi engellendi]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[<b>%3$s</b> uygulamasında %2$d şirketlerine ait %1$d izleme girişimi engellendi]]></string>
+
+    <string name="atp_ActivityEmptyListTitle">Yeni etkinlik yok</string>
+    <string name="atp_ActivityEmptyListMessage">Cihazınızı kullanmaya devam edin. Uygulama İzleme Koruması\'nın engellediği izleme girişimleri burada görünür.</string>
+    <string name="atp_ActivityPastWeekBlocked">Engellendi</string>
+    <string name="atp_ActivityPastWeekAcross">Uygulama Sayısı:</string>
+
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+        <item quantity="one">İzleme Girişimi</item>
+        <item quantity="other">İzleme Girişimi</item>
+    </plurals>
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Uygulama</item>
+        <item quantity="other">Uygulama</item>
+    </plurals>
+    <string name="atp_ActivityEnabledLabel">Bu özellik beta aşamasındadır. <annotation type="app_settings_link">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</annotation></string>
+    <string name="atp_ActivityDisabledLabel"><b>Uygulama İzleme Koruması devre dışı</b> Uygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>Cihazınızdaki bir VPN uygulaması Uygulama İzleme Koruması\'nı devre dışı bıraktı.</b>\nUygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
+    <string name="atp_ActivityAbout">Hakkında</string>
+    <string name="atp_ActivityManage">Yönet</string>
+    <string name="atp_ActivityRemoveFeature">Verileri Devre Dışı Bırak ve Sil</string>
+
+    <!--  App Tracking Protection FAQ -->
+    <string name="atp_FAQActivityTitle">SSS</string>
+    <string name="atp_FAQFirstHeader">Uygulama İzleme Koruması nasıl çalışır?</string>
+    <string name="atp_FAQFirstText"><b>Uygulama İzleme Koruması, sizi bir sağlık uygulamasında izleme girişiminde bulunan Facebook gibi diğer şirketlere ait bilinen uygulama izleyicileri engeller.</b> Şirketler, sahip oldukları uygulamalarda sizi izlemeye devam edebilir.</string>
+    <string name="atp_FAQSecondHeader">Uygulama İzleme Koruması tüm uygulamalarımdaki izleyicileri engeller mi?</string>
+    <string name="atp_FAQSecondText"><b>Koruma, içeriğin düzgün görünmesi için, web sitelerini yükleyenler gibi belirli uygulamalar için otomatik olarak devre dışı bırakılabilir</b>. Bilinen sorunları olan uygulamalarda bu durum, Uygulama İzleme Koruması\'nı iyileştirmeye çalıştığımız için çoğunlukla geçicidir. Bu korumayı cihazınızdaki her uygulama için ayarlardan yönetebilirsiniz.\n\nAyrıca, bazı izleyiciler henüz tespit edilip engelleme listemize eklenmediği için engellenmemiş olabilir. Yeni izleyicileri tespit etmek ve bunlara karşı koruma sağlamak için sürekli çalışıyoruz. Dolayısıyla en güncel korumayı aldığınızı bilerek içiniz rahat olabilir.\n\nİzleyici listemizde birkaç ayda bir güncelleme bekleyebilirsiniz. Bu güncellemeler cihazınıza otomatik olarak uygulanacaktır.</string>
+    <string name="atp_FAQThirdHeader">Uygulama İzleme Koruması neden VPN bağlantısı kullanıyor?</string>
+    <string name="atp_FAQThirdText">Bir sanal özel ağ (VPN) bağlantısı kurmanız istenir, <b>ancak Uygulama İzleme Koruması\'nın çalışması için bir VPN uygulaması yüklemeniz gerekmez.</b>\n\nBu izin, cihazınızda yerel olarak çalışan Uygulama İzleme Koruması\'nın <b>bilinen izleyicileri engelleyebilmek için</b> ağ trafiğini izlemesine olanak tanır.</string>
+    <string name="atp_FAQFourthHeader">Uygulama İzleme Koruması bir VPN uygulaması kullansam da çalışır mı?</string>
+    <string name="atp_FAQFourthText">""<b>"<![CDATA[Android aynı anda yalnızca bir etkin VPN bağlantısına izin verir.]]>"</b>"<![CDATA[ Bu, cihazınızdaki bir VPN uygulaması çalışırken veya \"Her zaman açık\" olarak ayarlanmışken Uygulama İzleme Koruması'nı kullanamayacağınız anlamına gelir.\n\n]]>"<b>"<![CDATA[Uygulama İzleme Koruması'nı VPN uygulaması kullanmadığınız zamanlarda etkinleştirmenizi öneririz]]>"</b>"<![CDATA[ VPN uygulamanızın \"her zaman açık\" olarak ayarlanmadığından emin olun. Android Ağ ayarları > VPN seçeneğine gidin. Ardından, listelenen VPN uygulamaları için dişli çark simgesini seçin ve \"her zaman açık\" özelliğini devre dışı bırakın. Bazı VPN uygulamalarının devre dışı bırakılması gereken bir otomatik bağlanma ayarı da olabilir.]]>"</string>
+    <string name="atp_FAQFifthHeader">Uygulama İzleme Koruması\'nın VPN\'den farkı nedir?</string>
+    <string name="atp_FAQFifthText">Bir VPN, verilerinizi cihazdan kendi sunucusuna gönderir ve burada verilerinizi meraklı gözlerden korur ve anonimleştirir. Ancak bu, VPN şirketinin ağ trafiğinizi görmesini sağlar.\n\n<b>Uygulama İzleme Koruması farklıdır.</b> Verilerinizi bir VPN sunucusuna göndermek yerine, <b>Uygulama İzleme Koruması cihazınızda yerel olarak çalışır</b> ve uygulamalarınız ile haberleştikleri sunucular arasında konumlanır.\n\nUygulama İzleme Koruması bilinen bir izleyiciyi tanıdığında, <b>izleyicinin cihazınızdan kişisel bilgilerinizi (IP adresiniz, etkinliğiniz ve cihaz bilgileriniz gibi) göndermesini engeller.</b> Diğer tüm trafik hedefine ulaşır, böylece uygulamalarınız normal şekilde çalışır.</string>
+    <string name="atp_FAQSixthHeader">Verilerim gizli tutulur mu?</string>
+    <string name="atp_FAQSixthText">Uygulama İzleme Koruması, cihazınızda çalışır ve kişisel verilerinizi cihazınızdan DuckDuckGo\'ya göndermez.</string>
+
+    <!--  App Tracking Protection Waitlist -->
+    <string name="atp_WaitlistActivityTitle">Uygulama İzleme Koruması</string>
+    <string name="atp_WaitlistActivityWaitlistTitle">Uygulama İzleme Koruması bekleme listesi</string>
+    <string name="atp_WaitlistNotificationTitle">Uygulama İzleme Koruması Davetiyeniz Burada!</string>
+    <string name="atp_WaitlistNotificationDescription">Bekleme listesine katılarak Uygulama İzleme Koruması özelliğini deneme sırası size geldiğinde sizi bilgilendirmemizi istediniz. Davetiyenizi görüntülemek için dokunun.</string>
+    <string name="atp_WaitlistStatusNotJoined">Daha iyi uygulama gizliliği için tek bir kolay adım!</string>
+    <string name="atp_WaitlistStatusJoined">Listedesiniz!</string>
+    <string name="atp_WaitlistStatusInBeta">Davetlisiniz!</string>
+    <string name="atp_WaitlistDescription">Diğer uygulamalarınızda saklandığını tespit ettiğimiz izleyicileri engelleyin ve sizi kimlerin izlemeye çalıştığını görün.\n<annotation type="beta_link">Daha fazla bilgi</annotation></string>
+    <string name="atp_WaitlistInBetaDescription">Diğer uygulamalarınızda saklandığını tespit ettiğimiz izleyicileri engelleyin ve sizi kimlerin izlemeye çalıştığını görün.\n\n<annotation type="beta_link">Beta hakkında daha fazla bilgi edinin</annotation></string>
+    <string name="atp_WaitlistJoin">Özel Bekleme Listesine Katılın</string>
+    <string name="atp_WaitlistCodeCta">Davet Kodum Var</string>
+    <string name="atp_WaitlistGetStartedCta">Başlayın</string>
+    <string name="atp_WaitlistRedeemCodeCta">Devam et</string>
+    <string name="atp_WaitlistRedeemCodeLabel">Davet Kodu</string>
+    <string name="atp_WaitlistRedeemCodeTitle">Bitmek üzere…</string>
+    <string name="atp_WaitlistRedeemCodeError">Bu Davet Kodunu tanıyamadık.</string>
+    <string name="atp_WaitlistFooterDescription">Bekleme listesine katılmak için kişisel bilgilerinizi paylaşmanız gerekmez. Yerinizi yalnızca cihazınıza yerleştirilen bir zaman damgası ile güvence altına alacaksınız. Böylece sıranız geldiğinde sizi bilgilendirebiliriz.</string>
+    <string name="atp_WaitlistErrorJoining">Bekleme listesine katılırken bir hata oluştu. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="atp_WaitlistJoinedWithNotification">&lt;br/&gt;Uygulama İzleme Koruması sizin için hazır olduğunda bildirim alacaksınız.\n\n<annotation type="beta_link">Beta hakkında daha fazla bilgi edinin</annotation></string>
+    <string name="atp_WaitlistJoinedWithoutNotification">Uygulama İzleme Koruması\'nı denemek için davetiyeniz buraya gelecektir. Yakında tekrar kontrol edin veya sıra size geldiğinde size bir bildirim gönderebiliriz\n\n<annotation type="notify_me_link">Bana bildirim gönder</annotation>\n\n<annotation type="beta_link">Beta hakkında daha fazla bilgi edinin</annotation></string>
+    <string name="atp_WaitlistRedeemCodeActivityTitle">Davet Kodunuzu Girin</string>
+    <string name="atp_WaitlistRedeemedCodeStatus">Başarılı! Katıldın.</string>
+    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
+
+    <!--  App Tracking Company Details -->
+    <plurals name="atp_CompanyDetailsTrackingAttempts">
+        <item quantity="one">%1$d girişim. Şunları topladığı biliniyor:</item>
+        <item quantity="other">%1$d girişimi. Şunları topladığı biliniyor:</item>
+    </plurals>
+    <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
+        <item quantity="one">%1$d izleme girişimini engelledi</item>
+        <item quantity="other">%1$d izleme girişimini engelledi</item>
+    </plurals>
+    <string name="atp_CompanyDetailsTrackingMenuReport">Bu Uygulamayla İlgili Bir Sorun Bildirin</string>
+    <string name="atp_CompanyDetailsTrackingShowMore">%1$d tane daha göster</string>
+    <string name="atp_CompanyDetailsTrackingLearnMore">Uygulamalar, diğer şirketlerin analiz ve pazarlama gibi amaçlarla kullandıkları izleyicileri içerebilir. Eğer onları engellemezsek, bu izleyiciler sizinle ilgili daha da ayrıntılı dijital profiller oluşturabilir. <annotation type="learn_more_link">Daha fazla bilgi</annotation></string>
+    <string name="atp_CompanyDetailsTrackingShowLess">Daha az göster</string>
+    <string name="atp_CompanyDetailsAppInfoPanel">Koruma bu uygulama için şu anda devre dışı. Uygulama İzleme Koruması bir soruna neden olduysa, lütfen <annotation type="report_issues_link">sorunu bildirin</annotation></string>
+
+    <!--  App Tracking Company Signals -->
+    <string name="atp_TrackingSignalAAID">Android Reklam Kimliği</string>
+    <string name="atp_TrackingSignalUniqueIdentifier">Benzersiz Tanımlayıcı</string>
+    <string name="atp_TrackingSignalCookies">Çerezler</string>
+    <string name="atp_TrackingSignalOsVersion">İşletim Sistemi Sürümü</string>
+    <string name="atp_TrackingSignalOsBuildNumber">İşletim Sistemi Yapı Numarası</string>
+    <string name="atp_TrackingSignalPlatform">Cihaz Platformu</string>
+    <string name="atp_TrackingSignalDeviceBrand">Cihaz Markası</string>
+    <string name="atp_TrackingSignalDeviceLanguage">Cihaz Dili</string>
+    <string name="atp_TrackingSignalDeviceModel">Cihaz Modeli</string>
+    <string name="atp_TrackingSignalCPUData">CPU Verileri</string>
+    <string name="atp_TrackingSignalScreenResolution">Ekran Çözünürlüğü</string>
+    <string name="atp_TrackingSignalInternalStorage">Dâhilî Depolama</string>
+    <string name="atp_TrackingSignalExternalStorage">Haricî Depolama</string>
+    <string name="atp_TrackingSignalDeviceMemory">Cihaz Belleği</string>
+    <string name="atp_TrackingSignalDeviceName">Cihaz Adı</string>
+    <string name="atp_TrackingSignalWifiNetworkName">Wifi Ağ Adı</string>
+    <string name="atp_TrackingSignalAppName">Uygulama Adı</string>
+    <string name="atp_TrackingSignalAppVersion">Uygulama Sürümü</string>
+    <string name="atp_TrackingSignalLocalIPAddress">Yerel IP Adresi</string>
+    <string name="atp_TrackingSignalISP">İnternet Servis Sağlayıcısı</string>
+    <string name="atp_TrackingSignalDeviceBootTime">Cihaz Önyükleme Süresi</string>
+    <string name="atp_TrackingSignalNetworkConnectionType">Ağ Bağlantı Türü</string>
+    <string name="atp_TrackingSignalSystemVolume">Sistem Birimi</string>
+    <string name="atp_TrackingSignalBatteryLevel">Pil Seviyesi</string>
+    <string name="atp_TrackingSignalChargingStatus">Şarj Durumu</string>
+    <string name="atp_TrackingSignalBrightness">Parlaklık</string>
+    <string name="atp_TrackingSignalHeadphoneStatus">Kulaklık Durumu</string>
+    <string name="atp_TrackingSignalAccelerometerData">İvmeölçer Verileri</string>
+    <string name="atp_TrackingSignalRotationData">Rotasyon Verileri</string>
+    <string name="atp_TrackingSignalDeviceOrientation">Cihaz Yönü</string>
+    <string name="atp_TrackingSignalMagnetometerData">Manyetometre Verileri</string>
+    <string name="atp_TrackingSignalAvailableInternalStorage">Kullanılabilir Dâhilî Depolama</string>
+    <string name="atp_TrackingSignalAvailableExternalStorage">Kullanılabilir Haricî Depolama</string>
+    <string name="atp_TrackingSignalDeviceTotalMemory">Cihaz Toplam Belleği</string>
+    <string name="atp_TrackingSignalAvailableDeviceMemory">Kullanılabilir Cihaz Belleği</string>
+    <string name="atp_TrackingSignalScreenMargins">Ekran Kenar Boşlukları</string>
+    <string name="atp_TrackingSignalScreenDensity">Ekran Yoğunluğu</string>
+    <string name="atp_TrackingSignalFontSize">Yazı Tipi Boyutu</string>
+    <string name="atp_TrackingSignalNetworkCarrier">Ağ Operatörü</string>
+    <string name="atp_TrackingSignalAppInstallDate">Uygulama Yükleme Tarihi</string>
+    <string name="atp_TrackingSignalFirstAppLaunchDate">İlk Uygulama Başlatma Tarihi</string>
+    <string name="atp_TrackingSignalGPSCoordinates">GPS Koordinatları</string>
+    <string name="atp_TrackingSignalPostalCode">Posta Kodu</string>
+    <string name="atp_TrackingSignalNeighbourhood">Mahalle</string>
+    <string name="atp_TrackingSignalCity">Şehir</string>
+    <string name="atp_TrackingSignalState">Eyalet</string>
+    <string name="atp_TrackingSignalCountry">Ülke</string>
+    <string name="atp_TrackingSignalTimezone">Saat Dilimi</string>
+    <string name="atp_TrackingSignalEmailAddress">E-posta Adresi</string>
+    <string name="atp_TrackingSignalBirthday">Doğum Günü</string>
+    <string name="atp_TrackingSignalGender">Cinsiyet</string>
+    <string name="atp_TrackingSignalFirstName">Ad</string>
+    <string name="atp_TrackingSignalLastName">Soyadı</string>
+
+    <!--  App Tracking Protection Disable VPN Dialog -->
+    <string name="atp_DisableConfirmationDialogTitle">Uygulama İzleme Koruması devre dışı bırakılsın mı?</string>
+    <string name="atp_DisableConfirmationDialogMessage">Belirli bir uygulamayla ilgili bir sorun fark ettiyseniz, bunun yerine o uygulama için korumayı yönetebilirsiniz.</string>
+    <string name="atp_DisableConfirmationDisableApp">Bir uygulama için devre dışı bırak</string>
+    <string name="atp_DisableConfirmationDisableAllApps">Tüm uygulamalar için devre dışı bırak</string>
+    <string name="atp_DisableConfirmationCancel">İptal</string>
+
+    <!--  App Tracking Protection VPN Conflict Dialog -->
+    <string name="atp_VpnConflictDialogTitle">VPN uygulamanızın bağlantısı kesilmiş olabilir</string>
+    <string name="atp_VpnConflictAlwaysOnDialogTitle">VPN uygulamanız, Uygulama İzleme Koruması\'nı engelliyor</string>
+    <string name="atp_VpnConflictDialogMessage">Android aynı anda yalnızca bir etkin VPN bağlantısına izin verir. Uygulama İzleme Koruması\'nı etkinleştirmek, cihazınızdaki tüm etkin VPN\'lerin bağlantısını kesebilir.</string>
+    <string name="atp_VpnConflictDialogAlwaysOnMessage">Android aynı anda yalnızca bir etkin VPN bağlantısına izin verir. Ağ ayarları &gt; VPN seçeneğini açın. \"Her zaman açık\" olan VPN uygulamasını bulun ve devam etmek için devre dışı bırakın.</string>
+    <string name="atp_VpnConflictDialogCancel">İptal</string>
+    <string name="atp_VpnConflictDialogOpenSettings">Ayarları aç</string>
+    <string name="atp_VpnConflictDialogGotIt">Anladım</string>
+
+    <!-- Manage Recent Apps Protection -->
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Bir uygulamayla ilgili sorun yaşıyorsanız (içeriğin yüklenmemesi gibi), bu uygulama için korumayı devre dışı bırakmayı deneyin ve <annotation type="report_issues_link">bir rapor gönderin.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Son Uygulamalar</string>
+    <string name="atp_ManageRecentAppsProtectionShowAll">Tüm Uygulamaları Göster</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Son uygulama yok</string>
+
+    <!--  App Tracking Protection Remove Feature Dialog -->
+    <string name="atp_RemoveFeatureDialogTitle">Veriler Devre Dışı Bırakılsın ve Silinsin mi?</string>
+    <string name="atp_RemoveFeatureDialogMessage">Uygulama İzleme Koruması devre dışı bırakılacak ve tüm ayarlar ve izleme girişimlerinin geçmişi silinecektir. Ayarlar\'da istediğiniz zaman tekrar etkinleştirebilirsiniz.</string>
+    <string name="atp_RemoveFeatureDialogCancel">İptal</string>
+    <string name="atp_RemoveFeatureDialogRemove">Devre dışı bırak</string>
+
+    <!--  App Tracking Protection Promote Always On -->
+    <string name="atp_PromoteAlwaysOnDialogTitle">Her Zaman Açık olarak ayarlansın mı?</string>
+    <string name="atp_PromoteAlwaysOnDialogMessage">Android\'in Uygulama İzleme Koruması\'nı periyodik olarak devre dışı bırakmasını önlemek için:\n\nAndroid Ayarlarına gidin\nDuckDuckGo için VPN Ayarlarını Açın\n\"Her Zaman Açık VPN\" ayarını açın</string>
+    <string name="atp_PromoteAlwaysOnDialogSettings">Ayarlar\'a gidin</string>
+    <string name="atp_PromoteAlwaysOnDialogLater">Bana Sonra Hatırlat</string>
+    <string name="atp_PromoteAlwaysOnDialogForget">Hayır Teşekkürler</string>
+
+</resources>
