@@ -117,6 +117,7 @@ class BrowserViewModel @Inject constructor(
                 is AppEnjoymentPromptOptions.ShowFeedbackPrompt -> {
                     command.value = Command.ShowAppFeedbackPrompt(promptType.promptCount)
                 }
+                else -> {}
             }
         }
     }

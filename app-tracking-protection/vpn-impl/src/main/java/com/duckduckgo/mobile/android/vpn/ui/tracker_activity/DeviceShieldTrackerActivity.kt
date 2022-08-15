@@ -213,7 +213,7 @@ class DeviceShieldTrackerActivity :
         return true
     }
 
-    private fun processCommand(it: DeviceShieldTrackerActivityViewModel.Command?) {
+    private fun processCommand(it: DeviceShieldTrackerActivityViewModel.Command) {
         when (it) {
             is DeviceShieldTrackerActivityViewModel.Command.StopVPN -> stopDeviceShield()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchVPN -> startVPN()
