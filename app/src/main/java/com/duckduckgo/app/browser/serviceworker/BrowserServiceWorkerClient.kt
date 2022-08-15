@@ -22,10 +22,16 @@ import androidx.webkit.ServiceWorkerClientCompat
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import javax.inject.Inject
 
-class BrowserServiceWorkerClient(
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class BrowserServiceWorkerClient @Inject constructor(
     private val requestInterceptor: RequestInterceptor,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository
 ) : ServiceWorkerClientCompat() {
