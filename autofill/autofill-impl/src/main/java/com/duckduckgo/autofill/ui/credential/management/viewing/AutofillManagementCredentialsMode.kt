@@ -27,8 +27,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoFragment
@@ -42,6 +42,8 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewMode
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -127,6 +129,13 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         binding.removeSaveStateWatcher(saveStateWatcher)
     }
 
+    private fun initializeEditStateIfNecessary(mode: Editing) {
+        if (!mode.hasPopulatedFields) {
+            populateFields(mode.credentialsViewed)
+            viewModel.onCredentialEditModePopulated()
+        }
+    }
+
     private fun resetToolbarOnExit() {
         getActionBar()?.apply {
             title = getString(R.string.managementScreenTitle)
@@ -201,26 +210,22 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.viewState.collect { state ->
-                    when (state.credentialMode) {
-                        is Viewing -> {
-                            populateFields(state.credentialMode.credentialsViewed)
-                            showViewMode(state.credentialMode.credentialsViewed)
-                        }
-                        is Editing -> {
-                            if (!state.credentialMode.isFromViewMode) {
-                                populateFields(state.credentialMode.credentialsViewed)
-                            }
-                            showEditMode()
-                        }
-                        else -> {
-                        }
+        viewModel.viewState
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { state ->
+                when (state.credentialMode) {
+                    is Viewing -> {
+                        populateFields(state.credentialMode.credentialsViewed)
+                        showViewMode(state.credentialMode.credentialsViewed)
+                    }
+                    is Editing -> {
+                        initializeEditStateIfNecessary(state.credentialMode)
+                        showEditMode()
+                    }
+                    else -> {
                     }
                 }
-            }
-        }
+            }.launchIn(lifecycleScope)
     }
 
     private fun String.convertBlankToNull(): String? = this.ifBlank { null }
@@ -266,7 +271,6 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     private fun invalidateMenu() = (activity as AppCompatActivity).invalidateMenu()
 
     companion object {
-
         fun instance() = AutofillManagementCredentialsMode()
     }
 }

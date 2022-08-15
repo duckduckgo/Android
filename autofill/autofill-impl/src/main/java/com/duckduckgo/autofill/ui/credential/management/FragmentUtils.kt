@@ -23,8 +23,10 @@ import com.duckduckgo.autofill.impl.R
 
 fun FragmentManager.forceExitFragment(tag: String) {
     commit {
-        findFragmentByTag(tag)?.let { this.remove(it) }
-        popBackStackImmediate()
+        findFragmentByTag(tag)?.let {
+            this.remove(it)
+            popBackStackImmediate()
+        }
     }
 }
 
