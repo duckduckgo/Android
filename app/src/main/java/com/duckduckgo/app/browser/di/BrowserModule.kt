@@ -41,7 +41,6 @@ import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.*
 import com.duckduckgo.app.browser.print.PrintInjector
-import com.duckduckgo.app.browser.serviceworker.ServiceWorkerLifecycleObserver
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -437,10 +436,4 @@ class BrowserModule {
     ): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository)
     }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    @IntoSet
-    fun serviceWorkerLifecycleObserver(serviceWorkerLifecycleObserver: ServiceWorkerLifecycleObserver): LifecycleObserver =
-        serviceWorkerLifecycleObserver
 }
