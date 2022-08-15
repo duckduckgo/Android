@@ -15,20 +15,32 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/settingsSectionGeneral"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/settingsSectionCustomize"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/setAsDefaultBrowserSetting"
-        style="@style/SettingsSwitch"
-        android:text="@string/settingsDefaultBrowserEnabled"
-        android:theme="@style/SettingsSwitchTheme" />
+    <TextView
+        android:id="@+id/settingsCustomizeTitle"
+        style="@style/SettingsSectionTitle"
+        android:text="@string/settingsHeadingCustomize" />
 
     <TextView
-        android:id="@+id/homeScreenWidgetSetting"
+        android:id="@+id/locationPermissions"
         style="@style/SettingsItemClickable"
-        android:text="@string/settingsAddHomeScreenWidget" />
+        android:text="@string/settingsPreciseLocation" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/autocompleteToggle"
+        style="@style/SettingsSwitch"
+        android:text="@string/settingsAutocompleteEnabled"
+        android:theme="@style/SettingsSwitchTheme" />
+
+    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+        android:id="@+id/appLinksSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="@string/settingsTitleAppLinks" />
 
 </LinearLayout>

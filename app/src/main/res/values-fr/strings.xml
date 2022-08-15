@@ -187,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Paramètres</string>
     <string name="settingsMenuItemTitle">Paramètres</string>
-    <string name="settingsHeadingGeneral">Général</string>
-    <string name="settingsHeadingOther">Autre</string>
     <string name="settingsHeadingPrivacy">Confidentialité</string>
     <string name="settingsAboutDuckduckgo">À propos de DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
@@ -210,14 +208,11 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Enregistrer</string>
 
-    <string name="settingsAutomaticallyClearWhat">Effacer automatiquement…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Effacer automatiquement…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Aucun</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Onglets</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Onglets et données</string>
 
-    <string name="settingsAutomaticallyClearWhen">Effacer le…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Effacer le…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Quitter l\'application uniquement</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Quitter l\'application, inactivité pendant 5 secondes</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Quitter l\'application, inactivité pendant 5 minutes</string>

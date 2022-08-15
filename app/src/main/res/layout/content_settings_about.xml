@@ -17,48 +17,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/settingsSectionPrivacy"
+    android:id="@+id/settingsSectionAbout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/settingsPrivacyTitle"
+        android:id="@+id/settingsAboutTitle"
         style="@style/SettingsSectionTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settingsHeadingPrivacy" />
-
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-        android:id="@+id/globalPrivacyControlSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:title="@string/globalPrivacyControlSetting"
-        tools:subtitle="test test test" />
+        android:text="@string/settingsHeadingAbout" />
 
     <TextView
-        android:id="@+id/whitelist"
+        android:id="@+id/about"
         style="@style/SettingsItemClickable"
-        android:text="@string/settingsPrivacyProtectionWhitelist" />
+        android:text="@string/settingsAboutDuckduckgo" />
 
     <TextView
-        android:id="@+id/fireproofWebsites"
+        android:id="@+id/privacyPolicy"
         style="@style/SettingsItemClickable"
-        android:text="@string/settingsFireproofWebsites" />
-
-
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-        android:id="@+id/automaticallyClearWhatSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:title="@string/settingsAutomaticallyClearWhat"
-        tools:subtitle="test test test" />
+        android:text="@string/settingsPrivacyPolicyDuckduckgo" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-        android:id="@+id/automaticallyClearWhenSetting"
+        android:id="@+id/version"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/settingsAutomaticallyClearWhen"
-        tools:subtitle="test test test" />
+        app:title="@string/settingsVersion"
+        tools:subtitle="123.43.5456" />
+
+    <TextView
+        android:id="@+id/provideFeedback"
+        style="@style/SettingsItemClickable"
+        android:text="@string/leaveFeedback" />
 
 </LinearLayout>

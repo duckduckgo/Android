@@ -187,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nustatymai</string>
     <string name="settingsMenuItemTitle">Nustatymai</string>
-    <string name="settingsHeadingGeneral">Bendrieji</string>
-    <string name="settingsHeadingOther">Kiti</string>
     <string name="settingsHeadingPrivacy">Privatumas</string>
     <string name="settingsAboutDuckduckgo">Apie „DuckDuckGo“</string>
     <string name="settingsVersion">Versija</string>
@@ -210,14 +208,11 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>
 
-    <string name="settingsAutomaticallyClearWhat">Valyti automatiškai…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Valyti automatiškai…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Jokie</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Kortelės</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Kortelės ir duomenys</string>
 
-    <string name="settingsAutomaticallyClearWhen">Valyti…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Valyti…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Tik išeinant iš programos</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Išeinant iš programos, po 5 sek. neveikimo</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Išeinant iš programos, po 5 min. neveikimo</string>

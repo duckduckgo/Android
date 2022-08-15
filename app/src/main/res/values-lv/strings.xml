@@ -187,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Iestatījumi</string>
     <string name="settingsMenuItemTitle">Iestatījumi</string>
-    <string name="settingsHeadingGeneral">Vispārīgi</string>
-    <string name="settingsHeadingOther">Citi</string>
     <string name="settingsHeadingPrivacy">Privātums</string>
     <string name="settingsAboutDuckduckgo">Par DuckDuckGo</string>
     <string name="settingsVersion">Versija</string>
@@ -210,14 +208,11 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
 
-    <string name="settingsAutomaticallyClearWhat">Automātiski notīrīt…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automātiski notīrīt…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Neko</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Cilnes</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Cilnes un datus</string>
 
-    <string name="settingsAutomaticallyClearWhen">Notīrīt…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Notīrīt…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Tikai iziešana no lietotnes</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Iziešana no lietotnes, neaktīva 5 sekundes</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Iziešana no lietotnes, neaktīva 5 minūtes</string>
