@@ -17,21 +17,20 @@
 package com.duckduckgo.autoconsent.impl
 
 import android.webkit.WebView
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
+import org.junit.runner.RunWith
+import org.robolectric.Shadows.shadowOf
 
+@RunWith(AndroidJUnit4::class)
 class RealAutoconsentTest {
 
     private val pluginPoint = FakePluginPoint()
     private val repository = FakeRepository()
-    private val mockWebView: WebView = mock()
+    private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
     lateinit var autoconsent: RealAutoconsent
 
@@ -45,12 +44,14 @@ class RealAutoconsentTest {
         repository.userSetting = false
         repository.firstPopupHandled = false
 
-        autoconsent.injectAutoconsent(mockWebView)
+        autoconsent.injectAutoconsent(webView)
+
+        assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
 
         repository.userSetting = true
-        autoconsent.injectAutoconsent(mockWebView)
+        autoconsent.injectAutoconsent(webView)
 
-        verify(mockWebView, times(2)).evaluateJavascript(any(), anyOrNull())
+        assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
     }
 
     @Test
@@ -58,9 +59,9 @@ class RealAutoconsentTest {
         repository.userSetting = false
         repository.firstPopupHandled = true
 
-        autoconsent.injectAutoconsent(mockWebView)
+        autoconsent.injectAutoconsent(webView)
 
-        verify(mockWebView, never()).evaluateJavascript(any(), anyOrNull())
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
     }
 
     @Test
@@ -68,9 +69,9 @@ class RealAutoconsentTest {
         repository.userSetting = true
         repository.firstPopupHandled = true
 
-        autoconsent.injectAutoconsent(mockWebView)
+        autoconsent.injectAutoconsent(webView)
 
-        verify(mockWebView).evaluateJavascript(any(), anyOrNull())
+        assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
     }
 
     @Test
@@ -91,4 +92,33 @@ class RealAutoconsentTest {
         assertTrue(autoconsent.isSettingEnabled())
     }
 
+    @Test
+    fun whenSetAutoconsentOptOutThenEvaluateJavascriptCalled() {
+        val expected = """
+        javascript:(function() {
+            window.autoconsentMessageCallback({ "type": "optOut" }, window.origin);
+        })();
+        """.trimIndent()
+
+        autoconsent.setAutoconsentOptOut(webView)
+        assertEquals(expected, shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenSetAutoconsentOptOutThenTrueValueStored() {
+        autoconsent.setAutoconsentOptOut(webView)
+        assertTrue(repository.userSetting)
+    }
+
+    @Test
+    fun whenSetAutoconsentOptInThenFalseValueStored() {
+        autoconsent.setAutoconsentOptIn()
+        assertFalse(repository.userSetting)
+    }
+
+    @Test
+    fun whenFirstPopUpHandledThenFalseValueStored() {
+        autoconsent.firstPopUpHandled()
+        assertTrue(repository.firstPopupHandled)
+    }
 }

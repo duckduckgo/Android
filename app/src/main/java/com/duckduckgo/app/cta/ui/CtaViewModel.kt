@@ -41,6 +41,7 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.ui.store.AppTheme
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
@@ -50,6 +51,7 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import dagger.SingleInstanceIn
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 
 @SingleInstanceIn(AppScope::class)
@@ -65,9 +67,11 @@ class CtaViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
-    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val appTheme: AppTheme,
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
+    var canShowAutoconsentCta: AtomicBoolean = AtomicBoolean(false)
 
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -180,7 +184,7 @@ class CtaViewModel @Inject constructor(
 
         return withContext(dispatcher) {
             if (isBrowserShowing) {
-                getBrowserCta(site)
+                getDaxDialogCta(site)
             } else {
                 Timber.i("favoritesOnboarding: - refreshCta $favoritesOnboarding")
                 if (favoritesOnboarding) {
@@ -211,15 +215,6 @@ class CtaViewModel @Inject constructor(
             }
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
-            }
-            else -> null
-        }
-    }
-
-    private suspend fun getBrowserCta(site: Site?): Cta? {
-        return when {
-            canShowDaxDialogCta() -> {
-                getDaxDialogCta(site)
             }
             else -> null
         }
@@ -269,7 +264,7 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private fun getDaxDialogCta(site: Site?): Cta? {
+    private suspend fun getDaxDialogCta(site: Site?): Cta? {
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
@@ -283,6 +278,21 @@ class CtaViewModel @Inject constructor(
                 return null
             }
 
+            val oldAutoconsentValue = canShowAutoconsentCta.get()
+            canShowAutoconsentCta.set(false)
+
+            // Autoconsent
+            if (oldAutoconsentValue && !daxDialogAutoconsentShown()) {
+                return DaxDialogCta.DaxAutoconsentCta(onboardingStore, appInstallStore, appTheme)
+            }
+
+            if (!canShowDaxDialogCta()) return null
+
+            // Trackers blocked
+            if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackingEntities().isNotEmpty()) {
+                return DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackingEntities(), host)
+            }
+
             // Is major network
             if (it.entity != null) {
                 it.entity?.let { entity ->
@@ -292,22 +302,25 @@ class CtaViewModel @Inject constructor(
                 }
             }
 
+            // SERP
             if (isSerpUrl(it.url) && !daxDialogSerpShown()) {
                 return DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
             }
 
-            // Trackers blocked
-            return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackingEntities().isNotEmpty()) {
-                DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackingEntities(), host)
-            } else if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
-                DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
-            } else {
-                null
+            if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
+                return DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
             }
+            return null
         }
     }
 
+    fun enableAutoconsentCta() {
+        canShowAutoconsentCta.set(true)
+    }
+
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
+
+    private fun daxDialogAutoconsentShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_AUTOCONSENT)
 
     private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
 
