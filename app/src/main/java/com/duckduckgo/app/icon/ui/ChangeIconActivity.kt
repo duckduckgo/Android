@@ -75,7 +75,7 @@ class ChangeIconActivity : DuckDuckGoActivity() {
         iconsAdapter.notifyChanges(viewState.appIcons)
     }
 
-    private fun processCommand(it: ChangeIconViewModel.Command?) {
+    private fun processCommand(it: ChangeIconViewModel.Command) {
         when (it) {
             is ChangeIconViewModel.Command.IconChanged -> {
                 finish()

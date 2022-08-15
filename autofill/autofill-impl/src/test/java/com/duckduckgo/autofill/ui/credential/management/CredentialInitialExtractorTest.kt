@@ -57,9 +57,9 @@ class CredentialInitialExtractorTest {
     }
 
     @Test
-    fun whenTitleStartsWithANumberThenNumberUsed() {
+    fun whenTitleStartsWithANumberThenPlaceholderUsed() {
         val loginCredentials = creds(title = "123 website")
-        assertEquals("1", testee.extractInitial(loginCredentials))
+        testee.extractInitial(loginCredentials).assertIsPlaceholder()
     }
 
     @Test

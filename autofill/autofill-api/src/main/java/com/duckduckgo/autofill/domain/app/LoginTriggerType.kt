@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,9 @@
  * limitations under the License.
  */
 
-plugins {
-    `kotlin-dsl`
-}
+package com.duckduckgo.autofill.domain.app
 
-repositories {
-    mavenCentral()
-    google()
-}
-
-dependencies {
-    /* Depend on the android gradle plugin, since we want to access it in our plugin */
-    implementation("com.android.tools.build:gradle:7.2.2")
-
-    /* Depend on the default Gradle API's since we want to build a custom plugin */
-    implementation(gradleApi())
-    implementation(localGroovy())
+enum class LoginTriggerType {
+    USER_INITIATED,
+    AUTOPROMPT
 }

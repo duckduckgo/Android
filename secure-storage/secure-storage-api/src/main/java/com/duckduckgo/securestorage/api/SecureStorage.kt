@@ -33,6 +33,7 @@ interface SecureStorage {
      * this is invoked, nothing will be done.
      *
      * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
+     * @return The ID of the saved credential if it saved successfully, otherwise null
      */
     @Throws(SecureStorageException::class)
     suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials): Long?
