@@ -16,6 +16,16 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
+    <!-- Settings - Automatically clearing data -->
+    <string name="settingsAutomaticallyClearWhat">Automatically Burn…</string>
+    <string name="settingsAutomaticallyClearWhen">Burn On…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Burn on…</string>
+
+    <!-- Settings activity -->
+    <string name="settingsHeadingAppearance">Appearance</string>
+    <string name="settingsHeadingCustomize">Customize</string>
+    <string name="settingsHeadingAbout">About</string>
+
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Autofill</string>
     <string name="autofillSnackbarAction">View</string>
