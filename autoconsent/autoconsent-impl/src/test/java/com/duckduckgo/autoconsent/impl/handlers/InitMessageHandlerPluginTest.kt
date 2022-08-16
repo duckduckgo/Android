@@ -108,6 +108,7 @@ class InitMessageHandlerPluginTest {
         assertNotNull(initResp.rules)
         assertFalse(initResp.config.enablePrehide)
         assertTrue(initResp.config.enabled)
+        assertEquals(20, initResp.config.detectRetries)
         assertEquals("initResp", initResp.type)
     }
 
@@ -125,6 +126,7 @@ class InitMessageHandlerPluginTest {
         assertNotNull(initResp.rules)
         assertTrue(initResp.config.enablePrehide)
         assertTrue(initResp.config.enabled)
+        assertEquals(20, initResp.config.detectRetries)
         assertEquals("initResp", initResp.type)
     }
 
