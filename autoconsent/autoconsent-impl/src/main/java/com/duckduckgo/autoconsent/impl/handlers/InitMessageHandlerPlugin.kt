@@ -72,7 +72,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val disabledCmps = emptyList<String>() // ToDo
                     val autoAction = getAutoAction()
                     val enablePreHide = repository.userSetting
-                    val detectRetries = 1 // ToDo
+                    val detectRetries = 20
 
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries)
                     val initResp = InitResp(rules = getRules(), config = config)

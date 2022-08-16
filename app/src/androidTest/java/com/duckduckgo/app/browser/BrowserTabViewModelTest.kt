@@ -128,6 +128,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
@@ -376,6 +377,8 @@ class BrowserTabViewModelTest {
 
     private val mockAutofillStore: AutofillStore = mock()
 
+    private val mockAppTheme: AppTheme = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -411,7 +414,8 @@ class BrowserTabViewModelTest {
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = DuckDuckGoUrlDetector()
+            duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
+            appTheme = mockAppTheme,
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
@@ -2134,6 +2138,23 @@ class BrowserTabViewModelTest {
 
         testee.registerDaxBubbleCtaDismissed()
         verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
+    }
+
+    @Test
+    fun whenRegisterDaxBubbleCtaDismissedThenCtaChangedToNull() = runTest {
+        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.registerDaxBubbleCtaDismissed()
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenRefreshCtaIfCtaAlreadyExistedThenReturnThatCta() = runTest {
+        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        assertEquals(cta, testee.refreshCta())
     }
 
     @Test

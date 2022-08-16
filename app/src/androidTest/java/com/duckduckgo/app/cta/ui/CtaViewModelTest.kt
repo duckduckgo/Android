@@ -52,6 +52,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.mobile.android.ui.store.AppTheme
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -117,6 +118,9 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockTabRepository: TabRepository
 
+    @Mock
+    private lateinit var mockAppTheme: AppTheme
+
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
@@ -154,7 +158,8 @@ class CtaViewModelTest {
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = DuckDuckGoUrlDetector()
+            duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
+            appTheme = mockAppTheme,
         )
     }
 
@@ -398,7 +403,8 @@ class CtaViewModelTest {
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site) as DaxDialogCta
 
         assertTrue(value is DaxDialogCta.DaxMainNetworkCta)
-        assertEquals(expectedCtaText, value.getDaxText(context))
+        val actualText = (value as DaxDialogCta.DaxMainNetworkCta).getDaxText(context)
+        assertEquals(expectedCtaText, actualText)
     }
 
     @Test
@@ -414,7 +420,8 @@ class CtaViewModelTest {
         )
 
         assertTrue(value is DaxDialogCta.DaxMainNetworkCta)
-        assertEquals(expectedCtaText, value.getDaxText(context))
+        val actualText = (value as DaxDialogCta.DaxMainNetworkCta).getDaxText(context)
+        assertEquals(expectedCtaText, actualText)
     }
 
     @Test
@@ -478,6 +485,25 @@ class CtaViewModelTest {
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
         assertTrue(value is DaxDialogCta.DaxNoSerpCta)
+    }
+
+    @Test
+    fun whenRefreshCtaWhileBrowsingAndNoAutoconsentThenReturnOtherCta() = runTest {
+        givenDaxOnboardingActive()
+        val site = site(url = "http://www.wikipedia.com")
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+
+        assertTrue(value is DaxDialogCta.DaxNoSerpCta)
+    }
+
+    @Test
+    fun whenRefreshCtaWhileBrowsingAndAutoconsentPresentThenReturnOtherCta() = runTest {
+        givenDaxOnboardingActive()
+        testee.enableAutoconsentCta()
+        val site = site(url = "http://www.wikipedia.com")
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+
+        assertTrue(value is DaxDialogCta.DaxAutoconsentCta)
     }
 
     @Test
