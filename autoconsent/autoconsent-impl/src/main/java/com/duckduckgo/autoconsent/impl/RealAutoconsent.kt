@@ -21,6 +21,7 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.AutoconsentInterface.Companion.AUTOCONSENT_INTERFACE
+import com.duckduckgo.autoconsent.impl.handlers.ReplyHandler
 import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -53,6 +54,19 @@ class RealAutoconsent @Inject constructor(
 
     override fun isSettingEnabled(): Boolean {
         return repository.userSetting
+    }
+
+    override fun setAutoconsentOptOut(webView: WebView) {
+        repository.userSetting = true
+        webView.evaluateJavascript("javascript:${ReplyHandler.constructReply("""{ "type": "optOut" }""")}", null)
+    }
+
+    override fun setAutoconsentOptIn() {
+        repository.userSetting = false
+    }
+
+    override fun firstPopUpHandled() {
+        repository.firstPopupHandled = true
     }
 
     private fun canBeInjected(): Boolean {

@@ -2282,6 +2282,7 @@ class BrowserTabViewModel @Inject constructor(
     suspend fun refreshCta(locale: Locale = Locale.getDefault()): Cta? {
         Timber.i("favoritesOnboarding: - refreshCta $showFavoritesOnboarding")
         if (currentGlobalLayoutState() is Browser) {
+            if (ctaViewState.value?.cta != null) return ctaViewState.value?.cta
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
                     dispatchers.io(),
@@ -2306,6 +2307,7 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             val cta = ctaViewState.value?.cta ?: return@launch
             ctaViewModel.registerDaxBubbleCtaDismissed(cta)
+            ctaViewState.value = currentCtaViewState().copy(cta = null)
         }
     }
 

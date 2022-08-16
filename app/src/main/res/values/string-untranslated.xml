@@ -25,4 +25,10 @@
     <!-- We won't have a translation for this, to be used later. -->
     <string name="trackersOverviewEmpty">No tracking requests were blocked from loading on this page. If a company\'s requests are loaded, it can allow them to profile you.</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Looks like this site has a cookie consent pop-up👇</string>
+    <string name="autoconsentDialogDescription">Want me to handle these for you? I can try to minimize cookies, maximize privacy, and hide pop-ups like these.</string>
+    <string name="autoconsentPrimaryCta">Manage Cookie Pop-ups</string>
+    <string name="autoconsentSecondaryCta">No Thanks</string>
+
 </resources>
