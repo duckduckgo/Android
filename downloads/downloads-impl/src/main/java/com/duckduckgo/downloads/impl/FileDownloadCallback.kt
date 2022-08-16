@@ -87,7 +87,8 @@ class FileDownloadCallback @Inject constructor(
     private val downloadsRepository: DownloadsRepository,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val mediaScanner: MediaScanner,
 ) : DownloadCallback, DownloadStateListener {
 
     private val command = Channel<DownloadCommand>(1, BufferOverflow.DROP_OLDEST)
@@ -120,6 +121,7 @@ class FileDownloadCallback @Inject constructor(
         )
         appCoroutineScope.launch(dispatchers.io()) {
             downloadsRepository.update(downloadId = downloadId, downloadStatus = FINISHED, contentLength = contentLength)
+            mediaScanner.scan(file)
             downloadsRepository.getDownloadItem(downloadId)?.let {
                 command.send(
                     DownloadCommand.ShowDownloadSuccessMessage(
@@ -142,6 +144,7 @@ class FileDownloadCallback @Inject constructor(
         )
         appCoroutineScope.launch(dispatchers.io()) {
             downloadsRepository.update(fileName = file.name, downloadStatus = FINISHED, contentLength = file.length())
+            mediaScanner.scan(file)
             command.send(
                 DownloadCommand.ShowDownloadSuccessMessage(
                     messageId = R.string.downloadsDownloadFinishedMessage,

@@ -57,6 +57,8 @@ class FileDownloadCallbackTest {
 
     private val mockFileDownloadNotificationManager: FileDownloadNotificationManager = mock()
 
+    private val mockMediaScanner: MediaScanner = mock()
+
     private lateinit var callback: FileDownloadCallback
 
     @Before
@@ -66,7 +68,8 @@ class FileDownloadCallbackTest {
             downloadsRepository = mockDownloadsRepository,
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
-            appCoroutineScope = TestScope()
+            appCoroutineScope = TestScope(),
+            mediaScanner = mockMediaScanner,
         )
     }
 
@@ -97,6 +100,7 @@ class FileDownloadCallbackTest {
         callback.onSuccess(item.downloadId, updatedContentLength, file, "type")
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
+        verify(mockMediaScanner).scan(file)
         verify(mockDownloadsRepository).update(
             downloadId = item.downloadId,
             downloadStatus = FINISHED,
@@ -121,6 +125,7 @@ class FileDownloadCallbackTest {
         callback.onSuccess(file = file, mimeType = mimeType)
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
+        verify(mockMediaScanner).scan(file)
         verify(mockDownloadsRepository).update(
             fileName = item.fileName,
             downloadStatus = FINISHED,
