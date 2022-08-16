@@ -19,35 +19,29 @@ package com.duckduckgo.autoconsent.impl.handlers
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.FakeRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.robolectric.Shadows
+import org.robolectric.Shadows.shadowOf
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class PopUpFoundMessageHandlerPluginTest {
-    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockCallback: AutoconsentCallback = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
     private val repository = FakeRepository()
 
-    private val popupFoundHandler = PopUpFoundMessageHandlerPlugin(coroutineRule.testScope, coroutineRule.testDispatcherProvider, repository)
+    private val popupFoundHandler = PopUpFoundMessageHandlerPlugin(repository)
 
     @Test
     fun whenProcessIfMessageTypeIsNotPopUpFoundThenDoNothing() {
         popupFoundHandler.process("noMatching", "", webView, mockCallback)
 
-        assertNull(Shadows.shadowOf(webView).lastEvaluatedJavascript)
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
     }
 
     @Test
@@ -56,7 +50,7 @@ class PopUpFoundMessageHandlerPluginTest {
 
         popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), "", webView, mockCallback)
 
-        assertNull(Shadows.shadowOf(webView).lastEvaluatedJavascript)
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
     }
 
     @Test
@@ -65,16 +59,7 @@ class PopUpFoundMessageHandlerPluginTest {
 
         popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), "", webView, mockCallback)
 
-        verify(mockCallback).onFirstPopUpHandled(any(), any())
-    }
-
-    @Test
-    fun whenProcessIfSettingDisabledThenFistPopupHandledSetToTrue() {
-        repository.userSetting = false
-
-        popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), "", webView, mockCallback)
-
-        assertTrue(repository.firstPopupHandled)
+        verify(mockCallback).onFirstPopUpHandled()
     }
 
 }

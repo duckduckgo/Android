@@ -17,7 +17,6 @@
 package com.duckduckgo.autoconsent.api
 
 import android.webkit.WebView
-import androidx.fragment.app.DialogFragment
 
 /** Public interface for the Autoconsent (CMP) feature */
 interface Autoconsent {
@@ -40,6 +39,21 @@ interface Autoconsent {
      * @return `true` if autoconsent was enabled by the user, `false` otherwise.
      */
     fun isSettingEnabled(): Boolean
+
+    /**
+     * This method sends and opt out message to autoconsent on the given [WebView] instance to set the opt out mode.
+     */
+    fun setAutoconsentOptOut(webView: WebView)
+
+    /**
+     * This method sets autoconsent to opt in mode.
+     */
+    fun setAutoconsentOptIn()
+
+    /**
+     * This method stores a value so autoconsent knows the first pop-up was already handled.
+     */
+    fun firstPopUpHandled()
 }
 
 /**
@@ -49,9 +63,8 @@ interface Autoconsent {
 interface AutoconsentCallback {
     /**
      * This method is called whenever a popup is handled for the first time.
-     * It passes a [DialogFragment] and a [String] to be used as a dialog tag.
      */
-    fun onFirstPopUpHandled(dialogFragment: DialogFragment, tag: String)
+    fun onFirstPopUpHandled()
 
     /**
      * This method is called whenever a popup is handled but not for the first time.
