@@ -21,12 +21,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.FakeRepository
-import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.robolectric.Shadows.shadowOf
 
 @RunWith(AndroidJUnit4::class)
 class PopUpFoundMessageHandlerPluginTest {
@@ -41,7 +40,7 @@ class PopUpFoundMessageHandlerPluginTest {
     fun whenProcessIfMessageTypeIsNotPopUpFoundThenDoNothing() {
         popupFoundHandler.process("noMatching", "", webView, mockCallback)
 
-        assertNull(shadowOf(webView).lastEvaluatedJavascript)
+        verify(mockCallback, never()).onFirstPopUpHandled()
     }
 
     @Test
@@ -50,16 +49,31 @@ class PopUpFoundMessageHandlerPluginTest {
 
         popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), "", webView, mockCallback)
 
-        assertNull(shadowOf(webView).lastEvaluatedJavascript)
+        verify(mockCallback, never()).onFirstPopUpHandled()
     }
 
     @Test
-    fun whenProcessIfSettingDisabledThenCallCallback() {
+    fun whenProcessIfSettingDisabledAndCmpIsNotTopThenCallCallback() {
         repository.userSetting = false
 
-        popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), "", webView, mockCallback)
+        popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), message("test"), webView, mockCallback)
 
         verify(mockCallback).onFirstPopUpHandled()
+    }
+
+    @Test
+    fun whenProcessIfSettingDisabledAndCmpIsTopThenDoNothing() {
+        repository.userSetting = false
+
+        popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), message("test-top"), webView, mockCallback)
+
+        verify(mockCallback, never()).onFirstPopUpHandled()
+    }
+
+    private fun message(cmp: String): String {
+        return """
+            {"type":"${popupFoundHandler.supportedTypes.first()}", "cmp": "$cmp", "url": "http://example.com"}
+        """.trimIndent()
     }
 
 }
