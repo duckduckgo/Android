@@ -38,7 +38,7 @@ class PopUpFoundMessageHandlerPlugin @Inject constructor(private val repository:
             if (supportedTypes.contains(messageType)) {
                 val message: PopUpFoundMessage = parseMessage(jsonString) ?: return
                 if (repository.userSetting) return
-                if (message.cmp.endsWith(IGNORE_CMP_SUFFIX)) return
+                if (message.cmp.endsWith(IGNORE_CMP_SUFFIX, ignoreCase = true)) return
 
                 autoconsentCallback.onFirstPopUpHandled()
             }
