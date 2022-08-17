@@ -8,12 +8,8 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: set pr number
-        run: echo "::set-env name=PR_NUMBER::$(echo -n "${GITHUB_REF}" | awk 'BEGIN { FS = "/" } ; { print $3 }')"
-      - uses: everphone-gmbh/github-asana-action
+      - uses: insurify/github-asana-action@v1.0.3
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          action: 'add-comment'
-          comment-id: "#pr:${{env.PR_NUMBER}}"
-          text: 'View Pull Request: https://github.com/everphone-gmbh/frontend-symfony/pull/${{env.PR_NUMBER}}'
-          is-pinned: true
+          task-comment: 'View Pull Request Here: '
+          trigger-phrase: "\\*\\*Asana Task:\\*\\*"
