@@ -1,16 +1,15 @@
+name: Add a comment
+
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, edited, labeled, unlabeled]
 
 jobs:
-  create-asana-attachment-job:
+  sync:
     runs-on: ubuntu-latest
-    name: Create pull request attachments on Asana tasks
     steps:
-      - name: Create pull request attachments
-        uses: Asana/create-app-attachment-github-action@latest
-        id: postAttachment
+      - uses: aitorvs/github-asana-action@v0.1.1
         with:
-          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
-      - name: Log output status
-        run: echo "Status is ${{ steps.postAttachment.outputs.status }}"
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          task-comment: 'View Pull Request Here: '
+          trigger-phrase: "Task/Issue URL:"
