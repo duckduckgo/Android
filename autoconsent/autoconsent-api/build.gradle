@@ -26,3 +26,6 @@ dependencies {
     implementation AndroidX.appCompat
 }
 
+android {
+    namespace 'com.duckduckgo.autoconsent.api'
+}
