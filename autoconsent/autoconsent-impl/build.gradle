@@ -47,6 +47,8 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
     implementation Google.dagger
     implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.lifecycle.runtimeKtx
 
     // Testing dependencies
     testImplementation project(path: ':common-test')

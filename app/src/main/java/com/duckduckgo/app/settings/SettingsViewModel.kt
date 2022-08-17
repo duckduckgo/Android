@@ -36,6 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -80,6 +81,7 @@ class SettingsViewModel @Inject constructor(
     private val macOsWaitlist: MacOsWaitlist,
     private val autofillStore: AutofillStore,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val autoconsent: Autoconsent,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -100,7 +102,8 @@ class SettingsViewModel @Inject constructor(
         val appTrackingProtectionEnabled: Boolean = false,
         val emailAddress: String? = null,
         val macOsWaitlistState: MacWaitlistState = MacWaitlistState.NotJoinedQueue,
-        val showAutofill: Boolean = false
+        val showAutofill: Boolean = false,
+        val autoconsentEnabled: Boolean = false,
     )
 
     data class AutomaticallyClearData(
@@ -124,6 +127,7 @@ class SettingsViewModel @Inject constructor(
         data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
         data class LaunchAppLinkSettings(val appLinksSettingType: AppLinkSettingType) : Command()
         object LaunchGlobalPrivacyControl : Command()
+        object LaunchAutoconsent : Command()
         object LaunchAppTPTrackersScreen : Command()
         object LaunchAppTPWaitlist : Command()
         object LaunchAppTPOnboarding : Command()
@@ -167,7 +171,8 @@ class SettingsViewModel @Inject constructor(
                     appTrackingProtectionWaitlistState = atpRepository.getState(),
                     emailAddress = emailManager.getEmailAddress(),
                     macOsWaitlistState = macOsWaitlist.getWaitlistState(),
-                    showAutofill = autofillStore.autofillAvailable
+                    showAutofill = autofillStore.autofillAvailable,
+                    autoconsentEnabled = autoconsent.isSettingEnabled(),
                 )
             )
         }
@@ -256,6 +261,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onGlobalPrivacyControlClicked() {
         viewModelScope.launch { command.send(Command.LaunchGlobalPrivacyControl) }
+    }
+
+    fun onAutoconsentClicked() {
+        viewModelScope.launch { command.send(Command.LaunchAutoconsent) }
     }
 
     fun onEmailProtectionSettingClicked() {
