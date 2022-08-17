@@ -2,28 +2,16 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "dd32606785fee8e61d0403857e9fc881",
+    "identityHash": "4d831db12e9b0c1a6ff120a7b93e8a24",
     "entities": [
       {
         "tableName": "site_permissions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `askCameraEnabled` INTEGER NOT NULL, `askMicEnabled` INTEGER NOT NULL, `askCameraSetting` TEXT NOT NULL, `askMicSetting` TEXT NOT NULL, PRIMARY KEY(`domain`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `askCameraSetting` TEXT NOT NULL, `askMicSetting` TEXT NOT NULL, PRIMARY KEY(`domain`))",
         "fields": [
           {
             "fieldPath": "domain",
             "columnName": "domain",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "askCameraEnabled",
-            "columnName": "askCameraEnabled",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "askMicEnabled",
-            "columnName": "askMicEnabled",
-            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -96,7 +84,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dd32606785fee8e61d0403857e9fc881')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4d831db12e9b0c1a6ff120a7b93e8a24')"
     ]
   }
 }
