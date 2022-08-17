@@ -60,6 +60,7 @@ import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.macos_api.MacWaitlistState.*
@@ -156,6 +157,7 @@ class SettingsActivity :
 
         with(viewsPrivacy) {
             globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
+            autoconsentSetting.setOnClickListener { viewModel.onAutoconsentClicked() }
             fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
             locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
             automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
@@ -215,6 +217,7 @@ class SettingsActivity :
                     updateDefaultBrowserViewVisibility(it)
                     updateAutomaticClearDataOptions(it.automaticallyClearData)
                     setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
+                    setAutoconsentSetting(it.autoconsentEnabled)
                     viewsGeneral.changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
@@ -252,6 +255,15 @@ class SettingsActivity :
             getString(R.string.disabled)
         }
         viewsPrivacy.globalPrivacyControlSetting.setSubtitle(stateText)
+    }
+
+    private fun setAutoconsentSetting(enabled: Boolean) {
+        val stateText = if (enabled) {
+            getString(R.string.enabled)
+        } else {
+            getString(R.string.disabled)
+        }
+        viewsPrivacy.autoconsentSetting.setSubtitle(stateText)
     }
 
     private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
@@ -327,6 +339,7 @@ class SettingsActivity :
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
             is Command.LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is Command.LaunchMacOs -> launchMacOsScreen()
+            is Command.LaunchAutoconsent -> launchAutoconsent()
             null -> TODO()
         }
     }
@@ -441,6 +454,11 @@ class SettingsActivity :
     private fun launchMacOsScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(MacOsWaitlistActivity.intent(this), options)
+    }
+
+    private fun launchAutoconsent() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(AutoconsentSettingsActivity.intent(this), options)
     }
 
     private fun launchAppTPTrackersScreen() {

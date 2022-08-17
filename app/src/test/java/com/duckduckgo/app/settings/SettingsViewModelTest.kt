@@ -34,6 +34,7 @@ import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.macos_api.MacOsWaitlist
@@ -111,6 +112,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
+    @Mock
+    private lateinit var autoconsent: Autoconsent
+
     private lateinit var appTrackingProtectionWaitlistDataStore: FakeAppTrackingProtectionWaitlistDataStore
 
     @get:Rule
@@ -149,6 +153,7 @@ class SettingsViewModelTest {
             mockMacOsWaitlist,
             autofillStore,
             vpnFeaturesRegistry,
+            autoconsent,
         )
     }
 
@@ -649,6 +654,37 @@ class SettingsViewModelTest {
 
         testee.viewState().test {
             assertFalse(awaitItem().showAutofill)
+        }
+    }
+
+    @Test
+    fun whenOnAutoconsentClickedThenEmitCommandLaunchAutoconsent() = runTest {
+        testee.commands().test {
+            testee.onAutoconsentClicked()
+
+            assertEquals(Command.LaunchAutoconsent, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAutoconsentEnabledThenAutoconsentEnabledIsTrue() = runTest {
+        whenever(autoconsent.isSettingEnabled()).thenReturn(true)
+        testee.start()
+
+        testee.viewState().test {
+            assertTrue(awaitItem().autoconsentEnabled)
+        }
+    }
+
+    @Test
+    fun whenAutoconsentDisabledThenAutoconsentEnabledIsFalse() = runTest {
+        whenever(autoconsent.isSettingEnabled()).thenReturn(false)
+        testee.start()
+
+        testee.viewState().test {
+            assertFalse(awaitItem().autoconsentEnabled)
         }
     }
 

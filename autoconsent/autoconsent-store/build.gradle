@@ -22,3 +22,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 }
+
+android {
+    namespace 'com.duckduckgo.autoconsent.store'
+}
