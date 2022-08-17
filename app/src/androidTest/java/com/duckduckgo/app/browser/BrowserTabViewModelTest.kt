@@ -2150,11 +2150,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaIfCtaAlreadyExistedThenReturnThatCta() = runTest {
-        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+    fun whenRefreshCtaIfCtaAlreadyShownForCurrentPageThenReturnNull() = runTest {
+        setBrowserShowing(isBrowsing = true)
+        testee.hasCtaBeenShownForCurrentPage.set(true)
 
-        assertEquals(cta, testee.refreshCta())
+        assertNull(testee.refreshCta())
     }
 
     @Test
@@ -2191,6 +2191,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSurveyCtaDismissedAndNoOtherCtaPossibleCtaIsNull() = runTest {
+        setBrowserShowing(isBrowsing = false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
 
         givenShownCtas(CtaId.DAX_INTRO, CtaId.DAX_END)
@@ -2201,6 +2202,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSurveyCtaDismissedAndWidgetCtaIsPossibleThenNextCtaIsWidget() = runTest {
+        setBrowserShowing(isBrowsing = false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
@@ -3800,6 +3802,13 @@ class BrowserTabViewModelTest {
         loadUrl(url = "www.example.com", isBrowserShowing = true)
         verify(mockAppLinksHandler).updatePreviousUrl("www.example.com")
         verify(mockAppLinksHandler).setUserQueryState(false)
+    }
+
+    @Test
+    fun whenPageChangedThenSetCtaBeenShownForCurrentPageToFalse() {
+        testee.hasCtaBeenShownForCurrentPage.set(true)
+        loadUrl(url = "www.example.com", isBrowserShowing = true)
+        assertFalse(testee.hasCtaBeenShownForCurrentPage.get())
     }
 
     @Test
