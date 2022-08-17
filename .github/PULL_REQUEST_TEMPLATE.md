@@ -8,7 +8,7 @@ If your PR involves UI changes:
 If your PR does not involve UI changes, you can remove the **UI changes** section
 -->
 
-Task/Issue URL: 
+Task URL: 
 
 ### Description
 
