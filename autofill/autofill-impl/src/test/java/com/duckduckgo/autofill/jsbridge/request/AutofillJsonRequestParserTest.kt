@@ -18,10 +18,12 @@ package com.duckduckgo.autofill.jsbridge.request
 
 import com.duckduckgo.app.FileUtilities
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class AutofillJsonRequestParserTest {
 
     private val moshi = Moshi.Builder().build()
@@ -30,43 +32,51 @@ class AutofillJsonRequestParserTest {
     @Test
     fun whenUsernameAndPasswordBothProvidedThenBothInResponse() = runTest {
         val parsed = "storeFormData_usernameAndPasswordProvided".parseStoreFormDataJson()
-        assertEquals("dax@duck.com", parsed.credentials.username)
-        assertEquals("123456", parsed.credentials.password)
+        assertEquals("dax@duck.com", parsed.credentials!!.username)
+        assertEquals("123456", parsed.credentials!!.password)
     }
 
     @Test
     fun whenUsernameAndPasswordBothMissingThenBothAreNull() = runTest {
         val parsed = "storeFormData_usernameAndPasswordMissing".parseStoreFormDataJson()
-        assertNull(parsed.credentials.username)
-        assertNull(parsed.credentials.password)
+        assertNull(parsed.credentials!!.username)
+        assertNull(parsed.credentials!!.password)
     }
 
     @Test
     fun whenUsernameAndPasswordBothNullThenBothAreNullInParsedObject() = runTest {
         val parsed = "storeFormData_usernameAndPasswordNull".parseStoreFormDataJson()
-        assertNull(parsed.credentials.username)
-        assertNull(parsed.credentials.password)
+        assertNull(parsed.credentials!!.username)
+        assertNull(parsed.credentials!!.password)
     }
 
     @Test
     fun whenAdditionalUnknownPropertiesInRequestThenStillParses() = runTest {
         val parsed = "storeFormData_additionalUnknownPropertiesIncluded".parseStoreFormDataJson()
-        assertEquals("dax@duck.com", parsed.credentials.username)
-        assertEquals("123456", parsed.credentials.password)
+        assertEquals("dax@duck.com", parsed.credentials!!.username)
+        assertEquals("123456", parsed.credentials!!.password)
     }
 
     @Test
     fun whenUsernameMissingThenPasswordPopulated() = runTest {
         val parsed = "storeFormData_usernameMissing".parseStoreFormDataJson()
-        assertNull(parsed.credentials.username)
-        assertEquals("123456", parsed.credentials.password)
+        assertNull(parsed.credentials!!.username)
+        assertEquals("123456", parsed.credentials!!.password)
     }
 
     @Test
     fun whenPasswordMissingThenUsernamePopulated() = runTest {
         val parsed = "storeFormData_passwordMissing".parseStoreFormDataJson()
-        assertEquals("dax@duck.com", parsed.credentials.username)
-        assertNull(parsed.credentials.password)
+        assertEquals("dax@duck.com", parsed.credentials!!.username)
+        assertNull(parsed.credentials!!.password)
+    }
+
+    @Test
+    fun whenTopLevelCredentialsObjectMissingThenParsesWithoutError() = runTest {
+        val parsed = "storeFormData_topLevelDataMissing".parseStoreFormDataJson()
+        assertNull(parsed.credentials)
+        assertNull(parsed.credentials!!.username)
+        assertNull(parsed.credentials!!.password)
     }
 
     private suspend fun String.parseStoreFormDataJson(): AutofillStoreFormDataRequest {
@@ -77,7 +87,7 @@ class AutofillJsonRequestParserTest {
 
     private fun String.loadJsonFile(): String {
         return FileUtilities.loadText(
-            AutofillJsonRequestParserTest::class.java.classLoader,
+            AutofillJsonRequestParserTest::class.java.classLoader!!,
             "json/$this.json"
         )
     }

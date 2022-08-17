@@ -29,6 +29,7 @@ import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
+import com.duckduckgo.autofill.jsbridge.request.AutofillStoreFormDataRequest
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputMainType.CREDENTIALS
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.USERNAME
@@ -190,20 +191,25 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
             val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
             val title = autofillDomainFormatter.extractDomain(currentUrl)
 
-            val request = requestParser.parseStoreFormDataRequest(data).credentials
+            val request = requestParser.parseStoreFormDataRequest(data)
 
-            if (request.username.isNullOrBlank() && request.password.isNullOrBlank()) {
-                Timber.w("Invalid data from storeFormData; username and password can't both be blank")
+            if (!request.isValid()) {
+                Timber.w("Invalid data from storeFormData")
                 return@launch
             }
 
-            val jsCredentials = JavascriptCredentials(request.username, request.password)
+            val jsCredentials = JavascriptCredentials(request.credentials!!.username, request.credentials.password)
             val credentials = jsCredentials.asLoginCredentials(currentUrl, title)
 
             withContext(dispatcherProvider.main()) {
                 callback?.onCredentialsAvailableToSave(currentUrl, credentials)
             }
         }
+    }
+
+    private fun AutofillStoreFormDataRequest?.isValid(): Boolean {
+        if (this == null || credentials == null) return false
+        return !(credentials.username.isNullOrBlank() && credentials.password.isNullOrBlank())
     }
 
     override fun injectCredentials(credentials: LoginCredentials) {
