@@ -31,4 +31,6 @@
     <string name="autoconsentPrimaryCta">Manage Cookie Pop-ups</string>
     <string name="autoconsentSecondaryCta">No Thanks</string>
 
+    <string name="autoconsentSetting">Manage Cookie Pop-ups</string>
+
 </resources>

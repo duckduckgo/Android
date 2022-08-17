@@ -16,5 +16,12 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duckduckgo.autoconsent.impl">
-
+    <application android:supportsRtl="true">
+        <activity
+            android:name=".ui.AutoconsentSettingsActivity"
+            android:exported="false"
+            android:label="@string/autoconsentTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:screenOrientation="portrait" />
+    </application>
 </manifest>
