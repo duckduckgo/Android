@@ -1630,7 +1630,12 @@ class BrowserTabFragment :
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
     }
 
-    private suspend fun showAuthenticationSavedOrUpdatedSnackbar(loginCredentials: LoginCredentials, @StringRes messageResourceId: Int) {
+    private suspend fun showAuthenticationSavedOrUpdatedSnackbar(
+        loginCredentials: LoginCredentials,
+        @StringRes messageResourceId: Int,
+        delay: Long = 200
+    ) {
+        delay(delay)
         withContext(Dispatchers.Main) {
             browserLayout.makeSnackbarWithNoBottomInset(messageResourceId, Snackbar.LENGTH_LONG)
                 .setAction(R.string.autofillSnackbarAction) {
