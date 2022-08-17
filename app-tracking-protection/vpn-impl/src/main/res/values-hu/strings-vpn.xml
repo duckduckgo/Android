@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="atp_name">Alkalmazáskövetés elleni védelem</string>
+    <string name="refresh">Frissítés</string>
+
+    <!-- Debug Screens -->
+    <string name="atp_DiagnosticsMenuLabel">Diagnosztika</string>
+    <string name="atp_DataMenuLabel">Adatstatisztikák</string>
+    <string name="atp_MeteredConnection">"Mért: %1$s"</string>
+    <string name="atp_ConnectionStatus">"VPN csatlakoztatva: %1$s"</string>
+    <string name="atp_NetworkAvailable">"Internethez csatlakoztatva: %1$s"</string>
+    <string name="atp_DnsServers">"Aktív hálózati DNS: %1$s"</string>
+    <string name="atp_AppExitsReasonsTitle">Az alkalmazásból való kilépés okai</string>
+    <string name="atp_AppRestartsTitle">Az alkalmazás újraindul</string>
+
+    <!-- Diagnostics -->
+    <string name="vpnTimeRunning">Futási idő: %1$s</string>
+    <string name="vpnTrackerCompaniesBlockedToday">A mai napon letiltott nyomkövető cégek: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek">Ezen a héten letiltott nyomkövető cégek: %1$d</string>
+    <string name="vpnTrackerCompaniesNone">"Még egyetlen nyomkövető cég sem lett letiltva"</string>
+    <string name="vpnTrackersBlockedToday">A mai napon letiltott nyomkövetők: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek">A héten letiltott nyomkövetők: %1$d</string>
+    <string name="vpnTrackersNone">"Még nincsenek letiltott nyomkövetők"</string>
+    <string name="vpnNotRunYet">"A VPN még nem futott"</string>
+    <string name="vpnDataTransferred">"%1$1s\n%2$2s csomag"</string>
+
+    <!-- App Tracking Protection Ongoing Notification -->
+    <string name="atp_ReportIssue">Problémáid vannak egy alkalmazással?</string>
+    <string name="atp_OnInitialNotification">"Az alkalmazáskövetés elleni védelem be van kapcsolva, és letiltja a követési kísérleteket az alkalmazásokban"</string>
+    <string name="atp_OnNoTrackersNotificationHeader">"Nyomkövető tevékenység keresése… bíp… búp"</string>
+    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ Nyomkövetési kísérletek blokkolva <b>%1$d alkalmazásban</b> (az elmúlt egy órában).]]></item>
+        <item quantity="other"><![CDATA[ Nyomkövetési kísérletek blokkolva <b>%1$d alkalmazásban</b> (az elmúlt egy órában).]]></item>
+    </plurals>
+    <string name="atp_DisabledNotification">Az alkalmazáskövetés elleni védelem ki van kapcsolva. Koppints a nyomkövetési kísérletek blokkolásának folytatásához.</string>
+    <string name="atp_RevokedNotification">A készülékeden lévő VPN alkalmazás letiltotta az alkalmazáskövetés elleni védelmet. Koppints az újbóli engedélyezéshez.</string>
+
+    <!-- App Tracking Protection Daily Notification -->
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet</b> blokkolt (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt 1 alkalmazásban, %2$s</b> (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt</b> (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt %2$d alkalmazásban, beleértve a(z) %3$s alkalmazást is</b> (az elmúlt egy napban).]]></string>
+
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[A(z) %1$s megpróbált követni téged <b>%2$d alkalmazásban</b> (az elmúlt egy napban). <b>Továbbiak megjelenítése</b>]]></item>
+        <item quantity="other"><![CDATA[A(z) %1$s megpróbált követni téged <b>%2$d alkalmazásban</b> (az elmúlt egy napban). <b>Továbbiak megjelenítése</b>]]></item>
+    </plurals>
+
+     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a legtöbb követési kísérletet a(z) <b>%1$s</b> alkalmazásban (az elmúlt egy napban).]]></item>
+        <item quantity="other"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a legtöbb követési kísérletet a(z) <b>%1$s</b> és a(z) <b>%2$s</b> alkalmazásban (az elmúlt egy napban).]]></item>
+    </plurals>
+
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalommal a(z) %3$s</b> alkalmazásban (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalommal a(z) %3$s és egy másik alkalmazásban</b> (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalommal a(z) %3$s és %4$d másik alkalmazásban</b> (az elmúlt egy napban).]]></string>
+
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalommal a(z) %3$s alkalmazásban</b> (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalommal a(z) %3$s és egy másik alkalmazásban</b> (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalommal a(z) %3$s és %4$d másik alkalmazásban</b> (az elmúlt egy napban).]]></string>
+
+    <!-- App Tracking Protection Weekly Notification -->
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet itt:%2$s</b> (az elmúlt héten).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet a(z) %2$s és egy másik alkalmazásban</b> (az elmúlt héten).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet a(z) %2$s és egy %3$d másik alkalmazásban</b> (az elmúlt héten).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet %2$s</b> (az elmúlt héten).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet a(z) %2$s és egy másik alkalmazásban</b> (az elmúlt héten).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet a(z) %2$s és egy %3$d másik alkalmazásban</b> (az elmúlt héten).]]></string>
+
+     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét egy %2$d alkalmazásban: %3$s</b> (az elmúlt héten).]]></item>
+        <item quantity="other"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalmazásban, köztük itt: %3$s</b> (az elmúlt héten).]]></item>
+    </plurals>
+
+    <string name="atp_EnableCTA">Alkalmazáskövetés elleni védelem bekapcsolása</string>
+
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet itt: %2$s </b> (az elmúlt egy órában).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérlet a(z) %2$s és egy másik alkalmazásban</b> (az elmúlt egy órában).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérlet a(z) %2$s és %3$d másik alkalmazásban</b> (az elmúlt egy órában).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet a(z) %2$s alkalmazásban</b> (az elmúlt egy órában).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérlet a(z) %2$s és egy másik alkalmazásban</b> (az elmúlt egy órában).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérlet a(z) %2$s és %3$d másik alkalmazásban</b> (az elmúlt egy órában).]]></string>
+
+    <!-- App Tracking Protection Privacy Report -->
+    <string name="atp_PrivacyReportEnabledTooltip">Az alkalmazáskövetés elleni védelem be van kapcsolva, és blokkolja a nyomkövetőket a készülékeden</string>
+
+    <!-- App Tracking Protection Onboarding -->
+    <string name="atp_OnboardingLogoDescription">Alkalmazáskövetés elleni védelem bekapcsolása</string>
+    <string name="atp_OnboardingLastPageOneTitle">Egy egyszerű lépés az alkalmazások jobb védelme érdekében!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Azt találtuk, hogy a <b>népszerű ingyenes alkalmazások több mint 96\u0025-a</b> lehetővé teszi más cégeknek, hogy nyomon kövessék a személyes adataid még alvás közben is.\n\nNézd meg, hogy mely alkalmazások <b>segítségével követhetnek más cégek,</b> és vedd vissza az irányítást!</string>
+    <string name="atp_OnboardingLastPageTwoTitle">Hogyan működik?</string>
+    <string name="atp_OnboardingLastPageTwoSubTitle">Az alkalmazáskövetés elleni védelem <b>észleli és blokkolja más cégek alkalmazáskövetőit,</b> például amikor a Facebook megpróbál nyomon követni egy egészségügyi alkalmazásban.\n\n<b>Ingyenes</b>, és az alkalmazásokat a szokásos módon használhatod. A háttérben dolgozva <b>véd meg éjjel és nappal.</b></string>
+    <string name="atp_OnboardingLastPageThreeTitle">Ki látja az adataidat?</string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Az alkalmazáskövetés elleni védelem nem VPN.</b> A készüléked azonban ekként ismeri fel. Ez azért van, mert a működéshez helyi VPN-kapcsolatot használ.\n\nAz alkalmazáskövetés elleni védelem más.<b> Soha nem irányítja át az alkalmazásadatokat külső szerveren keresztül. </b><annotation type="learn_more_link">További információk</annotation></string>
+    <string name="atp_FAQCta">Alkalmazáskövetés elleni védelem GYIK</string>
+    <string name="atp_OnboardingContinue">Folytatás</string>
+    <string name="atp_OnboardingMaybeLater">Talán később</string>
+
+    <!-- App Tracking Protection Dax Onboarding -->
+    <string name="atp_daxOnboardingIntroTitle">Alkalmazáskövetés elleni védelem</string>
+    <string name="atp_daxOnboardingIntroMessage">A népszerű ingyenes alkalmazások több mint 96\u0025-a lehetővé teszi más cégeknek, hogy nyomon kövessenek, még akkor is, ha éppen nem használod a telefont. Az alkalmazáskövetés elleni védelem felismeri és blokkolja ezeket a követési kísérleteket.</string>
+    <string name="atp_daxOnboardingPermissionTitle">Hogyan működik?</string>
+    <string name="atp_daxOnboardingPermissionMessage">Az alkalmazáskövetés elleni védelem nem VPN. Az eszköz azonban ekként ismeri fel. Ez azért van, mert a működéshez helyi VPN-kapcsolatot használ. Soha nem irányítja át az alkalmazásadatokat külső szerveren keresztül. <annotation type="learn_more_link">További információ</annotation></string>
+
+    <!--  App Tracking Protection Enabled Activity -->
+    <string name="atp_EnabledTitle">Hurrá! Minden készen áll.</string>
+    <string name="atp_EnabledMessage">Az alkalmazáskövetés elleni védelem <b>valós idejű listát mutat a készülékeden lévő alkalmazásokról</b>, amelyekről kiderítettük, hogy megpróbálnak követni.</string>
+    <string name="atp_EnabledActivityCTA">Nézd meg az alkalmazáskövetési összefoglalót</string>
+    <string name="atp_EnabledSettings">Az alkalmazáskövetés elleni védelem a <annotation type="settings_link">Beállításokban</annotation> érhető el.</string>
+
+    <!-- New Tab Integration -->
+    <string name="atp_NewTabDisabled"><b>Az alkalmazáskövetés elleni védelem ki van kapcsolva.</b>\nKoppints, ha folytatni szeretnéd a követési kísérletek blokkolását az alkalmazásokban.</string>
+    <string name="atp_NewTabRevoked"><b>A készülékeden lévő VPN alkalmazás kikapcsolta az alkalmazáskövetés elleni védelmet.</b>\nKoppints az újbóli engedélyezéshez.</string>
+    <string name="atp_NewTabEnabled"><b>Az alkalmazáskövetés elleni védelem be van kapcsolva</b> és blokkolja a követési kísérleteket az alkalmazásokban.</string>
+
+    <!-- Exclusion List -->
+    <string name="atp_ExclusionListActivityTitle">Minden alkalmazás</string>
+    <string name="atp_ExcludedAppsFeature">Az alkalmazáskövetés elleni védelem felismeri és blokkolja más cégek alkalmazáskövetőit, például amikor a Facebook megpróbál nyomon követni egy egészségügyi alkalmazásban. A cégek továbbra is követhetnek a saját alkalmazásaikban.\n\nHa egy alkalmazás nem a várt módon működik, próbáld meg kikapcsolni a védelmet az adott alkalmazásnál.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">A bétaverzióban a DuckDuckGo kikapcsolhatja a védelmet egyes alkalmazásoknál az ismert tartalombetöltési problémák megoldása érdekében. Az egyéni beállításaid csak akkor változnak, ha visszaállítod az alapértelmezett beállításokat.</string>
+    <string name="atp_ExcludedAppsDisabledLabel"><b>Az alkalmazáskövetés elleni védelem ki van kapcsolva</b> Okozott problémát az alkalmazáskövetés elleni védelem az alkalmazásaidban? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
+    <string name="atp_ExcludedAppsReport">Másik alkalmazással kapcsolatos probléma jelentése</string>
+    <string name="atp_ExcludedReasonLoadsWebsites">Webhelyek betöltése</string>
+    <string name="atp_ExcludedReasonKnownIssues">Ismert problémák</string>
+    <string name="atp_ExcludedReasonManuallyDisabled">Manuálisan kikapcsolva</string>
+    <string name="atp_ExcludedReasonManuallyEnabled">Manuálisan bekapcsolva</string>
+    <string name="atp_ExcludeAppsManuallyCTACancel">Mégsem</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnable">Engedélyezés</string>
+    <string name="atp_ExcludeAppsManuallyCTARestore">Visszaállítás</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName">Manuálisan bekapcsolod a védelmet a(z) %1$s alkalmazás számára?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Ebben az alkalmazásban köztudottan problémák lépnek fel, ha a követési kísérletek sikertelenek.</string>
+    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Előfordulhat, hogy az alkalmazásban lévő webhelytartalom nem jelenik meg megfelelően, ha a védelem be van kapcsolva.</string>
+    <string name="atp_ExcludeAppsManuallyEnableFooter">A védelem bekapcsolása elküldi az alkalmazás nevét a DuckDuckGo részére.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppName">Adatvédelem letiltva</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Ha kikapcsolod a védelmet egy probléma kijavításához, ellenőrizd, hogy az alkalmazás most működik-e, mielőtt jelentenéd a problémát a DuckDuckGónak.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Leállt az elvárt módon történő működés</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Elfogadom, hogy nyomon követnek ebben az alkalmazásban</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Más okból</string>
+    <string name="atp_ExcludeAppsManuallyCTAReport">Jelentés</string>
+    <string name="atp_ExcludeAppsManuallyCTASkip">Kihagyás</string>
+    <string name="atp_ExcludeAppsManuallyMenuRestore">Az alapértelmezett védett alkalmazások visszaállítása</string>
+    <string name="atp_ExcludeAppsManuallyMenuReport">Alkalmazással kapcsolatos probléma bejelentése</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsTitle">Visszaállítod az alapértelmezett védelmet?</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsMessage">Az egyéni védelmi beállításaid frissülnek a legújabb alapértelmezett védelemre. A védelmi beállításokat később bármikor módosíthatod.</string>
+    <string name="atp_ExcludeAppsRestoreDefaultSnackbar">A védelem visszaállt az alapértelmezett beállításokra</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsDisclaimer">A védelem bekapcsolása elküldi az alkalmazás nevét a DuckDuckGo részére.</string>
+
+    <!--  Breakage report app list  -->
+    <string name="atp_ReportBreakageAppListActivityTitle">Probléma jelentése</string>
+    <string name="atp_ReportBreakageAppFeature"><b>Válaszd ki a problémás alkalmazást</b>. A visszajelzésed segít bennünket a fejlődésben!\n\nÁltalános visszajelzésed van az alkalmazáskövetés elleni védelemmel kapcsolatban? Akkor inkább használd <annotation type="use_this_form_link">ezt az űrlapot</annotation>.</string>
+    <string name="atp_ReportBreakageAppEntry">%1$s alkalmazás</string>
+    <string name="atp_ReportBreakageAppSubmitCta">Elküldés</string>
+    <string name="atp_ReportBreakageAppNextCta">Következő</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Írd le, mi történik, mire számítottál, és milyen lépések vezettek a problémához.</string>
+    <string name="atp_ReportBreakageFormInputHint">Mondj el többet a tapasztalt problémáról</string>
+    <string name="atp_ReportBreakageFormCheckboxText">A „Beküldés” gombra kattintva elfogadom, hogy a DuckDuckGo felhasználja a jelentésben szereplő információkat az alkalmazáskövetés elleni védelem javítása céljából.
+    </string>
+    <string name="atp_ReportBreakageFormDisclaimerText">
+        <![CDATA[Az ezen űrlapon megadott adatokon kívül az alkalmazással kapcsolatos problémajelentésed tartalmazza a következőket:<br/>• Az alkalmazáscsomag neve<br/>• Az alkalmazásban blokkolt nyomkövetők listája<br/>• Az alkalmazás nyomkövetés elleni védelem be van-e kapcsolva<br/>• A DuckDuckGo összesített alkalmazásdiagnosztikája<br/>]]>
+    </string>
+    <string name="atp_ReportBreakageSent">Jelentés elküldve, köszönjük! A visszajelzésed segítenek nekünk, hogy mindenki számára javítsuk az alkalmazáskövetés elleni védelmet.</string>
+    <string name="atp_ThanksForTheFeedback">Köszönjük a visszajelzést!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">Mi történik?</string>
+    <string name="atp_ReportBreakageCategoriesHint">Mi történik?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">Az alkalmazás lefagy vagy összeomlik</string>
+    <string name="atp_ReportBreakageCategoryMessages">Az üzenet kézbesítése sikertelen</string>
+    <string name="atp_ReportBreakageCategoryCalls">A hanghívások nem működnek</string>
+    <string name="atp_ReportBreakageCategoryUploads">Nem lehet fájlokat feltölteni vagy megosztani</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Nem lehet fájlokat letölteni</string>
+    <string name="atp_ReportBreakageCategoryContent">A tartalom lassan töltődik be</string>
+    <string name="atp_ReportBreakageCategoryConnection">Az alkalmazásnak nincs kapcsolata</string>
+    <string name="atp_ReportBreakageCategoryIot">Nem lehet csatlakoztatni a helyi eszközt</string>
+    <string name="atp_ReportBreakageCategoryOther">Valami más</string>
+
+    <!--  Tracker Profiling Info -->
+    <string name="atp_ProfilingActivityTitle">Az alkalmazáskövetőkről</string>
+    <string name="atp_ProfilingInfoTitle">Mik az alkalmazáskövetők?</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Valószínűleg hallottál már arról, hogy olyan cégek, mint a Google és a Facebook a háttérben, harmadik felek weboldalain követnek téged. De tudtad, hogy a személyes adataidat is nyomon követik a készülékeden lévő alkalmazásokon keresztül?\n\n<b>Leteszteltünk 100 népszerű ingyenes androidos alkalmazást, és több mint 96\u0025-uk</b> tartalmazott rejtett, harmadik féltől származó nyomkövetőket. Ezek 87\u0025-a küldött adatokat a Google-nak és 68\u0025-a a Facebooknak. Ez akkor is megtörténik, ha éppen nem használod a készüléket.\n\n<b>Az alkalmazásokban lévő nyomkövetők sokkal több információhoz férhetnek hozzá,</b> mint a webhelykövető társaik, például a tartózkodási helyedhez, akár az épület emeletének megállapításával, vagy ahhoz, hogy a munkahelyeden milyen gyakran játszol, és naponta mikor, mennyi ideig alszol. <b>Még ha például nincs is Google- vagy Facebook-fiókod, akkor is gyűjthetnek rólad adatokat az alkalmazásaidon keresztül.</b>\n\nAz nyomkövető hálózatok, mint a Facebook és a Google, ezeket az apró információmorzsákat <b>arra használják, hogy digitális profilt készítsenek rólad.</b> Ezzel a nyomkövető hálózatok manipulálhatják, hogy mit látsz az interneten, és lehetővé teszik a hirdetők számára, hogy az adataid alapján árajánlatot tegyenek az elérésedre.\n\nAz alkalmazásokban lévő nyomkövetők NAGY problémát jelentenek az adatvédelem szempontjából. <b>De a DuckDuckGónak van egy megoldása, amely segíthet.</b>\n\nHa a DuckDuckGo Privacy Browser alkalmazásban engedélyezve van, akkor az alkalmazáskövetés elleni védelem számos nyomkövetőt blokkol a készülékeden lévő alkalmazásokban, miközben DuckDuckGo alkalmazás blokkolja a weboldalakon található nyomkövetőket, amikor böngészel. <b>Ez a kettős védelemmel a nyomkövető cégek összességében kevesebbet fognak tudni rólad</b>, így nagyobb nyugalommal használhatod az alkalmazásokat, tudva, hogy nagyobb védelemben részesülsz.</string>
+
+    <!--  App Tracking Protection Activity -->
+    <string name="atp_ActivityPastWeek">Az elmúlt 7 nap</string>
+    <string name="atp_ActivityTitle">Alkalmazáskövetés elleni védelem</string>
+    <string name="atp_MostRecentActivityTitle">Minden legutóbbi tevékenység</string>
+    <string name="atp_ActivityRecentActivity">Legutóbbi tevékenység</string>
+    <string name="atp_ActivityCtaShowAll">Minden legutóbbi tevékenység megtekintése</string>
+    <string name="atp_ActivityAppTrackersFAQ">Mik az alkalmazáskövetők?</string>
+    <string name="atp_ActivityReportProblem">Alkalmazással kapcsolatos probléma bejelentése</string>
+    <string name="atp_ActivityBetaInstructions">Béta utasítások</string>
+    <string name="atp_ActivityManageProtection">Problémáid vannak egy alkalmazással?</string>
+
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]></string>
+
+    <string name="atp_ActivityEmptyListTitle">Nincs új tevékenység</string>
+    <string name="atp_ActivityEmptyListMessage">Továbbra is használd a készülékedet Az alkalmazáskövetés elleni védelem által blokkolt követési kísérletek itt jelennek meg.</string>
+    <string name="atp_ActivityPastWeekBlocked">Blokkolt</string>
+    <string name="atp_ActivityPastWeekAcross">Itt:</string>
+
+     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Követési kísérlet</item>
+        <item quantity="other">Követési kísérletek</item>
+    </plurals>
+      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Alkalmazás</item>
+        <item quantity="other">Alkalmazások</item>
+    </plurals>
+    <string name="atp_ActivityEnabledLabel">Ez a funkció bétaverzióban van. <annotation type="app_settings_link">Problémáid vannak egy alkalmazással?</annotation></string>
+    <string name="atp_ActivityDisabledLabel"><b>Az alkalmazáskövetés elleni védelem le van tiltva</b> Okozott problémát az alkalmazáskövetés elleni védelem az Ön alkalmazásainál? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>A készülékeden lévő VPN alkalmazás kikapcsolta az alkalmazáskövetés elleni védelmet.</b>\nProblémát okozott az alkalmazáskövetés elleni védelem az alkalmazásaidban? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
+    <string name="atp_ActivityAbout">További információ</string>
+    <string name="atp_ActivityManage">Kezelés</string>
+    <string name="atp_ActivityRemoveFeature">Kikapcsolás és adatok törlése</string>
+
+    <!--  App Tracking Protection FAQ -->
+    <string name="atp_FAQActivityTitle">GYIK</string>
+    <string name="atp_FAQFirstHeader">Hogyan működik az alkalmazáskövetés elleni védelem?</string>
+    <string name="atp_FAQFirstText"><b>Az alkalmazáskövetés elleni védelem blokkolja más cégek ismert alkalmazáskövetőit, például amikor a Facebook megpróbál nyomon követni egy egészségügyi alkalmazásban.</b> A cégek továbbra is követhetnek a saját alkalmazásaikban.\n\n</string>
+    <string name="atp_FAQSecondHeader">Az alkalmazáskövetés elleni védelem blokkolja a nyomkövetőket minden alkalmazásomban?</string>
+    <string name="atp_FAQSecondText"><b>A védelem automatikusan kikapcsolható egyes alkalmazásoknál, például azoknál, amelyek weboldalakat töltenek be, így a tartalom normálisan jelenik meg.</b> Az ismert problémákkal rendelkező alkalmazások esetében ez többnyire átmeneti, mert dolgozunk az alkalmazáskövetés elleni védelem javításán. Az egyes alkalmazások védelmét a készülékeden lévő beállításokban kezelheted.\n\nEzenkívül előfordulhat, hogy egyes nyomkövetőket nem blokkol a rendszer, mert még nem észleltük és nem vettük fel őket a tiltólistára. Folyamatosan dolgozunk az új nyomkövetők azonosításán és az ellenük való védekezésen, így biztos lehetsz abban, hogy a legfrissebb védelmet kapod.\n\nA nyomkövetők listáját néhány havonta frissítjük. Ezeket automatikusan frissítjük a készülékeden.</string>
+    <string name="atp_FAQThirdHeader">Miért használ az alkalmazáskövetés elleni védelem VPN-kapcsolatot?</string>
+    <string name="atp_FAQThirdText">A rendszer arra kér, hogy állíts be egy virtuális magánhálózati (VPN) kapcsolatot, <b>de az alkalmazáskövetés elleni védelem működéséhez nem kell VPN alkalmazást telepítened.</b>\n\nEz az engedély lehetővé teszi, hogy a készülékeden helyileg működő alkalmazáskövetés elleni védelem megfigyelje a hálózati forgalmat, <b>hogy blokkolni tudja az ismert nyomkövetőket.</b></string>
+    <string name="atp_FAQFourthHeader">Működik az alkalmazáskövetés elleni védelem, ha VPN alkalmazást is használok?</string>
+    <string name="atp_FAQFourthText">""<b>"<![CDATA[Az Android egyszerre csak egy aktív VPN-kapcsolatot engedélyez.]]>"</b>"<![CDATA[ Ez azt jelenti, hogy nem használhatod az alkalmazáskövetés elleni védelmet, amíg a készüléken lévő VPN alkalmazás fut, vagy „Mindig bekapcsolva” értékre van állítva.\n\n]]>"<b>"<![CDATA[Azt javasoljuk, hogy kapcsold be az alkalmazáskövetés elleni védelmet, amikor nem használsz VPN alkalmazást.]]>"</b>"<![CDATA[ Csak győződj meg arról, hogy a VPN alkalmazás nincs mindig bekapcsolt értékre állítva. Lépj az Android hálózati beállítások > VPN menüpontra. Ezt követően ellenőrizd a fogaskerék ikonnál a felsorolt VPN alkalmazásokat, és kapcsold ki a mindig bekapcsolva opciót. Egyes VPN alkalmazások automatikus csatlakozási beállítással is rendelkezhetnek, amelyet ki kell kapcsolni.]]>"</string>
+    <string name="atp_FAQFifthHeader">Miben különbözik az alkalmazáskövetés elleni védelem a VPN-től?</string>
+    <string name="atp_FAQFifthText">A VPN az adatokat a készülékről a saját szerverére küldi, ahol az adatokat biztonságossá teszi és anonimizálja, hogy a kíváncsi szemek ne láthassák. Ez azonban lehetővé teszi, hogy a VPN cég lássa a hálózati forgalmadat.\n\n<b>Az alkalmazáskövetés elleni védelem más.</b> Ahelyett, hogy az adatokat egy VPN-szerverre küldené, az <b>alkalmazáskövetés elleni védelem helyileg, a készüléken működik</b>, az egymással kommunikáló alkalmazások és szerverek közé iktatva.\n\nAmikor az alkalmazáskövetés elleni védelem felismer egy ismert nyomkövetőt, <b>megakadályozza, hogy a nyomkövető személyes adatokat (például IP-címet, tevékenységet és eszközadatokat) küldjön a készülékedről.</b> Minden más forgalom eljut a rendeltetési helyére, így az alkalmazások rendben működnek.</string>
+    <string name="atp_FAQSixthHeader">Az adataim privátak?</string>
+    <string name="atp_FAQSixthText">Az alkalmazáskövetés elleni védelem a készülékeden működik, és nem küld személyes adatokat a készülékedről a DuckDuckGónak.</string>
+
+    <!--  App Tracking Protection Waitlist -->
+    <string name="atp_WaitlistActivityTitle">Alkalmazáskövetés elleni védelem</string>
+    <string name="atp_WaitlistActivityWaitlistTitle">Alkalmazáskövetés elleni védelem várólistája</string>
+    <string name="atp_WaitlistNotificationTitle">Megérkezett az alkalmazáskövetés elleni védelmi meghívója!</string>
+    <string name="atp_WaitlistNotificationDescription">Feliratkoztál a várólistára, és arra kértél minket, hogy értesítsünk, amikor rád kerül a sor, hogy kipróbálhasd az alkalmazáskövetés elleni védelmi funkciót. Koppints a meghívó megtekintéséhez.</string>
+    <string name="atp_WaitlistStatusNotJoined">Egyetlen egyszerű lépés az alkalmazások jobb védelme érdekében!</string>
+    <string name="atp_WaitlistStatusJoined">Rajta vagy a listán!</string>
+    <string name="atp_WaitlistStatusInBeta">Meghívót kaptál!</string>
+    <string name="atp_WaitlistDescription">Blokkold az alkalmazásaidban elrejtett nyomkövetőket, és nézd meg, hogy ki próbált követni.\n<annotation type="beta_link">További információ</annotation></string>
+    <string name="atp_WaitlistInBetaDescription">Blokkold az alkalmazásaidban elrejtett nyomkövetőket, és nézd meg, hogy ki próbált követni.\n<annotation type="beta_link">További információ a bétaverzióról</annotation></string>
+    <string name="atp_WaitlistJoin">Csatlakozz a privát várólistához</string>
+    <string name="atp_WaitlistCodeCta">Van meghívókódom</string>
+    <string name="atp_WaitlistGetStartedCta">Első lépések</string>
+    <string name="atp_WaitlistRedeemCodeCta">Folytatás</string>
+    <string name="atp_WaitlistRedeemCodeLabel">Meghívókód</string>
+    <string name="atp_WaitlistRedeemCodeTitle">Majdnem végeztünk…</string>
+    <string name="atp_WaitlistRedeemCodeError">Nem ismertük fel ezt a meghívókódot.</string>
+    <string name="atp_WaitlistFooterDescription">Nem kell megosztanod a személyes adataid a várólistához való csatlakozáshoz. A sorban elfoglalt helyedet egy olyan időbélyegző igazolja, amely kizárólag az eszközödön található meg, így értesíteni tudunk, amikor sorra kerülsz.</string>
+    <string name="atp_WaitlistErrorJoining">Hiba történt a várólistához való csatlakozás közben. Kérjük, próbáld újra később.</string>
+    <string name="atp_WaitlistJoinedWithNotification">Értesítést küldünk, amikor az alkalmazáskövetés elleni védelem készen áll számodra.\n\n<annotation type="beta_link">További információ a bétaverzióról</annotation></string>
+    <string name="atp_WaitlistJoinedWithoutNotification">Ide érkezik az alkalmazáskövetés elleni védelem kipróbálására szóló meghívód. Nézz vissza hamarosan, vagy küldhetünk neked értesítést, amikor sorra kerülsz\n\n<annotation type="notify_me_link">Értesítést kérek</annotation>\n\n<annotation type="beta_link">További információ a bétaverzióról</annotation></string>
+    <string name="atp_WaitlistRedeemCodeActivityTitle">Meghívókód megadása</string>
+    <string name="atp_WaitlistRedeemedCodeStatus">Sikerült! Bent vagy.</string>
+    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
+
+    <!--  App Tracking Company Details -->
+    <plurals name="atp_CompanyDetailsTrackingAttempts">
+        <item quantity="one">%1$d kísérlet. A következőket gyűjti:</item>
+        <item quantity="other">%1$d kísérlet. A következőket gyűjti:</item>
+    </plurals>
+    <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
+        <item quantity="one">%1$d követési kísérletet blokkolva</item>
+        <item quantity="other">%1$d követési kísérletet blokkolva</item>
+    </plurals>
+    <string name="atp_CompanyDetailsTrackingMenuReport">Az alkalmazással kapcsolatos probléma bejelentése</string>
+    <string name="atp_CompanyDetailsTrackingShowMore">További %1$d megjelenítése</string>
+    <string name="atp_CompanyDetailsTrackingLearnMore">Az alkalmazásokban lehetnek más cégek nyomkövetői, például analitikai és marketing célú megoldások. Ha nem blokkolnánk őket, ezek a nyomkövetők még részletesebb digitális profilt készíthetnánek rólad. <annotation type="learn_more_link">További információ.</annotation></string>
+    <string name="atp_CompanyDetailsTrackingShowLess">Mutass kevesebbet</string>
+    <string name="atp_CompanyDetailsAppInfoPanel">A védelem jelenleg le van tiltva ennél az alkalmazásnál. Ha az alkalmazáskövetés elleni védelem problémát okozott, <annotation type="report_issues_link">jelentsd a hibát</annotation></string>
+
+    <!--  App Tracking Company Signals -->
+    <string name="atp_TrackingSignalAAID">Android hirdetési azonosító</string>
+    <string name="atp_TrackingSignalUniqueIdentifier">Egyedi azonosító</string>
+    <string name="atp_TrackingSignalCookies">Sütik</string>
+    <string name="atp_TrackingSignalOsVersion">Operációs rendszer verziója</string>
+    <string name="atp_TrackingSignalOsBuildNumber">Operációs rendszer buildszáma</string>
+    <string name="atp_TrackingSignalPlatform">Eszköz platformja</string>
+    <string name="atp_TrackingSignalDeviceBrand">Eszköz márkája</string>
+    <string name="atp_TrackingSignalDeviceLanguage">Eszköz nyelve</string>
+    <string name="atp_TrackingSignalDeviceModel">Eszköz modellje</string>
+    <string name="atp_TrackingSignalCPUData">CPU adatai</string>
+    <string name="atp_TrackingSignalScreenResolution">Képernyőfelbontás</string>
+    <string name="atp_TrackingSignalInternalStorage">Belső tárhely</string>
+    <string name="atp_TrackingSignalExternalStorage">Külső tárhely</string>
+    <string name="atp_TrackingSignalDeviceMemory">Eszközmemória</string>
+    <string name="atp_TrackingSignalDeviceName">Eszköz neve</string>
+    <string name="atp_TrackingSignalWifiNetworkName">Wi-Fi hálózat neve</string>
+    <string name="atp_TrackingSignalAppName">Alkalmazás neve</string>
+    <string name="atp_TrackingSignalAppVersion">Alkalmazás verziója</string>
+    <string name="atp_TrackingSignalLocalIPAddress">Helyi IP-cím</string>
+    <string name="atp_TrackingSignalISP">Internetszolgáltató</string>
+    <string name="atp_TrackingSignalDeviceBootTime">Eszköz indítási ideje</string>
+    <string name="atp_TrackingSignalNetworkConnectionType">Hálózati kapcsolat típusa</string>
+    <string name="atp_TrackingSignalSystemVolume">Rendszer hangereje</string>
+    <string name="atp_TrackingSignalBatteryLevel">Akkumulátor töltöttségi szintje</string>
+    <string name="atp_TrackingSignalChargingStatus">Töltési állapot</string>
+    <string name="atp_TrackingSignalBrightness">Fényerő</string>
+    <string name="atp_TrackingSignalHeadphoneStatus">Fejhallgató állapota</string>
+    <string name="atp_TrackingSignalAccelerometerData">Gyorsulásmérő adatai</string>
+    <string name="atp_TrackingSignalRotationData">Elforgatási adatok</string>
+    <string name="atp_TrackingSignalDeviceOrientation">Eszköz tájolása</string>
+    <string name="atp_TrackingSignalMagnetometerData">Magnetométer adatai</string>
+    <string name="atp_TrackingSignalAvailableInternalStorage">Elérhető belső tárhely</string>
+    <string name="atp_TrackingSignalAvailableExternalStorage">Elérhető külső tárhely</string>
+    <string name="atp_TrackingSignalDeviceTotalMemory">Eszköz összes memóriája</string>
+    <string name="atp_TrackingSignalAvailableDeviceMemory">Rendelkezésre álló eszközmemória</string>
+    <string name="atp_TrackingSignalScreenMargins">Képernyő margói</string>
+    <string name="atp_TrackingSignalScreenDensity">Pixelsűrűség</string>
+    <string name="atp_TrackingSignalFontSize">Betűk mérete</string>
+    <string name="atp_TrackingSignalNetworkCarrier">Hálózati szolgáltató</string>
+    <string name="atp_TrackingSignalAppInstallDate">Alkalmazás telepítésének dátuma</string>
+    <string name="atp_TrackingSignalFirstAppLaunchDate">Alkalmazás első indításának dátuma</string>
+    <string name="atp_TrackingSignalGPSCoordinates">GPS-koordináták</string>
+    <string name="atp_TrackingSignalPostalCode">Irányítószám</string>
+    <string name="atp_TrackingSignalNeighbourhood">Környék</string>
+    <string name="atp_TrackingSignalCity">Város</string>
+    <string name="atp_TrackingSignalState">Állam</string>
+    <string name="atp_TrackingSignalCountry">Ország</string>
+    <string name="atp_TrackingSignalTimezone">Időzóna</string>
+    <string name="atp_TrackingSignalEmailAddress">E-mail-cím</string>
+    <string name="atp_TrackingSignalBirthday">Születésnap</string>
+    <string name="atp_TrackingSignalGender">Nem</string>
+    <string name="atp_TrackingSignalFirstName">Keresztnév</string>
+    <string name="atp_TrackingSignalLastName">Vezetéknév</string>
+
+    <!--  App Tracking Protection Disable VPN Dialog -->
+    <string name="atp_DisableConfirmationDialogTitle">Kikapcsolod az alkalmazáskövetés elleni védelmet?</string>
+    <string name="atp_DisableConfirmationDialogMessage">Ha problémát észleltél egy alkalmazással, akkor inkább állítsd be az adott alkalmazás védelmét.</string>
+    <string name="atp_DisableConfirmationDisableApp">Kikapcsolás egy alkalmazásnál</string>
+    <string name="atp_DisableConfirmationDisableAllApps">Kikapcsolás minden alkalmazásnál</string>
+    <string name="atp_DisableConfirmationCancel">Mégsem</string>
+
+    <!--  App Tracking Protection VPN Conflict Dialog -->
+    <string name="atp_VpnConflictDialogTitle">Előfordulhat, hogy VPN alkalmazás kapcsolata megszakad</string>
+    <string name="atp_VpnConflictAlwaysOnDialogTitle">A VPN alkalmazásod blokkolja az alkalmazáskövetés elleni védelmet</string>
+    <string name="atp_VpnConflictDialogMessage">Az Android egyszerre csak egy aktív VPN-kapcsolatot engedélyez. Az alkalmazáskövetés elleni védelem bekapcsolása megszakíthatja a készüléked aktív VPN-kapcsolatát.</string>
+    <string name="atp_VpnConflictDialogAlwaysOnMessage">Az Android egyszerre csak egy aktív VPN-kapcsolatot engedélyez. Nyisd meg a Hálózati beállítások &gt; VPN menüpontot. Keresd meg a „mindig bekapcsolva“ értékre állított VPN alkalmazást, és a folytatáshoz tiltsd le.</string>
+    <string name="atp_VpnConflictDialogCancel">Mégsem</string>
+    <string name="atp_VpnConflictDialogOpenSettings">Beállítások megnyitása</string>
+    <string name="atp_VpnConflictDialogGotIt">Értem</string>
+
+    <!-- Manage Recent Apps Protection -->
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Ha problémád van egy alkalmazással (például a tartalom nem töltődik be), próbáld meg kikapcsolni az adott alkalmazás védelmét, és <annotation type="report_issues_link">küldj jelentést.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Legutóbbi alkalmazások</string>
+    <string name="atp_ManageRecentAppsProtectionShowAll">Összes alkalmazás megjelenítése</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Még nincsenek legutóbbi alkalmazások</string>
+
+    <!--  App Tracking Protection Remove Feature Dialog -->
+    <string name="atp_RemoveFeatureDialogTitle">Letiltod és törlöd az adatokat?</string>
+    <string name="atp_RemoveFeatureDialogMessage">Az alkalmazáskövetés elleni védelem ki lesz kapcsolva, és a beállítások és a követési kísérletek előzményei törlődnek. A Beállításokban ezt bármikor újra engedélyezheted.</string>
+    <string name="atp_RemoveFeatureDialogCancel">Mégsem</string>
+    <string name="atp_RemoveFeatureDialogRemove">Letilt</string>
+
+    <!--  App Tracking Protection Promote Always On -->
+    <string name="atp_PromoteAlwaysOnDialogTitle">Mindig be van kapcsolva?</string>
+    <string name="atp_PromoteAlwaysOnDialogMessage">Annak megakadályozása, hogy az Android rendszeresen kikapcsolja az alkalmazáskövetés elleni védelmet:\n\nLépj az Android beállításaiba\nNyisd meg a DuckDuckGo VPN-beállításait\nKapcsold be a VPN „Mindig bekapcsolva” opcióját</string>
+    <string name="atp_PromoteAlwaysOnDialogSettings">Lépj a Beállítások menübe</string>
+    <string name="atp_PromoteAlwaysOnDialogLater">Emlékeztess később</string>
+    <string name="atp_PromoteAlwaysOnDialogForget">Nem, köszönöm</string>
+
+</resources>

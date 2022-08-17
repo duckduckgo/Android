@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.AppUrl
@@ -86,6 +87,12 @@ object NetworkModule {
 @Module
 @ContributesTo(AppScope::class)
 object DatabaseModule {
+
+    @Provides
+    @ConfigPersisterPreferences
+    fun providePrivacyConfigPersisterPreferences(context: Context): SharedPreferences {
+        return context.getSharedPreferences("com.duckduckgo.privacy.config.persister.preferences.v1", Context.MODE_PRIVATE)
+    }
 
     @SingleInstanceIn(AppScope::class)
     @Provides

@@ -16,9 +16,7 @@
 
 package com.duckduckgo.autofill.ui.credential.management.viewing
 
-import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,22 +27,24 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListModeBinding
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter
+import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Delete
+import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel
 import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.ui.credential.management.LoginCredentialTitleExtractor
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class AutofillManagementListMode : Fragment() {
+class AutofillManagementListMode : DuckDuckGoFragment() {
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -70,11 +70,6 @@ class AutofillManagementListMode : Fragment() {
         override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
             if (isChecked) viewModel.onEnableAutofill() else viewModel.onDisableAutofill()
         }
-    }
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -137,13 +132,19 @@ class AutofillManagementListMode : Fragment() {
             onCredentialSelected = this::onCredentialsSelected,
             onCopyUsername = this::onCopyUsername,
             onCopyPassword = this::onCopyPassword,
+            onContextMenuItemClicked = {
+                when (it) {
+                    is Edit -> viewModel.onEditCredentials(it.credentials, false)
+                    is Delete -> viewModel.onDeleteCredentials(it.credentials)
+                }
+            }
         )
 
         binding.logins.adapter = adapter
     }
 
     private fun onCredentialsSelected(credentials: LoginCredentials) {
-        viewModel.onViewCredentials(credentials)
+        viewModel.onViewCredentials(credentials, false)
     }
 
     private fun onCopyUsername(credentials: LoginCredentials) {

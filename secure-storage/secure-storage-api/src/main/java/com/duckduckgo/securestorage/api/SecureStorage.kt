@@ -33,9 +33,10 @@ interface SecureStorage {
      * this is invoked, nothing will be done.
      *
      * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
+     * @return The ID of the saved credential if it saved successfully, otherwise null
      */
     @Throws(SecureStorageException::class)
-    suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials)
+    suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials): Long?
 
     /**
      * This method returns all [WebsiteLoginDetails] with the [domain] stored in the [SecureStorage].
@@ -64,7 +65,7 @@ interface SecureStorage {
      * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
     @Throws(SecureStorageException::class)
-    suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials?
+    suspend fun getWebsiteLoginDetailsWithCredentials(id: Long): WebsiteLoginDetailsWithCredentials?
 
     /**
      * This method returns the [WebsiteLoginDetailsWithCredentials] with the [domain] stored in the [SecureStorage].
@@ -103,5 +104,5 @@ interface SecureStorage {
      * This method removes an existing [WebsiteLoginDetailsWithCredentials] associated with an [id] from the [SecureStorage].
      * If [canAccessSecureStorage] is false when this is invoked, nothing will be done.
      */
-    suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Int)
+    suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Long)
 }

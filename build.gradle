@@ -2,11 +2,11 @@
 buildscript {
 
     ext {
-        kotlin_version = '1.6.21'
+        kotlin_version = '1.7.10'
         spotless = "6.1.2"
-        anvil_version = "2.4.0"
-        gradle_plugin = "7.0.4" // When updating, also update lint_version
-        lint_version = "30.0.4" // This value must always be gradle_plugin + 23
+        anvil_version = "2.4.1"
+        gradle_plugin = "7.2.2" // When updating, also update lint_version
+        lint_version = "30.2.2" // This value must always be gradle_plugin + 23
         min_sdk = 23
         target_sdk = 30
         compile_sdk = 31
@@ -52,6 +52,8 @@ subprojects {
                     if (dependency instanceof ProjectDependency) {
                         def dependencyPath = dependency.dependencyProject.path
                         if (dependencyPath == projectPath) continue
+                        // vpn-internal is part of vpn-impl
+                        if (projectPath.endsWith(':vpn-internal') && dependencyPath.endsWith(':vpn-impl')) continue
                         if (!projectPath.endsWith(":app") && dependencyPath.endsWith("impl")) {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "Only :app module can depend on 'impl' modules")

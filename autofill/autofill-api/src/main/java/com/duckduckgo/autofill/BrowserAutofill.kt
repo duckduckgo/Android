@@ -18,6 +18,7 @@ package com.duckduckgo.autofill
 
 import android.webkit.WebView
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
 
 /**
  * Public interface for accessing and configuring browser autofill functionality for a WebView instance
@@ -56,7 +57,7 @@ interface BrowserAutofill {
  * Browser Autofill callbacks
  */
 interface Callback {
-    suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>)
+    suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>, triggerType: LoginTriggerType)
     suspend fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials)
     fun noCredentialsAvailable(originalUrl: String)
 }

@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -32,6 +31,7 @@ import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Editing
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.NotInCredentialMode
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementCredentialsMode
@@ -65,7 +65,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
-        setTitle(R.string.managementScreenTitle)
+        setupInitialState()
         observeViewModel()
     }
 
@@ -79,8 +79,19 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         viewModel.lock()
     }
 
+    private fun setupInitialState() {
+        if (intent.hasExtra(EXTRAS_CREDENTIALS_TO_VIEW)) {
+            intent.getParcelableExtra<LoginCredentials>(EXTRAS_CREDENTIALS_TO_VIEW)?.let {
+                viewModel.onViewCredentials(it, true)
+            }
+        } else {
+            showListMode()
+        }
+    }
+
     private fun launchDeviceAuth() {
         if (deviceAuthenticator.hasValidDeviceAuthentication()) {
+            viewModel.lock()
             deviceAuthenticator.authenticate(AUTOFILL, this) {
                 if (it == AuthResult.Success) {
                     viewModel.unlock()
@@ -112,18 +123,24 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun processState(state: AutofillSettingsViewModel.ViewState) {
+        if (state.credentialMode is NotInCredentialMode && !state.isLocked) {
+            showListMode()
+        }
     }
 
     private fun processCommand(command: AutofillSettingsViewModel.Command) {
         var processed = true
         when (command) {
-            is ShowListMode -> showListMode()
-            is ShowCredentialMode -> showCredentialMode(command.credentials)
+            is ShowCredentialMode -> showCredentialMode(command.credentials, command.isLaunchedDirectly)
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar("Username")
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar("Password")
             is ShowDisabledMode -> showDisabledMode()
             is ShowLockedMode -> showLockMode()
             is LaunchDeviceAuth -> launchDeviceAuth()
+            is ExitCredentialMode -> supportFragmentManager.forceExitFragment(TAG_CREDENTIAL)
+            is ExitLockedMode -> supportFragmentManager.forceExitFragment(TAG_LOCKED)
+            is ExitDisabledMode -> supportFragmentManager.forceExitFragment(TAG_DISABLED)
+            is ExitListMode -> supportFragmentManager.forceExitFragment(TAG_ALL_CREDENTIALS)
             else -> processed = false
         }
         if (processed) {
@@ -138,43 +155,36 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun showListMode() {
         resetToolbar()
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            replace(R.id.fragment_container_view, AutofillManagementListMode.instance())
-        }
+        supportFragmentManager.showFragment(AutofillManagementListMode.instance(), TAG_ALL_CREDENTIALS, false)
     }
 
-    private fun showCredentialMode(credentials: LoginCredentials?) {
+    private fun showCredentialMode(
+        credentials: LoginCredentials?,
+        isLaunchedDirectly: Boolean
+    ) {
         if (credentials != null) {
             binding.includeToolbar.toolbar.apply {
                 titleMarginStart = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
                 contentInsetStartWithNavigation = 0
             }
             title = credentials.domainTitle ?: credentials.domain
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                replace(R.id.fragment_container_view, AutofillManagementCredentialsMode.instance())
-            }
+
+            supportFragmentManager.showFragment(
+                fragment = AutofillManagementCredentialsMode.instance(),
+                tag = TAG_CREDENTIAL,
+                shouldAddToBackStack = !isLaunchedDirectly
+            )
         }
     }
 
     private fun showLockMode() {
         resetToolbar()
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            replace(
-                R.id.fragment_container_view,
-                AutofillManagementLockedMode.instance()
-            )
-        }
+        supportFragmentManager.showFragment(AutofillManagementLockedMode.instance(), TAG_LOCKED, true)
     }
 
     private fun showDisabledMode() {
         resetToolbar()
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            replace(R.id.fragment_container_view, AutofillManagementDisabledMode.instance())
-        }
+        supportFragmentManager.showFragment(AutofillManagementDisabledMode.instance(), TAG_DISABLED, false)
     }
 
     private fun resetToolbar() {
@@ -186,14 +196,31 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     override fun onBackPressed() {
         when (viewModel.viewState.value.credentialMode) {
             is Editing -> viewModel.onCancelEditMode()
-            is Viewing -> viewModel.onExitViewMode()
+            is Viewing -> if (supportFragmentManager.backStackEntryCount > 1) {
+                viewModel.onExitCredentialMode()
+            } else {
+                super.onBackPressed()
+            }
             else -> super.onBackPressed()
         }
     }
 
     companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, AutofillManagementActivity::class.java)
+        private const val EXTRAS_CREDENTIALS_TO_VIEW = "extras_credentials_to_view"
+        private const val TAG_LOCKED = "tag_fragment_locked"
+        private const val TAG_DISABLED = "tag_fragment_disabled"
+        private const val TAG_CREDENTIAL = "tag_fragment_credential"
+        private const val TAG_ALL_CREDENTIALS = "tag_fragment_all_credentials"
+
+        fun intent(
+            context: Context,
+            loginCredentials: LoginCredentials? = null
+        ): Intent {
+            return Intent(context, AutofillManagementActivity::class.java).apply {
+                if (loginCredentials != null) {
+                    putExtra(EXTRAS_CREDENTIALS_TO_VIEW, loginCredentials)
+                }
+            }
         }
     }
 }

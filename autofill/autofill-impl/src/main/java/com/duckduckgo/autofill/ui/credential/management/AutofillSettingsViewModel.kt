@@ -55,13 +55,77 @@ class AutofillSettingsViewModel @Inject constructor(
         addCommand(ShowUserPasswordCopied())
     }
 
-    fun onViewCredentials(credentials: LoginCredentials) {
+    fun onViewCredentials(
+        credentials: LoginCredentials,
+        isLaunchedDirectly: Boolean
+    ) {
+        addCommand(ShowCredentialMode(credentials = credentials, isLaunchedDirectly = isLaunchedDirectly))
         _viewState.value = viewState.value.copy(credentialMode = Viewing(credentialsViewed = credentials))
-        addCommand(ShowCredentialMode(credentials))
     }
 
-    fun onEditCredentials(loginCredentials: LoginCredentials) {
-        _viewState.value = viewState.value.copy(credentialMode = Editing(credentialsViewed = loginCredentials))
+    fun onEditCredentials(
+        credentials: LoginCredentials,
+        isFromViewMode: Boolean
+    ) {
+        // if edit is opened but not from view mode, it means that we should show the credentials view and we need to set hasPopulatedFields to false
+        // to force credential view to prefill the fields.
+        if (!isFromViewMode) {
+            addCommand(
+                ShowCredentialMode(
+                    credentials = credentials,
+                    isLaunchedDirectly = false,
+                )
+            )
+            _viewState.value = viewState.value.copy(
+                credentialMode = Editing(
+                    credentialsViewed = credentials,
+                    startedCredentialModeWithEdit = !isFromViewMode,
+                    hasPopulatedFields = false
+                )
+            )
+        } else {
+            _viewState.value = viewState.value.copy(
+                credentialMode = Editing(
+                    credentialsViewed = credentials,
+                    startedCredentialModeWithEdit = !isFromViewMode
+                )
+            )
+        }
+    }
+
+    fun onCredentialEditModePopulated() {
+        _viewState.value.credentialMode.let { credentialMode ->
+            if (credentialMode is Editing) {
+                _viewState.value = _viewState.value.copy(credentialMode = credentialMode.copy(hasPopulatedFields = true))
+            }
+        }
+    }
+
+    fun onCancelEditMode() {
+        viewState.value.let { value ->
+            value.credentialMode.let {
+                // if credential mode started with edit, it means that we need to exit credential mode right away instead of going
+                // back to view mode.
+                if (it is Editing && !it.startedCredentialModeWithEdit) {
+                    _viewState.value = value.copy(credentialMode = Viewing(credentialsViewed = it.credentialsViewed))
+                } else {
+                    onExitCredentialMode()
+                }
+            }
+        }
+    }
+
+    fun onExitCredentialMode() {
+        addCommand(ExitCredentialMode)
+        _viewState.value = viewState.value.copy(credentialMode = NotInCredentialMode)
+    }
+
+    fun allowSaveInEditMode(saveable: Boolean) {
+        _viewState.value.credentialMode.let { credentialMode ->
+            if (credentialMode is Editing) {
+                _viewState.value = _viewState.value.copy(credentialMode = credentialMode.copy(saveable = saveable))
+            }
+        }
     }
 
     fun launchDeviceAuth() {
@@ -70,17 +134,23 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun lock() {
         if (!viewState.value.isLocked) {
+            _viewState.value = viewState.value.copy(isLocked = true)
             addCommand(ShowLockedMode)
         }
     }
 
     fun unlock() {
-        _viewState.value = viewState.value.copy(isLocked = false, credentialMode = NotInCredentialMode)
-        addCommand(ShowListMode)
+        addCommand(ExitDisabledMode)
+        addCommand(ExitLockedMode)
+        _viewState.value = viewState.value.copy(isLocked = false)
     }
 
     fun disabled() {
-        _viewState.value = viewState.value.copy(isLocked = true, credentialMode = NotInCredentialMode)
+        _viewState.value = viewState.value.copy(isLocked = true)
+        // Remove backstack modes if they are present
+        addCommand(ExitListMode)
+        addCommand(ExitCredentialMode)
+        addCommand(ExitLockedMode)
         addCommand(ShowDisabledMode)
     }
 
@@ -120,13 +190,13 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun updateCredentials(updatedCredentials: LoginCredentials) {
-        _viewState.value.credentialMode.credentialsViewed?.let {
+        _viewState.value.credentialMode.credentialsViewed?.let { originalCredentials ->
             viewModelScope.launch {
-                autofillStore.updateCredentials(updatedCredentials.copy(id = it.id))
-                autofillStore.getCredentialsWithId(it.id!!)?.let { credentials ->
+                autofillStore.updateCredentials(updatedCredentials.copy(id = originalCredentials.id))
+                autofillStore.getCredentialsWithId(originalCredentials.id!!)?.let { credentialsWithLastUpdatedTimeUpdated ->
                     _viewState.value = viewState.value.copy(
                         credentialMode = Viewing(
-                            credentialsViewed = credentials
+                            credentialsViewed = credentialsWithLastUpdatedTimeUpdated
                         )
                     )
                 }
@@ -144,25 +214,6 @@ class AutofillSettingsViewModel @Inject constructor(
         _viewState.value = viewState.value.copy(autofillEnabled = false)
     }
 
-    fun onCancelEditMode() {
-        viewState.value.credentialMode.credentialsViewed?.let {
-            _viewState.value = viewState.value.copy(credentialMode = Viewing(credentialsViewed = it))
-        }
-    }
-
-    fun onExitViewMode() {
-        _viewState.value = viewState.value.copy(credentialMode = NotInCredentialMode)
-        addCommand(ShowListMode)
-    }
-
-    fun allowSaveInEditMode(saveable: Boolean) {
-        _viewState.value.credentialMode.let { credentialMode ->
-            if (credentialMode is Editing) {
-                _viewState.value = _viewState.value.copy(credentialMode = credentialMode.copy(saveable = saveable))
-            }
-        }
-    }
-
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val logins: List<LoginCredentials> = emptyList(),
@@ -174,7 +225,9 @@ class AutofillSettingsViewModel @Inject constructor(
         data class Viewing(override val credentialsViewed: LoginCredentials) : CredentialMode(credentialsViewed)
         data class Editing(
             override val credentialsViewed: LoginCredentials,
-            val saveable: Boolean = true
+            val saveable: Boolean = true,
+            val startedCredentialModeWithEdit: Boolean,
+            val hasPopulatedFields: Boolean = true
         ) : CredentialMode(credentialsViewed)
 
         object NotInCredentialMode : CredentialMode(null)
@@ -183,10 +236,22 @@ class AutofillSettingsViewModel @Inject constructor(
     sealed class Command(val id: String = UUID.randomUUID().toString()) {
         class ShowUserUsernameCopied : Command()
         class ShowUserPasswordCopied : Command()
-        data class ShowCredentialMode(val credentials: LoginCredentials) : Command()
-        object ShowListMode : Command()
+
+        /**
+         * [credentials] Credentials to be used to render the credential view
+         * [isLaunchedDirectly] if true it means that the credential view was launched directly and didn't have to go through the management screen.
+         */
+        data class ShowCredentialMode(
+            val credentials: LoginCredentials,
+            val isLaunchedDirectly: Boolean
+        ) : Command()
+
         object ShowDisabledMode : Command()
         object ShowLockedMode : Command()
         object LaunchDeviceAuth : Command()
+        object ExitCredentialMode : Command()
+        object ExitListMode : Command()
+        object ExitLockedMode : Command()
+        object ExitDisabledMode : Command()
     }
 }

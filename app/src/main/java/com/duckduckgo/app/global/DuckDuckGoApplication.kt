@@ -64,7 +64,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
     lateinit var appCoroutineScope: CoroutineScope
 
     @Inject
-    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*>>
+    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*, *>>
 
     private val processDetector = ProcessDetector()
 
@@ -211,7 +211,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
      *
      * This method will return the [AndroidInjector.Factory] for the given key passed in as parameter.
      */
-    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*> {
+    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
         return injectorFactoryMap[key]
             ?: throw RuntimeException(
                 """

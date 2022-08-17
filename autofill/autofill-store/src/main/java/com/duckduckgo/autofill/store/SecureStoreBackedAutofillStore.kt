@@ -16,9 +16,6 @@
 
 package com.duckduckgo.autofill.store
 
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.duckduckgo.app.global.extractSchemeAndDomain
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.domain.app.LoginCredentials
@@ -34,30 +31,25 @@ import timber.log.Timber
 
 class SecureStoreBackedAutofillStore(
     private val secureStorage: SecureStorage,
-    private val applicationContext: Context,
     private val internalTestUserChecker: InternalTestUserChecker,
-    private val lastUpdatedTimeProvider: LastUpdatedTimeProvider
+    private val lastUpdatedTimeProvider: LastUpdatedTimeProvider,
+    private val autofillPrefsStore: AutofillPrefsStore
 ) : AutofillStore {
-
-    private val prefs: SharedPreferences by lazy {
-        applicationContext.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
-    }
-
-    override var autofillEnabled: Boolean
-        get() = prefs.getBoolean(AUTOFILL_ENABLED, true)
-        set(value) = prefs.edit {
-            putBoolean(
-                AUTOFILL_ENABLED,
-                value && internalTestUserChecker.isInternalTestUser && secureStorage.canAccessSecureStorage()
-            )
-        }
 
     override val autofillAvailable: Boolean
         get() = internalTestUserChecker.isInternalTestUser && secureStorage.canAccessSecureStorage()
 
+    override var autofillEnabled: Boolean
+        get() = autofillPrefsStore.isEnabled
+        set(value) {
+            autofillPrefsStore.isEnabled = value
+        }
+
     override var showOnboardingWhenOfferingToSaveLogin: Boolean
-        get() = prefs.getBoolean(SHOW_SAVE_LOGIN_ONBOARDING, true)
-        set(value) = prefs.edit { putBoolean(SHOW_SAVE_LOGIN_ONBOARDING, value) }
+        get() = autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin
+        set(value) {
+            autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin = value
+        }
 
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
         return if (autofillEnabled && autofillAvailable) {
@@ -73,17 +65,17 @@ class SecureStoreBackedAutofillStore(
         }
     }
 
-    override suspend fun getCredentialsWithId(id: Int): LoginCredentials? =
+    override suspend fun getCredentialsWithId(id: Long): LoginCredentials? =
         secureStorage.getWebsiteLoginDetailsWithCredentials(id)?.toLoginCredentials()
 
     override suspend fun saveCredentials(
         rawUrl: String,
         credentials: LoginCredentials
-    ) {
+    ): Long? {
         val url = rawUrl.extractSchemeAndDomain()
         if (url == null) {
             Timber.w("Cannot save credentials as given url was in an unexpected format. Original url: %s", rawUrl)
-            return
+            return null
         }
 
         Timber.i("Saving login credentials for %s. username=%s", url, credentials.username)
@@ -97,9 +89,11 @@ class SecureStoreBackedAutofillStore(
         )
         val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(loginDetails, password = credentials.password)
 
-        secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)
+        val newId = secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)
 
         showOnboardingWhenOfferingToSaveLogin = false
+
+        return newId
     }
 
     override suspend fun updateCredentials(
@@ -135,7 +129,7 @@ class SecureStoreBackedAutofillStore(
             }
     }
 
-    override suspend fun deleteCredentials(id: Int) {
+    override suspend fun deleteCredentials(id: Long) {
         secureStorage.deleteWebsiteLoginDetailsWithCredentials(id)
     }
 
@@ -204,11 +198,5 @@ class SecureStoreBackedAutofillStore(
             ),
             password = password
         )
-    }
-
-    companion object {
-        const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
-        const val AUTOFILL_ENABLED = "autofill_enabled"
-        const val SHOW_SAVE_LOGIN_ONBOARDING = "autofill_show_onboardind_saved_login"
     }
 }

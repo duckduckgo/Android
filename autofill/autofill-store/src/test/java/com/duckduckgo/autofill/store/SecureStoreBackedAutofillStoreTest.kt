@@ -16,8 +16,6 @@
 
 package com.duckduckgo.autofill.store
 
-import android.content.Context
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.domain.app.LoginCredentials
@@ -35,24 +33,55 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SecureStoreBackedAutofillStoreTest {
 
-    private val context: Context = getApplicationContext()
     private val lastUpdatedTimeProvider = object : LastUpdatedTimeProvider {
         override fun getInMillis(): Long = UPDATED_INITIAL_LAST_UPDATED
     }
+
+    @Mock
+    private lateinit var autofillPrefsStore: AutofillPrefsStore
     private lateinit var testee: SecureStoreBackedAutofillStore
     private lateinit var internalTestUserChecker: FakeInternalTestUserChecker
     private lateinit var secureStore: FakeSecureStore
 
+    @Before
+    fun setUp() {
+        MockitoAnnotations.openMocks(this)
+        whenever(autofillPrefsStore.isEnabled).thenReturn(true)
+        whenever(autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin).thenReturn(true)
+    }
+
+    @Test
+    fun whenAutofillUnavailableAndPrefsAreAllTrueThenReturnTrueForAutofillEnabledAndShowOnboardingWhenOfferingToSaveLogin() {
+        setupTestee(isInternalUser = false, canAccessSecureStorage = false)
+
+        assertTrue(testee.autofillEnabled)
+        assertTrue(testee.showOnboardingWhenOfferingToSaveLogin)
+    }
+
+    @Test
+    fun whenAutofillAvailableAndPrefsAreAllFalseThenReturnFalseForAutofillEnabledAndShowOnboardingWhenOfferingToSaveLogin() {
+        setupTesteeWithAutofillAvailable()
+        whenever(autofillPrefsStore.isEnabled).thenReturn(false)
+        whenever(autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin).thenReturn(false)
+
+        assertFalse(testee.autofillEnabled)
+        assertFalse(testee.showOnboardingWhenOfferingToSaveLogin)
+    }
+
     @Test
     fun whenInternalTestUserTrueThenReturnAutofillEnabled() {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         assertTrue(testee.autofillAvailable)
     }
 
@@ -88,14 +117,14 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenStoreEmptyThenNoMatch() = runTest {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         val result = testee.containsCredentials("example.com", "username", "password")
         assertNotMatch(result)
     }
 
     @Test
     fun whenStoreContainsMatchingUsernameEntriesButNoneMatchingUrlThenNoMatch() = runTest {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         storeCredentials(1, "https://example.com", "username", "password")
         val result = testee.containsCredentials("foo.com", "username", "password")
         assertNotMatch(result)
@@ -103,7 +132,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenStoreContainsDomainButDifferentCredentialsThenUrlMatch() = runTest {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         storeCredentials(1, "https://example.com", "username", "password")
         val result = testee.containsCredentials("example.com", "differentUsername", "differentPassword")
         assertUrlOnlyMatch(result)
@@ -111,7 +140,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenStoreContainsDomainAndUsernameButDifferentPassword() = runTest {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         storeCredentials(1, "https://example.com", "username", "password")
         val result = testee.containsCredentials("example.com", "username", "differentPassword")
         assertUsernameMatch(result)
@@ -119,7 +148,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenStoreContainsMatchingDomainAndUsernameAndPassword() = runTest {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         storeCredentials(1, "https://example.com", "username", "password")
         val result = testee.containsCredentials("example.com", "username", "password")
         assertExactMatch(result)
@@ -127,7 +156,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenNoCredentialsForUrlStoredThenGetCredentialsReturnNothing() = runTest {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         storeCredentials(1, "url.com", "username1", "password123")
 
         assertEquals(0, testee.getCredentials("https://example.com").size)
@@ -135,13 +164,13 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenNoCredentialsSavedThenGetAllCredentialsReturnNothing() = runTest {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         assertEquals(0, testee.getAllCredentials().first().size)
     }
 
     @Test
     fun whenPasswordIsUpdatedForUrlThenUpdatedOnlyMatchingCredential() = runTest {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         val url = "https://example.com"
         storeCredentials(1, url, "username1", "password123")
         storeCredentials(2, url, "username2", "password456")
@@ -164,7 +193,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenPasswordIsUpdatedThenUpdatedOnlyMatchingCredential() = runTest {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         val url = "https://example.com"
         storeCredentials(1, url, "username1", "password123")
         storeCredentials(2, url, "username2", "password456")
@@ -187,7 +216,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenSaveCredentialsThenReturnSavedOnGetCredentials() = runTest {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         val url = "https://example.com"
         val credentials = LoginCredentials(
             domain = url,
@@ -201,7 +230,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenPasswordIsDeletedThenRemoveCredentialFromStore() = runTest {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         val url = "https://example.com"
         storeCredentials(1, url, "username1", "password123")
         storeCredentials(2, url, "username2", "password456")
@@ -217,7 +246,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenCredentialWithIdIsStoredTheReturnCredentialsOnGetCredentialsWithId() = runTest {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         val url = "https://example.com"
         storeCredentials(1, url, "username1", "password123")
         storeCredentials(2, url, "username2", "password456")
@@ -236,7 +265,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenNoCredentialStoredTheReturnNullOnGetCredentialsWithId() = runTest {
-        setupTesteeWithAutofillEnabledAndAvailable()
+        setupTesteeWithAutofillAvailable()
         assertNull(testee.getCredentialsWithId(1))
     }
 
@@ -264,16 +293,16 @@ class SecureStoreBackedAutofillStoreTest {
         assertEquals(1, result.size)
     }
 
-    private fun setupTesteeWithAutofillEnabledAndAvailable() {
+    private fun setupTesteeWithAutofillAvailable() {
         internalTestUserChecker = FakeInternalTestUserChecker(true)
         secureStore = FakeSecureStore(true)
-        testee = SecureStoreBackedAutofillStore(secureStore, context, internalTestUserChecker, lastUpdatedTimeProvider)
+        testee = SecureStoreBackedAutofillStore(secureStore, internalTestUserChecker, lastUpdatedTimeProvider, autofillPrefsStore)
     }
 
     private fun setupTestee(isInternalUser: Boolean, canAccessSecureStorage: Boolean) {
         internalTestUserChecker = FakeInternalTestUserChecker(isInternalUser)
         secureStore = FakeSecureStore(canAccessSecureStorage)
-        testee = SecureStoreBackedAutofillStore(secureStore, context, internalTestUserChecker, lastUpdatedTimeProvider)
+        testee = SecureStoreBackedAutofillStore(secureStore, internalTestUserChecker, lastUpdatedTimeProvider, autofillPrefsStore)
     }
 
     private fun assertNotMatch(result: ContainsCredentialsResult) {
@@ -293,7 +322,7 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     private suspend fun storeCredentials(
-        id: Int,
+        id: Long,
         domain: String,
         username: String,
         password: String,
@@ -308,8 +337,9 @@ class SecureStoreBackedAutofillStoreTest {
 
         private val credentials = mutableListOf<WebsiteLoginDetailsWithCredentials>()
 
-        override suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials) {
+        override suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials): Long {
             credentials.add(websiteLoginDetailsWithCredentials)
+            return credentials.size.toLong()
         }
 
         override suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> {
@@ -330,7 +360,7 @@ class SecureStoreBackedAutofillStoreTest {
             }
         }
 
-        override suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials? {
+        override suspend fun getWebsiteLoginDetailsWithCredentials(id: Long): WebsiteLoginDetailsWithCredentials? {
             return credentials.firstOrNull() { it.details.id == id }
         }
 
@@ -356,7 +386,7 @@ class SecureStoreBackedAutofillStoreTest {
             }
         }
 
-        override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Int) {
+        override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Long) {
             credentials.removeAll { it.details.id == id }
         }
 

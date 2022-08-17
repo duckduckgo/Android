@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.ui.credential.management
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
@@ -24,9 +25,13 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenBinding
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenHeaderBinding
+import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Delete
+import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGrouper
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.coroutines.launch
 
 class AutofillManagementRecyclerAdapter(
@@ -35,6 +40,7 @@ class AutofillManagementRecyclerAdapter(
     val grouper: CredentialGrouper,
     val titleExtractor: LoginCredentialTitleExtractor,
     val onCredentialSelected: (credentials: LoginCredentials) -> Unit,
+    val onContextMenuItemClicked: (ContextMenuAction) -> Unit,
     val onCopyUsername: (credentials: LoginCredentials) -> Unit,
     val onCopyPassword: (credentials: LoginCredentials) -> Unit
 ) : Adapter<RecyclerView.ViewHolder>() {
@@ -68,9 +74,15 @@ class AutofillManagementRecyclerAdapter(
     private fun onBindViewHolderCredential(position: Int, viewHolder: CredentialsViewHolder) {
         val item = listItems[position] as ListItem.Credential
         with(viewHolder.binding) {
-            title.text = item.credentials.username
-            subtitle.text = titleExtractor.extract(item.credentials)
+            title.text = titleExtractor.extract(item.credentials)
+            subtitle.text = item.credentials.username
             root.setOnClickListener { onCredentialSelected(item.credentials) }
+
+            val popupMenu = initializePopupMenu(root.context, item.credentials)
+            overflowMenu.setOnClickListener {
+                popupMenu.show(root, it)
+            }
+
             updateFavicon(item.credentials)
         }
     }
@@ -86,6 +98,13 @@ class AutofillManagementRecyclerAdapter(
         return when (listItems[position]) {
             is ListItem.GroupHeading -> ITEM_VIEW_TYPE_HEADER
             is ListItem.Credential -> ITEM_VIEW_TYPE_CREDENTIAL
+        }
+    }
+
+    private fun initializePopupMenu(context: Context, loginCredentials: LoginCredentials): PopupMenu {
+        return PopupMenu(LayoutInflater.from(context), R.layout.overflow_menu_list_item).apply {
+            onMenuItemClicked(contentView.findViewById(R.id.item_overflow_edit)) { onContextMenuItemClicked(Edit(loginCredentials)) }
+            onMenuItemClicked(contentView.findViewById(R.id.item_overflow_delete)) { onContextMenuItemClicked(Delete(loginCredentials)) }
         }
     }
 
@@ -113,6 +132,10 @@ class AutofillManagementRecyclerAdapter(
         data class GroupHeading(val initial: String) : ListItem()
     }
 
+    sealed class ContextMenuAction {
+        data class Edit(val credentials: LoginCredentials) : ContextMenuAction()
+        data class Delete(val credentials: LoginCredentials) : ContextMenuAction()
+    }
     companion object {
         private const val ITEM_VIEW_TYPE_HEADER = 0
         private const val ITEM_VIEW_TYPE_CREDENTIAL = 1

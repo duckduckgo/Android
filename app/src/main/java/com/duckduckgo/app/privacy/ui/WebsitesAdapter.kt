@@ -111,7 +111,7 @@ class WebsitesAdapter(
             }
             SECTION_TITLE_TYPE -> {
                 val binding = ViewListItemSectionTitleBinding.inflate(inflater, parent, false)
-                binding.listItemSectionTitle.setText(R.string.fireproofWebsiteItemsSectionTitle)
+                binding.listItemSectionTitle.setText(R.string.settingsPrivacyProtectionWhitelist)
                 WebsiteViewHolder.SimpleViewHolder(binding.root)
             }
             SITE_ENTRY -> {
@@ -141,6 +141,7 @@ class WebsitesAdapter(
             is WebsiteViewHolder.WebsiteItemViewHolder -> {
                 holder.bind(entries[getWebsiteItemPosition(position)])
             }
+            else -> {}
         }
     }
 }

@@ -21,7 +21,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "website_login_credentials")
 data class WebsiteLoginCredentialsEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val domain: String?,
     val username: String?,
     val password: String?,
