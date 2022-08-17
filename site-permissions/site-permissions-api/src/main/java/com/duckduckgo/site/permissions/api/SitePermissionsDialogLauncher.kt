@@ -4,6 +4,7 @@ import android.content.Context
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
 
+/** Public interface for Site Permissions dialog feature */
 interface SitePermissionsDialogLauncher {
 
     fun registerPermissionLauncher(caller: ActivityResultCaller)

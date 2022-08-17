@@ -3021,7 +3021,9 @@ class BrowserTabFragment :
     }
 
     private fun showSitePermissionsDialog(permissionsToRequest: Array<String>, request: PermissionRequest) {
-        sitePermissionsDialogLauncher.askForSitePermission(requireContext(), webView?.url ?: "", permissionsToRequest, request)
+        context?.let {
+            sitePermissionsDialogLauncher.askForSitePermission(it, webView?.url.orEmpty(), permissionsToRequest, request)
+        }
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {

@@ -29,3 +29,7 @@ java {
 dependencies {
     implementation AndroidX.appCompat
 }
+
+android {
+    namespace 'com.duckduckgo.site.permissions.api'
+}
