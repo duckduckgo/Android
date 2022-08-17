@@ -1,15 +1,16 @@
-name: Add a comment
-
 on:
   pull_request:
-    types: [opened, edited, labeled, unlabeled]
+    types: [opened, edited, reopened]
 
 jobs:
-  sync:
+  create-asana-attachment-job:
     runs-on: ubuntu-latest
+    name: Create pull request attachments on Asana tasks
     steps:
-      - uses: insurify/github-asana-action@v1.0.3
+      - name: Create pull request attachments
+        uses: Asana/create-app-attachment-github-action@latest
+        id: postAttachment
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          task-comment: 'View Pull Request Here: '
-          trigger-phrase: "\\*\\*Asana Task:\\*\\*"
+          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
+      - name: Log output status
+        run: echo "Status is ${{ steps.postAttachment.outputs.status }}"
