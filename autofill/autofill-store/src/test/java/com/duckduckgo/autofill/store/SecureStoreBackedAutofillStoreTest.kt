@@ -20,7 +20,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
-import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
+import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.ExactMatch
+import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.NoMatch
+import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.UrlOnlyMatch
+import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.UsernameMatch
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
@@ -176,10 +179,7 @@ class SecureStoreBackedAutofillStoreTest {
         storeCredentials(2, url, "username2", "password456")
         storeCredentials(3, url, "username3", "password789")
         val credentials = LoginCredentials(
-            domain = url,
-            username = "username1",
-            password = "newpassword",
-            id = 1
+            domain = url, username = "username1", password = "newpassword", id = 1
         )
 
         testee.updateCredentials(url, credentials)
@@ -199,10 +199,7 @@ class SecureStoreBackedAutofillStoreTest {
         storeCredentials(2, url, "username2", "password456")
         storeCredentials(3, url, "username3", "password789")
         val credentials = LoginCredentials(
-            domain = url,
-            username = "username1",
-            password = "newpassword",
-            id = 1
+            domain = url, username = "username1", password = "newpassword", id = 1
         )
 
         testee.updateCredentials(credentials)
@@ -219,9 +216,7 @@ class SecureStoreBackedAutofillStoreTest {
         setupTesteeWithAutofillAvailable()
         val url = "https://example.com"
         val credentials = LoginCredentials(
-            domain = url,
-            username = "username1",
-            password = "password"
+            domain = url, username = "username1", password = "password"
         )
         testee.saveCredentials(url, credentials)
 
@@ -253,11 +248,7 @@ class SecureStoreBackedAutofillStoreTest {
 
         assertEquals(
             LoginCredentials(
-                id = 1,
-                domain = url,
-                username = "username1",
-                password = "password123",
-                lastUpdatedMillis = DEFAULT_INITIAL_LAST_UPDATED
+                id = 1, domain = url, username = "username1", password = "password123", lastUpdatedMillis = DEFAULT_INITIAL_LAST_UPDATED
             ),
             testee.getCredentialsWithId(1)
         )
@@ -299,7 +290,10 @@ class SecureStoreBackedAutofillStoreTest {
         testee = SecureStoreBackedAutofillStore(secureStore, internalTestUserChecker, lastUpdatedTimeProvider, autofillPrefsStore)
     }
 
-    private fun setupTestee(isInternalUser: Boolean, canAccessSecureStorage: Boolean) {
+    private fun setupTestee(
+        isInternalUser: Boolean,
+        canAccessSecureStorage: Boolean
+    ) {
         internalTestUserChecker = FakeInternalTestUserChecker(isInternalUser)
         secureStore = FakeSecureStore(canAccessSecureStorage)
         testee = SecureStoreBackedAutofillStore(secureStore, internalTestUserChecker, lastUpdatedTimeProvider, autofillPrefsStore)
@@ -337,9 +331,11 @@ class SecureStoreBackedAutofillStoreTest {
 
         private val credentials = mutableListOf<WebsiteLoginDetailsWithCredentials>()
 
-        override suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials): Long {
+        override suspend fun addWebsiteLoginDetailsWithCredentials(
+            websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials
+        ): WebsiteLoginDetailsWithCredentials {
             credentials.add(websiteLoginDetailsWithCredentials)
-            return credentials.size.toLong()
+            return websiteLoginDetailsWithCredentials
         }
 
         override suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> {
@@ -380,10 +376,13 @@ class SecureStoreBackedAutofillStoreTest {
             }
         }
 
-        override suspend fun updateWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials) {
+        override suspend fun updateWebsiteLoginDetailsWithCredentials(
+            websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials
+        ): WebsiteLoginDetailsWithCredentials {
             credentials.indexOfFirst { it.details.id == websiteLoginDetailsWithCredentials.details.id }.also {
                 credentials[it] = websiteLoginDetailsWithCredentials
             }
+            return websiteLoginDetailsWithCredentials
         }
 
         override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Long) {
