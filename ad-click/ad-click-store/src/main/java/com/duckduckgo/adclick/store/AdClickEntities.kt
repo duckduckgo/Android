@@ -22,8 +22,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "link_formats")
 data class AdClickAttributionLinkFormatEntity(
     @PrimaryKey val url: String,
-    val parameterName: String,
-    val parameterValue: String,
     val adDomainParameterName: String
 )
 

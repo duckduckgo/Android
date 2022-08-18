@@ -34,8 +34,6 @@ data class AdClickAttributionSettings(
 
 data class AdClickAttributionLinkFormat(
     val url: String,
-    val parameterName: String?,
-    val parameterValue: String?,
     val adDomainParameterName: String?
 )
 

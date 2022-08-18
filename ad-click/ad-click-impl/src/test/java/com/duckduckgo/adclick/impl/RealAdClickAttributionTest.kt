@@ -158,8 +158,6 @@ class RealAdClickAttributionTest {
             listOf(
                 AdClickAttributionLinkFormatEntity(
                     url = "https://example.com",
-                    parameterName = "",
-                    parameterValue = "",
                     adDomainParameterName = ""
                 )
             )
@@ -182,8 +180,6 @@ class RealAdClickAttributionTest {
             listOf(
                 AdClickAttributionLinkFormatEntity(
                     url = "https://example.com",
-                    parameterName = "",
-                    parameterValue = "",
                     adDomainParameterName = ""
                 )
             )
@@ -206,8 +202,6 @@ class RealAdClickAttributionTest {
             listOf(
                 AdClickAttributionLinkFormatEntity(
                     url = "https://example.com",
-                    parameterName = "",
-                    parameterValue = "",
                     adDomainParameterName = "ad_domain"
                 )
             )
@@ -224,102 +218,6 @@ class RealAdClickAttributionTest {
     }
 
     @Test
-    fun whenFeatureEnabledAndUrlMatchesLinkFormatAndParamNameThenIsAdClickReturnsTrue() {
-        givenFeatureEnabled()
-        givenDetectionsEnabled(domainEnabled = true, heuristicEnabled = true)
-        whenever(mockAdClickAttributionRepository.linkFormats).thenReturn(
-            listOf(
-                AdClickAttributionLinkFormatEntity(
-                    url = "https://example.com",
-                    parameterName = "a",
-                    parameterValue = "",
-                    adDomainParameterName = ""
-                )
-            )
-        )
-        testee = RealAdClickAttribution(
-            mockAdClickAttributionRepository,
-            mockFeatureToggle
-        )
-
-        val result = testee.isAdClick("https://example.com?a=100")
-
-        assertTrue(result.first)
-    }
-
-    @Test
-    fun whenFeatureEnabledAndUrlMatchesLinkFormatAndParamNameAndParamValueThenIsAdClickReturnsTrue() {
-        givenFeatureEnabled()
-        givenDetectionsEnabled(domainEnabled = true, heuristicEnabled = true)
-        whenever(mockAdClickAttributionRepository.linkFormats).thenReturn(
-            listOf(
-                AdClickAttributionLinkFormatEntity(
-                    url = "https://example.com",
-                    parameterName = "a",
-                    parameterValue = "100",
-                    adDomainParameterName = ""
-                )
-            )
-        )
-        testee = RealAdClickAttribution(
-            mockAdClickAttributionRepository,
-            mockFeatureToggle
-        )
-
-        val result = testee.isAdClick("https://example.com?a=100")
-
-        assertTrue(result.first)
-    }
-
-    @Test
-    fun whenFeatureEnabledAndUrlMatchesLinkFormatAndDoesntMatchParamNameThenIsAdClickReturnsFalse() {
-        givenFeatureEnabled()
-        givenDetectionsEnabled(domainEnabled = true, heuristicEnabled = true)
-        whenever(mockAdClickAttributionRepository.linkFormats).thenReturn(
-            listOf(
-                AdClickAttributionLinkFormatEntity(
-                    url = "https://example.com",
-                    parameterName = "b",
-                    parameterValue = "100",
-                    adDomainParameterName = ""
-                )
-            )
-        )
-        testee = RealAdClickAttribution(
-            mockAdClickAttributionRepository,
-            mockFeatureToggle
-        )
-
-        val result = testee.isAdClick("https://example.com?a=100")
-
-        assertFalse(result.first)
-    }
-
-    @Test
-    fun whenFeatureEnabledAndUrlMatchesLinkFormatAndParamNameAndDoesntMatchParmaValueThenIsAdClickReturnsFalse() {
-        givenFeatureEnabled()
-        givenDetectionsEnabled(domainEnabled = true, heuristicEnabled = true)
-        whenever(mockAdClickAttributionRepository.linkFormats).thenReturn(
-            listOf(
-                AdClickAttributionLinkFormatEntity(
-                    url = "https://example.com",
-                    parameterName = "a",
-                    parameterValue = "0",
-                    adDomainParameterName = ""
-                )
-            )
-        )
-        testee = RealAdClickAttribution(
-            mockAdClickAttributionRepository,
-            mockFeatureToggle
-        )
-
-        val result = testee.isAdClick("https://example.com?a=100")
-
-        assertFalse(result.first)
-    }
-
-    @Test
     fun whenFeatureEnabledAndOnlyDomainDetectionEnabledAndUrlMatchesLinkFormatThenAdClickReturnsTrue() {
         givenFeatureEnabled()
         givenDetectionsEnabled(domainEnabled = true, heuristicEnabled = false)
@@ -327,8 +225,6 @@ class RealAdClickAttributionTest {
             listOf(
                 AdClickAttributionLinkFormatEntity(
                     url = "https://example.com",
-                    parameterName = "",
-                    parameterValue = "",
                     adDomainParameterName = ""
                 )
             )
@@ -351,8 +247,6 @@ class RealAdClickAttributionTest {
             listOf(
                 AdClickAttributionLinkFormatEntity(
                     url = "https://example.com",
-                    parameterName = "",
-                    parameterValue = "",
                     adDomainParameterName = ""
                 )
             )

@@ -108,17 +108,11 @@ class RealAdClickAttribution @Inject constructor(
         }
 
         val uri = Uri.parse(url)
-        if (linkFormat.parameterName.isEmpty() && linkFormat.parameterValue.isEmpty() && linkFormat.adDomainParameterName.isEmpty()) {
+        if (linkFormat.adDomainParameterName.isEmpty()) {
             return Pair(true, null)
         }
         if (linkFormat.adDomainParameterName.isNotEmpty() && uri.queryParameterNames.contains(linkFormat.adDomainParameterName)) {
             return Pair(true, uri.getQueryParameter(linkFormat.adDomainParameterName))
-        }
-        if (linkFormat.parameterName.isNotEmpty() && linkFormat.parameterValue.isNotEmpty()) {
-            return Pair(uri.getQueryParameter(linkFormat.parameterName) == linkFormat.parameterValue, null)
-        }
-        if (linkFormat.parameterName.isNotEmpty()) {
-            return Pair(uri.queryParameterNames.contains(linkFormat.parameterName), null)
         }
 
         return noMatch
