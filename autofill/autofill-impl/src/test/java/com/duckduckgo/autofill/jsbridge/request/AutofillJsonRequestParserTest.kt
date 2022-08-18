@@ -75,8 +75,6 @@ class AutofillJsonRequestParserTest {
     fun whenTopLevelCredentialsObjectMissingThenParsesWithoutError() = runTest {
         val parsed = "storeFormData_topLevelDataMissing".parseStoreFormDataJson()
         assertNull(parsed.credentials)
-        assertNull(parsed.credentials!!.username)
-        assertNull(parsed.credentials!!.password)
     }
 
     private suspend fun String.parseStoreFormDataJson(): AutofillStoreFormDataRequest {
