@@ -16,6 +16,15 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
+    <!-- Site Permissions Settings -->
+    <string name="sitePermissionsActivityTitle">Site Permissions</string>
+    <string name="sitePermissionsSettingsDescription">Sites you visit may ask for access to your device’s location, camera, or microphone. They won’t be able to access these unless you explicitly give them permission.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Allow all sites to ask for:</string>
+    <string name="sitePermissionsSettingsLocation">Location</string>
+    <string name="sitePermissionsSettingsCamera">Camera</string>
+    <string name="sitePermissionsSettingsMicrophone">Microphone</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Manage Sites</string>
+
     <!-- Autofill -->
     <string name="autofillSnackbarAction">View</string>
     <string name="autofillLoginSavedSnackbarMessage">Login saved</string>

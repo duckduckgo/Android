@@ -32,6 +32,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface SitePermissionsRepository {
+    var askCameraEnabled: Boolean
+    var askMicEnabled: Boolean
     fun isDomainAllowedToAsk(url: String, permission: String): Boolean
     fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
     fun sitePermissionGranted(url: String, tabId: String, permission: String)
@@ -45,6 +47,10 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider
 ) : SitePermissionsRepository {
+
+    override var askCameraEnabled: Boolean = sitePermissionsPreferences.askCameraEnabled
+
+    override var askMicEnabled: Boolean = sitePermissionsPreferences.askMicEnabled
 
     override fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
         val sitePermissionsForDomain = sitePermissionsDao.getSitePermissionsByDomain(url) ?: return true

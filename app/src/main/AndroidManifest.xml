@@ -362,9 +362,9 @@
             android:label="@string/fireproofWebsitesActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
-            android:name="com.duckduckgo.app.location.ui.LocationPermissionsActivity"
+            android:name="com.duckduckgo.app.sitepermissions.SitePermissionsActivity"
             android:exported="false"
-            android:label="@string/preciseLocationActivityTitle"
+            android:label="@string/sitePermissionsActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"

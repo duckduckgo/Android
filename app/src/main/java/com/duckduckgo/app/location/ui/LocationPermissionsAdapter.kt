@@ -30,8 +30,8 @@ import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsEmptyHintBinding
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsEntryBinding
-import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsSectionTitleBinding
-import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsToggleBinding
+import com.duckduckgo.app.browser.databinding.ViewSitePermissionsTitleBinding
+import com.duckduckgo.app.browser.databinding.ViewSitePermissionsToggleBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
@@ -109,8 +109,8 @@ class LocationPermissionsAdapter(
                 LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(binding.root)
             }
             TOGGLE_TYPE -> {
-                val binding = ViewLocationPermissionsToggleBinding.inflate(inflater, parent, false)
-                LocationPermissionsViewHolder.LocationPermissionsToggleViewHolder(binding) { _, isChecked ->
+                val binding = ViewSitePermissionsToggleBinding.inflate(inflater, parent, false)
+                LocationPermissionsViewHolder.sitePermissionsToggleViewHolder(binding) { _, isChecked ->
                     viewModel.onLocationPermissionToggled(isChecked)
                 }
             }
@@ -126,12 +126,12 @@ class LocationPermissionsAdapter(
                 LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(binding.root)
             }
             ALLOWED_SITES_SECTION_TITLE_TYPE -> {
-                val binding = ViewLocationPermissionsSectionTitleBinding.inflate(inflater, parent, false)
+                val binding = ViewSitePermissionsTitleBinding.inflate(inflater, parent, false)
                 LocationPermissionsViewHolder.LocationPermissionsAllowedSectionViewHolder(binding)
             }
             DENIED_SITES_SECTION_TITLE_TYPE -> {
-                val binding = ViewLocationPermissionsSectionTitleBinding.inflate(inflater, parent, false)
-                binding.locationPermissionsSectionTitle.setText(R.string.preciseLocationDeniedSitesSectionTitle)
+                val binding = ViewSitePermissionsTitleBinding.inflate(inflater, parent, false)
+                binding.sitePermissionsSectionTitle.setText(R.string.preciseLocationDeniedSitesSectionTitle)
                 LocationPermissionsViewHolder.LocationPermissionsDeniedSectionViewHolder(binding)
             }
             else -> throw IllegalArgumentException("viewType not found")
@@ -153,7 +153,7 @@ class LocationPermissionsAdapter(
         position: Int
     ) {
         when (holder) {
-            is LocationPermissionsViewHolder.LocationPermissionsToggleViewHolder -> {
+            is LocationPermissionsViewHolder.sitePermissionsToggleViewHolder -> {
                 holder.bind(locationPermissionEnabled)
             }
             is LocationPermissionsViewHolder.LocationPermissionsAllowedSectionViewHolder -> {
@@ -210,29 +210,29 @@ class LocationPermissionsAdapter(
 
 sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class LocationPermissionsToggleViewHolder(
-        private val binding: ViewLocationPermissionsToggleBinding,
+    class sitePermissionsToggleViewHolder(
+        private val binding: ViewSitePermissionsToggleBinding,
         private val listener: CompoundButton.OnCheckedChangeListener
     ) :
         LocationPermissionsViewHolder(binding.root) {
         fun bind(locationPermissionEnabled: Boolean) {
-            binding.locationPermissionsToggle.quietlySetIsChecked(locationPermissionEnabled, listener)
+            binding.sitePermissionsToggle.quietlySetIsChecked(locationPermissionEnabled, listener)
         }
     }
 
-    class LocationPermissionsAllowedSectionViewHolder(private val binding: ViewLocationPermissionsSectionTitleBinding) :
+    class LocationPermissionsAllowedSectionViewHolder(private val binding: ViewSitePermissionsTitleBinding) :
         LocationPermissionsViewHolder(binding.root) {
         fun bind(allowedPermissions: Boolean) {
-            binding.locationPermissionsSectionTitle.setText(R.string.preciseLocationAllowedSitesSectionTitle)
+            binding.sitePermissionsSectionTitle.setText(R.string.preciseLocationAllowedSitesSectionTitle)
             binding.root.isGone = !allowedPermissions
         }
     }
 
-    class LocationPermissionsDeniedSectionViewHolder(private val binding: ViewLocationPermissionsSectionTitleBinding) :
+    class LocationPermissionsDeniedSectionViewHolder(private val binding: ViewSitePermissionsTitleBinding) :
         LocationPermissionsViewHolder(binding.root) {
         fun bind(deniedPermissionsItems: Boolean) {
-            binding.locationPermissionsSectionTitle.setText(R.string.preciseLocationDeniedSitesSectionTitle)
-            binding.locationPermissionsSectionTitle.isGone = !deniedPermissionsItems
+            binding.sitePermissionsSectionTitle.setText(R.string.preciseLocationDeniedSitesSectionTitle)
+            binding.sitePermissionsSectionTitle.isGone = !deniedPermissionsItems
         }
     }
 

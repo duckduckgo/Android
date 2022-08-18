@@ -398,7 +398,7 @@
         <item name="android:layout_height">1dp</item>
     </style>
 
-    <style name="LocationPermissionsSwitch">
+    <style name="SitePermissionsSwitch">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">12dp</item>
@@ -411,7 +411,7 @@
         <item name="android:gravity">start</item>
     </style>
 
-    <style name="LocationPermissionsSectionTitle">
+    <style name="SitePermissionsSectionTitle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">16dp</item>
