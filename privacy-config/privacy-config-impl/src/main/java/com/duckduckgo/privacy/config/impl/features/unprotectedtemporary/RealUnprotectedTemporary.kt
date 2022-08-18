@@ -18,14 +18,11 @@ package com.duckduckgo.privacy.config.impl.features.unprotectedtemporary
 
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import dagger.SingleInstanceIn
-
-interface UnprotectedTemporary {
-    fun isAnException(url: String): Boolean
-}
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

@@ -250,7 +250,7 @@ class BrowserWebViewClient(
             Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
 
             url?.let {
-                autoconsent.injectAutoconsent(webView)
+                autoconsent.injectAutoconsent(webView, url)
                 adClickManager.detectAdDomain(url)
                 appCoroutineScope.launch(dispatcherProvider.default()) {
                     thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
