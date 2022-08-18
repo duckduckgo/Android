@@ -57,6 +57,13 @@
                 app:subtitle="@string/devSettingsTriggerAnrSubtitle"
                 app:title="@string/devSettingsTriggerAnr" />
 
+            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+                android:id="@+id/clearSavedSites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:subtitle="@string/devSettingsClearSavedSitesSubtitle"
+                app:title="@string/devSettingsClearSavedSites" />
+
             <TextView
                 android:id="@+id/privacyTitle"
                 style="@style/SettingsSectionTitle"

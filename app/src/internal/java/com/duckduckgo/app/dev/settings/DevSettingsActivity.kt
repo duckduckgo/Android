@@ -83,6 +83,9 @@ class DevSettingsActivity : DuckDuckGoActivity() {
                 Thread.sleep(10000)
             }
         }
+        binding.clearSavedSites.setOnClickListener {
+            viewModel.clearSavedSites()
+        }
         binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
     }
 
