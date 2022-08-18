@@ -122,23 +122,17 @@ class RealSavedSitesParser : SavedSitesParser {
         document: Document,
         bookmarksRepository: BookmarksRepository
     ): List<SavedSite> {
-        val children = document.select("body").first()?.children()
-        val savedSites: MutableList<SavedSite> = mutableListOf()
+        val body = document.select("body").first() ?: return emptyList()
+        val children = body.childNodes()
+            .filterIsInstance<Element>()
+            .filter { it.select("DT").isNotEmpty() }
 
-        children?.forEach { child ->
-            if (child.select("DL").first() == null) {
-                val linkItem = child.select("a")
-                if (linkItem.isNotEmpty()) {
-                    val link = linkItem.attr("href")
-                    val title = linkItem.text()
-                    val bookmark = SavedSite.Bookmark(0, title = title, url = link, parentId = 0)
-                    savedSites.add(bookmark)
-                }
-            } else {
-                savedSites += parseElement(child, 0, bookmarksRepository, mutableListOf(), false)
-            }
+        var rootElement: Element = document
+
+        if (children.size != 1) {
+            rootElement = Element("DL").appendChildren(children)
         }
-        return savedSites
+        return parseElement(rootElement, 0, bookmarksRepository, mutableListOf(), false)
     }
 
     private suspend fun parseElement(
