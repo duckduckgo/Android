@@ -25,10 +25,7 @@
     <TextView
         android:id="@+id/settingsAppearanceTitle"
         style="@style/SettingsSectionTitle"
-        android:text="@string/settingsHeadingAppearance"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="@string/settingsHeadingAppearance" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/selectedThemeSetting"
