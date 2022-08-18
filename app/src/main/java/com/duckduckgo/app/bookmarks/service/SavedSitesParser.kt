@@ -19,7 +19,6 @@ package com.duckduckgo.app.bookmarks.service
 import com.duckduckgo.app.bookmarks.model.*
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import timber.log.Timber
 
 interface SavedSitesParser {
     fun generateHtml(
@@ -128,13 +127,13 @@ class RealSavedSitesParser : SavedSitesParser {
 
         children?.forEach { child ->
             if (child.select("DL").first() == null) {
-            val linkItem = child.select("a")
-            if (linkItem.isNotEmpty()) {
-                val link = linkItem.attr("href")
-                val title = linkItem.text()
-                val bookmark = SavedSite.Bookmark(0, title = title, url = link, parentId = 0)
-                savedSites.add(bookmark)
-            }
+                val linkItem = child.select("a")
+                if (linkItem.isNotEmpty()) {
+                    val link = linkItem.attr("href")
+                    val title = linkItem.text()
+                    val bookmark = SavedSite.Bookmark(0, title = title, url = link, parentId = 0)
+                    savedSites.add(bookmark)
+                }
             } else {
                 savedSites += parseElement(child, 0, bookmarksRepository, mutableListOf(), false)
             }
