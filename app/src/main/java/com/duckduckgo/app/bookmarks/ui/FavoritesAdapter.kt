@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.bookmarks.ui.FavoritesAdapter.FavIconRequest
@@ -51,7 +52,7 @@ class FavoritesAdapter(
         const val FAVORITE_TYPE = 2
     }
 
-    private val favoriteItems: MutableList<FavoriteItemTypes> = mutableListOf()
+    private val favoriteItems = mutableListOf<FavoriteItemTypes>()
 
     data class FavIconRequest(val url: String)
     private val favIconRequestsChannel = Channel<FavIconRequest>(capacity = 100)
@@ -73,7 +74,10 @@ class FavoritesAdapter(
         favoriteItems: List<FavoriteItem>
     ) {
         val generatedList = generateNewList(favoriteItems)
+        val diffCallback = DiffCallback(old = this.favoriteItems, new = generatedList)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
         this.favoriteItems.clear().also { this.favoriteItems.addAll(generatedList) }
+        diffResult.dispatchUpdatesTo(this)
     }
 
     private fun generateNewList(value: List<FavoriteItemTypes>): List<FavoriteItemTypes> {
@@ -141,6 +145,28 @@ class FavoritesAdapter(
             else -> {
                 FAVORITE_TYPE
             }
+        }
+    }
+
+    class DiffCallback(
+        private val old: List<FavoriteItemTypes>,
+        private val new: List<FavoriteItemTypes>
+    ) : DiffUtil.Callback() {
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return old[oldItemPosition] == new[newItemPosition]
+        }
+
+        override fun getOldListSize(): Int {
+            return old.size
+        }
+
+        override fun getNewListSize(): Int {
+            return new.size
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return old[oldItemPosition] == new[newItemPosition]
         }
     }
 }

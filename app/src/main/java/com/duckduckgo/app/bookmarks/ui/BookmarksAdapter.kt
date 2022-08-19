@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.FavIconRequest
@@ -49,7 +50,7 @@ class BookmarksAdapter(
         const val BOOKMARK_TYPE = 1
     }
 
-    private val bookmarkItems: MutableList<BookmarksItemTypes> = mutableListOf()
+    private val bookmarkItems = mutableListOf<BookmarksItemTypes>()
 
     data class FavIconRequest(val url: String)
     private val favIconRequestsChannel = Channel<FavIconRequest>(capacity = 100)
@@ -71,7 +72,10 @@ class BookmarksAdapter(
         showEmptyHint: Boolean
     ) {
         val generatedList = generateNewList(bookmarkItems, showEmptyHint)
+        val diffCallback = DiffCallback(old = this.bookmarkItems, new = generatedList)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
         this.bookmarkItems.clear().also { this.bookmarkItems.addAll(generatedList) }
+        diffResult.dispatchUpdatesTo(this)
     }
 
     private fun generateNewList(
@@ -132,6 +136,28 @@ class BookmarksAdapter(
 
     override fun getItemCount(): Int {
         return this.bookmarkItems.size
+    }
+
+    class DiffCallback(
+        private val old: List<BookmarksItemTypes>,
+        private val new: List<BookmarksItemTypes>
+    ) : DiffUtil.Callback() {
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return old[oldItemPosition] == new[newItemPosition]
+        }
+
+        override fun getOldListSize(): Int {
+            return old.size
+        }
+
+        override fun getNewListSize(): Int {
+            return new.size
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return old[oldItemPosition] == new[newItemPosition]
+        }
     }
 }
 

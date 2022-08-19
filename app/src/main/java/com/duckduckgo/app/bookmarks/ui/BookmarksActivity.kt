@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -146,7 +145,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
         contentBookmarksBinding.recycler.itemAnimator = null
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun observeViewModel(parentId: Long) {
         viewModel.viewState.observe(
             this
@@ -154,10 +152,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
             viewState?.let { state ->
                 if (parentId == ROOT_FOLDER_ID) {
                     favoritesAdapter.setItems(state.favorites.map { FavoritesAdapter.FavoriteItem(it) })
-                    favoritesAdapter.notifyDataSetChanged()
                 }
                 bookmarksAdapter.setItems(state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
-                bookmarksAdapter.notifyDataSetChanged()
                 bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
                 setSearchMenuItemVisibility()
             }
