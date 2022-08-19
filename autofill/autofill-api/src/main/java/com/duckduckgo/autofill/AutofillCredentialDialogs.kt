@@ -26,12 +26,15 @@ import com.duckduckgo.autofill.domain.app.LoginTriggerType
 interface CredentialAutofillPickerDialog {
 
     companion object {
+
+        fun resultKey(tabId: String) = "$tabId/CredentialAutofillPickerDialogResult"
+
         const val TAG = "CredentialAutofillPickerDialog"
-        const val RESULT_KEY_CREDENTIAL_PICKER = "CredentialAutofillPickerDialogResult"
         const val KEY_CANCELLED = "cancelled"
         const val KEY_URL = "url"
         const val KEY_CREDENTIALS = "credentials"
         const val KEY_TRIGGER_TYPE = "triggerType"
+        const val KEY_TAB_ID = "tabId"
     }
 }
 
@@ -41,10 +44,12 @@ interface CredentialAutofillPickerDialog {
 interface CredentialSavePickerDialog {
 
     companion object {
+        fun resultKey(tabId: String) = "$tabId/CredentialSavePickerDialogResultSave"
+
         const val TAG = "CredentialSavePickerDialog"
-        const val RESULT_KEY_CREDENTIAL_RESULT_SAVE = "CredentialSavePickerDialogResultSave"
         const val KEY_URL = "url"
         const val KEY_CREDENTIALS = "credentials"
+        const val KEY_TAB_ID = "tabId"
     }
 }
 
@@ -54,10 +59,12 @@ interface CredentialSavePickerDialog {
 interface CredentialUpdateExistingCredentialsDialog {
 
     companion object {
+        fun resultKey(tabId: String) = "$tabId/CredentialUpdateExistingCredentialsResult"
+
         const val TAG = "CredentialUpdateExistingCredentialsDialog"
         const val KEY_URL = "url"
         const val KEY_CREDENTIALS = "credentials"
-        const val RESULT_KEY_CREDENTIAL_RESULT_UPDATE = "CredentialUpdateExistingCredentialsResult"
+        const val KEY_TAB_ID = "tabId"
     }
 }
 
@@ -66,10 +73,23 @@ interface CredentialUpdateExistingCredentialsDialog {
  */
 interface CredentialAutofillDialogFactory {
 
-    fun autofillSelectCredentialsDialog(url: String, credentials: List<LoginCredentials>, triggerType: LoginTriggerType): DialogFragment
+    fun autofillSelectCredentialsDialog(
+        url: String,
+        credentials: List<LoginCredentials>,
+        triggerType: LoginTriggerType,
+        tabId: String
+    ): DialogFragment
 
-    fun autofillSavingCredentialsDialog(url: String, credentials: LoginCredentials): DialogFragment
+    fun autofillSavingCredentialsDialog(
+        url: String,
+        credentials: LoginCredentials,
+        tabId: String
+    ): DialogFragment
 
-    fun autofillSavingUpdateCredentialsDialog(url: String, credentials: LoginCredentials): DialogFragment
+    fun autofillSavingUpdateCredentialsDialog(
+        url: String,
+        credentials: LoginCredentials,
+        tabId: String
+    ): DialogFragment
 
 }
