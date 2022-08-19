@@ -87,6 +87,20 @@ class DuckDuckGoFaviconManager constructor(
         }
     }
 
+    override suspend fun saveFaviconForUrl(url: String) {
+        val domain = url.extractDomain() ?: return
+
+        val cachedFavicon = faviconPersister.faviconFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
+        if (cachedFavicon != null) {
+            return
+        }
+
+        val favicon = downloadFaviconFor(domain)
+        if (favicon != null) {
+            saveFavicon("", favicon, domain)
+        }
+    }
+
     override suspend fun loadFromDisk(
         tabId: String?,
         url: String
@@ -144,6 +158,11 @@ class DuckDuckGoFaviconManager constructor(
         } else {
             view.loadFavicon(bitmap, url)
         }
+    }
+
+    override suspend fun loadToViewFromLocalWithPlaceholder(tabId: String?, url: String, view: ImageView) {
+        val bitmap = loadFromDisk(tabId, url)
+        view.loadFavicon(bitmap, url)
     }
 
     override suspend fun persistCachedFavicon(

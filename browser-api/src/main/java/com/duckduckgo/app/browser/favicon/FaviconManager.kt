@@ -31,12 +31,22 @@ interface FaviconManager {
         url: String
     ): File?
 
+    suspend fun saveFaviconForUrl(
+        url: String
+    )
+
     suspend fun persistCachedFavicon(
         tabId: String,
         url: String
     )
 
     suspend fun loadToViewFromLocalOrFallback(
+        tabId: String? = null,
+        url: String,
+        view: ImageView
+    )
+
+    suspend fun loadToViewFromLocalWithPlaceholder(
         tabId: String? = null,
         url: String,
         view: ImageView
@@ -75,3 +85,4 @@ sealed class FaviconSource {
         val url: String
     ) : FaviconSource()
 }
+

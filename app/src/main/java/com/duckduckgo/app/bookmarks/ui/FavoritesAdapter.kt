@@ -26,6 +26,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
+import com.duckduckgo.app.bookmarks.ui.FavoritesAdapter.FavIconRequest
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEntryBinding
@@ -33,7 +34,8 @@ import com.duckduckgo.app.browser.databinding.ViewSavedSiteSectionTitleBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 
 class FavoritesAdapter(
@@ -51,10 +53,21 @@ class FavoritesAdapter(
 
     private val favoriteItems: MutableList<FavoriteItemTypes> = mutableListOf()
 
+    data class FavIconRequest(val url: String)
+    private val favIconRequestsChannel = Channel<FavIconRequest>(capacity = 100)
+
     interface FavoriteItemTypes
     object Header : FavoriteItemTypes
     object EmptyHint : FavoriteItemTypes
     data class FavoriteItem(val favorite: Favorite) : FavoriteItemTypes
+
+    init {
+        lifecycleOwner.lifecycleScope.launch {
+            favIconRequestsChannel.consumeEach {
+                faviconManager.saveFaviconForUrl(it.url)
+            }
+        }
+    }
 
     fun setItems(
         favoriteItems: List<FavoriteItem>
@@ -75,7 +88,14 @@ class FavoritesAdapter(
         return when (viewType) {
             FAVORITE_TYPE -> {
                 val binding = ViewSavedSiteEntryBinding.inflate(inflater, parent, false)
-                return FavoritesScreenViewHolders.FavoriteViewHolder(layoutInflater, binding, viewModel, lifecycleOwner, faviconManager)
+                return FavoritesScreenViewHolders.FavoriteViewHolder(
+                    layoutInflater,
+                    binding,
+                    viewModel,
+                    lifecycleOwner,
+                    faviconManager,
+                    favIconRequestsChannel
+                )
             }
             FAVORITE_SECTION_TITLE_TYPE -> {
                 val binding = ViewSavedSiteSectionTitleBinding.inflate(inflater, parent, false)
@@ -144,7 +164,8 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
         private val binding: ViewSavedSiteEntryBinding,
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
-        private val faviconManager: FaviconManager
+        private val faviconManager: FaviconManager,
+        private val favIconRequestsChannel: Channel<FavIconRequest>
     ) : FavoritesScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
@@ -175,8 +196,9 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
         }
 
         private fun loadFavicon(url: String, image: ImageView) {
-            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = image)
+            lifecycleOwner.lifecycleScope.launch {
+                favIconRequestsChannel.send(FavIconRequest(url))
+                faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = image)
             }
         }
 

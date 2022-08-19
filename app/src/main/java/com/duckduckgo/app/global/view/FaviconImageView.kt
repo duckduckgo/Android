@@ -31,45 +31,38 @@ import com.duckduckgo.mobile.android.R as CommonR
 import java.io.File
 import java.util.*
 import kotlin.math.absoluteValue
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import okio.ByteString.Companion.encodeUtf8
 
 fun ImageView.loadFavicon(
     file: File,
     domain: String
 ) {
-    GlobalScope.launch(Dispatchers.Main) {
-        val defaultDrawable = generateDefaultDrawable(this@loadFavicon.context, domain)
-        Glide.with(context).clear(this@loadFavicon)
-        Glide.with(context)
-            .load(file)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
-            .transform(RoundedCorners(10))
-            .placeholder(defaultDrawable)
-            .error(defaultDrawable)
-            .into(this@loadFavicon)
-    }
+    val defaultDrawable = generateDefaultDrawable(this.context, domain)
+    Glide.with(context).clear(this@loadFavicon)
+    Glide.with(context)
+        .load(file)
+        .diskCacheStrategy(DiskCacheStrategy.NONE)
+        .skipMemoryCache(true)
+        .transform(RoundedCorners(10))
+        .placeholder(defaultDrawable)
+        .error(defaultDrawable)
+        .into(this)
 }
 
 fun ImageView.loadFavicon(
     bitmap: Bitmap?,
     domain: String
 ) {
-    GlobalScope.launch(Dispatchers.Main) {
-        val defaultDrawable = generateDefaultDrawable(this@loadFavicon.context, domain)
-        Glide.with(context).clear(this@loadFavicon)
-        Glide.with(context)
-            .load(bitmap)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
-            .transform(RoundedCorners(10))
-            .placeholder(defaultDrawable)
-            .error(defaultDrawable)
-            .into(this@loadFavicon)
-    }
+    val defaultDrawable = generateDefaultDrawable(this.context, domain)
+    Glide.with(context).clear(this)
+    Glide.with(context)
+        .load(bitmap)
+        .diskCacheStrategy(DiskCacheStrategy.NONE)
+        .skipMemoryCache(true)
+        .transform(RoundedCorners(10))
+        .placeholder(defaultDrawable)
+        .error(defaultDrawable)
+        .into(this)
 }
 
 fun ImageView.loadDefaultFavicon(domain: String) {
