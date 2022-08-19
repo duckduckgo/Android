@@ -96,6 +96,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
                 } else {
                     finish()
                 }
+                viewModel.onAuthenticationEnded()
             }
         } else {
             viewModel.disabled()
