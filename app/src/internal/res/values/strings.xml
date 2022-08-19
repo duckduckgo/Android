@@ -28,7 +28,7 @@
     <string name="devSettingsTriggerAnr" translatable="false">Trigger ANR</string>
     <string name="devSettingsTriggerAnrSubtitle" translatable="false">Click here to trigger an ANR in the app</string>
     <string name="devSettingsClearSavedSites" translatable="false">Clear saved sites</string>
-    <string name="devSettingsClearSavedSitesSubtitle" translatable="false">Click here to clear all bookmarks and favorites</string>
+    <string name="devSettingsClearSavedSitesSubtitle" translatable="false">Click here to clear all bookmarks, folders and favorites</string>
 
     <string name="devSettingsScreenUserAgentSection" translatable="false">USER AGENT</string>
     <string name="devSettingsScreenUserAgentOverride" translatable="false">Override UserAgent</string>
