@@ -85,4 +85,3 @@ sealed class FaviconSource {
         val url: String
     ) : FaviconSource()
 }
-
