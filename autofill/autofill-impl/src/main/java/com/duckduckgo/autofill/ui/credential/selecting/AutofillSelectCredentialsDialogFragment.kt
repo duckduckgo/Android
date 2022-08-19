@@ -29,7 +29,6 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
-import com.duckduckgo.autofill.CredentialSavePickerDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.domain.app.LoginTriggerType.AUTOPROMPT
@@ -150,7 +149,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
                     it.putString(CredentialAutofillPickerDialog.KEY_URL, url)
                     it.putParcelableArrayList(CredentialAutofillPickerDialog.KEY_CREDENTIALS, cr)
                     it.putSerializable(CredentialAutofillPickerDialog.KEY_TRIGGER_TYPE, triggerType)
-                    it.putString(CredentialSavePickerDialog.KEY_TAB_ID, tabId)
+                    it.putString(CredentialAutofillPickerDialog.KEY_TAB_ID, tabId)
                 }
             return fragment
         }
