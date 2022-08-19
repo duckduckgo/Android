@@ -35,6 +35,7 @@ import com.duckduckgo.autofill.impl.databinding.ContentAutofillSaveNewCredential
 import com.duckduckgo.autofill.ui.credential.dialog.animateClosed
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
@@ -68,6 +69,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     private fun configureViews(binding: ContentAutofillSaveNewCredentialsBinding, credentials: LoginCredentials) {
+        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         configureSiteDetails(binding)
         configureTitles(binding, credentials)
         configureCloseButtons(binding)

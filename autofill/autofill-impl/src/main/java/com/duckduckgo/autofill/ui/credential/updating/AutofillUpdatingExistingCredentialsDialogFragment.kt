@@ -34,6 +34,7 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillUpdateExistingCredentialsBinding
 import com.duckduckgo.autofill.ui.credential.dialog.animateClosed
 import com.duckduckgo.di.scopes.FragmentScope
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
@@ -67,6 +68,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
     }
 
     private fun configureViews(binding: ContentAutofillUpdateExistingCredentialsBinding) {
+        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         val credentials = getCredentialsToSave()
         val originalUrl = getOriginalUrl()
 
