@@ -37,6 +37,7 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSelectCredentialsTooltipBinding
 import com.duckduckgo.autofill.ui.credential.dialog.animateClosed
 import com.duckduckgo.di.scopes.FragmentScope
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
@@ -70,6 +71,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     private fun configureViews(binding: ContentAutofillSelectCredentialsTooltipBinding) {
+        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         configureSiteDetails(binding)
         configureRecyclerView(binding)
         configureCloseButton(binding)
