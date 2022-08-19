@@ -71,7 +71,7 @@ class SecureStoreBackedAutofillStore(
     override suspend fun saveCredentials(
         rawUrl: String,
         credentials: LoginCredentials
-    ): Long? {
+    ): LoginCredentials? {
         val url = rawUrl.extractSchemeAndDomain()
         if (url == null) {
             Timber.w("Cannot save credentials as given url was in an unexpected format. Original url: %s", rawUrl)
@@ -89,37 +89,36 @@ class SecureStoreBackedAutofillStore(
         )
         val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(loginDetails, password = credentials.password)
 
-        val newId = secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)
-
-        showOnboardingWhenOfferingToSaveLogin = false
-
-        return newId
+        return secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials().also {
+            showOnboardingWhenOfferingToSaveLogin = false
+        }
     }
 
-    override suspend fun updateCredentials(
-        rawUrl: String,
-        credentials: LoginCredentials
-    ) {
+    override suspend fun updateCredentials(rawUrl: String, credentials: LoginCredentials): LoginCredentials? {
         val url = rawUrl.extractSchemeAndDomain()
         if (url == null) {
             Timber.w("Cannot update credentials as given url was in an unexpected format. Original url: %s", rawUrl)
-            return
+            return null
         }
 
         val matchingCredentials =
             secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull()?.filter { it.details.username == credentials.username }
         if (matchingCredentials.isNullOrEmpty()) {
             Timber.w("Cannot update credentials as no credentials were found for %s", url)
-            return
+            return null
         }
 
         Timber.i("Updating %d saved login credentials for %s. username=%s", matchingCredentials.size, url, credentials.username)
 
+        var updatedCredentials: WebsiteLoginDetailsWithCredentials? = null
+
         matchingCredentials.forEach {
             val modifiedDetails = it.details.copy(username = credentials.username, lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis())
             val modified = it.copy(password = credentials.password, details = modifiedDetails)
-            secureStorage.updateWebsiteLoginDetailsWithCredentials(modified)
+            updatedCredentials = secureStorage.updateWebsiteLoginDetailsWithCredentials(modified)
         }
+
+        return updatedCredentials?.toLoginCredentials()
     }
 
     override suspend fun getAllCredentials(): Flow<List<LoginCredentials>> {
@@ -133,11 +132,11 @@ class SecureStoreBackedAutofillStore(
         secureStorage.deleteWebsiteLoginDetailsWithCredentials(id)
     }
 
-    override suspend fun updateCredentials(credentials: LoginCredentials) {
-        secureStorage.updateWebsiteLoginDetailsWithCredentials(
+    override suspend fun updateCredentials(credentials: LoginCredentials): LoginCredentials? {
+        return secureStorage.updateWebsiteLoginDetailsWithCredentials(
             credentials.copy(lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis())
                 .toWebsiteLoginCredentials()
-        )
+        )?.toLoginCredentials()
     }
 
     override suspend fun containsCredentials(

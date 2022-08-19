@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.ui.view
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Parcelable
 import android.text.TextWatcher
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
@@ -32,6 +33,9 @@ import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action.PerformEnd
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.textfield.TextInputLayout.END_ICON_CUSTOM
 import com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
+import android.os.Parcel
+import android.os.Parcelable.ClassLoaderCreator
+import android.util.SparseArray
 
 interface OutlinedTextInput {
     var text: String
@@ -86,7 +90,6 @@ class OutLinedTextInputView @JvmOverloads constructor(
                     showKeyboard()
                 }
             }
-
             recycle()
         }
     }
@@ -176,5 +179,74 @@ class OutLinedTextInputView @JvmOverloads constructor(
     private fun setupTextMode() {
         binding.internalPasswordIcon.visibility = View.GONE
         binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
+    }
+
+    override fun onSaveInstanceState(): Parcelable {
+        // All savedstate logic added here is necessary since this view have children with assigned ids. Without this code, having multiple
+        // OutlinedTextInput instances causes the state to be overwritten for children with the same id.
+        // More info: https://web.archive.org/web/20180625034135/http://trickyandroid.com/saving-android-view-state-correctly/
+        val superState = super.onSaveInstanceState()
+        val ss = SavedState(superState)
+        ss.childrenStates = SparseArray<Parcelable>()
+        for (i in 0 until childCount) {
+            getChildAt(i).saveHierarchyState(ss.childrenStates)
+        }
+        return ss
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable) {
+        val ss = state as SavedState
+        super.onRestoreInstanceState(ss.superState)
+        for (i in 0 until childCount) {
+            getChildAt(i).restoreHierarchyState(ss.childrenStates)
+        }
+    }
+
+    override fun dispatchSaveInstanceState(container: SparseArray<Parcelable?>?) {
+        dispatchFreezeSelfOnly(container)
+    }
+
+    override fun dispatchRestoreInstanceState(container: SparseArray<Parcelable?>?) {
+        dispatchThawSelfOnly(container)
+    }
+
+    internal class SavedState : BaseSavedState {
+        var childrenStates: SparseArray<Parcelable>? = null
+
+        constructor(superState: Parcelable?) : super(superState)
+        private constructor(
+            parcel: Parcel,
+            classLoader: ClassLoader?
+        ) : super(parcel) {
+            childrenStates = parcel.readSparseArray(classLoader)
+        }
+
+        override fun writeToParcel(
+            out: Parcel,
+            flags: Int
+        ) {
+            super.writeToParcel(out, flags)
+            out.writeSparseArray(childrenStates)
+        }
+
+        companion object {
+            @JvmField
+            val CREATOR: ClassLoaderCreator<SavedState> = object : ClassLoaderCreator<SavedState> {
+                override fun createFromParcel(
+                    source: Parcel,
+                    loader: ClassLoader?
+                ): SavedState {
+                    return SavedState(source, loader)
+                }
+
+                override fun createFromParcel(source: Parcel): SavedState {
+                    return createFromParcel(source, null)
+                }
+
+                override fun newArray(size: Int): Array<SavedState?> {
+                    return arrayOfNulls(size)
+                }
+            }
+        }
     }
 }

@@ -171,7 +171,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.post { tabsRecycler.scrollToPosition(index) }
     }
 
-    private fun processCommand(command: Command?) {
+    private fun processCommand(command: Command) {
         when (command) {
             is Close -> finishAfterTransition()
         }

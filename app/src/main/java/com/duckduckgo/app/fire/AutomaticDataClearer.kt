@@ -195,6 +195,7 @@ class AutomaticDataClearer @Inject constructor(
                     dataClearerState.value = FINISHED
                 }
             }
+            else -> {}
         }
     }
 

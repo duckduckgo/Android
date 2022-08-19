@@ -19,8 +19,8 @@ package com.duckduckgo.securestorage.impl
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
-import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
+import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedString
 import com.duckduckgo.securestorage.store.SecureStorageRepository
 import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity
@@ -46,9 +46,12 @@ class RealSecureStorage @Inject constructor(
 
     override fun canAccessSecureStorage(): Boolean = l2DataTransformer.canProcessData() && secureStorageRepository != null
 
-    override suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials): Long? {
+    override suspend fun addWebsiteLoginDetailsWithCredentials(
+        websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials
+    ): WebsiteLoginDetailsWithCredentials? {
         return withContext(dispatchers.io()) {
-            return@withContext secureStorageRepository?.addWebsiteLoginCredential(websiteLoginDetailsWithCredentials.toDataEntity())
+            val savedCredential = secureStorageRepository?.addWebsiteLoginCredential(websiteLoginDetailsWithCredentials.toDataEntity())
+            return@withContext savedCredential?.toCredentials()
         }
     }
 
@@ -102,9 +105,11 @@ class RealSecureStorage @Inject constructor(
             }
         } else emptyFlow()
 
-    override suspend fun updateWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials): Unit =
+    override suspend fun updateWebsiteLoginDetailsWithCredentials(
+        websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials
+    ): WebsiteLoginDetailsWithCredentials? =
         withContext(dispatchers.io()) {
-            secureStorageRepository?.updateWebsiteLoginCredentials(websiteLoginDetailsWithCredentials.toDataEntity())
+            secureStorageRepository?.updateWebsiteLoginCredentials(websiteLoginDetailsWithCredentials.toDataEntity())?.toCredentials()
         }
 
     override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Long): Unit =

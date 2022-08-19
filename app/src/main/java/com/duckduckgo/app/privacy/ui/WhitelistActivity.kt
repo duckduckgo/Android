@@ -97,7 +97,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun processCommand(command: WhitelistViewModel.Command?) {
+    private fun processCommand(command: WhitelistViewModel.Command) {
         when (command) {
             is ShowAdd -> showAddDialog()
             is ShowEdit -> showEditDialog(command.entry)

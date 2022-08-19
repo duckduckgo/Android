@@ -139,8 +139,10 @@ class BrowserWebViewClient(
                 }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
                     Timber.i("Found non-http app link for ${urlType.uriString}")
-                    webViewClientListener?.let { listener ->
-                        return listener.handleNonHttpAppLink(urlType)
+                    if (isForMainFrame) {
+                        webViewClientListener?.let { listener ->
+                            return listener.handleNonHttpAppLink(urlType)
+                        }
                     }
                     true
                 }

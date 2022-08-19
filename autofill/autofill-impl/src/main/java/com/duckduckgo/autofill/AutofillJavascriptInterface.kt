@@ -24,13 +24,18 @@ import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
+import com.duckduckgo.autofill.jsbridge.request.AutofillStoreFormDataRequest
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputMainType.CREDENTIALS
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.USERNAME
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType.AUTOPROMPT
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
@@ -89,6 +94,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
             }
 
             val request = requestParser.parseAutofillDataRequest(requestString)
+            val triggerType = convertTriggerType(request.trigger)
 
             if (request.mainType != CREDENTIALS) {
                 handleUnknownRequestMainType(request, url)
@@ -102,9 +108,16 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
                 if (credentials.isEmpty()) {
                     callback?.noCredentialsAvailable(url)
                 } else {
-                    callback?.onCredentialsAvailableToInject(credentials)
+                    callback?.onCredentialsAvailableToInject(credentials, triggerType)
                 }
             }
+        }
+    }
+
+    private fun convertTriggerType(trigger: SupportedAutofillTriggerType): LoginTriggerType {
+        return when (trigger) {
+            USER_INITIATED -> LoginTriggerType.USER_INITIATED
+            AUTOPROMPT -> LoginTriggerType.AUTOPROMPT
         }
     }
 
@@ -178,20 +191,25 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
             val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
             val title = autofillDomainFormatter.extractDomain(currentUrl)
 
-            val request = requestParser.parseStoreFormDataRequest(data).credentials
+            val request = requestParser.parseStoreFormDataRequest(data)
 
-            if (request.username.isNullOrBlank() && request.password.isNullOrBlank()) {
-                Timber.w("Invalid data from storeFormData; username and password can't both be blank")
+            if (!request.isValid()) {
+                Timber.w("Invalid data from storeFormData")
                 return@launch
             }
 
-            val jsCredentials = JavascriptCredentials(request.username, request.password)
+            val jsCredentials = JavascriptCredentials(request.credentials!!.username, request.credentials.password)
             val credentials = jsCredentials.asLoginCredentials(currentUrl, title)
 
             withContext(dispatcherProvider.main()) {
                 callback?.onCredentialsAvailableToSave(currentUrl, credentials)
             }
         }
+    }
+
+    private fun AutofillStoreFormDataRequest?.isValid(): Boolean {
+        if (this == null || credentials == null) return false
+        return !(credentials.username.isNullOrBlank() && credentials.password.isNullOrBlank())
     }
 
     override fun injectCredentials(credentials: LoginCredentials) {

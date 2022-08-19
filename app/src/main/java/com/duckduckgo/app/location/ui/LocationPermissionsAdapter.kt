@@ -165,6 +165,7 @@ class LocationPermissionsAdapter(
             is LocationPermissionsViewHolder.LocationPermissionsItemViewHolder -> {
                 holder.bind(getLocationPermission(position))
             }
+            else -> {}
         }
     }
 

@@ -152,7 +152,6 @@
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">For other reason</string>
     <string name="atp_ExcludeAppsManuallyCTAReport">Report</string>
     <string name="atp_ExcludeAppsManuallyCTASkip">Skip</string>
-    <string name="atp_ExcludeAppsManuallyDisableAnswerExplanation">Submissions are 100\% anonymous and only include your selection above and the app name.</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Restore Default Protected Apps</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Report an Issue With an App</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Restore default protection?</string>
@@ -166,6 +165,15 @@
     <string name="atp_ReportBreakageAppEntry">%s app</string>
     <string name="atp_ReportBreakageAppSubmitCta">Submit</string>
     <string name="atp_ReportBreakageAppNextCta">Next</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Please describe what\'s happening, what you expected to happen, and steps that led to the issue.</string>
+    <string name="atp_ReportBreakageFormInputHint">Tell us more about the issue you\'re experiencing</string>
+    <string name="atp_ReportBreakageFormCheckboxText">By clicking “Submit” I agree that DuckDuckGo may use the information in this report for purposes of improving App Tracking Protection.
+    </string>
+    <string name="atp_ReportBreakageFormDisclaimerText">
+        <![CDATA[In addition to the details entered into this form, your app issue report will contain:<br/>&#8226; The app package name<br/>&#8226; A list of trackers blocked in the app<br/>&#8226; Whether App Tracking Protection is enabled<br/>&#8226; Aggregate DuckDuckGo app diagnostics<br/>]]>
+    </string>
+    <string name="atp_ReportBreakageSent">Report sent, thanks! Your feedback helps us improve App Tracking Protection for everyone.</string>
+    <string name="atp_ThanksForTheFeedback">Thanks for the feedback!</string>
     <string name="atp_ReportBreakageCategoriesTitle">What\'s happening?</string>
     <string name="atp_ReportBreakageCategoriesHint">What\'s happening?</string>
     <string name="atp_ReportBreakageCategoryCrashes">App freezes or crashes</string>
@@ -177,15 +185,6 @@
     <string name="atp_ReportBreakageCategoryConnection">App has no connection</string>
     <string name="atp_ReportBreakageCategoryIot">Can\'t connect local device</string>
     <string name="atp_ReportBreakageCategoryOther">Something else</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Please describe what\'s happening, what you expected to happen, and steps that led to the issue.</string>
-    <string name="atp_ReportBreakageFormInputHint">Tell us more about the issue you\'re experiencing</string>
-    <string name="atp_ReportBreakageFormCheckboxText">By clicking “Submit” I agree that DuckDuckGo may use the information in this report for purposes of improving App Tracking Protection.
-    </string>
-    <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[In addition to the details entered into this form, your app issue report will contain:<br/>&#8226; The app package name<br/>&#8226; A list of trackers blocked in the app<br/>&#8226; Whether App Tracking Protection is enabled<br/>&#8226; Aggregate DuckDuckGo app diagnostics<br/>]]>
-    </string>
-    <string name="atp_ReportBreakageSent">Report sent, thanks! Your feedback helps us improve App Tracking Protection for everyone.</string>
-    <string name="atp_ThanksForTheFeedback">Thanks for the feedback!</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">About App Trackers</string>

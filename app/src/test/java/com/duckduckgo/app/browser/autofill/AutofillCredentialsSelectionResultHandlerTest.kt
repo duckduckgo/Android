@@ -151,11 +151,11 @@ class AutofillCredentialsSelectionResultHandlerTest {
         verifyAuthenticatorNeverCalled()
     }
 
-    private fun verifySaveNeverCalled() {
+    private suspend fun verifySaveNeverCalled() {
         verify(credentialsSaver, never()).saveCredentials(any(), any())
     }
 
-    private fun verifyUpdateNeverCalled() {
+    private suspend fun verifyUpdateNeverCalled() {
         verify(credentialsSaver, never()).updateCredentials(any(), any())
     }
 

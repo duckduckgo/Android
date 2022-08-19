@@ -128,7 +128,7 @@ class DuckDuckGoAdClickManager @Inject constructor(
     private fun toTldPlusOne(url: String): String? {
         val urlAdDomain = UriString.host(url)
         if (urlAdDomain.isNullOrEmpty()) return urlAdDomain
-        return publicSuffixDatabase.getEffectiveTldPlusOne(urlAdDomain)
+        return kotlin.runCatching { publicSuffixDatabase.getEffectiveTldPlusOne(urlAdDomain) }.getOrNull()
     }
 
     private fun adClicked(detectedAdDomain: String?) {

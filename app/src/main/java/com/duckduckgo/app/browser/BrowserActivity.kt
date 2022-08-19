@@ -28,6 +28,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.DialogFragment
+import androidx.webkit.ServiceWorkerClientCompat
+import androidx.webkit.ServiceWorkerControllerCompat
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
@@ -38,7 +41,6 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
-import com.duckduckgo.app.browser.serviceworker.ServiceWorkerLifecycleObserver
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -109,7 +111,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     lateinit var userEventsStore: UserEventsStore
 
     @Inject
-    lateinit var serviceWorkerLifecycleObserver: ServiceWorkerLifecycleObserver
+    lateinit var serviceWorkerClientCompat: ServiceWorkerClientCompat
 
     @Inject
     @AppCoroutineScope
@@ -145,13 +147,13 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
-        lifecycle.addObserver(serviceWorkerLifecycleObserver)
         toolbarMockupBinding = IncludeOmnibarToolbarMockupBinding.bind(binding.root)
         setContentView(binding.root)
         viewModel.viewState.observe(this) {
             renderer.renderBrowserViewState(it)
         }
         viewModel.awaitClearDataFinishedNotification()
+        initializeServiceWorker()
     }
 
     override fun onStop() {
@@ -178,6 +180,16 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         } else {
             Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
             lastIntent = intent
+        }
+    }
+
+    private fun initializeServiceWorker() {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_BASIC_USAGE)) {
+            try {
+                ServiceWorkerControllerCompat.getInstance().setServiceWorkerClient(serviceWorkerClientCompat)
+            } catch (e: Exception) {
+                Timber.w(e.localizedMessage)
+            }
         }
     }
 
@@ -347,7 +359,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         }
     }
 
-    private fun processCommand(command: Command?) {
+    private fun processCommand(command: Command) {
         Timber.i("Processing command: $command")
         when (command) {
             is Query -> currentTab?.submitQuery(command.query)

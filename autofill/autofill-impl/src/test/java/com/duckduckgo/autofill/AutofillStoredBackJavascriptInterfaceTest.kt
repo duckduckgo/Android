@@ -23,6 +23,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.autofill.AutofillStoredBackJavascriptInterface.UrlProvider
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
@@ -31,6 +32,7 @@ import com.duckduckgo.autofill.jsbridge.request.AutofillStoreFormDataRequest
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputMainType.CREDENTIALS
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.USERNAME
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
@@ -85,7 +87,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
         testee.webView = testWebView
 
         whenever(currentUrlProvider.currentUrl(testWebView)).thenReturn("https://example.com")
-        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(AutofillDataRequest(CREDENTIALS, USERNAME))
+        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(AutofillDataRequest(CREDENTIALS, USERNAME, USER_INITIATED))
         whenever(autofillResponseWriter.generateContentScope()).thenReturn("")
         whenever(autofillResponseWriter.generateEmptyResponseGetAutofillData()).thenReturn("")
         whenever(autofillResponseWriter.generateResponseGetAutofillData(any())).thenReturn("")
@@ -460,11 +462,11 @@ class AutofillStoredBackJavascriptInterfaceTest {
     ) = LoginCredentials(0, "example.com", username, password)
 
     private suspend fun setupRequestForSubTypeUsername() {
-        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(AutofillDataRequest(CREDENTIALS, USERNAME))
+        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(AutofillDataRequest(CREDENTIALS, USERNAME, USER_INITIATED))
     }
 
     private suspend fun setupRequestForSubTypePassword() {
-        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(AutofillDataRequest(CREDENTIALS, PASSWORD))
+        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(AutofillDataRequest(CREDENTIALS, PASSWORD, USER_INITIATED))
     }
 
     private fun assertCredentialsUnavailable() {
@@ -494,7 +496,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
         // for saving
         var credentialsToSave: LoginCredentials? = null
 
-        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
+        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
             credentialsAvailableToInject = true
             this.credentialsToInject = credentials
         }

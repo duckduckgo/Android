@@ -170,6 +170,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
                 variantManager.updateAppReferrerVariant(VariantManager.RESERVED_EU_AUCTION_VARIANT)
                 appReferrerDataStore.installedFromEuAuction = true
             }
+            else -> {}
         }
 
         appReferrerDataStore.referrerCheckedPreviously = true

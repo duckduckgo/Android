@@ -162,13 +162,13 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.NavigateToHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
@@ -190,6 +190,7 @@ import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.Callback
 import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.Companion.RESULT_KEY_CREDENTIAL_RESULT_UPDATE
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.ui.ExistingCredentialMatchDetector
@@ -342,6 +343,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var existingCredentialMatchDetector: ExistingCredentialMatchDetector
 
+    @Inject
+    lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
+
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
@@ -419,8 +423,8 @@ class BrowserTabFragment :
     }
 
     private val autofillCallback = object : Callback {
-        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
-            showAutofillDialogChooseCredentials(credentials)
+        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
+            showAutofillDialogChooseCredentials(credentials, triggerType)
         }
 
         override fun noCredentialsAvailable(originalUrl: String) {
@@ -788,11 +792,11 @@ class BrowserTabFragment :
     }
 
     private fun processCommand(it: Command?) {
-        if (it !is Command.DaxCommand) {
+        if (it is NavigationCommand) {
             renderer.cancelTrackersAnimation()
         }
         when (it) {
-            is Command.Refresh -> refresh()
+            is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query, it.sourceTabId)
             }
@@ -810,15 +814,15 @@ class BrowserTabFragment :
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
             is Command.ShowPrivacyProtectionDisabledConfirmation -> privacyProtectionDisabledConfirmation(it.domain)
-            is Command.Navigate -> {
+            is NavigationCommand.Navigate -> {
                 dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
             }
-            is Command.NavigateBack -> {
+            is NavigationCommand.NavigateBack -> {
                 dismissAppLinkSnackBar()
                 webView?.goBackOrForward(-it.steps)
             }
-            is Command.NavigateForward -> {
+            is NavigationCommand.NavigateForward -> {
                 dismissAppLinkSnackBar()
                 webView?.goForward()
             }
@@ -902,7 +906,7 @@ class BrowserTabFragment :
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
-            is Command.DaxCommand.FinishTrackerAnimation -> finishTrackerAnimation()
+            is Command.DaxCommand.FinishPartialTrackerAnimation -> finishPartialTrackerAnimation()
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
@@ -928,11 +932,14 @@ class BrowserTabFragment :
                 omnibarTextInput.setSelection(it.query.length)
             }
             is ShowBackNavigationHistory -> showBackNavigationHistory(it)
-            is NavigateToHistory -> navigateBackHistoryStack(it.historyStackIndex)
+            is NavigationCommand.NavigateToHistory -> navigateBackHistoryStack(it.historyStackIndex)
             is Command.EmailSignEvent -> {
                 notifyEmailSignEvent()
             }
             is Command.PrintLink -> launchPrint(it.url)
+            else -> {
+                // NO OP
+            }
         }
     }
 
@@ -1574,11 +1581,19 @@ class BrowserTabFragment :
         }
 
         setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_SAVE) { _, result ->
-            autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)
+            launch {
+                autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)?.let {
+                    showAuthenticationSavedOrUpdatedSnackbar(it, R.string.autofillLoginSavedSnackbarMessage)
+                }
+            }
         }
 
         setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_UPDATE) { _, result ->
-            autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)
+            launch {
+                autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)?.let {
+                    showAuthenticationSavedOrUpdatedSnackbar(it, R.string.autofillLoginUpdatedSnackbarMessage)
+                }
+            }
         }
     }
 
@@ -1592,10 +1607,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showAutofillDialogChooseCredentials(credentials: List<LoginCredentials>) {
+    private fun showAutofillDialogChooseCredentials(credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
         Timber.v("onCredentialsAvailable. %d creds to choose from", credentials.size)
         val url = webView?.url ?: return
-        val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(url, credentials)
+        val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(url, credentials, triggerType)
         showDialogHidingPrevious(dialog, CredentialAutofillPickerDialog.TAG)
     }
 
@@ -1613,6 +1628,20 @@ class BrowserTabFragment :
 
         val dialog = credentialAutofillDialogFactory.autofillSavingUpdateCredentialsDialog(url, credentials)
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
+    }
+
+    private suspend fun showAuthenticationSavedOrUpdatedSnackbar(
+        loginCredentials: LoginCredentials,
+        @StringRes messageResourceId: Int,
+        delay: Long = 200
+    ) {
+        delay(delay)
+        withContext(Dispatchers.Main) {
+            browserLayout.makeSnackbarWithNoBottomInset(messageResourceId, Snackbar.LENGTH_LONG)
+                .setAction(R.string.autofillSnackbarAction) {
+                    context?.let { startActivity(autofillSettingsActivityLauncher.intent(it, loginCredentials)) }
+                }.show()
+        }
     }
 
     private fun showDialogHidingPrevious(dialog: DialogFragment, tag: String) {
@@ -2089,7 +2118,7 @@ class BrowserTabFragment :
         }
     }
 
-    private fun finishTrackerAnimation() {
+    private fun finishPartialTrackerAnimation() {
         animatorHelper.finishTrackerAnimation(omnibarViews(), animationContainer)
     }
 
