@@ -80,7 +80,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
                 it.putString(CredentialSavePickerDialog.KEY_URL, getOriginalUrl())
                 it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, getCredentialsToSave())
             }
-            parentFragment?.setFragmentResult(CredentialSavePickerDialog.RESULT_KEY_CREDENTIAL_RESULT_SAVE, result)
+            parentFragment?.setFragmentResult(CredentialSavePickerDialog.resultKey(getTabId()), result)
             (dialog as BottomSheetDialog).animateClosed()
         }
     }
@@ -113,20 +113,21 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     private fun getCredentialsToSave() = arguments?.getParcelable<LoginCredentials>(CredentialSavePickerDialog.KEY_CREDENTIALS)!!
-
+    private fun getTabId() = arguments?.getString(CredentialSavePickerDialog.KEY_TAB_ID)!!
     private fun getOriginalUrl() = arguments?.getString(CredentialSavePickerDialog.KEY_URL)!!
 
     private fun showOnboarding() = viewModel.showOnboarding()
 
     companion object {
 
-        fun instance(url: String, credentials: LoginCredentials): AutofillSavingCredentialsDialogFragment {
+        fun instance(url: String, credentials: LoginCredentials, tabId: String): AutofillSavingCredentialsDialogFragment {
 
             val fragment = AutofillSavingCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {
                     it.putString(CredentialSavePickerDialog.KEY_URL, url)
                     it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, credentials)
+                    it.putString(CredentialSavePickerDialog.KEY_TAB_ID, tabId)
                 }
             return fragment
         }
