@@ -127,7 +127,10 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun launchDeviceAuth() {
-        addCommand(LaunchDeviceAuth)
+        if (!viewState.value.isAuthenticating) {
+            _viewState.value = viewState.value.copy(isAuthenticating = true)
+            addCommand(LaunchDeviceAuth)
+        }
     }
 
     fun lock() {
@@ -144,7 +147,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun disabled() {
-        _viewState.value = viewState.value.copy(isLocked = true)
+        _viewState.value = viewState.value.copy(isLocked = true, isAuthenticating = false)
         // Remove backstack modes if they are present
         addCommand(ExitListMode)
         addCommand(ExitCredentialMode)
@@ -212,10 +215,15 @@ class AutofillSettingsViewModel @Inject constructor(
         _viewState.value = viewState.value.copy(autofillEnabled = false)
     }
 
+    fun onAuthenticationEnded() {
+        _viewState.value = viewState.value.copy(isAuthenticating = false)
+    }
+
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val logins: List<LoginCredentials> = emptyList(),
         val credentialMode: CredentialMode = NotInCredentialMode,
+        val isAuthenticating: Boolean = false,
         val isLocked: Boolean = false
     )
 
