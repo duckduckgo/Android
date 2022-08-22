@@ -34,6 +34,7 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillUpdateExistingCredentialsBinding
 import com.duckduckgo.autofill.ui.credential.dialog.animateClosed
 import com.duckduckgo.di.scopes.FragmentScope
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
@@ -67,6 +68,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
     }
 
     private fun configureViews(binding: ContentAutofillUpdateExistingCredentialsBinding) {
+        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         val credentials = getCredentialsToSave()
         val originalUrl = getOriginalUrl()
 
@@ -79,7 +81,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
                 it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, originalUrl)
                 it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
             }
-            parentFragment?.setFragmentResult(CredentialUpdateExistingCredentialsDialog.RESULT_KEY_CREDENTIAL_RESULT_UPDATE, result)
+            parentFragment?.setFragmentResult(CredentialUpdateExistingCredentialsDialog.resultKey(getTabId()), result)
             (dialog as BottomSheetDialog).animateClosed()
         }
     }
@@ -109,18 +111,19 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
     }
 
     private fun getCredentialsToSave() = arguments?.getParcelable<LoginCredentials>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS)!!
-
+    private fun getTabId() = arguments?.getString(CredentialUpdateExistingCredentialsDialog.KEY_TAB_ID)!!
     private fun getOriginalUrl() = arguments?.getString(CredentialUpdateExistingCredentialsDialog.KEY_URL)!!
 
     companion object {
 
-        fun instance(url: String, credentials: LoginCredentials): AutofillUpdatingExistingCredentialsDialogFragment {
+        fun instance(url: String, credentials: LoginCredentials, tabId: String): AutofillUpdatingExistingCredentialsDialogFragment {
 
             val fragment = AutofillUpdatingExistingCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {
                     it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, url)
                     it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
+                    it.putString(CredentialUpdateExistingCredentialsDialog.KEY_TAB_ID, tabId)
                 }
             return fragment
         }

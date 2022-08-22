@@ -111,7 +111,8 @@ class SettingsViewModel @Inject constructor(
 
     sealed class Command {
         object LaunchDefaultBrowser : Command()
-        object LaunchEmailProtection : Command()
+        data class LaunchEmailProtection(val url: String) : Command()
+        object LaunchEmailProtectionNotSUpported : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
         object LaunchAutofillSettings : Command()
@@ -259,7 +260,14 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onEmailProtectionSettingClicked() {
-        viewModelScope.launch { command.send(Command.LaunchEmailProtection) }
+        viewModelScope.launch {
+            val com = if (emailManager.isEmailFeatureSupported()) {
+                Command.LaunchEmailProtection(EMAIL_PROTECTION_URL)
+            } else {
+                Command.LaunchEmailProtectionNotSUpported
+            }
+            command.send(com)
+        }
     }
 
     fun onMacOsSettingClicked() {
@@ -450,6 +458,10 @@ class SettingsViewModel @Inject constructor(
             ClearWhenOption.APP_EXIT_OR_60_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
             else -> null
         }
+    }
+
+    companion object {
+        const val EMAIL_PROTECTION_URL = "https://duckduckgo.com/email"
     }
 }
 

@@ -187,7 +187,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         if (WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_BASIC_USAGE)) {
             try {
                 ServiceWorkerControllerCompat.getInstance().setServiceWorkerClient(serviceWorkerClientCompat)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 Timber.w(e.localizedMessage)
             }
         }

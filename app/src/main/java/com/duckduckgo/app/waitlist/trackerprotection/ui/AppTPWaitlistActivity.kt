@@ -31,9 +31,9 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.duckduckgo.app.browser.databinding.ActivityAppTpWaitlistBinding
 import com.duckduckgo.app.browser.webview.WebViewActivity
-import com.duckduckgo.app.email.ui.EmailProtectionSignInFragment
-import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
+import com.duckduckgo.app.waitlist.WaitlistNotificationDialog
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.waitlist.WaitlistNotificationDialog.Companion.NOTIFICATION_DIALOG_TAG
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
@@ -183,7 +183,7 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
                 onNoThanksClicked = { viewModel.onNoThanksClicked() }
                 onDialogDismissed = { viewModel.onDialogDismissed() }
             }
-            dialog.show(it, EmailProtectionSignInFragment.NOTIFICATION_DIALOG_TAG)
+            dialog.show(it, NOTIFICATION_DIALOG_TAG)
         }
     }
 

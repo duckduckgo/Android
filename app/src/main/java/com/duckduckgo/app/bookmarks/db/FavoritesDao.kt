@@ -68,4 +68,7 @@ interface FavoritesDao {
             update(favoriteEntity)
         }
     }
+
+    @Query("delete from favorites")
+    fun deleteAll()
 }

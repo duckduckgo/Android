@@ -30,13 +30,11 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Editing
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.NotInCredentialMode
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
-import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementDisabledMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.*
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementCredentialsMode
-import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementLockedMode
+import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementListMode
+import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementLockedMode
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
@@ -98,6 +96,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
                 } else {
                     finish()
                 }
+                viewModel.onAuthenticationEnded()
             }
         } else {
             viewModel.disabled()
@@ -212,10 +211,12 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         private const val TAG_CREDENTIAL = "tag_fragment_credential"
         private const val TAG_ALL_CREDENTIALS = "tag_fragment_all_credentials"
 
-        fun intent(
-            context: Context,
-            loginCredentials: LoginCredentials? = null
-        ): Intent {
+        /**
+         * Launch the Autofill management activity.
+         * Optionally, can provide LoginCredentials to jump directly into viewing mode.
+         * If no LoginCredentials provided, will show the list mode.
+         */
+        fun intent(context: Context, loginCredentials: LoginCredentials? = null): Intent {
             return Intent(context, AutofillManagementActivity::class.java).apply {
                 if (loginCredentials != null) {
                     putExtra(EXTRAS_CREDENTIALS_TO_VIEW, loginCredentials)
@@ -232,8 +233,8 @@ class AutofillSettingsModule {
     @Provides
     fun activityLauncher(): AutofillSettingsActivityLauncher {
         return object : AutofillSettingsActivityLauncher {
-            override fun intent(context: Context): Intent {
-                return AutofillManagementActivity.intent(context)
+            override fun intent(context: Context, loginCredentials: LoginCredentials?): Intent {
+                return AutofillManagementActivity.intent(context, loginCredentials)
             }
         }
     }

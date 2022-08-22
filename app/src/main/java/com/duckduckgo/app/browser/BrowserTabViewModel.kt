@@ -2682,14 +2682,14 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(CancelIncomingAutofillRequest(originalUrl))
     }
 
-    override fun saveCredentials(url: String, credentials: LoginCredentials) {
-        viewModelScope.launch {
+    override suspend fun saveCredentials(url: String, credentials: LoginCredentials): LoginCredentials? {
+        return withContext(appCoroutineScope.coroutineContext) {
             autofillStore.saveCredentials(url, credentials)
         }
     }
 
-    override fun updateCredentials(url: String, credentials: LoginCredentials) {
-        viewModelScope.launch {
+    override suspend fun updateCredentials(url: String, credentials: LoginCredentials): LoginCredentials? {
+        return withContext(appCoroutineScope.coroutineContext) {
             autofillStore.updateCredentials(url, credentials)
         }
     }

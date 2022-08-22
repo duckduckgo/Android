@@ -19,9 +19,12 @@ package com.duckduckgo.app.dev.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.bookmarks.model.BookmarksRepository
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.traces.api.StartupTraces
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -38,7 +41,10 @@ import javax.inject.Inject
 class DevSettingsViewModel @Inject constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
     private val startupTraces: StartupTraces,
-    private val userAgentProvider: UserAgentProvider
+    private val userAgentProvider: UserAgentProvider,
+    private val bookmarksRepository: BookmarksRepository,
+    private val favoritesRepository: FavoritesRepository,
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     data class ViewState(
@@ -51,6 +57,7 @@ class DevSettingsViewModel @Inject constructor(
     sealed class Command {
         object SendTdsIntent : Command()
         object OpenUASelector : Command()
+        object ShowSavedSitesClearedConfirmation : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -113,6 +120,14 @@ class DevSettingsViewModel @Inject constructor(
         devSettingsDataStore.selectedUA = userAgent
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(userAgent = userAgentProvider.userAgent("", false)))
+        }
+    }
+
+    fun clearSavedSites() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            favoritesRepository.deleteAll()
+            bookmarksRepository.deleteAll()
+            command.send(Command.ShowSavedSitesClearedConfirmation)
         }
     }
 }

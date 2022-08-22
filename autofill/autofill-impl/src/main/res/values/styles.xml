@@ -22,6 +22,7 @@
 
     <style name="AutofillBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="backgroundTint">@android:color/transparent</item>
+        <item name="behavior_skipCollapsed">true</item>
     </style>
 
     <style name="AutofillDialogRootViewStyle">
