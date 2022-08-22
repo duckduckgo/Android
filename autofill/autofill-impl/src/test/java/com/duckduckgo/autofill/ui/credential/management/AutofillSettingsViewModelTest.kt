@@ -328,6 +328,68 @@ class AutofillSettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenLaunchDeviceAuthThenUpdateStateToIsAuthenticatingAndEmitLaunchDeviceCommand() = runTest {
+        testee.launchDeviceAuth()
+
+        testee.viewState.test {
+            val finalResult = this.expectMostRecentItem()
+            assertTrue(finalResult.isAuthenticating)
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.commands.test {
+            awaitItem().first().assertCommandType(LaunchDeviceAuth::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchDeviceAuthTwiceThenEmitLaunchDeviceCommandOnceOnly() = runTest {
+        testee.launchDeviceAuth()
+        testee.launchDeviceAuth()
+
+        testee.commands.test {
+            assertEquals(
+                listOf(LaunchDeviceAuth),
+                this.expectMostRecentItem().toList()
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedDeviceAuthHasEndedAndLaunchedAgainThenEmitLaunchDeviceCommandtwice() = runTest {
+        testee.launchDeviceAuth()
+        testee.onAuthenticationEnded()
+
+        testee.viewState.test {
+            val finalResult = this.expectMostRecentItem()
+            assertFalse(finalResult.isAuthenticating)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.launchDeviceAuth()
+
+        testee.commands.test {
+            assertEquals(
+                listOf(LaunchDeviceAuth, LaunchDeviceAuth),
+                this.expectMostRecentItem().toList()
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+    @Test
+    fun whenAuthWasLaunchAndThenDeviceAuthDisabledThenEmitViewStateWithIsAuthenticatingFalse() = runTest {
+        testee.launchDeviceAuth()
+        testee.disabled()
+
+        testee.viewState.test {
+            val finalResult = this.expectMostRecentItem()
+            assertFalse(finalResult.isAuthenticating)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun someCredentials(): LoginCredentials {
         return LoginCredentials(
             id = -1,

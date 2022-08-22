@@ -75,4 +75,7 @@ interface BookmarkFoldersDao {
 
     @Delete
     fun delete(bookmarkFolderEntities: List<BookmarkFolderEntity>)
+
+    @Query("delete from bookmark_folders")
+    fun deleteAll()
 }

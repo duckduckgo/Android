@@ -20,6 +20,7 @@
     <application>
         <activity
             android:name="com.duckduckgo.autofill.ui.credential.management.AutofillManagementActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="false" />
     </application>
 

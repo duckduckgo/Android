@@ -64,4 +64,7 @@ interface BookmarksDao {
 
     @Query("select * from bookmarks where url = :url limit 1")
     fun getBookmarkByUrl(url: String): BookmarkEntity?
+
+    @Query("delete from bookmarks")
+    fun deleteAll()
 }
