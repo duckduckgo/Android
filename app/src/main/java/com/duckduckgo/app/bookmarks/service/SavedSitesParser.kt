@@ -129,7 +129,7 @@ class RealSavedSitesParser : SavedSitesParser {
 
         var rootElement: Element = document
 
-        if (children.size != 1) {
+        if (children.size > 1) {
             rootElement = Element("DL").appendChildren(children)
         }
         return parseElement(rootElement, 0, bookmarksRepository, mutableListOf(), false)
