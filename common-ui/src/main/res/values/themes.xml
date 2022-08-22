@@ -70,6 +70,7 @@
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
         <item name="browserMenuTextColor">@color/white</item>
         <item name="browserMenuTextColorDisabled">@color/warGreyTwo</item>
+        <item name="cookiesRoundedFieldBackgroundColor">@color/almostBlackDark</item>
         <item name="omnibarRoundedFieldBackgroundColor">@color/almostBlack</item>
         <item name="omnibarTextColor">@color/white</item>
         <item name="omnibarHintColor">@color/paleBrownishGray</item>
@@ -196,6 +197,7 @@
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
         <item name="browserMenuTextColor">@color/almostBlackDark</item>
         <item name="browserMenuTextColorDisabled">@color/pinkish_grey_two</item>
+        <item name="cookiesRoundedFieldBackgroundColor">@color/whiteFive</item>
         <item name="omnibarRoundedFieldBackgroundColor">@color/whiteFour</item>
         <item name="omnibarTextColor">@color/almostBlackDark</item>
         <item name="omnibarHintColor">@color/brownishGrayTwo</item>

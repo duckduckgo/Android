@@ -202,6 +202,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.coroutines.flow.cancellable
 import javax.inject.Provider
@@ -347,6 +348,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
 
+    @Inject
+    lateinit var appTheme: AppTheme
+
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
@@ -385,7 +389,17 @@ class BrowserTabFragment :
         viewModel
     }
 
-    private val animatorHelper by lazy { BrowserTrackersAnimatorHelper() }
+    private val animatorHelper by lazy {
+        BrowserTrackersAnimatorHelper(
+            omnibarViews = listOf(clearTextButton, omnibarTextInput, searchIcon),
+            privacyGradeView = privacyGradeButton,
+            cookieView = cookieAnimation,
+            cookieScene = scene_root,
+            dummyCookieView = cookieDummyView,
+            container = animationContainer,
+            appTheme = appTheme
+        )
+    }
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
@@ -432,8 +446,9 @@ class BrowserTabFragment :
         }
 
         override fun onPopUpHandled() {
-            // ToDo Replace with a proper action
-            Toast.makeText(context?.applicationContext, "Cookie Popup Handled!", Toast.LENGTH_LONG).show()
+            launch {
+                context?.let { animatorHelper.createCookiesAnimation(it) }
+            }
         }
 
         override fun onResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean?) {
@@ -2147,7 +2162,7 @@ class BrowserTabFragment :
     }
 
     private fun finishPartialTrackerAnimation() {
-        animatorHelper.finishTrackerAnimation(omnibarViews(), animationContainer)
+        context?.let { animatorHelper.finishTrackerAnimation(it) }
     }
 
     private fun showHideTipsDialog(cta: Cta) {
@@ -2497,7 +2512,7 @@ class BrowserTabFragment :
                 privacyGradeButton?.isEnabled = viewState.isEnabled
 
                 if (viewState.shouldAnimate) {
-                    animatorHelper.startPulseAnimation(privacyGradeButton)
+                    animatorHelper.startPulseAnimation()
                 } else {
                     animatorHelper.stopPulseAnimation()
                 }
@@ -2597,8 +2612,8 @@ class BrowserTabFragment :
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackingEntities()
 
-                    activity?.let { activity ->
-                        animatorHelper.startTrackersAnimation(lastSeenCtaViewState?.cta, activity, animationContainer, omnibarViews(), events)
+                    context?.let {
+                        animatorHelper.startTrackersAnimation(it, lastSeenCtaViewState?.cta, events)
                     }
                 }
             }

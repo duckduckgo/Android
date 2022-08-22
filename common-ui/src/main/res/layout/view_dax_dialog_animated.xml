@@ -121,15 +121,15 @@
                     android:id="@+id/primaryCta"
                     style="@style/DaxDialogButton.Primary"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp" />
+                    android:layout_height="44dp"
+                    android:layout_marginTop="16dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/secondaryCta"
                     style="@style/DaxDialogButton.Secondary"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="-6dp"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="8dp"
                     android:visibility="visible" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>

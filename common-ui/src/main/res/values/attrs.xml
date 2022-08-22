@@ -27,6 +27,7 @@
     <attr name="browserMenuTextColor" format="color" />
     <attr name="browserMenuTextColorDisabled" format="color" />
     <attr name="omnibarRoundedFieldBackgroundColor" format="color" />
+    <attr name="cookiesRoundedFieldBackgroundColor" format="color" />
     <attr name="omnibarTextColor" format="color" />
     <attr name="omnibarHintColor" format="color" />
     <attr name="omnibarLogoLetterTextColor" format="color" />
