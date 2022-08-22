@@ -20,6 +20,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.bookmarks.model.*
+import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -29,6 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.jsoup.Jsoup
 import org.junit.Assert
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -113,15 +115,36 @@ class SavedSitesParserTest {
 
         val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
 
-        assertEquals(7, bookmarks.size)
+        assertEquals(17, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
         assertEquals("https://support.mozilla.org/en-US/products/firefox", firstBookmark.url)
         assertEquals("Get Help", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        assertEquals("https://duckduckgo.com/", lastBookmark.url)
-        assertEquals("DuckDuckGo — Privacy, simplified.", lastBookmark.title)
+        assertEquals("https://www.mozilla.org/en-US/firefox/central/", lastBookmark.url)
+        assertEquals("Getting Started", lastBookmark.title)
+    }
+
+    @Test
+    fun canImportFromBrave() = runTest {
+        val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_brave.html")
+        val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
+
+        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
+
+        assertEquals(12, bookmarks.size)
+
+        val firstBookmark = bookmarks.first()
+        assertEquals(
+            "https://www.theguardian.com/international",
+            firstBookmark.url
+        )
+        assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
+
+        val lastBookmark = bookmarks.last()
+        assertEquals("https://www.macrumors.com/", lastBookmark.url)
+        assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
     }
 
     @Test
@@ -131,31 +154,82 @@ class SavedSitesParserTest {
 
         val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
 
-        assertEquals(4, bookmarks.size)
+        assertEquals(12, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
         assertEquals(
-            "https://jupyter.duckduckgo.com/notebooks/Mobile/Android%20Monday%20Health%20Check%20(DO%20NOT%20CHANGE).ipynb",
+            "https://www.theguardian.com/international",
             firstBookmark.url
         )
-        assertEquals("Android Monday Health Check", firstBookmark.title)
+        assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        assertEquals("https://app.asana.com/0/414730916066338/598549668511654", lastBookmark.url)
-        assertEquals("Android App Development - Android Runtime Permissions Explanations - Asana", lastBookmark.title)
+        assertEquals("https://www.macrumors.com/", lastBookmark.url)
+        assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
     }
 
     @Test
-    fun canImportBookmarksFromDDG() = runTest {
-        val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_ddg.html")
+    fun canImportBookmarksFromDDGAndroid() = runTest {
+        val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_ddg_android.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
         val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
-        assertEquals(8, bookmarks.size)
+
+        assertEquals(13, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        assertEquals("https://as.com/", firstBookmark.url)
-        assertEquals("AS.com", firstBookmark.title)
+        assertEquals(
+            "https://www.theguardian.com/international",
+            firstBookmark.url
+        )
+        assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
+
+        val lastBookmark = bookmarks.last()
+        assertEquals("https://www.apple.com/uk/", lastBookmark.url)
+        assertEquals("Apple (United Kingdom)", lastBookmark.title)
+        assertTrue(lastBookmark is Favorite)
+    }
+
+    @Test
+    fun canImportBookmarksFromDDGMacOS() = runTest {
+        val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_ddg_macos.html")
+        val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
+
+        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
+
+        assertEquals(13, bookmarks.size)
+
+        val firstBookmark = bookmarks.first()
+        assertEquals(
+            "https://www.theguardian.com/international",
+            firstBookmark.url
+        )
+        assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
+
+        val lastBookmark = bookmarks.last()
+        assertEquals("https://www.apple.com/uk/", lastBookmark.url)
+        assertEquals("Apple (United Kingdom)", lastBookmark.title)
+    }
+
+    @Test
+    fun canImportBookmarksFromSafari() = runTest {
+        val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_safari.html")
+        val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
+
+        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
+
+        assertEquals(14, bookmarks.size)
+
+        val firstBookmark = bookmarks.first()
+        assertEquals(
+            "https://www.apple.com/uk",
+            firstBookmark.url
+        )
+        assertEquals("Apple", firstBookmark.title)
+
+        val lastBookmark = bookmarks.last()
+        assertEquals("https://www.macrumors.com/", lastBookmark.url)
+        assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
     }
 
     @Test
