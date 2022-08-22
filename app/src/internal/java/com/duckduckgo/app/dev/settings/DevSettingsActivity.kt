@@ -112,6 +112,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         when (it) {
             is Command.SendTdsIntent -> sendTdsIntent()
             is Command.OpenUASelector -> showUASelector(R.menu.user_agent_menu)
+            is Command.ShowSavedSitesClearedConfirmation -> showSavedSitesClearedConfirmation()
             else -> TODO()
         }
     }
@@ -146,6 +147,10 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         }
         popup.setOnDismissListener { }
         popup.show()
+    }
+
+    private fun showSavedSitesClearedConfirmation() {
+        Toast.makeText(this, getString(R.string.devSettingsClearSavedSitesConfirmation), Toast.LENGTH_SHORT).show()
     }
 
     companion object {

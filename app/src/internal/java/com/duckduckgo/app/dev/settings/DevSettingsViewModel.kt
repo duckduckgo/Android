@@ -57,6 +57,7 @@ class DevSettingsViewModel @Inject constructor(
     sealed class Command {
         object SendTdsIntent : Command()
         object OpenUASelector : Command()
+        object ShowSavedSitesClearedConfirmation : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -126,6 +127,7 @@ class DevSettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             favoritesRepository.deleteAll()
             bookmarksRepository.deleteAll()
+            command.send(Command.ShowSavedSitesClearedConfirmation)
         }
     }
 }
