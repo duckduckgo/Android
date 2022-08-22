@@ -20,7 +20,7 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
-import com.duckduckgo.autoconsent.impl.FakeRepository
+import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -32,7 +32,7 @@ class PopUpFoundMessageHandlerPluginTest {
 
     private val mockCallback: AutoconsentCallback = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
-    private val repository = FakeRepository()
+    private val repository = FakeSettingsRepository()
 
     private val popupFoundHandler = PopUpFoundMessageHandlerPlugin(repository)
 
