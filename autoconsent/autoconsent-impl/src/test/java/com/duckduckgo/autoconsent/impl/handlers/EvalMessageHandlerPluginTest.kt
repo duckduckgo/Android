@@ -26,6 +26,7 @@ import com.duckduckgo.autoconsent.impl.handlers.EvalMessageHandlerPlugin.EvalRes
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -44,7 +45,7 @@ class EvalMessageHandlerPluginTest {
     private val mockCallback: AutoconsentCallback = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
-    private val evalMessageHandlerPlugin = EvalMessageHandlerPlugin(coroutineRule.testScope, coroutineRule.testDispatcherProvider)
+    private val evalMessageHandlerPlugin = EvalMessageHandlerPlugin(TestScope(), coroutineRule.testDispatcherProvider)
 
     @Test
     fun whenProcessMessageIfTypeNotEvalDoNothing() {

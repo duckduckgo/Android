@@ -17,9 +17,13 @@
 package com.duckduckgo.autoconsent.impl
 
 import android.webkit.WebView
+import androidx.core.net.toUri
+import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 
 class FakePluginPoint : PluginPoint<MessageHandlerPlugin> {
     val plugin = FakeMessageHandlerPlugin()
@@ -43,7 +47,15 @@ class FakeMessageHandlerPlugin : MessageHandlerPlugin {
     override val supportedTypes: List<String> = listOf("fake")
 }
 
-class FakeRepository : AutoconsentSettingsRepository {
+class FakeSettingsRepository : AutoconsentSettingsRepository {
     override var userSetting: Boolean = false
     override var firstPopupHandled: Boolean = false
 }
+
+class FakeUnprotected(private val exceptionList: List<String>) : UnprotectedTemporary {
+    override fun isAnException(url: String): Boolean {
+        return exceptionList.contains(url.toUri().domain())
+    }
+}
+
+class FakeUserAllowlist(override val userWhiteList: List<String>) : UserWhiteListRepository
