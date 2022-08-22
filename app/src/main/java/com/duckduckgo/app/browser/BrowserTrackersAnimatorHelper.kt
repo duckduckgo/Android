@@ -16,56 +16,197 @@
 
 package com.duckduckgo.app.browser
 
+import android.animation.Animator
+import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.app.Activity
 import android.content.Context
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.animation.addListener
+import androidx.core.animation.doOnEnd
 import androidx.core.view.children
 import androidx.core.widget.TextViewCompat
+import androidx.transition.Scene
+import androidx.transition.Slide
+import androidx.transition.Transition
+import androidx.transition.Transition.TransitionListener
+import androidx.transition.TransitionManager
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
-import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.mobile.android.ui.store.AppTheme
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.mobile.android.R as CommonR
 
 interface TrackersAnimatorListener {
     fun onAnimationFinished()
 }
 
-class BrowserTrackersAnimatorHelper {
-
+class BrowserTrackersAnimatorHelper(
+    private val omnibarViews: List<View>,
+    private val privacyGradeView: View,
+    private val cookieView: LottieAnimationView,
+    private val cookieScene: ViewGroup,
+    private val dummyCookieView: View,
+    private val container: ConstraintLayout,
+    private val appTheme: AppTheme,
+) {
     private var trackersAnimation: AnimatorSet = AnimatorSet()
     private var pulseAnimation: AnimatorSet = AnimatorSet()
     private var listener: TrackersAnimatorListener? = null
+    private var enqueueCookiesAnimation = false
+    private var hasCookiesAnimationBeenCanceled = false
+    private var isCookiesAnimationRunning = false
+
+    lateinit var firstScene: Scene
+    lateinit var secondScene: Scene
+
+    fun createCookiesAnimation(context: Context) {
+        if (!trackersAnimation.isRunning) {
+            startCookiesAnimation(context)
+        } else {
+            enqueueCookiesAnimation = true
+        }
+    }
+
+    private fun tryToStartCookiesAnimation(context: Context) {
+        if (enqueueCookiesAnimation) {
+            startCookiesAnimation(context)
+            enqueueCookiesAnimation = false
+        }
+    }
+
+    private fun startCookiesAnimation(context: Context) {
+        isCookiesAnimationRunning = true
+        firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_1, context)
+        secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_2, context)
+
+        hasCookiesAnimationBeenCanceled = false
+        val allOmnibarViews: List<View> = (omnibarViews + privacyGradeView).toList()
+        cookieView.show()
+        cookieView.alpha = 1F
+        if (appTheme.isLightModeEnabled()) {
+            cookieView.setAnimation(R.raw.cookie_icon_animated_light)
+        } else {
+            cookieView.setAnimation(R.raw.cookie_icon_animated_dark)
+        }
+        cookieView.progress = 0F
+
+        val slideInCookiesTransition: Transition = createSlideTransition()
+        val slideOutCookiesTransition: Transition = createSlideTransition()
+
+        // After the slide in transitions, wait 1s and then begin slide out + fade out animation views
+        slideInCookiesTransition.addListener(object : TransitionListener {
+            override fun onTransitionEnd(transition: Transition) {
+                AnimatorSet().apply {
+                    play(animateFadeIn(cookieView, 0L)) // Fake animation because the delay doesn't really work
+                    startDelay = COOKIES_ANIMATION_DELAY
+                    addListener(
+                        doOnEnd {
+                            if (!hasCookiesAnimationBeenCanceled) {
+                                AnimatorSet().apply {
+                                    TransitionManager.go(firstScene, slideOutCookiesTransition)
+                                    play(animateFadeOut(cookieView, COOKIES_ANIMATION_FADE_OUT_DURATION))
+                                        .with(animateFadeOut(dummyCookieView, COOKIES_ANIMATION_FADE_OUT_DURATION))
+                                    addListener(
+                                        doOnEnd {
+                                            cookieView.gone()
+                                            isCookiesAnimationRunning = false
+                                        }
+                                    )
+                                    start()
+                                }
+                            } else {
+                                isCookiesAnimationRunning = false
+                            }
+                        }
+                    )
+                    start()
+                }
+            }
+            override fun onTransitionStart(transition: Transition) {}
+            override fun onTransitionCancel(transition: Transition) {}
+            override fun onTransitionPause(transition: Transition) {}
+            override fun onTransitionResume(transition: Transition) {}
+        })
+
+        // After slide out finished, hide view and fade in omnibar views
+        slideOutCookiesTransition.addListener(object : TransitionListener {
+            override fun onTransitionEnd(transition: Transition) {
+                if (!hasCookiesAnimationBeenCanceled) {
+                    AnimatorSet().apply {
+                        play(animateOmnibarIn(allOmnibarViews))
+                        start()
+                    }
+                    cookieScene.gone()
+                } else {
+                    isCookiesAnimationRunning = false
+                }
+            }
+            override fun onTransitionStart(transition: Transition) {}
+            override fun onTransitionCancel(transition: Transition) {}
+            override fun onTransitionPause(transition: Transition) {}
+            override fun onTransitionResume(transition: Transition) {}
+        })
+
+        // When lottie animation begins, begin the transition to slide in the text
+        cookieView.addAnimatorListener(object : AnimatorListener {
+            override fun onAnimationStart(p0: Animator?) {
+                TransitionManager.go(secondScene, slideInCookiesTransition)
+            }
+            override fun onAnimationEnd(p0: Animator?) {}
+            override fun onAnimationCancel(p0: Animator?) {}
+            override fun onAnimationRepeat(p0: Animator?) {}
+        })
+
+        // Here the animations begins. Fade out omnibar, fade in dummy view and after that start lottie animation
+        AnimatorSet().apply {
+            play(animateOmnibarOut(allOmnibarViews)).with(animateFadeIn(dummyCookieView))
+            addListener(onEnd = {
+                cookieScene.show()
+                cookieScene.alpha = 1F
+                cookieView.playAnimation()
+            })
+            start()
+        }
+    }
+
+    private fun createSlideTransition(): Transition {
+        val slideInCookiesTransition: Transition = Slide(Gravity.START)
+        slideInCookiesTransition.duration = COOKIES_ANIMATION_DURATION
+        return slideInCookiesTransition
+    }
 
     fun startTrackersAnimation(
+        context: Context,
         cta: Cta?,
-        activity: Activity,
-        container: ConstraintLayout,
-        omnibarViews: List<View>,
-        entities: List<Entity>?
+        entities: List<Entity>?,
     ) {
         if (entities.isNullOrEmpty()) {
             listener?.onAnimationFinished()
+            tryToStartCookiesAnimation(context)
             return
         }
 
-        val logoViews: List<View> = getLogosViewListInContainer(activity, container, entities)
+        if (isCookiesAnimationRunning) return // If cookies animation is running let it finish to avoid weird glitches with the other animations
+
+        val logoViews: List<View> = getLogosViewListInContainer(context, container, entities)
         if (logoViews.isEmpty()) {
             listener?.onAnimationFinished()
+            tryToStartCookiesAnimation(context)
             return
         }
 
@@ -75,17 +216,17 @@ class BrowserTrackersAnimatorHelper {
                     start()
                 }
             } else {
-                createFullTrackersAnimation(container, omnibarViews, logoViews).apply {
+                createFullTrackersAnimation(context, container, omnibarViews, logoViews).apply {
                     start()
                 }
             }
         }
     }
 
-    fun startPulseAnimation(view: ImageButton) {
+    fun startPulseAnimation() {
         if (!pulseAnimation.isRunning) {
             val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
-                view,
+                privacyGradeView,
                 PropertyValuesHolder.ofFloat("scaleX", 1f, 0.9f, 1f),
                 PropertyValuesHolder.ofFloat("scaleY", 1f, 0.9f, 1f)
             )
@@ -119,45 +260,57 @@ class BrowserTrackersAnimatorHelper {
     ) {
         stopTrackersAnimation()
         stopPulseAnimation()
+        stopCookiesAnimation()
         listener?.onAnimationFinished()
         omnibarViews.forEach { it.alpha = 1f }
         container.alpha = 0f
     }
 
-    fun finishTrackerAnimation(
-        omnibarViews: List<View>,
-        container: ViewGroup
-    ) {
+    private fun stopCookiesAnimation() {
+        hasCookiesAnimationBeenCanceled = true
+        if (this::firstScene.isInitialized) {
+            TransitionManager.go(firstScene)
+        }
+        privacyGradeView.alpha = 1f
+        dummyCookieView.alpha = 0f
+        cookieScene.gone()
+        cookieView.gone()
+    }
+
+    fun finishTrackerAnimation(context: Context) {
         trackersAnimation = AnimatorSet().apply {
             play(animateLogosSlideOut(container.children.toList()))
                 .before(animateOmnibarIn(omnibarViews))
                 .before(animateFadeOut(container))
             start()
-            addListener(onEnd = { listener?.onAnimationFinished() })
+            addListener(onEnd = {
+                listener?.onAnimationFinished()
+                tryToStartCookiesAnimation(context)
+            })
         }
     }
 
     private fun getLogosViewListInContainer(
-        activity: Activity,
+        context: Context,
         container: ViewGroup,
         entities: List<Entity>
     ): List<View> {
         container.removeAllViews()
         container.alpha = 0f
-        val logos = createTrackerLogoList(activity, entities)
-        return createLogosViewList(activity, container, logos)
+        val logos = createTrackerLogoList(context, entities)
+        return createLogosViewList(context, container, logos)
     }
 
     private fun createLogosViewList(
-        activity: Activity,
+        context: Context,
         container: ViewGroup,
         resourcesId: List<TrackerLogo>
     ): List<View> {
         return resourcesId.map {
             val frameLayout = when (it) {
-                is TrackerLogo.ImageLogo -> createTrackerImageLogo(activity, it)
-                is TrackerLogo.LetterLogo -> createTrackerTextLogo(activity, it)
-                is TrackerLogo.StackedLogo -> createTrackerStackedLogo(activity, it)
+                is TrackerLogo.ImageLogo -> createTrackerImageLogo(context, it)
+                is TrackerLogo.LetterLogo -> createTrackerTextLogo(context, it)
+                is TrackerLogo.StackedLogo -> createTrackerStackedLogo(context, it)
             }
             container.addView(frameLayout)
             return@map frameLayout
@@ -205,20 +358,20 @@ class BrowserTrackersAnimatorHelper {
     }
 
     private fun createTrackerTextLogo(
-        activity: Activity,
+        context: Context,
         trackerLogo: TrackerLogo.LetterLogo
     ): FrameLayout {
-        val animatedDrawable = createAnimatedDrawable(activity)
+        val animatedDrawable = createAnimatedDrawable(context)
 
-        val animationView = ImageView(activity)
+        val animationView = ImageView(context)
         animationView.setImageDrawable(animatedDrawable)
         animationView.layoutParams = getParams()
 
-        val textView = createTextView(activity)
+        val textView = createTextView(context)
         textView.setBackgroundResource(trackerLogo.resId)
         textView.text = trackerLogo.trackerLetter
 
-        val frameLayout = createFrameLayoutContainer(activity)
+        val frameLayout = createFrameLayoutContainer(context)
         frameLayout.addView(textView)
         frameLayout.addView(animationView)
 
@@ -226,11 +379,11 @@ class BrowserTrackersAnimatorHelper {
     }
 
     private fun createTrackerStackedLogo(
-        activity: Activity,
+        context: Context,
         trackerLogo: TrackerLogo.StackedLogo
     ): FrameLayout {
-        val imageView = createImageView(activity, trackerLogo.resId)
-        val frameLayout = createFrameLayoutContainer(activity)
+        val imageView = createImageView(context, trackerLogo.resId)
+        val frameLayout = createFrameLayoutContainer(context)
 
         frameLayout.addView(imageView)
 
@@ -238,31 +391,31 @@ class BrowserTrackersAnimatorHelper {
     }
 
     private fun createTrackerImageLogo(
-        activity: Activity,
+        context: Context,
         trackerLogo: TrackerLogo.ImageLogo
     ): FrameLayout {
-        val imageView = createImageView(activity, trackerLogo.resId)
-        val animatedDrawable = createAnimatedDrawable(activity)
+        val imageView = createImageView(context, trackerLogo.resId)
+        val animatedDrawable = createAnimatedDrawable(context)
         imageView.setImageDrawable(animatedDrawable)
 
-        val frameLayout = createFrameLayoutContainer(activity)
+        val frameLayout = createFrameLayoutContainer(context)
         frameLayout.addView(imageView)
 
         return frameLayout
     }
 
     private fun createTrackerLogoList(
-        activity: Activity,
+        context: Context,
         entities: List<Entity>
     ): List<TrackerLogo> {
-        if (activity.packageName == null) return emptyList()
+        if (context.packageName == null) return emptyList()
         val trackerLogoList = entities
             .asSequence()
             .distinct()
             .take(MAX_LOGOS_SHOWN + 1)
             .sortedWithDisplayNamesStartingWithVowelsToTheEnd()
             .map {
-                val resId = TrackersRenderer().networkLogoIcon(activity, it.name)
+                val resId = TrackersRenderer().networkLogoIcon(context, it.name)
                 if (resId == null) {
                     TrackerLogo.LetterLogo(it.displayName.take(1))
                 } else {
@@ -293,6 +446,7 @@ class BrowserTrackersAnimatorHelper {
     }
 
     private fun createFullTrackersAnimation(
+        context: Context,
         container: ConstraintLayout,
         omnibarViews: List<View>,
         logoViews: List<View>
@@ -310,7 +464,10 @@ class BrowserTrackersAnimatorHelper {
                 finalAnimation
             )
             start()
-            addListener(onEnd = { listener?.onAnimationFinished() })
+            addListener(onEnd = {
+                listener?.onAnimationFinished()
+                tryToStartCookiesAnimation(context)
+            })
         }
     }
 
@@ -447,9 +604,12 @@ class BrowserTrackersAnimatorHelper {
         }
     }
 
-    private fun animateFadeIn(view: View): ObjectAnimator {
+    private fun animateFadeIn(
+        view: View,
+        durationInMs: Long = DEFAULT_ANIMATION_DURATION
+    ): ObjectAnimator {
         return ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
-            duration = DEFAULT_ANIMATION_DURATION
+            duration = durationInMs
         }
     }
 
@@ -466,7 +626,10 @@ class BrowserTrackersAnimatorHelper {
         private const val START_MARGIN_IN_DP = 10
         private const val STACKED_LOGO_MARGIN_IN_DP = -11.5f
         private const val NORMAL_LOGO_MARGIN_IN_DP = -7f
-        private const val FIRST_LOGO_MARGIN_IN_DP = 25
+        private const val FIRST_LOGO_MARGIN_IN_DP = 29
+        private const val COOKIES_ANIMATION_DELAY = 1000L
+        private const val COOKIES_ANIMATION_DURATION = 300L
+        private const val COOKIES_ANIMATION_FADE_OUT_DURATION = 800L
     }
 }
 
