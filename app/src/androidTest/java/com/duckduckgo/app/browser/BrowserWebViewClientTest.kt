@@ -198,7 +198,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnPageStartedCalledThenInjectAutoconsentCalled() = runTest {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(autoconsent).injectAutoconsent(webView)
+        verify(autoconsent).injectAutoconsent(webView, EXAMPLE_URL)
     }
 
     @UiThreadTest

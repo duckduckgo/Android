@@ -18,8 +18,8 @@ package com.duckduckgo.privacy.config.impl.features.useragent
 
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.api.UserAgent
-import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject

@@ -18,7 +18,7 @@ package com.duckduckgo.privacy.config.impl.features.autofill
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.privacy.config.api.AutofillException
-import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.autofill.AutofillRepository
 import org.junit.Assert.*
 import org.junit.Before

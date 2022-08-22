@@ -19,57 +19,76 @@ package com.duckduckgo.autoconsent.impl
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.autoconsent.api.AutoconsentFeatureName
+import com.duckduckgo.autoconsent.store.AutoconsentExceptionEntity
+import com.duckduckgo.autoconsent.store.AutoconsentRepository
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.Shadows.shadowOf
 
 @RunWith(AndroidJUnit4::class)
 class RealAutoconsentTest {
 
     private val pluginPoint = FakePluginPoint()
-    private val repository = FakeRepository()
+    private val settingsRepository = FakeSettingsRepository()
+    private val unprotected = FakeUnprotected(listOf("unprotected.com"))
+    private val userAllowlist = FakeUserAllowlist(listOf("userallowed.com"))
+    private val mockAutoconsentRepository: AutoconsentRepository = mock()
+    private val mockFeatureToggle: FeatureToggle = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
     lateinit var autoconsent: RealAutoconsent
 
     @Before
     fun setup() {
-        autoconsent = RealAutoconsent(pluginPoint, repository)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutoconsentFeatureName.Autoconsent.value)).thenReturn(true)
+        whenever(mockAutoconsentRepository.exceptions).thenReturn(listOf(AutoconsentExceptionEntity("exception.com", "reason")))
+        autoconsent = RealAutoconsent(
+            pluginPoint,
+            settingsRepository,
+            mockAutoconsentRepository,
+            mockFeatureToggle,
+            userAllowlist,
+            unprotected
+        )
     }
 
     @Test
     fun whenInjectAutoconsentIfNeverHandledThenCallEvaluate() {
-        repository.userSetting = false
-        repository.firstPopupHandled = false
+        settingsRepository.userSetting = false
+        settingsRepository.firstPopupHandled = false
 
-        autoconsent.injectAutoconsent(webView)
+        autoconsent.injectAutoconsent(webView, URL)
 
         assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
 
-        repository.userSetting = true
-        autoconsent.injectAutoconsent(webView)
+        settingsRepository.userSetting = true
+        autoconsent.injectAutoconsent(webView, URL)
 
         assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
     }
 
     @Test
     fun whenInjectAutoconsentIfPreviouslyHandledAndSettingFalseThenDoNotCallEvaluate() {
-        repository.userSetting = false
-        repository.firstPopupHandled = true
+        settingsRepository.userSetting = false
+        settingsRepository.firstPopupHandled = true
 
-        autoconsent.injectAutoconsent(webView)
+        autoconsent.injectAutoconsent(webView, URL)
 
         assertNull(shadowOf(webView).lastEvaluatedJavascript)
     }
 
     @Test
     fun whenInjectAutoconsentIfPreviouslyHandledAndSettingTrueThenCallEvaluate() {
-        repository.userSetting = true
-        repository.firstPopupHandled = true
+        settingsRepository.userSetting = true
+        settingsRepository.firstPopupHandled = true
 
-        autoconsent.injectAutoconsent(webView)
+        autoconsent.injectAutoconsent(webView, URL)
 
         assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
     }
@@ -77,18 +96,18 @@ class RealAutoconsentTest {
     @Test
     fun whenChangeSettingChangedThenRepoSetValueChanged() {
         autoconsent.changeSetting(false)
-        assertFalse(repository.userSetting)
+        assertFalse(settingsRepository.userSetting)
 
         autoconsent.changeSetting(true)
-        assertTrue(repository.userSetting)
+        assertTrue(settingsRepository.userSetting)
     }
 
     @Test
     fun whenSettingEnabledCalledThenReturnValueFromRepo() {
-        repository.userSetting = false
+        settingsRepository.userSetting = false
         assertFalse(autoconsent.isSettingEnabled())
 
-        repository.userSetting = true
+        settingsRepository.userSetting = true
         assertTrue(autoconsent.isSettingEnabled())
     }
 
@@ -107,18 +126,77 @@ class RealAutoconsentTest {
     @Test
     fun whenSetAutoconsentOptOutThenTrueValueStored() {
         autoconsent.setAutoconsentOptOut(webView)
-        assertTrue(repository.userSetting)
+        assertTrue(settingsRepository.userSetting)
     }
 
     @Test
     fun whenSetAutoconsentOptInThenFalseValueStored() {
         autoconsent.setAutoconsentOptIn()
-        assertFalse(repository.userSetting)
+        assertFalse(settingsRepository.userSetting)
     }
 
     @Test
     fun whenFirstPopUpHandledThenFalseValueStored() {
         autoconsent.firstPopUpHandled()
-        assertTrue(repository.firstPopupHandled)
+        assertTrue(settingsRepository.firstPopupHandled)
+    }
+
+    @Test
+    fun whenInjectAutoconsentIfUrlIsExceptionThenDoNothing() {
+        givenSettingsRepositoryAllowsInjection()
+
+        autoconsent.injectAutoconsent(webView, EXCEPTION_URL)
+
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenInjectAutoconsentIfUrlContainsDomainThatIsExceptionThenDoNothing() {
+        givenSettingsRepositoryAllowsInjection()
+
+        autoconsent.injectAutoconsent(webView, EXCEPTION_SUBDOMAIN_URL)
+
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenInjectAutoconsentIfUrlIsInUserAllowListThenDoNothing() {
+        givenSettingsRepositoryAllowsInjection()
+
+        autoconsent.injectAutoconsent(webView, USER_ALLOWED_URL)
+
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenInjectAutoconsentIfUrlIsInUnprotectedListThenDoNothing() {
+        givenSettingsRepositoryAllowsInjection()
+
+        autoconsent.injectAutoconsent(webView, UNPROTECTED_URL)
+
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenInjectAutoconsentIfFeatureIsDisabledThenDoNothing() {
+        givenSettingsRepositoryAllowsInjection()
+        whenever(mockFeatureToggle.isFeatureEnabled(AutoconsentFeatureName.Autoconsent.value)).thenReturn(false)
+
+        autoconsent.injectAutoconsent(webView, URL)
+
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    private fun givenSettingsRepositoryAllowsInjection() {
+        settingsRepository.userSetting = true
+        settingsRepository.firstPopupHandled = true
+    }
+
+    companion object {
+        private const val URL = "http://example.com"
+        private const val UNPROTECTED_URL = "http://unprotected.com"
+        private const val USER_ALLOWED_URL = "http://userallowed.com"
+        private const val EXCEPTION_URL = "http://exception.com"
+        private const val EXCEPTION_SUBDOMAIN_URL = "http://test.exception.com"
     }
 }

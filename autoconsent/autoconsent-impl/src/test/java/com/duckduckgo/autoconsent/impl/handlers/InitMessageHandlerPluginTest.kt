@@ -21,17 +21,21 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
-import com.duckduckgo.autoconsent.impl.FakeRepository
+import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.handlers.InitMessageHandlerPlugin.InitResp
+import com.duckduckgo.autoconsent.store.AutoconsentRepository
+import com.duckduckgo.autoconsent.store.DisabledCmpsEntity
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.Shadows.shadowOf
 
 @ExperimentalCoroutinesApi
@@ -40,10 +44,11 @@ class InitMessageHandlerPluginTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockCallback: AutoconsentCallback = mock()
+    private val repository: AutoconsentRepository = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
-    private val repository = FakeRepository()
+    private val settingsRepository = FakeSettingsRepository()
 
-    private val initHandlerPlugin = InitMessageHandlerPlugin(coroutineRule.testScope, coroutineRule.testDispatcherProvider, repository)
+    private val initHandlerPlugin = InitMessageHandlerPlugin(TestScope(), coroutineRule.testDispatcherProvider, settingsRepository, repository)
 
     @Test
     fun whenProcessIfMessageTypeIsNotInitThenDoNothing() {
@@ -76,8 +81,8 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessIfAutoconsentIsDisabledAndAlreadyHandledThenDoNothing() {
-        repository.userSetting = false
-        repository.firstPopupHandled = true
+        settingsRepository.userSetting = false
+        settingsRepository.firstPopupHandled = true
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -86,8 +91,8 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessIfAutoconsentIsDisabledAndNotHandledThenCallEvaluate() {
-        repository.userSetting = false
-        repository.firstPopupHandled = false
+        settingsRepository.userSetting = false
+        settingsRepository.firstPopupHandled = false
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -96,8 +101,9 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessMessageForFirstTimeResponseSentIsCorrect() {
-        repository.userSetting = false
-        repository.firstPopupHandled = false
+        whenever(repository.disabledCmps).thenReturn(listOf(DisabledCmpsEntity("MyCmp")))
+        settingsRepository.userSetting = false
+        settingsRepository.firstPopupHandled = false
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
@@ -110,12 +116,14 @@ class InitMessageHandlerPluginTest {
         assertTrue(initResp.config.enabled)
         assertEquals(20, initResp.config.detectRetries)
         assertEquals("initResp", initResp.type)
+        assertEquals(1, initResp.config.disabledCmps.size)
+        assertEquals("MyCmp", initResp.config.disabledCmps.first())
     }
 
     @Test
     fun whenProcessMessageResponseSentIsCorrect() {
-        repository.userSetting = true
-        repository.firstPopupHandled = true
+        settingsRepository.userSetting = true
+        settingsRepository.firstPopupHandled = true
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 

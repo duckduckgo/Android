@@ -19,7 +19,7 @@ package com.duckduckgo.privacy.config.impl.features.autofill
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Autofill
-import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.autofill.AutofillRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
