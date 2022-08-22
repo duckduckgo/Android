@@ -17,26 +17,38 @@
 package com.duckduckgo.autoconsent.impl
 
 import android.webkit.WebView
+import androidx.core.net.toUri
+import com.duckduckgo.app.global.UriString
+import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentFeatureName
 import com.duckduckgo.autoconsent.impl.AutoconsentInterface.Companion.AUTOCONSENT_INTERFACE
 import com.duckduckgo.autoconsent.impl.handlers.ReplyHandler
+import com.duckduckgo.autoconsent.store.AutoconsentRepository
 import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealAutoconsent @Inject constructor(
     private val messageHandlerPlugins: PluginPoint<MessageHandlerPlugin>,
-    private val repository: AutoconsentSettingsRepository,
+    private val settingsRepository: AutoconsentSettingsRepository,
+    private val autoconsentRepository: AutoconsentRepository,
+    private val featureToggle: FeatureToggle,
+    private val userAllowlistRepository: UserWhiteListRepository,
+    private val unprotectedTemporary: UnprotectedTemporary,
 ) : Autoconsent {
 
     private lateinit var autoconsentJs: String
 
-    override fun injectAutoconsent(webView: WebView) {
-        if (canBeInjected()) {
+    override fun injectAutoconsent(webView: WebView, url: String) {
+        if (canBeInjected() && !urlInUserAllowList(url) && !isAnException(url)) {
             webView.evaluateJavascript("javascript:${getFunctionsJS()}", null)
         }
     }
@@ -49,28 +61,48 @@ class RealAutoconsent @Inject constructor(
     }
 
     override fun changeSetting(setting: Boolean) {
-        repository.userSetting = setting
+        settingsRepository.userSetting = setting
     }
 
     override fun isSettingEnabled(): Boolean {
-        return repository.userSetting
+        return settingsRepository.userSetting
     }
 
     override fun setAutoconsentOptOut(webView: WebView) {
-        repository.userSetting = true
+        settingsRepository.userSetting = true
         webView.evaluateJavascript("javascript:${ReplyHandler.constructReply("""{ "type": "optOut" }""")}", null)
     }
 
     override fun setAutoconsentOptIn() {
-        repository.userSetting = false
+        settingsRepository.userSetting = false
     }
 
     override fun firstPopUpHandled() {
-        repository.firstPopupHandled = true
+        settingsRepository.firstPopupHandled = true
+    }
+
+    private fun urlInUserAllowList(url: String): Boolean {
+        return try {
+            userAllowlistRepository.userWhiteList.contains(url.toUri().domain())
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun isEnabled(): Boolean {
+        return featureToggle.isFeatureEnabled(AutoconsentFeatureName.Autoconsent.value)
+    }
+
+    private fun isAnException(url: String): Boolean {
+        return matches(url) || unprotectedTemporary.isAnException(url)
+    }
+
+    private fun matches(url: String): Boolean {
+        return autoconsentRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 
     private fun canBeInjected(): Boolean {
-        return repository.userSetting || !repository.firstPopupHandled
+        return isEnabled() && (settingsRepository.userSetting || !settingsRepository.firstPopupHandled)
     }
 
     private fun getFunctionsJS(): String {

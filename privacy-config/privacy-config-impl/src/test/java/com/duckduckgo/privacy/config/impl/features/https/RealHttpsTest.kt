@@ -18,7 +18,7 @@ package com.duckduckgo.privacy.config.impl.features.https
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.privacy.config.api.HttpsException
-import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever

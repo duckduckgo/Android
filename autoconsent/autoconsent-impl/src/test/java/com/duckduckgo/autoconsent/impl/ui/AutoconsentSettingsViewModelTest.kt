@@ -68,7 +68,7 @@ class AutoconsentSettingsViewModelTest {
     internal class FakeAutoconsent : Autoconsent {
         var test: Boolean = false
 
-        override fun injectAutoconsent(webView: WebView) {
+        override fun injectAutoconsent(webView: WebView, url: String) {
             // NO OP
         }
 
