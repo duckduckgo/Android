@@ -350,4 +350,20 @@ class BookmarksDataRepositoryTest {
 
         assertTrue(result)
     }
+
+    @Test
+    fun whenDeleteAllFoldersAndBookmarksThenDeleteAllFoldersAndBookmarks() = runTest {
+        val parentFolderEntity = BookmarkFolderEntity(id = 1, name = "name", parentId = 0)
+        val childFolderEntity = BookmarkFolderEntity(id = 2, name = "another name", parentId = 1)
+        val childBookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1)
+
+        val branchToDelete = BookmarkFolderBranch(listOf(childBookmark), listOf(parentFolderEntity, childFolderEntity))
+
+        repository.insertFolderBranch(branchToDelete)
+
+        repository.deleteAll()
+
+        assertFalse(bookmarksDao.hasBookmarks())
+        assertTrue(bookmarkFoldersDao.getBookmarkFoldersSync().isEmpty())
+    }
 }
