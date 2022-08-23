@@ -394,6 +394,12 @@ interface DeviceShieldPixels {
 
     /** Will fire when the VPN is stopped */
     fun reportVpnUptime(uptime: Long)
+
+    /** Will fire when the user has VPN always-on setting enabled */
+    fun reportAlwaysOnEnabled()
+
+    /** Will fire when the user has VPN always-on lockdown setting enabled */
+    fun reportAlwaysOnLockdownEnabled()
 }
 
 @ContributesBinding(AppScope::class)
@@ -862,6 +868,14 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun reportVpnUptime(uptime: Long) {
         firePixel(DeviceShieldPixelNames.ATP_UPTIME, mapOf("uptime" to uptime.toString()))
+    }
+
+    override fun reportAlwaysOnEnabled() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_ALWAYS_ON_ENABLED_DAILY)
+    }
+
+    override fun reportAlwaysOnLockdownEnabled() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_ALWAYS_ON_LOCKDOWN_ENABLED_DAILY)
     }
 
     private fun firePixel(

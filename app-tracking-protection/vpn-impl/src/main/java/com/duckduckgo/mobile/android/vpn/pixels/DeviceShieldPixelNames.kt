@@ -222,5 +222,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_DID_ENABLE_APP_PROTECTION_FROM_DETAIL("m_atp_imp_enable_app_protection_detail_c"),
     ATP_DID_DISABLE_APP_PROTECTION_FROM_ALL("m_atp_imp_disable_app_protection_all_c"),
     ATP_DID_DISABLE_APP_PROTECTION_FROM_DETAIL("m_atp_imp_disable_app_protection_detail_c"),
+
+    ATP_REPORT_ALWAYS_ON_ENABLED_DAILY("m_atp_ev_always_on_enabled_d"),
+    ATP_REPORT_ALWAYS_ON_LOCKDOWN_ENABLED_DAILY("m_atp_ev_always_on_lockdown_enabled_d"),
     ;
 }

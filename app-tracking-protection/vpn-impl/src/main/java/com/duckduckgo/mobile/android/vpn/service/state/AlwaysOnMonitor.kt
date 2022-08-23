@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.service.state
 import android.annotation.SuppressLint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -37,7 +38,8 @@ import javax.inject.Provider
 class AlwaysOnMonitor @Inject constructor(
     private val vpnStore: VpnStore,
     private val appBuildConfig: AppBuildConfig,
-    private val vpnService: Provider<TrackerBlockingVpnService>
+    private val vpnService: Provider<TrackerBlockingVpnService>,
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : VpnServiceCallbacks {
 
     @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
@@ -46,8 +48,15 @@ class AlwaysOnMonitor @Inject constructor(
         if (appBuildConfig.sdkInt >= 29) {
             try {
                 val isAlwaysOnEnabled = vpnService.get().isAlwaysOn
-                Timber.i("AlwaysOnMonitor, Always On Enabled: $isAlwaysOnEnabled")
+                val isLockdownEnabled = vpnService.get().isLockdownEnabled
+                Timber.d("AlwaysOnMonitor, Always On Enabled: $isAlwaysOnEnabled / $isLockdownEnabled")
                 coroutineScope.launch {
+                    if (isAlwaysOnEnabled) {
+                        deviceShieldPixels.reportAlwaysOnEnabled()
+                    }
+                    if (isLockdownEnabled) {
+                        deviceShieldPixels.reportAlwaysOnLockdownEnabled()
+                    }
                     vpnStore.setAlwaysOn(isAlwaysOnEnabled)
                 }
             } catch (e: Exception) {
