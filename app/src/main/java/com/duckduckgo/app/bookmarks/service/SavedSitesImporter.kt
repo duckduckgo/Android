@@ -45,6 +45,7 @@ class RealSavedSitesImporter(
 
     companion object {
         private const val BASE_URI = "duckduckgo.com"
+        private const val IMPORT_BATCH_SIZE = 200
     }
 
     override suspend fun import(uri: Uri): ImportSavedSitesResult {
@@ -57,13 +58,17 @@ class RealSavedSitesImporter(
             savedSites.filterIsInstance<SavedSite.Bookmark>().map {
                 BookmarkEntity(title = it.title, url = it.url, parentId = (it as SavedSite.Bookmark).parentId)
             }.also {
-                bookmarksDao.insertList(it)
+                it.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
+                    bookmarksDao.insertList(chunk)
+                }
             }
 
             savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.map { site ->
                 FavoriteEntity(title = site.title.takeIf { it.isNotEmpty() } ?: site.url, url = site.url, position = site.position)
             }.also {
-                favoritesDao.insertList(it)
+                it.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
+                    favoritesDao.insertList(chunk)
+                }
             }
 
             ImportSavedSitesResult.Success(savedSites)
