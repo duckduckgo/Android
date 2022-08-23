@@ -126,7 +126,10 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             surrogates = testCase.surrogates.joinToString(","),
             webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.DESKTOP_SITE,
-            urlParametersRemoved = testCase.urlParameterRemoved
+            urlParametersRemoved = testCase.urlParameterRemoved,
+            consentManaged = testCase.consentManaged,
+            consentOptOutFailed = testCase.consentOptOutFailed,
+            consentSelfTestFailed = testCase.consentSelfTestFailed,
         )
 
         testee.submitBrokenSiteFeedback(brokenSite)
@@ -170,7 +173,10 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val expectReportURLPrefix: String,
         val expectReportURLParams: List<UrlParam>,
         val exceptPlatforms: List<String>,
-        val urlParameterRemoved: Boolean
+        val urlParameterRemoved: Boolean,
+        val consentManaged: Boolean,
+        val consentOptOutFailed: Boolean,
+        val consentSelfTestFailed: Boolean,
     )
 
     data class UrlParam(

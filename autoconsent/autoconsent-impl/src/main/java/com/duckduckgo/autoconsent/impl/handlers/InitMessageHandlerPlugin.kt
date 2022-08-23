@@ -67,6 +67,9 @@ class InitMessageHandlerPlugin @Inject constructor(
                         return@launch
                     }
 
+                    // Reset site
+                    autoconsentCallback.onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false)
+
                     val disabledCmps = repository.disabledCmps.map { it.name }
                     val autoAction = getAutoAction()
                     val enablePreHide = settingsRepository.userSetting

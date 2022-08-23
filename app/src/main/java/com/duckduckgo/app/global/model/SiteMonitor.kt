@@ -141,6 +141,12 @@ class SiteMonitor(
 
     override var urlParametersRemoved: Boolean = false
 
+    override var consentManaged: Boolean = false
+
+    override var consentOptOutFailed: Boolean = false
+
+    override var consentSelfTestFailed: Boolean = false
+
     private fun privacyGrade(scores: Grade.Scores): PrivacyGrade {
         return when (scores) {
             Grade.Scores.ScoresUnavailable -> PrivacyGrade.UNKNOWN

@@ -26,7 +26,10 @@ data class BrokenSiteData(
     val blockedTrackers: String,
     val surrogates: String,
     val upgradedToHttps: Boolean,
-    val urlParametersRemoved: Boolean
+    val urlParametersRemoved: Boolean,
+    val consentManaged: Boolean,
+    val consentOptOutFailed: Boolean,
+    val consentSelfTestFailed: Boolean,
 ) {
 
     companion object {
@@ -39,7 +42,19 @@ data class BrokenSiteData(
             val surrogates = site?.surrogates?.map { Uri.parse(it.name).baseHost }.orEmpty().distinct().joinToString(",")
             val url = site?.url.orEmpty()
             val urlParametersRemoved = site?.urlParametersRemoved ?: false
-            return BrokenSiteData(url, blockedTrackers, surrogates, upgradedHttps, urlParametersRemoved)
+            val consentManaged = site?.consentManaged ?: false
+            val consentOptOutFailed = site?.consentOptOutFailed ?: false
+            val consentSelfTestFailed = site?.consentSelfTestFailed ?: false
+            return BrokenSiteData(
+                url = url,
+                blockedTrackers = blockedTrackers,
+                surrogates = surrogates,
+                upgradedToHttps = upgradedHttps,
+                urlParametersRemoved = urlParametersRemoved,
+                consentManaged = consentManaged,
+                consentOptOutFailed = consentOptOutFailed,
+                consentSelfTestFailed = consentSelfTestFailed,
+            )
         }
     }
 }

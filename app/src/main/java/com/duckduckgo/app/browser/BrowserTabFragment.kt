@@ -451,8 +451,8 @@ class BrowserTabFragment :
             }
         }
 
-        override fun onResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean?) {
-            TODO("Not yet implemented")
+        override fun onResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean) {
+            viewModel.onAutoconsentResultReceived(consentManaged, optOutFailed, selfTestFailed)
         }
     }
 
