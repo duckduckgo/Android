@@ -48,6 +48,7 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TdsJson
+import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
@@ -83,6 +84,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private lateinit var trackerDetector: TrackerDetector
     private lateinit var tdsEntityDao: TdsEntityDao
     private lateinit var tdsDomainEntityDao: TdsDomainEntityDao
+    private lateinit var tdsCnameEntityDao: TdsCnameEntityDao
     private lateinit var testee: WebViewRequestInterceptor
 
     private val resourceSurrogates = ResourceSurrogatesImpl()
@@ -196,6 +198,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
 
         tdsEntityDao = db.tdsEntityDao()
         tdsDomainEntityDao = db.tdsDomainEntityDao()
+        tdsCnameEntityDao = db.tdsCnameEntityDao()
 
         entityLookup = TdsEntityLookup(tdsEntityDao, tdsDomainEntityDao)
         trackerDetector =
@@ -205,7 +208,8 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
                 mockContentBlocking,
                 mockTrackerAllowlist,
                 mockWebTrackersBlockedDao,
-                mockAdClickManager
+                mockAdClickManager,
+                tdsCnameEntityDao
             )
 
         val json = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/tracker_radar_reference.json")
@@ -214,10 +218,12 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         val trackers = tdsJson.jsonToTrackers().values.toList()
         val entities = tdsJson.jsonToEntities()
         val domainEntities = tdsJson.jsonToDomainEntities()
+        val cnameEntities = tdsJson.jsonToCnameEntities()
         val client = TdsClient(Client.ClientName.TDS, trackers)
 
         tdsEntityDao.insertAll(entities)
         tdsDomainEntityDao.insertAll(domainEntities)
+        tdsCnameEntityDao.insertAll(cnameEntities)
         trackerDetector.addClient(client)
     }
 
