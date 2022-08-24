@@ -16,27 +16,19 @@
 
 package com.duckduckgo.app.httpsupgrade
 
-class BloomFilter {
+import android.content.Context
+import com.duckduckgo.library.loader.LibraryLoader
+
+class BloomFilter constructor(context: Context, private val config: Config) {
 
     private val nativePointer: Long
-
     init {
-        System.loadLibrary("https-bloom-lib")
-    }
+        LibraryLoader.loadLibrary(context, "https-bloom-lib")
 
-    constructor(
-        maxItems: Int,
-        targetProbability: Double
-    ) {
-        nativePointer = createBloomFilter(maxItems, targetProbability)
-    }
-
-    constructor(
-        path: String,
-        bits: Int,
-        maxItems: Int
-    ) {
-        nativePointer = createBloomFilterFromFile(path, bits, maxItems)
+        nativePointer = when (config) {
+            is Config.PathConfig -> createBloomFilterFromFile(config.path, config.bits, config.maxItems)
+            is Config.ProbabilityConfig -> createBloomFilter(config.maxItems, config.targetProbability)
+        }
     }
 
     private external fun createBloomFilter(
@@ -74,4 +66,9 @@ class BloomFilter {
     }
 
     private external fun releaseBloomFilter(nativePointer: Long)
+
+    sealed class Config(open val maxItems: Int) {
+        data class PathConfig(override val maxItems: Int, val path: String, val bits: Int) : Config(maxItems)
+        data class ProbabilityConfig(override val maxItems: Int, val targetProbability: Double) : Config(maxItems)
+    }
 }

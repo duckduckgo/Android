@@ -17,6 +17,7 @@
 package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -33,13 +34,15 @@ class HttpsUpgraderTest {
 
     lateinit var testee: HttpsUpgrader
 
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
+
     private var mockHttpsBloomFilterFactory: HttpsBloomFilterFactory = mock()
     private var mockBloomFalsePositiveListDao: HttpsFalsePositivesDao = mock()
     private var mockUserAllowlistDao: UserWhitelistDao = mock()
 
     private var mockFeatureToggle: FeatureToggle = mock()
     private var mockHttps: Https = mock()
-    private var bloomFilter = BloomFilter(100, 0.01)
+    private var bloomFilter = BloomFilter(context, BloomFilter.Config.ProbabilityConfig(100, 0.01))
 
     @Before
     fun before() {
