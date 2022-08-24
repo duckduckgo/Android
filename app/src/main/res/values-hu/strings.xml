@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Kérdezzen rá minden alkalommal</string>
     <string name="settingsAppLinksAlways">Mindig</string>
     <string name="settingsAppLinksNever">Soha</string>
+    <string name="settingsHeadingAppearance">Megjelenés</string>
+    <string name="settingsHeadingCustomize">Testreszabás</string>
+    <string name="settingsHeadingAbout">További információ</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Nincs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Lapok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Lapok és adatok</string>
+    <string name="settingsAutomaticallyClearWhat">Automatikus törlés…</string>
+    <string name="settingsAutomaticallyClearWhen">Törlés ekkor…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Törlés ekkor…</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Kilépés csak az alkalmazásból</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Kilépés az alkalmazásból 5 másodperc inaktivitás után</string>
@@ -706,5 +712,8 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Alkalmazáskövetők letiltása az eszközödön</string>
     <string name="atp_SettingsDeviceShieldEnabled">Engedélyezve</string>
     <string name="atp_SettingsDeviceShieldDisabled">Letiltva</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automatikus kitöltés</string>
 
 </resources>

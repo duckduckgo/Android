@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Спрашивать каждый раз</string>
     <string name="settingsAppLinksAlways">Всегда</string>
     <string name="settingsAppLinksNever">Никогда</string>
+    <string name="settingsHeadingAppearance">Внешний вид</string>
+    <string name="settingsHeadingCustomize">Собственная настройка</string>
+    <string name="settingsHeadingAbout">О нас</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Ничего</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Вкладки</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Вкладки и данные</string>
+    <string name="settingsAutomaticallyClearWhat">Стирать автоматически…</string>
+    <string name="settingsAutomaticallyClearWhen">Стереть…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Стереть…</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Только после выхода из приложения</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">После выхода из приложения, через 5 секунд бездействия</string>
@@ -714,5 +720,8 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Блокируйте трекеры приложений на своем устройстве</string>
     <string name="atp_SettingsDeviceShieldEnabled">Включено</string>
     <string name="atp_SettingsDeviceShieldDisabled">Отключено</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Автозаполнение</string>
 
 </resources>

@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Întreabă de fiecare dată</string>
     <string name="settingsAppLinksAlways">Întotdeauna</string>
     <string name="settingsAppLinksNever">Niciodată</string>
+    <string name="settingsHeadingAppearance">Aspect</string>
+    <string name="settingsHeadingCustomize">Personalizare</string>
+    <string name="settingsHeadingAbout">Despre</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvează</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Niciuna</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">File</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">File și date</string>
+    <string name="settingsAutomaticallyClearWhat">Arde automat…</string>
+    <string name="settingsAutomaticallyClearWhen">Arde pe…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Arde pe…</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Doar la ieșirea din aplicație</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ieșire din aplicație, inactiv timp de 5 secunde</string>
@@ -710,5 +716,8 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blochează tehnologiile de urmărire pe dispozitivul tău</string>
     <string name="atp_SettingsDeviceShieldEnabled">Activat</string>
     <string name="atp_SettingsDeviceShieldDisabled">Dezactivat</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Completare automată</string>
 
 </resources>

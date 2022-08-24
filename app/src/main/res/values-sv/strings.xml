@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Fråga varje gång</string>
     <string name="settingsAppLinksAlways">Alltid</string>
     <string name="settingsAppLinksNever">Aldrig</string>
+    <string name="settingsHeadingAppearance">Utseende</string>
+    <string name="settingsHeadingCustomize">Anpassa</string>
+    <string name="settingsHeadingAbout">Om</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spara</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Inga</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Flikar</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Flikar och data</string>
+    <string name="settingsAutomaticallyClearWhat">Bränn automatiskt …</string>
+    <string name="settingsAutomaticallyClearWhen">Bränn den …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Bränn på datum …</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Gå bara ur appen</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Avsluta app, inaktiv i 5 sekunder</string>
@@ -706,5 +712,8 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blockera appspårare på din enhet</string>
     <string name="atp_SettingsDeviceShieldEnabled">Aktiverad</string>
     <string name="atp_SettingsDeviceShieldDisabled">Inaktiverad</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automatisk ifyllning</string>
 
 </resources>

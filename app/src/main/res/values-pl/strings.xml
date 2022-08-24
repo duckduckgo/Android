@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Pytaj za każdym razem</string>
     <string name="settingsAppLinksAlways">Zawsze</string>
     <string name="settingsAppLinksNever">Nigdy</string>
+    <string name="settingsHeadingAppearance">Wygląd</string>
+    <string name="settingsHeadingCustomize">Spersonalizuj</string>
+    <string name="settingsHeadingAbout">Informacje</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Zapisz</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Brak</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty i dane</string>
+    <string name="settingsAutomaticallyClearWhat">Automatyczne czyszczenie…</string>
+    <string name="settingsAutomaticallyClearWhen">Czyść…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Czyść…</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Wyłącznie zamknięcie aplikacji</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Zamknięcie aplikacji, brak aktywności przez 5 sekund</string>
@@ -714,5 +720,8 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blokowanie skryptów śledzących aplikacji na urządzeniu</string>
     <string name="atp_SettingsDeviceShieldEnabled">Włączone</string>
     <string name="atp_SettingsDeviceShieldDisabled">Wyłączone</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Autouzupełnianie</string>
 
 </resources>

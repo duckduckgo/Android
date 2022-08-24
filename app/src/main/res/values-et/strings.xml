@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Küsi iga kord</string>
     <string name="settingsAppLinksAlways">Alati</string>
     <string name="settingsAppLinksNever">Mitte kunagi</string>
+    <string name="settingsHeadingAppearance">Välimus</string>
+    <string name="settingsHeadingCustomize">Kohanda</string>
+    <string name="settingsHeadingAbout">Teave</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Puudub</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Vahelehed</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Vahelehed ja andmed</string>
+    <string name="settingsAutomaticallyClearWhat">Automaatne kustutamine …</string>
+    <string name="settingsAutomaticallyClearWhen">Kustuta …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Kustuta …</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Ainult rakendusest väljumisel</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Rakendusest väljumisel, 5-sekundilise passiivsuse järel</string>
@@ -706,5 +712,8 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blokeeri oma seadmes rakenduste jälgurid</string>
     <string name="atp_SettingsDeviceShieldEnabled">Lubatud</string>
     <string name="atp_SettingsDeviceShieldDisabled">Keelatud</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automaatne täitmine</string>
 
 </resources>

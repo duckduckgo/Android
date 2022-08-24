@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Jautāt katru reizi</string>
     <string name="settingsAppLinksAlways">Vienmēr</string>
     <string name="settingsAppLinksNever">Nekad</string>
+    <string name="settingsHeadingAppearance">Izskats</string>
+    <string name="settingsHeadingCustomize">Pielāgošana</string>
+    <string name="settingsHeadingAbout">Par</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Neko</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Cilnes</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Cilnes un datus</string>
+    <string name="settingsAutomaticallyClearWhat">Automātiski dzēst…</string>
+    <string name="settingsAutomaticallyClearWhen">Dzēst…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Dzēst…</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Tikai iziešana no lietotnes</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Iziešana no lietotnes, neaktīva 5 sekundes</string>
@@ -710,5 +716,8 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Lietotņu izsekotāju bloķēšana ierīcē</string>
     <string name="atp_SettingsDeviceShieldEnabled">Iespējots</string>
     <string name="atp_SettingsDeviceShieldDisabled">Atspējots</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automātiska aizpilde</string>
 
 </resources>

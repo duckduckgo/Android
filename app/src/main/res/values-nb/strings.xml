@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Spør hver gang</string>
     <string name="settingsAppLinksAlways">Alltid</string>
     <string name="settingsAppLinksNever">Aldri</string>
+    <string name="settingsHeadingAppearance">Utseende</string>
+    <string name="settingsHeadingCustomize">Tilpass</string>
+    <string name="settingsHeadingAbout">Om</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Lagre</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Ingen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Faner</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Faner og data</string>
+    <string name="settingsAutomaticallyClearWhat">Brenn automatisk …</string>
+    <string name="settingsAutomaticallyClearWhen">Brenn …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Brenn …</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">kun når appen lukkes</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">når appen lukkes eller har vært inaktiv i 5 sekunder</string>
@@ -706,5 +712,8 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blokker appsporere på enheten din</string>
     <string name="atp_SettingsDeviceShieldEnabled">Aktivert</string>
     <string name="atp_SettingsDeviceShieldDisabled">Deaktivert</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Autofyll</string>
 
 </resources>
