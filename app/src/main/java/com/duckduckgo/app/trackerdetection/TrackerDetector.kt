@@ -74,12 +74,14 @@ class TrackerDetectorImpl @Inject constructor(
 
         var urlString = url
 
-        val uncloakedHostName = detectCnameCloakedHost(url)
-        if (uncloakedHostName != null) {
-            urlString = uncloakedHostName
-        } else if (firstParty(url, documentUrl)) {
+        if (firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
-            return null
+            val uncloakedHostName = detectCnameCloakedHost(url)
+            if (uncloakedHostName != null) {
+                urlString = uncloakedHostName
+            } else {
+                return null
+            }
         }
 
         val result = clients
