@@ -99,12 +99,12 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
                     Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity")
                 )
             )
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
         val restartVpnIntent = Intent(context, VpnReminderReceiver::class.java).let { intent ->
             intent.action = TrackerBlockingVpnService.ACTION_VPN_REMINDER_RESTART
-            PendingIntent.getBroadcast(context, 0, intent, 0)
+            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         }
 
         return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
@@ -139,12 +139,12 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
                     Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity")
                 )
             )
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
         val restartVpnIntent = Intent(context, VpnReminderReceiver::class.java).let { intent ->
             intent.action = TrackerBlockingVpnService.ACTION_VPN_REMINDER_RESTART
-            PendingIntent.getBroadcast(context, 0, intent, 0)
+            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         }
 
         return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
@@ -208,7 +208,7 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
         val vpnControllerIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = resultReceiver)
         val vpnControllerPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
             addNextIntentWithParentStack(vpnControllerIntent)
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
         return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)

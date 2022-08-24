@@ -14,12 +14,12 @@ ext {
 }
 
 android {
-    compileSdkVersion compile_sdk
     ndkVersion '21.0.6113669'
     defaultConfig {
         applicationId "com.duckduckgo.mobile.android"
         minSdk min_sdk
         targetSdk target_sdk
+        compileSdk compile_sdk
         versionCode buildVersionCode()
         versionName buildVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

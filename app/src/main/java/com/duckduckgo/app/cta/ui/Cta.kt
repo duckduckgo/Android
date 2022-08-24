@@ -322,12 +322,9 @@ sealed class BubbleCta(
             super.showCta(view)
             val accessibilityDelegate: View.AccessibilityDelegate =
                 object : View.AccessibilityDelegate() {
-                    override fun onInitializeAccessibilityNodeInfo(
-                        v: View?,
-                        info: AccessibilityNodeInfo
-                    ) {
-                        super.onInitializeAccessibilityNodeInfo(v, info)
-                        info.text = v?.context?.getString(R.string.daxFavoritesOnboardingCtaContentDescription)
+                    override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo) {
+                        super.onInitializeAccessibilityNodeInfo(host, info)
+                        info.text = host.context?.getString(R.string.daxFavoritesOnboardingCtaContentDescription)
                     }
                 }
             // Using braille unicode inside textview (to simulate the overflow icon), override description for accessibility

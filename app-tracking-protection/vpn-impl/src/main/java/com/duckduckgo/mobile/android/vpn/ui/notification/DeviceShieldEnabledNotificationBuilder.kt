@@ -61,7 +61,7 @@ class DeviceShieldEnabledNotificationBuilder {
             val privacyReportIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
             val vpnShowDashboardPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
                 addNextIntentWithParentStack(privacyReportIntent)
-                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             }
 
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_enabled)
@@ -90,7 +90,7 @@ class DeviceShieldEnabledNotificationBuilder {
             val privacyReportIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
             val vpnShowDashboardPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
                 addNextIntentWithParentStack(privacyReportIntent)
-                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             }
 
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_trackers)

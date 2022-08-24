@@ -189,7 +189,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
             intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
             intent.putExtra(NOTIFICATION_AUTO_CANCEL, specification.autoCancel)
-            return PendingIntent.getService(context, 0, intent, 0)!!
+            return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)!!
         }
     }
 }

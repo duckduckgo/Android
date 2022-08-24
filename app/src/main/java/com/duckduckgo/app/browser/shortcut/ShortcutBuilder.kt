@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.shortcut
 
 import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.pm.ShortcutInfoCompat
@@ -60,7 +59,12 @@ class ShortcutBuilder @Inject constructor() {
         val pinnedShortcutCallbackIntent = Intent(SHORTCUT_ADDED_ACTION)
         pinnedShortcutCallbackIntent.putExtra(SHORTCUT_URL_ARG, url)
         pinnedShortcutCallbackIntent.putExtra(SHORTCUT_TITLE_ARG, title)
-        return PendingIntent.getBroadcast(context, SHORTCUT_ADDED_CODE, pinnedShortcutCallbackIntent, FLAG_UPDATE_CURRENT)
+        return PendingIntent.getBroadcast(
+            context,
+            SHORTCUT_ADDED_CODE,
+            pinnedShortcutCallbackIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
     }
 
     fun requestPinShortcut(
