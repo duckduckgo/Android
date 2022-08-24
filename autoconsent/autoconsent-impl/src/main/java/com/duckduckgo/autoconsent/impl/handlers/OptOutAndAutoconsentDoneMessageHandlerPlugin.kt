@@ -51,7 +51,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor() : Messa
             val message: OptOutResultMessage = parseOptOutMessage(jsonString) ?: return
 
             if (!message.result) {
-                autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = null)
+                autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false)
             } else if (message.scheduleSelfTest) {
                 selfTest = true
             }
@@ -64,11 +64,10 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor() : Messa
     private fun processAutoconsentDone(jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         try {
             val message: AutoconsentDoneMessage = parseAutoconsentDoneMessage(jsonString) ?: return
-            val host: String = message.url.toUri().host ?: return
+            message.url.toUri().host ?: return
 
-            if (true) { // ToDo Store the host and check it doesn't exist
-                autoconsentCallback.onPopUpHandled()
-            }
+            autoconsentCallback.onPopUpHandled()
+            autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false)
 
             if (selfTest) {
                 webView.evaluateJavascript("javascript:${ReplyHandler.constructReply("""{ "type": "selfTest" }""")}", null)

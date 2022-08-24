@@ -124,7 +124,16 @@ class BrokenSiteViewModelTest {
 
     @Test
     fun whenCanSubmitBrokenSiteAndUrlNotNullAndSubmitPressedThenReportAndPixelSubmitted() {
-        testee.setInitialBrokenSite(url, "", "", upgradedHttps = false, urlParametersRemoved = false)
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+        )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
 
@@ -136,7 +145,10 @@ class BrokenSiteViewModelTest {
             surrogates = "",
             webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.DESKTOP_SITE,
-            urlParametersRemoved = false
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -147,7 +159,16 @@ class BrokenSiteViewModelTest {
     @Test
     fun whenCanSubmitBrokenSiteAndUrlIsEmptyAndSubmitPressedThenDoNotSubmit() {
         val nullUrl = ""
-        testee.setInitialBrokenSite(nullUrl, "", "", upgradedHttps = false, urlParametersRemoved = false)
+        testee.setInitialBrokenSite(
+            url = nullUrl,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+        )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
 
@@ -159,7 +180,10 @@ class BrokenSiteViewModelTest {
             surrogates = "",
             webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.DESKTOP_SITE,
-            urlParametersRemoved = false
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
         )
 
         verify(mockPixel, never()).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to nullUrl))
@@ -171,7 +195,16 @@ class BrokenSiteViewModelTest {
     fun whenCanSubmitBrokenSiteAndLastAmpLinkIsNullAndSubmitPressedThenReportUrlAndPixelSubmitted() {
         whenever(mockAmpLinks.lastAmpLinkInfo).thenReturn(null)
 
-        testee.setInitialBrokenSite(url, "", "", upgradedHttps = false, urlParametersRemoved = false)
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+        )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
 
@@ -183,7 +216,10 @@ class BrokenSiteViewModelTest {
             surrogates = "",
             webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.DESKTOP_SITE,
-            urlParametersRemoved = false
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -195,7 +231,16 @@ class BrokenSiteViewModelTest {
     fun whenCanSubmitBrokenSiteAndUrlHasAssociatedAmpLinkAndSubmitPressedThenAmpLinkReportedAndPixelSubmitted() {
         whenever(mockAmpLinks.lastAmpLinkInfo).thenReturn(AmpLinkInfo(trackingUrl, url))
 
-        testee.setInitialBrokenSite(url, "", "", upgradedHttps = false, urlParametersRemoved = false)
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+        )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
 
@@ -207,7 +252,10 @@ class BrokenSiteViewModelTest {
             surrogates = "",
             webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.DESKTOP_SITE,
-            urlParametersRemoved = false
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to trackingUrl))
@@ -217,7 +265,16 @@ class BrokenSiteViewModelTest {
 
     @Test
     fun whenUrlIsDesktopThenSendDesktopParameter() {
-        testee.setInitialBrokenSite(url, "", "", upgradedHttps = false, urlParametersRemoved = false)
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+        )
         selectAndAcceptCategory()
 
         val brokenSiteExpected = testee.getBrokenSite(url, "")
@@ -227,7 +284,16 @@ class BrokenSiteViewModelTest {
     @Test
     fun whenUrlIsMobileThenSendMobileParameter() {
         val url = "http://m.example.com"
-        testee.setInitialBrokenSite(url, "", "", upgradedHttps = false, urlParametersRemoved = false)
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+        )
         selectAndAcceptCategory()
 
         val brokenSiteExpected = testee.getBrokenSite(url, "")
@@ -238,7 +304,16 @@ class BrokenSiteViewModelTest {
     fun whenGetBrokenSiteThenReturnCorrectCategory() {
         val url = "http://m.example.com"
         val categoryIndex = 0
-        testee.setInitialBrokenSite(url, "", "", upgradedHttps = false, urlParametersRemoved = false)
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+        )
         selectAndAcceptCategory(categoryIndex)
 
         val categoryExpected = testee.categories[categoryIndex].key
@@ -248,7 +323,16 @@ class BrokenSiteViewModelTest {
 
     @Test
     fun whenCancelSelectionThenAssignOldIndexValue() {
-        testee.setInitialBrokenSite("", "", "", upgradedHttps = false, urlParametersRemoved = false)
+        testee.setInitialBrokenSite(
+            url = "",
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+        )
         selectAndAcceptCategory(0)
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()
@@ -258,7 +342,16 @@ class BrokenSiteViewModelTest {
 
     @Test
     fun whenCancelSelectionAndNoPreviousValueThenAssignMinusOne() {
-        testee.setInitialBrokenSite("", "", "", upgradedHttps = false, urlParametersRemoved = false)
+        testee.setInitialBrokenSite(
+            url = "",
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+        )
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()
 

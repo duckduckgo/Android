@@ -60,7 +60,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
     fun whenProcessOptOutIfResultIsFailsThenSendResultWithFailure() {
         handler.process(getOptOut(), optOutMessage(result = false, selfTest = false), webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = null)
+        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false)
     }
 
     @Test

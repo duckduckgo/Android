@@ -69,6 +69,9 @@ interface Site {
     )
 
     var urlParametersRemoved: Boolean
+    var consentManaged: Boolean
+    var consentOptOutFailed: Boolean
+    var consentSelfTestFailed: Boolean
 }
 
 fun Site.orderedTrackingEntities(): List<Entity> = trackingEvents
