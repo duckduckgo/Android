@@ -56,7 +56,7 @@ class RealSavedSitesImporter(
             }
 
             savedSites.filterIsInstance<SavedSite.Bookmark>().map {
-                BookmarkEntity(title = it.title, url = it.url, parentId = (it as SavedSite.Bookmark).parentId)
+                BookmarkEntity(title = it.title, url = it.url, parentId = it.parentId)
             }.also {
                 it.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
                     bookmarksDao.insertList(chunk)
