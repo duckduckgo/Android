@@ -19,6 +19,7 @@ package com.duckduckgo.app.trackerdetection
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -44,6 +45,7 @@ class TrackerDetectorClientTypeTest {
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private val mockAdClickManager: AdClickManager = mock()
+    private val mockCnameEntityDao: TdsCnameEntityDao = mock()
 
     private val testee = TrackerDetectorImpl(
         mockEntityLookup,
@@ -51,7 +53,8 @@ class TrackerDetectorClientTypeTest {
         mockContentBlocking,
         mockTrackerAllowlist,
         mockWebTrackersBlockedDao,
-        mockAdClickManager
+        mockAdClickManager,
+        mockCnameEntityDao
     )
 
     @Before
