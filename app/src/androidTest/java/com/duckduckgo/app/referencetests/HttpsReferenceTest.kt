@@ -201,7 +201,8 @@ class HttpsReferenceTest(private val testCase: TestCase) {
             binaryDataStore,
             embeddedDataPersister,
             httpsDataPersister,
-            mockPixel
+            mockPixel,
+            InstrumentationRegistry.getInstrumentation().targetContext,
         )
     }
 

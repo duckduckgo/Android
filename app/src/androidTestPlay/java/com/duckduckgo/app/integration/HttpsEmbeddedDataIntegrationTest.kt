@@ -74,7 +74,8 @@ class HttpsEmbeddedDataIntegrationTest {
 
         val embeddedDataPersister = PlayHttpsEmbeddedDataPersister(persister, binaryDataStore, httpsBloomSpecDao, context, moshi)
 
-        val factory = HttpsBloomFilterFactoryImpl(httpsBloomSpecDao, binaryDataStore, embeddedDataPersister, persister, mockPixel)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val factory = HttpsBloomFilterFactoryImpl(httpsBloomSpecDao, binaryDataStore, embeddedDataPersister, persister, mockPixel, context)
         httpsUpgrader = HttpsUpgraderImpl(factory, httpsFalsePositivesDao, mockUserAllowlistDao, mockFeatureToggle, mockHttps)
         httpsUpgrader.reloadData()
     }
