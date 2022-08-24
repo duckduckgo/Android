@@ -73,7 +73,7 @@
         "expectAction": "block"
       },
       {
-        "name": "first party cname blocks cname tracker",
+        "name": "first party blocks cname tracker",
         "siteURL": "https://bad.cnames.test/",
         "requestURL": "https://bad.cnames.test/something",
         "requestType": "script",
