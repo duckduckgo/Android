@@ -42,6 +42,7 @@ import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import com.duckduckgo.app.trackerdetection.Client
+import com.duckduckgo.app.trackerdetection.CloakedCnameDetectorImpl
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsClient
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
@@ -166,7 +167,8 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             gpc = mockGpc,
             userAgentProvider = userAgentProvider,
-            adClickManager = mockAdClickManager
+            adClickManager = mockAdClickManager,
+            cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao)
         )
     }
 
@@ -211,8 +213,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
                 mockContentBlocking,
                 mockTrackerAllowlist,
                 mockWebTrackersBlockedDao,
-                mockAdClickManager,
-                tdsCnameEntityDao
+                mockAdClickManager
             )
 
         val json = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/tracker_radar_reference.json")

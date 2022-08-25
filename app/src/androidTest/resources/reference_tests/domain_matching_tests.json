@@ -73,8 +73,8 @@
         "expectAction": "block"
       },
       {
-        "name": "first party blocks cname tracker",
-        "siteURL": "https://bad.cnames.test/",
+        "name": "random blocks cname tracker",
+        "siteURL": "https://randomsite123.com/",
         "requestURL": "https://bad.cnames.test/something",
         "requestType": "script",
         "expectAction": "block"

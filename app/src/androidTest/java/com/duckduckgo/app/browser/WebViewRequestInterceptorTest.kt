@@ -33,6 +33,7 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.SurrogateResponse
+import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -67,6 +68,7 @@ class WebViewRequestInterceptorTest {
     private val mockGpc: Gpc = mock()
     private val mockWebBackForwardList: WebBackForwardList = mock()
     private val mockAdClickManager: AdClickManager = mock()
+    private val mockCloakedCnameDetector: CloakedCnameDetector = mock()
     private val fakeUserAgent: UserAgent = UserAgentFake()
     private val fakeToggle: FeatureToggle = FeatureToggleFake()
     private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
@@ -95,7 +97,8 @@ class WebViewRequestInterceptorTest {
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             gpc = mockGpc,
             userAgentProvider = userAgentProvider,
-            adClickManager = mockAdClickManager
+            adClickManager = mockAdClickManager,
+            cloakedCnameDetector = mockCloakedCnameDetector
         )
     }
 

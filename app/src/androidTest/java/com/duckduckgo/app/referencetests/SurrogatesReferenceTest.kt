@@ -41,6 +41,7 @@ import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import com.duckduckgo.app.trackerdetection.Client
+import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsClient
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
@@ -111,6 +112,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     )
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()
+    private val mockCloakedCnameDetector: CloakedCnameDetector = mock()
 
     companion object {
         private val moshi = Moshi.Builder().add(ActionJsonAdapter()).build()
@@ -163,7 +165,8 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             gpc = mockGpc,
             userAgentProvider = userAgentProvider,
-            adClickManager = mockAdClickManager
+            adClickManager = mockAdClickManager,
+            cloakedCnameDetector = mockCloakedCnameDetector
         )
     }
 
@@ -208,8 +211,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
                 mockContentBlocking,
                 mockTrackerAllowlist,
                 mockWebTrackersBlockedDao,
-                mockAdClickManager,
-                tdsCnameEntityDao
+                mockAdClickManager
             )
 
         val json = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/tracker_radar_reference.json")
