@@ -24,9 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
-        android:layout_marginVertical="@dimen/keyline_5"
-        android:orientation="vertical">
-
+        android:orientation="vertical"
+        android:paddingVertical="@dimen/keyline_5">
 
         <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
             android:id="@+id/domainTitleEditText"
