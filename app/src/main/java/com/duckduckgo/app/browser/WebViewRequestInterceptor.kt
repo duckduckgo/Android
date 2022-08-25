@@ -157,7 +157,6 @@ class WebViewRequestInterceptor(
             trackingEvent.status == TrackerStatus.ALLOWED ||
             trackingEvent.status == TrackerStatus.SAME_ENTITY_ALLOWED
         ) {
-
             cloakedCnameDetector.detectCnameCloakedHost(request.url)?.let { uncloakedHost ->
                 trackingEvent(request, documentUrl, webViewClientListener, false, uncloakedHost)?.let { cloakedTrackingEvent ->
                     if (cloakedTrackingEvent.status == TrackerStatus.BLOCKED) {
