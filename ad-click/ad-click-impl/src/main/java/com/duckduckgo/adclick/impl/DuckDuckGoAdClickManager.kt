@@ -26,6 +26,7 @@ import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_M
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_MISMATCH
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_NONE
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_SERP_ONLY
+import com.duckduckgo.adclick.impl.pixels.AdClickPixels
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
@@ -41,6 +42,7 @@ class DuckDuckGoAdClickManager @Inject constructor(
     private val adClickData: AdClickData,
     private val adClickAttribution: AdClickAttribution,
     private val pixel: Pixel,
+    private val adClickPixels: AdClickPixels
 ) : AdClickManager {
 
     private val publicSuffixDatabase = PublicSuffixDatabase()
@@ -195,6 +197,7 @@ class DuckDuckGoAdClickManager @Inject constructor(
                         adClickActivePixelFired = false
                     )
                 )
+                adClickPixels.updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
             }
         } else {
             // propagate exemption with timeout since it's a different host
@@ -207,6 +210,7 @@ class DuckDuckGoAdClickManager @Inject constructor(
                     adClickActivePixelFired = false
                 )
             )
+            adClickPixels.updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
         }
     }
 
@@ -220,9 +224,11 @@ class DuckDuckGoAdClickManager @Inject constructor(
                 )
             )
             fireAdClickDetectedPixel(savedAdDomain, urlAdDomain)
+            adClickPixels.updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
         }
     }
 
+    // TODO: [ANA] move these 2 to AdClickPixels
     private fun fireAdClickDetectedPixel(savedAdDomain: String?, urlAdDomain: String) {
         val params = mutableMapOf<String, String>()
         when {

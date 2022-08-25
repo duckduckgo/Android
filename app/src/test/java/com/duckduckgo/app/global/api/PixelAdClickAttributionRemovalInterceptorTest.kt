@@ -17,7 +17,7 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
-import com.duckduckgo.app.global.api.PixelAdClickAttributionRemovalInterceptor.Companion.PIXELS_SET
+import com.duckduckgo.app.global.api.PixelAdClickAttributionRemovalInterceptor.Companion.PIXELS_SET_NO_ATB
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +34,7 @@ class PixelAdClickAttributionRemovalInterceptorTest {
     fun whenSendPixelTheRemoveAtbInfoFromDefinedPixels() {
         AdClickPixelName.values().map { it.pixelName }.forEach { pixelName ->
             val pixelUrl = String.format(PIXEL_TEMPLATE, pixelName)
-            val removalExpected = PIXELS_SET.contains(pixelName)
+            val removalExpected = PIXELS_SET_NO_ATB.contains(pixelName)
 
             val interceptedUrl = interceptor.intercept(FakeChain(pixelUrl)).request.url
 

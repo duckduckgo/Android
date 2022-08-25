@@ -27,6 +27,7 @@ import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_M
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_MISMATCH
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_NONE
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_SERP_ONLY
+import com.duckduckgo.adclick.impl.pixels.AdClickPixels
 import com.duckduckgo.app.statistics.pixels.Pixel
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -50,11 +51,12 @@ class DuckDuckGoAdClickManagerTest {
     private val mockAdClickData: AdClickData = mock()
     private val mockAdClickAttribution: AdClickAttribution = mock()
     private val mockPixel: Pixel = mock()
+    private val mockAdClickPixels: AdClickPixels = mock()
     private lateinit var testee: AdClickManager
 
     @Before
     fun before() {
-        testee = DuckDuckGoAdClickManager(mockAdClickData, mockAdClickAttribution, mockPixel)
+        testee = DuckDuckGoAdClickManager(mockAdClickData, mockAdClickAttribution, mockPixel, mockAdClickPixels)
     }
 
     @Test
@@ -165,6 +167,7 @@ class DuckDuckGoAdClickManagerTest {
 
         verify(mockAdClickData).setActiveTab(tabId)
         verify(mockAdClickData).addExemption(tabId = any(), exemption = any())
+        verify(mockAdClickPixels).updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
     }
 
     @Test
@@ -180,6 +183,7 @@ class DuckDuckGoAdClickManagerTest {
 
         verify(mockAdClickData).setActiveTab(tabId)
         verify(mockAdClickData, never()).addExemption(tabId = any(), exemption = any())
+        verify(mockAdClickPixels, never()).updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
     }
 
     @Test

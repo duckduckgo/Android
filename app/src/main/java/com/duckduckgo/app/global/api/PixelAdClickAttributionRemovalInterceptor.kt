@@ -35,10 +35,16 @@ class PixelAdClickAttributionRemovalInterceptor @Inject constructor() : Intercep
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
+        val pixelName = getPixelName(pixel)
 
-        val url = if (PIXELS_SET.contains(getPixelName(pixel))) {
+        val url = if (PIXELS_SET_NO_ATB.contains(pixelName)) {
             chain.request().url.newBuilder()
                 .removeAllQueryParameters(AppUrl.ParamKey.ATB)
+                .build()
+        } else if (PIXELS_SET_NO_ATB_AND_VERSION.contains(pixelName)) {
+            chain.request().url.newBuilder()
+                .removeAllQueryParameters(AppUrl.ParamKey.ATB)
+                .removeAllQueryParameters(APP_VERSION_PARAM)
                 .build()
         } else {
             chain.request().url
@@ -56,11 +62,17 @@ class PixelAdClickAttributionRemovalInterceptor @Inject constructor() : Intercep
 
     companion object {
         private const val PIXEL_PLATFORM_SUFFIX = "_android"
+        private const val APP_VERSION_PARAM = "appVersion"
 
         @VisibleForTesting
-        internal val PIXELS_SET = setOf(
+        internal val PIXELS_SET_NO_ATB = setOf(
             AdClickPixelName.AD_CLICK_DETECTED.pixelName,
             AdClickPixelName.AD_CLICK_ACTIVE.pixelName,
+        )
+
+        @VisibleForTesting
+        internal val PIXELS_SET_NO_ATB_AND_VERSION = setOf(
+            AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION.pixelName,
         )
     }
 }

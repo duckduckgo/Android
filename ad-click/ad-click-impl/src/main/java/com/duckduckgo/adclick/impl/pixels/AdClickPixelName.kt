@@ -20,7 +20,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class AdClickPixelName(override val pixelName: String) : Pixel.PixelName {
     AD_CLICK_DETECTED("m_ad_click_detected"),
-    AD_CLICK_ACTIVE("m_ad_click_active")
+    AD_CLICK_ACTIVE("m_ad_click_active"),
+    AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION("m_pageloads_with_ad_attribution")
 }
 
 object AdClickPixelValues {
@@ -35,4 +36,5 @@ object AdClickPixelParameters {
     const val AD_CLICK_DOMAIN_DETECTION = "domainDetection"
     const val AD_CLICK_HEURISTIC_DETECTION = "heuristicDetection"
     const val AD_CLICK_DOMAIN_DETECTION_ENABLED = "domainDetectionEnabled"
+    const val AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION_COUNT = "count"
 }
