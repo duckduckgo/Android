@@ -1683,6 +1683,9 @@ class BrowserTabFragment :
     private fun showDialogHidingPrevious(dialog: DialogFragment, tag: String) {
         childFragmentManager.findFragmentByTag(tag)?.let {
             Timber.i("Found existing dialog for %s; removing it now", tag)
+            if (it is DaxDialog) {
+                it.setDaxDialogListener(null) // Avoids calling onDaxDialogDismiss()
+            }
             childFragmentManager.commitNow(allowStateLoss = true) { remove(it) }
         }
         dialog.show(childFragmentManager, tag)
@@ -1996,6 +1999,7 @@ class BrowserTabFragment :
         if (ctaContainer.isNotEmpty()) {
             renderer.renderHomeCta()
         }
+        renderer.recreateDaxDialogCta()
         configureQuickAccessGridLayout(quickAccessRecyclerView)
         configureQuickAccessGridLayout(quickAccessSuggestionsRecyclerView)
         decorator.recreatePopupMenu()
@@ -2790,6 +2794,18 @@ class BrowserTabFragment :
                 is DialogCta -> showDaxDialogCta(configuration)
             }
             messageCta.gone()
+        }
+
+        fun recreateDaxDialogCta() {
+            val configuration = lastSeenCtaViewState?.cta
+            if (configuration is DaxDialogCta) {
+                activity?.let { activity ->
+                    val listener = if (configuration is DaxAutoconsentCta) daxAutoconsentListener else daxListener
+                    configuration.createCta(activity, listener).apply {
+                        showDialogHidingPrevious(this, DAX_DIALOG_DIALOG_TAG)
+                    }
+                }
+            }
         }
 
         private fun showDaxDialogCta(configuration: DialogCta) {

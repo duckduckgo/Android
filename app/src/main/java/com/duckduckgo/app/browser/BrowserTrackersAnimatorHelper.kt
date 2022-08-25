@@ -125,12 +125,14 @@ class BrowserTrackersAnimatorHelper(
                                         doOnEnd {
                                             cookieView.gone()
                                             isCookiesAnimationRunning = false
+                                            listener?.onAnimationFinished()
                                         }
                                     )
                                     start()
                                 }
                             } else {
                                 isCookiesAnimationRunning = false
+                                listener?.onAnimationFinished()
                             }
                         }
                     )
@@ -154,6 +156,7 @@ class BrowserTrackersAnimatorHelper(
                     cookieScene.gone()
                 } else {
                     isCookiesAnimationRunning = false
+                    listener?.onAnimationFinished()
                 }
             }
             override fun onTransitionStart(transition: Transition) {}
@@ -164,12 +167,12 @@ class BrowserTrackersAnimatorHelper(
 
         // When lottie animation begins, begin the transition to slide in the text
         cookieView.addAnimatorListener(object : AnimatorListener {
-            override fun onAnimationStart(p0: Animator?) {
+            override fun onAnimationStart(p0: Animator) {
                 TransitionManager.go(secondScene, slideInCookiesTransition)
             }
-            override fun onAnimationEnd(p0: Animator?) {}
-            override fun onAnimationCancel(p0: Animator?) {}
-            override fun onAnimationRepeat(p0: Animator?) {}
+            override fun onAnimationEnd(p0: Animator) {}
+            override fun onAnimationCancel(p0: Animator) {}
+            override fun onAnimationRepeat(p0: Animator) {}
         })
 
         // Here the animations begins. Fade out omnibar, fade in dummy view and after that start lottie animation

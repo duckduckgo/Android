@@ -261,7 +261,7 @@ sealed class DaxDialogCta(
                 primaryButtonText = context.getString(R.string.autoconsentPrimaryCta),
                 secondaryButtonText = context.getString(R.string.autoconsentSecondaryCta),
                 hideButtonText = context.getString(R.string.daxDialogHideButton),
-                showHideButton = true,
+                showHideButton = false,
             )
             dialog.setDaxDialogListener(daxDialogListener)
             return dialog
