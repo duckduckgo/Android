@@ -44,7 +44,7 @@ class LottieDaxDialog : DialogFragment(R.layout.view_dax_dialog_animated), DaxDi
 
     private var daxDialogListener: DaxDialogListener? = null
 
-    override fun setDaxDialogListener(listener: DaxDialogListener) {
+    override fun setDaxDialogListener(listener: DaxDialogListener?) {
         daxDialogListener = listener
     }
 

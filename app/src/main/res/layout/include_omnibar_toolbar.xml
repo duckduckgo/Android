@@ -54,58 +54,94 @@
                     android:layout_height="match_parent"
                     android:layout_margin="8dp"
                     android:background="@drawable/omnibar_field_background"
-                    android:paddingStart="6dp"
+                    android:paddingStart="2dp"
                     android:paddingEnd="6dp">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/animationContainer"
-                            android:paddingStart="10dp"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/animationContainer"
+                        android:paddingStart="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        app:layout_constraintBottom_toBottomOf="@id/omnibarIconContainer"
+                        app:layout_constraintStart_toStartOf="@id/omnibarIconContainer"
+                        app:layout_constraintTop_toTopOf="@id/omnibarIconContainer"
+                        tools:ignore="RtlSymmetry" >
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <FrameLayout
+                        android:id="@+id/omnibarIconContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="4dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="RtlSymmetry">
+
+                        <ImageView
+                            android:id="@+id/daxIcon"
                             android:layout_width="wrap_content"
-                            android:layout_height="0dp"
-                            app:layout_constraintBottom_toBottomOf="@id/omnibarIconContainer"
-                            app:layout_constraintStart_toStartOf="@id/omnibarIconContainer"
-                            app:layout_constraintTop_toTopOf="@id/omnibarIconContainer"
-                            tools:ignore="RtlSymmetry" >
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:layout_gravity="start|center_vertical"
+                            android:contentDescription="@string/privacyGradeContentDescription"
+                            android:padding="4dp"
+                            android:visibility="gone"
+                            android:src="@drawable/ic_ddg_logo" />
+
+                        <ImageButton
+                            android:id="@+id/privacyGradeButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:layout_gravity="start|center_vertical"
+                            android:padding="4dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/privacyGradeContentDescription"
+                            android:src="@drawable/privacygrade_icon_loading" />
+
+                        <ImageView
+                            android:id="@+id/searchIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:layout_gravity="start|center_vertical"
+                            android:contentDescription="@string/privacyGradeContentDescription"
+                            android:padding="4dp"
+                            android:src="@drawable/ic_loupe_24dp" />
 
                         <FrameLayout
-                            android:id="@+id/omnibarIconContainer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <ImageView
-                                android:id="@+id/daxIcon"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:contentDescription="@string/privacyGradeContentDescription"
-                                android:padding="4dp"
-                                android:visibility="gone"
-                                android:src="@drawable/ic_ddg_logo" />
-
-                            <ImageButton
-                                android:id="@+id/privacyGradeButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:padding="4dp"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:contentDescription="@string/privacyGradeContentDescription"
-                                android:src="@drawable/privacygrade_icon_loading" />
-
-                            <ImageView
-                                android:id="@+id/searchIcon"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:contentDescription="@string/privacyGradeContentDescription"
-                                android:padding="4dp"
-                                android:src="@drawable/ic_loupe_24dp" />
-
+                            android:layout_gravity="start|center_vertical"
+                            android:visibility="gone"
+                            android:layout_marginStart="17dp"
+                            android:layout_marginEnd="4dp"
+                            android:id="@+id/scene_root">
+                            <include layout="@layout/cookie_scene_1" />
                         </FrameLayout>
+                    </FrameLayout>
+
+                    <View
+                        android:id="@+id/cookieDummyView"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:alpha="0"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/omnibarIconContainer"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_gravity="start|center_vertical"
+                        android:background="@drawable/cookies_dummy_background" />
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/cookieAnimation"
+                        android:layout_gravity="start|center_vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/omnibarIconContainer"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:lottie_loop="false" />
 
                         <com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
                             android:id="@+id/omnibarTextInput"

@@ -1636,6 +1636,12 @@ class BrowserTabViewModel @Inject constructor(
         onSiteChanged()
     }
 
+    fun onAutoconsentResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean) {
+        site?.consentManaged = consentManaged
+        site?.consentOptOutFailed = optOutFailed
+        site?.consentSelfTestFailed = selfTestFailed
+    }
+
     private fun onSiteChanged() {
         httpsUpgraded = false
         viewModelScope.launch {

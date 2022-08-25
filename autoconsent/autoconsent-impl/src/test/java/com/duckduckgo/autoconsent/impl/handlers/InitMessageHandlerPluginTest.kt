@@ -35,6 +35,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.Shadows.shadowOf
 
@@ -136,6 +137,16 @@ class InitMessageHandlerPluginTest {
         assertTrue(initResp.config.enabled)
         assertEquals(20, initResp.config.detectRetries)
         assertEquals("initResp", initResp.type)
+    }
+
+    @Test
+    fun whenProcessMessageThenOnResultReceivedCalled() {
+        settingsRepository.userSetting = true
+        settingsRepository.firstPopupHandled = true
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        verify(mockCallback).onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false)
     }
 
     private fun message(): String {

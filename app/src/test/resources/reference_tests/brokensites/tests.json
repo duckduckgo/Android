@@ -20,6 +20,9 @@
           {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
           {"name": "surrogates", "value": "surrogate.domain.test"}
         ],
+        "consentManaged": false,
+        "consentOptoutFailed": false,
+        "consentSelftestFailed": false,
         "exceptPlatforms": []
       },
       {
@@ -40,6 +43,9 @@
           {"name": "blockedTrackers", "value": ""},
           {"name": "surrogates", "value": ""}
         ],
+        "consentManaged": false,
+        "consentOptoutFailed": false,
+        "consentSelftestFailed": false,
         "exceptPlatforms": []
       },
       {
@@ -68,6 +74,9 @@
           {"name": "os", "value": "12"},
           {"name": "gpc", "value": "true"}
         ],
+        "consentManaged": false,
+        "consentOptoutFailed": false,
+        "consentSelftestFailed": false,
         "exceptPlatforms": [
           "web-extension",
           "safari-extension"

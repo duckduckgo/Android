@@ -32,7 +32,7 @@ import com.duckduckgo.mobile.android.databinding.ViewDaxDialogBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 interface DaxDialog {
-    fun setDaxDialogListener(listener: DaxDialogListener)
+    fun setDaxDialogListener(listener: DaxDialogListener?)
 }
 
 interface DaxDialogListener {
@@ -57,7 +57,7 @@ class TypewriterDaxDialog : DialogFragment(R.layout.view_dax_dialog), DaxDialog 
 
     private var daxDialogListener: DaxDialogListener? = null
 
-    override fun setDaxDialogListener(listener: DaxDialogListener) {
+    override fun setDaxDialogListener(listener: DaxDialogListener?) {
         daxDialogListener = listener
     }
 
