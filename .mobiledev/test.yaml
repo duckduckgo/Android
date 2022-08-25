@@ -1,0 +1,25 @@
+appId: com.duckduckgo.mobile.android
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    text: ".*Not to worry! Searching and browsing privately.*"
+- tapOn: "let's do it!"
+- tapOn: "cancel"
+- assertVisible:
+    text: ".*I'll also upgrade the security of your connection if possible.*"
+- inputText: "https://www.search-company.site/"
+- tapOn:
+    id: ".*key_pos_ime_action.*"
+- assertVisible:
+    text: ".*Got It.*"
+- tapOn:
+    text: ".*Got It.*"
+- assertVisible:
+    id: ".*ad-id-2.*"
+- tapOn:
+    id: ".*ad-id-2.*"
+- assertVisible:
+    text: ".*Publisher site.*"
+- tapOn:
+    text: ".*Publisher site.*"
