@@ -20,9 +20,11 @@ import android.content.Context
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import java.io.BufferedReader
 import javax.inject.Inject
 
+@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class FileBasedJavascriptInjector @Inject constructor() : JavascriptInjector {
     private lateinit var functions: String
