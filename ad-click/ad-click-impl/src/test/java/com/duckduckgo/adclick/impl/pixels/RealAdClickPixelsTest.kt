@@ -19,9 +19,12 @@ package com.duckduckgo.adclick.impl.pixels
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.adclick.impl.Exemption
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -53,7 +56,43 @@ class RealAdClickPixelsTest {
         testee = RealAdClickPixels(mockPixel, mockContext)
     }
 
-    // TODO: [ANA] add tests for fireAdClickActivePixel
+    @Test
+    fun whenFireAdClickActivePixelCalledWithNullExemptionThenReturnFalse() {
+        val exemption = null
+
+        val result = testee.fireAdClickActivePixel(exemption)
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenFireAdClickActivePixelCalledWithNonNullExemptionAndPixelAlreadyFiredThenReturnFalse() {
+        val exemption = Exemption(
+            hostTldPlusOne = "ad_domain",
+            navigationExemptionDeadline = 0L,
+            exemptionDeadline = 0L,
+            adClickActivePixelFired = true
+        )
+
+        val result = testee.fireAdClickActivePixel(exemption)
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenFireAdClickActivePixelCalledWithNonNullExemptionAndPixelNotAlreadyFiredThenFirePixelAndReturnTrue() {
+        val exemption = Exemption(
+            hostTldPlusOne = "ad_domain",
+            navigationExemptionDeadline = 0L,
+            exemptionDeadline = 0L,
+            adClickActivePixelFired = false
+        )
+
+        val result = testee.fireAdClickActivePixel(exemption)
+
+        verify(mockPixel).fire(AdClickPixelName.AD_CLICK_ACTIVE)
+        assertTrue(result)
+    }
 
     @Test
     fun whenFireAdClickDetectedPixelCalledWithSavedAdDomainSameAsUrlAdDomainThenPixelSentWithMatchedParam() {

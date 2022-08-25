@@ -19,6 +19,7 @@ package com.duckduckgo.adclick.impl.pixels
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.adclick.impl.Exemption
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelParameters.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION_COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface AdClickPixels {
+    fun fireAdClickActivePixel(exemption: Exemption?): Boolean
     fun fireAdClickDetectedPixel(savedAdDomain: String?, urlAdDomain: String, heuristicEnabled: Boolean, domainEnabled: Boolean)
     fun updateCountPixel(adClickPixelName: AdClickPixelName)
     fun fireCountPixel(adClickPixelName: AdClickPixelName)
@@ -41,6 +43,14 @@ class RealAdClickPixels @Inject constructor(
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+
+    override fun fireAdClickActivePixel(exemption: Exemption?): Boolean {
+        if (exemption == null || exemption.adClickActivePixelFired) return false
+
+        pixel.fire(AdClickPixelName.AD_CLICK_ACTIVE)
+
+        return true
+    }
 
     override fun fireAdClickDetectedPixel(savedAdDomain: String?, urlAdDomain: String, heuristicEnabled: Boolean, domainEnabled: Boolean) {
         val params = mutableMapOf<String, String>()
