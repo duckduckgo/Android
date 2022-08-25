@@ -23,6 +23,7 @@ import com.android.tools.lint.detector.api.Issue
 import com.duckduckgo.lint.NoFragmentDetector.Companion.NO_FRAGMENT_ISSUE
 import com.duckduckgo.lint.NoLifecycleObserverDetector.Companion.NO_LIFECYCLE_OBSERVER_ISSUE
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
+import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
 
 @Suppress("UnstableApiUsage")
 class DuckDuckGoIssueRegistry : IssueRegistry() {
@@ -31,6 +32,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_SINGLETON_ISSUE,
             NO_LIFECYCLE_OBSERVER_ISSUE,
             NO_FRAGMENT_ISSUE,
+            NO_SYSTEM_LOAD_LIBRARY,
         )
 
     override val api: Int
