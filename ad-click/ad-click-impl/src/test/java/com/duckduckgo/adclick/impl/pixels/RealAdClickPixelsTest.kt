@@ -53,6 +53,141 @@ class RealAdClickPixelsTest {
         testee = RealAdClickPixels(mockPixel, mockContext)
     }
 
+    // TODO: [ANA] add tests for fireAdClickActivePixel
+
+    @Test
+    fun whenFireAdClickDetectedPixelCalledWithSavedAdDomainSameAsUrlAdDomainThenPixelSentWithMatchedParam() {
+        val savedAdDomain = "ad_domain"
+        val urlAdDomain = "ad_domain"
+        val heuristicEnabled = true
+        val domainEnabled = true
+
+        testee.fireAdClickDetectedPixel(savedAdDomain, urlAdDomain, heuristicEnabled, domainEnabled)
+
+        verify(mockPixel).fire(
+            AdClickPixelName.AD_CLICK_DETECTED,
+            mapOf(
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_MATCHED,
+                AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "true",
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true"
+            )
+        )
+    }
+
+    @Test
+    fun whenFireAdClickDetectedPixelCalledWithSavedAdDomainDifferentThanUrlAdDomainThenPixelSentWithMismatchParam() {
+        val savedAdDomain = "ad_domain"
+        val urlAdDomain = "other_domain"
+        val heuristicEnabled = true
+        val domainEnabled = true
+
+        testee.fireAdClickDetectedPixel(savedAdDomain, urlAdDomain, heuristicEnabled, domainEnabled)
+
+        verify(mockPixel).fire(
+            AdClickPixelName.AD_CLICK_DETECTED,
+            mapOf(
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_MISMATCH,
+                AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "true",
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true"
+            )
+        )
+    }
+
+    @Test
+    fun whenFireAdClickDetectedPixelCalledWithSavedAdDomainAndNoUrlAdDomainThenPixelSentWithSerpOnlyParam() {
+        val savedAdDomain = "ad_domain"
+        val urlAdDomain = ""
+        val heuristicEnabled = true
+        val domainEnabled = true
+
+        testee.fireAdClickDetectedPixel(savedAdDomain, urlAdDomain, heuristicEnabled, domainEnabled)
+
+        verify(mockPixel).fire(
+            AdClickPixelName.AD_CLICK_DETECTED,
+            mapOf(
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_SERP_ONLY,
+                AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "true",
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true"
+            )
+        )
+    }
+
+    @Test
+    fun whenFireAdClickDetectedPixelCalledWithNoSavedAdDomainAndUrlAdDomainThenPixelSentWithHeuristicOnlyParam() {
+        val savedAdDomain = ""
+        val urlAdDomain = "ad_domain"
+        val heuristicEnabled = true
+        val domainEnabled = true
+
+        testee.fireAdClickDetectedPixel(savedAdDomain, urlAdDomain, heuristicEnabled, domainEnabled)
+
+        verify(mockPixel).fire(
+            AdClickPixelName.AD_CLICK_DETECTED,
+            mapOf(
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_HEURISTIC_ONLY,
+                AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "true",
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true"
+            )
+        )
+    }
+
+    @Test
+    fun whenFireAdClickDetectedPixelCalledWithNoSavedAdDomainAndNoUrlAdDomainThenPixelSentWithNoneParam() {
+        val savedAdDomain = ""
+        val urlAdDomain = ""
+        val heuristicEnabled = true
+        val domainEnabled = true
+
+        testee.fireAdClickDetectedPixel(savedAdDomain, urlAdDomain, heuristicEnabled, domainEnabled)
+
+        verify(mockPixel).fire(
+            AdClickPixelName.AD_CLICK_DETECTED,
+            mapOf(
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_NONE,
+                AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "true",
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true"
+            )
+        )
+    }
+
+    @Test
+    fun whenFireAdClickDetectedPixelCalledWithDisabledHeuristicDetectionThenPixelSentWithCorrectParam() {
+        val savedAdDomain = ""
+        val urlAdDomain = ""
+        val heuristicEnabled = false
+        val domainEnabled = true
+
+        testee.fireAdClickDetectedPixel(savedAdDomain, urlAdDomain, heuristicEnabled, domainEnabled)
+
+        verify(mockPixel).fire(
+            AdClickPixelName.AD_CLICK_DETECTED,
+            mapOf(
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_NONE,
+                AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "false",
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "true"
+            )
+        )
+    }
+
+    @Test
+    fun whenFireAdClickDetectedPixelCalledWithDisabledDomainDetectionThenPixelSentWithCorrectParam() {
+        val savedAdDomain = ""
+        val urlAdDomain = ""
+        val heuristicEnabled = true
+        val domainEnabled = false
+
+        testee.fireAdClickDetectedPixel(savedAdDomain, urlAdDomain, heuristicEnabled, domainEnabled)
+
+        verify(mockPixel).fire(
+            AdClickPixelName.AD_CLICK_DETECTED,
+            mapOf(
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION to AdClickPixelValues.AD_CLICK_DETECTED_NONE,
+                AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION to "true",
+                AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED to "false"
+            )
+        )
+    }
+
     @Test
     fun whenUpdateCountPixelCalledThenSharedPrefUpdated() {
         val key = "${AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION.pixelName}_count"
