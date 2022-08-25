@@ -41,7 +41,7 @@ interface TrackerDetector {
     fun evaluate(
         url: String,
         documentUrl: String,
-        checkFirstParty: Boolean = true
+        checkFirstParty: Boolean
     ): TrackingEvent?
 }
 

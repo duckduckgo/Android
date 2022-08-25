@@ -590,7 +590,7 @@ class WebViewRequestInterceptorTest {
             surrogateId = "testId"
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
-        whenever(mockTrackerDetector.evaluate(any(), any())).thenReturn(blockTrackingEvent)
+        whenever(mockTrackerDetector.evaluate(any(), any(), eq(true))).thenReturn(blockTrackingEvent)
     }
 
     private fun configureUrlExistsInTheStack(uri: Uri = validUri()) {
