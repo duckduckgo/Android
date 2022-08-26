@@ -671,7 +671,7 @@ class WebViewRequestInterceptorTest {
     }
 
     private fun configureTrackingEvent(status: TrackerStatus) {
-        val blockTrackingEvent = TrackingEvent(
+        val trackingEvent = TrackingEvent(
             status = status,
             type = TrackerType.OTHER,
             documentUrl = "",
@@ -681,7 +681,7 @@ class WebViewRequestInterceptorTest {
             surrogateId = "testId"
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
-        whenever(mockTrackerDetector.evaluate(any(), any(), eq(true))).thenReturn(blockTrackingEvent)
+        whenever(mockTrackerDetector.evaluate(any(), any(), eq(true))).thenReturn(trackingEvent)
     }
 
     private fun configureNull() {
@@ -698,7 +698,7 @@ class WebViewRequestInterceptorTest {
     }
 
     private fun configureCnameTrackingEvent(status: TrackerStatus) {
-        val blockTrackingEvent = TrackingEvent(
+        val trackingEvent = TrackingEvent(
             status = status,
             type = TrackerType.OTHER,
             documentUrl = "",
@@ -708,7 +708,7 @@ class WebViewRequestInterceptorTest {
             surrogateId = null
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
-        whenever(mockTrackerDetector.evaluate(any(), any(), eq(false))).thenReturn(blockTrackingEvent)
+        whenever(mockTrackerDetector.evaluate(any(), any(), eq(false))).thenReturn(trackingEvent)
     }
 
     private fun configureUrlExistsInTheStack(uri: Uri = validUri()) {
