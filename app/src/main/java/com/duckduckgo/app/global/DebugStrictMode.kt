@@ -41,7 +41,7 @@ class DebugStrictMode {
         { it: DdgStrictModeViolation -> it.stackTrace.contains("VpnSharedPreferencesProviderImpl.getSharedPreferences") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("AccessibilitySettingsSharedPreferences.getOverrideSystemFontSize") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("SecureStoreBackedAutofillStore.getAutofillAvailable") },
-        { it: DdgStrictModeViolation -> it.stackTrace.contains("BrowserTabViewModel.onCtaShown") },
+        // { it: DdgStrictModeViolation -> it.stackTrace.contains("BrowserTabViewModel.onCtaShown") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("appReferrerDataStore.installedFromEuAuction") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("AppReferenceSharePreferences.getInstalledFromEuAuction") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("RealGpcRepository.isGpcEnabled") },
