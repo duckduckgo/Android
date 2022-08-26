@@ -23,6 +23,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
@@ -31,6 +32,7 @@ import com.duckduckgo.app.browser.BrowserActivity.Companion.FAVORITES_ONBOARDING
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.THEME_EXTRAS
 import timber.log.Timber
 import javax.inject.Inject
@@ -62,6 +64,9 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
 
     @Inject
     lateinit var voiceSearchWidgetConfigurator: VoiceSearchWidgetConfigurator
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     private var layoutId: Int = R.layout.search_favorites_widget_daynight_auto
 
@@ -215,7 +220,8 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         widgetTheme: WidgetTheme
     ) {
         val favoriteItemClickIntent = Intent(context, BrowserActivity::class.java)
-        val favoriteClickPendingIntent = PendingIntent.getActivity(context, 0, favoriteItemClickIntent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntentFlags = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
+        val favoriteClickPendingIntent = PendingIntent.getActivity(context, 0, favoriteItemClickIntent, pendingIntentFlags)
 
         val extras = Bundle()
         extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
