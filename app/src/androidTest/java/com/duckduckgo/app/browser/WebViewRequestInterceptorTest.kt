@@ -575,13 +575,104 @@ class WebViewRequestInterceptorTest {
         assertRequestCanContinueToLoad(response)
     }
 
+    @Test
+    fun whenTrackingEventIsNullAndUncloakedHostFoundAndIsTrackerThenBlockRequest() = runTest {
+        configureNull()
+        assertRequestBlockedWhenUncloakedHostFound()
+    }
+
+    @Test
+    fun whenTrackingEventIsAllowedAndUncloakedHostFoundAndIsTrackerThenBlockRequest() = runTest {
+        configureShouldAllow()
+        assertRequestBlockedWhenUncloakedHostFound()
+    }
+
+    @Test
+    fun whenTrackingEventIsSameEntityAllowedAndUncloakedHostFoundAndIsTrackerThenBlockRequest() = runTest {
+        configureSameEntity()
+        assertRequestBlockedWhenUncloakedHostFound()
+    }
+
+    @Test
+    fun whenTrackingEventIsNotBlockedAndUncloakedHostNotFoundThenContinueToLoad() = runTest {
+        configureNull()
+        configureShouldNotUpgrade()
+        configureBlockedCnameTrackingEvent()
+
+        val uri = "host.com".toUri()
+        whenever(mockRequest.url).thenReturn(uri)
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(any())).thenReturn(null)
+
+        val response = testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = "foo.com",
+            webView = webView,
+            webViewClientListener = null
+        )
+
+        verify(mockCloakedCnameDetector).detectCnameCloakedHost(uri)
+        assertRequestCanContinueToLoad(response)
+    }
+
+    @Test
+    fun whenTrackingEventIsNotBlockedAndUncloakedHostFoundButIsNotATrackerThenContinueToLoad() = runTest {
+        configureNull()
+        configureShouldNotUpgrade()
+        configureAllowedCnameTrackingEvent()
+
+        val uri = "host.com".toUri()
+        whenever(mockRequest.url).thenReturn(uri)
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(any())).thenReturn("uncloaked-host.com")
+
+        val response = testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = "foo.com",
+            webView = webView,
+            webViewClientListener = null
+        )
+
+        verify(mockCloakedCnameDetector).detectCnameCloakedHost(uri)
+        assertRequestCanContinueToLoad(response)
+    }
+
+    private suspend fun assertRequestBlockedWhenUncloakedHostFound() {
+        configureShouldNotUpgrade()
+        configureBlockedCnameTrackingEvent()
+
+        val uri = "host.com".toUri()
+        whenever(mockRequest.url).thenReturn(uri)
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(any())).thenReturn("uncloaked-host.com")
+
+        val response = testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = "foo.com",
+            webView = webView,
+            webViewClientListener = null
+        )
+
+        verify(mockCloakedCnameDetector).detectCnameCloakedHost(uri)
+        assertCancelledResponse(response)
+    }
+
     private fun assertRequestCanContinueToLoad(response: WebResourceResponse?) {
         assertNull(response)
     }
 
     private fun configureShouldBlock() {
+        configureTrackingEvent(TrackerStatus.BLOCKED)
+    }
+
+    private fun configureShouldAllow() {
+        configureTrackingEvent(TrackerStatus.ALLOWED)
+    }
+
+    private fun configureSameEntity() {
+        configureTrackingEvent(TrackerStatus.SAME_ENTITY_ALLOWED)
+    }
+
+    private fun configureTrackingEvent(status: TrackerStatus) {
         val blockTrackingEvent = TrackingEvent(
-            status = TrackerStatus.BLOCKED,
+            status = status,
             type = TrackerType.OTHER,
             documentUrl = "",
             trackerUrl = "",
@@ -591,6 +682,33 @@ class WebViewRequestInterceptorTest {
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
         whenever(mockTrackerDetector.evaluate(any(), any(), eq(true))).thenReturn(blockTrackingEvent)
+    }
+
+    private fun configureNull() {
+        whenever(mockRequest.isForMainFrame).thenReturn(false)
+        whenever(mockTrackerDetector.evaluate(any(), any(), eq(true))).thenReturn(null)
+    }
+
+    private fun configureBlockedCnameTrackingEvent() {
+        configureCnameTrackingEvent(TrackerStatus.BLOCKED)
+    }
+
+    private fun configureAllowedCnameTrackingEvent() {
+        configureCnameTrackingEvent(TrackerStatus.ALLOWED)
+    }
+
+    private fun configureCnameTrackingEvent(status: TrackerStatus) {
+        val blockTrackingEvent = TrackingEvent(
+            status = status,
+            type = TrackerType.OTHER,
+            documentUrl = "",
+            trackerUrl = "",
+            entity = null,
+            categories = null,
+            surrogateId = null
+        )
+        whenever(mockRequest.isForMainFrame).thenReturn(false)
+        whenever(mockTrackerDetector.evaluate(any(), any(), eq(false))).thenReturn(blockTrackingEvent)
     }
 
     private fun configureUrlExistsInTheStack(uri: Uri = validUri()) {
