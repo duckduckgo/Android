@@ -66,11 +66,12 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 43,
+    exportSchema = true, version = 44,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
+        TdsCnameEntity::class,
         UserWhitelistedDomain::class,
         HttpsBloomFilterSpec::class,
         HttpsFalsePositiveDomain::class,
@@ -119,6 +120,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsTrackerDao(): TdsTrackerDao
     abstract fun tdsEntityDao(): TdsEntityDao
     abstract fun tdsDomainEntityDao(): TdsDomainEntityDao
+    abstract fun tdsCnameEntityDao(): TdsCnameEntityDao
     abstract fun userWhitelistDao(): UserWhitelistDao
     abstract fun httpsFalsePositivesDao(): HttpsFalsePositivesDao
     abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
@@ -563,6 +565,15 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    val MIGRATION_43_TO_44: Migration = object : Migration(43, 44) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `tds_cname_entity` (`cloakedHostName` TEXT NOT NULL, " +
+                    "`uncloakedHostName` TEXT NOT NULL, PRIMARY KEY(`cloakedHostName`))"
+            )
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -630,7 +641,8 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_39_TO_40,
             MIGRATION_40_TO_41,
             MIGRATION_41_TO_42,
-            MIGRATION_42_TO_43
+            MIGRATION_42_TO_43,
+            MIGRATION_43_TO_44
         )
 
     @Deprecated(

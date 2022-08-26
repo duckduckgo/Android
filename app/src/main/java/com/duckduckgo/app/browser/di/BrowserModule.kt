@@ -76,6 +76,7 @@ import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
+import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.BrowserAutofill
@@ -275,7 +276,8 @@ class BrowserModule {
         privacyProtectionCountDao: PrivacyProtectionCountDao,
         gpc: Gpc,
         userAgentProvider: UserAgentProvider,
-        adClickManager: AdClickManager
+        adClickManager: AdClickManager,
+        cloakedCnameDetector: CloakedCnameDetector
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -284,7 +286,8 @@ class BrowserModule {
             privacyProtectionCountDao,
             gpc,
             userAgentProvider,
-            adClickManager
+            adClickManager,
+            cloakedCnameDetector
         )
 
     @Provides

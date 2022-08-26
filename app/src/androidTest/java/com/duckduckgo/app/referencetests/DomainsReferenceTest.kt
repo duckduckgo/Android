@@ -42,6 +42,7 @@ import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import com.duckduckgo.app.trackerdetection.Client
+import com.duckduckgo.app.trackerdetection.CloakedCnameDetectorImpl
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsClient
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
@@ -49,6 +50,7 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TdsJson
+import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
@@ -86,6 +88,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     private lateinit var trackerDetector: TrackerDetector
     private lateinit var tdsEntityDao: TdsEntityDao
     private lateinit var tdsDomainEntityDao: TdsDomainEntityDao
+    private lateinit var tdsCnameEntityDao: TdsCnameEntityDao
     private lateinit var testee: WebViewRequestInterceptor
 
     private val resourceSurrogates = ResourceSurrogatesImpl()
@@ -164,7 +167,8 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             gpc = mockGpc,
             userAgentProvider = userAgentProvider,
-            adClickManager = mockAdClickManager
+            adClickManager = mockAdClickManager,
+            cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao)
         )
     }
 
@@ -199,6 +203,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
 
         tdsEntityDao = db.tdsEntityDao()
         tdsDomainEntityDao = db.tdsDomainEntityDao()
+        tdsCnameEntityDao = db.tdsCnameEntityDao()
 
         entityLookup = TdsEntityLookup(tdsEntityDao, tdsDomainEntityDao)
         trackerDetector =
@@ -217,10 +222,12 @@ class DomainsReferenceTest(private val testCase: TestCase) {
         val trackers = tdsJson.jsonToTrackers().values.toList()
         val entities = tdsJson.jsonToEntities()
         val domainEntities = tdsJson.jsonToDomainEntities()
+        val cnameEntities = tdsJson.jsonToCnameEntities()
         val client = TdsClient(Client.ClientName.TDS, trackers)
 
         tdsEntityDao.insertAll(entities)
         tdsDomainEntityDao.insertAll(domainEntities)
+        tdsCnameEntityDao.insertAll(cnameEntities)
         trackerDetector.addClient(client)
     }
 

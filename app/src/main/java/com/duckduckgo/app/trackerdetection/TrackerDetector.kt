@@ -40,7 +40,8 @@ interface TrackerDetector {
     fun addClient(client: Client)
     fun evaluate(
         url: String,
-        documentUrl: String
+        documentUrl: String,
+        checkFirstParty: Boolean = true
     ): TrackingEvent?
 }
 
@@ -67,10 +68,11 @@ class TrackerDetectorImpl @Inject constructor(
 
     override fun evaluate(
         url: String,
-        documentUrl: String
+        documentUrl: String,
+        checkFirstParty: Boolean
     ): TrackingEvent? {
 
-        if (firstParty(url, documentUrl)) {
+        if (checkFirstParty && firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
             return null
         }

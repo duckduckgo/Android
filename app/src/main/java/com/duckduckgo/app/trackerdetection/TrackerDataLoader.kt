@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.api.TdsJson
+import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
@@ -49,6 +50,7 @@ class TrackerDataLoader @Inject constructor(
     private val tdsTrackerDao: TdsTrackerDao,
     private val tdsEntityDao: TdsEntityDao,
     private val tdsDomainEntityDao: TdsDomainEntityDao,
+    private val tdsCnameEntityDao: TdsCnameEntityDao,
     private val tdsMetadataDao: TdsMetadataDao,
     private val context: Context,
     private val appDatabase: AppDatabase,
@@ -88,6 +90,7 @@ class TrackerDataLoader @Inject constructor(
             tdsEntityDao.updateAll(tdsJson.jsonToEntities())
             tdsDomainEntityDao.updateAll(tdsJson.jsonToDomainEntities())
             tdsTrackerDao.updateAll(tdsJson.jsonToTrackers().values)
+            tdsCnameEntityDao.updateAll(tdsJson.jsonToCnameEntities())
         }
     }
 
