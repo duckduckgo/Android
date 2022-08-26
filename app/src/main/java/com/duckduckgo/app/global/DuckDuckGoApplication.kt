@@ -77,6 +77,8 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
 
         configureLogging()
 
+        DebugStrictMode().enable()
+
         val currentProcess = processDetector.detectProcess(this)
         Timber.i("Creating DuckDuckGoApplication. Process %s", currentProcess)
 
