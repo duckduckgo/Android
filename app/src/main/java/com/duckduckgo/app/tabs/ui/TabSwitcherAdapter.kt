@@ -35,12 +35,15 @@ import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIF
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_VIEWED
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.image.GlideRequests
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 
@@ -48,7 +51,8 @@ class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val lifecycleOwner: LifecycleOwner,
-    private val faviconManager: FaviconManager
+    private val faviconManager: FaviconManager,
+    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
 ) :
     ListAdapter<TabEntity, TabViewHolder>(TabEntityDiffCallback()) {
 
@@ -151,22 +155,26 @@ class TabSwitcherAdapter(
         glide: GlideRequests,
         holder: TabViewHolder
     ) {
-        val previewFile = tab.tabPreviewFile
-        if (previewFile == null) {
-            glide.clear(holder.tabPreview)
-            return
-        }
+        lifecycleOwner.lifecycleScope.launch(dispatcherProvider.default()) {
+            val previewFile = tab.tabPreviewFile
+            if (previewFile == null) {
+                glide.clear(holder.tabPreview)
+                return@launch
+            }
 
-        val cachedWebViewPreview = File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile))
-        if (!cachedWebViewPreview.exists()) {
-            glide.clear(holder.tabPreview)
-            return
-        }
+            val cachedWebViewPreview = File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile))
+            if (!cachedWebViewPreview.exists()) {
+                glide.clear(holder.tabPreview)
+                return@launch
+            }
 
-        holder.tabPreview.show()
-        glide.load(cachedWebViewPreview)
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .into(holder.tabPreview)
+            withContext(dispatcherProvider.main()) {
+                holder.tabPreview.show()
+                glide.load(cachedWebViewPreview)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(holder.tabPreview)
+            }
+        }
     }
 
     private fun attachClickListeners(

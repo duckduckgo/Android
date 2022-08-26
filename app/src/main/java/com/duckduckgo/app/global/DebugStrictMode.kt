@@ -45,7 +45,7 @@ class DebugStrictMode {
         { it: DdgStrictModeViolation -> it.stackTrace.contains("appReferrerDataStore.installedFromEuAuction") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("AppReferenceSharePreferences.getInstalledFromEuAuction") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("RealGpcRepository.isGpcEnabled") },
-        { it: DdgStrictModeViolation -> it.stackTrace.contains("TabSwitcherAdapter.loadTabPreviewImage") },
+        // { it: DdgStrictModeViolation -> it.stackTrace.contains("TabSwitcherAdapter.loadTabPreviewImage") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("UnsentForgetAllPixelStoreSharedPreferences.incrementCount") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("SecureStoreBackedAutofillStore.getAutofillEnabled") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("UserAgentProvider.userAgent") },
