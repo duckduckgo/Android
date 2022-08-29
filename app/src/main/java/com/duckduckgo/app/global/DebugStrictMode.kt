@@ -56,7 +56,7 @@ class DebugStrictMode {
         { it: DdgStrictModeViolation -> it.stackTrace.contains("SettingsSharedPreferences.setAppUsedSinceLastClear") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("SettingsSharedPreferences.setAppIconChanged") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("SettingsSharedPreferences.setAppBackgroundedTimestamp") },
-        { it: DdgStrictModeViolation -> it.stackTrace.contains("DuckDuckGoFaviconManager.loadFromDisk") },
+        // { it: DdgStrictModeViolation -> it.stackTrace.contains("DuckDuckGoFaviconManager.loadFromDisk") },
     )
 
     fun enable() {
