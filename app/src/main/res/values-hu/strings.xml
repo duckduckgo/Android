@@ -187,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Beállítások</string>
     <string name="settingsMenuItemTitle">Beállítások</string>
-    <string name="settingsHeadingGeneral">Általános</string>
-    <string name="settingsHeadingOther">Egyéb</string>
     <string name="settingsHeadingPrivacy">Adatvédelem</string>
     <string name="settingsAboutDuckduckgo">A DuckDuckGo névjegye</string>
     <string name="settingsVersion">Változat</string>
@@ -206,18 +204,21 @@
     <string name="settingsAppLinksAskEveryTime">Kérdezzen rá minden alkalommal</string>
     <string name="settingsAppLinksAlways">Mindig</string>
     <string name="settingsAppLinksNever">Soha</string>
+    <string name="settingsHeadingAppearance">Megjelenés</string>
+    <string name="settingsHeadingCustomize">Testreszabás</string>
+    <string name="settingsHeadingAbout">További információ</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>
 
-    <string name="settingsAutomaticallyClearWhat">Automatikus törlés…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatikus törlés…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nincs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Lapok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Lapok és adatok</string>
+    <string name="settingsAutomaticallyClearWhat">Automatikus törlés…</string>
+    <string name="settingsAutomaticallyClearWhen">Törlés ekkor…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Törlés ekkor…</string>
 
-    <string name="settingsAutomaticallyClearWhen">Törlés ideje: …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Törlés ideje: …</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Kilépés csak az alkalmazásból</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Kilépés az alkalmazásból 5 másodperc inaktivitás után</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Kilépés az alkalmazásból 5 perc inaktivitás után</string>
@@ -720,5 +721,8 @@
 
     <string name="autoconsentSetting">Felugró sütiablakok kezelése</string>
     <string name="autoconsentAnimationText">Kezelt sütik</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automatikus kitöltés</string>
 
 </resources>

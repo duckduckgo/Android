@@ -187,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Indstillinger</string>
     <string name="settingsMenuItemTitle">Indstillinger</string>
-    <string name="settingsHeadingGeneral">Generelt</string>
-    <string name="settingsHeadingOther">Andet</string>
     <string name="settingsHeadingPrivacy">Privatliv</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
@@ -206,18 +204,21 @@
     <string name="settingsAppLinksAskEveryTime">Spørg hver gang</string>
     <string name="settingsAppLinksAlways">Altid</string>
     <string name="settingsAppLinksNever">Aldrig</string>
+    <string name="settingsHeadingAppearance">udseende</string>
+    <string name="settingsHeadingCustomize">Tilpas</string>
+    <string name="settingsHeadingAbout">Omkring</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
 
-    <string name="settingsAutomaticallyClearWhat">Ryd automatisk …</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Ryd automatisk …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Ingen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Faner</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Faner og data</string>
+    <string name="settingsAutomaticallyClearWhat">Brænd automatisk …</string>
+    <string name="settingsAutomaticallyClearWhen">Brænd Til  …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Brænd til …</string>
 
-    <string name="settingsAutomaticallyClearWhen">Ryd den …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Ryd den …</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Kun ved app-afslutning</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App-afslutning, inaktiv i 5 sekunder</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">App-afslutning, inaktiv i 5 minutter</string>
@@ -720,5 +721,7 @@
 
     <string name="autoconsentSetting">Administrer cookie pop op-vinduer</string>
     <string name="autoconsentAnimationText">Administrerede cookies</string>
+
+    <string name="autofillSettingsDisplayName">Automatisk udfyldning</string>
 
 </resources>
