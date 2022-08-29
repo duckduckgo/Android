@@ -115,8 +115,17 @@ class SettingsActivity :
     private val viewsGeneral
         get() = binding.includeSettings.contentSettingsGeneral
 
+    private val viewsAutofill
+        get() = binding.includeSettings.contentSettingsAutofill
+
+    private val viewsAppearance
+        get() = binding.includeSettings.contentSettingsAppearance
+
     private val viewsPrivacy
         get() = binding.includeSettings.contentSettingsPrivacy
+
+    private val viewsCustomize
+        get() = binding.includeSettings.contentSettingsCustomize
 
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
@@ -146,11 +155,17 @@ class SettingsActivity :
 
     private fun configureUiEventHandlers() {
         with(viewsGeneral) {
-            selectedThemeSetting.setOnClickListener { viewModel.userRequestedToChangeTheme() }
-            autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
             setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
-            changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
             homeScreenWidgetSetting.setOnClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
+        }
+
+        with(viewsAutofill) {
+            autofill.setOnClickListener { viewModel.onAutofillSettingsClick() }
+        }
+
+        with(viewsAppearance) {
+            selectedThemeSetting.setOnClickListener { viewModel.userRequestedToChangeTheme() }
+            changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
             selectedFireAnimationSetting.setOnClickListener { viewModel.userRequestedToChangeFireAnimation() }
             accessibilitySetting.setOnClickListener { viewModel.onAccessibilitySettingClicked() }
         }
@@ -158,10 +173,14 @@ class SettingsActivity :
         with(viewsPrivacy) {
             globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
             fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
-            locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
             automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
             automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
             whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
+        }
+
+        with(viewsCustomize) {
+            autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
+            locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
             appLinksSetting.setOnClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
         }
 
@@ -201,7 +220,7 @@ class SettingsActivity :
 
     private fun configureAppLinksSettingVisibility() {
         if (appBuildConfig.sdkInt < Build.VERSION_CODES.N) {
-            viewsPrivacy.appLinksSetting.visibility = View.GONE
+            viewsCustomize.appLinksSetting.visibility = View.GONE
         }
     }
 
@@ -212,11 +231,11 @@ class SettingsActivity :
                 viewState.let {
                     viewsOther.version.setSubtitle(it.version)
                     updateSelectedTheme(it.theme)
-                    viewsGeneral.autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
+                    viewsCustomize.autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                     updateDefaultBrowserViewVisibility(it)
                     updateAutomaticClearDataOptions(it.automaticallyClearData)
                     setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
-                    viewsGeneral.changeAppIcon.setImageResource(it.appIcon.icon)
+                    viewsAppearance.changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
                     updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
@@ -232,12 +251,11 @@ class SettingsActivity :
             .launchIn(lifecycleScope)
     }
 
-    private fun updateAutofill(autofillEnabled: Boolean) {
-        if (autofillEnabled) {
-            viewsPrivacy.autofill.visibility = View.VISIBLE
-            viewsPrivacy.autofill.setOnClickListener { viewModel.onAutofillSettingsClick() }
+    private fun updateAutofill(autofillEnabled: Boolean) = with(viewsAutofill.settingsSectionAutofill) {
+        visibility = if (autofillEnabled) {
+            View.VISIBLE
         } else {
-            viewsPrivacy.autofill.visibility = View.GONE
+            View.GONE
         }
     }
 
@@ -257,7 +275,7 @@ class SettingsActivity :
 
     private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
         val subtitle = getString(fireAnimation.nameResId)
-        viewsGeneral.selectedFireAnimationSetting.setSubtitle(subtitle)
+        viewsAppearance.selectedFireAnimationSetting.setSubtitle(subtitle)
     }
 
     private fun updateSelectedTheme(selectedTheme: DuckDuckGoTheme) {
@@ -268,7 +286,7 @@ class SettingsActivity :
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> R.string.settingsSystemTheme
             }
         )
-        viewsGeneral.selectedThemeSetting.setSubtitle(subtitle)
+        viewsAppearance.selectedThemeSetting.setSubtitle(subtitle)
     }
 
     private fun updateAppLinkBehavior(appLinkSettingType: AppLinkSettingType) {
@@ -279,7 +297,7 @@ class SettingsActivity :
                 AppLinkSettingType.NEVER -> R.string.settingsAppLinksNever
             }
         )
-        viewsPrivacy.appLinksSetting.setSubtitle(subtitle)
+        viewsCustomize.appLinksSetting.setSubtitle(subtitle)
     }
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
