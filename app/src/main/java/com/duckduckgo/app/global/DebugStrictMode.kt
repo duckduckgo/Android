@@ -51,7 +51,7 @@ class DebugStrictMode {
         { it: DdgStrictModeViolation -> it.stackTrace.contains("UserAgentProvider.userAgent") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("RealWebViewHttpAuthStore.clearHttpAuthUsernamePassword") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("WebViewDataManager.clearAuthentication") },
-        { it: DdgStrictModeViolation -> it.stackTrace.contains("AppWidgetThemePreferences.storeWidgetSize") },
+        // { it: DdgStrictModeViolation -> it.stackTrace.contains("AppWidgetThemePreferences.storeWidgetSize") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("EnqueuedPixelWorker.onStateChanged") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("SettingsSharedPreferences.setAppUsedSinceLastClear") },
         { it: DdgStrictModeViolation -> it.stackTrace.contains("SettingsSharedPreferences.setAppIconChanged") },
