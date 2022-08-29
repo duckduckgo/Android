@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Spørg hver gang</string>
     <string name="settingsAppLinksAlways">Altid</string>
     <string name="settingsAppLinksNever">Aldrig</string>
+    <string name="settingsHeadingAppearance">udseende</string>
+    <string name="settingsHeadingCustomize">Tilpas</string>
+    <string name="settingsHeadingAbout">Omkring</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Ingen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Faner</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Faner og data</string>
+    <string name="settingsAutomaticallyClearWhat">Brænd automatisk …</string>
+    <string name="settingsAutomaticallyClearWhen">Brænd Til  …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Brænd til …</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Kun ved app-afslutning</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App-afslutning, inaktiv i 5 sekunder</string>
@@ -706,5 +712,7 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Bloker app-trackere på din enhed</string>
     <string name="atp_SettingsDeviceShieldEnabled">Aktiveret</string>
     <string name="atp_SettingsDeviceShieldDisabled">Deaktiveret</string>
+
+    <string name="autofillSettingsDisplayName">Automatisk udfyldning</string>
 
 </resources>

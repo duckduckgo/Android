@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Jedes Mal fragen</string>
     <string name="settingsAppLinksAlways">Immer</string>
     <string name="settingsAppLinksNever">Nie</string>
+    <string name="settingsHeadingAppearance">Appearance</string>
+    <string name="settingsHeadingCustomize">Customize</string>
+    <string name="settingsHeadingAbout">About</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Speichern</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">gar nichts</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs und Daten</string>
+    <string name="settingsAutomaticallyClearWhat">Automatically Burn…</string>
+    <string name="settingsAutomaticallyClearWhen">Burn On…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Burn on…</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">nur beim Verlassen der App</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Beim Verlassen der App, 5 Sekunden lang inaktiv</string>
@@ -706,5 +712,8 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blockiere App-Tracker auf deinem Gerät</string>
     <string name="atp_SettingsDeviceShieldEnabled">Aktiviert</string>
     <string name="atp_SettingsDeviceShieldDisabled">Deaktiviert</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Autofill</string>
 
 </resources>

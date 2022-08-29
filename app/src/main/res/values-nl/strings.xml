@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Elke keer vragen</string>
     <string name="settingsAppLinksAlways">Altijd</string>
     <string name="settingsAppLinksNever">Nooit</string>
+    <string name="settingsHeadingAppearance">Uiterlijk</string>
+    <string name="settingsHeadingCustomize">Aanpassen</string>
+    <string name="settingsHeadingAbout">Over</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Geen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabbladen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabbladen en gegevens</string>
+    <string name="settingsAutomaticallyClearWhat">Automatisch verbranden …</string>
+    <string name="settingsAutomaticallyClearWhen">Verbranden op …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Verbranden op …</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Alleen app afsluiten</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App afsluiten, 5 seconden inactief</string>
@@ -706,5 +712,8 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">App trackers blokkeren op je apparaat</string>
     <string name="atp_SettingsDeviceShieldEnabled">Ingeschakeld</string>
     <string name="atp_SettingsDeviceShieldDisabled">Uitgeschakeld</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automatisch invullen</string>
 
 </resources>

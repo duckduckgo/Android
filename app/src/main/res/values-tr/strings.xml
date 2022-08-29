@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Her seferinde sor</string>
     <string name="settingsAppLinksAlways">Her zaman</string>
     <string name="settingsAppLinksNever">Hiçbir zaman</string>
+    <string name="settingsHeadingAppearance">Görünüm</string>
+    <string name="settingsHeadingCustomize">Özelleştir</string>
+    <string name="settingsHeadingAbout">Hakkında</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Yok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Sekmeler</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Sekmeler ve veriler</string>
+    <string name="settingsAutomaticallyClearWhat">Otomatik Olarak Yak…</string>
+    <string name="settingsAutomaticallyClearWhen">Yakma…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Yakma…</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Uygulamadan çık</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Uygulamadan çık, 5 saniye boyunca inaktif</string>
@@ -706,5 +712,8 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Cihazınızdaki uygulama izleyicileri engelleyin</string>
     <string name="atp_SettingsDeviceShieldEnabled">Etkin</string>
     <string name="atp_SettingsDeviceShieldDisabled">Devre Dışı</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Otomatik Doldurma</string>
 
 </resources>

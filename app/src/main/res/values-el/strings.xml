@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Να γίνεται ερώτηση κάθε φορά</string>
     <string name="settingsAppLinksAlways">Πάντα</string>
     <string name="settingsAppLinksNever">Ποτέ</string>
+    <string name="settingsHeadingAppearance">Εμφάνιση</string>
+    <string name="settingsHeadingCustomize">Προσαρμογή</string>
+    <string name="settingsHeadingAbout">Σχετικά</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Αποθήκευση</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Κανένα</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Καρτέλες</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Καρτέλες και δεδομένα</string>
+    <string name="settingsAutomaticallyClearWhat">Αυτόματο κάψιμο...</string>
+    <string name="settingsAutomaticallyClearWhen">Κάψιμο στις...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Κάψιμο στις...</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Μόνο έξοδος εφαρμογής</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Έξοδος εφαρμογής, ανενεργή για 5 δευτερόλεπτα</string>
@@ -706,5 +712,8 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Αποκλείστε εφαρμογές παρακολούθησης στη συσκευή σας</string>
     <string name="atp_SettingsDeviceShieldEnabled">Ενεργοποιήθηκε</string>
     <string name="atp_SettingsDeviceShieldDisabled">Απενεργοποιήθηκε</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Αυτόματη συμπλήρωση</string>
 
 </resources>

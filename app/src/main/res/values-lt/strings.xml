@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Klausti kiekvieną kartą</string>
     <string name="settingsAppLinksAlways">Visada</string>
     <string name="settingsAppLinksNever">Niekada</string>
+    <string name="settingsHeadingAppearance">Išvaizda</string>
+    <string name="settingsHeadingCustomize">Tinkinti</string>
+    <string name="settingsHeadingAbout">Apie</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Jokie</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Kortelės</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Kortelės ir duomenys</string>
+    <string name="settingsAutomaticallyClearWhat">Automatiškai įrašyti...</string>
+    <string name="settingsAutomaticallyClearWhen">Įrašyti į...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Įrašyti į...</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Tik išeinant iš programos</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Išeinant iš programos, po 5 sek. neveikimo</string>
@@ -714,5 +720,8 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blokuokite programėlių stebėjimo priemones savo įrenginyje</string>
     <string name="atp_SettingsDeviceShieldEnabled">Įjungta</string>
     <string name="atp_SettingsDeviceShieldDisabled">Išjungta</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automatinis pildymas</string>
 
 </resources>

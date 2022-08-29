@@ -204,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Питай всеки път</string>
     <string name="settingsAppLinksAlways">Винаги</string>
     <string name="settingsAppLinksNever">Никога</string>
+    <string name="settingsHeadingAppearance">Външен вид</string>
+    <string name="settingsHeadingCustomize">Персонализиране</string>
+    <string name="settingsHeadingAbout">За нас</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Запази</string>
@@ -212,6 +215,9 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Няма</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Раздели</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Раздели и данни</string>
+    <string name="settingsAutomaticallyClearWhat">Автоматично записване на…</string>
+    <string name="settingsAutomaticallyClearWhen">Записване на…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Записване на…</string>
 
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Само при изход от приложението</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Изход от приложението, неактивен за 5 секунди</string>
@@ -706,5 +712,9 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Блокиране на тракерите на Вашето устройство</string>
     <string name="atp_SettingsDeviceShieldEnabled">Активирано</string>
     <string name="atp_SettingsDeviceShieldDisabled">Деактивирано</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Автоматично попълване</string>
+
 
 </resources>
