@@ -28,6 +28,8 @@ import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -45,7 +47,7 @@ interface ClearDataAction {
         shouldFireDataClearPixel: Boolean
     ): Unit?
 
-    fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
+    suspend fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
     fun killProcess()
     fun killAndRestartProcess(notifyDataCleared: Boolean)
 }
@@ -60,7 +62,8 @@ class ClearPersonalDataAction(
     private val appCacheClearer: AppCacheClearer,
     private val geoLocationPermissions: GeoLocationPermissions,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
-    private val adClickManager: AdClickManager
+    private val adClickManager: AdClickManager,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean) {
@@ -123,8 +126,10 @@ class ClearPersonalDataAction(
         return WebStorage.getInstance()
     }
 
-    override fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean) {
-        settingsDataStore.appUsedSinceLastClear = appUsedSinceLastClear
-        Timber.d("Set appUsedSinceClear flag to $appUsedSinceLastClear")
+    override suspend fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean) {
+        withContext(dispatchers.io()) {
+            settingsDataStore.appUsedSinceLastClear = appUsedSinceLastClear
+            Timber.d("Set appUsedSinceClear flag to $appUsedSinceLastClear")
+        }
     }
 }
