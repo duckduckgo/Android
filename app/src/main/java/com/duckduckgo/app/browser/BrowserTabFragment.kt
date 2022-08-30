@@ -532,6 +532,10 @@ class BrowserTabFragment :
                 }
             }
         })
+
+        childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
+            (dialog as EditSavedSiteDialogFragment).listener = viewModel
+        }
     }
 
     private fun getDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
