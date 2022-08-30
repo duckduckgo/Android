@@ -17,6 +17,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
     <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Autofill</string>
     <string name="autofillSnackbarAction">View</string>
     <string name="autofillLoginSavedSnackbarMessage">Login saved</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Login updated</string>

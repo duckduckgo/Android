@@ -187,6 +187,8 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nastavení</string>
     <string name="settingsMenuItemTitle">Nastavení</string>
+    <string name="settingsHeadingGeneral">Obecné</string>
+    <string name="settingsHeadingOther">Jiné</string>
     <string name="settingsHeadingPrivacy">Soukromí</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
@@ -204,22 +206,18 @@
     <string name="settingsAppLinksAskEveryTime">Vždycky se ptát</string>
     <string name="settingsAppLinksAlways">Vždy</string>
     <string name="settingsAppLinksNever">Nikdy</string>
-    <string name="settingsHeadingAppearance">Vzhled</string>
-    <string name="settingsHeadingCustomize">Přizpůsobit</string>
-    <string name="settingsHeadingAbout">Informace</string>
-
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložit</string>
 
+    <string name="settingsAutomaticallyClearWhat">Automatické vymazání…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatické vymazání…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Žádný</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a data</string>
-    <string name="settingsAutomaticallyClearWhat">Automatické mazání…</string>
-    <string name="settingsAutomaticallyClearWhen">Smazat…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Smazat…</string>
 
+    <string name="settingsAutomaticallyClearWhen">Vymazat dne…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazat dne…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Pouze ukončení aplikace</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončení aplikace, neaktivní po dobu 5 sekund</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončení aplikace, neaktivní po dobu 5 minut</string>
@@ -721,8 +719,5 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blokuj trackery v aplikacích na svém zařízení</string>
     <string name="atp_SettingsDeviceShieldEnabled">Povoleno</string>
     <string name="atp_SettingsDeviceShieldDisabled">Zakázáno</string>
-
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Automaticky vyplnit</string>
 
 </resources>

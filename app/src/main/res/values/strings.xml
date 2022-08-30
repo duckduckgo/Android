@@ -186,6 +186,8 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Settings</string>
     <string name="settingsMenuItemTitle">Settings</string>
+    <string name="settingsHeadingGeneral">General</string>
+    <string name="settingsHeadingOther">Other</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
@@ -207,11 +209,14 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>
 
+    <string name="settingsAutomaticallyClearWhat">Automatically Clear…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatically clear…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">None</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs and data</string>
 
+    <string name="settingsAutomaticallyClearWhen">Clear On…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Clear on…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">App exit only</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App exit, inactive for 5 seconds</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">App exit, inactive for 5 minutes</string>
@@ -707,19 +712,5 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Block app trackers on your device</string>
     <string name="atp_SettingsDeviceShieldEnabled">Enabled</string>
     <string name="atp_SettingsDeviceShieldDisabled">Disabled</string>
-
-    <!-- Settings - Automatically clearing data -->
-    <string name="settingsAutomaticallyClearWhat">Automatically Burn…</string>
-    <string name="settingsAutomaticallyClearWhen">Burn On…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Burn on…</string>
-
-    <!-- Settings activity -->
-    <string name="settingsHeadingAppearance">Appearance</string>
-    <string name="settingsHeadingCustomize">Customize</string>
-    <string name="settingsHeadingAbout">About</string>
-
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Autofill</string>
-
 
 </resources>
