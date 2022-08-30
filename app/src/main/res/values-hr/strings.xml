@@ -187,6 +187,8 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Postavke</string>
     <string name="settingsMenuItemTitle">Postavke</string>
+    <string name="settingsHeadingGeneral">Općenito</string>
+    <string name="settingsHeadingOther">Ostalo</string>
     <string name="settingsHeadingPrivacy">Zaštita privatnosti</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Inačica</string>
@@ -204,21 +206,18 @@
     <string name="settingsAppLinksAskEveryTime">Pitaj svaki puta</string>
     <string name="settingsAppLinksAlways">Uvijek</string>
     <string name="settingsAppLinksNever">Nikada</string>
-    <string name="settingsHeadingAppearance">Izgled</string>
-    <string name="settingsHeadingCustomize">Prilagodba</string>
-    <string name="settingsHeadingAbout">O</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spremi</string>
 
+    <string name="settingsAutomaticallyClearWhat">Automatski obriši…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatski obriši…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Nijedno</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Kartice</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Kartice i podaci</string>
-    <string name="settingsAutomaticallyClearWhat">Automatsko snimanje…</string>
-    <string name="settingsAutomaticallyClearWhen">Snimi na…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Snimi na…</string>
 
+    <string name="settingsAutomaticallyClearWhen">Očisti na…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Očisti na…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Samo izlaz iz aplikacije</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Izlaz iz aplikacije, neaktivna 5 sekundi</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Izlaz iz aplikacije, neaktivna 5 minuta</string>
@@ -720,8 +719,5 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blokiraj aplikacija za praćenje na tvom uređaju</string>
     <string name="atp_SettingsDeviceShieldEnabled">Omogućeno</string>
     <string name="atp_SettingsDeviceShieldDisabled">Onemogućeno</string>
-
-    <!-- Autofill -->
-    <string name="autofillSettingsDisplayName">Automatsko popunjavanje</string>
 
 </resources>
