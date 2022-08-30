@@ -355,6 +355,21 @@ class BookmarksActivity : DuckDuckGoActivity() {
         dialog.listener = viewModel
     }
 
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        with(supportFragmentManager) {
+            findFragmentByTag(EDIT_BOOKMARK_FRAGMENT_TAG)?.let { dialog ->
+                (dialog as EditSavedSiteDialogFragment).listener = viewModel
+            }
+            findFragmentByTag(ADD_BOOKMARK_FOLDER_FRAGMENT_TAG)?.let { dialog ->
+                (dialog as AddBookmarkFolderDialogFragment).listener = viewModel
+            }
+            findFragmentByTag(EDIT_BOOKMARK_FOLDER_FRAGMENT_TAG)?.let { dialog ->
+                (dialog as EditBookmarkFolderDialogFragment).listener = viewModel
+            }
+        }
+    }
+
     override fun onDestroy() {
         deleteDialog?.dismiss()
         super.onDestroy()
