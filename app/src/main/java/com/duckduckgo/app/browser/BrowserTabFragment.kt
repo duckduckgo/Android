@@ -439,10 +439,11 @@ class BrowserTabFragment :
 
     private val autoconsentCallback = object : AutoconsentCallback {
         override fun onFirstPopUpHandled() {
-            ctaViewModel.enableAutoconsentCta()
-            launch {
-                viewModel.refreshCta()
-            }
+            // Remove comment to promote feature
+            // ctaViewModel.enableAutoconsentCta()
+            // launch {
+            //     viewModel.refreshCta()
+            // }
         }
 
         override fun onPopUpHandled() {

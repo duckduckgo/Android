@@ -59,13 +59,13 @@ class RealAutoconsentTest {
     }
 
     @Test
-    fun whenInjectAutoconsentIfNeverHandledThenCallEvaluate() {
+    fun whenInjectAutoconsentIfNeverHandledThenDoNotCallEvaluate() {
         settingsRepository.userSetting = false
         settingsRepository.firstPopupHandled = false
 
         autoconsent.injectAutoconsent(webView, URL)
 
-        assertNotNull(shadowOf(webView).lastEvaluatedJavascript)
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
 
         settingsRepository.userSetting = true
         autoconsent.injectAutoconsent(webView, URL)

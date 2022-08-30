@@ -91,17 +91,17 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessIfAutoconsentIsDisabledAndNotHandledThenCallEvaluate() {
+    fun whenProcessIfAutoconsentIsDisabledAndNotHandledThenDoNotCallEvaluate() {
         settingsRepository.userSetting = false
         settingsRepository.firstPopupHandled = false
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
-        assertTrue(shadowOf(webView).lastEvaluatedJavascript.isNotBlank())
+        assertNull(shadowOf(webView).lastEvaluatedJavascript)
     }
 
     @Test
-    fun whenProcessMessageForFirstTimeResponseSentIsCorrect() {
+    fun whenProcessMessageForFirstTimeThenDoNotCallEvaluate() {
         whenever(repository.disabledCmps).thenReturn(listOf(DisabledCmpsEntity("MyCmp")))
         settingsRepository.userSetting = false
         settingsRepository.firstPopupHandled = false
@@ -110,15 +110,7 @@ class InitMessageHandlerPluginTest {
 
         val shadow = shadowOf(webView)
         val result = shadow.lastEvaluatedJavascript
-        val initResp = jsonToInitResp(result)
-        assertNull(initResp!!.config.autoAction)
-        assertNotNull(initResp.rules)
-        assertFalse(initResp.config.enablePrehide)
-        assertTrue(initResp.config.enabled)
-        assertEquals(20, initResp.config.detectRetries)
-        assertEquals("initResp", initResp.type)
-        assertEquals(1, initResp.config.disabledCmps.size)
-        assertEquals("MyCmp", initResp.config.disabledCmps.first())
+        assertNull(result)
     }
 
     @Test

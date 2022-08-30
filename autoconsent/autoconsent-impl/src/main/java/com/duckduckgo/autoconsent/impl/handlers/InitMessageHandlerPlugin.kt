@@ -61,7 +61,8 @@ class InitMessageHandlerPlugin @Inject constructor(
                         return@launch
                     }
 
-                    val isAutoconsentDisabled = !settingsRepository.userSetting && settingsRepository.firstPopupHandled
+                    // Remove comment to promote feature
+                    val isAutoconsentDisabled = !settingsRepository.userSetting // && settingsRepository.firstPopupHandled
 
                     if (isAutoconsentDisabled) {
                         return@launch
@@ -91,7 +92,9 @@ class InitMessageHandlerPlugin @Inject constructor(
     override val supportedTypes: List<String> = listOf("init")
 
     private fun getAutoAction(): String? {
-        return if (!settingsRepository.firstPopupHandled) null else "optOut"
+        // Remove comment to promote feature
+        // return if (!settingsRepository.firstPopupHandled) null else "optOut"
+        return "optOut"
     }
 
     private fun parseMessage(jsonString: String): InitMessage? {

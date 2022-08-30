@@ -70,12 +70,13 @@ class BrowserTrackersAnimatorHelper(
     private var enqueueCookiesAnimation = false
     private var hasCookiesAnimationBeenCanceled = false
     private var isCookiesAnimationRunning = false
+    private var isPartialTrackersAnimationRunning = false
 
     lateinit var firstScene: Scene
     lateinit var secondScene: Scene
 
     fun createCookiesAnimation(context: Context) {
-        if (!trackersAnimation.isRunning) {
+        if (!trackersAnimation.isRunning && !isPartialTrackersAnimationRunning) {
             startCookiesAnimation(context)
         } else {
             enqueueCookiesAnimation = true
@@ -287,6 +288,7 @@ class BrowserTrackersAnimatorHelper(
                 .before(animateFadeOut(container))
             start()
             addListener(onEnd = {
+                isPartialTrackersAnimationRunning = false
                 listener?.onAnimationFinished()
                 tryToStartCookiesAnimation(context)
             })
@@ -468,6 +470,7 @@ class BrowserTrackersAnimatorHelper(
             )
             start()
             addListener(onEnd = {
+                isPartialTrackersAnimationRunning = false
                 listener?.onAnimationFinished()
                 tryToStartCookiesAnimation(context)
             })
@@ -482,6 +485,8 @@ class BrowserTrackersAnimatorHelper(
         applyConstraintSet(container, logoViews)
         container.alpha = 1f
         animateLogosBlocked(logoViews)
+
+        isPartialTrackersAnimationRunning = true
 
         return AnimatorSet().apply {
             play(animateLogosSlideIn(logoViews)).after(animateOmnibarOut(omnibarViews))
