@@ -18,16 +18,8 @@ package com.duckduckgo.adclick.impl
 
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_HEURISTIC_ONLY
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_MATCHED
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_MISMATCH
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_NONE
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_SERP_ONLY
+import com.duckduckgo.adclick.impl.pixels.AdClickPixels
 import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -40,7 +32,7 @@ import javax.inject.Inject
 class DuckDuckGoAdClickManager @Inject constructor(
     private val adClickData: AdClickData,
     private val adClickAttribution: AdClickAttribution,
-    private val pixel: Pixel,
+    private val adClickPixels: AdClickPixels
 ) : AdClickManager {
 
     private val publicSuffixDatabase = PublicSuffixDatabase()
@@ -118,7 +110,11 @@ class DuckDuckGoAdClickManager @Inject constructor(
 
         if (adClickAttribution.isAllowed(url)) {
             Timber.d("isExemption: Url $url MATCHES the allow list")
-            fireAdClickActivePixel(adClickData.getExemption())
+            val exemption = adClickData.getExemption()
+            val pixelFired = adClickPixels.fireAdClickActivePixel(exemption)
+            if (pixelFired && exemption != null) {
+                adClickData.addExemption(exemption.copy(adClickActivePixelFired = true))
+            }
             return true
         }
 
@@ -195,6 +191,7 @@ class DuckDuckGoAdClickManager @Inject constructor(
                         adClickActivePixelFired = false
                     )
                 )
+                adClickPixels.updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
             }
         } else {
             // propagate exemption with timeout since it's a different host
@@ -207,6 +204,7 @@ class DuckDuckGoAdClickManager @Inject constructor(
                     adClickActivePixelFired = false
                 )
             )
+            adClickPixels.updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
         }
     }
 
@@ -219,35 +217,13 @@ class DuckDuckGoAdClickManager @Inject constructor(
                     exemptionDeadline = System.currentTimeMillis() + adClickAttribution.getTotalExpirationMillis()
                 )
             )
-            fireAdClickDetectedPixel(savedAdDomain, urlAdDomain)
-        }
-    }
-
-    private fun fireAdClickDetectedPixel(savedAdDomain: String?, urlAdDomain: String) {
-        val params = mutableMapOf<String, String>()
-        when {
-            !savedAdDomain.isNullOrEmpty() && savedAdDomain == urlAdDomain ->
-                params[AD_CLICK_DOMAIN_DETECTION] = AD_CLICK_DETECTED_MATCHED
-            !savedAdDomain.isNullOrEmpty() && urlAdDomain.isNotEmpty() && savedAdDomain != urlAdDomain ->
-                params[AD_CLICK_DOMAIN_DETECTION] = AD_CLICK_DETECTED_MISMATCH
-            !savedAdDomain.isNullOrEmpty() ->
-                params[AD_CLICK_DOMAIN_DETECTION] = AD_CLICK_DETECTED_SERP_ONLY
-            savedAdDomain.isNullOrEmpty() && urlAdDomain.isNotEmpty() ->
-                params[AD_CLICK_DOMAIN_DETECTION] = AD_CLICK_DETECTED_HEURISTIC_ONLY
-            else ->
-                params[AD_CLICK_DOMAIN_DETECTION] = AD_CLICK_DETECTED_NONE
-        }
-        params[AD_CLICK_HEURISTIC_DETECTION] = adClickAttribution.isHeuristicDetectionEnabled().toString()
-        params[AD_CLICK_DOMAIN_DETECTION_ENABLED] = adClickAttribution.isDomainDetectionEnabled().toString()
-        pixel.fire(AdClickPixelName.AD_CLICK_DETECTED, params)
-    }
-
-    private fun fireAdClickActivePixel(exemption: Exemption?) {
-        if (exemption == null) return
-        val firedAlready = exemption.adClickActivePixelFired
-        if (!firedAlready) {
-            adClickData.addExemption(exemption.copy(adClickActivePixelFired = true))
-            pixel.fire(AdClickPixelName.AD_CLICK_ACTIVE)
+            adClickPixels.fireAdClickDetectedPixel(
+                savedAdDomain = savedAdDomain,
+                urlAdDomain = urlAdDomain,
+                heuristicEnabled = adClickAttribution.isHeuristicDetectionEnabled(),
+                domainEnabled = adClickAttribution.isDomainDetectionEnabled()
+            )
+            adClickPixels.updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
         }
     }
 

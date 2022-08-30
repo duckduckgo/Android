@@ -18,16 +18,7 @@ package com.duckduckgo.adclick.impl
 
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelName.AD_CLICK_DETECTED
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelParameters.AD_CLICK_DOMAIN_DETECTION_ENABLED
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelParameters.AD_CLICK_HEURISTIC_DETECTION
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_HEURISTIC_ONLY
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_MATCHED
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_MISMATCH
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_NONE
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelValues.AD_CLICK_DETECTED_SERP_ONLY
-import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.adclick.impl.pixels.AdClickPixels
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -49,12 +40,12 @@ class DuckDuckGoAdClickManagerTest {
 
     private val mockAdClickData: AdClickData = mock()
     private val mockAdClickAttribution: AdClickAttribution = mock()
-    private val mockPixel: Pixel = mock()
+    private val mockAdClickPixels: AdClickPixels = mock()
     private lateinit var testee: AdClickManager
 
     @Before
     fun before() {
-        testee = DuckDuckGoAdClickManager(mockAdClickData, mockAdClickAttribution, mockPixel)
+        testee = DuckDuckGoAdClickManager(mockAdClickData, mockAdClickAttribution, mockAdClickPixels)
     }
 
     @Test
@@ -165,6 +156,7 @@ class DuckDuckGoAdClickManagerTest {
 
         verify(mockAdClickData).setActiveTab(tabId)
         verify(mockAdClickData).addExemption(tabId = any(), exemption = any())
+        verify(mockAdClickPixels).updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
     }
 
     @Test
@@ -180,6 +172,7 @@ class DuckDuckGoAdClickManagerTest {
 
         verify(mockAdClickData).setActiveTab(tabId)
         verify(mockAdClickData, never()).addExemption(tabId = any(), exemption = any())
+        verify(mockAdClickPixels, never()).updateCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
     }
 
     @Test
@@ -213,13 +206,11 @@ class DuckDuckGoAdClickManagerTest {
 
         testee.detectAdDomain(url = "https://landing_page.com/")
 
-        verify(mockPixel).fire(
-            AD_CLICK_DETECTED,
-            mapOf(
-                AD_CLICK_DOMAIN_DETECTION to AD_CLICK_DETECTED_MATCHED,
-                AD_CLICK_HEURISTIC_DETECTION to "false",
-                AD_CLICK_DOMAIN_DETECTION_ENABLED to "false"
-            )
+        verify(mockAdClickPixels).fireAdClickDetectedPixel(
+            savedAdDomain = "landing_page.com",
+            urlAdDomain = "landing_page.com",
+            heuristicEnabled = false,
+            domainEnabled = false
         )
     }
 
@@ -229,13 +220,11 @@ class DuckDuckGoAdClickManagerTest {
 
         testee.detectAdDomain(url = "https://other_landing_page.com/")
 
-        verify(mockPixel).fire(
-            AD_CLICK_DETECTED,
-            mapOf(
-                AD_CLICK_DOMAIN_DETECTION to AD_CLICK_DETECTED_MISMATCH,
-                AD_CLICK_HEURISTIC_DETECTION to "false",
-                AD_CLICK_DOMAIN_DETECTION_ENABLED to "false"
-            )
+        verify(mockAdClickPixels).fireAdClickDetectedPixel(
+            savedAdDomain = "landing_page.com",
+            urlAdDomain = "other_landing_page.com",
+            heuristicEnabled = false,
+            domainEnabled = false
         )
     }
 
@@ -245,13 +234,11 @@ class DuckDuckGoAdClickManagerTest {
 
         testee.detectAdDomain(url = "https://")
 
-        verify(mockPixel).fire(
-            AD_CLICK_DETECTED,
-            mapOf(
-                AD_CLICK_DOMAIN_DETECTION to AD_CLICK_DETECTED_SERP_ONLY,
-                AD_CLICK_HEURISTIC_DETECTION to "false",
-                AD_CLICK_DOMAIN_DETECTION_ENABLED to "false"
-            )
+        verify(mockAdClickPixels).fireAdClickDetectedPixel(
+            savedAdDomain = "landing_page",
+            urlAdDomain = "",
+            heuristicEnabled = false,
+            domainEnabled = false
         )
     }
 
@@ -261,13 +248,11 @@ class DuckDuckGoAdClickManagerTest {
 
         testee.detectAdDomain(url = "https://landing_page.com/")
 
-        verify(mockPixel).fire(
-            AD_CLICK_DETECTED,
-            mapOf(
-                AD_CLICK_DOMAIN_DETECTION to AD_CLICK_DETECTED_HEURISTIC_ONLY,
-                AD_CLICK_HEURISTIC_DETECTION to "false",
-                AD_CLICK_DOMAIN_DETECTION_ENABLED to "false"
-            )
+        verify(mockAdClickPixels).fireAdClickDetectedPixel(
+            savedAdDomain = "",
+            urlAdDomain = "landing_page.com",
+            heuristicEnabled = false,
+            domainEnabled = false
         )
     }
 
@@ -277,13 +262,11 @@ class DuckDuckGoAdClickManagerTest {
 
         testee.detectAdDomain(url = "https://")
 
-        verify(mockPixel).fire(
-            AD_CLICK_DETECTED,
-            mapOf(
-                AD_CLICK_DOMAIN_DETECTION to AD_CLICK_DETECTED_NONE,
-                AD_CLICK_HEURISTIC_DETECTION to "false",
-                AD_CLICK_DOMAIN_DETECTION_ENABLED to "false"
-            )
+        verify(mockAdClickPixels).fireAdClickDetectedPixel(
+            savedAdDomain = "",
+            urlAdDomain = "",
+            heuristicEnabled = false,
+            domainEnabled = false
         )
     }
 
@@ -294,13 +277,11 @@ class DuckDuckGoAdClickManagerTest {
 
         testee.detectAdDomain(url = "https://")
 
-        verify(mockPixel).fire(
-            AD_CLICK_DETECTED,
-            mapOf(
-                AD_CLICK_DOMAIN_DETECTION to AD_CLICK_DETECTED_NONE,
-                AD_CLICK_HEURISTIC_DETECTION to "true",
-                AD_CLICK_DOMAIN_DETECTION_ENABLED to "false"
-            )
+        verify(mockAdClickPixels).fireAdClickDetectedPixel(
+            savedAdDomain = "",
+            urlAdDomain = "",
+            heuristicEnabled = true,
+            domainEnabled = false
         )
     }
 
@@ -311,13 +292,11 @@ class DuckDuckGoAdClickManagerTest {
 
         testee.detectAdDomain(url = "https://")
 
-        verify(mockPixel).fire(
-            AD_CLICK_DETECTED,
-            mapOf(
-                AD_CLICK_DOMAIN_DETECTION to AD_CLICK_DETECTED_NONE,
-                AD_CLICK_HEURISTIC_DETECTION to "false",
-                AD_CLICK_DOMAIN_DETECTION_ENABLED to "true"
-            )
+        verify(mockAdClickPixels).fireAdClickDetectedPixel(
+            savedAdDomain = "",
+            urlAdDomain = "",
+            heuristicEnabled = false,
+            domainEnabled = true
         )
     }
 
@@ -350,7 +329,7 @@ class DuckDuckGoAdClickManagerTest {
         val url = "https://tracker.com"
 
         val result = testee.isExemption(documentUrl = documentUrl, url = url)
-        verify(mockPixel, never()).fire(AdClickPixelName.AD_CLICK_ACTIVE)
+        verify(mockAdClickPixels, never()).fireAdClickActivePixel(any())
         assertFalse(result)
     }
 
@@ -366,7 +345,7 @@ class DuckDuckGoAdClickManagerTest {
         val result = testee.isExemption(documentUrl = documentUrl, url = url)
 
         verify(mockAdClickData).removeExemption()
-        verify(mockPixel, never()).fire(AdClickPixelName.AD_CLICK_ACTIVE)
+        verify(mockAdClickPixels, never()).fireAdClickActivePixel(any())
         assertFalse(result)
     }
 
@@ -383,7 +362,7 @@ class DuckDuckGoAdClickManagerTest {
         val result = testee.isExemption(documentUrl = documentUrl, url = url)
 
         verify(mockAdClickData, never()).removeExemption()
-        verify(mockPixel, never()).fire(AdClickPixelName.AD_CLICK_ACTIVE)
+        verify(mockAdClickPixels, never()).fireAdClickActivePixel(any())
         assertFalse(result)
     }
 
@@ -400,7 +379,7 @@ class DuckDuckGoAdClickManagerTest {
         val result = testee.isExemption(documentUrl = documentUrl, url = url)
 
         verify(mockAdClickData, never()).removeExemption()
-        verify(mockPixel).fire(AdClickPixelName.AD_CLICK_ACTIVE)
+        verify(mockAdClickPixels).fireAdClickActivePixel(any())
         assertTrue(result)
     }
 
