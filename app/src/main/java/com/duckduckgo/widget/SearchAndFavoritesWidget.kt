@@ -31,12 +31,12 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserActivity.Companion.FAVORITES_ONBOARDING_EXTRA
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.THEME_EXTRAS
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -76,6 +76,9 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private var layoutId: Int = R.layout.search_favorites_widget_daynight_auto
 
@@ -118,7 +121,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         context: Context,
         appWidgetIds: IntArray
     ) {
-        appCoroutineScope.launch(Dispatchers.IO) {
+        appCoroutineScope.launch(dispatchers.io()) {
             appWidgetIds.forEach {
                 widgetPrefs.removeWidgetSettings(it)
             }
@@ -132,7 +135,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetId: Int,
         newOptions: Bundle?
     ) {
-        val widgetTheme = withContext(Dispatchers.IO) {
+        val widgetTheme = withContext(dispatchers.io()) {
             widgetPrefs.widgetTheme(appWidgetId)
         }
         Timber.i("SearchAndFavoritesWidget theme for $appWidgetId is $widgetTheme")
@@ -140,11 +143,11 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         val (columns, rows) = getCurrentWidgetSize(context, appWidgetManager.getAppWidgetOptions(appWidgetId), newOptions)
         layoutId = getLayoutThemed(columns, widgetTheme)
 
-        withContext(Dispatchers.IO) {
+        withContext(dispatchers.io()) {
             widgetPrefs.storeWidgetSize(appWidgetId, columns, rows)
         }
 
-        withContext(Dispatchers.Main) {
+        withContext(dispatchers.main()) {
             val remoteViews = RemoteViews(context.packageName, layoutId)
 
             remoteViews.setViewVisibility(R.id.searchInputBox, if (columns == 2) View.INVISIBLE else View.VISIBLE)
