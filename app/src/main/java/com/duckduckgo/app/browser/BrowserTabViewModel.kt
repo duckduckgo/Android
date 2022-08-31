@@ -2276,7 +2276,9 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onCtaShown() {
         val cta = ctaViewState.value?.cta ?: return
-        ctaViewModel.onCtaShown(cta)
+        viewModelScope.launch(dispatchers.io()) {
+            ctaViewModel.onCtaShown(cta)
+        }
     }
 
     suspend fun refreshCta(locale: Locale = Locale.getDefault()): Cta? {
