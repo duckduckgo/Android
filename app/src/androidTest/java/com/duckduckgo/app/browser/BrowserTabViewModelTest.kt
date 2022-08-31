@@ -2119,7 +2119,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenCtaShownThenFirePixel() {
+    fun whenCtaShownThenFirePixel() = runTest {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 
