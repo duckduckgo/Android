@@ -19,9 +19,7 @@ package com.duckduckgo.mobile.android.vpn.apps
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
@@ -60,8 +58,6 @@ interface TrackingProtectionAppsRepository {
 class RealTrackingProtectionAppsRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,
-    private val appBuildConfig: AppBuildConfig,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
     private val dispatcherProvider: DispatcherProvider
 ) : TrackingProtectionAppsRepository {
 
@@ -199,13 +195,13 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         val appExclusionList = appTrackerRepository.getAppExclusionList()
         val manualAppExclusionList = appTrackerRepository.getManualAppExclusionList()
 
-        if (appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(packageName)) {
-            return true
-        }
-
         val userExcludedApp = manualAppExclusionList.find { it.packageId == packageName }
         if (userExcludedApp != null) {
             return userExcludedApp.isProtected
+        }
+
+        if (appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(packageName)) {
+            return true
         }
 
         return !appExclusionList.any { it.packageId == packageName }
