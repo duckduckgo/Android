@@ -63,7 +63,7 @@ class EvalMessageHandlerPlugin @Inject constructor(
             try {
                 return !!(($code));
             } catch (e) {
-              // ignore CSP errors
+              // ignore errors
               return;
             }
         })();

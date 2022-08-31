@@ -723,6 +723,6 @@
     <string name="autoconsentSecondaryCta">Nu, mulțumesc</string>
 
     <string name="autoconsentSetting">Gestionează ferestrele pop-up cu privire la modulele cookie</string>
-    <string name="autoconsentAnimationText">Modulele cookie au fost gestionate</string>
+    <string name="autoconsentAnimationText">Cookie-uri Gestionate</string>
 
 </resources>

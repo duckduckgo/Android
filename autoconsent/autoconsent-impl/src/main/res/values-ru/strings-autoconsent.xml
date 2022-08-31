@@ -17,7 +17,7 @@
 <resources>
     <!-- Autoconsent -->
     <string name="autoconsentTitle">Управление окнами выбора куки-файлов</string>
-    <string name="autoconsentDescription">DuckDuckGo может автоматически выбирать куки-файлы, сугубо необходимые для работы сайтов, отказываясь от всех остальных и закрывая соответствующее всплывающее окно. Так будет обеспечена максимальная защита ваших личных данных.</string>
-    <string name="autoconsentToggle">Разрешить DuckDuckGo автоматически выбирать минимум куки-файлов</string>
+    <string name="autoconsentDescription">Если DuckDuckGo обнаружит всплывающие окна выбора куки-файлов на сайтах, мы можем автоматически минимизировать выбор для максимальной защиты ваших данных, а затем закрыть всплывающие окна.</string>
+    <string name="autoconsentToggle">Разрешить DuckDuckGo управлять окнами выбора куки-файлов</string>
 
 </resources>

@@ -72,7 +72,7 @@ class EvalMessageHandlerPluginTest {
             try {
                 return !!((42==42));
             } catch (e) {
-              // ignore CSP errors
+              // ignore errors
               return;
             }
         })();

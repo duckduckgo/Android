@@ -32,6 +32,81 @@
       ]
     },
     {
+      "name": "Adroll",
+      "prehideSelectors": [
+        "#adroll_consent_container"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#adroll_consent_container"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#adroll_consent_container"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#adroll_consent_accept"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#adroll_consent_reject"
+        }
+      ],
+      "test": [
+        {
+          "eval": "!document.cookie.includes('__adroll_fpc')"
+        }
+      ]
+    },
+    {
+      "name": "affinity.serif.com",
+      "detectCmp": [
+        {
+          "exists": ".c-cookie-banner"
+        },
+        {
+          "exists": ".c-cookie-banner button"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".c-cookie-banner"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "button[data-qa=\"allow-all-cookies\"]"
+        }
+      ],
+      "optOut": [
+        {
+          "click": "button[data-qa=\"manage-cookies\"]"
+        },
+        {
+          "waitFor": ".c-cookie-banner ~ [role=\"dialog\"]"
+        },
+        {
+          "waitForThenClick": ".c-cookie-banner ~ [role=\"dialog\"] input[type=\"checkbox\"][value=\"true\"]",
+          "all": true
+        },
+        {
+          "click": ".c-cookie-banner ~ [role=\"dialog\"] .c-modal__action button"
+        }
+      ],
+      "test": [
+        {
+          "wait": 500
+        },
+        {
+          "eval": "document.cookie.includes('serif_manage_cookies_viewed') && !document.cookie.includes('serif_allow_analytics')"
+        }
+      ]
+    },
+    {
       "name": "arzt-auskunft.de",
       "prehideSelectors": [
         "#cookiescript_injected"
@@ -139,10 +214,52 @@
           "click": "button[data-id=awsccc-cb-btn-customize]"
         },
         {
-          "eval": "Array.from(document.querySelectorAll('input[aria-checked=true')).forEach(e => e.click()) || true"
+          "waitFor": "input[aria-checked]"
+        },
+        {
+          "click": "input[aria-checked=true]",
+          "all": true,
+          "optional": true
         },
         {
           "click": "button[data-id=awsccc-cs-btn-save]"
+        }
+      ]
+    },
+    {
+      "name": "axeptio",
+      "prehideSelectors": [
+        ".axeptio_widget"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".axeptio_widget"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".axeptio_widget"
+        }
+      ],
+      "optIn": [
+        {
+          "waitFor": ".axeptio-widget--open"
+        },
+        {
+          "click": "button#axeptio_btn_acceptAll"
+        }
+      ],
+      "optOut": [
+        {
+          "waitFor": ".axeptio-widget--open"
+        },
+        {
+          "click": "button#axeptio_btn_dismiss"
+        }
+      ],
+      "test": [
+        {
+          "eval": "document.cookie.includes('axeptio_authorized_vendors=%2C%2C')"
         }
       ]
     },
@@ -301,6 +418,213 @@
       ]
     },
     {
+      "name": "click.io",
+      "prehideSelectors": [
+        "#cl-consent"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#cl-consent"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#cl-consent"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#cl-consent [data-role=\"b_agree\"]"
+        }
+      ],
+      "optOut": [
+        {
+          "waitFor": "#cl-consent [data-role=\"b_options\"]"
+        },
+        {
+          "wait": 500
+        },
+        {
+          "click": "#cl-consent [data-role=\"b_options\"]"
+        },
+        {
+          "waitFor": ".cl-consent-popup.cl-consent-visible [data-role=\"alloff\"]"
+        },
+        {
+          "click": ".cl-consent-popup.cl-consent-visible [data-role=\"alloff\"]",
+          "all": true
+        },
+        {
+          "click": "[data-role=\"b_save\"]"
+        }
+      ],
+      "test": [
+        {
+          "eval": "document.cookie.includes('__lxG__consent__v2_daisybit=')",
+          "comment": "TODO: this only checks if we interacted at all"
+        }
+      ]
+    },
+    {
+      "name": "Complianz banner",
+      "prehideSelectors": [
+        "#cmplz-cookiebanner-container"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#cmplz-cookiebanner-container .cmplz-cookiebanner"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#cmplz-cookiebanner-container .cmplz-cookiebanner",
+          "check": "any"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".cmplz-cookiebanner .cmplz-accept"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": ".cmplz-cookiebanner .cmplz-deny"
+        }
+      ],
+      "test": [
+        {
+          "eval": "document.cookie.includes('cmplz_banner-status=dismissed')"
+        }
+      ]
+    },
+    {
+      "name": "Complianz categories",
+      "prehideSelectors": [
+        ".cc-type-categories[aria-describedby=\"cookieconsent:desc\"]"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".cc-type-categories[aria-describedby=\"cookieconsent:desc\"]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cc-type-categories[aria-describedby=\"cookieconsent:desc\"]"
+        }
+      ],
+      "optIn": [
+        {
+          "click": ".cc-accept-all",
+          "optional": true
+        },
+        {
+          "click": ".cc-allow",
+          "optional": true
+        },
+        {
+          "click": ".cc-dismiss",
+          "optional": true
+        }
+      ],
+      "optOut": [
+        {
+          "click": ".cc-dismiss"
+        }
+      ],
+      "test": [
+        {
+          "eval": "!!document.cookie.match(/cmplz_[^=]+=deny/)"
+        }
+      ]
+    },
+    {
+      "name": "Complianz notice",
+      "prehideSelectors": [
+        ".cc-type-info[aria-describedby=\"cookieconsent:desc\"]"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".cc-type-info[aria-describedby=\"cookieconsent:desc\"]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cc-type-info[aria-describedby=\"cookieconsent:desc\"]"
+        }
+      ],
+      "optIn": [
+        {
+          "click": ".cc-accept-all",
+          "optional": true
+        },
+        {
+          "click": ".cc-allow",
+          "optional": true
+        },
+        {
+          "click": ".cc-dismiss",
+          "optional": true
+        }
+      ],
+      "optOut": [
+        {
+          "hide": [
+            "[aria-describedby=\"cookieconsent:desc\"]"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Complianz optin",
+      "prehideSelectors": [
+        ".cc-type-opt-in[aria-describedby=\"cookieconsent:desc\"]"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".cc-type-opt-in[aria-describedby=\"cookieconsent:desc\"]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cc-type-opt-in[aria-describedby=\"cookieconsent:desc\"]"
+        }
+      ],
+      "optIn": [
+        {
+          "click": ".cc-accept-all",
+          "optional": true
+        },
+        {
+          "click": ".cc-allow",
+          "optional": true
+        },
+        {
+          "click": ".cc-dismiss",
+          "optional": true
+        }
+      ],
+      "optOut": [
+        {
+          "click": ".cc-settings"
+        },
+        {
+          "waitForVisible": "[aria-label=\"cookies preferences popup\"]"
+        },
+        {
+          "click": "[aria-label=\"cookies preferences popup\"] input[type=checkbox]:not([disabled])",
+          "all": true
+        },
+        {
+          "click": "[aria-label=\"cookies preferences popup\"] [aria-label=\"Accept Selected\"]"
+        }
+      ],
+      "test": [
+        {
+          "eval": "!!document.cookie.match(/cookieconsent_preferences_disabled=[^;]+/)"
+        }
+      ]
+    },
+    {
       "name": "cookie-law-info",
       "prehideSelectors": [
         "#cookie-law-info-bar"
@@ -343,7 +667,7 @@
       ],
       "detectCmp": [
         {
-          "exists": "#cookie-notice"
+          "visible": "#cookie-notice .cookie-notice-container"
         }
       ],
       "detectPopup": [
@@ -367,30 +691,39 @@
       ]
     },
     {
-      "name": "cookieconsent",
+      "name": "Cookie Information Banner",
       "prehideSelectors": [
-        "[aria-label=\"cookieconsent\"][aria-describedby=\"cookieconsent:desc\"]"
+        "#cookie-information-template-wrapper"
       ],
       "detectCmp": [
         {
-          "exists": "[aria-label=\"cookieconsent\"][aria-describedby=\"cookieconsent:desc\"]"
+          "exists": "#cookie-information-template-wrapper"
         }
       ],
       "detectPopup": [
         {
-          "visible": "[aria-label=\"cookieconsent\"][aria-describedby=\"cookieconsent:desc\"]"
+          "visible": "#cookie-information-template-wrapper"
         }
       ],
       "optIn": [
         {
-          "click": ".cc-dismiss"
+          "eval": "CookieInformation.submitAllCategories() || true"
         }
       ],
       "optOut": [
         {
           "hide": [
-            "[aria-label=\"cookieconsent\"][aria-describedby=\"cookieconsent:desc\"]"
-          ]
+            "#cookie-information-template-wrapper"
+          ],
+          "comment": "some templates don't hide the banner automatically"
+        },
+        {
+          "eval": "CookieInformation.declineAllCategories() || true"
+        }
+      ],
+      "test": [
+        {
+          "eval": "document.cookie.includes('CookieInformationConsent=')"
         }
       ]
     },
@@ -450,36 +783,6 @@
       ]
     },
     {
-      "name": "destatis.de",
-      "prehideSelectors": [
-        "div[aria-labelledby=cookiebannerhead]"
-      ],
-      "detectCmp": [
-        {
-          "exists": ".cookiebannerbox"
-        }
-      ],
-      "detectPopup": [
-        {
-          "visible": ".cookiebannerbox"
-        }
-      ],
-      "optOut": [
-        {
-          "hide": [
-            ".cookiebannerbox"
-          ]
-        }
-      ],
-      "optIn": [
-        {
-          "click": [
-            ".cookiebannerbox .close"
-          ]
-        }
-      ]
-    },
-    {
       "name": "Drupal",
       "detectCmp": [
         {
@@ -499,6 +802,42 @@
       "optIn": [
         {
           "click": ".yes"
+        }
+      ]
+    },
+    {
+      "name": "WP DSGVO Tools",
+      "link": "https://wordpress.org/plugins/shapepress-dsgvo/",
+      "prehideSelectors": [
+        ".sp-dsgvo"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".sp-dsgvo.sp-dsgvo-popup-overlay"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".sp-dsgvo.sp-dsgvo-popup-overlay",
+          "check": "any"
+        }
+      ],
+      "optIn": [
+        {
+          "click": ".sp-dsgvo-privacy-btn-accept-all",
+          "all": true
+        }
+      ],
+      "optOut": [
+        {
+          "hide": [
+            ".sp-dsgvo.sp-dsgvo-popup-overlay"
+          ]
+        }
+      ],
+      "test": [
+        {
+          "eval": "!document.cookie.includes('sp_dsgvo_cookie_settings')"
         }
       ]
     },
@@ -608,6 +947,88 @@
       "test": [
         {
           "eval": "document.cookie.indexOf('cookie-agreed=2') === -1"
+        }
+      ]
+    },
+    {
+      "name": "EU Cookie Law",
+      "prehideSelectors": [
+        ".pea_cook_wrapper,.pea_cook_more_info_popover"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".pea_cook_wrapper"
+        }
+      ],
+      "detectPopup": [
+        {
+          "wait": 500
+        },
+        {
+          "visible": ".pea_cook_wrapper"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "#pea_cook_btn"
+        }
+      ],
+      "optOut": [
+        {
+          "hide": [
+            ".pea_cook_wrapper"
+          ]
+        }
+      ],
+      "test": [
+        {
+          "eval": "!document.cookie.includes('euCookie')"
+        }
+      ]
+    },
+    {
+      "name": "EZoic",
+      "prehideSelectors": [
+        "#ez-cookie-dialog-wrapper"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#ez-cookie-dialog-wrapper"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#ez-cookie-dialog-wrapper"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "#ez-accept-all",
+          "optional": true
+        },
+        {
+          "eval": "ezCMP.handleAcceptAllClick()",
+          "optional": true
+        }
+      ],
+      "optOut": [
+        {
+          "click": "#ez-manage-settings"
+        },
+        {
+          "waitFor": "#ez-cookie-dialog input[type=checkbox]"
+        },
+        {
+          "click": "#ez-cookie-dialog input[type=checkbox][checked]",
+          "all": true
+        },
+        {
+          "click": "#ez-save-settings"
+        }
+      ],
+      "test": [
+        {
+          "eval": "!!document.cookie.match(/ezCMPCookieConsent=[^;]+\\|2=0\\|3=0\\|4=0/)"
         }
       ]
     },
@@ -775,6 +1196,43 @@
       ]
     },
     {
+      "name": "iubenda",
+      "prehideSelectors": [
+        "#iubenda-cs-banner"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#iubenda-cs-banner"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".iubenda-cs-accept-btn"
+        }
+      ],
+      "optIn": [
+        {
+          "click": ".iubenda-cs-accept-btn"
+        }
+      ],
+      "optOut": [
+        {
+          "click": ".iubenda-cs-customize-btn"
+        },
+        {
+          "eval": "document.querySelectorAll('.purposes-item input[type=checkbox]:not([disabled])').forEach(x => {if(x.checked) x.click()}) || true"
+        },
+        {
+          "click": "#iubFooterBtn"
+        }
+      ],
+      "test": [
+        {
+          "eval": "!!document.cookie.match(/_iub_cs-\\d+=/)"
+        }
+      ]
+    },
+    {
       "name": "johnlewis.com",
       "prehideSelectors": [
         "div[class^=pecr-cookie-banner-]"
@@ -812,30 +1270,41 @@
       ]
     },
     {
-      "name": "klaro",
+      "name": "jquery.cookieBar",
+      "comment": "https://github.com/kovarp/jquery.cookieBar",
+      "prehideSelectors": [
+        ".cookie-bar"
+      ],
       "detectCmp": [
         {
-          "exists": ".klaro > .cookie-notice"
+          "exists": ".cookie-bar .cookie-bar__message,.cookie-bar .cookie-bar__buttons"
         }
       ],
       "detectPopup": [
         {
-          "visible": ".klaro > .cookie-notice"
+          "visible": ".cookie-bar .cookie-bar__message,.cookie-bar .cookie-bar__buttons",
+          "check": "any"
         }
       ],
       "optIn": [
         {
-          "click": ".cm-btn-success"
+          "click": ".cookie-bar .cookie-bar__btn"
         }
       ],
       "optOut": [
         {
-          "click": ".cn-decline"
+          "hide": [
+            ".cookie-bar"
+          ]
         }
       ],
       "test": [
         {
-          "eval": "Object.values(klaro.getManager().consents).every(c => !c)"
+          "visible": ".cookie-bar .cookie-bar__message,.cookie-bar .cookie-bar__buttons",
+          "check": "none"
+        },
+        {
+          "eval": "!document.cookie.includes('cookies-state=accepted')"
         }
       ]
     },
@@ -891,6 +1360,45 @@
       "optIn": [
         {
           "click": "button[data-test^=pwa-consent-layer-accept-all"
+        }
+      ]
+    },
+    {
+      "name": "Mediavine",
+      "prehideSelectors": [
+        "[data-name=\"mediavine-gdpr-cmp\"]"
+      ],
+      "detectCmp": [
+        {
+          "exists": "[data-name=\"mediavine-gdpr-cmp\"]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "wait": 500
+        },
+        {
+          "visible": "[data-name=\"mediavine-gdpr-cmp\"]"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "[data-name=\"mediavine-gdpr-cmp\"] [format=\"primary\"]"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "[data-name=\"mediavine-gdpr-cmp\"] [data-view=\"manageSettings\"]"
+        },
+        {
+          "waitFor": "[data-name=\"mediavine-gdpr-cmp\"] input[type=checkbox]"
+        },
+        {
+          "eval": "document.querySelectorAll(\"[data-name=\\\"mediavine-gdpr-cmp\\\"] input[type=checkbox]\").forEach(x => x.checked && x.click()) || true",
+          "optional": true
+        },
+        {
+          "click": "[data-name=\"mediavine-gdpr-cmp\"] [format=\"secondary\"]"
         }
       ]
     },
@@ -974,6 +1482,95 @@
         },
         {
           "click": "#pc-confirm"
+        }
+      ]
+    },
+    {
+      "name": "monzo.com",
+      "prehideSelectors": [
+        ".cookie-alert, cookie-alert__content"
+      ],
+      "detectCmp": [
+        {
+          "exists": "div.cookie-alert[role=\"dialog\"]"
+        },
+        {
+          "exists": "a[href*=\"monzo\"]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cookie-alert__content"
+        }
+      ],
+      "optIn": [
+        {
+          "click": ".js-accept-cookie-policy"
+        }
+      ],
+      "optOut": [
+        {
+          "click": ".js-decline-cookie-policy"
+        }
+      ],
+      "test": [
+        {
+          "eval": "document.cookie.includes('_cookies_banner_dismissed=true') && !document.cookie.includes('_cookie_advertising_accepted')"
+        }
+      ]
+    },
+    {
+      "name": "Moove",
+      "prehideSelectors": [
+        "#moove_gdpr_cookie_info_bar"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#moove_gdpr_cookie_info_bar"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#moove_gdpr_cookie_info_bar"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".moove-gdpr-infobar-allow-all"
+        }
+      ],
+      "optOut": [
+        {
+          "if": {
+            "exists": "#moove_gdpr_cookie_info_bar .change-settings-button"
+          },
+          "then": [
+            {
+              "click": "#moove_gdpr_cookie_info_bar .change-settings-button"
+            },
+            {
+              "waitForVisible": "#moove_gdpr_cookie_modal"
+            },
+            {
+              "eval": "document.querySelectorAll('#moove_gdpr_cookie_modal input').forEach(i => { if (!i.disabled) i.checked = false }) || true"
+            },
+            {
+              "click": ".moove-gdpr-modal-save-settings"
+            }
+          ],
+          "else": [
+            {
+              "hide": [
+                "#moove_gdpr_cookie_info_bar"
+              ]
+            }
+          ]
+        }
+      ],
+      "test": [
+        {
+          "visible": "#moove_gdpr_cookie_info_bar",
+          "check": "none"
         }
       ]
     },
@@ -1227,7 +1824,48 @@
       ],
       "test": [
         {
+          "wait": 500
+        },
+        {
           "eval": "document.cookie.includes('cookie_prefs') === true"
+        }
+      ]
+    },
+    {
+      "name": "PrimeBox CookieBar",
+      "prehideSelectors": [
+        "#cookie-bar"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#cookie-bar .cb-enable,#cookie-bar .cb-disable,#cookie-bar .cb-policy"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#cookie-bar .cb-enable,#cookie-bar .cb-disable,#cookie-bar .cb-policy",
+          "check": "any"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#cookie-bar .cb-enable"
+        }
+      ],
+      "optOut": [
+        {
+          "click": "#cookie-bar .cb-disable",
+          "optional": true
+        },
+        {
+          "hide": [
+            "#cookie-bar"
+          ]
+        }
+      ],
+      "test": [
+        {
+          "eval": "!document.cookie.includes('cb-enabled=accepted')"
         }
       ]
     },
@@ -1270,6 +1908,37 @@
       "optIn": [
         {
           "click": ".qc-cmp2-summary-buttons > button[mode=\"primary\"]"
+        }
+      ]
+    },
+    {
+      "name": "Sirdata",
+      "prehideSelectors": [
+        "#sd-cmp"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#sd-cmp"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#sd-cmp"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#sd-cmp .sd-cmp-3cRQ2"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#sd-cmp .sd-cmp-1pO44"
+        }
+      ],
+      "test": [
+        {
+          "eval": "document.cookie.includes('euconsent-v2')"
         }
       ]
     },
@@ -1339,6 +2008,39 @@
       ]
     },
     {
+      "name": "tarteaucitron.js",
+      "prehideSelectors": [
+        "#tarteaucitronRoot"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#tarteaucitronRoot"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#tarteaucitronRoot #tarteaucitronAlertSmall,#tarteaucitronRoot #tarteaucitronAlertBig",
+          "check": "any"
+        }
+      ],
+      "optIn": [
+        {
+          "eval": "tarteaucitron.userInterface.respondAll(true) || true"
+        }
+      ],
+      "optOut": [
+        {
+          "eval": "tarteaucitron.userInterface.respondAll(false) || true"
+        }
+      ],
+      "test": [
+        {
+          "eval": "document.cookie.match(/tarteaucitron=[^;]*/)[0].includes('false')",
+          "comment": "sometimes there are required categories, so we check that at least something is false"
+        }
+      ]
+    },
+    {
       "name": "Tealium",
       "prehideSelectors": [
         "#__tealiumGDPRecModal,#__tealiumGDPRcpPrefs,#consent-layer"
@@ -1357,13 +2059,6 @@
         }
       ],
       "optOut": [
-        {
-          "hide": [
-            "#__tealiumGDPRecModal",
-            "#__tealiumGDPRcpPrefs",
-            "#consent-layer"
-          ]
-        },
         {
           "waitForThenClick": "#cm-acceptNone,.js-accept-essential-cookies",
           "timeout": 1000
@@ -1389,6 +2084,66 @@
       ]
     },
     {
+      "name": "Termly",
+      "prehideSelectors": [
+        "#termly-code-snippet-support"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#termly-code-snippet-support"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#termly-code-snippet-support div"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "[data-tid=\"banner-accept\"]"
+        }
+      ],
+      "optOut": [
+        {
+          "if": {
+            "exists": "[data-tid=\"banner-decline\"]"
+          },
+          "then": [
+            {
+              "click": "[data-tid=\"banner-decline\"]"
+            }
+          ],
+          "else": [
+            {
+              "click": ".t-preference-button"
+            },
+            {
+              "wait": 500
+            },
+            {
+              "if": {
+                "exists": ".t-declineAllButton"
+              },
+              "then": [
+                {
+                  "click": ".t-declineAllButton"
+                }
+              ],
+              "else": [
+                {
+                  "waitForThenClick": ".t-preference-modal input[type=checkbox][checked]:not([disabled])",
+                  "all": true
+                },
+                {
+                  "waitForThenClick": ".t-saveButton"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Test page CMP",
       "prehideSelectors": [
         "#reject-all"
@@ -1404,6 +2159,9 @@
         }
       ],
       "optIn": [
+        {
+          "waitFor": "#accept-all"
+        },
         {
           "click": "#accept-all"
         }
@@ -1475,7 +2233,40 @@
       ]
     },
     {
-      "name": "usercentrics-1",
+      "name": "UK Cookie Consent",
+      "prehideSelectors": [
+        "#catapult-cookie-bar"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#catapult-cookie-bar"
+        }
+      ],
+      "detectPopup": [
+        {
+          "exists": ".has-cookie-bar #catapult-cookie-bar"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "#catapultCookie"
+        }
+      ],
+      "optOut": [
+        {
+          "hide": [
+            "#catapult-cookie-bar"
+          ]
+        }
+      ],
+      "test": [
+        {
+          "eval": "!document.cookie.includes('catAccCookies')"
+        }
+      ]
+    },
+    {
+      "name": "usercentrics-api",
       "detectCmp": [
         {
           "exists": "#usercentrics-root"
@@ -1483,7 +2274,7 @@
       ],
       "detectPopup": [
         {
-          "eval": "!!document.querySelector('#usercentrics-root').shadowRoot.querySelector('#uc-center-container')"
+          "eval": "typeof UC_UI === 'object'"
         }
       ],
       "optIn": [
@@ -1508,6 +2299,34 @@
       "test": [
         {
           "eval": "UC_UI.areAllConsentsAccepted() === false"
+        }
+      ]
+    },
+    {
+      "name": "usercentrics-button",
+      "detectCmp": [
+        {
+          "exists": "#usercentrics-button"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#usercentrics-button #uc-btn-accept-banner"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "#usercentrics-button #uc-btn-accept-banner"
+        }
+      ],
+      "optOut": [
+        {
+          "click": "#usercentrics-button #uc-btn-deny-banner"
+        }
+      ],
+      "test": [
+        {
+          "eval": "JSON.parse(localStorage.getItem('usercentrics')).consents.every(c => c.isEssential || !c.consentStatus)"
         }
       ]
     },
@@ -1539,6 +2358,9 @@
     },
     {
       "name": "vodafone.de",
+      "runContext": {
+        "url": "https://www.vodafone.de/"
+      },
       "prehideSelectors": [
         ".dip-consent,.dip-consent-container"
       ],
@@ -1554,15 +2376,12 @@
       ],
       "optOut": [
         {
-          "click": ".dip-consent-btn.white-btn"
-        },
-        {
-          "eval": "Array.from(document.querySelectorAll('.dip-consent-btn.red-btn')).filter(e => e.innerText === 'Auswahl bestätigen')[0].click() || true"
+          "click": ".dip-consent-btn[tabindex=\"2\"]"
         }
       ],
       "optIn": [
         {
-          "click": ".dip-consent-btn.red-btn"
+          "click": ".dip-consent-btn[tabindex=\"1\"]"
         }
       ]
     },
@@ -1628,6 +2447,38 @@
       "optOut": [
         {
           "click": ".welcome__button--decline"
+        }
+      ]
+    },
+    {
+      "name": "WP Cookie Notice for GDPR",
+      "comment": "https://wordpress.org/plugins/gdpr-cookie-consent/",
+      "prehideSelectors": [
+        "#gdpr-cookie-consent-bar"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#gdpr-cookie-consent-bar"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#gdpr-cookie-consent-bar"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#gdpr-cookie-consent-bar #cookie_action_accept"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#gdpr-cookie-consent-bar #cookie_action_reject"
+        }
+      ],
+      "test": [
+        {
+          "eval": "document.cookie.includes('wpl_viewed_cookie=no')"
         }
       ]
     },
