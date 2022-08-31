@@ -712,4 +712,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Engedélyezve</string>
     <string name="atp_SettingsDeviceShieldDisabled">Letiltva</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Úgy tűnik, hogy az oldalon sütik elfogadására szolgáló felugró ablak van👇</string>
+    <string name="autoconsentDialogDescription">Elintézzem helyetted? Megpróbálhatom minimalizálni a sütiket, maximalizálni az adatvédelmet, illetve elrejteni az ilyen felugró ablakokat.</string>
+    <string name="autoconsentPrimaryCta">Felugró sütiablakok kezelése</string>
+    <string name="autoconsentSecondaryCta">Nem, köszönöm</string>
+
+    <string name="autoconsentSetting">Felugró sütiablakok kezelése</string>
+    <string name="autoconsentAnimationText">Kezelt sütik</string>
+
 </resources>

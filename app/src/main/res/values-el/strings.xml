@@ -712,4 +712,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Ενεργοποιήθηκε</string>
     <string name="atp_SettingsDeviceShieldDisabled">Απενεργοποιήθηκε</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Φαίνεται ότι αυτός ο ιστότοπος έχει ένα αναδυόμενο παράθυρο συναίνεσης για cookies👇</string>
+    <string name="autoconsentDialogDescription">Θέλετε να τα διαχειριστώ αυτά για εσάς; Μπορώ να προσπαθήσω να ελαχιστοποιήσω τα cookies, να μεγιστοποιήσω το απόρρητο και να αποκρύψω αναδυόμενα παράθυρα όπως αυτά.</string>
+    <string name="autoconsentPrimaryCta">Διαχείριση αναδυόμενων παραθύρων για cookies</string>
+    <string name="autoconsentSecondaryCta">Όχι, ευχαριστώ</string>
+
+    <string name="autoconsentSetting">Διαχείριση αναδυόμενων παραθύρων για cookies</string>
+    <string name="autoconsentAnimationText">Διαχειριζόμενα cookies</string>
+
 </resources>

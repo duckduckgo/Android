@@ -712,4 +712,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Käytössä</string>
     <string name="atp_SettingsDeviceShieldDisabled">Pois käytöstä</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Näyttää siltä, että tällä sivustolla on evästeiden hallinnan ponnahdusikkuna👇</string>
+    <string name="autoconsentDialogDescription">Haluatko, että hoidan nämä puolestasi? Voin yrittää minimoida evästeet, maksimoida yksityisyyden ja piilottaa tällaiset ponnahdusikkunat.</string>
+    <string name="autoconsentPrimaryCta">Evästeiden hallinnan ponnahdusikkunat</string>
+    <string name="autoconsentSecondaryCta">Ei kiitos</string>
+
+    <string name="autoconsentSetting">Evästeiden hallinnan ponnahdusikkunat</string>
+    <string name="autoconsentAnimationText">Hallitut evästeet</string>
+
 </resources>

@@ -712,4 +712,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Etkin</string>
     <string name="atp_SettingsDeviceShieldDisabled">Devre Dışı</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Görünüşe göre bu sitede çerez izni için açılır pencere var👇</string>
+    <string name="autoconsentDialogDescription">Bunları sizin yerinize halletmemizi ister misiniz? Çerezleri en aza indirmeyi, gizliliği en üst düzeye çıkarmayı ve bunun gibi açılır pencereleri gizlemeyi deneyebiliriz.</string>
+    <string name="autoconsentPrimaryCta">Çerez Açılır Pencerelerini Yönetin</string>
+    <string name="autoconsentSecondaryCta">Hayır Teşekkürler</string>
+
+    <string name="autoconsentSetting">Çerez Açılır Pencerelerini Yönetin</string>
+    <string name="autoconsentAnimationText">Yönetilen Çerezler</string>
+
 </resources>

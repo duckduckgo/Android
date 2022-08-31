@@ -720,4 +720,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Включено</string>
     <string name="atp_SettingsDeviceShieldDisabled">Отключено</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Похоже, на этом сайте есть всплывающее окно выбора куки-файлов👇</string>
+    <string name="autoconsentDialogDescription">Мы можем попытаться минимизировать выбор куки-файлов для большей безопасности ваших данных и автоматически закрывать такие окна.</string>
+    <string name="autoconsentPrimaryCta">Разрешить управление окнами выбора куки-файлов</string>
+    <string name="autoconsentSecondaryCta">Нет, спасибо</string>
+
+    <string name="autoconsentSetting">Управление окнами выбора куки-файлов</string>
+    <string name="autoconsentAnimationText">Kуки-файлы выбраны</string>
+
 </resources>

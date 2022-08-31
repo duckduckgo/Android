@@ -712,4 +712,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Ingeschakeld</string>
     <string name="atp_SettingsDeviceShieldDisabled">Uitgeschakeld</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Het lijkt erop dat deze site een pop-up met toestemming voor cookies heeft👇</string>
+    <string name="autoconsentDialogDescription">Wil je dat ik deze voor je afhandel? Ik kan proberen cookies te minimaliseren, privacy te maximaliseren en pop-ups zoals deze te verbergen.</string>
+    <string name="autoconsentPrimaryCta">Cookiepop-ups beheren</string>
+    <string name="autoconsentSecondaryCta">Nee, bedankt</string>
+
+    <string name="autoconsentSetting">Cookiepop-ups beheren</string>
+    <string name="autoconsentAnimationText">Beheerde cookies</string>
+
 </resources>

@@ -712,4 +712,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Aktivert</string>
     <string name="atp_SettingsDeviceShieldDisabled">Deaktivert</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Det ser ut til at dette nettstedet har et popup-vindu om samtykke til informasjonskapsler👇</string>
+    <string name="autoconsentDialogDescription">Skal jeg håndtere dette for deg? Jeg kan prøve å minimere informasjonskapslene, maksimere personvernet og skjule popup-vinduer som dette.</string>
+    <string name="autoconsentPrimaryCta">Administrer popup-vinduer om informasjonskapsler</string>
+    <string name="autoconsentSecondaryCta">Nei takk</string>
+
+    <string name="autoconsentSetting">Administrer popup-vinduer om informasjonskapsler</string>
+    <string name="autoconsentAnimationText">Informasjonskapsler administrert</string>
+
 </resources>

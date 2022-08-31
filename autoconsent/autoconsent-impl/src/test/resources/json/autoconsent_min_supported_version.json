@@ -1,0 +1,17 @@
+{
+  "state": "enabled",
+  "minSupportedVersion": 1234,
+  "exceptions": [
+    {
+      "domain": "www.example.com",
+      "reason": "Cannot identify"
+    },
+    {
+      "domain": "weather.com",
+      "reason": "Broken autoconsent"
+    }
+  ],
+  "settings": {
+    "disabledCMPs": ["TestCmp"]
+  }
+}

@@ -720,4 +720,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Omogućeno</string>
     <string name="atp_SettingsDeviceShieldDisabled">Onemogućeno</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Čini se da ova stranica ima skočni prozor za pristanak na kolačiće👇</string>
+    <string name="autoconsentDialogDescription">Da se ja pobrinem za to umjesto tebe? Mogu pokušati minimizirati kolačiće, maksimalno povećati privatnost i sakriti skočne prozore poput ovih.</string>
+    <string name="autoconsentPrimaryCta">Upravljanje skočnim prozorima kolačića</string>
+    <string name="autoconsentSecondaryCta">Ne, hvala</string>
+
+    <string name="autoconsentSetting">Upravljanje skočnim prozorima kolačića</string>
+    <string name="autoconsentAnimationText">Upravlja se kolačićima</string>
+
 </resources>

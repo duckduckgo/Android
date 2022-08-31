@@ -18,6 +18,8 @@ out/
 build/
 .externalNativeBuild/
 
+#Autoconsent
+/node_modules/@duckduckgo/autoconsent/
 
 # Local configuration file (sdk path, etc)
 local.properties
