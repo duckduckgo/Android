@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Yalnızca Bu Oturum için</string>
     <string name="preciseLocationSiteDialogDenyAlways">Her Zaman Reddet</string>
     <string name="preciseLocationSiteDialogDenyOnce">Bu Oturum için Reddet</string>
-    <string name="settingsPreciseLocation">Konum</string>
     <string name="preciseLocationFeatureDescription">Ziyaret ettiğiniz siteler cihazınızın konumunu öğrenmek isteyebilir. Ancak siz açıkça izin vermediğiniz takdirde konumunuza erişemezler. DuckDuckGo, konumunuzu yalnızca yerel arama sonuçları sunmak için anonim olarak kullanır.</string>
     <string name="preciseLocationToggleText">Siteler Konumumu Sorabilir</string>
     <string name="preciseLocationEmptyListHint">Hiçbir web sitesine konuma erişim izni verilmedi</string>

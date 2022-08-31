@@ -364,8 +364,12 @@
         <activity
             android:name="com.duckduckgo.app.sitepermissions.SitePermissionsActivity"
             android:exported="false"
-            android:label="@string/sitePermissionsActivityTitle"
+            android:label="@string/settingsSitePermissions"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteActivity"
+            android:exported="false"
+            android:parentActivityName="com.duckduckgo.app.sitepermissions.SitePermissionsActivity" />
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
             android:exported="false"

@@ -594,7 +594,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Tikai šai sesijai</string>
     <string name="preciseLocationSiteDialogDenyAlways">Vienmēr aizliegt</string>
     <string name="preciseLocationSiteDialogDenyOnce">Aizliegt šai sesijai</string>
-    <string name="settingsPreciseLocation">Atrašanās vieta</string>
     <string name="preciseLocationFeatureDescription">Apmeklētās vietnes var prasīt atklāt tavas ierīces atrašanās vietu. Tās nevarēs tai piekļūt, ja tu skaidri nepiešķirsi atļauju. DuckDuckGo izmanto tavu atrašanās vietu tikai anonīmi, lai nodrošinātu lokālās meklēšanas rezultātus.</string>
     <string name="preciseLocationToggleText">Vietnes var pieprasīt manu atrašanās vietu</string>
     <string name="preciseLocationEmptyListHint">Nevienai vietnei nav piešķirta atļauja piekļūt atrašanās vietai</string>

@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Alleen voor deze sessie</string>
     <string name="preciseLocationSiteDialogDenyAlways">Altijd weigeren</string>
     <string name="preciseLocationSiteDialogDenyOnce">Weigeren voor deze sessie</string>
-    <string name="settingsPreciseLocation">Locatie</string>
     <string name="preciseLocationFeatureDescription">Sites die je bezoekt, kunnen om je apparaatlocatie vragen. Ze kunnen deze pas gebruiken als je hiervoor expliciet toestemming geeft. DuckDuckGo gebruikt je locatie alleen anoniem om lokale zoekresultaten te leveren.</string>
     <string name="preciseLocationToggleText">Sites mogen om mijn locatie vragen</string>
     <string name="preciseLocationEmptyListHint">Geen websites hebben toestemming om je locatie te gebruiken</string>

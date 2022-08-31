@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Nur für diese Sitzung</string>
     <string name="preciseLocationSiteDialogDenyAlways">Immer ablehnen</string>
     <string name="preciseLocationSiteDialogDenyOnce">Für diese Sitzung ablehnen</string>
-    <string name="settingsPreciseLocation">Standort</string>
     <string name="preciseLocationFeatureDescription">Von Ihnen besuchte Websites können nach Ihrem Gerätestandort fragen. Ohne Ihre ausdrückliche Erlaubnis, können diese aber nicht auf diese Information zugreifen. Um für Ihre Region relevante Suchergebnisse zu liefern, nutzt DuckDuckGo Ihren anonymisierten Standort.</string>
     <string name="preciseLocationToggleText">Websites dürfen meinen Standort erfragen</string>
     <string name="preciseLocationEmptyListHint">Keinen Websites wurde Zugriff auf Ihren Gerätestandort gewährt</string>

@@ -456,7 +456,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         startActivity(SettingsActivity.intent(this))
     }
 
-    fun launchLocationSettings() {
+    fun launchSitePermissionsSettings() {
         startActivity(SitePermissionsActivity.intent(this))
     }
 

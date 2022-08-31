@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Seulement pour cette session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Toujours refuser</string>
     <string name="preciseLocationSiteDialogDenyOnce">Refuser pour cette session</string>
-    <string name="settingsPreciseLocation">Localisation</string>
     <string name="preciseLocationFeatureDescription">Les sites que vous avez visités peuvent demander l\'accès à la localisation de votre appareil. Ils n\'y auront accès que si vous leur accordez expressément l\'autorisation. DuckDuckGo utilise votre localisation de manière anonyme pour fournir des résultats de recherche locaux.</string>
     <string name="preciseLocationToggleText">Les sites peuvent demander ma localisation</string>
     <string name="preciseLocationEmptyListHint">L\'autorisation d\'accès à la localisation n\'a été accordée à aucun site Web</string>

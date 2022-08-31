@@ -596,7 +596,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Iba pre túto reláciu</string>
     <string name="preciseLocationSiteDialogDenyAlways">Vždy odmietnuť</string>
     <string name="preciseLocationSiteDialogDenyOnce">Odmietnuť pre túto reláciu</string>
-    <string name="settingsPreciseLocation">Miesto</string>
     <string name="preciseLocationFeatureDescription">Stránky, ktoré navštívite, môžu požadovať informácie o polohe vášho zariadenia. Nebudú k nim mať prístup, kým im výslovne neudelíte povolenie. Prehliadač DuckDuckGo používa vašu polohu iba anonymne na doručenie miestnych výsledkov vyhľadávania.</string>
     <string name="preciseLocationToggleText">Lokality môžu požiadať o moju polohu</string>
     <string name="preciseLocationEmptyListHint">Žiadne webové stránky nemajú povolenie na prístup k polohe</string>

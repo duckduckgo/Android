@@ -594,7 +594,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Numai pentru această sesiune</string>
     <string name="preciseLocationSiteDialogDenyAlways">Respinge întotdeauna</string>
     <string name="preciseLocationSiteDialogDenyOnce">Respinge pentru această sesiune</string>
-    <string name="settingsPreciseLocation">Locație</string>
     <string name="preciseLocationFeatureDescription">Site-urile pe care le vizitezi pot solicita să îți cunoască locația dispozitivului. Acestea nu vor putea să-l acceseze până când nu acorzi în mod explicit permisiunea. DuckDuckGo utilizează locația ta doar în mod anonim pentru a furniza rezultate de căutare locale.</string>
     <string name="preciseLocationToggleText">Site-urile îmi pot cere locația</string>
     <string name="preciseLocationEmptyListHint">Niciun site web nu a acordat permisiunea de a accesa locația</string>

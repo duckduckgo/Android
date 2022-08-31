@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Kun for denne økten</string>
     <string name="preciseLocationSiteDialogDenyAlways">Aldri tillat</string>
     <string name="preciseLocationSiteDialogDenyOnce">Ikke tillat for denne økten</string>
-    <string name="settingsPreciseLocation">Posisjon</string>
     <string name="preciseLocationFeatureDescription">Nettstedene du besøker kan be om å få tilgang til posisjonen til enheten din. De får ikke tilgang før du eksplisitt gir dem tillatelse. DuckDuckGo bruker kun posisjoner anonymt for å kunne gi deg lokale søkeresultater.</string>
     <string name="preciseLocationToggleText">Nettsteder kan be om posisjonen min</string>
     <string name="preciseLocationEmptyListHint">Ingen nettsider har fått tilgang til posisjon</string>

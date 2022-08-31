@@ -22,13 +22,16 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferencesImp
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.ALLOW_ALWAYS
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity.Companion.allowedWithin24h
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface SitePermissionsRepository {
@@ -37,6 +40,10 @@ interface SitePermissionsRepository {
     fun isDomainAllowedToAsk(url: String, permission: String): Boolean
     fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
     fun sitePermissionGranted(url: String, tabId: String, permission: String)
+    fun sitePermissionsWebsitesFlow(): Flow<List<SitePermissionsEntity>>
+    suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>)
+    suspend fun deleteAll()
+    suspend fun getSitePermissionsForWebsite(url: String): SitePermissionsEntity?
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -48,22 +55,27 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) : SitePermissionsRepository {
 
-    override var askCameraEnabled: Boolean = sitePermissionsPreferences.askCameraEnabled
-
-    override var askMicEnabled: Boolean = sitePermissionsPreferences.askMicEnabled
+    override var askCameraEnabled: Boolean
+        get() = sitePermissionsPreferences.askCameraEnabled
+        set(value) {
+            sitePermissionsPreferences.askCameraEnabled = value
+        }
+    override var askMicEnabled: Boolean
+        get() = sitePermissionsPreferences.askMicEnabled
+        set(value) {
+            sitePermissionsPreferences.askMicEnabled = value
+        }
 
     override fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
-        val sitePermissionsForDomain = sitePermissionsDao.getSitePermissionsByDomain(url) ?: return true
+        val sitePermissionsForDomain = sitePermissionsDao.getSitePermissionsByDomain(url)
         return when (permission) {
             PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
-                val askForCameraEnabled = sitePermissionsPreferences.askCameraEnabled
-                val isAskCameraSettingDenied = sitePermissionsForDomain.askCameraSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
-                askForCameraEnabled && !isAskCameraSettingDenied
+                val isAskCameraSettingDenied = sitePermissionsForDomain?.askCameraSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
+                askCameraEnabled && !isAskCameraSettingDenied
             }
             PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
-                val askForMicEnabled = sitePermissionsPreferences.askMicEnabled
-                val isAskMicSettingDenied = sitePermissionsForDomain.askMicSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
-                askForMicEnabled && !isAskMicSettingDenied
+                val isAskMicSettingDenied = sitePermissionsForDomain?.askMicSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
+                askMicEnabled && !isAskMicSettingDenied
             }
             else -> false
         }
@@ -102,6 +114,25 @@ class SitePermissionsRepositoryImpl @Inject constructor(
                 System.currentTimeMillis()
             )
             sitePermissionsAllowedDao.insert(sitePermissionAllowed)
+        }
+    }
+
+    override fun sitePermissionsWebsitesFlow(): Flow<List<SitePermissionsEntity>> {
+        return sitePermissionsDao.getAllSitesPermissionsAsFlow()
+    }
+
+    override suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>) {
+        sitePermissions.forEach { entity ->
+            sitePermissionsDao.insert(entity)
+        }
+    }
+    override suspend fun deleteAll() {
+        sitePermissionsDao.deleteAll()
+    }
+
+    override suspend fun getSitePermissionsForWebsite(url: String): SitePermissionsEntity? {
+        return withContext(dispatcherProvider.io()) {
+            sitePermissionsDao.getSitePermissionsByDomain(url)
         }
     }
 }

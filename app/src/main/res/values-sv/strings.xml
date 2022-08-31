@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Endast för denna session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Neka alltid</string>
     <string name="preciseLocationSiteDialogDenyOnce">Neka för denna session</string>
-    <string name="settingsPreciseLocation">Position</string>
     <string name="preciseLocationFeatureDescription">Webbplatser du besöker kan begära åtkomst till din enhetsplats. De får inte åtkomst till din enhetsplats innan du uttryckligen beviljat detta. DuckDuckGo använder bara din enhetsplats anonymt för att tillhandahålla lokala sökresultat.</string>
     <string name="preciseLocationToggleText">Webbplatser kan be om åtkomst till min platsinf\bormation</string>
     <string name="preciseLocationEmptyListHint">Inga webbplatser har fått åtkomst till enhetsplats</string>

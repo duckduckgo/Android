@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Vain tässä istunnossa</string>
     <string name="preciseLocationSiteDialogDenyAlways">Kiellä aina</string>
     <string name="preciseLocationSiteDialogDenyOnce">Kiellä tässä istunnossa</string>
-    <string name="settingsPreciseLocation">Sijainti</string>
     <string name="preciseLocationFeatureDescription">Sivustot, joilla käyt, voivat pyytää saada tietää sijaintisi. Ne eivät saa tietää sijaintiasi ennen kuin annat siihen erikseen luvan. DuckDuckGo käyttää sijaintiasi pelkästään anonyymisti antaakseen sinulle paikallisia hakutuloksia.</string>
     <string name="preciseLocationToggleText">Sivustot voivat pyytää nähdä sijaintini</string>
     <string name="preciseLocationEmptyListHint">Millekään sivustolle ei ole annettu lupaa käyttää sijaintiasi</string>

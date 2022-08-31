@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Само за тази сесия</string>
     <string name="preciseLocationSiteDialogDenyAlways">Винаги да се отказва</string>
     <string name="preciseLocationSiteDialogDenyOnce">Отказ само за тази сесия</string>
-    <string name="settingsPreciseLocation">Местоположение</string>
     <string name="preciseLocationFeatureDescription">Сайтовете, които посещавате, може да поискат да научат местоположението на устройството. Те няма да имат достъп до него, докато не им дадете изрично разрешение. DuckDuckGo използва местоположението само анонимно, за да осигурява локални резултати от търсенето.</string>
     <string name="preciseLocationToggleText">Сайтовете може да питат за местоположението ми</string>
     <string name="preciseLocationEmptyListHint">Никой уебсайт няма разрешение за достъп до местоположението</string>

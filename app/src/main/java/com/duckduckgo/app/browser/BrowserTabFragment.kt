@@ -1104,7 +1104,7 @@ class BrowserTabFragment :
                 Snackbar.LENGTH_SHORT
             )
         snackbar.view.setOnClickListener {
-            browserActivity?.launchLocationSettings()
+            browserActivity?.launchSitePermissionsSettings()
         }
         snackbar.show()
     }

@@ -19,17 +19,25 @@ package com.duckduckgo.app.sitepermissions
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityLocationPermissionsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command
-import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ConfirmRemoveAllAllowedSites
+import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
+import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
+import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.item_autocomplete_bookmark_suggestion.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -61,7 +69,9 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
             viewModel.viewState
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { state ->
-                    updateList(state.sitesAllowed, state.askLocationEnabled, state.askCameraEnabled, state.askMicEnabled)
+                    val sitePermissionsWebsites =
+                        state.locationPermissionsAllowed.map { it.domain }.union(state.sitesPermissionsAllowed.map { it.domain }).toList()
+                    updateList(sitePermissionsWebsites, state.askLocationEnabled, state.askCameraEnabled, state.askMicEnabled)
                 }
         }
         lifecycleScope.launch {
@@ -73,8 +83,24 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            is ConfirmRemoveAllAllowedSites -> {}
+            is ShowRemovedAllConfirmationSnackbar -> showRemovedAllSnackbar(command.removedSitePermissions, command.removedLocationPermissions)
+            is LaunchWebsiteAllowed -> launchWebsiteAllowed(command.domain)
         }
+    }
+
+    private fun showRemovedAllSnackbar(
+        removedSitePermissions: List<SitePermissionsEntity>,
+        removedLocationPermissions: List<LocationPermissionEntity>
+    ) {
+        val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteRemoveAllConfirmation), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        viewModel.removeAllSitesSelected()
+        Snackbar.make(
+            binding.root,
+            message,
+            Snackbar.LENGTH_LONG
+        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
+            viewModel.onSnackBarUndoRemoveAllWebsites(removedSitePermissions, removedLocationPermissions)
+        }.show()
     }
 
     private fun updateList(
@@ -88,6 +114,10 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
 
     private fun setupRecyclerView() {
         binding.recycler.adapter = adapter
+    }
+
+    private fun launchWebsiteAllowed(domain: String) {
+        startActivity(PermissionsPerWebsiteActivity.intent(this, domain))
     }
 
     companion object {

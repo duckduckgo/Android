@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Μόνο γι\' αυτή τη σύνδεση</string>
     <string name="preciseLocationSiteDialogDenyAlways">Άρνηση για πάντα</string>
     <string name="preciseLocationSiteDialogDenyOnce">Άρνηση γι\' αυτή τη σύνδεση</string>
-    <string name="settingsPreciseLocation">Τοποθεσία</string>
     <string name="preciseLocationFeatureDescription">Οι ιστότοποι που επισκέπτεστε ίσως ζητήσουν να μάθουν την τοποθεσία της συσκευής σας. Δεν θα μπορούν να έχουν πρόσβαση έως ότου τους εκχωρήσετε ρητά άδεια. Το DuckDuckGo χρησιμοποιεί την τοποθεσία σας μόνο ανώνυμα για να παρέχει τοπικά αποτελέσματα αναζήτησης.</string>
     <string name="preciseLocationToggleText">Οι ιστότοποι μπορούν να ζητήσουν την τοποθεσία μου</string>
     <string name="preciseLocationEmptyListHint">Δεν εκχωρήθηκε σε κανέναν ιστότοπο δικαίωμα πρόσβασης στην τοποθεσία</string>

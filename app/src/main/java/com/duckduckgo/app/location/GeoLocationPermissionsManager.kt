@@ -22,6 +22,7 @@ import android.webkit.GeolocationPermissions
 import androidx.core.location.LocationManagerCompat
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -30,6 +31,7 @@ interface GeoLocationPermissions {
     fun isDeviceLocationEnabled(): Boolean
     fun allow(domain: String)
     fun clear(domain: String)
+    suspend fun undoClearAll(locationPermissions: List<LocationPermissionEntity>)
     suspend fun clearAll()
     suspend fun clearAllButFireproofed()
 }
@@ -54,6 +56,12 @@ class GeoLocationPermissionsManager @Inject constructor(
     override fun clear(domain: String) {
         val geolocationPermissions = GeolocationPermissions.getInstance()
         geolocationPermissions.clear(domain)
+    }
+
+    override suspend fun undoClearAll(locationPermissions: List<LocationPermissionEntity>) {
+        locationPermissions.forEach { entity ->
+            permissionsRepository.savePermissionEntity(entity)
+        }
     }
 
     override suspend fun clearAll() {

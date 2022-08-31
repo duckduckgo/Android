@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Csak erre a munkamenetre</string>
     <string name="preciseLocationSiteDialogDenyAlways">Mindig megtagad</string>
     <string name="preciseLocationSiteDialogDenyOnce">Megtagad erre a munkamenetre</string>
-    <string name="settingsPreciseLocation">Hely</string>
     <string name="preciseLocationFeatureDescription">A felkeresett webhelyek hozzáférést kérhetnek az eszközöd helyadataihoz. Addig nem férhetnek hozzá, amíg kifejezetten nem adsz engedélyt. A DuckDuckGo csak névtelenül használja a helyadataidat a helyi keresési eredmények megadásához.</string>
     <string name="preciseLocationToggleText">A webhelyek kérhetik a tartózkodási helyemet</string>
     <string name="preciseLocationEmptyListHint">Egyetlen webhely sem kapott helyhozzáférési engedélyt</string>

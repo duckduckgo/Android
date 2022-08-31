@@ -17,26 +17,33 @@
 package com.duckduckgo.app.sitepermissions
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.GeoLocationPermissionsManager
+import com.duckduckgo.app.location.data.LocationPermissionEntity
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SitePermissionsViewModel @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository,
-    private val locationPermissionsRepository: SitePermissionsRepository,
+    private val locationPermissionsRepository: LocationPermissionsRepository,
     private val geolocationPermissions: GeoLocationPermissionsManager,
-    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -47,13 +54,18 @@ class SitePermissionsViewModel @Inject constructor(
 
     data class ViewState(
         val askLocationEnabled: Boolean = true,
-        val askCameraEnabled: Boolean = true,
+        val askCameraEnabled: Boolean = false,
         val askMicEnabled: Boolean = true,
-        val sitesAllowed: List<String> = listOf()
+        val sitesPermissionsAllowed: List<SitePermissionsEntity> = listOf(),
+        val locationPermissionsAllowed: List<LocationPermissionEntity> = listOf()
     )
 
     sealed class Command {
-        class ConfirmRemoveAllAllowedSites(val removedSites: List<String>) : Command()
+        class ShowRemovedAllConfirmationSnackbar(
+            val removedSitePermissions: List<SitePermissionsEntity>,
+            val removedLocationPermissions: List<LocationPermissionEntity>
+        ) : Command()
+        class LaunchWebsiteAllowed(val domain: String) : Command()
     }
 
     init {
@@ -65,23 +77,60 @@ class SitePermissionsViewModel @Inject constructor(
     }
 
     fun allowedSites() {
-        // TODO get allowed sites
-        _viewState.value = ViewState(sitesAllowed = listOf("www.maps.google.com"))
+        viewModelScope.launch {
+            locationPermissionsRepository.getLocationPermissionsFlow().collect { locationPermissionsList ->
+                sitePermissionsRepository.sitePermissionsWebsitesFlow().collect { sitePermissionsList ->
+                    _viewState.emit(
+                        _viewState.value.copy(
+                            sitesPermissionsAllowed = sitePermissionsList,
+                            locationPermissionsAllowed = locationPermissionsList
+                        )
+                    )
+                }
+            }
+        }
     }
 
     fun permissionToggleSelected(
         isChecked: Boolean,
         textRes: Int
     ) {
-        TODO("Not yet implemented")
+        when (textRes) {
+            R.string.sitePermissionsSettingsLocation -> {
+                settingsDataStore.appLocationPermission = isChecked
+                _viewState.value = _viewState.value.copy(askLocationEnabled = isChecked)
+            }
+            R.string.sitePermissionsSettingsCamera -> {
+                sitePermissionsRepository.askCameraEnabled = isChecked
+                _viewState.value = _viewState.value.copy(askCameraEnabled = isChecked)
+            }
+            R.string.sitePermissionsSettingsMicrophone -> {
+                sitePermissionsRepository.askMicEnabled = isChecked
+                _viewState.value = _viewState.value.copy(askMicEnabled = isChecked)
+            }
+        }
     }
 
     fun allowedSiteSelected(domain: String) {
-        TODO("Not yet implemented")
+        viewModelScope.launch {
+            _commands.send(LaunchWebsiteAllowed(domain))
+        }
     }
 
     fun removeAllSitesSelected() {
-        TODO("Not yet implemented")
+        viewModelScope.launch(dispatcherProvider.io()) {
+            geolocationPermissions.clearAll()
+            sitePermissionsRepository.deleteAll()
+        }
     }
 
+    fun onSnackBarUndoRemoveAllWebsites(
+        removedSitePermissions: List<SitePermissionsEntity>,
+        removedLocationPermissions: List<LocationPermissionEntity>
+    ) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            sitePermissionsRepository.undoDeleteAll(removedSitePermissions)
+            geolocationPermissions.undoClearAll(removedLocationPermissions)
+        }
+    }
 }

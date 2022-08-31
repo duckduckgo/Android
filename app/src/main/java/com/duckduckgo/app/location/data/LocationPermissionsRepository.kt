@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import dagger.Lazy
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -31,6 +32,7 @@ class LocationPermissionsRepository @Inject constructor(
 
     fun getLocationPermissionsSync(): List<LocationPermissionEntity> = locationPermissionsDao.allPermissions()
     fun getLocationPermissionsAsync(): LiveData<List<LocationPermissionEntity>> = locationPermissionsDao.allPermissionsEntities()
+    fun getLocationPermissionsFlow(): Flow<List<LocationPermissionEntity>> = locationPermissionsDao.allPermissionsAsFlow()
 
     suspend fun savePermission(
         domain: String,
@@ -67,5 +69,9 @@ class LocationPermissionsRepository @Inject constructor(
         return withContext(dispatchers.io()) {
             locationPermissionsDao.permissionEntitiesCountByDomain(domain)
         }
+    }
+
+    fun savePermissionEntity(entity: LocationPermissionEntity) {
+        locationPermissionsDao.insert(entity)
     }
 }

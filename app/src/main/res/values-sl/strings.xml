@@ -596,7 +596,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Samo za to sejo</string>
     <string name="preciseLocationSiteDialogDenyAlways">Vedno zavrni</string>
     <string name="preciseLocationSiteDialogDenyOnce">Zavrni za to sejo</string>
-    <string name="settingsPreciseLocation">Lokacija</string>
     <string name="preciseLocationFeatureDescription">Obiskana spletna mesta bodo morda želela vedeti lokacijo vaše naprave. Do nje ne bodo mogli dostopati, dokler ne podelite izrecnega dovoljenja. DuckDuckGo uporablja vašo lokacijo samo anonimno za prikaz rezultatov lokalnega iskanja.</string>
     <string name="preciseLocationToggleText">Spletna mesta lahko zahtevajo mojo lokacijo</string>
     <string name="preciseLocationEmptyListHint">Nobeno spletno mesto nima dovoljenja za dostop do lokacije</string>

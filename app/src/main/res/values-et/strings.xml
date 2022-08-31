@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Ainult selle seansi jaoks</string>
     <string name="preciseLocationSiteDialogDenyAlways">Keela alati</string>
     <string name="preciseLocationSiteDialogDenyOnce">Keela selle seansi jaoks</string>
-    <string name="settingsPreciseLocation">Asukoht</string>
     <string name="preciseLocationFeatureDescription">Saidid, mida sa külastad, võivad küsida sinu seadme asukohta. Nad ei saa sellele juurde enne, kui oled andnud selgesõnalise loa. DuckDuckGo kasutab sinu asukohta alati anonüümselt, et edastada kohaliku otsingu tulemused.</string>
     <string name="preciseLocationToggleText">Saidid võivad küsida minu asukohta</string>
     <string name="preciseLocationEmptyListHint">Ühelegi veebisaidile ei ole antud luba asukohale juurdepääsuks</string>

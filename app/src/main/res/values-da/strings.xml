@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Kun for denne session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Afvis altid</string>
     <string name="preciseLocationSiteDialogDenyOnce">Afvis for denne session</string>
-    <string name="settingsPreciseLocation">Placering</string>
     <string name="preciseLocationFeatureDescription">Websteder, du besøger, kan bede om at få kendskab til din enhedsplacering. De kan ikke få adgang til den, før du udtrykkeligt giver tilladelse. DuckDuckGo bruger kun din placering anonymt til at levere lokale søgeresultater.</string>
     <string name="preciseLocationToggleText">Websteder kan bede om min placering</string>
     <string name="preciseLocationEmptyListHint">Ingen websteder har tilladelse til at få adgang til placering</string>
