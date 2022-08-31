@@ -18,6 +18,8 @@ package com.duckduckgo.autoconsent.impl.handlers
 
 import android.webkit.WebView
 import androidx.core.net.toUri
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
@@ -25,11 +27,16 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor() : MessageHandlerPlugin {
+class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
+    @AppCoroutineScope val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
     private var selfTest = false
@@ -70,7 +77,9 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor() : Messa
             autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false)
 
             if (selfTest) {
-                webView.evaluateJavascript("javascript:${ReplyHandler.constructReply("""{ "type": "selfTest" }""")}", null)
+                appCoroutineScope.launch(dispatcherProvider.main()) {
+                    webView.evaluateJavascript("javascript:${ReplyHandler.constructReply("""{ "type": "selfTest" }""")}", null)
+                }
             }
             selfTest = false
         } catch (e: Exception) {

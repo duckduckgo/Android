@@ -35,6 +35,7 @@ dependencies {
     implementation project(path: ':app-store')
     implementation project(path: ':autoconsent-api')
     implementation project(path: ':autoconsent-store')
+    implementation project(path: ':statistics')
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat

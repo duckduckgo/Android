@@ -19,8 +19,12 @@ package com.duckduckgo.autoconsent.impl.handlers
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -28,13 +32,16 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.robolectric.Shadows
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
+
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockCallback: AutoconsentCallback = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
-    private val handler = OptOutAndAutoconsentDoneMessageHandlerPlugin()
+    private val handler = OptOutAndAutoconsentDoneMessageHandlerPlugin(TestScope(), coroutineRule.testDispatcherProvider)
 
     @Test
     fun whenProcessIfMessageTypeIsNotIncludedInListThenDoNothing() {
