@@ -93,17 +93,19 @@ class DuckDuckGoFaviconManager constructor(
     ): Bitmap? {
         val domain = url.extractDomain() ?: return null
 
-        var cachedFavicon: File? = null
-        if (tabId != null) {
-            cachedFavicon = faviconPersister.faviconFile(FAVICON_TEMP_DIR, tabId, domain)
-        }
-        if (cachedFavicon == null) {
-            cachedFavicon = faviconPersister.faviconFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
-        }
+        return withContext(dispatcherProvider.io()) {
+            var cachedFavicon: File? = null
+            if (tabId != null) {
+                cachedFavicon = faviconPersister.faviconFile(FAVICON_TEMP_DIR, tabId, domain)
+            }
+            if (cachedFavicon == null) {
+                cachedFavicon = faviconPersister.faviconFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
+            }
 
-        return if (cachedFavicon != null) {
-            faviconDownloader.getFaviconFromDisk(cachedFavicon)
-        } else null
+            return@withContext if (cachedFavicon != null) {
+                faviconDownloader.getFaviconFromDisk(cachedFavicon)
+            } else null
+        }
     }
 
     override suspend fun loadFromDiskWithParams(
@@ -115,17 +117,19 @@ class DuckDuckGoFaviconManager constructor(
     ): Bitmap? {
         val domain = url.extractDomain() ?: return null
 
-        var cachedFavicon: File? = null
-        if (tabId != null) {
-            cachedFavicon = faviconPersister.faviconFile(FAVICON_TEMP_DIR, tabId, domain)
-        }
-        if (cachedFavicon == null) {
-            cachedFavicon = faviconPersister.faviconFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
-        }
+        return withContext(dispatcherProvider.io()) {
+            var cachedFavicon: File? = null
+            if (tabId != null) {
+                cachedFavicon = faviconPersister.faviconFile(FAVICON_TEMP_DIR, tabId, domain)
+            }
+            if (cachedFavicon == null) {
+                cachedFavicon = faviconPersister.faviconFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
+            }
 
-        return if (cachedFavicon != null) {
-            faviconDownloader.getFaviconFromDisk(cachedFavicon, cornerRadius, width, height)
-        } else null
+            return@withContext if (cachedFavicon != null) {
+                faviconDownloader.getFaviconFromDisk(cachedFavicon, cornerRadius, width, height)
+            } else null
+        }
     }
 
     override suspend fun loadToViewFromLocalOrFallback(
