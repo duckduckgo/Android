@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -24,9 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
-        android:layout_marginVertical="@dimen/keyline_5"
-        android:orientation="vertical">
-
+        android:orientation="vertical"
+        android:paddingVertical="@dimen/keyline_5">
 
         <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
             android:id="@+id/domainTitleEditText"
@@ -84,4 +83,4 @@
 
     </LinearLayout>
 
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

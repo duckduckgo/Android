@@ -242,7 +242,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
 
         testee.getRuntimeConfiguration("", url)
 
-        verify(autofillResponseWriter).generateUserPreferences(false)
+        verifyAutofillCredentialsReturnedAs(false)
     }
 
     @Test
@@ -255,7 +255,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
 
         testee.getRuntimeConfiguration("", url)
 
-        verify(autofillResponseWriter).generateUserPreferences(false)
+        verifyAutofillCredentialsReturnedAs(false)
     }
 
     @Test
@@ -268,7 +268,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
 
         testee.getRuntimeConfiguration("", url)
 
-        verify(autofillResponseWriter).generateUserPreferences(false)
+        verifyAutofillCredentialsReturnedAs(false)
     }
 
     @Test
@@ -278,10 +278,17 @@ class AutofillStoredBackJavascriptInterfaceTest {
         whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
         whenever(autofillStore.autofillEnabled).thenReturn(true)
         whenever(autofillStore.autofillAvailable).thenReturn(true)
-
         testee.getRuntimeConfiguration("", url)
 
-        verify(autofillResponseWriter).generateUserPreferences(true)
+        verifyAutofillCredentialsReturnedAs(true)
+    }
+
+    @Test
+    fun whenCanAutofillThenConfigSpecifiesShowingKeyIcon() = runTest {
+        val url = "example.com"
+        configureAutofillAvailableForSite(url)
+        testee.getRuntimeConfiguration("", url)
+        verifyKeyIconRequestedToShow()
     }
 
     @Test
@@ -439,6 +446,21 @@ class AutofillStoredBackJavascriptInterfaceTest {
         configureRequestParserToReturn(username = " ", password = " ")
         testee.storeFormData("")
         assertNull(testCallback.credentialsToSave)
+    }
+
+    private fun verifyAutofillCredentialsReturnedAs(expectedValue: Boolean) {
+        verify(autofillResponseWriter).generateUserPreferences(autofillCredentials = eq(expectedValue), showInlineKeyIcon = any())
+    }
+
+    private fun verifyKeyIconRequestedToShow() {
+        verify(autofillResponseWriter).generateUserPreferences(showInlineKeyIcon = any(), autofillCredentials = eq(true))
+    }
+
+    private suspend fun configureAutofillAvailableForSite(url: String) {
+        whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.autofillAvailable).thenReturn(true)
     }
 
     private suspend fun configureRequestParserToReturn(username: String?, password: String?) {

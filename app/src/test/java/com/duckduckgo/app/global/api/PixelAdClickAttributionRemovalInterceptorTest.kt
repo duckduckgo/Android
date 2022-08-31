@@ -17,7 +17,8 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
-import com.duckduckgo.app.global.api.PixelAdClickAttributionRemovalInterceptor.Companion.PIXELS_SET
+import com.duckduckgo.app.global.api.PixelAdClickAttributionRemovalInterceptor.Companion.PIXELS_SET_NO_ATB
+import com.duckduckgo.app.global.api.PixelAdClickAttributionRemovalInterceptor.Companion.PIXELS_SET_NO_ATB_AND_VERSION
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -34,11 +35,23 @@ class PixelAdClickAttributionRemovalInterceptorTest {
     fun whenSendPixelTheRemoveAtbInfoFromDefinedPixels() {
         AdClickPixelName.values().map { it.pixelName }.forEach { pixelName ->
             val pixelUrl = String.format(PIXEL_TEMPLATE, pixelName)
-            val removalExpected = PIXELS_SET.contains(pixelName)
+            val removalExpected = PIXELS_SET_NO_ATB.contains(pixelName) || PIXELS_SET_NO_ATB_AND_VERSION.contains(pixelName)
 
             val interceptedUrl = interceptor.intercept(FakeChain(pixelUrl)).request.url
 
             assertEquals(removalExpected, interceptedUrl.queryParameter("atb") == null)
+        }
+    }
+
+    @Test
+    fun whenSendPixelTheRemoveAppVersionInfoFromDefinedPixels() {
+        AdClickPixelName.values().map { it.pixelName }.forEach { pixelName ->
+            val pixelUrl = String.format(PIXEL_TEMPLATE, pixelName)
+            val removalExpected = PIXELS_SET_NO_ATB_AND_VERSION.contains(pixelName)
+
+            val interceptedUrl = interceptor.intercept(FakeChain(pixelUrl)).request.url
+
+            assertEquals(removalExpected, interceptedUrl.queryParameter("appVersion") == null)
         }
     }
 

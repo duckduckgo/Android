@@ -28,7 +28,7 @@ interface AutofillResponseWriter {
     fun generateResponseGetAvailableInputTypes(credentialsAvailable: Boolean, emailAvailable: Boolean): String
     fun generateContentScope(): String
     fun generateUserUnprotectedDomains(): String
-    fun generateUserPreferences(autofillCredentials: Boolean, showInlineKeyIcon: Boolean = false): String
+    fun generateUserPreferences(autofillCredentials: Boolean, showInlineKeyIcon: Boolean): String
 }
 
 @ContributesBinding(AppScope::class)

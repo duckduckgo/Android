@@ -18,24 +18,27 @@ package com.duckduckgo.mobile.android.ui.view
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Parcel
 import android.os.Parcelable
+import android.os.Parcelable.ClassLoaderCreator
 import android.text.TextWatcher
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
+import android.util.SparseArray
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.inputmethod.EditorInfo
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewOutlinedTextInputBinding
 import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
 import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action.PerformEndAction
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textfield.TextInputLayout.END_ICON_CUSTOM
 import com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
-import android.os.Parcel
-import android.os.Parcelable.ClassLoaderCreator
-import android.util.SparseArray
 
 interface OutlinedTextInput {
     var text: String
@@ -77,7 +80,7 @@ class OutLinedTextInputView @JvmOverloads constructor(
 
             // This needs to be done after we know that the view has the end icon set
             isEditable = getBoolean(R.styleable.OutLinedTextInputView_editable, true)
-            binding.internalInputLayout.hint = getString(R.styleable.OutLinedTextInputView_android_hint)
+            binding.internalInputLayout.setHintWithoutAnimation(getString(R.styleable.OutLinedTextInputView_android_hint))
             isPassword = getBoolean(R.styleable.OutLinedTextInputView_isPassword, false)
             if (isPassword) {
                 setupPasswordMode()
@@ -208,6 +211,13 @@ class OutLinedTextInputView @JvmOverloads constructor(
 
     override fun dispatchRestoreInstanceState(container: SparseArray<Parcelable?>?) {
         dispatchThawSelfOnly(container)
+    }
+
+    private fun TextInputLayout.setHintWithoutAnimation(hint: String?) {
+        val hintAnimationEnabledSnapshot = isHintAnimationEnabled
+        isHintAnimationEnabled = false
+        this.hint = hint
+        doOnNextLayout { isHintAnimationEnabled = hintAnimationEnabledSnapshot }
     }
 
     internal class SavedState : BaseSavedState {

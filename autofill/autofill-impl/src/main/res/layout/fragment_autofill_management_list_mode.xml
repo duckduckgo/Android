@@ -24,7 +24,7 @@
 
     <TextView
         android:id="@+id/enabledToggleLabel"
-        style="@style/TextAppearance.AppCompat.Title"
+        style="@style/TextAppearance.DuckDuckGo.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"

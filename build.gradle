@@ -9,7 +9,7 @@ buildscript {
         lint_version = "30.2.2" // This value must always be gradle_plugin + 23
         min_sdk = 23
         target_sdk = 30
-        compile_sdk = 31
+        compile_sdk = 33
         fladle_version = "0.17.4"
     }
 

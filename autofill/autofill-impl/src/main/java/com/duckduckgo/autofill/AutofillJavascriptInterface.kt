@@ -52,7 +52,10 @@ interface AutofillJavascriptInterface {
     @JavascriptInterface
     fun getAutofillData(requestString: String)
 
-    suspend fun getRuntimeConfiguration(rawJs: String, url: String?): String
+    suspend fun getRuntimeConfiguration(
+        rawJs: String,
+        url: String?
+    ): String
 
     fun injectCredentials(credentials: LoginCredentials)
     fun injectNoCredentials()
@@ -147,7 +150,10 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
         val contentScope = autofillResponseWriter.generateContentScope()
         val userUnprotectedDomains = autofillResponseWriter.generateUserUnprotectedDomains()
-        val userPreferences = autofillResponseWriter.generateUserPreferences(autofillCredentials = determineIfAutofillEnabled())
+        val userPreferences = autofillResponseWriter.generateUserPreferences(
+            autofillCredentials = determineIfAutofillEnabled(),
+            showInlineKeyIcon = true
+        )
         val availableInputTypes = generateAvailableInputTypes(url)
 
         return rawJs
@@ -234,7 +240,10 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         )
     }
 
-    private fun JavascriptCredentials.asLoginCredentials(url: String, title: String?): LoginCredentials {
+    private fun JavascriptCredentials.asLoginCredentials(
+        url: String,
+        title: String?
+    ): LoginCredentials {
         return LoginCredentials(
             id = null,
             domain = url,
