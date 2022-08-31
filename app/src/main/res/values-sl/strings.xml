@@ -720,4 +720,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Omogočeno</string>
     <string name="atp_SettingsDeviceShieldDisabled">Onemogočeno</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Videti je, da ima to spletno mesto pojavno okno s soglasjem za piškotke👇</string>
+    <string name="autoconsentDialogDescription">Želite, da jih uredim namesto vas? Poskušam zmanjšati piškotke, povečati zasebnost in skriti pojavna okna, kot so ta.</string>
+    <string name="autoconsentPrimaryCta">Upravljanje pojavnih oken za piškotke</string>
+    <string name="autoconsentSecondaryCta">Ne, hvala</string>
+
+    <string name="autoconsentSetting">Upravljanje pojavnih oken za piškotke</string>
+    <string name="autoconsentAnimationText">Upravljani piškotki</string>
+
 </resources>

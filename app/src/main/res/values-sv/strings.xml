@@ -712,4 +712,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Aktiverad</string>
     <string name="atp_SettingsDeviceShieldDisabled">Inaktiverad</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Den här webbplatsen verkar ha ett popup-fönster för godkännande av cookies👇</string>
+    <string name="autoconsentDialogDescription">Vill du att jag ska hantera dessa åt dig? Jag kan försöka minimera cookies, maximera integriteten och dölja sådana här popup-fönster.</string>
+    <string name="autoconsentPrimaryCta">Hantera popup-fönster för cookies</string>
+    <string name="autoconsentSecondaryCta">Nej tack</string>
+
+    <string name="autoconsentSetting">Hantera popup-fönster för cookies</string>
+    <string name="autoconsentAnimationText">Cookies hanteras</string>
+
 </resources>

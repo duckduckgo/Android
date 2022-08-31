@@ -720,4 +720,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Įjungta</string>
     <string name="atp_SettingsDeviceShieldDisabled">Išjungta</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Atrodo, kad šioje svetainėje yra sutikimo su slapukais iššokantysis langas👇</string>
+    <string name="autoconsentDialogDescription">Norite, kad viską sutvarkyčiau? Galiu pabandyti sumažinti slapukų skaičių, sustiprinti privatumą ir paslėpti tokius iššokančiuosius langus.</string>
+    <string name="autoconsentPrimaryCta">Valdyti slapukų iššokančiuosius langus</string>
+    <string name="autoconsentSecondaryCta">Ne, dėkoju</string>
+
+    <string name="autoconsentSetting">Valdyti slapukų iššokančiuosius langus</string>
+    <string name="autoconsentAnimationText">Slapukai valdomi</string>
+
 </resources>

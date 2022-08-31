@@ -712,4 +712,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Активирано</string>
     <string name="atp_SettingsDeviceShieldDisabled">Деактивирано</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Изглежда, че този сайт има изскачащ прозорец за съгласие за бисквитки👇</string>
+    <string name="autoconsentDialogDescription">Искате ли да се справя с това вместо Вас? Мога да се опитам да намаля бисквитките до минимум, да увелича поверителността и да скрия подобни изскачащи прозорци.</string>
+    <string name="autoconsentPrimaryCta">Управление на изскачащите прозорци за бисквитки</string>
+    <string name="autoconsentSecondaryCta">Не, благодаря</string>
+
+    <string name="autoconsentSetting">Управление на изскачащите прозорци за бисквитки</string>
+    <string name="autoconsentAnimationText">Бисквитките са настроени</string>
+
 </resources>

@@ -720,4 +720,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Włączone</string>
     <string name="atp_SettingsDeviceShieldDisabled">Wyłączone</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Wygląda na to, że na tej stronie pojawia się okienko z prośbą o zgodę na używanie plików cookie👇</string>
+    <string name="autoconsentDialogDescription">Mamy się tym za Ciebie zająć? Możemy spróbować zminimalizować liczbę plików cookie, zmaksymalizować prywatność i ukryć takie wyskakujące okienka.</string>
+    <string name="autoconsentPrimaryCta">Zarządzaj wyskakującymi okienkami z prośbą o używanie plików cookie</string>
+    <string name="autoconsentSecondaryCta">Nie, dziękuję</string>
+
+    <string name="autoconsentSetting">Zarządzaj wyskakującymi okienkami z prośbą o używanie plików cookie</string>
+    <string name="autoconsentAnimationText">Zarządzane pliki cookie</string>
+
 </resources>

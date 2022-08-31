@@ -720,4 +720,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Povoleno</string>
     <string name="atp_SettingsDeviceShieldDisabled">Zakázáno</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Vypadá to, že tenhle web má vyskakovací okno pro souhlas se soubory cookie 👇</string>
+    <string name="autoconsentDialogDescription">Mám ho vyřešit za tebe? Můžu zkusit vybrat jen nezbytné soubory cookie, maximalizovat ochranu soukromí a podobná vyskakovací okna odteď skrývat.</string>
+    <string name="autoconsentPrimaryCta">Správa vyskakovacích oken ohledně cookies</string>
+    <string name="autoconsentSecondaryCta">Ne, děkuji</string>
+
+    <string name="autoconsentSetting">Správa vyskakovacích oken ohledně cookies</string>
+    <string name="autoconsentAnimationText">O cookies je postaráno!</string>
+
 </resources>
