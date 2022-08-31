@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.store
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
@@ -37,6 +38,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -46,6 +48,9 @@ import org.mockito.kotlin.whenever
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SecureStoreBackedAutofillStoreTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val lastUpdatedTimeProvider = object : LastUpdatedTimeProvider {
         override fun getInMillis(): Long = UPDATED_INITIAL_LAST_UPDATED
@@ -296,7 +301,13 @@ class SecureStoreBackedAutofillStoreTest {
     ) {
         internalTestUserChecker = FakeInternalTestUserChecker(isInternalUser)
         secureStore = FakeSecureStore(canAccessSecureStorage)
-        testee = SecureStoreBackedAutofillStore(secureStore, internalTestUserChecker, lastUpdatedTimeProvider, autofillPrefsStore)
+        testee = SecureStoreBackedAutofillStore(
+            secureStore,
+            internalTestUserChecker,
+            lastUpdatedTimeProvider,
+            autofillPrefsStore,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider
+        )
     }
 
     private fun assertNotMatch(result: ContainsCredentialsResult) {
