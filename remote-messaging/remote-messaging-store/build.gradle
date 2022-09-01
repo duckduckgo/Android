@@ -31,7 +31,7 @@ android {
         }
     }
     sourceSets {
-        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+        test.assets.srcDirs += files("$projectDir/schemas".toString())
     }
     namespace 'com.duckduckgo.remote.messaging.store'
 }

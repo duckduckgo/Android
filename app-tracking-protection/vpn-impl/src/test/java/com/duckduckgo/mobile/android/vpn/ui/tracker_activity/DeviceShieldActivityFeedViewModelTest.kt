@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import androidx.room.Room
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
@@ -33,14 +34,17 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedIt
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit.DAYS
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
+@RunWith(AndroidJUnit4::class)
 class DeviceShieldActivityFeedViewModelTest {
 
     private lateinit var db: VpnDatabase
@@ -58,6 +62,11 @@ class DeviceShieldActivityFeedViewModelTest {
             CoroutineTestRule().testDispatcherProvider,
             RealTimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext)
         )
+    }
+
+    @After
+    fun after() {
+        db.close()
     }
 
     @Test
