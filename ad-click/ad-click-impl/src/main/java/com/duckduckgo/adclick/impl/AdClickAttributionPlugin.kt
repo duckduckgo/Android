@@ -55,8 +55,6 @@ class AdClickAttributionPlugin @Inject constructor(
                 linkFormats.add(
                     AdClickAttributionLinkFormatEntity(
                         url = it.url,
-                        parameterName = it.parameterName.orEmpty(),
-                        parameterValue = it.parameterValue.orEmpty(),
                         adDomainParameterName = it.adDomainParameterName.orEmpty()
                     )
                 )
