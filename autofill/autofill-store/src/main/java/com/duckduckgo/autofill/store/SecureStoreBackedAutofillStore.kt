@@ -16,6 +16,8 @@
 
 package com.duckduckgo.autofill.store
 
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extractSchemeAndDomain
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.domain.app.LoginCredentials
@@ -27,13 +29,15 @@ import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class SecureStoreBackedAutofillStore(
     private val secureStorage: SecureStorage,
     private val internalTestUserChecker: InternalTestUserChecker,
     private val lastUpdatedTimeProvider: LastUpdatedTimeProvider,
-    private val autofillPrefsStore: AutofillPrefsStore
+    private val autofillPrefsStore: AutofillPrefsStore,
+    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
 ) : AutofillStore {
 
     override val autofillAvailable: Boolean
@@ -52,16 +56,18 @@ class SecureStoreBackedAutofillStore(
         }
 
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
-        return if (autofillEnabled && autofillAvailable) {
-            Timber.i("Querying secure store for stored credentials. rawUrl: %s, extractedDomain:%s", rawUrl, rawUrl.extractSchemeAndDomain())
-            val url = rawUrl.extractSchemeAndDomain() ?: return emptyList()
+        return withContext(dispatcherProvider.io()) {
+            return@withContext if (autofillEnabled && autofillAvailable) {
+                Timber.i("Querying secure store for stored credentials. rawUrl: %s, extractedDomain:%s", rawUrl, rawUrl.extractSchemeAndDomain())
+                val url = rawUrl.extractSchemeAndDomain() ?: return@withContext emptyList()
 
-            val storedCredentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: emptyList()
-            Timber.v("Found %d credentials for %s", storedCredentials.size, url)
+                val storedCredentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: emptyList()
+                Timber.v("Found %d credentials for %s", storedCredentials.size, url)
 
-            storedCredentials.map { it.toLoginCredentials() }
-        } else {
-            emptyList()
+                storedCredentials.map { it.toLoginCredentials() }
+            } else {
+                emptyList()
+            }
         }
     }
 
