@@ -16,6 +16,8 @@
 
 package com.duckduckgo.downloads.impl
 
+import android.webkit.MimeTypeMap
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.downloads.impl.DataUriParser.ParseResult.Invalid
 import com.duckduckgo.downloads.impl.DataUriParser.ParseResult.ParsedDataUri
 import org.junit.Assert.assertEquals
@@ -23,13 +25,19 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.Shadows.shadowOf
 
+@RunWith(AndroidJUnit4::class)
 class DataUriParserTest {
 
     private lateinit var testee: DataUriParser
 
     @Before
     fun setup() {
+        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypMapping("jpg", "image/jpeg")
+        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypMapping("png", "image/png")
+        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypMapping("txt", "text/plain")
         testee = DataUriParser()
     }
 

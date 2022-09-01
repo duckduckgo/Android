@@ -16,8 +16,8 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
@@ -40,14 +40,13 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 
 // TODO: when pattern established, refactor objects to use (create module https://app.asana.com/0/0/1201807285420697/f)
 @ExperimentalCoroutinesApi
+@RunWith(AndroidJUnit4::class)
 class AppRemoteMessagingRepositoryTest {
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @ExperimentalCoroutinesApi
     @get:Rule
@@ -61,7 +60,7 @@ class AppRemoteMessagingRepositoryTest {
 
     private val dao = db.remoteMessagesDao()
 
-    private val remoteMessagingConfigRepository = mock<RemoteMessagingConfigRepository>()
+    private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository = mock()
 
     private val testee = AppRemoteMessagingRepository(remoteMessagingConfigRepository, dao, coroutineRule.testDispatcherProvider)
 

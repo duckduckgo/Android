@@ -16,14 +16,18 @@
 
 package com.duckduckgo.downloads.impl
 
-import androidx.test.filters.SdkSuppress
+import android.webkit.MimeTypeMap
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.robolectric.Shadows.shadowOf
 
+@RunWith(AndroidJUnit4::class)
 class UriUtilsFilenameExtractorTest {
 
     private val mockedPixel: Pixel = mock()
@@ -82,8 +86,9 @@ class UriUtilsFilenameExtractorTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = 22)
     fun whenUrlContainsAmbiguousFilenameButContainsPathSegmentsWhichLookLikeAFilenameAndMimeTypeProvidedThenFilenameShouldBeExtracted() {
+        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypMapping("jpg", "image/jpeg")
+
         val url = "https://foo.example.com/path/dotted.path/b/b1/realFilename"
         val mimeType = "image/jpeg"
         val contentDisposition: String? = null
@@ -204,23 +209,9 @@ class UriUtilsFilenameExtractorTest {
     }
 
     @Test
-    @SdkSuppress(maxSdkVersion = 21)
-    fun whenUrlIsEmptyStringAndMimeTypeProvidedThenDefaultNameAndFiletypeFromMimeReturnedLollipop() {
-        val url = ""
-        val mimeType = "image/jpeg"
-        val contentDisposition: String? = null
-
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Guess)
-
-        extractionResult as FilenameExtractor.FilenameExtractionResult.Guess
-
-        assertEquals("downloadfile.jpeg", extractionResult.bestGuess)
-    }
-
-    @Test
-    @SdkSuppress(minSdkVersion = 22)
     fun whenUrlIsEmptyStringAndMimeTypeProvidedThenDefaultNameAndFiletypeFromMimeReturned() {
+        shadowOf(MimeTypeMap.getSingleton()).addExtensionMimeTypMapping("jpg", "image/jpeg")
+
         val url = ""
         val mimeType = "image/jpeg"
         val contentDisposition: String? = null
