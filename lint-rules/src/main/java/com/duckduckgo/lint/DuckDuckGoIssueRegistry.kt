@@ -24,6 +24,7 @@ import com.duckduckgo.lint.NoFragmentDetector.Companion.NO_FRAGMENT_ISSUE
 import com.duckduckgo.lint.NoLifecycleObserverDetector.Companion.NO_LIFECYCLE_OBSERVER_ISSUE
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
+import com.duckduckgo.lint.ui.AndroidButtonUsedInXml.Companion.ANDROID_BUTTON_IN_XML
 
 @Suppress("UnstableApiUsage")
 class DuckDuckGoIssueRegistry : IssueRegistry() {
@@ -33,6 +34,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_LIFECYCLE_OBSERVER_ISSUE,
             NO_FRAGMENT_ISSUE,
             NO_SYSTEM_LOAD_LIBRARY,
+            ANDROID_BUTTON_IN_XML
         )
 
     override val api: Int
