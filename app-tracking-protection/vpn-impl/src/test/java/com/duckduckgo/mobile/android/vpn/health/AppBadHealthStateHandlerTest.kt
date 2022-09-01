@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.health
 
 import androidx.room.Room
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -31,12 +32,14 @@ import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
@@ -48,6 +51,7 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 
 @ExperimentalCoroutinesApi
+@RunWith(AndroidJUnit4::class)
 class AppBadHealthStateHandlerTest {
 
     @get:Rule @Suppress("unused") val coroutineRule = CoroutineTestRule()
@@ -76,6 +80,11 @@ class AppBadHealthStateHandlerTest {
         appBadHealthStateHandler = AppBadHealthStateHandler(
             context, appBuildConfig, db, appTpConfig, deviceShieldPixels, coroutineRule.testDispatcherProvider, coroutineRule.testScope
         )
+    }
+
+    @After
+    fun after() {
+        db.close()
     }
 
     @Test

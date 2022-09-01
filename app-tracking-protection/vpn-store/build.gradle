@@ -31,9 +31,15 @@ android {
         }
     }
     sourceSets {
-        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+        test.assets.srcDirs += files("$projectDir/schemas".toString())
     }
     namespace 'com.duckduckgo.mobile.android.vpn.store'
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -61,27 +67,16 @@ dependencies {
     implementation Google.dagger
     kapt AndroidX.room.compiler
     testImplementation AndroidX.room.testing
-    androidTestImplementation AndroidX.room.testing
     // multi-process shared preferences
     implementation "com.frybits.harmony:harmony:_"
 
-    testImplementation "junit:junit:_"
+    testImplementation Testing.junit4
     testImplementation project(path: ':common-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation Testing.robolectric
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.core
+    testImplementation AndroidX.test.ext.junit
 
-    androidTestImplementation project(path: ':common-test')
-    androidTestImplementation AndroidX.test.runner
-    androidTestImplementation AndroidX.test.rules
     androidTestUtil AndroidX.test.orchestrator
-    androidTestImplementation "org.mockito:mockito-android:_"
-    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    androidTestImplementation AndroidX.archCore.testing
-}
-
-fulladleModuleConfig {
-    maxTestShards.set(1)
-}
-
-tasks.register('androidTestsBuild') {
-    dependsOn 'assembleDebugAndroidTest'
 }

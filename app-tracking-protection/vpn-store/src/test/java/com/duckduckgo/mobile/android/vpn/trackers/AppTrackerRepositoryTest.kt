@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.trackers
 
 import androidx.room.Room
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -26,8 +27,10 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(AndroidJUnit4::class)
 class AppTrackerRepositoryTest {
 
     @ExperimentalCoroutinesApi
@@ -47,7 +50,6 @@ class AppTrackerRepositoryTest {
         ).allowMainThreadQueries().build().apply {
             VpnDatabaseCallback(context, { this }, coroutineRule.testDispatcherProvider).prepopulateAppTrackerBlockingList()
         }
-
         appTrackerRepository = RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao(), vpnDatabase.vpnSystemAppsOverridesDao())
     }
 
