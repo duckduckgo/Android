@@ -5,17 +5,16 @@ on:
     - cron: '0 2 * * *' # run at 2 AM UTC
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   unit_tests:
     name: Spotless and unit tests
     runs-on: ubuntu-latest
 
     steps:
-      - name: Cancel previous
-        uses: styfle/cancel-workflow-action@0.7.0
-        with:
-          access_token: ${{ github.token }}
-
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
@@ -49,11 +48,6 @@ jobs:
     name: Android CI checks
 
     steps:
-      - name: Cancel previous
-        uses: styfle/cancel-workflow-action@0.7.0
-        with:
-          access_token: ${{ github.token }}
-
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
