@@ -78,6 +78,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
@@ -116,6 +117,8 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    private val lastActiveTabs = TabList()
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -235,6 +238,8 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
         if (tab.tabId == currentTab?.tabId) return
 
+        lastActiveTabs.add(tab.tabId)
+
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
             openNewTab(tab.tabId, tab.url, tab.skipHome)
@@ -251,7 +256,10 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     private fun removeTabs(fragments: List<BrowserTabFragment>) {
         val transaction = supportFragmentManager.beginTransaction()
-        fragments.forEach { transaction.remove(it) }
+        fragments.forEach {
+            transaction.remove(it)
+            lastActiveTabs.remove(it.tabId)
+        }
         transaction.commit()
     }
 
@@ -331,10 +339,13 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
             processCommand(it)
         }
         viewModel.selectedTab.observe(this) {
-            if (it != null) selectTab(it)
+            if (it != null) {
+                selectTab(it)
+            }
         }
         viewModel.tabs.observe(this) {
             clearStaleTabs(it)
+            removeOldTabs()
             launch { viewModel.onTabsUpdated(it) }
         }
     }
@@ -356,6 +367,19 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
         if (stale.isNotEmpty()) {
             removeTabs(stale)
+        }
+    }
+
+    private fun removeOldTabs() {
+        val candidatesToRemove = lastActiveTabs.dropLast(MAX_ACTIVE_TABS)
+        if (candidatesToRemove.isEmpty()) return
+
+        val tabsToRemove = supportFragmentManager.fragments
+            .mapNotNull { it as? BrowserTabFragment }
+            .filter { candidatesToRemove.contains(it.tabId) }
+
+        if (tabsToRemove.isNotEmpty()) {
+            removeTabs(tabsToRemove)
         }
     }
 
@@ -507,6 +531,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 
         private const val DASHBOARD_REQUEST_CODE = 100
+        private const val MAX_ACTIVE_TABS = 40
     }
 
     inner class BrowserStateRenderer {
@@ -568,4 +593,14 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         val originalInstanceState: Bundle?,
         val newInstanceState: Bundle?
     )
+}
+
+// Temporary class to keep track of latest visited tabs, keeping unique ids.
+private class TabList() : ArrayList<String>() {
+    override fun add(element: String): Boolean {
+        if (this.contains(element)) {
+            this.remove(element)
+        }
+        return super.add(element)
+    }
 }
