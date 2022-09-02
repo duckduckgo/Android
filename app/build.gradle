@@ -360,6 +360,18 @@ tasks.register('jvm_checks') {
     dependsOn 'spotlessCheck', 'lint', 'testPlayDebugUnitTest'
 }
 
+tasks.register('spotless') {
+    dependsOn 'spotlessCheck'
+}
+
+tasks.register('lint_check') {
+    dependsOn 'lint'
+}
+
+tasks.register('jvm_tests') {
+    dependsOn 'testPlayDebugUnitTest'
+}
+
 tasks.register('androidTestsBuild') {
     dependsOn 'assemblePlayDebug', 'assemblePlayDebugAndroidTest'
 }
