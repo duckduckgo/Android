@@ -83,8 +83,7 @@ object PrivacyModule {
         geoLocationPermissions: GeoLocationPermissions,
         thirdPartyCookieManager: ThirdPartyCookieManager,
         adClickManager: AdClickManager,
-        dispatcherProvider: DispatcherProvider,
-        fireproofWebsiteRepository: FireproofWebsiteRepository,
+        fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
         sitePermissionsManager: SitePermissionsManager
     ): ClearDataAction {
         return ClearPersonalDataAction(
@@ -98,7 +97,6 @@ object PrivacyModule {
             geoLocationPermissions,
             thirdPartyCookieManager,
             adClickManager,
-            dispatcherProvider,
             fireproofWebsiteRepository,
             sitePermissionsManager
         )

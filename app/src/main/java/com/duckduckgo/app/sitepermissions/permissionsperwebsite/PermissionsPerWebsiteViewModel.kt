@@ -29,8 +29,12 @@ import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWe
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType.ALLOW
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType.ASK
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType.DENY
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
+import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelParameter
+import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelValue
+import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.SitePermissionsPixelName
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -44,7 +48,8 @@ import javax.inject.Inject
 class PermissionsPerWebsiteViewModel @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository,
     private val locationPermissionsRepository: LocationPermissionsRepository,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
+    private val pixel: Pixel
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -138,14 +143,17 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
             R.string.sitePermissionsSettingsLocation -> {
                 askLocationSetting = editedPermissionSetting.setting
                 updateLocationSetting(editedPermissionSetting.setting, url)
+                fireSettingChangedPixel(PixelValue.LOCATION, askLocationSetting)
             }
             R.string.sitePermissionsSettingsCamera -> {
                 askCameraSetting = editedPermissionSetting.setting
                 updateSitePermissionsSetting(askCameraSetting, askMicSetting, url)
+                fireSettingChangedPixel(PixelValue.CAMERA, askCameraSetting)
             }
             R.string.sitePermissionsSettingsMicrophone -> {
                 askMicSetting = editedPermissionSetting.setting
                 updateSitePermissionsSetting(askCameraSetting, askMicSetting, url)
+                fireSettingChangedPixel(PixelValue.MIC, askMicSetting)
             }
         }
 
@@ -161,6 +169,18 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
         viewModelScope.launch {
             locationPermissionsRepository.savePermission(url, locationPermissionType)
         }
+    }
+
+    private fun fireSettingChangedPixel(permissionParamValue: String, newPermissionSetting: WebsitePermissionSettingType) {
+        val permissionChangedValue = when (newPermissionSetting) {
+            ASK -> PixelValue.ASK
+            DENY -> PixelValue.DENY
+            ALLOW -> PixelValue.ALLOW
+        }
+        pixel.fire(
+            SitePermissionsPixelName.SITE_PERMISSIONS_SETTING_CHANGED,
+            mapOf(PixelParameter.SITE_PERMISSION to permissionParamValue, PixelParameter.VALUE to permissionChangedValue)
+        )
     }
 
     private fun updateSitePermissionsSetting(

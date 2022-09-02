@@ -65,9 +65,9 @@ class ClearPersonalDataAction(
     private val geoLocationPermissions: GeoLocationPermissions,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val adClickManager: AdClickManager,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
-    private val sitePermissionsManager: SitePermissionsManager
+    private val sitePermissionsManager: SitePermissionsManager,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean) {
