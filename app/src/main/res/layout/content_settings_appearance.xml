@@ -30,6 +30,8 @@
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/selectedThemeSetting"
         style="@style/SettingsItemClickable"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="0dp"
@@ -70,6 +72,8 @@
         style="@style/SettingsItemClickable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
         android:paddingStart="0dp"
         android:paddingEnd="0dp"
         app:subtitle="@string/settingsHeroFireAnimation"
