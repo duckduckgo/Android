@@ -39,7 +39,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -74,7 +73,7 @@ class AutomaticDataClearer @Inject constructor(
     private val clearJob: Job = Job()
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + clearJob
+        get() = dispatchers.main() + clearJob
 
     override val dataClearerState: MutableLiveData<ApplicationClearDataState> = MutableLiveData<ApplicationClearDataState>().also {
         it.postValue(INITIALIZING)
@@ -170,7 +169,7 @@ class AutomaticDataClearer @Inject constructor(
                 .setInitialDelay(durationMillis, TimeUnit.MILLISECONDS)
                 .addTag(DataClearingWorker.WORK_REQUEST_TAG)
                 .build()
-            it.enqueue(workRequest)
+            // it.enqueue(workRequest)
             Timber.i(
                 "Work request scheduled, ${durationMillis}ms from now, " +
                     "to clear data if the user hasn't returned to the app. job id: ${workRequest.id}"
