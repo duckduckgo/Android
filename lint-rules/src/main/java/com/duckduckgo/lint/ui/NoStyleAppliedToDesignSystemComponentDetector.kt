@@ -28,9 +28,9 @@ import com.android.tools.lint.detector.api.XmlContext
 import org.w3c.dom.Element
 
 @Suppress("UnstableApiUsage")
-class AndroidButtonUsedInXml : LayoutDetector() {
+class NoStyleAppliedToDesignSystemComponentDetector : LayoutDetector() {
 
-    override fun getApplicableElements() = BUTTON_WIDGETS
+    override fun getApplicableElements() = DESIGN_COMPONENTS
 
     override fun appliesTo(folderType: ResourceFolderType): Boolean {
         return folderType == ResourceFolderType.LAYOUT
@@ -40,37 +40,45 @@ class AndroidButtonUsedInXml : LayoutDetector() {
         context: XmlContext,
         element: Element
     ) {
-        reportUsage(context, element)
+        if (element.hasAttribute("style")) {
+            reportIssue(context, element)
+        }
     }
 
-    private fun reportUsage(
+    private fun reportIssue(
         context: XmlContext,
         element: Element
     ) {
         context.report(
-            issue = ANDROID_BUTTON_IN_XML,
+            issue = STYLE_IN_DESIGN_SYSTEM_COMPONENT,
             location = context.getNameLocation(element),
-            message = ANDROID_BUTTON_IN_XML.getExplanation(TextFormat.RAW)
+            message = STYLE_IN_DESIGN_SYSTEM_COMPONENT.getExplanation(TextFormat.RAW)
         )
     }
 
     companion object {
-        private const val LEGACY_ANDROID_BUTTON = "Button"
-        private const val MATERIAL_BUTTON = "com.google.android.material.button.MaterialButton"
+        private const val BUTTON_PRIMARY_LARGE = "com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge"
+        private const val BUTTON_PRIMARY_SMALL = "com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall"
+        private const val BUTTON_SECONDARY_LARGE = "com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge"
+        private const val BUTTON_SECONDARY_SMALL = "com.duckduckgo.mobile.android.ui.view.button.ButtonSecondarySmall"
+        private const val BUTTON_GHOST_LARGE = "com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge"
+        private const val BUTTON_GHOST_SMALL = "com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall"
 
-        val BUTTON_WIDGETS = listOf(LEGACY_ANDROID_BUTTON, MATERIAL_BUTTON)
-        val ANDROID_BUTTON_IN_XML = Issue
+        val DESIGN_COMPONENTS =
+            listOf(BUTTON_PRIMARY_LARGE, BUTTON_PRIMARY_SMALL, BUTTON_SECONDARY_LARGE, BUTTON_SECONDARY_SMALL, BUTTON_GHOST_LARGE, BUTTON_GHOST_SMALL)
+
+        val STYLE_IN_DESIGN_SYSTEM_COMPONENT = Issue
             .create(
-                id = "AndroidButtonInXml",
-                briefDescription = "Default Android Button Widget used instead of Design System Component",
-                explanation = "Always favor the use of the Design System Component. ButtonPrimaryLarge, ButtonSecondaryLarge, etc...",
+                id = "StyleInDesignSystemComponent",
+                briefDescription = "Design System Components should not be styled.",
+                explanation = "Design System Components should not be styled. Consider creating a new Component or use one of the Components already created",
                 moreInfo = "https://app.asana.com/0/1202857801505092/list",
                 category = CUSTOM_LINT_CHECKS,
                 priority = 10,
                 severity = Severity.ERROR,
                 androidSpecific = true,
                 implementation = Implementation(
-                    AndroidButtonUsedInXml::class.java,
+                    NoStyleAppliedToDesignSystemComponentDetector::class.java,
                     Scope.RESOURCE_FILE_SCOPE
                 )
             )
