@@ -20,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -47,10 +48,10 @@ import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.TOGGLE
 import com.duckduckgo.mobile.android.databinding.ViewSingleLineListItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.SectionDivider
+import com.duckduckgo.mobile.android.ui.view.disable
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
-import kotlinx.android.synthetic.main.view_site_permissions_toggle.view.*
 import kotlinx.coroutines.launch
 
 class SitePermissionsAdapter(
@@ -60,6 +61,7 @@ class SitePermissionsAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var items: List<SitePermissionListItem> = listOf()
+    private var sitesEmpty: Boolean = true
 
     fun updateItems(sites: List<String>, isLocationEnabled: Boolean, isCameraEnabled: Boolean, isMicEnabled: Boolean) {
         val listItems = mutableListOf<SitePermissionListItem>()
@@ -76,6 +78,7 @@ class SitePermissionsAdapter(
             sites.forEach { listItems.add(SiteAllowedItem(it)) }
         }
         items = listItems
+        sitesEmpty = sites.isEmpty()
         notifyDataSetChanged()
     }
 
@@ -109,7 +112,7 @@ class SitePermissionsAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
-            is SitePermissionsHeader -> (holder as SitePermissionsHeaderViewHolder).bind(item.title)
+            is SitePermissionsHeader -> (holder as SitePermissionsHeaderViewHolder).bind(item.title, sitesEmpty)
             is SitePermissionToggle -> (holder as SitePermissionToggleViewHolder).bind(item) { _, isChecked ->
                 viewModel.permissionToggleSelected(isChecked, item.text)
             }
@@ -134,12 +137,12 @@ class SitePermissionsAdapter(
         private val layoutInflater: LayoutInflater,
         private val viewModel: SitePermissionsViewModel
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(title: Int) {
+        fun bind(title: Int, isListEmpty: Boolean) {
             when (title) {
                 R.string.sitePermissionsSettingsAllowedSitesTitle -> {
                     binding.overflowMenu.apply {
                         show()
-                        setOnClickListener { showOverflowMenu() }
+                        setOnClickListener { showOverflowMenu(isListEmpty) }
                     }
                 }
                 else -> binding.overflowMenu.gone()
@@ -147,13 +150,14 @@ class SitePermissionsAdapter(
             binding.sitePermissionsSectionTitle.setText(title)
         }
 
-        private fun showOverflowMenu() {
+        private fun showOverflowMenu(removeDisabled: Boolean) {
             val popupMenu = PopupMenu(layoutInflater, layout.popup_window_remove_all_menu)
-            val view = popupMenu.contentView
+            val menuItem = popupMenu.contentView.findViewById<TextView>(R.id.removeAll)
+            if (removeDisabled) menuItem.disable()
             popupMenu.apply {
-                onMenuItemClicked(view.findViewById(R.id.removeAll)) { viewModel.removeAllSitesSelected() }
+                onMenuItemClicked(menuItem) { viewModel.removeAllSitesSelected() }
+                show(binding.root, binding.overflowMenu)
             }
-            popupMenu.show(binding.root, binding.overflowMenu)
         }
     }
 

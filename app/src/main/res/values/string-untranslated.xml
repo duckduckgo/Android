@@ -24,10 +24,12 @@
     <string name="sitePermissionsSettingsCamera">Camera</string>
     <string name="sitePermissionsSettingsMicrophone">Microphone</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Manage Sites</string>
+    <string name="sitePermissionsSettingsEmptyText">No sites yet</string>
     <string name="permissionPerWebsiteText">Permissions for \"%s\" </string>
     <string name="permissionsPerWebsiteAskSetting">Ask</string>
     <string name="permissionsPerWebsiteDenySetting">Deny</string>
     <string name="permissionsPerWebsiteAllowSetting">Allow</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%s permission for %s</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction">View</string>

@@ -37,7 +37,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.item_autocomplete_bookmark_suggestion.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -93,7 +92,6 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
         removedLocationPermissions: List<LocationPermissionEntity>
     ) {
         val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteRemoveAllConfirmation), HtmlCompat.FROM_HTML_MODE_LEGACY)
-        viewModel.removeAllSitesSelected()
         Snackbar.make(
             binding.root,
             message,

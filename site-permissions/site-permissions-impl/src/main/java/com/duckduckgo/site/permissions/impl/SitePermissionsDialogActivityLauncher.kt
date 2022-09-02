@@ -23,16 +23,20 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.webkit.PermissionRequest
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
+import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.impl.R.layout
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesBinding(ActivityScope::class)
@@ -40,7 +44,9 @@ import javax.inject.Inject
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
     private val sitePermissionsRepository: SitePermissionsRepository,
-    private val appCoroutineScope: CoroutineScope
+    private val faviconManager: FaviconManager,
+    private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
@@ -91,6 +97,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         val view: View = LayoutInflater.from(context).inflate(layout.dialog_site_permissions, null)
         val title = view.findViewById<TextView>(R.id.sitePermissionsDialogTitle)
         title.text = String.format(context.getString(titleRes), url.websiteFromGeoLocationsApiOrigin())
+        val favicon = view.findViewById<ImageView>(R.id.sitePermissionDialogFavicon)
+        appCoroutineScope.launch(dispatcherProvider.main()) {
+            faviconManager.loadToViewFromLocalOrFallback(tabId, url, favicon)
+        }
         dialog.setView(view)
         dialog.apply {
             setPositiveButton(R.string.sitePermissionsDialogAllowButton) { dialog, _ ->

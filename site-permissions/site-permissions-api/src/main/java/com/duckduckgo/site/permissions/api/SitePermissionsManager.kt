@@ -21,4 +21,6 @@ interface SitePermissionsManager {
     suspend fun getSitePermissionsGranted(url: String, tabId: String, resources: Array<String>): Array<String>
 
     suspend fun getSitePermissionsAllowedToAsk(url: String, resources: Array<String>): Array<String>
+
+    suspend fun clearAllButFireproof(fireproofWebsites: List<String>)
 }

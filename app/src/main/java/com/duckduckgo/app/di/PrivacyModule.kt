@@ -21,8 +21,11 @@ import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.*
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
@@ -40,6 +43,10 @@ import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.impl.SitePermissionsManagerImp
+import com.duckduckgo.site.permissions.impl.SitePermissionsRepositoryImpl
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
@@ -75,7 +82,9 @@ object PrivacyModule {
         appCacheClearer: AppCacheClearer,
         geoLocationPermissions: GeoLocationPermissions,
         thirdPartyCookieManager: ThirdPartyCookieManager,
-        adClickManager: AdClickManager
+        adClickManager: AdClickManager,
+        fireproofWebsiteRepository: FireproofWebsiteRepository,
+        sitePermissionsManager: SitePermissionsManager
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -87,7 +96,9 @@ object PrivacyModule {
             appCacheClearer,
             geoLocationPermissions,
             thirdPartyCookieManager,
-            adClickManager
+            adClickManager,
+            fireproofWebsiteRepository,
+            sitePermissionsManager
         )
     }
 
@@ -121,5 +132,20 @@ object PrivacyModule {
         dispatcherProvider: DispatcherProvider
     ): GeoLocationPermissions {
         return GeoLocationPermissionsManager(context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun fireproofWebsiteRepository(
+        fireproofWebsiteDao: FireproofWebsiteDao,
+        dispatchers: DispatcherProvider,
+        faviconManager: Lazy<FaviconManager>
+    ): FireproofWebsiteRepositoryAPI {
+        return FireproofWebsiteRepository(fireproofWebsiteDao, dispatchers, faviconManager)
+    }
+
+    @Provides
+    fun providesSitePermissionsManager(sitePermissionsRepository: SitePermissionsRepositoryImpl): SitePermissionsManager {
+        return SitePermissionsManagerImp(sitePermissionsRepository)
     }
 }

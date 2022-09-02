@@ -17,14 +17,11 @@
 package com.duckduckgo.site.permissions.impl
 
 import android.webkit.PermissionRequest
-import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
-import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-@ContributesBinding(ActivityScope::class)
 class SitePermissionsManagerImpl @Inject constructor(
-    private val sitePermissionsRepository: SitePermissionsRepository
+    private val sitePermissionsRepository: SitePermissionsRepositoryImpl
 ) : SitePermissionsManager {
 
     override suspend fun getSitePermissionsGranted(url: String, tabId: String, resources: Array<String>): Array<String> =
@@ -37,6 +34,17 @@ class SitePermissionsManagerImpl @Inject constructor(
             .filter { isPermissionSupported(it) }
             .filter { sitePermissionsRepository.isDomainAllowedToAsk(url, it) }
             .toTypedArray()
+
+    override suspend fun clearAllButFireproof(fireproofWebsites: List<String>) {
+        sitePermissionsRepository.askCameraEnabled = true
+        sitePermissionsRepository.askMicEnabled = true
+
+        sitePermissionsRepository.sitePermissionsForAllWebsites().forEach { permission ->
+            if (!fireproofWebsites.contains(permission.domain)) {
+                sitePermissionsRepository.deletePermissionsForSite(permission.domain)
+            }
+        }
+    }
 
     private fun isPermissionSupported(permission: String): Boolean =
         permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE || permission == PermissionRequest.RESOURCE_VIDEO_CAPTURE

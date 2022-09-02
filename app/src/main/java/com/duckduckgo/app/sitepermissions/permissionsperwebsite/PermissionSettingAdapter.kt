@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemSitePermissionSettingSelectionBinding
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionSettingAdapter.ViewHolder
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
+import java.io.Serializable
 
 class PermissionSettingAdapter(private val viewModel: PermissionsPerWebsiteViewModel) : RecyclerView.Adapter<ViewHolder>() {
 
@@ -64,7 +65,7 @@ data class WebsitePermissionSetting(
     val icon: Int,
     val title: Int,
     val setting: WebsitePermissionSettingType
-)
+) : Serializable
 
 enum class WebsitePermissionSettingType {
     ASK, ALLOW, DENY;
@@ -74,6 +75,13 @@ enum class WebsitePermissionSettingType {
             ASK -> R.string.permissionsPerWebsiteAskSetting
             ALLOW -> R.string.permissionsPerWebsiteAllowSetting
             DENY -> R.string.permissionsPerWebsiteDenySetting
+        }
+
+    fun toSitePermissionSettingEntityType(): SitePermissionAskSettingType =
+        when (this) {
+            ASK -> SitePermissionAskSettingType.ASK_EVERY_TIME
+            ALLOW -> SitePermissionAskSettingType.ALLOW_ALWAYS
+            DENY -> SitePermissionAskSettingType.DENY_ALWAYS
         }
 
     companion object {

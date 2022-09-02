@@ -41,9 +41,12 @@ interface SitePermissionsRepository {
     fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
     fun sitePermissionGranted(url: String, tabId: String, permission: String)
     fun sitePermissionsWebsitesFlow(): Flow<List<SitePermissionsEntity>>
+    fun sitePermissionsForAllWebsites(): List<SitePermissionsEntity>
     suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>)
     suspend fun deleteAll()
     suspend fun getSitePermissionsForWebsite(url: String): SitePermissionsEntity?
+    suspend fun deletePermissionsForSite(url: String)
+    suspend fun savePermission(sitePermissionsEntity: SitePermissionsEntity)
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -121,9 +124,15 @@ class SitePermissionsRepositoryImpl @Inject constructor(
         return sitePermissionsDao.getAllSitesPermissionsAsFlow()
     }
 
+    override fun sitePermissionsForAllWebsites(): List<SitePermissionsEntity> {
+        return sitePermissionsDao.getAllSitesPermissions()
+    }
+
     override suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>) {
-        sitePermissions.forEach { entity ->
-            sitePermissionsDao.insert(entity)
+        withContext(dispatcherProvider.io()) {
+            sitePermissions.forEach { entity ->
+                sitePermissionsDao.insert(entity)
+            }
         }
     }
     override suspend fun deleteAll() {
@@ -133,6 +142,19 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     override suspend fun getSitePermissionsForWebsite(url: String): SitePermissionsEntity? {
         return withContext(dispatcherProvider.io()) {
             sitePermissionsDao.getSitePermissionsByDomain(url)
+        }
+    }
+
+    override suspend fun deletePermissionsForSite(url: String) {
+        return withContext(dispatcherProvider.io()) {
+            val entity = sitePermissionsDao.getSitePermissionsByDomain(url)
+            entity?.let { sitePermissionsDao.delete(it) }
+        }
+    }
+
+    override suspend fun savePermission(sitePermissionsEntity: SitePermissionsEntity) {
+        withContext(dispatcherProvider.io()) {
+            sitePermissionsDao.insert(sitePermissionsEntity)
         }
     }
 }

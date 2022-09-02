@@ -28,11 +28,13 @@ import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -63,7 +65,9 @@ class ClearPersonalDataAction(
     private val geoLocationPermissions: GeoLocationPermissions,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val adClickManager: AdClickManager,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
+    private val sitePermissionsManager: SitePermissionsManager
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean) {
@@ -81,8 +85,10 @@ class ClearPersonalDataAction(
         shouldFireDataClearPixel: Boolean
     ) {
         withContext(Dispatchers.IO) {
+            val fireproofWebsites = fireproofWebsiteRepository.getFireproofWebsites().value?.map { it.domain } ?: listOf()
             cookieManager.flush()
             geoLocationPermissions.clearAllButFireproofed()
+            sitePermissionsManager.clearAllButFireproof(fireproofWebsites)
             thirdPartyCookieManager.clearAllData()
             clearTabsAsync(appInForeground)
         }

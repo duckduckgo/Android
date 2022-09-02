@@ -28,6 +28,7 @@ dependencies {
     implementation project(path: ':common')
     implementation project(path: ':common-ui')
     implementation project(path: ':di')
+    implementation project(path: ':browser-api')
     implementation project(path: ':site-permissions-api')
     api project(path: ':site-permissions-store')
 

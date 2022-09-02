@@ -19,7 +19,8 @@ package com.duckduckgo.app.sitepermissions.permissionsperwebsite
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import android.view.Menu
+import android.view.MenuItem
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,6 +30,7 @@ import com.duckduckgo.app.browser.databinding.ActivityPermissionPerWebsiteBindin
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command
+import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -36,7 +38,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
-class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
+class PermissionsPerWebsiteActivity : DuckDuckGoActivity(), PermissionsSettingsSelectorFragment.Listener {
 
     private val viewModel: PermissionsPerWebsiteViewModel by bindViewModel()
     private val binding: ActivityPermissionPerWebsiteBinding by viewBinding()
@@ -52,6 +54,21 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
         setViews()
         observeViewModel()
         viewModel.websitePermissionSettings(url)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_permissions_per_website_activity, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.remove -> {
+                viewModel.removeWebsitePermissionsSettings(url)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setViews() {
@@ -79,6 +96,7 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is ShowPermissionSettingSelectionDialog -> showPermissionSettingSelectionDialog(command.setting)
+            is GoBackToSitePermissions -> finish()
         }
     }
 
@@ -87,11 +105,13 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
     }
 
     private fun showPermissionSettingSelectionDialog(setting: WebsitePermissionSetting) {
-        Toast.makeText(this, getString(setting.title), Toast.LENGTH_SHORT).show()
+        val dialog = PermissionsSettingsSelectorFragment.create(setting, url.websiteFromGeoLocationsApiOrigin())
+        dialog.show(supportFragmentManager, PERMISSIONS_SETTING_SELECTOR_DIALOG_TAG)
     }
 
     companion object {
         private const val EXTRA_URL = "URL"
+        private const val PERMISSIONS_SETTING_SELECTOR_DIALOG_TAG = "PERMISSIONS_SETTING_SELECTOR_DIALOG_TAG"
 
         fun intent(context: Context, url: String): Intent {
             val intent = Intent(context, PermissionsPerWebsiteActivity::class.java)
@@ -100,4 +120,7 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onPermissionSettingSelected(websitePermissionSetting: WebsitePermissionSetting) {
+        viewModel.onPermissionSettingSelected(websitePermissionSetting, url)
+    }
 }

@@ -25,12 +25,21 @@ import dagger.Lazy
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+interface FireproofWebsiteRepositoryAPI {
+    suspend fun fireproofWebsite(domain: String): FireproofWebsiteEntity?
+    fun getFireproofWebsites(): LiveData<List<FireproofWebsiteEntity>>
+    fun isDomainFireproofed(domain: String): Boolean
+    suspend fun removeFireproofWebsite(fireproofWebsiteEntity: FireproofWebsiteEntity)
+    suspend fun fireproofWebsitesCountByDomain(domain: String): Int
+    suspend fun removeAllFireproofWebsites()
+}
+
 class FireproofWebsiteRepository @Inject constructor(
     private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val dispatchers: DispatcherProvider,
     private val faviconManager: Lazy<FaviconManager>
-) {
-    suspend fun fireproofWebsite(domain: String): FireproofWebsiteEntity? {
+) : FireproofWebsiteRepositoryAPI {
+    override suspend fun fireproofWebsite(domain: String): FireproofWebsiteEntity? {
         if (!UriString.isValidDomain(domain)) return null
 
         val fireproofWebsiteEntity = FireproofWebsiteEntity(domain = domain)
@@ -45,29 +54,29 @@ class FireproofWebsiteRepository @Inject constructor(
         }
     }
 
-    fun getFireproofWebsites(): LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteDao.fireproofWebsitesEntities()
+    override fun getFireproofWebsites(): LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteDao.fireproofWebsitesEntities()
 
-    fun isDomainFireproofed(domain: String): Boolean {
+    override fun isDomainFireproofed(domain: String): Boolean {
         val uri = Uri.parse(domain)
         val host = uri.host ?: return false
 
         return fireproofWebsiteDao.getFireproofWebsiteSync(host) != null
     }
 
-    suspend fun removeFireproofWebsite(fireproofWebsiteEntity: FireproofWebsiteEntity) {
+    override suspend fun removeFireproofWebsite(fireproofWebsiteEntity: FireproofWebsiteEntity) {
         withContext(dispatchers.io()) {
             faviconManager.get().deletePersistedFavicon(fireproofWebsiteEntity.domain)
             fireproofWebsiteDao.delete(fireproofWebsiteEntity)
         }
     }
 
-    suspend fun fireproofWebsitesCountByDomain(domain: String): Int {
+    override suspend fun fireproofWebsitesCountByDomain(domain: String): Int {
         return withContext(dispatchers.io()) {
             fireproofWebsiteDao.fireproofWebsitesCountByDomain(domain)
         }
     }
 
-    suspend fun removeAllFireproofWebsites() {
+    override suspend fun removeAllFireproofWebsites() {
         withContext(dispatchers.io()) {
             fireproofWebsiteDao.deleteAll()
         }
