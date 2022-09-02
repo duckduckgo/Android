@@ -1,6 +1,6 @@
 package com.duckduckgo.site.permissions.api
 
-import android.content.Context
+import android.app.Activity
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
 
@@ -9,5 +9,5 @@ interface SitePermissionsDialogLauncher {
 
     fun registerPermissionLauncher(caller: ActivityResultCaller)
 
-    fun askForSitePermission(context: Context, url: String, tabId: String, permissionsRequested: Array<String>, request: PermissionRequest)
+    fun askForSitePermission(activity: Activity, url: String, tabId: String, permissionsRequested: Array<String>, request: PermissionRequest)
 }

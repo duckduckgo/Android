@@ -17,15 +17,17 @@
 package com.duckduckgo.site.permissions.impl
 
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.PermissionRequest
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -33,6 +35,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.impl.R.layout
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -50,7 +53,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
-    private lateinit var context: Context
+    private lateinit var activity: Activity
     private lateinit var permissionRequested: SitePermissionsRequestedType
     private var siteURL: String = ""
     private var tabId: String = ""
@@ -64,7 +67,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     override fun askForSitePermission(
-        context: Context,
+        activity: Activity,
         url: String,
         tabId: String,
         permissionsRequested: Array<String>,
@@ -73,7 +76,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         sitePermissionRequest = request
         siteURL = url
         this.tabId = tabId
-        this.context = context
+        this.activity = activity
 
         when {
             permissionsRequested.size == 2 -> {
@@ -93,22 +96,18 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         url: String,
         onPermissionAllowed: () -> Unit
     ) {
-        val dialog = AlertDialog.Builder(context)
-        val view: View = LayoutInflater.from(context).inflate(layout.dialog_site_permissions, null)
+        val dialog = AlertDialog.Builder(activity)
+        val view: View = LayoutInflater.from(activity).inflate(layout.dialog_site_permissions, null)
         val title = view.findViewById<TextView>(R.id.sitePermissionsDialogTitle)
-        title.text = String.format(context.getString(titleRes), url.websiteFromGeoLocationsApiOrigin())
+        title.text = String.format(activity.getString(titleRes), url.websiteFromGeoLocationsApiOrigin())
         val favicon = view.findViewById<ImageView>(R.id.sitePermissionDialogFavicon)
         appCoroutineScope.launch(dispatcherProvider.main()) {
             faviconManager.loadToViewFromLocalOrFallback(tabId, url, favicon)
         }
-        dialog.setView(view)
         dialog.apply {
-            setPositiveButton(R.string.sitePermissionsDialogAllowButton) { dialog, _ ->
-                onPermissionAllowed()
-            }
-            setNegativeButton(R.string.sitePermissionsDialogDenyButton) { dialog, _ ->
-                Toast.makeText(context, "Deny", Toast.LENGTH_SHORT).show()
-            }
+            setView(view)
+            setPositiveButton(R.string.sitePermissionsDialogAllowButton) { dialog, _ -> onPermissionAllowed() }
+            setNegativeButton(R.string.sitePermissionsDialogDenyButton) { _, _ -> }
             show()
         }
     }
@@ -117,7 +116,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         permissionRequested = SitePermissionsRequestedType.CAMERA_AND_AUDIO
         when {
             systemPermissionsHelper.hasMicPermissionsGranted() && systemPermissionsHelper.hasCameraPermissionsGranted() -> {
-                systemPermissionGranted(SitePermissionsRequestedType.CAMERA_AND_AUDIO)
+                systemPermissionGranted()
             }
             systemPermissionsHelper.hasMicPermissionsGranted() -> {
                 systemPermissionsHelper.requestPermission(Manifest.permission.CAMERA)
@@ -145,7 +144,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private fun askForMicPermissions() {
         permissionRequested = SitePermissionsRequestedType.AUDIO
         if (systemPermissionsHelper.hasMicPermissionsGranted()) {
-            systemPermissionGranted(SitePermissionsRequestedType.AUDIO)
+            systemPermissionGranted()
         } else {
             systemPermissionsHelper.requestMultiplePermissions(arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.MODIFY_AUDIO_SETTINGS))
         }
@@ -154,7 +153,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private fun askForCameraPermissions() {
         permissionRequested = SitePermissionsRequestedType.CAMERA
         if (systemPermissionsHelper.hasCameraPermissionsGranted()) {
-            systemPermissionGranted(SitePermissionsRequestedType.CAMERA)
+            systemPermissionGranted()
         } else {
             systemPermissionsHelper.requestPermission(Manifest.permission.CAMERA)
         }
@@ -162,21 +161,21 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     private fun onResultSystemPermissionRequest(granted: Boolean) {
         when (granted) {
-            true -> systemPermissionGranted(permissionRequested)
-            false -> systemPermissionDenied(permissionRequested)
+            true -> systemPermissionGranted()
+            false -> systemPermissionDenied()
         }
     }
 
     private fun onResultMultipleSystemPermissionsRequest(grantedPermissions: Map<String, Boolean>) {
         if (grantedPermissions.values.contains(false)) {
-            systemPermissionDenied(permissionRequested)
+            systemPermissionDenied()
         } else {
-            systemPermissionGranted(permissionRequested)
+            systemPermissionGranted()
         }
     }
 
-    private fun systemPermissionGranted(permissionType: SitePermissionsRequestedType) {
-        when (permissionType) {
+    private fun systemPermissionGranted() {
+        when (permissionRequested) {
             SitePermissionsRequestedType.CAMERA -> {
                 sitePermissionRequest.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
                 sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
@@ -193,15 +192,47 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         }
     }
 
-    private fun systemPermissionDenied(permissionType: SitePermissionsRequestedType) {
-        // TODO show correct snackbar
+    private fun systemPermissionDenied() {
         val message =
-            when (permissionType) {
-                SitePermissionsRequestedType.CAMERA -> "Camera denied"
-                SitePermissionsRequestedType.AUDIO -> "Audio denied"
-                SitePermissionsRequestedType.CAMERA_AND_AUDIO -> "Audio and camera denied"
+            when (permissionRequested) {
+                SitePermissionsRequestedType.CAMERA -> R.string.sitePermissionsCameraDeniedSnackBarMessage
+                SitePermissionsRequestedType.AUDIO -> R.string.sitePermissionsMicDeniedSnackBarMessage
+                SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.sitePermissionsCameraAndMicDeniedSnackBarMessage
             }
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        val view = activity.findViewById<ViewGroup>(android.R.id.content).rootView
+        Snackbar.make(
+            view,
+            message,
+            Snackbar.LENGTH_LONG
+        ).setAction(R.string.sitePermissionsDeniedSnackBarAction) {
+            showSystemPermissionsDeniedDialog()
+        }.show()
+    }
+
+    private fun showSystemPermissionsDeniedDialog() {
+        val titleRes = when (permissionRequested) {
+            SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedTitle
+            SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedTitle
+            SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedTitle
+        }
+        val contentRes = when (permissionRequested) {
+            SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedContent
+            SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedContent
+            SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedContent
+        }
+        AlertDialog.Builder(activity).apply {
+            setTitle(titleRes)
+            setMessage(contentRes)
+            setPositiveButton(R.string.systemPermissionsDeniedDialogPositiveButton) { dialog, _ ->
+                val intent = Intent()
+                intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                val uri = Uri.fromParts("package", activity.packageName, null)
+                intent.data = uri
+                context.startActivity(intent)
+            }
+            setNegativeButton(R.string.systemPermissionsDeniedDialogNegativeButton) { _, _ -> }
+            show()
+        }
     }
 }
 

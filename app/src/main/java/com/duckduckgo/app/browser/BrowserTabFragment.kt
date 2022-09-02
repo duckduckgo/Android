@@ -3022,7 +3022,7 @@ class BrowserTabFragment :
     }
 
     private fun showSitePermissionsDialog(permissionsToRequest: Array<String>, request: PermissionRequest) {
-        context?.let {
+        activity?.let {
             sitePermissionsDialogLauncher.askForSitePermission(it, webView?.url.orEmpty(), tabId, permissionsToRequest, request)
         }
     }

@@ -21,4 +21,16 @@
     <string name="sitePermissionsDialogContent">Manage granted permissions in settings</string>
     <string name="sitePermissionsDialogDenyButton">Deny</string>
     <string name="sitePermissionsDialogAllowButton">Allow</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Allow DuckDuckGo to ask for camera and microphone access</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Allow DuckDuckGo to ask for camera access</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Allow DuckDuckGo to ask for microphone access</string>
+    <string name="sitePermissionsDeniedSnackBarAction">Allow</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Allow DuckDuckGo to ask for camera access on this device</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Sites can only use your camera if you allow DuckDuckGo to ask for access.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Allow DuckDuckGo to ask for microphone access on this device</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Sites can only use your microphone if you allow DuckDuckGo to ask for access.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Allow DuckDuckGo to ask for camera and microphone access on this device</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Sites can only use your camera and microphone if you allow DuckDuckGo to ask for access.</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Open settings</string>
+    <string name="systemPermissionsDeniedDialogNegativeButton">Cancel</string>
 </resources>
