@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.lint
+package com.duckduckgo.lint.ui
 
 import com.android.tools.lint.checks.infrastructure.TestFiles
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
-import com.duckduckgo.lint.ui.AndroidButtonUsedInXml
 import org.junit.Test
 
 @Suppress("UnstableApiUsage")
-class AndroidButtonUsedInXmlTest {
+class DeprecatedAndroidButtonUsedInXmlDetectorTest {
     @Test
     fun whenAndroidButtonFoundThenFailWithError() {
         lint()
@@ -58,7 +57,7 @@ class AndroidButtonUsedInXmlTest {
             """
                 ).indented()
             )
-            .issues(AndroidButtonUsedInXml.ANDROID_BUTTON_IN_XML)
+            .issues(DeprecatedAndroidButtonUsedInXmlDetector.DEPRECATED_BUTTON_IN_XML)
             .run()
             .expect(
                 """
@@ -106,7 +105,7 @@ class AndroidButtonUsedInXmlTest {
                 ).indented()
             )
             .allowCompilationErrors()
-            .issues(AndroidButtonUsedInXml.ANDROID_BUTTON_IN_XML)
+            .issues(DeprecatedAndroidButtonUsedInXmlDetector.DEPRECATED_BUTTON_IN_XML)
             .run()
             .expectClean()
     }
