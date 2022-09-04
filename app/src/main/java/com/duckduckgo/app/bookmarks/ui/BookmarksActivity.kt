@@ -42,7 +42,7 @@ import com.duckduckgo.app.browser.databinding.ContentBookmarksBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.DividerAdapter
-import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.mobile.android.ui.view.SearchBar
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
@@ -353,6 +353,21 @@ class BookmarksActivity : DuckDuckGoActivity() {
         val dialog = DeleteBookmarkFolderConfirmationFragment.instance(bookmarkFolder)
         dialog.show(supportFragmentManager, DELETE_BOOKMARK_FOLDER_FRAGMENT_TAG)
         dialog.listener = viewModel
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        with(supportFragmentManager) {
+            findFragmentByTag(EDIT_BOOKMARK_FRAGMENT_TAG)?.let { dialog ->
+                (dialog as EditSavedSiteDialogFragment).listener = viewModel
+            }
+            findFragmentByTag(ADD_BOOKMARK_FOLDER_FRAGMENT_TAG)?.let { dialog ->
+                (dialog as AddBookmarkFolderDialogFragment).listener = viewModel
+            }
+            findFragmentByTag(EDIT_BOOKMARK_FOLDER_FRAGMENT_TAG)?.let { dialog ->
+                (dialog as EditBookmarkFolderDialogFragment).listener = viewModel
+            }
+        }
     }
 
     override fun onDestroy() {

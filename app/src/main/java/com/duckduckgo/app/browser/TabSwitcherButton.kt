@@ -57,7 +57,7 @@ class TabSwitcherButton @JvmOverloads constructor(
 
     private fun fadeOutCount(callback: () -> Unit) {
         val listener = object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 // otherwise on end keeps being called repeatedly
                 binding.tabCount.animate().setListener(null)
                 callback()

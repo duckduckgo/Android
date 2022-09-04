@@ -510,11 +510,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Conexiunea a fost anulată. Acest site web ar putea dăuna dispozitivului tău.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Managerul descărcărilor este dezactivat</string>
-    <string name="downloadManagerIncompatible">Managerul descărcărilor nu este disponibil pe acest dispozitiv</string>
-    <string name="enable">Activare</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Activezi locația dispozitivului pentru browserul de confidențialitate DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s solicită locația dispozitivului tău. Mai întâi va trebui să permiți aplicației să trimită locația dispozitivului, apoi %2$s poate cere permisiunea.</string>
@@ -546,7 +541,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href="">Află mai multe</a><u/>]]>
+        <![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href=\"\">Află mai multe</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -572,52 +567,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blochează modulele cookie de urmărire pentru e-mail și îți ascunde adresa</string>
     <string name="newEmailAliasMenuTitle">Creează adresa Duck</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Elimini protecțiile comunicațiilor prin e-mail?</string>
-    <string name="emailSignOutDialogText">Notă: eliminarea protecțiilor comunicațiilor prin e-mail de pe acest dispozitiv nu va șterge adresa Duck.</string>
-    <string name="emailSignOutDialogCancel">Anulare</string>
-    <string name="emailSignOutDialogDisable">Elimină</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Trimite prin e-mail lista de așteptare</string>
-    <string name="waitlistNotificationTitle">Protecția pentru e-mail este pregătită!</string>
-    <string name="waitlistNotificationDescription">Deschide invitația ta</string>
-
     <string name="waitlistNotificationDialogDescription">Dorești să îți trimitem o notificare când este rândul tău?</string>
     <string name="waitlistNotificationDialogNoThanks">Nu, mulțumesc</string>
     <string name="waitlistNotificationDialogNotifyMe">DORESC SĂ PRIMESC NOTIFICĂRI</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Protecția comunicațiilor prin e-mail (beta)</string>
     <string name="emailProtectionActivityTitle">Protecția comunicațiilor prin e-mail (beta)</string>
-    <string name="emailProtectionFooterDescription">Nu va trebui să comunici informații personale pentru a te înscrie pe lista de așteptare. Îți vei asigura locul la coadă, folosind o marcă de timp care există numai pe dispozitivul tău, astfel încât să te putem înștiința când ți-a sosit rândul.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">A apărut o eroare la aderarea la lista de așteptare, încearcă din nou mai târziu</string>
-    <string name="emailProtectionDuckAddressCta">Am deja o adresă Duck</string>
-    <string name="emailProtectionInviteCodeCta">Am un cod de invitație</string>
-    <string name="emailProtectionWaitlistCta">Alătură-te listei de așteptare private</string>
-    <string name="emailProtectionGetStartedCta">Să începem</string>
     <string name="emailNotSupported">Dispozitivul nu este acceptat</string>
     <string name="emailNotSupportedExplanation">Protecția pentru e-mail îți permite să creezi adrese de e-mail private care elimină tehnologiile de urmărire prin e-mail. Trebuie să criptăm și să stocăm aceste adrese pe care le-ai creat local, pe dispozitivul tău. Din cauza faptului că dispozitivul tău nu acceptă stocarea criptată, protecția pentru e-mail este indisponibilă.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Confidențialitatea e-mailurilor, simplificată.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, fără a schimba furnizorul de e-mail. <a href=""><b>Află mai multe</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Ești pe listă!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Îți vom trimite o notificare când<br/> protecția comunicațiilor prin e-mail este pregătită pentru tine. <a href=""><b>Află mai multe</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Invitația ta va apărea aici când vom fi pregătiți pentru tine. Dorești să <a href=""><b>primești o notificare</b></a> când ajunge?<br/><a href=""><b>Află mai multe</b></a> despre protecția comunicațiilor prin e-mail.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Ești invitat!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, fără a schimba furnizorul de e-mail. <a href=""><b>Află mai multe</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Adresa Duck personală</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Eliminarea protecției comunicațiilor prin e-mail de pe acest dispozitiv elimină opțiunea de a completa adresa personală Duck sau o adresă Duck privată, recent generată în câmpurile de e-mail în timp ce navighezi pe web.<br/><br/>Pentru a șterge complet adresele Duck sau pentru orice alte întrebări sau feedback, contactează-ne la <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Elimină de pe dispozitiv</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Editare marcaj</string>
@@ -687,5 +645,14 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blochează tehnologiile de urmărire pe dispozitivul tău</string>
     <string name="atp_SettingsDeviceShieldEnabled">Activat</string>
     <string name="atp_SettingsDeviceShieldDisabled">Dezactivat</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Se pare că acest site are o fereastră pop-up de solicitare a consimțământului cu privire la modulele cookie👇</string>
+    <string name="autoconsentDialogDescription">Vrei să mă ocup de asta pentru tine? Pot să încerc să minimizez numărul de module cookie, să maximizez confidențialitatea și să ascund ferestrele pop-up precum aceasta.</string>
+    <string name="autoconsentPrimaryCta">Gestionează ferestrele pop-up cu privire la modulele cookie</string>
+    <string name="autoconsentSecondaryCta">Nu, mulțumesc</string>
+
+    <string name="autoconsentSetting">Gestionează ferestrele pop-up cu privire la modulele cookie</string>
+    <string name="autoconsentAnimationText">Cookie-uri Gestionate</string>
 
 </resources>

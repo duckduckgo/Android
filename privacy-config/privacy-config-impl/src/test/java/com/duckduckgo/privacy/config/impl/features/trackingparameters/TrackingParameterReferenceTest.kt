@@ -22,7 +22,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackingParameterException
 import com.duckduckgo.privacy.config.api.TrackingParameters
-import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -52,7 +52,7 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
         mockTrackingParameters()
         testee = RealTrackingParameters(mockRepository, mockFeatureToggle, mockUnprotectedTemporary, mockUserWhiteListRepository)
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingParametersFeatureName, true)).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingParametersFeatureName.value, true)).thenReturn(true)
     }
 
     companion object {

@@ -39,6 +39,9 @@ object DaoModule {
     fun providesTdsDomainEntityDao(database: AppDatabase) = database.tdsDomainEntityDao()
 
     @Provides
+    fun providesTdsCnameEntityDao(database: AppDatabase) = database.tdsCnameEntityDao()
+
+    @Provides
     fun providesUserWhitelist(database: AppDatabase) = database.userWhitelistDao()
 
     @Provides

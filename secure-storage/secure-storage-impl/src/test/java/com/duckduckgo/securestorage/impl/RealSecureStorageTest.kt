@@ -16,6 +16,7 @@
 
 package com.duckduckgo.securestorage.impl
 
+import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
@@ -27,6 +28,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -35,23 +38,30 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class RealSecureStorageTest {
     private lateinit var testee: RealSecureStorage
+
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
+
     @Mock
     private lateinit var secureStorageRepository: SecureStorageRepository
+
     @Mock
     private lateinit var l2DataTransformer: L2DataTransformer
     private val testCredentials = WebsiteLoginDetailsWithCredentials(
         details = WebsiteLoginDetails(
             domain = "test.com",
             username = "user@test.com",
-            id = 1
+            id = 1,
+            domainTitle = "test",
+            notes = "notes",
+            lastUpdatedMillis = 1000L
         ),
         password = expectedDecryptedData
     )
@@ -61,7 +71,10 @@ class RealSecureStorageTest {
         domain = "test.com",
         username = "user@test.com",
         password = expectedEncryptedData,
-        iv = expectedEncryptedIv
+        iv = expectedEncryptedIv,
+        notes = "notes",
+        domainTitle = "test",
+        lastUpdatedInMillis = 1000L
     )
 
     @Before
@@ -71,7 +84,13 @@ class RealSecureStorageTest {
         whenever(l2DataTransformer.encrypt(any())).thenReturn(
             EncryptedString(expectedEncryptedData, expectedEncryptedIv)
         )
-        testee = RealSecureStorage(secureStorageRepository, coroutineRule.testDispatcherProvider, l2DataTransformer)
+        testee = RealSecureStorage(
+            object : SecureStorageRepository.Factory {
+                override fun get(): SecureStorageRepository = secureStorageRepository
+            },
+            coroutineRule.testDispatcherProvider,
+            l2DataTransformer
+        )
     }
 
     @Test
@@ -153,6 +172,93 @@ class RealSecureStorageTest {
         val result = testee.websiteLoginDetailsWithCredentialsForDomain("test.com").first()
 
         assertEquals(listOf(testCredentials), result)
+    }
+
+    @Test
+    fun whenNoSecureStorageRepositoryThenCanAccessSecureStorageFalse() {
+        setUpNoSecureStorageRepository()
+
+        assertFalse(testee.canAccessSecureStorage())
+    }
+
+    @Test
+    fun whenNoSecureStorageRepositoryAddCredentialsThenDoNothing() = runTest {
+        setUpNoSecureStorageRepository()
+
+        testee.addWebsiteLoginDetailsWithCredentials(testCredentials)
+
+        verifyNoInteractions(secureStorageRepository)
+    }
+
+    @Test
+    fun whenNoSecureStorageRepositoryGetCredentialsThenReturnNull() = runTest {
+        setUpNoSecureStorageRepository()
+
+        assertNull(testee.getWebsiteLoginDetailsWithCredentials(1))
+    }
+
+    @Test
+    fun whenNoSecureStorageRepositoryUpdateCredentialsThenDoNothing() = runTest {
+        setUpNoSecureStorageRepository()
+
+        testee.updateWebsiteLoginDetailsWithCredentials(testCredentials)
+
+        verifyNoInteractions(secureStorageRepository)
+    }
+
+    @Test
+    fun whenNoSecureStorageRepositoryDeleteCredentialsThenDoNothing() = runTest {
+        setUpNoSecureStorageRepository()
+
+        testee.deleteWebsiteLoginDetailsWithCredentials(1)
+
+        verifyNoInteractions(secureStorageRepository)
+    }
+
+    @Test
+    fun whenNoSecureStorageRepositoryGetWebsiteLoginDetailsForDomainThenFlowReturnsNothing() = runTest {
+        setUpNoSecureStorageRepository()
+
+        testee.websiteLoginDetailsForDomain("test").test {
+            this.awaitComplete()
+        }
+    }
+
+    @Test
+    fun whenNoSecureStorageRepositoryGetWebsiteLoginDetailsThenFlowReturnsNothing() = runTest {
+        setUpNoSecureStorageRepository()
+
+        testee.websiteLoginDetails().test {
+            this.awaitComplete()
+        }
+    }
+
+    @Test
+    fun whenNoSecureStorageRepositoryGetWebsiteCredentialsForDomainThenFlowReturnsNothing() = runTest {
+        setUpNoSecureStorageRepository()
+
+        testee.websiteLoginDetailsWithCredentialsForDomain("test").test {
+            this.awaitComplete()
+        }
+    }
+
+    @Test
+    fun whenNoSecureStorageRepositoryGetWebsiteCredentialsThenFlowReturnsNothing() = runTest {
+        setUpNoSecureStorageRepository()
+
+        testee.websiteLoginDetailsWithCredentials().test {
+            this.awaitComplete()
+        }
+    }
+
+    private fun setUpNoSecureStorageRepository() {
+        testee = RealSecureStorage(
+            object : SecureStorageRepository.Factory {
+                override fun get(): SecureStorageRepository? = null
+            },
+            coroutineRule.testDispatcherProvider,
+            l2DataTransformer
+        )
     }
 
     companion object {

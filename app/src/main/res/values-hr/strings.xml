@@ -512,11 +512,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Veza je prekinuta. Ovo mrežno mjesto može biti štetno za vaš uređaj.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Onemogućen je upravitelj preuzimanja</string>
-    <string name="downloadManagerIncompatible">Upravitelj preuzimanja nije dostupan na ovom uređaju</string>
-    <string name="enable">Omogući</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Omogućiti lokaciju uređaja za preglednik privatnosti DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s traži lokaciju vašeg uređaja. Prvo ćete trebati dopustiti aplikaciji da pošalje lokaciju vašeg uređaja, a zatim %2$s može zatražiti dopuštenje.</string>
@@ -548,7 +543,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalna kontrola privatnosti (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automatski blokira mnoge alate za indeksiranje. S globalnom kontrolom privatnosti (GPC) također možete tražiti od web-mjesta koja sudjeluju u programu da ograniče prodaju ili dijeljenje vaših osobnih podataka drugim tvrtkama. <u><a href="">Saznajte više</a><u/>]]>
+        <![CDATA[DuckDuckGo automatski blokira mnoge alate za indeksiranje. S globalnom kontrolom privatnosti (GPC) također možete tražiti od web-mjesta koja sudjeluju u programu da ograniče prodaju ili dijeljenje vaših osobnih podataka drugim tvrtkama. <u><a href=\"\">Saznajte više</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globalna kontrola privatnosti (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalna kontrola privatnosti (GPC)</string>
@@ -574,52 +569,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokira programe za praćenje e-pošte i skriva vašu adresu</string>
     <string name="newEmailAliasMenuTitle">Izradite Duck adresu</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Ukloniti zaštitu e-pošte?</string>
-    <string name="emailSignOutDialogText">Napomena: uklanjanjem zaštite e-pošte s ovog uređaja neće se izbrisati vaša Duck adresa.</string>
-    <string name="emailSignOutDialogCancel">Otkaži</string>
-    <string name="emailSignOutDialogDisable">Ukloni</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Lista čekanja e-pošte</string>
-    <string name="waitlistNotificationTitle">Zaštita e-pošte je spremna!</string>
-    <string name="waitlistNotificationDescription">Otvori svoju pozivnicu</string>
-
     <string name="waitlistNotificationDialogDescription">Želite li da vam pošaljemo obavijest kad dođete na red?</string>
     <string name="waitlistNotificationDialogNoThanks">Ne, hvala</string>
     <string name="waitlistNotificationDialogNotifyMe">OBAVIJESTI ME</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Zaštita e-pošte (Beta)</string>
     <string name="emailProtectionActivityTitle">Zaštita e-pošte (Beta)</string>
-    <string name="emailProtectionFooterDescription">Nećeš morati podijeliti nikakve osobne podatke za pridruživanje listi čekanja. Svoje ćeš mjesto osigurati u skladu s vremenskom oznakom koja postoji samo na tvom uređaju kako bismo te mogli obavijestiti kada na tebe dođe red.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Došlo je do pogreške prilikom pridruživanja listi čekanja; pokušajte ponovo kasnije</string>
-    <string name="emailProtectionDuckAddressCta">Već imam Duck adresu</string>
-    <string name="emailProtectionInviteCodeCta">Imam pozivnu šifru</string>
-    <string name="emailProtectionWaitlistCta">Pridružite se privatnoj listi čekanja</string>
-    <string name="emailProtectionGetStartedCta">Započnite</string>
     <string name="emailNotSupported">Uređaj nije podržan</string>
     <string name="emailNotSupportedExplanation">Zaštita e-pošte omogućuje ti stvaranje privatnih adresa e-pošte koje uklanjaju praćenje e-pošte. Adrese koje kreiraš moramo šifrirati i pohraniti lokalno na tvom uređaju. Budući da tvoj uređaj ne podržava šifriranu pohranu, zaštita e-pošte nije dostupna.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Zaštita privatnosti e-pošte, na jednostavan način.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokiraj programe za praćenje e-pošte i sakrij svoju adresu bez promjene pružatelja usluga e-pošte. <br/><a href=""><b>Saznaj više</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Na popisu ste!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Poslat ćemo vam obavijest kada<br/>zaštita e-pošte bude spremna za vas. <a href=""><b>Saznajte više</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaša pozivnica pojavit će se ovdje kad budemo spremni za vas. Želite li <a href=""><b>dobiti obavijest</b></a> kad stigne?<br/><a href=""><b>Saznajte više</b></a> o zaštiti e-pošte.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Pozvani ste!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokiraj programe za praćenje e-pošte i sakrij svoju adresu <br/>bez promjene pružatelja usluga e-pošte.<br/> <a href=""><b>Saznaj više</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Osobna Duck adresa</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Uklanjanjem zaštite e-pošte s ovog uređaja uklanja se mogućnost da se polja za e-poštu dok pregledavate web popune vašom osobnom Duck adresom ili novogeneriranom privatnom Duck adresom.<br/><br/>Da biste u potpunosti izbrisali svoje Duck adrese ili za bilo kakva druga pitanja ili povratne informacije, obratite nam se na <a href=\"mailto:support@duck.com\">support@duck.com</a> .]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Ukloni s uređaja</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Uredi knjižnu oznaku</string>
@@ -691,5 +649,14 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blokiraj aplikacija za praćenje na tvom uređaju</string>
     <string name="atp_SettingsDeviceShieldEnabled">Omogućeno</string>
     <string name="atp_SettingsDeviceShieldDisabled">Onemogućeno</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Čini se da ova stranica ima skočni prozor za pristanak na kolačiće👇</string>
+    <string name="autoconsentDialogDescription">Da se ja pobrinem za to umjesto tebe? Mogu pokušati minimizirati kolačiće, maksimalno povećati privatnost i sakriti skočne prozore poput ovih.</string>
+    <string name="autoconsentPrimaryCta">Upravljanje skočnim prozorima kolačića</string>
+    <string name="autoconsentSecondaryCta">Ne, hvala</string>
+
+    <string name="autoconsentSetting">Upravljanje skočnim prozorima kolačića</string>
+    <string name="autoconsentAnimationText">Upravlja se kolačićima</string>
 
 </resources>

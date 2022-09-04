@@ -51,7 +51,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun processCommand(it: LaunchViewModel.Command?) {
+    private fun processCommand(it: LaunchViewModel.Command) {
         when (it) {
             LaunchViewModel.Command.Onboarding -> {
                 showOnboarding()

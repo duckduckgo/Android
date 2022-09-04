@@ -22,15 +22,14 @@ import javax.inject.Inject
 
 abstract class DaggerActivity : AppCompatActivity(), HasDaggerInjector {
     @Inject
-    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*>>
+    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*, *>>
 
-    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*> {
+    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
         return injectorFactoryMap[key]
             ?: throw RuntimeException(
                 """
                 Could not find the dagger component for ${key.simpleName}.
-                You probably forgot to create the ${key.simpleName}Component.
-                If you DID create the ${key.simpleName}Component, check that it uses @ContributesTo(ActivityScope::class)
+                You probably forgot to annotate your class with @InjectWith(Scope::class).
                 """.trimIndent()
             )
     }

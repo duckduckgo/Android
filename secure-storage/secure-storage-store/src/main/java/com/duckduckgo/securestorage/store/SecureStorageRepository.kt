@@ -16,32 +16,37 @@
 
 package com.duckduckgo.securestorage.store
 
-import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity
 import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsDao
+import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity
 import kotlinx.coroutines.flow.Flow
 
 /**
  * This class is mainly responsible only for accessing and storing data into the DB.
  */
 interface SecureStorageRepository {
-    suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity)
+    interface Factory {
+        fun get(): SecureStorageRepository?
+    }
+
+    suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity): WebsiteLoginCredentialsEntity?
 
     suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
 
-    suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity
+    suspend fun getWebsiteLoginCredentialsForId(id: Long): WebsiteLoginCredentialsEntity?
 
     suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>>
 
-    suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentialsEntity)
+    suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentialsEntity): WebsiteLoginCredentialsEntity?
 
-    suspend fun deleteWebsiteLoginCredentials(id: Int)
+    suspend fun deleteWebsiteLoginCredentials(id: Long)
 }
 
 class RealSecureStorageRepository constructor(
     private val websiteLoginCredentialsDao: WebsiteLoginCredentialsDao
 ) : SecureStorageRepository {
-    override suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity) {
-        websiteLoginCredentialsDao.insert(websiteLoginCredentials)
+    override suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity): WebsiteLoginCredentialsEntity? {
+        val newCredentialId = websiteLoginCredentialsDao.insert(websiteLoginCredentials)
+        return websiteLoginCredentialsDao.getWebsiteLoginCredentialsById(newCredentialId)
     }
 
     override suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>> =
@@ -50,13 +55,16 @@ class RealSecureStorageRepository constructor(
     override suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>> =
         websiteLoginCredentialsDao.websiteLoginCredentials()
 
-    override suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity =
+    override suspend fun getWebsiteLoginCredentialsForId(id: Long): WebsiteLoginCredentialsEntity? =
         websiteLoginCredentialsDao.getWebsiteLoginCredentialsById(id)
 
-    override suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentialsEntity) =
+    override suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentialsEntity): WebsiteLoginCredentialsEntity? {
+        val credentialId = websiteLoginCredentials.id
         websiteLoginCredentialsDao.update(websiteLoginCredentials)
+        return websiteLoginCredentialsDao.getWebsiteLoginCredentialsById(credentialId)
+    }
 
-    override suspend fun deleteWebsiteLoginCredentials(id: Int) {
+    override suspend fun deleteWebsiteLoginCredentials(id: Long) {
         websiteLoginCredentialsDao.delete(id)
     }
 }

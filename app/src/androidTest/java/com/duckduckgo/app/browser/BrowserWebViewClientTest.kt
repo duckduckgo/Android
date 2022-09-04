@@ -29,6 +29,7 @@ import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -42,6 +43,7 @@ import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.privacy.config.api.Gpc
@@ -61,6 +63,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.verifyNoInteractions
 
 @ExperimentalCoroutinesApi
 class BrowserWebViewClientTest {
@@ -92,6 +95,8 @@ class BrowserWebViewClientTest {
     private val ampLinks: AmpLinks = mock()
     private val printInjector: PrintInjector = mock()
     private val internalTestUserChecker: InternalTestUserChecker = mock()
+    private val adClickManager: AdClickManager = mock()
+    private val autoconsent: Autoconsent = mock()
 
     @UiThreadTest
     @Before
@@ -116,7 +121,9 @@ class BrowserWebViewClientTest {
             accessibilitySettings,
             ampLinks,
             printInjector,
-            internalTestUserChecker
+            internalTestUserChecker,
+            adClickManager,
+            autoconsent,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -185,6 +192,13 @@ class BrowserWebViewClientTest {
     fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() = runTest {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(thirdPartyCookieManager).processUriForThirdPartyCookies(webView, EXAMPLE_URL.toUri())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledThenInjectAutoconsentCalled() = runTest {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(autoconsent).injectAutoconsent(webView, EXAMPLE_URL)
     }
 
     @UiThreadTest
@@ -356,8 +370,22 @@ class BrowserWebViewClientTest {
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
             whenever(webResourceRequest.isRedirect).thenReturn(false)
             whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
             assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
             verify(listener).handleNonHttpAppLink(urlType)
+        }
+    }
+
+    @Test
+    fun whenNonHttpAppLinkDetectedAndIsNotForMainframeThenOnlyReturnTrue() = runTest {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
+            whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+            whenever(webResourceRequest.isRedirect).thenReturn(false)
+            whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+            assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+            verifyNoInteractions(listener)
         }
     }
 
@@ -367,6 +395,7 @@ class BrowserWebViewClientTest {
             val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
             whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
             assertTrue(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
             verify(listener).handleNonHttpAppLink(urlType)
         }
@@ -379,6 +408,7 @@ class BrowserWebViewClientTest {
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
             whenever(webResourceRequest.isRedirect).thenReturn(false)
             whenever(listener.handleNonHttpAppLink(any())).thenReturn(false)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
             assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
             verify(listener).handleNonHttpAppLink(urlType)
         }

@@ -24,12 +24,21 @@ import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
+import com.duckduckgo.autofill.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
+import com.duckduckgo.autofill.jsbridge.request.AutofillStoreFormDataRequest
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputMainType.CREDENTIALS
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.USERNAME
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType.AUTOPROMPT
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +52,11 @@ interface AutofillJavascriptInterface {
     @JavascriptInterface
     fun getAutofillData(requestString: String)
 
-    suspend fun getRuntimeConfiguration(rawJs: String, url: String?): String
+    suspend fun getRuntimeConfiguration(
+        rawJs: String,
+        url: String?
+    ): String
+
     fun injectCredentials(credentials: LoginCredentials)
     fun injectNoCredentials()
 
@@ -53,7 +66,6 @@ interface AutofillJavascriptInterface {
     companion object {
         const val INTERFACE_NAME = "BrowserAutofill"
     }
-
 }
 
 @ContributesBinding(AppScope::class)
@@ -62,8 +74,10 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val autofillStore: AutofillStore,
     private val autofillMessagePoster: AutofillMessagePoster,
     private val autofillResponseWriter: AutofillResponseWriter,
+    private val autofillDomainFormatter: AutofillDomainFormatter,
     private val emailManager: EmailManager,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val deviceAuthenticator: DeviceAuthenticator,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     private val currentUrlProvider: UrlProvider = WebViewUrlProvider(dispatcherProvider)
 ) : AutofillJavascriptInterface {
@@ -76,37 +90,70 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     override fun getAutofillData(requestString: String) {
         Timber.v("BrowserAutofill: getAutofillData called:\n%s", requestString)
         getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
-            val request = requestParser.parseAutofillDataRequest(requestString)
-
-            if (request.mainType != CREDENTIALS) {
-                Timber.w("Autofill type %s unsupported", request.mainType)
-                return@launch
-            }
-
             val url = currentUrlProvider.currentUrl(webView)
             if (url == null) {
                 Timber.w("Can't autofill as can't retrieve current URL")
                 return@launch
             }
 
-            val credentials = autofillStore.getCredentials(url)
+            val request = requestParser.parseAutofillDataRequest(requestString)
+            val triggerType = convertTriggerType(request.trigger)
+
+            if (request.mainType != CREDENTIALS) {
+                handleUnknownRequestMainType(request, url)
+                return@launch
+            }
+
+            val allCredentials = autofillStore.getCredentials(url)
+            val credentials = filterRequestedSubtypes(request, allCredentials)
 
             withContext(dispatcherProvider.main()) {
                 if (credentials.isEmpty()) {
                     callback?.noCredentialsAvailable(url)
                 } else {
-                    callback?.onCredentialsAvailableToInject(credentials)
+                    callback?.onCredentialsAvailableToInject(credentials, triggerType)
                 }
             }
         }
     }
 
-    override suspend fun getRuntimeConfiguration(rawJs: String, url: String?): String {
+    private fun convertTriggerType(trigger: SupportedAutofillTriggerType): LoginTriggerType {
+        return when (trigger) {
+            USER_INITIATED -> LoginTriggerType.USER_INITIATED
+            AUTOPROMPT -> LoginTriggerType.AUTOPROMPT
+        }
+    }
+
+    private fun filterRequestedSubtypes(
+        request: AutofillDataRequest,
+        credentials: List<LoginCredentials>
+    ): List<LoginCredentials> {
+        return when (request.subType) {
+            USERNAME -> credentials.filterNot { it.username.isNullOrBlank() }
+            PASSWORD -> credentials.filterNot { it.password.isNullOrBlank() }
+        }
+    }
+
+    private fun handleUnknownRequestMainType(
+        request: AutofillDataRequest,
+        url: String
+    ) {
+        Timber.w("Autofill type %s unsupported", request.mainType)
+        callback?.noCredentialsAvailable(url)
+    }
+
+    override suspend fun getRuntimeConfiguration(
+        rawJs: String,
+        url: String?
+    ): String {
         Timber.v("BrowserAutofill: getRuntimeConfiguration called")
 
         val contentScope = autofillResponseWriter.generateContentScope()
         val userUnprotectedDomains = autofillResponseWriter.generateUserUnprotectedDomains()
-        val userPreferences = autofillResponseWriter.generateUserPreferences(autofillCredentials = determineIfAutofillEnabled())
+        val userPreferences = autofillResponseWriter.generateUserPreferences(
+            autofillCredentials = determineIfAutofillEnabled(),
+            showInlineKeyIcon = true
+        )
         val availableInputTypes = generateAvailableInputTypes(url)
 
         return rawJs
@@ -129,10 +176,11 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()
 
     // in the future, we'll also tie this into feature toggles and remote config
-    private fun determineIfAutofillEnabled(): Boolean = autofillStore.autofillEnabled
+    private fun determineIfAutofillEnabled(): Boolean =
+        autofillStore.autofillAvailable && autofillStore.autofillEnabled && deviceAuthenticator.hasValidDeviceAuthentication()
 
     private suspend fun determineIfCredentialsAvailable(url: String?): Boolean {
-        return if (url == null) {
+        return if (url == null || !determineIfAutofillEnabled()) {
             false
         } else {
             val savedCredentials = autofillStore.getCredentials(url)
@@ -144,12 +192,20 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     fun storeFormData(data: String) {
         Timber.i("storeFormData called, credentials provided to be persisted")
 
-        getAutofillDataJob += coroutineScope.launch {
-            val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
+        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
 
-            val request = requestParser.parseStoreFormDataRequest(data).credentials
-            val jsCredentials = JavascriptCredentials(request.username, request.password)
-            val credentials = jsCredentials.asLoginCredentials(currentUrl)
+            val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
+            val title = autofillDomainFormatter.extractDomain(currentUrl)
+
+            val request = requestParser.parseStoreFormDataRequest(data)
+
+            if (!request.isValid()) {
+                Timber.w("Invalid data from storeFormData")
+                return@launch
+            }
+
+            val jsCredentials = JavascriptCredentials(request.credentials!!.username, request.credentials.password)
+            val credentials = jsCredentials.asLoginCredentials(currentUrl, title)
 
             withContext(dispatcherProvider.main()) {
                 callback?.onCredentialsAvailableToSave(currentUrl, credentials)
@@ -157,7 +213,13 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         }
     }
 
+    private fun AutofillStoreFormDataRequest?.isValid(): Boolean {
+        if (this == null || credentials == null) return false
+        return !(credentials.username.isNullOrBlank() && credentials.password.isNullOrBlank())
+    }
+
     override fun injectCredentials(credentials: LoginCredentials) {
+        Timber.v("Informing JS layer with credentials selected")
         getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
             val jsCredentials = credentials.asJsCredentials()
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateResponseGetAutofillData(jsCredentials))
@@ -165,6 +227,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     }
 
     override fun injectNoCredentials() {
+        Timber.v("No credentials selected; informing JS layer")
         getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateEmptyResponseGetAutofillData())
         }
@@ -177,12 +240,16 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         )
     }
 
-    private fun JavascriptCredentials.asLoginCredentials(url: String): LoginCredentials {
+    private fun JavascriptCredentials.asLoginCredentials(
+        url: String,
+        title: String?
+    ): LoginCredentials {
         return LoginCredentials(
             id = null,
             domain = url,
             username = username,
-            password = password
+            password = password,
+            domainTitle = title
         )
     }
 
@@ -198,5 +265,4 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
             }
         }
     }
-
 }

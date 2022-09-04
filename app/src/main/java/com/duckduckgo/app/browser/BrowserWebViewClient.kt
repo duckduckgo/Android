@@ -26,6 +26,7 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -43,6 +44,7 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
 import kotlinx.coroutines.*
@@ -68,7 +70,9 @@ class BrowserWebViewClient(
     private val accessibilityManager: AccessibilityManager,
     private val ampLinks: AmpLinks,
     private val printInjector: PrintInjector,
-    private val internalTestUserChecker: InternalTestUserChecker
+    private val internalTestUserChecker: InternalTestUserChecker,
+    private val adClickManager: AdClickManager,
+    private val autoconsent: Autoconsent,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -137,8 +141,10 @@ class BrowserWebViewClient(
                 }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
                     Timber.i("Found non-http app link for ${urlType.uriString}")
-                    webViewClientListener?.let { listener ->
-                        return listener.handleNonHttpAppLink(urlType)
+                    if (isForMainFrame) {
+                        webViewClientListener?.let { listener ->
+                            return listener.handleNonHttpAppLink(urlType)
+                        }
                     }
                     true
                 }
@@ -242,7 +248,10 @@ class BrowserWebViewClient(
     ) {
         try {
             Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
+
             url?.let {
+                autoconsent.injectAutoconsent(webView, url)
+                adClickManager.detectAdDomain(url)
                 appCoroutineScope.launch(dispatcherProvider.default()) {
                     thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
                 }

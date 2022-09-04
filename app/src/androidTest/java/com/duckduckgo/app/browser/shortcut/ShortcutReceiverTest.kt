@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.shortcut
 
 import android.content.Intent
-import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -40,8 +39,7 @@ class ShortcutReceiverTest {
 
     @Before
     fun before() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
-        testee = ShortcutReceiver(context, mockPixel, coroutinesTestRule.testDispatcherProvider, TestScope())
+        testee = ShortcutReceiver(mockPixel, coroutinesTestRule.testDispatcherProvider, TestScope())
     }
 
     @Test

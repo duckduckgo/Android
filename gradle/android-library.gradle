@@ -46,8 +46,10 @@ android {
     lintOptions {
         disable 'ObsoleteLintCustomCheck'
         abortOnError true
-        baseline file("lint-baseline.xml")
     }
+}
+dependencies {
+    lintChecks project(':lint-rules')
 }
 
 tasks.register('checks') {

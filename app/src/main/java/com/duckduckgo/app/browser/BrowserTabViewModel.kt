@@ -34,6 +34,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete
@@ -88,7 +89,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.global.view.asLocationPermissionOrigin
+import com.duckduckgo.app.global.extensions.asLocationPermissionOrigin
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -115,8 +116,8 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadCommand
+import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.privacy.config.api.*
@@ -132,6 +133,7 @@ import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
@@ -172,11 +174,12 @@ class BrowserTabViewModel @Inject constructor(
     private val appLinksHandler: AppLinksHandler,
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
-    private val downloadCallback: DownloadCallback,
+    private val downloadCallback: DownloadStateListener,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore,
     private val autofillStore: AutofillStore,
+    private val adClickManager: AdClickManager
 ) : WebViewClientListener,
     EditSavedSiteListener,
     HttpAuthenticationListener,
@@ -236,7 +239,8 @@ class BrowserTabViewModel @Inject constructor(
         var previousAppLink: AppLink? = null,
         val canFindInPage: Boolean = false,
         val forceRenderingTicker: Long = System.currentTimeMillis(),
-        val canPrintPage: Boolean = false
+        val canPrintPage: Boolean = false,
+        val showAutofill: Boolean = false
     )
 
     sealed class HighlightableButton {
@@ -422,12 +426,14 @@ class BrowserTabViewModel @Inject constructor(
         }
         class InjectCredentials(val url: String, val credentials: LoginCredentials) : Command()
         class CancelIncomingAutofillRequest(val url: String) : Command()
+        object LaunchAutofillSettings : Command()
         class EditWithSelectedQuery(val query: String) : Command()
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
+        class NavigateToHistory(val historyStackIndex: Int) : Command()
         object EmailSignEvent : Command()
     }
 
-    sealed class NavigationCommand() : Command() {
+    sealed class NavigationCommand : Command() {
         class NavigateToHistory(val historyStackIndex: Int) : Command()
         object Refresh : NavigationCommand()
         class Navigate(
@@ -451,6 +457,7 @@ class BrowserTabViewModel @Inject constructor(
     val privacyShieldViewState: MutableLiveData<PrivacyShieldViewState> = MutableLiveData()
 
     var skipHome = false
+    var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -745,6 +752,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewVisible() {
+        setAdClickActiveTabData(url)
+
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
         if (!currentBrowserViewState().browserShowing) {
             viewModelScope.launch {
@@ -907,6 +916,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun removeCurrentTabFromRepository() {
         val currentTab = tabRepository.liveSelectedTab.value
         currentTab?.let {
+            adClickManager.clearTabId(it.tabId)
             tabRepository.deleteTabAndSelectSource(it.tabId)
         }
     }
@@ -1097,6 +1107,7 @@ class BrowserTabViewModel @Inject constructor(
             is WebNavigationStateChange.PageCleared -> pageCleared()
             is WebNavigationStateChange.UrlUpdated -> urlUpdated(stateChange.url)
             is WebNavigationStateChange.PageNavigationCleared -> disableUserNavigation()
+            else -> {}
         }
 
         if (newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
@@ -1128,7 +1139,9 @@ class BrowserTabViewModel @Inject constructor(
         title: String?
     ) {
         Timber.v("Page changed: $url")
+        hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title)
+        setAdClickActiveTabData(url)
 
         val currentOmnibarViewState = currentOmnibarViewState()
         val omnibarText = omnibarTextForUrl(url)
@@ -1199,6 +1212,12 @@ class BrowserTabViewModel @Inject constructor(
 
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
+    }
+
+    private fun setAdClickActiveTabData(url: String?) {
+        val sourceTabId = tabRepository.liveSelectedTab.value?.sourceTabId
+        val sourceTabUrl = tabRepository.liveTabs.value?.firstOrNull { it.tabId == sourceTabId }?.url
+        adClickManager.setActiveTabId(tabId, url, sourceTabId, sourceTabUrl)
     }
 
     private fun cacheAppLink(url: String?) {
@@ -1612,6 +1631,12 @@ class BrowserTabViewModel @Inject constructor(
     private fun enableUrlParametersRemovedFlag() {
         site?.urlParametersRemoved = true
         onSiteChanged()
+    }
+
+    fun onAutoconsentResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean) {
+        site?.consentManaged = consentManaged
+        site?.consentOptOutFailed = optOutFailed
+        site?.consentSelfTestFailed = selfTestFailed
     }
 
     private fun onSiteChanged() {
@@ -2099,7 +2124,8 @@ class BrowserTabViewModel @Inject constructor(
     private fun initializeViewStates() {
         globalLayoutState.value = Browser()
         browserViewState.value = BrowserViewState().copy(
-            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported()
+            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+            showAutofill = autofillStore.autofillAvailable
         )
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
@@ -2239,21 +2265,25 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onCtaShown() {
         val cta = ctaViewState.value?.cta ?: return
-        ctaViewModel.onCtaShown(cta)
+        viewModelScope.launch(dispatchers.io()) {
+            ctaViewModel.onCtaShown(cta)
+        }
     }
 
     suspend fun refreshCta(locale: Locale = Locale.getDefault()): Cta? {
-        Timber.i("favoritesOnboarding: - refreshCta $showFavoritesOnboarding")
         if (currentGlobalLayoutState() is Browser) {
+            val isBrowserShowing = currentBrowserViewState().browserShowing
+            if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
                     dispatchers.io(),
-                    currentBrowserViewState().browserShowing,
+                    isBrowserShowing,
                     siteLiveData.value,
                     showFavoritesOnboarding,
                     locale
                 )
             }
+            if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
             ctaViewState.value = currentCtaViewState().copy(cta = cta)
             ctaChangedTicker.emit(System.currentTimeMillis().toString())
             return cta
@@ -2269,6 +2299,7 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             val cta = ctaViewState.value?.cta ?: return@launch
             ctaViewModel.registerDaxBubbleCtaDismissed(cta)
+            ctaViewState.value = currentCtaViewState().copy(cta = null)
         }
     }
 
@@ -2578,9 +2609,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun download(pendingFileDownload: PendingFileDownload) {
-        viewModelScope.launch(dispatchers.io()) {
-            fileDownloader.download(pendingFileDownload, downloadCallback)
-        }
+        fileDownloader.enqueueDownload(pendingFileDownload)
     }
 
     fun deleteQuickAccessItem(savedSite: SavedSite) {
@@ -2647,14 +2676,14 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(CancelIncomingAutofillRequest(originalUrl))
     }
 
-    override fun saveCredentials(url: String, credentials: LoginCredentials) {
-        viewModelScope.launch {
+    override suspend fun saveCredentials(url: String, credentials: LoginCredentials): LoginCredentials? {
+        return withContext(appCoroutineScope.coroutineContext) {
             autofillStore.saveCredentials(url, credentials)
         }
     }
 
-    override fun updateCredentials(url: String, credentials: LoginCredentials) {
-        viewModelScope.launch {
+    override suspend fun updateCredentials(url: String, credentials: LoginCredentials): LoginCredentials? {
+        return withContext(appCoroutineScope.coroutineContext) {
             autofillStore.updateCredentials(url, credentials)
         }
     }
@@ -2671,6 +2700,10 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun linkOpenedInNewTab(): Boolean {
         return isLinkOpenedInNewTab
+    }
+
+    fun onAutofillMenuSelected() {
+        command.value = LaunchAutofillSettings
     }
 
     @VisibleForTesting

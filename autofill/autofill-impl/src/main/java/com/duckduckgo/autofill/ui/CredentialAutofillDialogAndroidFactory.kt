@@ -16,14 +16,13 @@
 
 package com.duckduckgo.autofill.ui
 
+import androidx.fragment.app.DialogFragment
 import com.duckduckgo.autofill.CredentialAutofillDialogFactory
-import com.duckduckgo.autofill.CredentialAutofillPickerDialog
-import com.duckduckgo.autofill.CredentialSavePickerDialog
-import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment
-import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingUpdatingExistingCredentialsDialogFragment
 import com.duckduckgo.autofill.ui.credential.selecting.AutofillSelectCredentialsDialogFragment
+import com.duckduckgo.autofill.ui.credential.updating.AutofillUpdatingExistingCredentialsDialogFragment
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -31,15 +30,28 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialAutofillDialogFactory {
 
-    override fun autofillSelectCredentialsDialog(url: String, credentials: List<LoginCredentials>): CredentialAutofillPickerDialog {
-        return AutofillSelectCredentialsDialogFragment.instance(url, credentials)
+    override fun autofillSelectCredentialsDialog(
+        url: String,
+        credentials: List<LoginCredentials>,
+        triggerType: LoginTriggerType,
+        tabId: String
+    ): DialogFragment {
+        return AutofillSelectCredentialsDialogFragment.instance(url, credentials, triggerType, tabId)
     }
 
-    override fun autofillSavingCredentialsDialog(url: String, credentials: LoginCredentials): CredentialSavePickerDialog {
-        return AutofillSavingCredentialsDialogFragment.instance(url, credentials)
+    override fun autofillSavingCredentialsDialog(
+        url: String,
+        credentials: LoginCredentials,
+        tabId: String
+    ): DialogFragment {
+        return AutofillSavingCredentialsDialogFragment.instance(url, credentials, tabId)
     }
 
-    override fun autofillSavingUpdateCredentialsDialog(url: String, credentials: LoginCredentials): CredentialUpdateExistingCredentialsDialog {
-        return AutofillSavingUpdatingExistingCredentialsDialogFragment.instance(url, credentials)
+    override fun autofillSavingUpdateCredentialsDialog(
+        url: String,
+        credentials: LoginCredentials,
+        tabId: String
+    ): DialogFragment {
+        return AutofillUpdatingExistingCredentialsDialogFragment.instance(url, credentials, tabId)
     }
 }

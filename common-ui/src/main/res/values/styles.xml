@@ -76,29 +76,9 @@
         <item name="android:gravity">start</item>
     </style>
 
-    <style name="SettingsGroupDivider">
-        <item name="android:background">?attr/settingsDividerColor</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_marginTop">25dp</item>
-        <item name="android:layout_height">1dp</item>
-    </style>
-
-    <style name="OverflowMenuFullDivider">
-        <item name="android:background">?attr/overflowMenuDividerColor</item>
-        <item name="android:layout_height">1dp</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_marginTop">@dimen/keyline_2</item>
-        <item name="android:layout_marginBottom">@dimen/keyline_2</item>
-    </style>
-
-    <style name="OverflowMenuDivider">
-        <item name="android:background">?attr/overflowMenuDividerColor</item>
-        <item name="android:layout_height">1dp</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_marginTop">3dp</item>
-        <item name="android:layout_marginBottom">3dp</item>
-        <item name="android:layout_marginStart">@dimen/keyline_5</item>
-        <item name="android:layout_marginEnd">@dimen/keyline_5</item>
+    <style name="SectionDivider">
+        <item name="android:paddingTop">24dp</item>
+        <item name="android:paddingBottom">24dp</item>
     </style>
 
     <style name="BrowserIconMenuItem">
@@ -271,12 +251,16 @@
         <item name="backgroundTint">@color/cornflowerBlue</item>
         <item name="android:textColor">@color/white</item>
         <item name="rippleColor">?attr/daxDialogSecondaryButtonRippleColor</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetTop">0dp</item>
     </style>
 
     <style name="DaxDialogButton.Secondary">
         <item name="backgroundTint">?attr/daxDialogBackgroundColor</item>
         <item name="android:textColor">?attr/daxDialogSecondaryButtonTextColor</item>
         <item name="rippleColor">?attr/daxDialogSecondaryButtonRippleColor</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetTop">0dp</item>
     </style>
 
     <style name="EmailSignOutButton" parent="@style/Widget.MaterialComponents.Button.TextButton">
@@ -323,14 +307,6 @@
         <item name="android:textStyle">normal</item>
         <item name="android:selectable">false</item>
         <item name="android:gravity">start</item>
-    </style>
-
-    <style name="ListDivider">
-        <item name="android:background">?attr/settingsDividerColor</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_marginTop">24dp</item>
-        <item name="android:layout_marginBottom">24dp</item>
-        <item name="android:layout_height">1dp</item>
     </style>
 
     <style name="FireDialog" parent="@style/Theme.Design.BottomSheetDialog">
@@ -412,14 +388,6 @@
         <item name="android:textStyle">normal</item>
         <item name="android:selectable">false</item>
         <item name="android:gravity">start</item>
-    </style>
-
-    <style name="LocationPermissionsGroupDivider">
-        <item name="android:background">?attr/settingsDividerColor</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_marginTop">24dp</item>
-        <item name="android:layout_marginBottom">24dp</item>
-        <item name="android:layout_height">1dp</item>
     </style>
 
     <style name="LocationPermissionsSectionTitle">

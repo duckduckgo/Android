@@ -24,6 +24,7 @@ import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.browser.WebViewRequestInterceptor
@@ -40,6 +41,7 @@ import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import com.duckduckgo.app.trackerdetection.Client
+import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsClient
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
@@ -47,6 +49,7 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TdsJson
+import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
@@ -82,6 +85,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private lateinit var trackerDetector: TrackerDetector
     private lateinit var tdsEntityDao: TdsEntityDao
     private lateinit var tdsDomainEntityDao: TdsDomainEntityDao
+    private lateinit var tdsCnameEntityDao: TdsCnameEntityDao
     private lateinit var testee: WebViewRequestInterceptor
 
     private val resourceSurrogates = ResourceSurrogatesImpl()
@@ -107,6 +111,8 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         coroutinesTestRule.testDispatcherProvider
     )
     private val mockGpc: Gpc = mock()
+    private val mockAdClickManager: AdClickManager = mock()
+    private val mockCloakedCnameDetector: CloakedCnameDetector = mock()
 
     companion object {
         private val moshi = Moshi.Builder().add(ActionJsonAdapter()).build()
@@ -158,7 +164,9 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             resourceSurrogates = resourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             gpc = mockGpc,
-            userAgentProvider = userAgentProvider
+            userAgentProvider = userAgentProvider,
+            adClickManager = mockAdClickManager,
+            cloakedCnameDetector = mockCloakedCnameDetector
         )
     }
 
@@ -193,10 +201,18 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
 
         tdsEntityDao = db.tdsEntityDao()
         tdsDomainEntityDao = db.tdsDomainEntityDao()
+        tdsCnameEntityDao = db.tdsCnameEntityDao()
 
         entityLookup = TdsEntityLookup(tdsEntityDao, tdsDomainEntityDao)
         trackerDetector =
-            TrackerDetectorImpl(entityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
+            TrackerDetectorImpl(
+                entityLookup,
+                mockUserWhitelistDao,
+                mockContentBlocking,
+                mockTrackerAllowlist,
+                mockWebTrackersBlockedDao,
+                mockAdClickManager
+            )
 
         val json = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/tracker_radar_reference.json")
         val adapter = moshi.adapter(TdsJson::class.java)
@@ -204,10 +220,12 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         val trackers = tdsJson.jsonToTrackers().values.toList()
         val entities = tdsJson.jsonToEntities()
         val domainEntities = tdsJson.jsonToDomainEntities()
+        val cnameEntities = tdsJson.jsonToCnameEntities()
         val client = TdsClient(Client.ClientName.TDS, trackers)
 
         tdsEntityDao.insertAll(entities)
         tdsDomainEntityDao.insertAll(domainEntities)
+        tdsCnameEntityDao.insertAll(cnameEntities)
         trackerDetector.addClient(client)
     }
 

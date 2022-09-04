@@ -508,11 +508,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Bağlantı iptal edildi. Bu web sitesi cihazınıza zarar verebilir.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">İndirme Yöneticisi devre dışı</string>
-    <string name="downloadManagerIncompatible">İndirme Yöneticisi bu cihazda kullanılamıyor</string>
-    <string name="enable">Etkinleştir</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">DuckDuckGo Gizlilik Tarayıcısı için cihaz konumu etkinleştirilsin mi?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s cihazınızın konumunu öğrenmek istiyor. %2$s tarafından izin istenebilmesi için ilk olarak uygulamanın cihazınızın konumunu göndermesine izin vermeniz gerekir.</string>
@@ -544,7 +539,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Küresel Gizlilik Kontrolü (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo birçok izleyiciyi otomatik olarak engeller. Küresel Gizlilik Kontrolü (GPC) ile, katılımcı web sitelerinden kişisel verilerinizin satışını veya diğer şirketlerle paylaşımını kısıtlamalarını da isteyebilirsiniz. <u><a href="">Daha Fazla Bilgi</a><u/>]]>
+        <![CDATA[DuckDuckGo birçok izleyiciyi otomatik olarak engeller. Küresel Gizlilik Kontrolü (GPC) ile, katılımcı web sitelerinden kişisel verilerinizin satışını veya diğer şirketlerle paylaşımını kısıtlamalarını da isteyebilirsiniz. <u><a href=\"\">Daha Fazla Bilgi</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Küresel Gizlilik Kontrolü (GPC)</string>
     <string name="globalPrivacyControlToggle">Küresel Gizlilik Kontrolü (GPC)</string>
@@ -570,52 +565,15 @@
     <string name="autofillTooltipGenerateAddressDescription">E-posta izleyicileri engeller ve adresinizi gizler</string>
     <string name="newEmailAliasMenuTitle">Duck Adresi Oluştur</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">E-posta Korumaları Kaldırılsın mı?</string>
-    <string name="emailSignOutDialogText">Not: E-posta Korumalarının bu cihazdan kaldırılması Duck Adresinizin silinmesine yol açmaz.</string>
-    <string name="emailSignOutDialogCancel">İptal</string>
-    <string name="emailSignOutDialogDisable">Kaldır</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">E-posta bekleme listesi</string>
-    <string name="waitlistNotificationTitle">E-posta Koruması hazır!</string>
-    <string name="waitlistNotificationDescription">Davetiyenizi açın</string>
-
     <string name="waitlistNotificationDialogDescription">Sıra size geldiğinde size bir bildirim göndermemizi ister misiniz?</string>
     <string name="waitlistNotificationDialogNoThanks">Hayır Teşekkürler</string>
     <string name="waitlistNotificationDialogNotifyMe">BANA BİLDİR</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">E-posta Koruması (Beta)</string>
     <string name="emailProtectionActivityTitle">E-posta Koruması (Beta)</string>
-    <string name="emailProtectionFooterDescription">Bekleme listesine katılmak için kişisel bilgilerinizi paylaşmanız gerekmez. Yerinizi yalnızca cihazınıza yerleştirilen bir zaman damgası ile güvence altına alacaksınız. Böylece sıranız geldiğinde sizi bilgilendirebiliriz.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Bekleme listesine katılırken bir hata oluştu. Lütfen daha sonra tekrar deneyin.</string>
-    <string name="emailProtectionDuckAddressCta">Zaten Duck Adresim var</string>
-    <string name="emailProtectionInviteCodeCta">Davet Kodum var</string>
-    <string name="emailProtectionWaitlistCta">Özel Bekleme Listesine Katılın</string>
-    <string name="emailProtectionGetStartedCta">Başlayın</string>
     <string name="emailNotSupported">Cihaz desteklenmiyor</string>
     <string name="emailNotSupportedExplanation">E-posta Koruması, e-posta izleyicilerini devre dışı bırakan özel e-posta adresleri oluşturmanıza olanak tanır. Oluşturduğunuz bu adresleri cihazınızda yerel olarak şifrelememiz ve depolamamız gerekir. Cihazınız şifreli depolama alanını desteklemediğinden E-posta Koruması kullanılamıyor.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">E-posta gizliliğinin basitleştirilmiş hâli.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[E-posta sağlayıcınızı değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin.<a href=""><b>Daha fazla bilgi</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Listedesiniz!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[<br/> E-posta Koruması hazır olduğunda size bildirim gönderilecektir. <a href=""><b>Daha fazla bilgi</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Özellik hazır olduğunda davetiye burada gösterilecek. Bunun için <a href=""><b>bildirim almak</b></a> ister misiniz?<br/>E-posta Koruma hakkında<a href=""><b>daha fazla bilgi edinin</b></a>.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Davetlisiniz!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-posta sağlayıcınızı değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin.<a href=""><b>Daha fazla bilgi</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Kişisel Duck Adresi</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[E-posta Korumasını bu cihazdan kaldırmak, Web\'de gezinirken Kişisel Duck Adresinizi veya yeni oluşturulan Özel Duck Adresinizi e-posta alanlarına doldurma seçeneğini kaldırır.<br/><br/>Duck Adreslerinizi tamamen silmek veya diğer sorularınız veya geri bildirimleriniz için <a href=\"mailto:support@duck.com\">support@duck.com</a> adresinden bize ulaşın.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Cihazdan Kaldır</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Yer İşaretini Düzenle</string>
@@ -683,5 +641,14 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Cihazınızdaki uygulama izleyicileri engelleyin</string>
     <string name="atp_SettingsDeviceShieldEnabled">Etkin</string>
     <string name="atp_SettingsDeviceShieldDisabled">Devre Dışı</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Görünüşe göre bu sitede çerez izni için açılır pencere var👇</string>
+    <string name="autoconsentDialogDescription">Bunları sizin yerinize halletmemizi ister misiniz? Çerezleri en aza indirmeyi, gizliliği en üst düzeye çıkarmayı ve bunun gibi açılır pencereleri gizlemeyi deneyebiliriz.</string>
+    <string name="autoconsentPrimaryCta">Çerez Açılır Pencerelerini Yönetin</string>
+    <string name="autoconsentSecondaryCta">Hayır Teşekkürler</string>
+
+    <string name="autoconsentSetting">Çerez Açılır Pencerelerini Yönetin</string>
+    <string name="autoconsentAnimationText">Yönetilen Çerezler</string>
 
 </resources>

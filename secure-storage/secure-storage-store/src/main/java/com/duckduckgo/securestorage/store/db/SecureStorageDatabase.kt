@@ -19,10 +19,22 @@ package com.duckduckgo.securestorage.store.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [WebsiteLoginCredentialsEntity::class], version = 1)
+@Database(
+    version = 2,
+    entities = [WebsiteLoginCredentialsEntity::class]
+)
 abstract class SecureStorageDatabase : RoomDatabase() {
     abstract fun websiteLoginCredentialsDao(): WebsiteLoginCredentialsDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `notes` TEXT")
+        database.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `domainTitle` TEXT")
+        database.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `lastUpdatedInMillis` INTEGER")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)

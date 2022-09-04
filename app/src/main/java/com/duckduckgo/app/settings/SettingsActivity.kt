@@ -35,10 +35,11 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.accessibility.AccessibilityActivity
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.browser.webview.WebViewActivity
-import com.duckduckgo.app.email.ui.EmailProtectionActivity
+import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -60,6 +61,7 @@ import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.macos_api.MacWaitlistState.*
@@ -156,6 +158,7 @@ class SettingsActivity :
 
         with(viewsPrivacy) {
             globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
+            autoconsentSetting.setOnClickListener { viewModel.onAutoconsentClicked() }
             fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
             locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
             automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
@@ -215,6 +218,7 @@ class SettingsActivity :
                     updateDefaultBrowserViewVisibility(it)
                     updateAutomaticClearDataOptions(it.automaticallyClearData)
                     setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
+                    setAutoconsentSetting(it.autoconsentEnabled)
                     viewsGeneral.changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
@@ -252,6 +256,15 @@ class SettingsActivity :
             getString(R.string.disabled)
         }
         viewsPrivacy.globalPrivacyControlSetting.setSubtitle(stateText)
+    }
+
+    private fun setAutoconsentSetting(enabled: Boolean) {
+        val stateText = if (enabled) {
+            getString(R.string.enabled)
+        } else {
+            getString(R.string.disabled)
+        }
+        viewsPrivacy.autoconsentSetting.setSubtitle(stateText)
     }
 
     private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
@@ -319,7 +332,8 @@ class SettingsActivity :
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
             is Command.LaunchAppTPWaitlist -> launchAppTPWaitlist()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
-            is Command.LaunchEmailProtection -> launchEmailProtectionScreen()
+            is Command.LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
+            is Command.LaunchEmailProtectionNotSUpported -> launchEmailProtectionNotSupported()
             is Command.LaunchThemeSettings -> launchThemeSelector(it.theme)
             is Command.LaunchAppLinkSettings -> launchAppLinksSettingSelector(it.appLinksSettingType)
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
@@ -327,6 +341,7 @@ class SettingsActivity :
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
             is Command.LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is Command.LaunchMacOs -> launchMacOsScreen()
+            is Command.LaunchAutoconsent -> launchAutoconsent()
             null -> TODO()
         }
     }
@@ -433,14 +448,25 @@ class SettingsActivity :
         startActivity(GlobalPrivacyControlActivity.intent(this), options)
     }
 
-    private fun launchEmailProtectionScreen() {
+    private fun launchEmailProtectionScreen(url: String) {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(EmailProtectionActivity.intent(this), options)
+        startActivity(BrowserActivity.intent(this, url), options)
+        this.finish()
+    }
+
+    private fun launchEmailProtectionNotSupported() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(EmailProtectionUnsupportedActivity.intent(this), options)
     }
 
     private fun launchMacOsScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(MacOsWaitlistActivity.intent(this), options)
+    }
+
+    private fun launchAutoconsent() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(AutoconsentSettingsActivity.intent(this), options)
     }
 
     private fun launchAppTPTrackersScreen() {

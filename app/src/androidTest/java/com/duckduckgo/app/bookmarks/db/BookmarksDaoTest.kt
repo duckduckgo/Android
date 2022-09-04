@@ -172,4 +172,15 @@ class BookmarksDaoTest {
         val result = dao.getBookmarkByUrl("www.example.com")
         assertEquals(bookmark, result)
     }
+
+    @Test
+    fun whenAllBookmarksDeletedThenDeleteAllBookmarks() = runTest {
+        val bookmarks = listOf(
+            BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1),
+            BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 1)
+        )
+        dao.insertList(bookmarks)
+        dao.deleteAll()
+        assertFalse(dao.hasBookmarks())
+    }
 }

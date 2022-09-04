@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 interface Site {
@@ -50,6 +51,8 @@ interface Site {
     var certificate: SslCertificate?
     val trackingEvents: List<TrackingEvent>
     val trackerCount: Int
+    val otherDomainsLoadedCount: Int
+    val specialDomainsLoadedCount: Int
     val majorNetworkCount: Int
     val allTrackersBlocked: Boolean
     val surrogates: List<SurrogateResponse>
@@ -60,10 +63,13 @@ interface Site {
     fun privacyProtection(): PrivacyShield
 
     var urlParametersRemoved: Boolean
+    var consentManaged: Boolean
+    var consentOptOutFailed: Boolean
+    var consentSelfTestFailed: Boolean
 }
 
 fun Site.orderedTrackerBlockedEntities(): List<Entity> = trackingEvents
-    .filter { it.blocked }
+    .filter { it.status == TrackerStatus.BLOCKED }
     .mapNotNull { it.entity }
     .filter { it.displayName.isNotBlank() }
     .sortedByDescending { it.prevalence }
@@ -73,3 +79,4 @@ fun Site.domainMatchesUrl(matchingUrl: String): Boolean {
 }
 
 val Site.domain get() = uri?.domain()
+val Site.baseHost get() = uri?.baseHost

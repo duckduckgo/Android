@@ -25,6 +25,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
 
     implementation project(path: ':privacy-config-api')
+    implementation project(path: ':feature-toggles-api')
     implementation project(path: ':common')
 
     implementation Kotlin.stdlib.jdk7
@@ -52,3 +53,7 @@ dependencies {
     testImplementation project(path: ':common-test')
 }
 
+
+android {
+  namespace 'com.duckduckgo.privacy.config.store'
+}

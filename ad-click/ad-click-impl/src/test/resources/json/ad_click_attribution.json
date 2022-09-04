@@ -1,0 +1,56 @@
+{
+  "state": "enabled",
+  "exceptions": [],
+  "settings": {
+    "linkFormats": [
+      {
+        "url": "duckduckgo.com/y.js",
+        "adDomainParameterName": "ad_domain",
+        "desc": "SERP Ads"
+      },
+      {
+        "url": "www.search-company.site/y.js",
+        "adDomainParameterName": "ad_domain",
+        "desc": "Test Domain"
+      },
+      {
+        "url": "www.search-company.example/y.js",
+        "adDomainParameterName": "ad_domain",
+        "desc": "Test Domain"
+      },
+      {
+        "url": "links.duckduckgo.com/m.js",
+        "adDomainParameterName": "ad_domain",
+        "desc": "Shopping Ads"
+      },
+      {
+        "url": "www.search-company.site/m.js",
+        "adDomainParameterName": "ad_domain",
+        "desc": "Test Domain"
+      },
+      {
+        "url": "www.search-company.example/m.js",
+        "adDomainParameterName": "ad_domain",
+        "desc": "Test Domain"
+      }
+    ],
+    "allowlist": [
+      {
+        "blocklistEntry": "bing.com",
+        "host": "bat.bing.com"
+      },
+      {
+        "blocklistEntry": "ad-company.site",
+        "host": "convert.ad-company.site"
+      },
+      {
+        "blocklistEntry": "ad-company.example",
+        "host": "convert.ad-company.example"
+      }
+    ],
+    "navigationExpiration": 1800,
+    "totalExpiration": 604800,
+    "heuristicDetection": "enabled",
+    "domainDetection": "enabled"
+  }
+}

@@ -508,11 +508,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Verbindung getrennt. Diese Website könnte schädlich für dein Gerät sein.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Der Download-Manager ist deaktiviert</string>
-    <string name="downloadManagerIncompatible">Der Download-Manager ist auf diesem Gerät nicht verfügbar</string>
-    <string name="enable">Aktivieren</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Gerätestandort für DuckDuckGo Privacy Browser freigeben?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s erfragt Ihren Gerätestandort. Zuerst müssen Sie der App die Befugnis geben, den Standort Ihres Geräts weiterzugeben, erst dann kann %2$s um Erlaubnis bitten.</string>
@@ -544,7 +539,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blockiert viele Tracker automatisch. Mit Global Privacy Control (GPC) können Sie auch teilnehmende Websites bitten, das Verkaufen oder Teilen Ihrer personenbezogenen Daten mit anderen Unternehmen einzuschränken. <u><a href="">Mehr erfahren</a><u/>]]>
+        <![CDATA[DuckDuckGo blockiert viele Tracker automatisch. Mit Global Privacy Control (GPC) können Sie auch teilnehmende Websites bitten, das Verkaufen oder Teilen Ihrer personenbezogenen Daten mit anderen Unternehmen einzuschränken. <u><a href=\"\">Mehr erfahren</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -570,52 +565,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blockiert E-Mail-Tracker und verbirgt deine Adresse</string>
     <string name="newEmailAliasMenuTitle">Duck-Adresse erstellen</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">E-Mail-Schutz entfernen?</string>
-    <string name="emailSignOutDialogText">Hinweis: Beim Entfernen des E-Mail-Schutzes von diesem Gerät wird deine Duck-Adresse nicht gelöscht.</string>
-    <string name="emailSignOutDialogCancel">Abbrechen</string>
-    <string name="emailSignOutDialogDisable">Entfernen</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">E-Mail-Warteliste</string>
-    <string name="waitlistNotificationTitle">E-Mail-Schutz ist bereit!</string>
-    <string name="waitlistNotificationDescription">Öffne deine Einladung</string>
-
     <string name="waitlistNotificationDialogDescription">Möchtest du eine Benachrichtigung erhalten, wenn du die E-Mail-Schutzfunktion testen kannst?</string>
     <string name="waitlistNotificationDialogNoThanks">Nein, danke</string>
     <string name="waitlistNotificationDialogNotifyMe">ICH MÖCHTE BENACHRICHTIGT WERDEN</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">E-Mail-Schutz (Beta)</string>
     <string name="emailProtectionActivityTitle">E-Mail-Schutz (Beta)</string>
-    <string name="emailProtectionFooterDescription">Um dich in die Warteliste einzutragen, musst du keine persönlichen Daten angeben. Du sicherst deinen Platz mit einem Zeitstempel, der nur auf deinem Gerät vorhanden ist, damit wir dich benachrichtigen können, wenn du an der Reihe bist.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Bei der Aktion „Auf die Warteliste setzen“ ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später noch einmal.</string>
-    <string name="emailProtectionDuckAddressCta">Ich habe bereits eine Duck-Adresse</string>
-    <string name="emailProtectionInviteCodeCta">Ich habe einen Einladungscode</string>
-    <string name="emailProtectionWaitlistCta">Auf die private Warteliste setzen</string>
-    <string name="emailProtectionGetStartedCta">Los geht\'s!</string>
     <string name="emailNotSupported">Gerät nicht unterstützt</string>
     <string name="emailNotSupportedExplanation">Mit dem E-Mail-Schutz kannst du private E-Mail-Adressen erstellen, die E-Mail-Tracker entfernen. Wir müssen diese Adressen, die du erstellst, lokal auf deinem Gerät verschlüsseln und speichern. Da dein Gerät keine verschlüsselte Speicherung unterstützt, ist der E-Mail-Schutz nicht verfügbar.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">E-Mail-Datenschutz, vereinfacht.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen, ohne den E-Mail-Anbieter zu wechseln.<br/><a href=""><b>Mehr erfahren</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Du stehst jetzt auf der Warteliste.</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Du erhältst eine Benachrichtigung,<br/> wenn du die E-Mail-Schutzfunktion testen kannst. <a href=""><b>Mehr erfahren</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Deine Einladung wird hier angezeigt, wenn es soweit ist. Möchtest du <a href=""><b>eine Benachrichtigung erhalten</b></a>, wenn die Einladung eintrifft?<a href=""><b>Mehr erfahren</b></a> über den E-Mail-Schutz.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Du hast eine Einladung erhalten!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen,<br/>ohne den E-Mail-Anbieter zu wechseln.<br/><a href=""><b>Mehr erfahren</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Persönliche Duck-Adresse</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Beim Entfernen des E-Mail-Schutzes von diesem Gerät wird auch die Option entfernt, über die beim Browsen automatisch deine persönliche Duck-Adresse oder deine neu erstellte private Duck-Adresse in die E-Mail-Felder eingegeben wird.<br/><br/>Wenn du mehr darüber erfahren möchtest, wie du deine Duck-Adressen vollständig löschen kannst oder andere Fragen oder Feedback an uns hast, melde dich bei uns unter <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Von diesem Gerät entfernen</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Lesezeichen bearbeiten</string>
@@ -683,5 +641,14 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blockiere App-Tracker auf deinem Gerät</string>
     <string name="atp_SettingsDeviceShieldEnabled">Aktiviert</string>
     <string name="atp_SettingsDeviceShieldDisabled">Deaktiviert</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Sieht so aus, als hätte diese Website ein Cookie-Zustimmungs-Pop-up👇</string>
+    <string name="autoconsentDialogDescription">Soll ich das für dich erledigen? Ich kann versuchen, Cookies zu minimieren, den Datenschutz zu maximieren und Pop-ups wie diese auszublenden.</string>
+    <string name="autoconsentPrimaryCta">Cookie-Pop-ups verwalten</string>
+    <string name="autoconsentSecondaryCta">Nein, danke</string>
+
+    <string name="autoconsentSetting">Cookie-Pop-ups verwalten</string>
+    <string name="autoconsentAnimationText">Cookies verwaltet</string>
 
 </resources>

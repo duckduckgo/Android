@@ -17,7 +17,6 @@
 package com.duckduckgo.app.onboarding.ui.page
 
 import android.app.Activity.RESULT_OK
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -31,10 +30,9 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.R as CommonR
-import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -82,11 +80,6 @@ class WelcomePage : OnboardingPageFragment() {
                 .flatMapLatest { welcomePageViewModel.reduce(it) }
                 .collect(::render)
         }
-    }
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
     }
 
     private fun render(state: WelcomePageView.State) {

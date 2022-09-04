@@ -508,11 +508,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Kapcsolat megszakadt. Ez a weboldal káros lehet az eszközödre.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Letöltéskezelő letiltva</string>
-    <string name="downloadManagerIncompatible">A letöltéskezelő nem érhető el ezen az eszközön.</string>
-    <string name="enable">Engedélyezés</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Engedélyezed az eszköz helyének elérését a DuckDuckGo adatvédelmi böngésző számára?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s az eszközöd helyét kéri. Először engedélyezned kell az alkalmazás számára, hogy elküldje az eszközöd helyét, majd a %2$s engedélyt kérhet.</string>
@@ -544,7 +539,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href="">További részletek</a><u/>]]>
+        <![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href=\"\">További részletek</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlToggle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
@@ -570,52 +565,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Letiltja az e-mail nyomkövetőket, és elrejti a címedet</string>
     <string name="newEmailAliasMenuTitle">Duck cím létrehozása</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Eltávolítod az e-mail védelmet?</string>
-    <string name="emailSignOutDialogText">Megjegyzés: az e-mail védelem eltávolítása erről az eszközről nem törli a Duck címedet.</string>
-    <string name="emailSignOutDialogCancel">Mégsem</string>
-    <string name="emailSignOutDialogDisable">Eltávolítás</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">E-mail várólista</string>
-    <string name="waitlistNotificationTitle">Az e-mail-védelem készen áll.</string>
-    <string name="waitlistNotificationDescription">Meghívó megnyitása</string>
-
     <string name="waitlistNotificationDialogDescription">Szeretnéd, hogy értesítést küldjünk neked, amikor rád kerül a sor?</string>
     <string name="waitlistNotificationDialogNoThanks">Nem, köszönöm</string>
     <string name="waitlistNotificationDialogNotifyMe">ÉRTESÍTSETEK</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">E-mail védelem (béta)</string>
     <string name="emailProtectionActivityTitle">E-mail védelem (béta)</string>
-    <string name="emailProtectionFooterDescription">Nem kell megosztanod a személyes adataid a várólistához való csatlakozáshoz. A sorban elfoglalt helyedet egy olyan időbélyegző igazolja, amely kizárólag az eszközödön található meg, így értesíteni tudunk, amikor sorra kerülsz.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Hiba történt a várólistához való csatlakozás közben. Kérjük, próbáld újra később.</string>
-    <string name="emailProtectionDuckAddressCta">Már van Duck címem</string>
-    <string name="emailProtectionInviteCodeCta">Van meghívókódom</string>
-    <string name="emailProtectionWaitlistCta">Csatlakozz a privát várólistához</string>
-    <string name="emailProtectionGetStartedCta">Első lépések</string>
     <string name="emailNotSupported">Az eszköz nem támogatott</string>
     <string name="emailNotSupportedExplanation">Az e-mail-védelem lehetővé teszi olyan privát e-mail-címek létrehozását, amelyek eltávolítják az e-mail nyomkövetőket. Ezeket a címeket helyileg az eszközödön kell titkosítanunk és tárolnunk. Mivel az eszközöd nem támogatja a titkosított tárhelyet, az e-mail-védelem nem érhető el.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">E-mail adatvédelem, egyszerűsítve.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet anélkül, hogy e-mail-szolgáltatót váltanál.<br/><a href=""><b>További részletek</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Rajta vagy a listán!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Értesítést küldünk, amikor<br/> az e-mail védelem készen áll számodra. <a href=""><b>További részletek</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Meghívód itt jelenik meg, amikor készen állunk. Szeretnél <a href=""><b>értesítést kapni</b></a>, amikor megérkezik?<br/><a href=""><b>További tudnivalók</b></a> az e-mail védelemről.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Meghívót kaptál!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet<br/>anélkül, hogy e-mail-szolgáltatót váltanál.<br/><a href=""><b>További részletek</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Személyes Duck cím</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Az e-mail védelem eltávolítása erről az eszközről megszünteti azt a lehetőséget, hogy a webes böngészés során a rendszer automatikusan beírja a személyes Duck címedet vagy egy újonnan létrehozott privát Duck címet az e-mail mezőkbe.<br/><br/>A Duck címeid teljes törléséhez, vagy bármilyen más kérdés vagy visszajelzés esetén fordulj hozzánk a <a href=\"mailto:support@duck.com\">support@duck.com</a> címen.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Eltávolítás az eszközről</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Könyvjelző szerkesztése</string>
@@ -683,5 +641,14 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Alkalmazáskövetők letiltása az eszközödön</string>
     <string name="atp_SettingsDeviceShieldEnabled">Engedélyezve</string>
     <string name="atp_SettingsDeviceShieldDisabled">Letiltva</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Úgy tűnik, hogy az oldalon sütik elfogadására szolgáló felugró ablak van👇</string>
+    <string name="autoconsentDialogDescription">Elintézzem helyetted? Megpróbálhatom minimalizálni a sütiket, maximalizálni az adatvédelmet, illetve elrejteni az ilyen felugró ablakokat.</string>
+    <string name="autoconsentPrimaryCta">Felugró sütiablakok kezelése</string>
+    <string name="autoconsentSecondaryCta">Nem, köszönöm</string>
+
+    <string name="autoconsentSetting">Felugró sütiablakok kezelése</string>
+    <string name="autoconsentAnimationText">Kezelt sütik</string>
 
 </resources>

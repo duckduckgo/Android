@@ -37,7 +37,8 @@ interface Client {
         val matches: Boolean,
         val entityName: String? = null,
         val categories: List<String>? = null,
-        val surrogate: String? = null
+        val surrogate: String? = null,
+        val isATracker: Boolean
     )
 
     val name: ClientName

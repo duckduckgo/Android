@@ -27,7 +27,10 @@ data class BrokenSite(
     val surrogates: String,
     val webViewVersion: String,
     val siteType: String,
-    val urlParametersRemoved: Boolean
+    val urlParametersRemoved: Boolean,
+    val consentManaged: Boolean,
+    val consentOptOutFailed: Boolean,
+    val consentSelfTestFailed: Boolean,
 )
 
 sealed class BrokenSiteCategory(

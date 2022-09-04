@@ -512,11 +512,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Povezava prekinjena. To spletno mesto lahko škoduje vaši napravi.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Upravitelj prenosov je onemogočen</string>
-    <string name="downloadManagerIncompatible">Upravitelj prenosov ni na voljo v tej napravi</string>
-    <string name="enable">Omogoči</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Želite omogočiti lokacijo naprave za zasebnost brskalnika DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s zahteva lokacijo vaše naprave. Najprej boste morali aplikaciji dovoliti, da pošlje lokacijo vaše naprave, nato lahko %2$s zahteva dovoljenje.</string>
@@ -548,7 +543,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalni nadzor zasebnosti (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href="">Več</a><u/>]]>
+        <![CDATA[DuckDuckGo samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href=\"\">Več</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globalni nadzor zasebnosti (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalni nadzor zasebnosti (GPC)</string>
@@ -574,52 +569,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokira sledilce e-pošte in skrije vaš naslov</string>
     <string name="newEmailAliasMenuTitle">Ustvari naslov Duck</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Želite odstraniti zaščito e-pošte?</string>
-    <string name="emailSignOutDialogText">Opomba: Če odstranite zaščito e-pošte iz te naprave, s tem ne boste izbrisali naslova Duck.</string>
-    <string name="emailSignOutDialogCancel">Preklic</string>
-    <string name="emailSignOutDialogDisable">Odstrani</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Čakalni seznam e-pošte</string>
-    <string name="waitlistNotificationTitle">Zaščita e-pošte je pripravljena!</string>
-    <string name="waitlistNotificationDescription">Odprite svoje povabilo</string>
-
     <string name="waitlistNotificationDialogDescription">Želite, da vam pošljemo obvestilo, ko ste na vrsti?</string>
     <string name="waitlistNotificationDialogNoThanks">Ne, hvala</string>
     <string name="waitlistNotificationDialogNotifyMe">OBVESTI ME</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Zaščita e-pošte (Beta)</string>
     <string name="emailProtectionActivityTitle">Zaščita e-pošte (Beta)</string>
-    <string name="emailProtectionFooterDescription">Za pridružitev čakalnemu seznamu vam ne bo treba posredovati nobenih osebnih podatkov. Svoje mesto si boste zagotovili v skladu s časovnim žigom, ki obstaja samo v vaši napravi, tako da vas lahko obvestimo, ko boste na vrsti.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Pri dodajanju na čakalni seznam je prišlo do napake. Poskusite znova pozneje.</string>
-    <string name="emailProtectionDuckAddressCta">Naslov Duck že imam</string>
-    <string name="emailProtectionInviteCodeCta">Imam kodo povabila</string>
-    <string name="emailProtectionWaitlistCta">Pridruži se zasebnemu čakalnemu seznamu</string>
-    <string name="emailProtectionGetStartedCta">Začni</string>
     <string name="emailNotSupported">Naprava ni podprta</string>
     <string name="emailNotSupportedExplanation">Zaščita e-pošte vam omogoča ustvarjanje zasebnih e-poštnih naslovov, ki odstranijo sledilnike e-pošte. Te naslove, ki jih ustvarite lokalno, moramo šifrirati in shraniti v vaši napravi. Ker vaša naprava ne podpira šifriranega pomnilnika, zaščita e-pošte ni na voljo.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Poenostavljena zasebnost e-pošte.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokirajte sledilnike e-pošte in skrijte svoj naslov, brez zamenjave ponudnika e-pošte.<a href=""><b>Več</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Ste na seznamu!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Obvestili vas bomo, ko bo<br/> zaščita e-pošte pripravljena za vas. <a href=""><b>Več</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaše povabilo se bo prikazalo tukaj, ko bomo pripravljeni. Želite <a href=""><b>prejeti obvestilo</b></a>, ko prispe?<br/><a href=""><b>Preberite več</b></a> o zaščiti e-pošte.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Povabljeni ste!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokirajte sledilnike e-pošte in skrijte svoj naslov, brez zamenjave ponudnika e-pošte.<a href=""><b>Več</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Osebni naslov Duck</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Odstranitev zaščite e-pošte iz te naprave odstrani možnost, da med brskanjem po spletu v e-poštna polja vpišete svoj osebni naslov Duck ali na novo ustvarjeni zasebni naslov Duck.<br/><br/>Če želite v celoti izbrisati svoje naslove Duck ali za kakršna koli druga vprašanja ali povratne informacije, se obrnite na nas na <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Odstrani iz naprave</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Uredi zaznamek</string>
@@ -691,5 +649,14 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blokiraj sledilnike aplikacij v napravi</string>
     <string name="atp_SettingsDeviceShieldEnabled">Omogočeno</string>
     <string name="atp_SettingsDeviceShieldDisabled">Onemogočeno</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Videti je, da ima to spletno mesto pojavno okno s soglasjem za piškotke👇</string>
+    <string name="autoconsentDialogDescription">Želite, da jih uredim namesto vas? Poskušam zmanjšati piškotke, povečati zasebnost in skriti pojavna okna, kot so ta.</string>
+    <string name="autoconsentPrimaryCta">Upravljanje pojavnih oken za piškotke</string>
+    <string name="autoconsentSecondaryCta">Ne, hvala</string>
+
+    <string name="autoconsentSetting">Upravljanje pojavnih oken za piškotke</string>
+    <string name="autoconsentAnimationText">Upravljani piškotki</string>
 
 </resources>

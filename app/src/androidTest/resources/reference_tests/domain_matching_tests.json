@@ -77,10 +77,7 @@
         "siteURL": "https://randomsite123.com/",
         "requestURL": "https://bad.cnames.test/something",
         "requestType": "script",
-        "expectAction": "block",
-        "exceptPlatforms": [
-          "android-browser"
-        ]
+        "expectAction": "block"
       },
       {
         "name": "uncloacked tracker should contain original path and be checked against the ignore rules",

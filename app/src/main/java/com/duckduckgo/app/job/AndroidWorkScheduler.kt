@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.job
 
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
@@ -31,17 +31,19 @@ import timber.log.Timber
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
 @SingleInstanceIn(AppScope::class)
 class AndroidWorkScheduler @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val notificationScheduler: AndroidNotificationScheduler,
     private val jobCleaner: JobCleaner,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun scheduleWork() {
+    override fun onResume(owner: LifecycleOwner) {
         Timber.v("Scheduling work")
         appCoroutineScope.launch(dispatcherProvider.default()) {
             jobCleaner.cleanDeprecatedJobs()

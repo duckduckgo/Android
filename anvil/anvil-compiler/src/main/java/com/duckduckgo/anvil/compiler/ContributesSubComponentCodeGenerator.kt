@@ -18,6 +18,7 @@ package com.duckduckgo.anvil.compiler
 
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.google.auto.service.AutoService
+import com.squareup.anvil.annotations.ContributesSubcomponent
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.ExperimentalAnvilApi
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -30,6 +31,7 @@ import com.squareup.anvil.compiler.internal.reference.classAndInnerClassReferenc
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import dagger.Binds
+import dagger.BindsInstance
 import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
@@ -73,16 +75,27 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                             .builder(singleInstanceAnnotationFqName.asClassName(module)).addMember("scope = %T::class", scope.asClassName())
                             .build()
                     )
-                    .addAnnotation(AnnotationSpec.builder(MergeSubcomponent::class).addMember("scope = %T::class", scope.asClassName()).build())
+                    .addAnnotation(scope.fqName.subComponentAnnotation(module))
                     .addSuperinterface(duckduckgoAndroidInjectorFqName.asClassName(module).parameterizedBy(vmClass.asClassName()))
                     .addType(
                         TypeSpec.interfaceBuilder("Factory")
                             .addSuperinterface(
                                 duckduckgoAndroidInjectorFqName.asClassName(module)
                                     .nestedClass("Factory")
-                                    .parameterizedBy(vmClass.asClassName())
+                                    .parameterizedBy(vmClass.asClassName(), FqName(subcomponentFactoryClassName).asClassName(module))
                             )
-                            .addAnnotation(AnnotationSpec.builder(Subcomponent.Factory::class).build())
+                            .addAnnotation(scope.fqName.subComponentFactoryAnnotation(module))
+                            .addFunction(
+                                // This function should follow the [AndroidInjector.Factory.create] signature
+                                FunSpec.builder("create")
+                                    .addModifiers(KModifier.OVERRIDE)
+                                    .addModifiers(KModifier.ABSTRACT)
+                                    .addParameter(
+                                        ParameterSpec.builder("instance", vmClass.asClassName()).addAnnotation(BindsInstance::class).build()
+                                    )
+                                    .returns(FqName(subcomponentFactoryClassName).asClassName(module))
+                                    .build()
+                            )
                             .build()
                     )
                     .addType(generateParentComponentInterface(vmClass, codeGenDir, module))
@@ -144,7 +157,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                                 AnnotationSpec.builder(ClassKey::class).addMember("%T::class", bindingClassKey.asClassName(module)).build()
                             )
                             .addModifiers(KModifier.ABSTRACT)
-                            .returns(duckduckgoAndroidInjectorFqName.asClassName(module).nestedClass("Factory").parameterizedBy(STAR))
+                            .returns(duckduckgoAndroidInjectorFqName.asClassName(module).nestedClass("Factory").parameterizedBy(STAR, STAR))
                             .build()
                     )
                     .build()
@@ -153,6 +166,25 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
 
         return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content)
 
+    }
+
+    private fun FqName.subComponentAnnotation(module: ModuleDescriptor): AnnotationSpec {
+        return if (this == vpnScopeFqName) {
+            AnnotationSpec.builder(ContributesSubcomponent::class)
+                .addMember("scope = %T::class", this.asClassName(module))
+                .addMember("parentScope = %T::class", getParentScope(module).asClassName(module))
+                .build()
+        } else {
+            AnnotationSpec.builder(MergeSubcomponent::class).addMember("scope = %T::class", this.asClassName(module)).build()
+        }
+    }
+
+    private fun FqName.subComponentFactoryAnnotation(module: ModuleDescriptor): AnnotationSpec {
+        return if (this == vpnScopeFqName) {
+            AnnotationSpec.builder(ContributesSubcomponent.Factory::class).build()
+        } else {
+            AnnotationSpec.builder(Subcomponent.Factory::class).build()
+        }
     }
 
     private fun FqName.getParentScope(module: ModuleDescriptor): FqName {

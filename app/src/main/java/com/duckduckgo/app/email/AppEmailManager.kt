@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.email
 
-import com.duckduckgo.app.email.EmailManager.FetchCodeResult
-import com.duckduckgo.app.email.EmailManager.WaitlistState
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.global.DispatcherProvider
@@ -26,7 +24,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -81,59 +78,6 @@ class AppEmailManager(
             put(USERNAME, emailDataStore.emailUsername)
             put(NEXT_ALIAS, emailDataStore.nextAlias?.replace(DUCK_EMAIL_DOMAIN, ""))
         }.toString()
-    }
-
-    override fun waitlistState(): WaitlistState {
-        if (emailDataStore.waitlistTimestamp != -1 && emailDataStore.inviteCode == null) {
-            return WaitlistState.JoinedQueue(emailDataStore.sendNotification)
-        }
-        emailDataStore.inviteCode?.let {
-            return WaitlistState.InBeta
-        }
-        return WaitlistState.NotJoinedQueue
-    }
-
-    override fun joinWaitlist(
-        timestamp: Int,
-        token: String
-    ) {
-        if (emailDataStore.waitlistTimestamp == -1) {
-            emailDataStore.waitlistTimestamp = timestamp
-        }
-        if (emailDataStore.waitlistToken == null) {
-            emailDataStore.waitlistToken = token
-        }
-    }
-
-    override fun getInviteCode(): String {
-        return emailDataStore.inviteCode.orEmpty()
-    }
-
-    override suspend fun fetchInviteCode(): FetchCodeResult {
-        val token = emailDataStore.waitlistToken
-        val timestamp = emailDataStore.waitlistTimestamp
-        if (doesCodeAlreadyExist()) return FetchCodeResult.CodeExisted
-        return withContext(dispatcherProvider.io()) {
-            try {
-                val waitlistTimestamp = emailService.waitlistStatus().timestamp
-                if (waitlistTimestamp >= timestamp && token != null) {
-                    val inviteCode = emailService.getCode(token).code
-                    if (inviteCode.isNotEmpty()) {
-                        emailDataStore.inviteCode = inviteCode
-                        return@withContext FetchCodeResult.Code
-                    }
-                }
-                return@withContext FetchCodeResult.NoCode
-            } catch (e: Exception) {
-                return@withContext FetchCodeResult.NoCode
-            }
-        }
-    }
-
-    override fun doesCodeAlreadyExist(): Boolean = emailDataStore.inviteCode != null
-
-    override fun notifyOnJoinedWaitlist() {
-        emailDataStore.sendNotification = true
     }
 
     override fun getCohort(): String {

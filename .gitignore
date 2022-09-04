@@ -19,9 +19,8 @@ build/
 !node_modules/@duckduckgo/privacy_dashboard/build
 .externalNativeBuild/
 
-#node modules
-/node_modules
-!node_modules/@duckduckgo
+#Autoconsent
+/node_modules/@duckduckgo/autoconsent/
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -62,3 +61,17 @@ build-cache
 report
 
 .DS_Store
+
+# Ignore everything in node_modules except autofill dist, license and readme
+# Info on the weird syntax here: https://stackoverflow.com/a/54870120/1948947
+!/node_modules/
+/node_modules/*
+!/node_modules/@duckduckgo/
+/node_modules/@duckduckgo/*
+!/node_modules/@duckduckgo/autofill/
+/node_modules/@duckduckgo/autofill/*
+!/node_modules/@duckduckgo/autofill/LICENSE.md
+!/node_modules/@duckduckgo/autofill/README.md
+!/node_modules/@duckduckgo/autofill/dist/
+/node_modules/@duckduckgo/autofill/dist/*
+!/node_modules/@duckduckgo/autofill/dist/*

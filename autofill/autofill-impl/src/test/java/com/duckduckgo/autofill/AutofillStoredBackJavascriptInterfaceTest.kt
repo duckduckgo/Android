@@ -18,17 +18,24 @@ package com.duckduckgo.autofill
 
 import android.webkit.WebView
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.autofill.AutofillStoredBackJavascriptInterface.UrlProvider
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
+import com.duckduckgo.autofill.jsbridge.request.AutofillStoreFormDataCredentialsRequest
+import com.duckduckgo.autofill.jsbridge.request.AutofillStoreFormDataRequest
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputMainType.CREDENTIALS
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.USERNAME
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -39,10 +46,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
-import org.robolectric.RobolectricTestRunner
 
 @ExperimentalCoroutinesApi
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class AutofillStoredBackJavascriptInterfaceTest {
 
     @get:Rule
@@ -54,14 +60,17 @@ class AutofillStoredBackJavascriptInterfaceTest {
     private val autofillResponseWriter: AutofillResponseWriter = mock()
     private val emailManager: EmailManager = mock()
     private val currentUrlProvider: UrlProvider = mock()
+    private val deviceAuthenticator: DeviceAuthenticator = mock()
+    private val autofillDomainFormatter: AutofillDomainFormatter = AutofillDomainFormatterDomainNameOnly()
     private val coroutineScope: CoroutineScope = TestScope()
 
     private val testWebView = WebView(getApplicationContext())
+    private lateinit var testee: AutofillStoredBackJavascriptInterface
 
-    private lateinit var testee: AutofillJavascriptInterface
+    private val testCallback = TestCallback()
 
     @Before
-    fun setup() = runTest {
+    fun setUp() = runTest {
         testee = AutofillStoredBackJavascriptInterface(
             requestParser = requestParser,
             autofillStore = autofillStore,
@@ -71,12 +80,20 @@ class AutofillStoredBackJavascriptInterfaceTest {
             coroutineScope = coroutineScope,
             currentUrlProvider = currentUrlProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            deviceAuthenticator = deviceAuthenticator,
+            autofillDomainFormatter = autofillDomainFormatter
         )
-        testee.callback = TestCallback
+        testee.callback = testCallback
         testee.webView = testWebView
 
         whenever(currentUrlProvider.currentUrl(testWebView)).thenReturn("https://example.com")
-        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(AutofillDataRequest(CREDENTIALS, USERNAME))
+        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(AutofillDataRequest(CREDENTIALS, USERNAME, USER_INITIATED))
+        whenever(autofillResponseWriter.generateContentScope()).thenReturn("")
+        whenever(autofillResponseWriter.generateEmptyResponseGetAutofillData()).thenReturn("")
+        whenever(autofillResponseWriter.generateResponseGetAutofillData(any())).thenReturn("")
+        whenever(autofillResponseWriter.generateResponseGetAvailableInputTypes(any(), any())).thenReturn("")
+        whenever(autofillResponseWriter.generateUserPreferences(any(), any())).thenReturn("")
+        whenever(autofillResponseWriter.generateUserUnprotectedDomains()).thenReturn("")
     }
 
     @Test
@@ -108,14 +125,380 @@ class AutofillStoredBackJavascriptInterfaceTest {
         assertCredentialsAvailable()
     }
 
+    @Test
+    fun whenRequestSpecifiesSubtypeUsernameAndNoEntriesThenNoCredentialsCallbackInvoked() = runTest {
+        setupRequestForSubTypeUsername()
+        whenever(autofillStore.getCredentials(any())).thenReturn(emptyList())
+        initiateGetAutofillDataRequest()
+        assertCredentialsUnavailable()
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypeUsernameAndNoEntriesWithAUsernameThenNoCredentialsCallbackInvoked() = runTest {
+        setupRequestForSubTypeUsername()
+        whenever(autofillStore.getCredentials(any())).thenReturn(
+            listOf(
+                loginCredential(username = null, password = "foo"),
+                loginCredential(username = null, password = "bar")
+            )
+        )
+        initiateGetAutofillDataRequest()
+        assertCredentialsUnavailable()
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypeUsernameAndSingleEntryWithAUsernameThenCredentialsAvailableCallbackInvoked() = runTest {
+        setupRequestForSubTypeUsername()
+        whenever(autofillStore.getCredentials(any())).thenReturn(
+            listOf(
+                loginCredential(username = null, password = "foo"),
+                loginCredential(username = null, password = "bar"),
+                loginCredential(username = "foo", password = "bar")
+            )
+        )
+        initiateGetAutofillDataRequest()
+        assertCredentialsAvailable()
+        assertCredentialsContains({ it.username }, "foo")
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypeUsernameAndMultipleEntriesWithAUsernameThenCredentialsAvailableCallbackInvoked() = runTest {
+        setupRequestForSubTypeUsername()
+        whenever(autofillStore.getCredentials(any())).thenReturn(
+            listOf(
+                loginCredential(username = null, password = "foo"),
+                loginCredential(username = "username1", password = "bar"),
+                loginCredential(username = null, password = "bar"),
+                loginCredential(username = null, password = "bar"),
+                loginCredential(username = "username2", password = null),
+            )
+        )
+        initiateGetAutofillDataRequest()
+        assertCredentialsAvailable()
+        assertCredentialsContains({ it.username }, "username1", "username2")
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypePasswordAndNoEntriesThenNoCredentialsCallbackInvoked() = runTest {
+        setupRequestForSubTypePassword()
+        whenever(autofillStore.getCredentials(any())).thenReturn(emptyList())
+        initiateGetAutofillDataRequest()
+        assertCredentialsUnavailable()
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypePasswordAndNoEntriesWithAPasswordThenNoCredentialsCallbackInvoked() = runTest {
+        setupRequestForSubTypePassword()
+        whenever(autofillStore.getCredentials(any())).thenReturn(
+            listOf(
+                loginCredential(username = "foo", password = null),
+                loginCredential(username = "bar", password = null)
+            )
+        )
+        initiateGetAutofillDataRequest()
+        assertCredentialsUnavailable()
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypePasswordAndSingleEntryWithAPasswordThenCredentialsAvailableCallbackInvoked() = runTest {
+        setupRequestForSubTypePassword()
+        whenever(autofillStore.getCredentials(any())).thenReturn(
+            listOf(
+                loginCredential(username = null, password = null),
+                loginCredential(username = "foobar", password = null),
+                loginCredential(username = "foo", password = "bar")
+            )
+        )
+        initiateGetAutofillDataRequest()
+        assertCredentialsAvailable()
+        assertCredentialsContains({ it.password }, "bar")
+    }
+
+    @Test
+    fun whenRequestSpecifiesSubtypePasswordAndMultipleEntriesWithAPasswordThenCredentialsAvailableCallbackInvoked() = runTest {
+        setupRequestForSubTypePassword()
+        whenever(autofillStore.getCredentials(any())).thenReturn(
+            listOf(
+                loginCredential(username = null, password = null),
+                loginCredential(username = "username2", password = null),
+                loginCredential(username = "username1", password = "password1"),
+                loginCredential(username = null, password = "password2"),
+                loginCredential(username = null, password = "password3"),
+
+            )
+        )
+        initiateGetAutofillDataRequest()
+        assertCredentialsAvailable()
+        assertCredentialsContains({ it.password }, "password1", "password2", "password3")
+    }
+
+    @Test
+    fun whenAutofillEnabledButNoDeviceAuthThenConfigurationUserPrefsCredentialsIsFalse() = runTest {
+        val url = "example.com"
+        whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(false)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.autofillAvailable).thenReturn(true)
+
+        testee.getRuntimeConfiguration("", url)
+
+        verifyAutofillCredentialsReturnedAs(false)
+    }
+
+    @Test
+    fun whenAutofillUnavailableThenConfigurationUserPrefsCredentialsIsFalse() = runTest {
+        val url = "example.com"
+        whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(false)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.autofillAvailable).thenReturn(false)
+
+        testee.getRuntimeConfiguration("", url)
+
+        verifyAutofillCredentialsReturnedAs(false)
+    }
+
+    @Test
+    fun whenAutofillNotEnabledThenConfigurationUserPrefsCredentialsIsFalse() = runTest {
+        val url = "example.com"
+        whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(false)
+        whenever(autofillStore.autofillAvailable).thenReturn(true)
+
+        testee.getRuntimeConfiguration("", url)
+
+        verifyAutofillCredentialsReturnedAs(false)
+    }
+
+    @Test
+    fun whenAutofillEnabledWithDeviceAuthThenConfigurationUserPrefsCredentialsIsTrue() = runTest {
+        val url = "example.com"
+        whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.autofillAvailable).thenReturn(true)
+        testee.getRuntimeConfiguration("", url)
+
+        verifyAutofillCredentialsReturnedAs(true)
+    }
+
+    @Test
+    fun whenCanAutofillThenConfigSpecifiesShowingKeyIcon() = runTest {
+        val url = "example.com"
+        configureAutofillAvailableForSite(url)
+        testee.getRuntimeConfiguration("", url)
+        verifyKeyIconRequestedToShow()
+    }
+
+    @Test
+    fun whenNoCredentialsForUrlThenConfigurationInputTypeCredentialsIsFalse() = runTest {
+        val url = "example.com"
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.autofillAvailable).thenReturn(true)
+        whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
+
+        testee.getRuntimeConfiguration("", url)
+
+        verify(autofillResponseWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = false, emailAvailable = false)
+    }
+
+    @Test
+    fun whenWithCredentialsForUrlThenConfigurationInputTypeCredentialsIsTrue() = runTest {
+        val url = "example.com"
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.autofillAvailable).thenReturn(true)
+        whenever(autofillStore.getCredentials(url)).thenReturn(
+            listOf(
+                LoginCredentials(
+                    id = 1,
+                    domain = url,
+                    username = "username",
+                    password = "password"
+                )
+            )
+        )
+
+        testee.getRuntimeConfiguration("", url)
+
+        verify(autofillResponseWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = true, emailAvailable = false)
+    }
+
+    @Test
+    fun whenWithCredentialsForUrlButNoDeviceAuthThenConfigurationInputTypeCredentialsIsFalse() = runTest {
+        val url = "example.com"
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(false)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.autofillAvailable).thenReturn(true)
+        whenever(autofillStore.getCredentials(url)).thenReturn(
+            listOf(
+                LoginCredentials(
+                    id = 1,
+                    domain = url,
+                    username = "username",
+                    password = "password"
+                )
+            )
+        )
+
+        testee.getRuntimeConfiguration("", url)
+
+        verify(autofillResponseWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = false, emailAvailable = false)
+    }
+
+    @Test
+    fun whenWithCredentialsForUrlButAutofillDisabledThenConfigurationInputTypeCredentialsIsFalse() = runTest {
+        val url = "example.com"
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(false)
+        whenever(autofillStore.autofillAvailable).thenReturn(true)
+        whenever(autofillStore.getCredentials(url)).thenReturn(
+            listOf(
+                LoginCredentials(
+                    id = 1,
+                    domain = url,
+                    username = "username",
+                    password = "password"
+                )
+            )
+        )
+
+        testee.getRuntimeConfiguration("", url)
+
+        verify(autofillResponseWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = false, emailAvailable = false)
+    }
+
+    @Test
+    fun whenWithCredentialsForUrlButAutofillUnavailableThenConfigurationInputTypeCredentialsIsFalse() = runTest {
+        val url = "example.com"
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.autofillAvailable).thenReturn(false)
+        whenever(autofillStore.getCredentials(url)).thenReturn(
+            listOf(
+                LoginCredentials(
+                    id = 1,
+                    domain = url,
+                    username = "username",
+                    password = "password"
+                )
+            )
+        )
+
+        testee.getRuntimeConfiguration("", url)
+
+        verify(autofillResponseWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = false, emailAvailable = false)
+    }
+
+    @Test
+    fun whenEmailIsSignedInThenConfigurationInputTypeEmailIsTrue() = runTest {
+        val url = "example.com"
+        whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
+        whenever(emailManager.isSignedIn()).thenReturn(true)
+
+        testee.getRuntimeConfiguration("", url)
+
+        verify(autofillResponseWriter).generateResponseGetAvailableInputTypes(credentialsAvailable = false, emailAvailable = true)
+    }
+
+    @Test
+    fun whenStoreFormDataCalledWithNoUsernameThenCallbackInvoked() = runTest {
+        configureRequestParserToReturn(username = null, password = "password")
+        testee.storeFormData("")
+        assertNotNull(testCallback.credentialsToSave)
+    }
+
+    @Test
+    fun whenStoreFormDataCalledWithNoPasswordThenCallbackInvoked() = runTest {
+        configureRequestParserToReturn(username = "dax@duck.com", password = null)
+        testee.storeFormData("")
+        assertNotNull(testCallback.credentialsToSave)
+        assertEquals("dax@duck.com", testCallback.credentialsToSave!!.username)
+    }
+
+    @Test
+    fun whenStoreFormDataCalledWithNullUsernameAndPasswordThenCallbackNotInvoked() = runTest {
+        configureRequestParserToReturn(username = null, password = null)
+        testee.storeFormData("")
+        assertNull(testCallback.credentialsToSave)
+    }
+
+    @Test
+    fun whenStoreFormDataCalledWithBlankUsernameThenCallbackInvoked() = runTest {
+        configureRequestParserToReturn(username = " ", password = "password")
+        testee.storeFormData("")
+        assertEquals(" ", testCallback.credentialsToSave!!.username)
+        assertEquals("password", testCallback.credentialsToSave!!.password)
+    }
+
+    @Test
+    fun whenStoreFormDataCalledWithBlankPasswordThenCallbackInvoked() = runTest {
+        configureRequestParserToReturn(username = "username", password = " ")
+        testee.storeFormData("")
+        assertEquals("username", testCallback.credentialsToSave!!.username)
+        assertEquals(" ", testCallback.credentialsToSave!!.password)
+    }
+
+    @Test
+    fun whenStoreFormDataCalledWithBlankUsernameAndBlankPasswordThenCallbackNotInvoked() = runTest {
+        configureRequestParserToReturn(username = " ", password = " ")
+        testee.storeFormData("")
+        assertNull(testCallback.credentialsToSave)
+    }
+
+    private fun verifyAutofillCredentialsReturnedAs(expectedValue: Boolean) {
+        verify(autofillResponseWriter).generateUserPreferences(autofillCredentials = eq(expectedValue), showInlineKeyIcon = any())
+    }
+
+    private fun verifyKeyIconRequestedToShow() {
+        verify(autofillResponseWriter).generateUserPreferences(showInlineKeyIcon = any(), autofillCredentials = eq(true))
+    }
+
+    private suspend fun configureAutofillAvailableForSite(url: String) {
+        whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(true)
+        whenever(autofillStore.autofillEnabled).thenReturn(true)
+        whenever(autofillStore.autofillAvailable).thenReturn(true)
+    }
+
+    private suspend fun configureRequestParserToReturn(username: String?, password: String?) {
+        val credentials = AutofillStoreFormDataCredentialsRequest(username = username, password = password)
+        val topLevelRequest = AutofillStoreFormDataRequest(credentials)
+        whenever(requestParser.parseStoreFormDataRequest(any())).thenReturn(topLevelRequest)
+    }
+
+    private fun assertCredentialsContains(
+        property: (LoginCredentials) -> String?,
+        vararg expected: String?
+    ) {
+        val numberExpected = expected.size
+        val numberMatched = testCallback.credentialsToInject?.filter { expected.contains(property(it)) }?.count()
+        assertEquals("Wrong number of matched properties. Expected $numberExpected but found $numberMatched", numberExpected, numberMatched)
+    }
+
+    private fun loginCredential(
+        username: String?,
+        password: String?
+    ) = LoginCredentials(0, "example.com", username, password)
+
+    private suspend fun setupRequestForSubTypeUsername() {
+        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(AutofillDataRequest(CREDENTIALS, USERNAME, USER_INITIATED))
+    }
+
+    private suspend fun setupRequestForSubTypePassword() {
+        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(AutofillDataRequest(CREDENTIALS, PASSWORD, USER_INITIATED))
+    }
+
     private fun assertCredentialsUnavailable() {
-        assertNotNull("Callback has not been called", TestCallback.credentialsAvailable)
-        assertFalse(TestCallback.credentialsAvailable!!)
+        assertNotNull("Callback has not been called", testCallback.credentialsAvailableToInject)
+        assertFalse(testCallback.credentialsAvailableToInject!!)
     }
 
     private fun assertCredentialsAvailable() {
-        assertNotNull("Callback has not been called", TestCallback.credentialsAvailable)
-        assertTrue(TestCallback.credentialsAvailable!!)
+        assertNotNull("Callback has not been called", testCallback.credentialsAvailableToInject)
+        assertTrue(testCallback.credentialsAvailableToInject!!)
     }
 
     private fun initiateGetAutofillDataRequest() {
@@ -126,23 +509,29 @@ class AutofillStoredBackJavascriptInterfaceTest {
         verify(autofillMessagePoster).postMessage(any(), anyOrNull())
     }
 
-    object TestCallback : Callback {
+    class TestCallback : Callback {
 
-        var credentials: List<LoginCredentials>? = null
-        var credentialsAvailable: Boolean? = null
+        // for injection
+        var credentialsToInject: List<LoginCredentials>? = null
+        var credentialsAvailableToInject: Boolean? = null
 
-        override fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
-            credentialsAvailable = true
-            this.credentials = credentials
+        // for saving
+        var credentialsToSave: LoginCredentials? = null
+
+        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
+            credentialsAvailableToInject = true
+            this.credentialsToInject = credentials
         }
 
-        override fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials) {
-
+        override suspend fun onCredentialsAvailableToSave(
+            currentUrl: String,
+            credentials: LoginCredentials
+        ) {
+            credentialsToSave = credentials
         }
 
         override fun noCredentialsAvailable(originalUrl: String) {
-            credentialsAvailable = false
+            credentialsAvailableToInject = false
         }
     }
-
 }

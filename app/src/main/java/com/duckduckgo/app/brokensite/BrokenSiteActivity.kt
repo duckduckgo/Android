@@ -63,7 +63,19 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val upgradedHttps = intent.getBooleanExtra(UPGRADED_TO_HTTPS_EXTRA, false)
         val surrogates = intent.getStringExtra(SURROGATES_EXTRA).orEmpty()
         val urlParametersRemoved = intent.getBooleanExtra(URL_PARAMETERS_REMOVED_EXTRA, false)
-        viewModel.setInitialBrokenSite(url, blockedTrackers, surrogates, upgradedHttps, urlParametersRemoved)
+        val consentManaged = intent.getBooleanExtra(CONSENT_MANAGED_EXTRA, false)
+        val consentOptOutFailed = intent.getBooleanExtra(CONSENT_OPT_OUT_FAILED_EXTRA, false)
+        val consentSelfTestFailed = intent.getBooleanExtra(CONSENT_SELF_TEST_FAILED_EXTRA, false)
+        viewModel.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = blockedTrackers,
+            surrogates = surrogates,
+            upgradedHttps = upgradedHttps,
+            urlParametersRemoved = urlParametersRemoved,
+            consentManaged = consentManaged,
+            consentOptOutFailed = consentOptOutFailed,
+            consentSelfTestFailed = consentSelfTestFailed,
+        )
     }
 
     private fun configureListeners() {
@@ -127,6 +139,9 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val UPGRADED_TO_HTTPS_EXTRA = "UPGRADED_TO_HTTPS_EXTRA"
         private const val SURROGATES_EXTRA = "SURROGATES_EXTRA"
         private const val URL_PARAMETERS_REMOVED_EXTRA = "URL_PARAMETERS_REMOVED_EXTRA"
+        private const val CONSENT_MANAGED_EXTRA = "CONSENT_MANAGED_EXTRA"
+        private const val CONSENT_OPT_OUT_FAILED_EXTRA = "CONSENT_OPT_OUT_FAILED_EXTRA"
+        private const val CONSENT_SELF_TEST_FAILED_EXTRA = "CONSENT_SELF_TEST_FAILED_EXTRA"
 
         fun intent(
             context: Context,
@@ -138,6 +153,9 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             intent.putExtra(SURROGATES_EXTRA, data.surrogates)
             intent.putExtra(UPGRADED_TO_HTTPS_EXTRA, data.upgradedToHttps)
             intent.putExtra(URL_PARAMETERS_REMOVED_EXTRA, data.urlParametersRemoved)
+            intent.putExtra(CONSENT_MANAGED_EXTRA, data.consentManaged)
+            intent.putExtra(CONSENT_OPT_OUT_FAILED_EXTRA, data.consentOptOutFailed)
+            intent.putExtra(CONSENT_SELF_TEST_FAILED_EXTRA, data.consentSelfTestFailed)
             return intent
         }
     }

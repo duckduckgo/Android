@@ -70,6 +70,9 @@ class BrokenSiteViewModel @Inject constructor(
     private var upgradedHttps: Boolean = false
     private val viewValue: ViewState get() = viewState.value!!
     private var urlParametersRemoved: Boolean = false
+    private var consentManaged: Boolean = false
+    private var consentOptOutFailed: Boolean = false
+    private var consentSelfTestFailed: Boolean = false
 
     init {
         viewState.value = ViewState()
@@ -80,13 +83,19 @@ class BrokenSiteViewModel @Inject constructor(
         blockedTrackers: String,
         surrogates: String,
         upgradedHttps: Boolean,
-        urlParametersRemoved: Boolean
+        urlParametersRemoved: Boolean,
+        consentManaged: Boolean,
+        consentOptOutFailed: Boolean,
+        consentSelfTestFailed: Boolean,
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
         this.upgradedHttps = upgradedHttps
         this.surrogates = surrogates
         this.urlParametersRemoved = urlParametersRemoved
+        this.consentManaged = consentManaged
+        this.consentOptOutFailed = consentOptOutFailed
+        this.consentSelfTestFailed = consentSelfTestFailed
     }
 
     fun onCategoryIndexChanged(newIndex: Int) {
@@ -139,14 +148,16 @@ class BrokenSiteViewModel @Inject constructor(
             surrogates = surrogates,
             webViewVersion = webViewVersion,
             siteType = if (Uri.parse(url).isMobileSite) MOBILE_SITE else DESKTOP_SITE,
-            urlParametersRemoved = urlParametersRemoved
+            urlParametersRemoved = urlParametersRemoved,
+            consentManaged = consentManaged,
+            consentOptOutFailed = consentOptOutFailed,
+            consentSelfTestFailed = consentSelfTestFailed,
         )
     }
 
     private fun canSubmit(): Boolean = categories.elementAtOrNull(indexSelected) != null
 
     companion object {
-        const val WEBVIEW_UNKNOWN_VERSION = "unknown"
         const val MOBILE_SITE = "mobile"
         const val DESKTOP_SITE = "desktop"
     }

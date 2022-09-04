@@ -40,7 +40,10 @@ class RealSecureStorageRepositoryTest {
         domain = "test.com",
         username = "test",
         password = "pass123",
-        iv = "iv"
+        iv = "iv",
+        notes = "my notes",
+        domainTitle = "test",
+        lastUpdatedInMillis = 0L
     )
 
     @Before

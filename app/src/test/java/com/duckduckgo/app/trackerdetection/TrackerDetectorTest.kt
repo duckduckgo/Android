@@ -17,12 +17,16 @@
 package com.duckduckgo.app.trackerdetection
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.app.trackerdetection.model.TdsEntity
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import org.mockito.kotlin.mock
@@ -39,9 +43,17 @@ class TrackerDetectorTest {
     private val mockUserWhitelistDao: UserWhitelistDao = mock()
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
-    private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
-    private val trackerDetector =
-        TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
+    private val mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
+    private val mockAdClickManager: AdClickManager = mock()
+
+    private val trackerDetector = TrackerDetectorImpl(
+        mockEntityLookup,
+        mockUserWhitelistDao,
+        mockContentBlocking,
+        mockTrackerAllowlist,
+        mockWebTrackersBlockedDao,
+        mockAdClickManager
+    )
 
     @Test
     fun whenThereAreNoClientsThenClientCountIsZero() {
@@ -67,21 +79,64 @@ class TrackerDetectorTest {
         assertEquals(1, trackerDetector.clientCount)
         assertNotNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com"))
 
-        trackerDetector.addClient(neverMatchingClient(CLIENT_A))
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         assertEquals(1, trackerDetector.clientCount)
-        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com"))
+        assertNotNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com"))
     }
 
     @Test
-    fun whenThereAreNoClientsThenEvaluateReturnsNull() {
-        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com"))
+    fun whenThereAreNoClientsAndIsThirdPartyThenEvaluateReturnsNonTrackingEvent() {
+        trackerDetector.addClient(nonMatchingClientNoTracker(CLIENT_A))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.ALLOWED,
+            type = TrackerType.OTHER
+        )
+
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        assertEquals(expected, actual)
     }
 
     @Test
-    fun whenAllClientsFailToMatchThenEvaluateReturnsNull() {
-        trackerDetector.addClient(neverMatchingClient(CLIENT_A))
-        trackerDetector.addClient(neverMatchingClient(CLIENT_B))
-        assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com"))
+    fun whenThereAreNoClientsAndIsThirdPartyFromSameEntityThenEvaluateReturnsSameEntityNonTrackingEvent() {
+        val entity = TdsEntity("example", "example", 0.0)
+        whenever(mockEntityLookup.entityForUrl(anyString())).thenReturn(entity)
+        trackerDetector.addClient(nonMatchingClientNoTracker(CLIENT_A))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = entity,
+            surrogateId = null,
+            status = TrackerStatus.SAME_ENTITY_ALLOWED,
+            type = TrackerType.OTHER
+        )
+
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenThereAreClientsAndIsThirdPartyButIgnoredThenEvaluateReturnsNonTrackingEvent() {
+        val entity = TdsEntity("example", "example", 0.0)
+        whenever(mockEntityLookup.entityForUrl(anyString())).thenReturn(entity)
+        trackerDetector.addClient(matchingClientTrackerIgnored(CLIENT_A))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = entity,
+            surrogateId = null,
+            status = TrackerStatus.SAME_ENTITY_ALLOWED,
+            type = TrackerType.OTHER
+        )
+
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        assertEquals(expected, actual)
     }
 
     @Test
@@ -89,7 +144,15 @@ class TrackerDetectorTest {
         whenever(mockUserWhitelistDao.contains("example.com")).thenReturn(false)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
-        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, true, null)
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER
+        )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
     }
@@ -99,7 +162,15 @@ class TrackerDetectorTest {
         whenever(mockUserWhitelistDao.contains("example.com")).thenReturn(true)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
-        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, false, null)
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.USER_ALLOWED,
+            type = TrackerType.OTHER,
+        )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
     }
@@ -107,9 +178,16 @@ class TrackerDetectorTest {
     @Test
     fun whenSiteIsNotUserWhitelistedAndSomeClientsMatchThenEvaluateReturnsBlockedTrackingEvent() {
         whenever(mockUserWhitelistDao.contains("example.com")).thenReturn(false)
-        trackerDetector.addClient(neverMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
-        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, true, null)
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER,
+        )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
     }
@@ -117,9 +195,16 @@ class TrackerDetectorTest {
     @Test
     fun whenSiteIsUserWhitelistedAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
         whenever(mockUserWhitelistDao.contains("example.com")).thenReturn(true)
-        trackerDetector.addClient(neverMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
-        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, false, null)
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.USER_ALLOWED,
+            type = TrackerType.OTHER
+        )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
     }
@@ -128,7 +213,15 @@ class TrackerDetectorTest {
     fun whenSiteIsInContentBlockingExceptionsListAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
         whenever(mockContentBlocking.isAnException(anyString())).thenReturn(true)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, false, null)
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.ALLOWED,
+            type = TrackerType.OTHER,
+        )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
     }
@@ -137,7 +230,15 @@ class TrackerDetectorTest {
     fun whenSiteIsNotUserWhitelistedAndSomeClientsMatchWithSurrogateThenEvaluateReturnsBlockedTrackingEventWithSurrogate() {
         whenever(mockUserWhitelistDao.contains("example.com")).thenReturn(false)
         trackerDetector.addClient(alwaysMatchingClientWithSurrogate(CLIENT_A))
-        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, true, "testId")
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = "testId",
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER
+        )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
     }
@@ -146,7 +247,32 @@ class TrackerDetectorTest {
     fun whenRequestIsInAllowlistAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
         whenever(mockTrackerAllowlist.isAnException(anyString(), anyString())).thenReturn(true)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, false, null)
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.SITE_BREAKAGE_ALLOWED,
+            type = TrackerType.OTHER
+        )
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun whenRequestIsInAdClickAllowListAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
+        whenever(mockAdClickManager.isExemption(anyString(), anyString())).thenReturn(true)
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.AD_ALLOWED,
+            type = TrackerType.AD,
+        )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
     }
@@ -184,21 +310,28 @@ class TrackerDetectorTest {
     private fun alwaysMatchingClient(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(true))
-        return client
-    }
-
-    private fun neverMatchingClient(name: ClientName): Client {
-        val client: Client = mock()
-        whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(false))
+        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(matches = true, isATracker = true))
         return client
     }
 
     private fun alwaysMatchingClientWithSurrogate(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(matches = true, surrogate = "testId"))
+        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(matches = true, surrogate = "testId", isATracker = true))
+        return client
+    }
+
+    private fun nonMatchingClientNoTracker(name: ClientName): Client {
+        val client: Client = mock()
+        whenever(client.name).thenReturn(name)
+        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(matches = false, isATracker = false))
+        return client
+    }
+
+    private fun matchingClientTrackerIgnored(name: ClientName): Client {
+        val client: Client = mock()
+        whenever(client.name).thenReturn(name)
+        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(matches = false, isATracker = true))
         return client
     }
     companion object {

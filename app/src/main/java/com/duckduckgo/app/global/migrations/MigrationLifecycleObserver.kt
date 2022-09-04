@@ -16,25 +16,27 @@
 
 package com.duckduckgo.app.global.migrations
 
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.migrations.MigrationPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
 @SingleInstanceIn(AppScope::class)
 class MigrationLifecycleObserver @Inject constructor(
     private val migrationPluginPoint: PluginPoint<MigrationPlugin>,
     private val migrationStore: MigrationStore
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun migrate() {
+    override fun onCreate(owner: LifecycleOwner) {
         val currentVersion = migrationStore.version
         migrationPluginPoint.getPlugins()
             .sortedBy { it.version }

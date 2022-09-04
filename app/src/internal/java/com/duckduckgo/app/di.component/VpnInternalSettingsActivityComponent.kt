@@ -37,7 +37,7 @@ import dagger.multibindings.IntoMap
 )
 interface VpnInternalSettingsActivityComponent : AndroidInjector<VpnInternalSettingsActivity> {
     @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<VpnInternalSettingsActivity>
+    interface Factory : AndroidInjector.Factory<VpnInternalSettingsActivity, VpnInternalSettingsActivityComponent>
 }
 
 @ContributesTo(AppScope::class)
@@ -51,5 +51,5 @@ abstract class VpnInternalSettingsActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(VpnInternalSettingsActivity::class)
-    abstract fun VpnInternalSettingsActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
+    abstract fun VpnInternalSettingsActivityComponent.Factory.bind(): AndroidInjector.Factory<*, *>
 }

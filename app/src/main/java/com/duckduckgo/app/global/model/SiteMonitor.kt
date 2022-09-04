@@ -20,6 +20,7 @@ import android.net.Uri
 import android.net.http.SslCertificate
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
@@ -28,6 +29,7 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import kotlinx.coroutines.CoroutineScope
@@ -74,13 +76,27 @@ class SiteMonitor(
     override val surrogates = CopyOnWriteArrayList<SurrogateResponse>()
 
     override val trackerCount: Int
-        get() = trackingEvents.size
+        get() = trackingEvents.count { it.status == TrackerStatus.BLOCKED }
+
+    override val otherDomainsLoadedCount: Int
+        get() = trackingEvents.asSequence()
+            .filter { it.status == TrackerStatus.ALLOWED }
+            .map { UriString.host(it.trackerUrl) }
+            .distinct()
+            .count()
+
+    override val specialDomainsLoadedCount: Int
+        get() = trackingEvents.asSequence()
+            .filter { specialDomainTypes.contains(it.status) }
+            .map { UriString.host(it.trackerUrl) }
+            .distinct()
+            .count()
 
     override val majorNetworkCount: Int
         get() = trackingEvents.distinctBy { it.entity?.name }.count { it.entity?.isMajor ?: false }
 
     override val allTrackersBlocked: Boolean
-        get() = trackingEvents.none { !it.blocked }
+        get() = trackingEvents.none { it.status == TrackerStatus.USER_ALLOWED }
 
     private var fullSiteDetailsAvailable: Boolean = false
 
@@ -144,4 +160,24 @@ class SiteMonitor(
     }
 
     override var urlParametersRemoved: Boolean = false
+
+    override var consentManaged: Boolean = false
+
+    override var consentOptOutFailed: Boolean = false
+
+    override var consentSelfTestFailed: Boolean = false
+
+    companion object {
+        private val specialDomainTypes = setOf(
+            TrackerStatus.AD_ALLOWED,
+            TrackerStatus.SITE_BREAKAGE_ALLOWED,
+            TrackerStatus.SAME_ENTITY_ALLOWED,
+            TrackerStatus.USER_ALLOWED
+        )
+
+        private val allowedDomainTypes = setOf(
+            TrackerStatus.USER_ALLOWED,
+            TrackerStatus.SAME_ENTITY_ALLOWED
+        )
+    }
 }

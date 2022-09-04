@@ -508,11 +508,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Connexion interrompue. Ce site Web pourrait nuire à votre appareil.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Le gestionnaire de téléchargement est désactivé</string>
-    <string name="downloadManagerIncompatible">Le gestionnaire de téléchargement est indisponible sur cet appareil</string>
-    <string name="enable">Activer</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Voulez-vous activer la localisation de l\'appareil pour le navigateur de confidentialité DuckDuckGo ?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s souhaite accéder à la localisation de votre appareil. Vous devez d\'abord autoriser l\'application à envoyer la localisation de votre appareil avant que %2$s puisse demander l\'autorisation.</string>
@@ -544,7 +539,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo bloque automatiquement de nombreux traqueurs. Grâce au Global Privacy Control (GPC), vous pouvez également demander aux sites web participants de limiter la vente ou le partage de vos données personnelles avec d\'autres entreprises. <u><a href="">En savoir plus</a><u/>]]>
+        <![CDATA[DuckDuckGo bloque automatiquement de nombreux traqueurs. Grâce au Global Privacy Control (GPC), vous pouvez également demander aux sites web participants de limiter la vente ou le partage de vos données personnelles avec d\'autres entreprises. <u><a href=\"\">En savoir plus</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -570,52 +565,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Bloque les traqueurs d\'e-mails et masque votre adresse</string>
     <string name="newEmailAliasMenuTitle">Créer une adresse Duck</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Supprimer la protection des e-mails ?</string>
-    <string name="emailSignOutDialogText">Remarque : la suppression de la protection des e-mails sur cet appareil ne supprimera pas votre adresse Duck.</string>
-    <string name="emailSignOutDialogCancel">Annuler</string>
-    <string name="emailSignOutDialogDisable">Supprimer</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Liste d\'attente pour la protection des e-mails</string>
-    <string name="waitlistNotificationTitle">La protection des e-mails est prête !</string>
-    <string name="waitlistNotificationDescription">Ouvrez votre invitation</string>
-
     <string name="waitlistNotificationDialogDescription">Souhaitez-vous être prévenu(e) lorsque vous aurez accès à notre nouvelle fonctionnalité ?</string>
     <string name="waitlistNotificationDialogNoThanks">Non merci</string>
     <string name="waitlistNotificationDialogNotifyMe">ME PRÉVENIR</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Protection des e-mails (bêta)</string>
     <string name="emailProtectionActivityTitle">Protection des e-mails (bêta)</string>
-    <string name="emailProtectionFooterDescription">Vous n\'aurez pas à fournir d\'informations personnelles pour vous inscrire sur la liste d\'attente. Votre place sera assurée par un horodatage associé uniquement à votre appareil, qui nous permettra de vous informer quand viendra votre tour.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Une erreur s\'est produite lors de l\'inscription sur la liste d\'attente. Veuillez réessayer plus tard.</string>
-    <string name="emailProtectionDuckAddressCta">J\'ai déjà une adresse Duck</string>
-    <string name="emailProtectionInviteCodeCta">J\'ai un code d\'invitation</string>
-    <string name="emailProtectionWaitlistCta">Rejoindre la liste d\'attente privée</string>
-    <string name="emailProtectionGetStartedCta">Commencer</string>
     <string name="emailNotSupported">Appareil non pris en charge</string>
     <string name="emailNotSupportedExplanation">La protection des e-mails vous permet de créer des adresses e-mail privées qui suppriment les traqueurs d\'e-mails. Nous devons chiffrer et stocker ces adresses que vous créez localement sur votre appareil. Ce dernier ne prenant pas en charge le stockage chiffré, la protection des e-mails n\'est pas disponible.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">La confidentialité des e-mails, simplifiée.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloquez les traqueurs d\'e-mails et masquez votre adresse, sans changer de fournisseur de messagerie.<br/><a href=""><b>En savoir plus</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Vous êtes sur la liste !</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Nous vous contacterons lorsque la protection des e-mails sera disponible pour vous. <a href=""><b>En savoir plus</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Votre invitation s\'affichera ici lorsque vous aurez accès à la fonctionnalité. Vous souhaitez <a href=""><b>être prévenu(e)</b></a> de son lancement ?<br/><a href=""><b>En savoir plus</b></a> sur la protection des e-mails.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Vous êtes invité(e) !</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloquez les traqueurs d\'e-mails et masquez votre adresse,<br/>sans changer de fournisseur de messagerie.<br/><a href=""><b>En savoir plus</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Adresse Duck personnelle</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[En supprimant la protection des e-mails de cet appareil, vous ne pourrez plus renseigner d\'adresse Duck personnelle ni de nouvelle adresse privée Duck dans les champs Adresse e-mail lorsque vous naviguez sur le Web.<br/><br/>Pour supprimer intégralement vos adresses Duck ou pour toute autre question ou commentaire, contactez-nous à l\'adresse <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Supprimer de cet appareil</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Modifier le signet</string>
@@ -683,5 +641,14 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Bloquer les traqueurs d\'applications sur votre appareil</string>
     <string name="atp_SettingsDeviceShieldEnabled">Activé</string>
     <string name="atp_SettingsDeviceShieldDisabled">Désactivé</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Il semble que ce site ait une fenêtre contextuelle de consentement aux cookies👇</string>
+    <string name="autoconsentDialogDescription">Voulez-vous que je m\'en charge ? Je peux essayer de minimiser les cookies, de maximiser la confidentialité et de masquer les fenêtres contextuelles comme celles-ci.</string>
+    <string name="autoconsentPrimaryCta">Gérer les fenêtres contextuelles de cookies</string>
+    <string name="autoconsentSecondaryCta">Non merci</string>
+
+    <string name="autoconsentSetting">Gérer les fenêtres contextuelles de cookies</string>
+    <string name="autoconsentAnimationText">Cookies gérés</string>
 
 </resources>

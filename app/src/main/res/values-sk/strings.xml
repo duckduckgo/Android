@@ -512,11 +512,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Spojenie bolo prerušené. Táto webová stránka môže byť pre vaše zariadenie škodlivá.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Správca sťahovania je zakázaný</string>
-    <string name="downloadManagerIncompatible">Správca sťahovania nie je na tomto zariadení k dispozícií</string>
-    <string name="enable">Povoliť</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Povoliť polohu zariadenia pre súkromný prehliadač DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s žiada o polohu vášho zariadenia. Najskôr budete musieť aplikácii povoliť odosielanie polohy vášho zariadenia a potom bude môcť %2$s požiadať o povolenie.</string>
@@ -548,7 +543,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globálna kontrola súkromia (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automaticky blokuje množstvo trackerov. Vďaka Globálnej kontrole súkromia (GPC) môžete tiež požiadať partnerské webové lokality o obmedzenie predaja alebo zdieľania vašich osobných údajov s inými spoločnosťami. <u><a href="">Ďalšie informácie</a><u/>]]>
+        <![CDATA[DuckDuckGo automaticky blokuje množstvo trackerov. Vďaka Globálnej kontrole súkromia (GPC) môžete tiež požiadať partnerské webové lokality o obmedzenie predaja alebo zdieľania vašich osobných údajov s inými spoločnosťami. <u><a href=\"\">Ďalšie informácie</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globálna kontrola súkromia (GPC)</string>
     <string name="globalPrivacyControlToggle">Globálna kontrola súkromia (GPC)</string>
@@ -574,52 +569,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokuje e mailové trackery a skryje vašu adresu</string>
     <string name="newEmailAliasMenuTitle">Vytvoriť adresu Duck</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Odstrániť ochranu e‑mailu?</string>
-    <string name="emailSignOutDialogText">Poznámka: Odstránením ochrany e‑mailu z tohto zariadenia sa neodstráni vaša adresa Duck.</string>
-    <string name="emailSignOutDialogCancel">Zrušiť</string>
-    <string name="emailSignOutDialogDisable">Odstrániť</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Zoznam čakateľov na ochranu e‑mailu</string>
-    <string name="waitlistNotificationTitle">Ochrana e‑mailov je pripravená!</string>
-    <string name="waitlistNotificationDescription">Otvorte svoju pozvánku</string>
-
     <string name="waitlistNotificationDialogDescription">Chcete, aby sme vám poslali upozornenie, keď na vás príde rad?</string>
     <string name="waitlistNotificationDialogNoThanks">Nie, ďakujem</string>
     <string name="waitlistNotificationDialogNotifyMe">UPOZORNITE MA</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Ochrana e‑mailu (beta)</string>
     <string name="emailProtectionActivityTitle">Ochrana e‑mailu (beta)</string>
-    <string name="emailProtectionFooterDescription">Na zaradenie do poradovníka nemusíte zdieľať žiadne osobné údaje. Svoje miesto si zabezpečíte časovou pečiatkou, ktorá existuje výlučne vo vašom zariadení, aby sme vás mohli upozorniť, keď budete na rade.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Počas pridávania na zoznam čakateľov došlo k chybe. Skúste to znova neskôr.</string>
-    <string name="emailProtectionDuckAddressCta">Už mám adresu Duck</string>
-    <string name="emailProtectionInviteCodeCta">Mám pozývací kód</string>
-    <string name="emailProtectionWaitlistCta">Pridajte sa do súkromného zoznamu čakateľov</string>
-    <string name="emailProtectionGetStartedCta">Začnite</string>
     <string name="emailNotSupported">Nepodporované zariadenia</string>
     <string name="emailNotSupportedExplanation">Ochrana e‑mailov vám umožňuje vytvárať súkromné e‑mailové adresy, ktoré odstraňujú nástroje na sledovanie e‑mailov. Tieto adresy, ktoré vytvárate, musíme šifrovať a ukladať lokálne vo vašom zariadení. Keďže vaše zariadenie nepodporuje šifrované úložisko, ochrana e‑mailov nie je k dispozícii.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Zjednodušená ochrana súkromia v e‑mailoch.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokujte nástroje na sledovanie e‑mailov bez zmeny poskytovateľa e‑mailu.<b><a href="">Zistite viac</a></b>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Ste na zozname!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Keď budete mať pripravenú ochranu e‑mailu,<br/>pošleme vám upozornenie. <b><a href="">Zistite viac</a></b>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tu sa zobrazí vaša pozvánka, keď budeme na vás pripravení. Chcete <a href=""><b>dostať upozornenie</b></a>, keď dorazí?<br/><a href=""><b>Zistite viac</b></a> o ochrane e‑mailu.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Dostali ste pozvánku!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokujte nástroje na sledovanie e‑mailov bez zmeny poskytovateľa e‑mailu.<b><a href="">Zistite viac</a></b>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Osobná adresa Duck</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Odstránením ochrany e‑mailu z tohto zariadenia stratíte možnosť vyplniť svoju osobnú adresu Duck alebo novovygenerovanú súkromnú adresu Duck do e‑mailových polí pri prehliadaní webu.<br/><br/>Ak si chcete úplne odstrániť adresy Duck alebo ak máte iné otázky či pripomienky, obráťte sa na nás na adrese <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Odstrániť zo zariadenia</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Upraviť záložku</string>
@@ -691,5 +649,14 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blokovanie sledovacích nástrojov aplikácií vo vašom zariadení</string>
     <string name="atp_SettingsDeviceShieldEnabled">Povolené</string>
     <string name="atp_SettingsDeviceShieldDisabled">Zakázané</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Zdá sa, že táto stránka má kontextové okno týkajúce sa súhlasu so súbormi cookie👇</string>
+    <string name="autoconsentDialogDescription">Chceš, aby som to riešil za teba? Môžem sa pokúsiť minimalizovať súbory cookie, maximalizovať ochranu súkromia a skryť kontextové okná, ako sú tieto.</string>
+    <string name="autoconsentPrimaryCta">Správa kontextových okien súborov cookie</string>
+    <string name="autoconsentSecondaryCta">Nie, ďakujem</string>
+
+    <string name="autoconsentSetting">Správa kontextových okien súborov cookie</string>
+    <string name="autoconsentAnimationText">Spravované súbory cookie</string>
 
 </resources>

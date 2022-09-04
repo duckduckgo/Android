@@ -25,5 +25,5 @@ import com.duckduckgo.autofill.store.AutofillStore
  * We can only show that prompt if we've first determined there is an existing partial match in need of an update.
  */
 interface ExistingCredentialMatchDetector {
-    suspend fun determine(currentUrl: String, username: String, password: String): AutofillStore.ContainsCredentialsResult
+    suspend fun determine(currentUrl: String, username: String?, password: String?): AutofillStore.ContainsCredentialsResult
 }

@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.global.formatters.time.model
 
+import android.content.res.Resources
+import com.duckduckgo.app.global.R
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import org.threeten.bp.LocalDateTime
 
@@ -45,47 +47,41 @@ data class TimePassed(
     val seconds: Long
 ) {
 
-    fun shortFormat(): String {
-        val sb = StringBuilder()
-
+    fun shortFormat(resources: Resources): String {
         if (hours > 0) {
-            sb.append(hours)
-            sb.append("h ago")
-            return sb.toString()
+            return resources.getString(R.string.common_HoursAgo, hours)
         }
 
         if (minutes > 2) {
-            sb.append(minutes)
-            sb.append("m ago")
-            return sb.toString()
+            return resources.getString(R.string.common_MinutesAgo, minutes)
         }
 
-        sb.append("just now")
-        return sb.toString()
+        return resources.getString(R.string.common_JustNow)
     }
 
     fun format(
         alwaysShowHours: Boolean = true,
         alwaysShowMinutes: Boolean = true,
-        alwaysShowSeconds: Boolean = true
+        alwaysShowSeconds: Boolean = true,
+        resources: Resources
     ): String {
         val sb = StringBuilder()
 
         if (hours > 0 || alwaysShowHours) {
             sb.append(hours)
-            sb.append(" hr")
+            sb.append(" ${resources.getString(R.string.common_hour_abbreviation)}")
         }
 
         if (minutes > 0 || alwaysShowMinutes) {
             sb.append(" ")
             sb.append(minutes)
-            sb.append(" min")
+            sb.append(" ${resources.getString(R.string.common_min_abbreviation)}")
         }
 
         if (alwaysShowSeconds) {
             sb.append(" ")
             sb.append(seconds)
-            sb.append(" sec")
+            sb.append(" ${resources.getString(R.string.common_seconds_abbreviation)}")
         }
 
         return sb.toString()

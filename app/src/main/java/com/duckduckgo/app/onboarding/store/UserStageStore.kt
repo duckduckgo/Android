@@ -16,12 +16,11 @@
 
 package com.duckduckgo.app.onboarding.store
 
-import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-interface UserStageStore : LifecycleObserver {
+interface UserStageStore {
     suspend fun getUserAppStage(): AppStage
     suspend fun stageCompleted(appStage: AppStage): AppStage
     suspend fun moveToStage(appStage: AppStage)

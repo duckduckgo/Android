@@ -21,7 +21,9 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.surrogates.SurrogateResponse
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import kotlinx.coroutines.test.TestScope
@@ -92,18 +94,50 @@ class BrokenSiteDataTest {
     @Test
     fun whenSiteHasBlockedTrackersThenBlockedTrackersExist() {
         val site = buildSite(SITE_URL)
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false, null)
-        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.anothertracker.com/tracker.js", emptyList(), null, false, null)
+        val event = TrackingEvent(
+            documentUrl = "http://www.example.com",
+            trackerUrl = "http://www.tracker.com/tracker.js",
+            categories = emptyList(),
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER
+        )
+        val anotherEvent = TrackingEvent(
+            documentUrl = "http://www.example.com/test",
+            trackerUrl = "http://www.anothertracker.com/tracker.js",
+            categories = emptyList(),
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.ALLOWED,
+            type = TrackerType.OTHER
+        )
         site.trackerDetected(event)
         site.trackerDetected(anotherEvent)
-        assertEquals("www.tracker.com,www.anothertracker.com", BrokenSiteData.fromSite(site).blockedTrackers)
+        assertEquals("www.tracker.com", BrokenSiteData.fromSite(site).blockedTrackers)
     }
 
     @Test
     fun whenSiteHasSameHostBlockedTrackersThenOnlyUniqueTrackersIncludedInData() {
         val site = buildSite(SITE_URL)
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false, null)
-        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.tracker.com/tracker2.js", emptyList(), null, false, null)
+        val event = TrackingEvent(
+            documentUrl = "http://www.example.com",
+            trackerUrl = "http://www.tracker.com/tracker.js",
+            categories = emptyList(),
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER
+        )
+        val anotherEvent = TrackingEvent(
+            documentUrl = "http://www.example.com/test",
+            trackerUrl = "http://www.tracker.com/tracker2.js",
+            categories = emptyList(),
+            entity = null,
+            surrogateId = null,
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER
+        )
         site.trackerDetected(event)
         site.trackerDetected(anotherEvent)
         assertEquals("www.tracker.com", BrokenSiteData.fromSite(site).blockedTrackers)

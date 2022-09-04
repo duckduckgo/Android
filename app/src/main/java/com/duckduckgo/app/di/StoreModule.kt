@@ -75,10 +75,6 @@ abstract class StoreModule {
     abstract fun bindUserStageStore(userStageStore: AppUserStageStore): UserStageStore
 
     @Binds
-    @IntoSet
-    abstract fun bindUserStageStoreObserver(userStageStore: UserStageStore): LifecycleObserver
-
-    @Binds
     abstract fun bindUserEventsStore(userEventsStore: AppUserEventsStore): UserEventsStore
 
     @Binds

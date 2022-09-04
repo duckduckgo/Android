@@ -21,13 +21,17 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.annotation.WorkerThread
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
+import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.Gpc
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +61,9 @@ class WebViewRequestInterceptor(
     private val httpsUpgrader: HttpsUpgrader,
     private val privacyProtectionCountDao: PrivacyProtectionCountDao,
     private val gpc: Gpc,
-    private val userAgentProvider: UserAgentProvider
+    private val userAgentProvider: UserAgentProvider,
+    private val adClickManager: AdClickManager,
+    private val cloakedCnameDetector: CloakedCnameDetector
 ) : RequestInterceptor {
 
     /**
@@ -79,6 +85,8 @@ class WebViewRequestInterceptor(
 
         val url = request.url
 
+        adClickManager.detectAdClick(url?.toString(), request.isForMainFrame)
+
         newUserAgent(request, webView, webViewClientListener)?.let {
             withContext(Dispatchers.Main) {
                 webView.settings?.userAgentString = it
@@ -86,6 +94,8 @@ class WebViewRequestInterceptor(
             }
             return WebResourceResponse(null, null, null)
         }
+
+        if (appUrlPixel(url)) return null
 
         if (shouldUpgrade(request)) {
             val newUri = httpsUpgrader.upgrade(url)
@@ -141,22 +151,40 @@ class WebViewRequestInterceptor(
         webViewClientListener: WebViewClientListener?
     ): WebResourceResponse? {
         val trackingEvent = trackingEvent(request, documentUrl, webViewClientListener)
-        if (trackingEvent?.blocked == true) {
-            trackingEvent.surrogateId?.let { surrogateId ->
-                val surrogate = resourceSurrogates.get(surrogateId)
-                if (surrogate.responseAvailable) {
-                    Timber.d("Surrogate found for ${request.url}")
-                    webViewClientListener?.surrogateDetected(surrogate)
-                    return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
+        if (trackingEvent?.status == TrackerStatus.BLOCKED) {
+            return blockRequest(trackingEvent, request, webViewClientListener)
+        } else if (trackingEvent == null ||
+            trackingEvent.status == TrackerStatus.ALLOWED ||
+            trackingEvent.status == TrackerStatus.SAME_ENTITY_ALLOWED
+        ) {
+            cloakedCnameDetector.detectCnameCloakedHost(request.url)?.let { uncloakedHost ->
+                trackingEvent(request, documentUrl, webViewClientListener, false, uncloakedHost)?.let { cloakedTrackingEvent ->
+                    if (cloakedTrackingEvent.status == TrackerStatus.BLOCKED) {
+                        return blockRequest(cloakedTrackingEvent, request, webViewClientListener)
+                    }
                 }
             }
+        }
+        return null
+    }
 
-            Timber.d("Blocking request ${request.url}")
-            privacyProtectionCountDao.incrementBlockedTrackerCount()
-            return WebResourceResponse(null, null, null)
+    private fun blockRequest(
+        trackingEvent: TrackingEvent,
+        request: WebResourceRequest,
+        webViewClientListener: WebViewClientListener?
+    ): WebResourceResponse {
+        trackingEvent.surrogateId?.let { surrogateId ->
+            val surrogate = resourceSurrogates.get(surrogateId)
+            if (surrogate.responseAvailable) {
+                Timber.d("Surrogate found for ${request.url}")
+                webViewClientListener?.surrogateDetected(surrogate)
+                return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
+            }
         }
 
-        return null
+        Timber.d("Blocking request ${request.url}")
+        privacyProtectionCountDao.incrementBlockedTrackerCount()
+        return WebResourceResponse(null, null, null)
     }
 
     private fun getHeaders(request: WebResourceRequest): Map<String, String> {
@@ -207,16 +235,20 @@ class WebViewRequestInterceptor(
     private fun trackingEvent(
         request: WebResourceRequest,
         documentUrl: String?,
-        webViewClientListener: WebViewClientListener?
+        webViewClientListener: WebViewClientListener?,
+        checkFirstParty: Boolean = true,
+        url: String = request.url.toString()
     ): TrackingEvent? {
-        val url = request.url.toString()
 
         if (request.isForMainFrame || documentUrl == null) {
             return null
         }
 
-        val trackingEvent = trackerDetector.evaluate(url, documentUrl) ?: return null
+        val trackingEvent = trackerDetector.evaluate(url, documentUrl, checkFirstParty) ?: return null
         webViewClientListener?.trackerDetected(trackingEvent)
         return trackingEvent
     }
+
+    private fun appUrlPixel(url: Uri?): Boolean =
+        url?.toString()?.startsWith(AppUrl.Url.PIXEL) == true
 }

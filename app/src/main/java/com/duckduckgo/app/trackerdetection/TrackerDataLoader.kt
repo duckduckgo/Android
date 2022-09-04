@@ -18,13 +18,14 @@ package com.duckduckgo.app.trackerdetection
 
 import android.content.Context
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.api.TdsJson
+import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
@@ -39,21 +40,24 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @WorkerThread
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
 class TrackerDataLoader @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val trackerDetector: TrackerDetector,
     private val tdsTrackerDao: TdsTrackerDao,
     private val tdsEntityDao: TdsEntityDao,
     private val tdsDomainEntityDao: TdsDomainEntityDao,
+    private val tdsCnameEntityDao: TdsCnameEntityDao,
     private val tdsMetadataDao: TdsMetadataDao,
     private val context: Context,
     private val appDatabase: AppDatabase,
     private val moshi: Moshi
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun onApplicationCreated() {
+    override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch { loadData() }
     }
 
@@ -86,6 +90,7 @@ class TrackerDataLoader @Inject constructor(
             tdsEntityDao.updateAll(tdsJson.jsonToEntities())
             tdsDomainEntityDao.updateAll(tdsJson.jsonToDomainEntities())
             tdsTrackerDao.updateAll(tdsJson.jsonToTrackers().values)
+            tdsCnameEntityDao.updateAll(tdsJson.jsonToCnameEntities())
         }
     }
 

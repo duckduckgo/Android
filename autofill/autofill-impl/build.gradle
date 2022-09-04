@@ -33,6 +33,7 @@ dependencies {
     implementation project(path: ':device-auth-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':autofill-store')
+    implementation project(path: ':statistics')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
@@ -74,6 +75,9 @@ dependencies {
 android {
     anvil {
         generateDaggerFactories = true // default is false
+    }
+    lintOptions {
+        baseline file("lint-baseline.xml")
     }
     testOptions {
         unitTests {

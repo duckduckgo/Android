@@ -49,3 +49,7 @@ dependencies {
     testImplementation project(path: ':common-test')
 }
 
+
+android {
+  namespace 'com.duckduckgo.bandwidth.store'
+}

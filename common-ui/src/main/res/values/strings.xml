@@ -21,10 +21,12 @@
     <!--Main-->
     <string name="tab_title_color_palette">Color Palette</string>
     <string name="tab_title_typography">Typography</string>
+    <string name="tab_title_dialogs">DIALOGS</string>
     <string name="tab_title_component_interactive">Interactive</string>
     <string name="tab_title_component_cards">Cards</string>
     <string name="tab_title_component_messaging">Messaging</string>
     <string name="tab_title_component_list_items">List items</string>
+    <string name="tab_title_component_others">Others</string>
     <string name="tab_title_component_system">System</string>
 
     <!--Components-->

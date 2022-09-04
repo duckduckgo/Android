@@ -19,7 +19,7 @@ package com.duckduckgo.downloads.impl
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.notification.model.Channel
 
-object FileDownloadNotificationChannelType {
+internal object FileDownloadNotificationChannelType {
     val FILE_DOWNLOADING = Channel(
         "com.duckduckgo.downloading",
         R.string.notificationChannelFileDownloading,

@@ -25,6 +25,7 @@ class TdsJson {
     lateinit var entities: Map<String, TdsJsonEntity>
     lateinit var domains: Map<String, String?>
     lateinit var trackers: Map<String, TdsJsonTracker>
+    lateinit var cnames: Map<String, String?>
 
     fun jsonToEntities(): List<TdsEntity> {
         return entities.mapNotNull { (key, value) ->
@@ -46,6 +47,13 @@ class TdsJson {
             val owner = value.owner ?: return@mapNotNull null
             key to TdsTracker(domain, default, owner.name, value.categories ?: emptyList(), value.rules ?: emptyList())
         }.toMap()
+    }
+
+    fun jsonToCnameEntities(): List<TdsCnameEntity> {
+        return cnames.mapNotNull { (key, value) ->
+            if (value == null) null
+            else TdsCnameEntity(key, value)
+        }
     }
 }
 

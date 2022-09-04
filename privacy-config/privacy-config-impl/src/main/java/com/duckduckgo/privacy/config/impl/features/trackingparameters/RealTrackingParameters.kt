@@ -27,7 +27,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackingParameters
-import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -60,7 +60,7 @@ class RealTrackingParameters @Inject constructor(
     }
 
     override fun cleanTrackingParameters(initiatingUrl: String?, url: String): String? {
-        if (!featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingParametersFeatureName)) return null
+        if (!featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingParametersFeatureName.value)) return null
         if (isAnException(initiatingUrl, url)) return null
 
         val trackingParameters = trackingParametersRepository.parameters

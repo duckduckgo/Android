@@ -16,35 +16,35 @@
 
 package com.duckduckgo.autofill.ui.credential.management.viewing
 
-import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.CompoundButton
-import android.widget.RadioGroup.OnCheckedChangeListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListModeBinding
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter
+import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Delete
+import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
+import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGrouper
+import com.duckduckgo.autofill.ui.credential.management.LoginCredentialTitleExtractor
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import dagger.android.support.AndroidSupportInjection
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class AutofillManagementListMode : Fragment() {
+class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_list_mode) {
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -52,11 +52,17 @@ class AutofillManagementListMode : Fragment() {
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
+    @Inject
+    lateinit var credentialGrouper: CredentialGrouper
+
+    @Inject
+    lateinit var titleExtractor: LoginCredentialTitleExtractor
+
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
     }
 
-    private lateinit var binding: FragmentAutofillManagementListModeBinding
+    private val binding: FragmentAutofillManagementListModeBinding by viewBinding()
     private lateinit var adapter: AutofillManagementRecyclerAdapter
 
     private val globalAutofillToggleListener = object : CompoundButton.OnCheckedChangeListener {
@@ -66,24 +72,14 @@ class AutofillManagementListMode : Fragment() {
         }
     }
 
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentAutofillManagementListModeBinding.inflate(inflater, container, false)
-        configureToggle()
-        configureRecyclerView()
-        return binding.root
-    }
-
     private fun configureToggle() {
         binding.enabledToggle.setOnCheckedChangeListener(globalAutofillToggleListener)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        configureToggle()
+        configureRecyclerView()
         observeViewModel()
     }
 
@@ -124,17 +120,26 @@ class AutofillManagementListMode : Fragment() {
 
     private fun configureRecyclerView() {
         adapter = AutofillManagementRecyclerAdapter(
-            this, faviconManager,
+            this,
+            faviconManager = faviconManager,
+            grouper = credentialGrouper,
+            titleExtractor = titleExtractor,
             onCredentialSelected = this::onCredentialsSelected,
             onCopyUsername = this::onCopyUsername,
             onCopyPassword = this::onCopyPassword,
+            onContextMenuItemClicked = {
+                when (it) {
+                    is Edit -> viewModel.onEditCredentials(it.credentials, false)
+                    is Delete -> viewModel.onDeleteCredentials(it.credentials)
+                }
+            }
         )
 
         binding.logins.adapter = adapter
     }
 
     private fun onCredentialsSelected(credentials: LoginCredentials) {
-        viewModel.onEditCredentials(credentials)
+        viewModel.onViewCredentials(credentials, false)
     }
 
     private fun onCopyUsername(credentials: LoginCredentials) {

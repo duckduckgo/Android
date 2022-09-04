@@ -22,16 +22,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.extractDomain
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.app.LoginTriggerType
+import com.duckduckgo.autofill.domain.app.LoginTriggerType.AUTOPROMPT
+import com.duckduckgo.autofill.impl.AutofillPixelNames
+import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSelectCredentialsTooltipBinding
+import com.duckduckgo.autofill.ui.credential.dialog.animateClosed
 import com.duckduckgo.di.scopes.FragmentScope
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.launch
@@ -41,6 +48,11 @@ import javax.inject.Inject
 class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialAutofillPickerDialog {
 
     @Inject
+    lateinit var pixel: Pixel
+
+    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
+
+    @Inject
     lateinit var faviconManager: FaviconManager
 
     override fun onAttach(context: Context) {
@@ -48,15 +60,27 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         super.onAttach(context)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         val binding = ContentAutofillSelectCredentialsTooltipBinding.inflate(inflater, container, false)
         configureViews(binding)
         return binding.root
     }
 
     private fun configureViews(binding: ContentAutofillSelectCredentialsTooltipBinding) {
+        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         configureSiteDetails(binding)
         configureRecyclerView(binding)
+        configureCloseButton(binding)
+    }
+
+    private fun configureCloseButton(binding: ContentAutofillSelectCredentialsTooltipBinding) {
+        binding.closeButton.setOnClickListener {
+            (dialog as BottomSheetDialog).animateClosed()
+        }
     }
 
     private fun configureSiteDetails(binding: ContentAutofillSelectCredentialsTooltipBinding) {
@@ -71,16 +95,24 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     private fun configureRecyclerView(binding: ContentAutofillSelectCredentialsTooltipBinding) {
-        binding.availableCredentialsRecycler.adapter =
-            CredentialsPickerRecyclerAdapter(this, faviconManager, getAvailableCredentials()) { selectedCredentials ->
-                val result = Bundle().also {
-                    it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, false)
-                    it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
-                    it.putParcelable(CredentialAutofillPickerDialog.KEY_CREDENTIALS, selectedCredentials)
-                }
-                parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.RESULT_KEY_CREDENTIAL_PICKER, result)
-                dismiss()
+        binding.availableCredentialsRecycler.adapter = configureAdapter()
+    }
+
+    private fun configureAdapter(): CredentialsPickerRecyclerAdapter {
+        return CredentialsPickerRecyclerAdapter(
+            lifecycleOwner = this,
+            faviconManager = faviconManager,
+            credentialTextExtractor = CredentialTextExtractor(requireContext()),
+            credentials = getAvailableCredentials()
+        ) { selectedCredentials ->
+            val result = Bundle().also {
+                it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, false)
+                it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
+                it.putParcelable(CredentialAutofillPickerDialog.KEY_CREDENTIALS, selectedCredentials)
             }
+            parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.resultKey(getTabId()), result)
+            dismiss()
+        }
     }
 
     override fun onCancel(dialog: DialogInterface) {
@@ -88,18 +120,28 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, true)
             it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
         }
-        parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.RESULT_KEY_CREDENTIAL_PICKER, result)
+
+        when (getTriggerType()) {
+            AUTOPROMPT -> pixel.fire(AutofillPixelNames.AUTOFILL_LOGINS_AUTOPROMPT_DISMISSED)
+            else -> {}
+        }
+
+        parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.resultKey(getTabId()), result)
     }
 
     private fun getAvailableCredentials() = arguments?.getParcelableArrayList<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS)!!
-
     private fun getOriginalUrl() = arguments?.getString(CredentialAutofillPickerDialog.KEY_URL)!!
-
-    override fun asDialogFragment(): DialogFragment = this
+    private fun getTriggerType() = arguments?.getSerializable(CredentialAutofillPickerDialog.KEY_TRIGGER_TYPE) as LoginTriggerType
+    private fun getTabId() = arguments?.getString(CredentialAutofillPickerDialog.KEY_TAB_ID)!!
 
     companion object {
 
-        fun instance(url: String, credentials: List<LoginCredentials>): AutofillSelectCredentialsDialogFragment {
+        fun instance(
+            url: String,
+            credentials: List<LoginCredentials>,
+            triggerType: LoginTriggerType,
+            tabId: String
+        ): AutofillSelectCredentialsDialogFragment {
 
             val cr = ArrayList<LoginCredentials>(credentials)
 
@@ -108,6 +150,8 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
                 Bundle().also {
                     it.putString(CredentialAutofillPickerDialog.KEY_URL, url)
                     it.putParcelableArrayList(CredentialAutofillPickerDialog.KEY_CREDENTIALS, cr)
+                    it.putSerializable(CredentialAutofillPickerDialog.KEY_TRIGGER_TYPE, triggerType)
+                    it.putString(CredentialAutofillPickerDialog.KEY_TAB_ID, tabId)
                 }
             return fragment
         }

@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.impl.referencetests.privacyconfig
 import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
@@ -117,7 +118,8 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
             mockTogglesRepository,
             referenceTestUtilities.unprotectedTemporaryRepository,
             referenceTestUtilities.privacyRepository,
-            db
+            db,
+            InMemorySharedPreferences()
         )
         privacyConfigPersister.persistPrivacyConfig(
             referenceTestUtilities.getJsonPrivacyConfig(

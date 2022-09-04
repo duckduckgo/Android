@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.autofill
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler.AutofillCredentialSaver
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler.CredentialInjector
@@ -38,10 +39,9 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
-import org.robolectric.RobolectricTestRunner
 
 @ExperimentalCoroutinesApi
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class AutofillCredentialsSelectionResultHandlerTest {
 
     private val credentialsSaver: AutofillCredentialSaver = mock()
@@ -151,11 +151,11 @@ class AutofillCredentialsSelectionResultHandlerTest {
         verifyAuthenticatorNeverCalled()
     }
 
-    private fun verifySaveNeverCalled() {
+    private suspend fun verifySaveNeverCalled() {
         verify(credentialsSaver, never()).saveCredentials(any(), any())
     }
 
-    private fun verifyUpdateNeverCalled() {
+    private suspend fun verifyUpdateNeverCalled() {
         verify(credentialsSaver, never()).updateCredentials(any(), any())
     }
 
