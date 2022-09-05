@@ -55,9 +55,15 @@ class DeprecatedAndroidButtonUsedInXmlDetector : LayoutDetector() {
     }
 
     companion object {
+
+        private const val LEGACY_PRIMARY_LOWERCASE_BUTTON = "com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLowercase"
+        private const val LEGACY_PRIMARY_ROUNDED_BUTTON = "com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryRounded"
+        private const val LEGACY_SECONDARY_ROUNDED_BUTTON = "com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryRounded"
+
         private const val LEGACY_ANDROID_BUTTON = "Button"
         private const val MATERIAL_BUTTON = "com.google.android.material.button.MaterialButton"
 
+        // this list will also contain the depreacated DS buttons that we are using until the migration is complete
         val BUTTON_WIDGETS = listOf(LEGACY_ANDROID_BUTTON, MATERIAL_BUTTON)
         val DEPRECATED_BUTTON_IN_XML = Issue
             .create(
