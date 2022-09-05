@@ -21,11 +21,12 @@ import android.util.AttributeSet
 import com.duckduckgo.mobile.android.R
 import com.google.android.material.button.MaterialButton
 
-class ButtonSecondaryLarge(
+class ButtonSecondaryLarge @JvmOverloads constructor(
     ctx: Context,
-    attrs: AttributeSet
+    attrs: AttributeSet,
+    defStyleAttr: Int = R.attr.secondaryButtonLargeStyle
 ) : MaterialButton(
     ctx,
     attrs,
-    R.attr.secondaryButtonLargeStyle
+    defStyleAttr
 )
