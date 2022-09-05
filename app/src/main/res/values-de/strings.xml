@@ -211,14 +211,14 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Speichern</string>
 
+    <string name="settingsAutomaticallyClearWhat">Automatisches Löschen von …</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatisches Löschen von …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">gar nichts</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs und Daten</string>
-    <string name="settingsAutomaticallyClearWhat">Automatically Burn…</string>
-    <string name="settingsAutomaticallyClearWhen">Burn On…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Burn on…</string>
 
+    <string name="settingsAutomaticallyClearWhen">Löschen …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Löschen …</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">nur beim Verlassen der App</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Beim Verlassen der App, 5 Sekunden lang inaktiv</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Beim Verlassen der App, 5 Minuten lang inaktiv</string>

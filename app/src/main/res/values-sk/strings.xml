@@ -211,14 +211,14 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložiť</string>
 
+    <string name="settingsAutomaticallyClearWhat">Automaticky vymazať…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automaticky vymazať…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Žiadne</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a údaje</string>
-    <string name="settingsAutomaticallyClearWhat">Automatické vypaľovanie...</string>
-    <string name="settingsAutomaticallyClearWhen">Vypaľovanie je zapnuté...</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Vypaľovanie je zapnuté...</string>
 
+    <string name="settingsAutomaticallyClearWhen">Vymazať dňa…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazať dňa…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Iba ukončiť aplikáciu</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončiť 5 sekúnd neaktívnu aplikáciu</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončiť 5 minút neaktívnu aplikáciu</string>

@@ -211,14 +211,14 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Αποθήκευση</string>
 
+    <string name="settingsAutomaticallyClearWhat">Αυτόματη εκκαθάριση…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Αυτόματη εκκαθάριση…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Κανένα</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Καρτέλες</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Καρτέλες και δεδομένα</string>
-    <string name="settingsAutomaticallyClearWhat">Αυτόματο κάψιμο...</string>
-    <string name="settingsAutomaticallyClearWhen">Κάψιμο στις...</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Κάψιμο στις...</string>
 
+    <string name="settingsAutomaticallyClearWhen">Εκκαθάριση στις…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Εκκαθάριση στις…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Μόνο έξοδος εφαρμογής</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Έξοδος εφαρμογής, ανενεργή για 5 δευτερόλεπτα</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Έξοδος εφαρμογής, ανενεργή για 5 λεπτά</string>

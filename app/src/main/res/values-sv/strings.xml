@@ -211,14 +211,14 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spara</string>
 
+    <string name="settingsAutomaticallyClearWhat">Autorensning …</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Autorensning …</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Inga</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Flikar</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Flikar och data</string>
-    <string name="settingsAutomaticallyClearWhat">Bränn automatiskt …</string>
-    <string name="settingsAutomaticallyClearWhen">Bränn den …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Bränn på datum …</string>
 
+    <string name="settingsAutomaticallyClearWhen">Rensa den …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Rensa den …</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Gå bara ur appen</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Avsluta app, inaktiv i 5 sekunder</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Avsluta app, inaktiv i 5 minuter</string>

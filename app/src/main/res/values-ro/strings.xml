@@ -211,14 +211,14 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvează</string>
 
+    <string name="settingsAutomaticallyClearWhat">Ștergere automată…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Ștergere automată…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Niciuna</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">File</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">File și date</string>
-    <string name="settingsAutomaticallyClearWhat">Arde automat…</string>
-    <string name="settingsAutomaticallyClearWhen">Arde pe…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Arde pe…</string>
 
+    <string name="settingsAutomaticallyClearWhen">Șterge la…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Șterge la…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Doar la ieșirea din aplicație</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ieșire din aplicație, inactiv timp de 5 secunde</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ieșire din aplicație, inactiv timp de 5 minute</string>

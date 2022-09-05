@@ -211,14 +211,14 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salva</string>
 
+    <string name="settingsAutomaticallyClearWhat">Elimina automaticamente…</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Elimina automaticamente…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Niente</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Schede</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Schede e dati</string>
-    <string name="settingsAutomaticallyClearWhat">Elimina automaticamente…</string>
-    <string name="settingsAutomaticallyClearWhen">Elimina il…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Elimina il…</string>
 
+    <string name="settingsAutomaticallyClearWhen">Elimina…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Elimina…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">solo in caso di uscita dall\'app</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Uscita dall\'app, inattività di 5 secondi</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Uscita dall\'app, inattività di 5 minuti</string>
