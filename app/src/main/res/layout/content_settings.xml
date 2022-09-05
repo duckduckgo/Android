@@ -38,14 +38,14 @@
         <com.duckduckgo.mobile.android.ui.view.SectionDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="0dp" />
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp" />
 
         <include
             android:id="@+id/contentSettingsAutofill"
             layout="@layout/content_settings_autofill"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="26dp" />
+            android:layout_height="wrap_content" />
 
         <include
             android:id="@+id/contentSettingsAppearance"
@@ -56,7 +56,8 @@
         <com.duckduckgo.mobile.android.ui.view.SectionDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="0dp" />
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp" />
 
         <include
             android:id="@+id/contentSettingsPrivacy"
@@ -67,7 +68,8 @@
         <com.duckduckgo.mobile.android.ui.view.SectionDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="0dp" />
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp" />
 
         <include
             android:id="@+id/contentSettingsCustomize"
@@ -78,7 +80,8 @@
         <com.duckduckgo.mobile.android.ui.view.SectionDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="0dp" />
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp" />
 
         <include
             android:id="@+id/contentSettingsMore"
@@ -90,7 +93,8 @@
             android:id="@+id/settingsSectionMoreBottomDivider"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="0dp" />
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp" />
 
         <include
             android:id="@+id/contentSettingsOther"
