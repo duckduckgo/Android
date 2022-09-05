@@ -56,7 +56,7 @@
         <item name="ghostButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Borderless.Small</item>
         <item name="primaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Rounded</item>
         <item name="secondaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Secondary.Rounded</item>
-        <item name="primaryButtonLowercase">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
+        <item name="primaryButtonLowercaseStyle">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
     </style>
 
     <style name="AppTheme.BaseDark">

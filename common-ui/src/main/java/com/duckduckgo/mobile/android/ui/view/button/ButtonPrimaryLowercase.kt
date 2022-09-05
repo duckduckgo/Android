@@ -28,7 +28,7 @@ class ButtonPrimaryLowercase(
 ) : MaterialButton(
     ctx,
     attrs,
-    R.attr.primaryButtonLargeStyle
+    R.attr.primaryButtonLowercaseStyle
 ) {
 
 }
