@@ -26,6 +26,6 @@
     // Deprecated - This will be removed once we migrate all Components to the new Design System Spec"
     <attr name="primaryButtonRoundedStyle" format="reference"/>
     <attr name="secondaryButtonRoundedStyle" format="reference"/>
-    <attr name="primaryButtonLowercase" format="reference"/>
+    <attr name="primaryButtonLowercaseStyle" format="reference"/>
 
 </resources>
