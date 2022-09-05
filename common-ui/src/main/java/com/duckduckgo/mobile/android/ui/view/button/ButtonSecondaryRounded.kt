@@ -22,11 +22,12 @@ import com.duckduckgo.mobile.android.R
 import com.google.android.material.button.MaterialButton
 
 @Deprecated("This will be removed once we migrate all Components to the new Design System Spec")
-class ButtonSecondaryRounded(
+class ButtonSecondaryRounded @JvmOverloads constructor(
     ctx: Context,
-    attrs: AttributeSet
+    attrs: AttributeSet,
+    defStyleAttr: Int = R.attr.secondaryButtonRoundedStyle
 ) : MaterialButton(
     ctx,
     attrs,
-    R.attr.secondaryButtonRoundedStyle
+    defStyleAttr
 )

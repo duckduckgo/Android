@@ -22,13 +22,11 @@ import com.duckduckgo.mobile.android.R
 import com.google.android.material.button.MaterialButton
 
 @Deprecated("This will be removed once we migrate all Components to the new Design System Spec")
-class ButtonPrimaryLowercase(
+class ButtonPrimaryLowercase @JvmOverloads constructor(
     ctx: Context,
-    attrs: AttributeSet
+    attrs: AttributeSet,
+    defStyleAttr: Int = R.attr.primaryButtonLowercaseStyle
 ) : MaterialButton(
     ctx,
     attrs,
-    R.attr.primaryButtonLowercaseStyle
-) {
-
-}
+    defStyleAttr)
