@@ -79,9 +79,8 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppName"/>
 
-            <Button
+            <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
                     android:id="@+id/trackingProtectionExcludeAppDialogReport"
-                    style="@style/Widget.DuckDuckGo.Button.Primary"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dialogButtonHeight"
                     android:layout_marginStart="8dp"
@@ -94,9 +93,8 @@
                     app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppLabel"
                     app:layout_constraintVertical_bias="0.0"/>
 
-            <Button
+            <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
                     android:id="@+id/trackingProtectionExcludeAppDialogSkip"
-                    style="@style/Widget.DuckDuckGo.Button.Borderless"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dialogButtonHeight"
                     android:layout_marginTop="16dp"
