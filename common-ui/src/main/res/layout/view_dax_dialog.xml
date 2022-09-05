@@ -15,12 +15,12 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/dialogContainer"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/dialogContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -31,14 +31,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/dimmed"
-            app:layout_constraintBottom_toTopOf="@id/hideText" />
+            app:layout_constraintBottom_toTopOf="@id/hideText"/>
 
         <View
             android:id="@+id/dialogLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/dimmed"
-            app:layout_constraintTop_toTopOf="@id/hideText" />
+            app:layout_constraintTop_toTopOf="@id/hideText"/>
 
         <TextView
             android:id="@+id/hideText"
@@ -52,7 +52,7 @@
             android:textSize="14sp"
             tools:text="HIDE"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/logo"
@@ -62,7 +62,7 @@
             android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toTopOf="@id/cardView"
             app:layout_constraintStart_toStartOf="@id/cardView"
-            app:srcCompat="@drawable/ic_dax_icon" />
+            app:srcCompat="@drawable/ic_dax_icon"/>
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/triangle"
@@ -71,7 +71,7 @@
             app:layout_constraintBottom_toTopOf="@+id/cardView"
             app:layout_constraintEnd_toEndOf="@id/logo"
             app:layout_constraintStart_toStartOf="@id/logo"
-            app:srcCompat="@drawable/ic_triangle_bubble" />
+            app:srcCompat="@drawable/ic_triangle_bubble"/>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
@@ -107,7 +107,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/grayishBrown"
                         android:textSize="16sp"
-                        android:visibility="invisible" />
+                        android:visibility="invisible"/>
 
                     <com.duckduckgo.mobile.android.ui.view.TypeAnimationTextView
                         android:id="@+id/dialogText"
@@ -117,21 +117,21 @@
                         android:focusable="true"
                         android:textColor="?attr/normalTextColor"
                         android:textSize="16sp"
-                        android:visibility="visible" />
+                        android:visibility="visible"/>
                 </FrameLayout>
 
                 <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
-                    android:layout_marginTop="16dp" />
+                    android:layout_marginTop="16dp"/>
 
                 <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
                     android:id="@+id/secondaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
                     android:layout_marginTop="8dp"
-                    android:visibility="visible" />
+                    android:visibility="visible"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
