@@ -29,4 +29,5 @@ class ButtonPrimaryLowercase @JvmOverloads constructor(
 ) : MaterialButton(
     ctx,
     attrs,
-    defStyleAttr)
+    defStyleAttr
+)
