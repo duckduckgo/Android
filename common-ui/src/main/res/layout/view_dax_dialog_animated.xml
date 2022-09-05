@@ -117,15 +117,14 @@
                     android:textSize="16sp"
                     android:visibility="visible" />
 
-                <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
+                <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryRounded
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
                     android:layout_marginTop="16dp" />
 
-                <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+                <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryRounded
                     android:id="@+id/secondaryCta"
-                    style="@style/DaxDialogButton.Secondary"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
                     android:layout_marginTop="8dp"/>

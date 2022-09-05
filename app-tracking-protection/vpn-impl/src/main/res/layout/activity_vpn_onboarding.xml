@@ -43,9 +43,8 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="SpeakableTextPresentCheck"/>
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryRounded
         android:id="@+id/onboarding_next_cta"
-        style="@style/Widget.DuckDuckGo.Button.Rounded"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_5"

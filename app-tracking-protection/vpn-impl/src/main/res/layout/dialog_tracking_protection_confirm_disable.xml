@@ -45,28 +45,26 @@
             android:layout_marginTop="@dimen/keyline_3"
             android:text="@string/atp_DisableConfirmationDialogMessage"/>
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
             android:id="@+id/disableConfirmationDialogOneApp"
-            style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_gravity="end"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:textColor="@color/cornflowerBlue"
             android:layout_marginTop="@dimen/keyline_5"
             android:text="@string/atp_DisableConfirmationDisableApp"/>
-    <Button
+
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
             android:id="@+id/disableConfirmationDialogAllApps"
-            style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_gravity="end"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:layout_marginTop="@dimen/keyline_2"
             android:text="@string/atp_DisableConfirmationDisableAllApps"/>
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
             android:id="@+id/disableConfirmationDialogCancel"
             android:layout_gravity="end"
-            style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:textColor="@color/cornflowerBlue"

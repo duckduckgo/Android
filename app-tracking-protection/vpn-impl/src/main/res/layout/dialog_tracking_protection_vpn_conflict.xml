@@ -53,16 +53,14 @@
         android:orientation="horizontal"
         android:gravity="end">
 
-        <Button
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
             android:id="@+id/vpnConflictDialogStartCta"
-            style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:text="@string/atp_VpnConflictDialogCancel"/>
 
-        <Button
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
             android:id="@+id/vpnConflictDialogEndCta"
-            style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:textColor="@color/cornflowerBlue"
