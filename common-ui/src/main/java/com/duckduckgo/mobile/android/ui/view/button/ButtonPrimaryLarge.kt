@@ -29,6 +29,4 @@ class ButtonPrimaryLarge @JvmOverloads constructor(
     ctx,
     attrs,
     defStyleAttr
-) {
-
-}
+)
