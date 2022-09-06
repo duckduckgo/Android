@@ -100,12 +100,9 @@ class AdClickAttributionPluginTest {
         val linkFormatEntity = linkFormatCaptor.firstValue
         assertEquals(6, linkFormatEntity.size)
         assertEquals("duckduckgo.com/y.js", linkFormatEntity[0].url)
-        assertEquals("u3", linkFormatEntity[0].parameterName)
-        assertTrue(linkFormatEntity[0].parameterValue.isEmpty())
+        assertEquals("ad_domain", linkFormatEntity[0].adDomainParameterName)
         assertEquals("links.duckduckgo.com/m.js", linkFormatEntity[3].url)
-        assertEquals("dsl", linkFormatEntity[3].parameterName)
-        assertEquals("1", linkFormatEntity[3].parameterValue)
-
+        assertEquals("ad_domain", linkFormatEntity[3].adDomainParameterName)
         val allowlistEntity = allowlistCaptor.firstValue
         assertEquals(3, allowlistEntity.size)
         assertEquals("bing.com", allowlistEntity[0].blocklistEntry)

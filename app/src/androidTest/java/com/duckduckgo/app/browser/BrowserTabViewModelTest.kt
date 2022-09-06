@@ -128,11 +128,11 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
-import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
@@ -376,6 +376,8 @@ class BrowserTabViewModelTest {
 
     private val mockAutofillStore: AutofillStore = mock()
 
+    private val mockAppTheme: AppTheme = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -411,7 +413,8 @@ class BrowserTabViewModelTest {
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
-            duckDuckGoUrlDetector = DuckDuckGoUrlDetector()
+            duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
+            appTheme = mockAppTheme,
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
@@ -2119,7 +2122,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenCtaShownThenFirePixel() {
+    fun whenCtaShownThenFirePixel() = runTest {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 
@@ -2134,6 +2137,23 @@ class BrowserTabViewModelTest {
 
         testee.registerDaxBubbleCtaDismissed()
         verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
+    }
+
+    @Test
+    fun whenRegisterDaxBubbleCtaDismissedThenCtaChangedToNull() = runTest {
+        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.registerDaxBubbleCtaDismissed()
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenRefreshCtaIfCtaAlreadyShownForCurrentPageThenReturnNull() = runTest {
+        setBrowserShowing(isBrowsing = true)
+        testee.hasCtaBeenShownForCurrentPage.set(true)
+
+        assertNull(testee.refreshCta())
     }
 
     @Test
@@ -2170,6 +2190,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSurveyCtaDismissedAndNoOtherCtaPossibleCtaIsNull() = runTest {
+        setBrowserShowing(isBrowsing = false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
 
         givenShownCtas(CtaId.DAX_INTRO, CtaId.DAX_END)
@@ -2180,6 +2201,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSurveyCtaDismissedAndWidgetCtaIsPossibleThenNextCtaIsWidget() = runTest {
+        setBrowserShowing(isBrowsing = false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
@@ -3782,6 +3804,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenPageChangedThenSetCtaBeenShownForCurrentPageToFalse() {
+        testee.hasCtaBeenShownForCurrentPage.set(true)
+        loadUrl(url = "www.example.com", isBrowserShowing = true)
+        assertFalse(testee.hasCtaBeenShownForCurrentPage.get())
+    }
+
+    @Test
     fun whenPageChangedAndIsAppLinkThenUpdatePreviousAppLink() {
         val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = "www.example.com")
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(appLink)
@@ -4172,6 +4201,15 @@ class BrowserTabViewModelTest {
         testee.updateCredentials(url, credentials)
 
         verify(mockAutofillStore).updateCredentials(url, credentials)
+    }
+
+    @Test
+    fun whenOnAutoconsentResultReceivedThenSiteUpdated() {
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        testee.onAutoconsentResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = true)
+        assertTrue(testee.siteLiveData.value?.consentManaged!!)
+        assertTrue(testee.siteLiveData.value?.consentOptOutFailed!!)
+        assertTrue(testee.siteLiveData.value?.consentSelfTestFailed!!)
     }
 
     private fun assertShowHistoryCommandSent(expectedStackSize: Int) {

@@ -132,6 +132,7 @@ import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
@@ -459,6 +460,7 @@ class BrowserTabViewModel @Inject constructor(
     val privacyGradeViewState: MutableLiveData<PrivacyGradeViewState> = MutableLiveData()
 
     var skipHome = false
+    var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -1140,6 +1142,7 @@ class BrowserTabViewModel @Inject constructor(
         title: String?
     ) {
         Timber.v("Page changed: $url")
+        hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title)
         setAdClickActiveTabData(url)
 
@@ -1631,6 +1634,12 @@ class BrowserTabViewModel @Inject constructor(
     private fun enableUrlParametersRemovedFlag() {
         site?.urlParametersRemoved = true
         onSiteChanged()
+    }
+
+    fun onAutoconsentResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean) {
+        site?.consentManaged = consentManaged
+        site?.consentOptOutFailed = optOutFailed
+        site?.consentSelfTestFailed = selfTestFailed
     }
 
     private fun onSiteChanged() {
@@ -2276,21 +2285,25 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onCtaShown() {
         val cta = ctaViewState.value?.cta ?: return
-        ctaViewModel.onCtaShown(cta)
+        viewModelScope.launch(dispatchers.io()) {
+            ctaViewModel.onCtaShown(cta)
+        }
     }
 
     suspend fun refreshCta(locale: Locale = Locale.getDefault()): Cta? {
-        Timber.i("favoritesOnboarding: - refreshCta $showFavoritesOnboarding")
         if (currentGlobalLayoutState() is Browser) {
+            val isBrowserShowing = currentBrowserViewState().browserShowing
+            if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
             val cta = withContext(dispatchers.io()) {
                 ctaViewModel.refreshCta(
                     dispatchers.io(),
-                    currentBrowserViewState().browserShowing,
+                    isBrowserShowing,
                     siteLiveData.value,
                     showFavoritesOnboarding,
                     locale
                 )
             }
+            if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
             ctaViewState.value = currentCtaViewState().copy(cta = cta)
             ctaChangedTicker.emit(System.currentTimeMillis().toString())
             return cta
@@ -2306,6 +2319,7 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             val cta = ctaViewState.value?.cta ?: return@launch
             ctaViewModel.registerDaxBubbleCtaDismissed(cta)
+            ctaViewState.value = currentCtaViewState().copy(cta = null)
         }
     }
 

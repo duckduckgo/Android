@@ -4,17 +4,22 @@
     "desc": "These tests use the ad_click_attribution_reference.json file.",
     "tests": [
       {
-        "name": "A URL is matching the first rule - url and param name in first position.",
-        "url": "https://duckduckgo.com/y.js?u3=1",
+        "name": "A URL is matching the first rule - url and empty adDomainParameterName name (no other params).",
+        "url": "https://duckduckgo.com/y.js?ad_domain=",
         "isAdClick": true
       },
       {
-        "name": "A URL is matching the first rule - url and param name.",
-        "url": "https://duckduckgo.com/y.js?ad_provider=bing&u3=1&other_param=true",
+        "name": "A URL is matching the first rule - url and empty adDomainParameterName name (other params are there).",
+        "url": "https://duckduckgo.com/y.js?ad_provider=bing&ad_domain=&other_param=true",
         "isAdClick": true
       },
       {
-        "name": "A URL is matching the first rule - url and ad domain param when no param name.",
+        "name": "A URL is matching the first rule - url and non empty adDomainParameterName name (no other params).",
+        "url": "https://duckduckgo.com/y.js?ad_domain=nike.com",
+        "isAdClick": true
+      },
+      {
+        "name": "A URL is matching the first rule - url and non empty adDomainParameterName name (other params are there).",
         "url": "https://duckduckgo.com/y.js?ad_provider=bing&ad_domain=nike.com&other_param=true",
         "isAdClick": true
       },
@@ -29,37 +34,37 @@
         "isAdClick": false
       },
       {
-        "name": "A URL is matching the second rule - url and param name in first position.",
-        "url": "https://www.search-company.site/y.js?u3=1",
+        "name": "A URL is matching the second rule - url and adDomainParameterName name (no other params).",
+        "url": "https://www.search-company.site/y.js?ad_domain=nike.com",
         "isAdClick": true
       },
       {
-        "name": "A URL is matching the second rule - url and param name.",
-        "url": "https://www.search-company.site/y.js?ad_provider=bing&u3=1&other_param=true",
+        "name": "A URL is matching the second rule - url and adDomainParameterName name (other params are there).",
+        "url": "https://www.search-company.site/y.js?ad_provider=bing&ad_domain=nike.com1&other_param=true",
         "isAdClick": true
       },
       {
-        "name": "A URL is matching the third rule - url and param name in first position.",
-        "url": "https://www.search-company.example/y.js?u3=1",
+        "name": "A URL is matching the third rule - url and adDomainParameterName name (no other params).",
+        "url": "https://www.search-company.example/y.js?ad_domain=nike.com",
         "isAdClick": true
       },
       {
-        "name": "A URL is matching the third rule - url and param name.",
-        "url": "https://www.search-company.example/y.js?ad_provider=bing&u3=1&other_param=true",
+        "name": "A URL is matching the third rule - url and adDomainParameterName name (other params are there).",
+        "url": "https://www.search-company.example/y.js?ad_provider=bing&ad_domain=nike.com&other_param=true",
         "isAdClick": true
       },
       {
-        "name": "A URL is matching the fourth rule - url and param name in first position.",
-        "url": "https://links.duckduckgo.com/m.js?dsl=1",
+        "name": "A URL is matching the fourth rule - url and adDomainParameterName name (no other params).",
+        "url": "https://links.duckduckgo.com/m.js?ad_domain=nike.com",
         "isAdClick": true
       },
       {
-        "name": "A URL is matching the fourth rule - url and param name.",
-        "url": "https://links.duckduckgo.com/m.js?ad_provider=bing&dsl=1&other_param=true",
+        "name": "A URL is matching the fourth rule - url and adDomainParameterName name (other params are there).",
+        "url": "https://links.duckduckgo.com/m.js?ad_provider=bing&ad_domain=nike.com&other_param=true",
         "isAdClick": true
       },
       {
-        "name": "A URL is not matching any rules - url and param name are matching, but the param value is not the expected one.",
+        "name": "A URL is not matching any rules - url and param name are matching, but the adDomainParameterName is not there.",
         "url": "https://links.duckduckgo.com/m.js?ad_provider=bing&dsl=2&other_param=true",
         "isAdClick": false
       },

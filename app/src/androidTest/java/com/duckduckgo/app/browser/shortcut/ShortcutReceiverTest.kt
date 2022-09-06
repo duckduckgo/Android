@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,10 @@ class ShortcutReceiverTest {
 
     @Before
     fun before() {
-        testee = ShortcutReceiver(mockPixel, coroutinesTestRule.testDispatcherProvider, TestScope())
+        testee = ShortcutReceiver()
+        testee.pixel = mockPixel
+        testee.dispatcher = coroutinesTestRule.testDispatcherProvider
+        testee.appCoroutineScope = TestScope()
     }
 
     @Test
@@ -47,7 +50,7 @@ class ShortcutReceiverTest {
         val intent = Intent()
         intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, "www.example.com")
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
-        testee.onReceive(null, intent)
+        testee.onShortcutAdded(null, intent)
 
         verify(mockPixel).fire(AppPixelName.SHORTCUT_ADDED)
     }

@@ -112,8 +112,6 @@ class RealAdClickAttributionRepositoryTest {
     companion object {
         val linkFormatEntity = AdClickAttributionLinkFormatEntity(
             url = "good.first-party.site/y.js",
-            parameterName = "a",
-            parameterValue = "1",
             adDomainParameterName = ""
         )
 

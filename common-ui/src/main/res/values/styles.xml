@@ -304,12 +304,16 @@
         <item name="backgroundTint">@color/cornflowerBlue</item>
         <item name="android:textColor">@color/white</item>
         <item name="rippleColor">?attr/daxDialogSecondaryButtonRippleColor</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetTop">0dp</item>
     </style>
 
     <style name="DaxDialogButton.Secondary">
         <item name="backgroundTint">?attr/daxDialogBackgroundColor</item>
         <item name="android:textColor">?attr/daxDialogSecondaryButtonTextColor</item>
         <item name="rippleColor">?attr/daxDialogSecondaryButtonRippleColor</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetTop">0dp</item>
     </style>
 
     <style name="EmailSignOutButton" parent="@style/Widget.MaterialComponents.Button.TextButton">

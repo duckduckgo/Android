@@ -712,4 +712,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Activado</string>
     <string name="atp_SettingsDeviceShieldDisabled">Desactivado</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Parece que este sitio tiene una ventana emergente de consentimiento para cookies👇</string>
+    <string name="autoconsentDialogDescription">¿Quieres que me encargue de ella por ti? Puedo intentar minimizar las cookies, maximizar la privacidad y ocultar ventanas emergentes como estas.</string>
+    <string name="autoconsentPrimaryCta">Administrar ventanas emergentes de cookies</string>
+    <string name="autoconsentSecondaryCta">No, gracias</string>
+
+    <string name="autoconsentSetting">Administrar ventanas emergentes de cookies</string>
+    <string name="autoconsentAnimationText">Cookies gestionadas</string>
+
 </resources>

@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.adclick.store.AdClickAttributionRepository
 import com.duckduckgo.adclick.store.AdClickDatabase
+import com.duckduckgo.adclick.store.AdClickDatabase.Companion.ALL_MIGRATIONS
 import com.duckduckgo.adclick.store.AdClickFeatureToggleRepository
 import com.duckduckgo.adclick.store.RealAdClickAttributionRepository
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -39,6 +40,7 @@ class AdClickModule {
     @SingleInstanceIn(AppScope::class)
     fun provideAdClickDatabase(context: Context): AdClickDatabase {
         return Room.databaseBuilder(context, AdClickDatabase::class.java, "adclick.db")
+            .addMigrations(*ALL_MIGRATIONS)
             .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .build()

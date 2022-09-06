@@ -720,4 +720,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Povolené</string>
     <string name="atp_SettingsDeviceShieldDisabled">Zakázané</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Zdá sa, že táto stránka má kontextové okno týkajúce sa súhlasu so súbormi cookie👇</string>
+    <string name="autoconsentDialogDescription">Chceš, aby som to riešil za teba? Môžem sa pokúsiť minimalizovať súbory cookie, maximalizovať ochranu súkromia a skryť kontextové okná, ako sú tieto.</string>
+    <string name="autoconsentPrimaryCta">Správa kontextových okien súborov cookie</string>
+    <string name="autoconsentSecondaryCta">Nie, ďakujem</string>
+
+    <string name="autoconsentSetting">Správa kontextových okien súborov cookie</string>
+    <string name="autoconsentAnimationText">Spravované súbory cookie</string>
+
 </resources>

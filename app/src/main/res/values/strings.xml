@@ -713,4 +713,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Enabled</string>
     <string name="atp_SettingsDeviceShieldDisabled">Disabled</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Looks like this site has a cookie consent pop-up 👇</string>
+    <string name="autoconsentDialogDescription">Want me to handle these for you? I can try to minimize cookies, maximize privacy, and hide pop-ups like these.</string>
+    <string name="autoconsentPrimaryCta">Manage Cookie Pop-ups</string>
+    <string name="autoconsentSecondaryCta">No Thanks</string>
+
+    <string name="autoconsentSetting">Manage Cookie Pop-ups</string>
+    <string name="autoconsentAnimationText">Cookies Managed</string>
+
 </resources>

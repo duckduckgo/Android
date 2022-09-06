@@ -712,4 +712,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Activé</string>
     <string name="atp_SettingsDeviceShieldDisabled">Désactivé</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Il semble que ce site ait une fenêtre contextuelle de consentement aux cookies👇</string>
+    <string name="autoconsentDialogDescription">Voulez-vous que je m\'en charge ? Je peux essayer de minimiser les cookies, de maximiser la confidentialité et de masquer les fenêtres contextuelles comme celles-ci.</string>
+    <string name="autoconsentPrimaryCta">Gérer les fenêtres contextuelles de cookies</string>
+    <string name="autoconsentSecondaryCta">Non merci</string>
+
+    <string name="autoconsentSetting">Gérer les fenêtres contextuelles de cookies</string>
+    <string name="autoconsentAnimationText">Cookies gérés</string>
+
 </resources>

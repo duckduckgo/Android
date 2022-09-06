@@ -32,11 +32,7 @@ import com.duckduckgo.mobile.android.databinding.ViewDaxDialogBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 interface DaxDialog {
-    fun setDaxText(daxText: String)
-    fun setButtonText(buttonText: String)
-    fun setDialogAndStartAnimation()
-    fun getDaxDialog(): DialogFragment
-    fun setDaxDialogListener(listener: DaxDialogListener)
+    fun setDaxDialogListener(listener: DaxDialogListener?)
 }
 
 interface DaxDialogListener {
@@ -61,7 +57,7 @@ class TypewriterDaxDialog : DialogFragment(R.layout.view_dax_dialog), DaxDialog 
 
     private var daxDialogListener: DaxDialogListener? = null
 
-    override fun setDaxDialogListener(listener: DaxDialogListener) {
+    override fun setDaxDialogListener(listener: DaxDialogListener?) {
         daxDialogListener = listener
     }
 
@@ -133,17 +129,7 @@ class TypewriterDaxDialog : DialogFragment(R.layout.view_dax_dialog), DaxDialog 
         super.onDismiss(dialog)
     }
 
-    override fun getDaxDialog(): DialogFragment = this
-
-    override fun setDaxText(daxText: String) {
-        this.daxText = daxText
-    }
-
-    override fun setButtonText(buttonText: String) {
-        this.primaryButtonText = buttonText
-    }
-
-    override fun setDialogAndStartAnimation() {
+    private fun setDialogAndStartAnimation() {
         setDialog()
         setListeners()
         binding.dialogText.startTypingAnimation(daxText, true)

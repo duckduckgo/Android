@@ -91,8 +91,6 @@ class AdClickAttributionLinkFormatsReferenceTest(private val testCase: TestCase)
                 list.map {
                     AdClickAttributionLinkFormatEntity(
                         url = it.url,
-                        parameterName = it.parameterName.orEmpty(),
-                        parameterValue = it.parameterValue.orEmpty(),
                         adDomainParameterName = it.adDomainParameterName.orEmpty()
                     )
                 }

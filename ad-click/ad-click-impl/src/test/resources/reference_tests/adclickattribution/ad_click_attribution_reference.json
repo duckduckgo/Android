@@ -5,40 +5,31 @@
     "linkFormats": [
       {
         "url": "duckduckgo.com/y.js",
-        "parameterName": "u3",
         "adDomainParameterName": "ad_domain",
         "desc": "SERP Ads"
       },
       {
         "url": "www.search-company.site/y.js",
-        "parameterName": "u3",
         "adDomainParameterName": "ad_domain",
         "desc": "Test Domain"
       },
       {
         "url": "www.search-company.example/y.js",
-        "parameterName": "u3",
         "adDomainParameterName": "ad_domain",
         "desc": "Test Domain"
       },
       {
         "url": "links.duckduckgo.com/m.js",
-        "parameterName": "dsl",
-        "parameterValue": "1",
         "adDomainParameterName": "ad_domain",
         "desc": "Shopping Ads"
       },
       {
         "url": "www.search-company.site/m.js",
-        "parameterName": "dsl",
-        "parameterValue": "1",
         "adDomainParameterName": "ad_domain",
         "desc": "Test Domain"
       },
       {
         "url": "www.search-company.example/m.js",
-        "parameterName": "dsl",
-        "parameterValue": "1",
         "adDomainParameterName": "ad_domain",
         "desc": "Test Domain"
       }

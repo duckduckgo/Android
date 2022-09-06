@@ -716,4 +716,13 @@
     <string name="atp_SettingsDeviceShieldEnabled">Activat</string>
     <string name="atp_SettingsDeviceShieldDisabled">Dezactivat</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Se pare că acest site are o fereastră pop-up de solicitare a consimțământului cu privire la modulele cookie👇</string>
+    <string name="autoconsentDialogDescription">Vrei să mă ocup de asta pentru tine? Pot să încerc să minimizez numărul de module cookie, să maximizez confidențialitatea și să ascund ferestrele pop-up precum aceasta.</string>
+    <string name="autoconsentPrimaryCta">Gestionează ferestrele pop-up cu privire la modulele cookie</string>
+    <string name="autoconsentSecondaryCta">Nu, mulțumesc</string>
+
+    <string name="autoconsentSetting">Gestionează ferestrele pop-up cu privire la modulele cookie</string>
+    <string name="autoconsentAnimationText">Cookie-uri Gestionate</string>
+
 </resources>

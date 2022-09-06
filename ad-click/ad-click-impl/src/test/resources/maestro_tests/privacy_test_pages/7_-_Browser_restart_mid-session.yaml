@@ -20,9 +20,12 @@ appId: com.duckduckgo.mobile.android
 - tapOn:
     text: "HIDE TIPS FOREVER"
 - assertVisible:
-    id: "ad-id-1"
+    id: "ad-id-3"
+- action: scroll
+- assertVisible:
+    id: "ad-id-5"
 - tapOn:
-    id: "ad-id-1"
+    id: "ad-id-5"
 - assertVisible:
     text: "Publisher site"
 - tapOn:
