@@ -33,6 +33,7 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.blocklist.AppTrackerListUpdateWorker
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
+import com.duckduckgo.mobile.android.vpn.health.CPUMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
@@ -53,6 +54,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var vpnBugReporter: VpnBugReporter
+
+    @Inject
+    lateinit var cpuMonitor: CPUMonitor
 
     @Inject
     lateinit var appHealthMonitor: AppHealthMonitor
@@ -80,6 +84,14 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         } else {
             TransparencyModeDebugReceiver.turnOffIntent()
         }.also { sendBroadcast(it) }
+    }
+
+    private val cpuMonitoringToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
+        if (toggleState) {
+            cpuMonitor.startMonitoring()
+        } else {
+            cpuMonitor.stopMonitoring()
+        }
     }
 
     private val badHealthMonitoringToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
@@ -118,7 +130,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupDeleteTrackingHistory()
         setupForceUpdateBlocklist()
         setupViewDiagnosticsView()
-        setupBadHealthMonitoring()
+        setupHealthMonitoring()
         setupConfigSection()
         setupUiElementsState()
         setupAppProtectionSection()
@@ -260,7 +272,10 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         binding.transparencyModeToggle.setOnCheckedChangeListener(transparencyToggleListener)
     }
 
-    private fun setupBadHealthMonitoring() {
+    private fun setupHealthMonitoring() {
+        binding.cpuMonitorToggle.isChecked = cpuMonitor.isMonitoringStarted()
+        binding.cpuMonitorToggle.setOnCheckedChangeListener(cpuMonitoringToggleListener)
+
         binding.badHealthMonitorToggle.isChecked = appHealthMonitor.isMonitoringStarted()
         binding.badHealthMonitorToggle.setOnCheckedChangeListener(badHealthMonitoringToggleListener)
 
