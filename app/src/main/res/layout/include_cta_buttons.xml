@@ -22,9 +22,8 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
         android:id="@+id/ctaDismissButton"
-        style="?android:attr/borderlessButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:layout_marginStart="16dp"
@@ -38,9 +37,8 @@
         android:textSize="13sp"
         tools:text="@string/surveyCtaDismissButton" />
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
         android:id="@+id/ctaOkButton"
-        style="?android:attr/borderlessButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:layout_marginStart="8dp"

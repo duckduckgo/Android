@@ -93,18 +93,13 @@
         app:layout_constraintEnd_toEndOf="@id/logo"
         app:layout_constraintStart_toStartOf="@id/logo" />
 
-    <com.google.android.material.button.MaterialButton
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
         android:id="@+id/primaryCta"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_marginTop="12dp"
         app:backgroundTint="@color/cornflowerBlue"
         android:text="@string/onboardingLetsDoItButton"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:letterSpacing="0.0"
-        app:cornerRadius="22dp"
         app:layout_constraintEnd_toEndOf="@id/cardView"
         app:layout_constraintStart_toStartOf="@id/cardView"
         app:layout_constraintTop_toBottomOf="@id/cardView" />
