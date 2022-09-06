@@ -27,35 +27,35 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import com.duckduckgo.app.bookmarks.ui.FavoritesAdapter.FavIconRequest
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEntryBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteSectionTitleBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 
 class FavoritesAdapter(
     private val layoutInflater: LayoutInflater,
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
-    private val faviconManager: FaviconManager
+    private val faviconManager: FaviconManager,
+    private val dispatchers: DispatcherProvider
 ) : RecyclerView.Adapter<FavoritesScreenViewHolders>() {
 
     companion object {
         const val FAVORITE_SECTION_TITLE_TYPE = 0
         const val EMPTY_STATE_TYPE = 1
         const val FAVORITE_TYPE = 2
+        private const val FAVICON_REQ_CHANNEL_CONSUMERS = 10
     }
 
     private val favoriteItems = mutableListOf<FavoriteItemTypes>()
 
-    data class FavIconRequest(val url: String)
-    private val favIconRequestsChannel = Channel<FavIconRequest>(capacity = 100)
+    private val faviconRequestsChannel = Channel<String>(capacity = 2000)
 
     interface FavoriteItemTypes
     object Header : FavoriteItemTypes
@@ -63,9 +63,11 @@ class FavoritesAdapter(
     data class FavoriteItem(val favorite: Favorite) : FavoriteItemTypes
 
     init {
-        lifecycleOwner.lifecycleScope.launch {
-            favIconRequestsChannel.consumeEach {
-                faviconManager.saveFaviconForUrl(it.url)
+        repeat(FAVICON_REQ_CHANNEL_CONSUMERS) {
+            lifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
+                for (item in faviconRequestsChannel) {
+                    faviconManager.saveFaviconForUrl(item)
+                }
             }
         }
     }
@@ -78,6 +80,16 @@ class FavoritesAdapter(
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         this.favoriteItems.clear().also { this.favoriteItems.addAll(generatedList) }
         diffResult.dispatchUpdatesTo(this)
+
+        if (favoriteItems.isEmpty()) {
+            return
+        }
+
+        lifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
+            favoriteItems.forEach {
+                faviconRequestsChannel.send(it.favorite.url)
+            }
+        }
     }
 
     private fun generateNewList(value: List<FavoriteItemTypes>): List<FavoriteItemTypes> {
@@ -97,8 +109,7 @@ class FavoritesAdapter(
                     binding,
                     viewModel,
                     lifecycleOwner,
-                    faviconManager,
-                    favIconRequestsChannel
+                    faviconManager
                 )
             }
             FAVORITE_SECTION_TITLE_TYPE -> {
@@ -190,8 +201,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
         private val binding: ViewSavedSiteEntryBinding,
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
-        private val faviconManager: FaviconManager,
-        private val favIconRequestsChannel: Channel<FavIconRequest>
+        private val faviconManager: FaviconManager
     ) : FavoritesScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
@@ -223,7 +233,6 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
 
         private fun loadFavicon(url: String, image: ImageView) {
             lifecycleOwner.lifecycleScope.launch {
-                favIconRequestsChannel.send(FavIconRequest(url))
                 faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = image)
             }
         }

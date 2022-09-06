@@ -27,42 +27,44 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.FavIconRequest
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 
 class BookmarksAdapter(
     private val layoutInflater: LayoutInflater,
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
-    private val faviconManager: FaviconManager
+    private val faviconManager: FaviconManager,
+    private val dispatchers: DispatcherProvider
 ) : RecyclerView.Adapter<BookmarkScreenViewHolders>() {
 
     companion object {
         const val EMPTY_STATE_TYPE = 0
         const val BOOKMARK_TYPE = 1
+        private const val FAVICON_REQ_CHANNEL_CONSUMERS = 10
     }
 
     private val bookmarkItems = mutableListOf<BookmarksItemTypes>()
 
-    data class FavIconRequest(val url: String)
-    private val favIconRequestsChannel = Channel<FavIconRequest>(capacity = 100)
+    private val faviconRequestsChannel = Channel<String>(Channel.UNLIMITED)
 
     interface BookmarksItemTypes
     object EmptyHint : BookmarksItemTypes
     data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
 
     init {
-        lifecycleOwner.lifecycleScope.launch {
-            favIconRequestsChannel.consumeEach {
-                faviconManager.saveFaviconForUrl(it.url)
+        repeat(FAVICON_REQ_CHANNEL_CONSUMERS) {
+            lifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
+                for (item in faviconRequestsChannel) {
+                    faviconManager.saveFaviconForUrl(item)
+                }
             }
         }
     }
@@ -76,6 +78,16 @@ class BookmarksAdapter(
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         this.bookmarkItems.clear().also { this.bookmarkItems.addAll(generatedList) }
         diffResult.dispatchUpdatesTo(this)
+
+        if (bookmarkItems.isEmpty()) {
+            return
+        }
+
+        lifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
+            bookmarkItems.forEach {
+                faviconRequestsChannel.send(it.bookmark.url)
+            }
+        }
     }
 
     private fun generateNewList(
@@ -101,8 +113,7 @@ class BookmarksAdapter(
                     binding,
                     viewModel,
                     lifecycleOwner,
-                    faviconManager,
-                    favIconRequestsChannel
+                    faviconManager
                 )
             }
             EMPTY_STATE_TYPE -> {
@@ -175,7 +186,6 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
-        private val favIconRequestsChannel: Channel<FavIconRequest>
     ) : BookmarkScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
@@ -204,7 +214,6 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
 
         private fun loadFavicon(url: String, image: ImageView) {
             lifecycleOwner.lifecycleScope.launch {
-                favIconRequestsChannel.send(FavIconRequest(url))
                 faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = image)
             }
         }
