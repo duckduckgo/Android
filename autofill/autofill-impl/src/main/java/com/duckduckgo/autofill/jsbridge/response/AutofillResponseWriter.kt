@@ -25,16 +25,11 @@ import javax.inject.Inject
 interface AutofillResponseWriter {
     fun generateResponseGetAutofillData(credentials: JavascriptCredentials): String
     fun generateEmptyResponseGetAutofillData(): String
-    fun generateResponseGetAvailableInputTypes(credentialsAvailable: Boolean, emailAvailable: Boolean): String
-    fun generateContentScope(): String
-    fun generateUserUnprotectedDomains(): String
-    fun generateUserPreferences(autofillCredentials: Boolean, showInlineKeyIcon: Boolean): String
 }
 
 @ContributesBinding(AppScope::class)
 class AutofillJsonResponseWriter @Inject constructor(val moshi: Moshi) : AutofillResponseWriter {
 
-    private val availableInputTypesAdapter = moshi.adapter(AvailableInputSuccessResponse::class.java).indent("  ")
     private val autofillDataAdapterCredentialsAvailable = moshi.adapter(ContainingCredentials::class.java).indent("  ")
     private val autofillDataAdapterCredentialsUnavailable = moshi.adapter(EmptyResponse::class.java).indent("  ")
 
@@ -48,66 +43,6 @@ class AutofillJsonResponseWriter @Inject constructor(val moshi: Moshi) : Autofil
         val credentialsResponse = EmptyResponse.EmptyCredentialResponse()
         val topLevelResponse = EmptyResponse(success = credentialsResponse)
         return autofillDataAdapterCredentialsUnavailable.toJson(topLevelResponse)
-    }
-
-    override fun generateResponseGetAvailableInputTypes(credentialsAvailable: Boolean, emailAvailable: Boolean): String {
-        val availableInputTypes = AvailableInputSuccessResponse(credentialsAvailable, emailAvailable)
-        return availableInputTypesAdapter.toJson(availableInputTypes)
-    }
-
-    /*
-    * hardcoded for now, but eventually will be a dump of the most up-to-date privacy remote config, untouched by us
-    */
-    override fun generateContentScope(): String {
-        return """
-            contentScope = {
-              "features": {
-                "autofill": {
-                  "state": "enabled",
-                  "exceptions": []
-                }
-              },
-              "unprotectedTemporary": []
-            };
-        """.trimIndent()
-    }
-
-    /*
-     * userUnprotectedDomains: any sites for which the user has chosen to disable privacy protections (leave empty for now)
-     */
-    override fun generateUserUnprotectedDomains(): String {
-        return """
-            userUnprotectedDomains = [];
-        """.trimIndent()
-    }
-
-    override fun generateUserPreferences(
-        autofillCredentials: Boolean,
-        showInlineKeyIcon: Boolean
-    ): String {
-        return """
-            userPreferences = {
-              "debug": false,
-              "platform": {
-                "name": "android"
-              },
-              "features": {
-                "autofill": {
-                  "settings": {
-                    "featureToggles": {
-                      "inputType_credentials": $autofillCredentials,
-                      "inputType_identities": false,
-                      "inputType_creditCards": false,
-                      "emailProtection": true,
-                      "password_generation": false,
-                      "credentials_saving": $autofillCredentials,
-                      "inlineIcon_credentials": $showInlineKeyIcon
-                    }
-                  }
-                }
-              }
-            };
-        """.trimIndent()
     }
 
 }

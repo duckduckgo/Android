@@ -24,6 +24,15 @@ import com.duckduckgo.autofill.domain.app.LoginTriggerType
  * Public interface for accessing and configuring browser autofill functionality for a WebView instance
  */
 interface BrowserAutofill {
+    interface Configurator {
+        /**
+         * Configures autofill for the current webpage.
+         * This should be called once per page load (e.g., onPageStarted())
+         *
+         * Responsible for injecting the required autofill configuration to the JS layer
+         */
+        fun configureAutofillForCurrentPage(webView: WebView, url: String?)
+    }
 
     /**
      * Adds the native->JS interface to the given WebView
@@ -35,14 +44,6 @@ interface BrowserAutofill {
      * Removes the JS interface as a clean-up. Recommended to call from onDestroy() of Fragment/Activity containing the WebView
      */
     fun removeJsInterface()
-
-    /**
-     * Configures autofill for the current webpage.
-     * This should be called once per page load (e.g., onPageStarted())
-     *
-     * Responsible for injecting the required autofill configuration to the JS layer
-     */
-    fun configureAutofillForCurrentPage(webView: WebView, url: String?)
 
     /**
      * Communicates with the JS layer to pass the given credentials
