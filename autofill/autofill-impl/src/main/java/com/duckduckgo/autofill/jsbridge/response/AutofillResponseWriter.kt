@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.jsbridge.response
 
 import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
@@ -27,7 +27,7 @@ interface AutofillResponseWriter {
     fun generateEmptyResponseGetAutofillData(): String
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 class AutofillJsonResponseWriter @Inject constructor(val moshi: Moshi) : AutofillResponseWriter {
 
     private val autofillDataAdapterCredentialsAvailable = moshi.adapter(ContainingCredentials::class.java).indent("  ")

@@ -18,7 +18,7 @@ package com.duckduckgo.autofill
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.baseHost
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -26,7 +26,7 @@ interface AutofillDomainFormatter {
     fun extractDomain(url: String?): String?
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 class AutofillDomainFormatterDomainNameOnly @Inject constructor() : AutofillDomainFormatter {
     override fun extractDomain(url: String?): String? {
         val domain = url?.toUri()?.baseHost

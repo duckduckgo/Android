@@ -18,12 +18,12 @@ package com.duckduckgo.autofill
 
 import android.webkit.WebView
 import com.duckduckgo.autofill.domain.app.LoginCredentials
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 class InlineBrowserAutofill @Inject constructor(
     private val autofillInterface: AutofillJavascriptInterface
 ) : BrowserAutofill {

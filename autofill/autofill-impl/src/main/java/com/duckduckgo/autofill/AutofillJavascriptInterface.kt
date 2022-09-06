@@ -38,6 +38,7 @@ import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType.USE
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -61,7 +62,7 @@ interface AutofillJavascriptInterface {
     }
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val requestParser: AutofillRequestParser,
     private val autofillStore: AutofillStore,
