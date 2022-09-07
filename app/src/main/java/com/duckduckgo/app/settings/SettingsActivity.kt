@@ -182,7 +182,7 @@ class SettingsActivity :
 
         with(viewsCustomize) {
             autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
-            locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
+            sitePermissions.setOnClickListener { viewModel.onSitePermissionsClicked() }
             appLinksSetting.setOnClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
         }
 

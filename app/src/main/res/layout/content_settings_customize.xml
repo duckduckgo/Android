@@ -27,9 +27,9 @@
         android:text="@string/settingsHeadingCustomize" />
 
     <TextView
-        android:id="@+id/locationPermissions"
+        android:id="@+id/sitePermissions"
         style="@style/SettingsItemClickable"
-        android:text="@string/settingsPreciseLocation" />
+        android:text="@string/settingsSitePermissions" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/autocompleteToggle"
