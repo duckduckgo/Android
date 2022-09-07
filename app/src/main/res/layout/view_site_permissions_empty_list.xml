@@ -21,14 +21,15 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_5"
+        android:layout_marginTop="@dimen/keyline_5"
         android:src="@drawable/ic_sites_empty" />
 
     <TextView
-        style="@style/TextAppearance.DuckDuckGo.Body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:textSize="14sp"
         android:text="@string/sitePermissionsSettingsEmptyText" />
 
 </LinearLayout>

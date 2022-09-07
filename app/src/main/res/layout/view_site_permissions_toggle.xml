@@ -32,8 +32,7 @@
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/sitePermissionsToggle"
         style="@style/SitePermissionsSwitch"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
+        android:padding="@dimen/keyline_4"
         android:theme="@style/SettingsSwitchTheme"
         tools:text="@string/preciseLocationToggleText" />
 </LinearLayout>

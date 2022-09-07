@@ -31,6 +31,9 @@
     <string name="permissionsPerWebsiteAllowSetting">Allow</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle">%s permission for %s</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permissions Removed for All Sites</string>
+
     <!-- Autofill -->
     <string name="autofillSnackbarAction">View</string>
     <string name="autofillLoginSavedSnackbarMessage">Login saved</string>

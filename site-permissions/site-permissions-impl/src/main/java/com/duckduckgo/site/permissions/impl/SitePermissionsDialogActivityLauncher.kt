@@ -24,7 +24,6 @@ import android.net.Uri
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.webkit.PermissionRequest
 import android.widget.ImageView
 import android.widget.TextView
@@ -207,13 +206,20 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun systemPermissionDenied() {
+        when (systemPermissionsHelper.isPermissionsRejectedForever(activity)) {
+            true -> showSystemPermissionsDeniedDialog()
+            false -> showPermissionsDeniedSnackBar()
+        }
+    }
+
+    private fun showPermissionsDeniedSnackBar() {
         val message =
             when (permissionRequested) {
                 SitePermissionsRequestedType.CAMERA -> R.string.sitePermissionsCameraDeniedSnackBarMessage
                 SitePermissionsRequestedType.AUDIO -> R.string.sitePermissionsMicDeniedSnackBarMessage
                 SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.sitePermissionsCameraAndMicDeniedSnackBarMessage
             }
-        val view = activity.findViewById<ViewGroup>(android.R.id.content).rootView
+        val view = activity.window.decorView.rootView
         Snackbar.make(
             view,
             message,

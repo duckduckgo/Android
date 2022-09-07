@@ -91,7 +91,7 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
         removedSitePermissions: List<SitePermissionsEntity>,
         removedLocationPermissions: List<LocationPermissionEntity>
     ) {
-        val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteRemoveAllConfirmation), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        val message = HtmlCompat.fromHtml(getString(R.string.sitePermissionsRemoveAllWebsitesSnackbarText), HtmlCompat.FROM_HTML_MODE_LEGACY)
         Snackbar.make(
             binding.root,
             message,

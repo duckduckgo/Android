@@ -15,9 +15,9 @@
   -->
 
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">%s wants to access the camera and microphone</string>
-    <string name="sitePermissionsMicDialogTitle">%s wants to access the microphone</string>
-    <string name="sitePermissionsCameraDialogTitle">%s wants to access the camera</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle">\"%s\" wants to access the camera and microphone</string>
+    <string name="sitePermissionsMicDialogTitle">\"%s\" wants to access the microphone</string>
+    <string name="sitePermissionsCameraDialogTitle">\"%s\" wants to access the camera</string>
     <string name="sitePermissionsDialogContent">Manage granted permissions in settings</string>
     <string name="sitePermissionsDialogDenyButton">Deny</string>
     <string name="sitePermissionsDialogAllowButton">Allow</string>

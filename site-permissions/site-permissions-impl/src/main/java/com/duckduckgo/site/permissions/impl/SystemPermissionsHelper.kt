@@ -17,12 +17,14 @@
 package com.duckduckgo.site.permissions.impl
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -39,6 +41,7 @@ interface SystemPermissionsHelper {
     )
     fun requestPermission(permission: String)
     fun requestMultiplePermissions(permissions: Array<String>)
+    fun isPermissionsRejectedForever(activity: Activity): Boolean
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -86,4 +89,7 @@ class SystemPermissionsHelperImpl @Inject constructor(
             throw IllegalAccessException("registerPermissionLaunchers() needs to be called before requestMultiplePermissions()")
         }
     }
+
+    override fun isPermissionsRejectedForever(activity: Activity): Boolean =
+        !ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.RECORD_AUDIO)
 }
