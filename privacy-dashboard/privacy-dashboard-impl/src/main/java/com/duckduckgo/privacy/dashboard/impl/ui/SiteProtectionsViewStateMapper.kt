@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 import android.net.http.SslCertificate
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus.BLOCKED
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CertificateViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
@@ -81,7 +82,7 @@ class AppSiteProtectionsViewStateMapper @Inject constructor(
                 val urls = trackerViewState.urls + Pair(
                     it.trackerUrl,
                     TrackerEventViewState(
-                        isBlocked = it.blocked,
+                        isBlocked = it.status == BLOCKED,
                         reason = DEFAULT_VIEW_STATE_TRACKER_REASON,
                         categories = it.categories?.toSet() ?: emptySet()
                     )
@@ -95,7 +96,7 @@ class AppSiteProtectionsViewStateMapper @Inject constructor(
                 prevalence = entity.prevalence,
                 urls = mutableMapOf(
                     it.trackerUrl to TrackerEventViewState(
-                        isBlocked = it.blocked,
+                        isBlocked = it.status == BLOCKED,
                         reason = DEFAULT_VIEW_STATE_TRACKER_REASON,
                         categories = it.categories?.toSet() ?: emptySet()
                     )
@@ -122,14 +123,14 @@ class AppSiteProtectionsViewStateMapper @Inject constructor(
 
         val trackersBlocked: MutableMap<String, TrackerViewState> = mutableMapOf()
 
-        site.trackingEvents.filter { it.blocked }.forEach {
+        site.trackingEvents.filter { it.status == BLOCKED }.forEach {
             val entity = it.entity?.let { it } ?: return@forEach
 
             val trackerViewState: TrackerViewState = trackersBlocked[entity.displayName]?.let { trackerViewState ->
                 val urls = trackerViewState.urls + Pair(
                     it.trackerUrl,
                     TrackerEventViewState(
-                        isBlocked = it.blocked,
+                        isBlocked = it.status == BLOCKED,
                         reason = "first party",
                         categories = it.categories?.toSet() ?: emptySet()
                     )
@@ -143,7 +144,7 @@ class AppSiteProtectionsViewStateMapper @Inject constructor(
                 prevalence = entity.prevalence,
                 urls = mutableMapOf(
                     it.trackerUrl to TrackerEventViewState(
-                        isBlocked = it.blocked,
+                        isBlocked = it.status == BLOCKED,
                         reason = DEFAULT_VIEW_STATE_TRACKER_REASON,
                         categories = it.categories?.toSet() ?: emptySet()
                     )
