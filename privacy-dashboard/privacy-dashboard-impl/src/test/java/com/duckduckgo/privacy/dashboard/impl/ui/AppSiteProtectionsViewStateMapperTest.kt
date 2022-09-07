@@ -24,6 +24,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus.ALLOWED
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus.BLOCKED
+import com.duckduckgo.app.trackerdetection.model.TrackerType.AD
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.dashboard.impl.ui.AppSiteProtectionsViewStateMapperTest.EntityMO.MAJOR_ENTITY_A
@@ -98,8 +101,8 @@ class AppSiteProtectionsViewStateMapperTest {
     fun whenSiteContainsTrackersEventsThenViewStateHasTrackerData() {
         val site = site(
             events = listOf(
-                TrackingEvent("test.com", "test.com", null, MAJOR_ENTITY_A, true, null),
-                TrackingEvent("test2.com", "test2.com", null, MAJOR_ENTITY_A, true, null)
+                TrackingEvent("test.com", "test.com", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
+                TrackingEvent("test2.com", "test2.com", null, MAJOR_ENTITY_A, null, BLOCKED, AD)
             )
         )
 
@@ -116,8 +119,8 @@ class AppSiteProtectionsViewStateMapperTest {
     fun whenSiteContainsTrackersEventsThenSiteViewStateHasUrls() {
         val site = site(
             events = listOf(
-                TrackingEvent("test.com", "test.com", null, MAJOR_ENTITY_A, true, null),
-                TrackingEvent("test2.com", "test2.com", null, MAJOR_ENTITY_A, false, null)
+                TrackingEvent("test.com", "test.com", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
+                TrackingEvent("test2.com", "test2.com", null, MAJOR_ENTITY_A, null, ALLOWED, AD)
             )
         )
 
@@ -131,8 +134,8 @@ class AppSiteProtectionsViewStateMapperTest {
     fun whenAllTrackersEventsNotBlockedThenViewStateBlockedTrackersEmpty() {
         val site = site(
             events = listOf(
-                TrackingEvent("test.com", "test.com", null, MAJOR_ENTITY_A, false, null),
-                TrackingEvent("test2.com", "test2.com", null, MAJOR_ENTITY_A, false, null)
+                TrackingEvent("test.com", "test.com", null, MAJOR_ENTITY_A, null, ALLOWED, AD),
+                TrackingEvent("test2.com", "test2.com", null, MAJOR_ENTITY_A, null, ALLOWED, AD)
             )
         )
 
