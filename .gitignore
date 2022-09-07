@@ -16,7 +16,6 @@ out/
 # Gradle files
 .gradle/
 build/
-!node_modules/@duckduckgo/privacy_dashboard/build
 .externalNativeBuild/
 
 #Autoconsent
@@ -69,9 +68,12 @@ report
 !/node_modules/@duckduckgo/
 /node_modules/@duckduckgo/*
 !/node_modules/@duckduckgo/autofill/
+!/node_modules/@duckduckgo/privacy_dashboard/
 /node_modules/@duckduckgo/autofill/*
 !/node_modules/@duckduckgo/autofill/LICENSE.md
 !/node_modules/@duckduckgo/autofill/README.md
 !/node_modules/@duckduckgo/autofill/dist/
 /node_modules/@duckduckgo/autofill/dist/*
 !/node_modules/@duckduckgo/autofill/dist/*
+/node_modules/@duckduckgo/privacy_dashboard/*
+!/node_modules/@duckduckgo/privacy_dashboard/build
