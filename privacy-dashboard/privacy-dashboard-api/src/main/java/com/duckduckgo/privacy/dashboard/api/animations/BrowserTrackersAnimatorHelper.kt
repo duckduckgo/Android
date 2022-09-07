@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.dashboard.api.animations
 
+import android.content.Context
 import android.view.View
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -41,6 +42,8 @@ interface BrowserTrackersAnimatorHelper {
         omnibarViews: List<View>,
         entities: List<Entity>?
     )
+
+    fun createCookiesAnimation(context: Context)
 
     /**
      * Cancel a running animation.

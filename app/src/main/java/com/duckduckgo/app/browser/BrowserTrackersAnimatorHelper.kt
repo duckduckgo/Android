@@ -16,45 +16,11 @@
 
 package com.duckduckgo.app.browser
 
-import android.animation.Animator
-import android.animation.Animator.AnimatorListener
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
-import android.animation.PropertyValuesHolder
-import android.content.Context
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.ImageView
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.animation.addListener
-import androidx.core.animation.doOnEnd
-import androidx.core.view.children
-import androidx.core.widget.TextViewCompat
-import androidx.transition.Scene
-import androidx.transition.Slide
-import androidx.transition.Transition
-import androidx.transition.Transition.TransitionListener
-import androidx.transition.TransitionManager
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
-import com.airbnb.lottie.LottieAnimationView
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.DaxDialogCta
-import com.duckduckgo.app.privacy.renderer.TrackersRenderer
-import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.mobile.android.ui.store.AppTheme
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.view.toPx
-import com.duckduckgo.mobile.android.R as CommonR
-
 interface TrackersAnimatorListener {
     fun onAnimationFinished()
 }
-
+// TODO: replaced by BrowserLottieTrackersAnimatorHelper. Needs migration to accomodate cookie animation
+/*
 class BrowserTrackersAnimatorHelper(
     private val omnibarViews: List<View>,
     private val privacyGradeView: View,
@@ -650,3 +616,4 @@ sealed class TrackerLogo(val resId: Int) {
 
     class StackedLogo(resId: Int = R.drawable.other_tracker_bg) : TrackerLogo(resId)
 }
+*/

@@ -78,12 +78,12 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             this.setImageAssetDelegate(TrackersLottieAssetDelegate(context, logos))
             this.removeAllAnimatorListeners()
             this.addAnimatorListener(object : AnimatorListener {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     if (completePartialAnimation) return
                     animateOmnibarOut(omnibarViews).start()
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     if (!runPartialAnimation) {
                         animateOmnibarIn(omnibarViews).start()
                         completePartialAnimation = false
@@ -91,10 +91,10 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                     }
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                 }
 
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationRepeat(animation: Animator) {
                 }
             })
 
@@ -108,6 +108,10 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             shieldAnimationView.playAnimation()
             this.playAnimation()
         }
+    }
+
+    override fun createCookiesAnimation(context: Context) {
+        //TODO: migrate cookieAnimation
     }
 
     override fun removeListener() {
