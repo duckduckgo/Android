@@ -33,12 +33,14 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.impl.R.layout
 import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelParameter
 import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelValue
 import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.SitePermissionsPixelName
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -219,14 +221,14 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 SitePermissionsRequestedType.AUDIO -> R.string.sitePermissionsMicDeniedSnackBarMessage
                 SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.sitePermissionsCameraAndMicDeniedSnackBarMessage
             }
-        val view = activity.window.decorView.rootView
-        Snackbar.make(
-            view,
-            message,
-            Snackbar.LENGTH_LONG
-        ).setAction(R.string.sitePermissionsDeniedSnackBarAction) {
-            showSystemPermissionsDeniedDialog()
-        }.show()
+
+        val snackbar = Snackbar.make(activity.window.decorView.rootView, message, Snackbar.LENGTH_LONG)
+        val layout = snackbar.view as SnackbarLayout
+        layout.setPadding(0, 0, 0, 40.toPx())
+        snackbar.apply {
+            setAction(R.string.sitePermissionsDeniedSnackBarAction) { showSystemPermissionsDeniedDialog() }
+            show()
+        }
     }
 
     private fun showSystemPermissionsDeniedDialog() {

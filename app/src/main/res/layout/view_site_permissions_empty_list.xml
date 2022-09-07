@@ -30,6 +30,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/keyline_4"
         android:textSize="14sp"
+        android:textColor="?secondaryTextColor"
         android:text="@string/sitePermissionsSettingsEmptyText" />
 
 </LinearLayout>
