@@ -74,9 +74,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/onboarding_page_title" />
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryRounded
         android:id="@+id/onboarding_next_cta"
-        style="@style/Widget.DuckDuckGo.Button.Rounded"
         android:text="@string/atp_OnboardingContinue"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -87,9 +86,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryRounded
         android:id="@+id/onboarding_maybe_later"
-        style="@style/Widget.DuckDuckGo.Button.Secondary.Rounded"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_5"

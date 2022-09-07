@@ -40,7 +40,6 @@
         <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
             android:id="@+id/animated_button"
             android:text="Dialog with animated text"
-            style="@style/Widget.DuckDuckGo.Button.Secondary"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -49,7 +48,6 @@
         <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
             android:id="@+id/not_dimmed_button"
             android:text="Dialog not dimmed"
-            style="@style/Widget.DuckDuckGo.Button.Secondary"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -58,7 +56,6 @@
         <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
             android:id="@+id/dismissible_button"
             android:text="Dialog that can be dismissed without an action"
-            style="@style/Widget.DuckDuckGo.Button.Secondary"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,7 +64,6 @@
         <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
             android:id="@+id/no_hide_button"
             android:text="Dialog without hide button"
-            style="@style/Widget.DuckDuckGo.Button.Secondary"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -76,7 +72,6 @@
         <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
             android:id="@+id/custom_typing_button"
             android:text="Dialog with custom typing delay"
-            style="@style/Widget.DuckDuckGo.Button.Secondary"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
