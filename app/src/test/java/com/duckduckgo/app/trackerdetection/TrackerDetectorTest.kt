@@ -295,18 +295,6 @@ class TrackerDetectorTest {
         assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://mobile.example.com/index.com"))
     }
 
-    @Test
-    fun whenUrlBelongsToSameNetworkDocumentThenReturnsUnblockedTrackingEvent() {
-        whenever(mockEntityLookup.entityForUrl("http://tracker.com/update.jss")).thenReturn(ENTITY)
-        whenever(mockEntityLookup.entityForUrl("http://parentnetwork.com/index.com")).thenReturn(ENTITY)
-        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        val expected = TrackingEvent("http://parentnetwork.com/index.com", "http://tracker.com/update.jss", null, null, false, null)
-
-        val actual = trackerDetector.evaluate("http://tracker.com/update.jss", "http://parentnetwork.com/index.com")
-
-        assertEquals(expected, actual)
-    }
-
     private fun alwaysMatchingClient(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
