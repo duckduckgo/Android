@@ -194,7 +194,6 @@ import com.duckduckgo.autofill.ui.ExistingCredentialMatchDetector
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -204,7 +203,6 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
 import com.duckduckgo.privacy.dashboard.api.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.privacy.dashboard.api.animations.PrivacyShieldAnimationHelper

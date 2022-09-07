@@ -16,11 +16,12 @@
 
 package com.duckduckgo.app.browser
 
+// TODO: replaced by BrowserLottieTrackersAnimatorHelper. Needs migration to accomodate cookie animation
+/*
 interface TrackersAnimatorListener {
     fun onAnimationFinished()
 }
-// TODO: replaced by BrowserLottieTrackersAnimatorHelper. Needs migration to accomodate cookie animation
-/*
+
 class BrowserTrackersAnimatorHelper(
     private val omnibarViews: List<View>,
     private val privacyGradeView: View,
