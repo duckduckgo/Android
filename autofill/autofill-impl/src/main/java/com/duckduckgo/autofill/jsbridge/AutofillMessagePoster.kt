@@ -22,7 +22,7 @@ import androidx.core.net.toUri
 import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -33,7 +33,7 @@ interface AutofillMessagePoster {
     suspend fun postMessage(webView: WebView?, message: String)
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 class AutofillWebViewMessagePoster @Inject constructor() : AutofillMessagePoster {
 
     @SuppressLint("RequiresFeature")
