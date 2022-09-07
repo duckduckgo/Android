@@ -961,14 +961,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnSiteChangedThenPrivacyGradeIsUpdated() {
+    fun whenOnSiteChangedThenPrivacyShieldIsUpdated() {
         givenCurrentSite("https://www.example.com/").also {
             whenever(it.privacyProtection()).thenReturn(PROTECTED)
         }
         loadUrl("https://example.com")
         val entity = TestEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
-            testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false, null))
+            testee.trackerDetected(
+                TrackingEvent(
+                    documentUrl = "https://example.com",
+                    trackerUrl = "",
+                    categories = null,
+                    entity = entity,
+                    surrogateId = null,
+                    status = TrackerStatus.ALLOWED,
+                    type = TrackerType.OTHER
+                )
+            )
         }
         assertEquals(PROTECTED, privacyShieldState().privacyShield)
     }
