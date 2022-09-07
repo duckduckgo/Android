@@ -187,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Настройки</string>
     <string name="settingsMenuItemTitle">Настройки</string>
-    <string name="settingsHeadingGeneral">Обща информация</string>
-    <string name="settingsHeadingOther">Други</string>
     <string name="settingsHeadingPrivacy">Поверителност</string>
     <string name="settingsAboutDuckduckgo">За DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
@@ -206,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Питай всеки път</string>
     <string name="settingsAppLinksAlways">Винаги</string>
     <string name="settingsAppLinksNever">Никога</string>
+    <string name="settingsHeadingAppearance">Външен вид</string>
+    <string name="settingsHeadingCustomize">Персонализиране</string>
+    <string name="settingsHeadingAbout">За нас</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Запази</string>
@@ -720,5 +721,9 @@
 
     <string name="autoconsentSetting">Управление на изскачащите прозорци за бисквитки</string>
     <string name="autoconsentAnimationText">Бисквитките са настроени</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Автоматично попълване</string>
+
 
 </resources>

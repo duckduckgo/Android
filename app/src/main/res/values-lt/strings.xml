@@ -187,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nustatymai</string>
     <string name="settingsMenuItemTitle">Nustatymai</string>
-    <string name="settingsHeadingGeneral">Bendrieji</string>
-    <string name="settingsHeadingOther">Kiti</string>
     <string name="settingsHeadingPrivacy">Privatumas</string>
     <string name="settingsAboutDuckduckgo">Apie „DuckDuckGo“</string>
     <string name="settingsVersion">Versija</string>
@@ -206,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Klausti kiekvieną kartą</string>
     <string name="settingsAppLinksAlways">Visada</string>
     <string name="settingsAppLinksNever">Niekada</string>
+    <string name="settingsHeadingAppearance">Išvaizda</string>
+    <string name="settingsHeadingCustomize">Tinkinti</string>
+    <string name="settingsHeadingAbout">Apie</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>
@@ -728,5 +729,8 @@
 
     <string name="autoconsentSetting">Valdyti slapukų iššokančiuosius langus</string>
     <string name="autoconsentAnimationText">Slapukai valdomi</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automatinis pildymas</string>
 
 </resources>
