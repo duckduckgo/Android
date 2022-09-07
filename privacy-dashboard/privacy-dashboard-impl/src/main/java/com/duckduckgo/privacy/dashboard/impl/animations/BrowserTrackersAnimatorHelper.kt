@@ -111,7 +111,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     }
 
     override fun createCookiesAnimation(context: Context) {
-        //TODO: migrate cookieAnimation
+        // TODO: migrate cookieAnimation
     }
 
     override fun removeListener() {
