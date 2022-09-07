@@ -16,80 +16,141 @@
 
 package com.duckduckgo.mobile.android.ui.view.dialog
 
+import android.animation.Animator
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.DialogInterface.OnClickListener
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.animation.addListener
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class TextAlertDialog(val builder: Builder): DialogFragment() {
+class TextAlertDialog(val builder: Builder) : DialogFragment() {
 
-    private val binding: DialogTextAlertBinding by viewBinding()
+    abstract class EventListener {
+        open fun onDialogShown() {}
+        open fun onDialogDismissed() {}
+        open fun onPositiveButtonClicked() {}
+        open fun onNegativeButtonClicked() {}
+    }
+    internal class DefaultEventListener: EventListener()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isCancelable = false
+        builder.listener.onDialogShown()
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val binding: DialogTextAlertBinding = DialogTextAlertBinding.inflate(layoutInflater)
 
-        val rootView = layoutInflater.inflate(R.layout.dialog_text_alert, null)
+        if (builder.headerImageDrawableId > 0) {
+            binding.textAlertDialogImage.setImageResource(builder.headerImageDrawableId)
+        } else {
+            binding.textAlertDialogImage.gone()
+        }
+
+        binding.textAlertDialogTitle.text = builder.titleText
+        binding.textAlertDialogMessage.text = builder.messageText
 
         binding.textAlertDialogPositiveButton.text = builder.positiveButtonText
-        binding.textAlertDialogPositiveButton.setOnClickListener { builder.positiveButtonOnClick.invoke() }
+        binding.textAlertDialogPositiveButton.setOnClickListener {
+            builder.listener.onPositiveButtonClicked()
+            dismiss()
+        }
+
+        binding.textAlertDialogCancelButton.text = builder.negativeButtonText
+        binding.textAlertDialogCancelButton.setOnClickListener {
+            builder.listener.onNegativeButtonClicked()
+            dismiss()
+        }
 
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
             com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog
         )
-            .setView(rootView)
+            .setView(binding.root)
 
         isCancelable = false
 
         return alertDialog.create()
     }
 
-    fun usage(){
-        // val dialog = AppTPDisableConfirmationDialog.instance(this)
-        // dialog.show(
-        //     supportFragmentManager,
-        //     AppTPDisableConfirmationDialog.TAG_APPTP_DISABLE_DIALOG
-        // )
+    override fun onDismiss(dialog: DialogInterface) {
+        builder.listener.onDialogDismissed()
+        super.onDismiss(dialog)
     }
 
     companion object {
-
         const val TAG_TEXT_ALERT_DIALOG = "TextAlertDialog"
-
-        // fun instance(listener: Listener): AppTPDisableConfirmationDialog {
-        //     return AppTPDisableConfirmationDialog(listener)
-        // }
     }
 
     class Builder(val context: Context) {
 
-        var positiveButtonText: CharSequence = ""
-        var positiveButtonOnClick: () -> Unit = {}
+        var listener: EventListener = DefaultEventListener()
 
-        fun setPositiveButton(
-            @StringRes textId: Int,
-            onClick: () -> Unit
+        var titleText: CharSequence = ""
+        var messageText: CharSequence = ""
+
+        var headerImageDrawableId = 0
+
+        var positiveButtonText: CharSequence = ""
+        var negativeButtonText: CharSequence = ""
+
+        fun setHeaderImageResource(
+            @DrawableRes drawableId: Int
         ): Builder {
+            headerImageDrawableId = drawableId
+            return this
+        }
+
+        fun setTitle(
+            @StringRes textId: Int,
+        ): Builder {
+            titleText = context.getText(textId)
+            return this
+        }
+
+        fun setMessage(
+            @StringRes textId: Int,
+        ): Builder {
+            messageText = context.getText(textId)
+            return this
+        }
+
+        fun setPositiveButton(@StringRes textId: Int): Builder {
             positiveButtonText = context.getText(textId)
-            positiveButtonOnClick = onClick
+            return this
+        }
+
+        fun setNegativeButton(
+            @StringRes textId: Int
+        ): Builder {
+            negativeButtonText = context.getText(textId)
+            return this
+        }
+
+        fun addEventListener(eventListener: EventListener): Builder{
+            listener = eventListener
             return this
         }
 
         fun build(): TextAlertDialog {
-            return TextAlertDialog()
+            val builder = this
+            if (builder.positiveButtonText.isEmpty()) {
+
+            }
+            return TextAlertDialog(this)
         }
     }
-
-
 }

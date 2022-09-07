@@ -23,34 +23,36 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="@dimen/keyline_4">
+    android:background="?dialogBgColor"
+    android:padding="@dimen/keyline_5">
+
+    <ImageView
+        android:id="@+id/textAlertDialogImage"
+        android:layout_width="@dimen/dialogImageSize"
+        android:layout_height="@dimen/dialogImageSize"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_globe_gray_16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/textAlertDialogTitle"
         style="@style/Widget.DuckDuckGo.Dialog.Title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
         android:orientation="vertical"
-        android:text="Accept"
-        android:textAlignment="viewStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
+        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogImage"/>
     <TextView
         android:id="@+id/textAlertDialogMessage"
         style="@style/TextAppearance.DuckDuckGo.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
         android:text="@string/atp_DisableConfirmationDialogMessage"
-        android:textAlignment="viewStart"
-        android:textColor="?attr/settingsMinorTextColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/textAlertDialogTitle"/>
 
@@ -59,7 +61,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp" android:layout_marginBottom="24dp"
         android:text="Positive" app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
 
@@ -68,7 +69,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp" android:text="Cancel"
+        android:text="Cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/textAlertDialogPositiveButton"
         app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
 
