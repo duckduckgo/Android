@@ -43,7 +43,7 @@ interface SystemPermissionsHelper {
 
 @ContributesBinding(ActivityScope::class)
 @SingleInstanceIn(ActivityScope::class)
-class SystemPermissionsHelperImp @Inject constructor(
+class SystemPermissionsHelperImpl @Inject constructor(
     private val context: Context
 ) : SystemPermissionsHelper {
 

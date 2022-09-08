@@ -23,7 +23,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(ActivityScope::class)
-class SitePermissionsManagerImp @Inject constructor(
+class SitePermissionsManagerImpl @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository
 ) : SitePermissionsManager {
 
