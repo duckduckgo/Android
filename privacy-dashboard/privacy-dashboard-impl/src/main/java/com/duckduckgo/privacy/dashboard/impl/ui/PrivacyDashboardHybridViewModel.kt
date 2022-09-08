@@ -52,7 +52,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val siteProtectionsViewStateMapper: SiteProtectionsViewStateMapper
+    private val siteProtectionsViewStateMapper: SiteProtectionsViewStateMapper,
+    private val requestDataViewStateMapper: RequestDataViewStateMapper
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -64,8 +65,52 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     data class ViewState(
         val userSettingsViewState: UserSettingsViewState,
         val siteProtectionsViewState: SiteProtectionsViewState,
-        val userChangedValues: Boolean = false
+        val userChangedValues: Boolean = false,
+        val requestData: RequestDataViewState,
+        val protectionStatus: ProtectionStatusViewState
     )
+
+    data class ProtectionStatusViewState(
+        val allowlisted: Boolean,
+        val denylisted: Boolean,
+        val enabledFeatures: List<String>,
+        val unprotectedTemporary: Boolean
+    )
+
+    data class RequestDataViewState(
+        val installedSurrogates: List<String>? = null,
+        val requests: List<DetectedRequest>
+    )
+
+    data class DetectedRequest(
+        val category: String?,
+        val eTLDplus1: String?,
+        val entityName: String,
+        val ownerName: String?,
+        val pageUrl: String,
+        val prevalence: Double,
+        val state: Blocked, // TODO: temporary, this needs to be a sealed class
+        val url: String
+    )
+
+    data class Blocked(
+        val blocked: Any
+    )
+
+    sealed class State {
+        // data class Blocked(val blocked: Unit = Unit): State()
+        data class Allowed(val allowed: Reason) : State()
+    }
+
+    data class Reason(val reason: String)
+
+    enum class AllowedReasons(val value: String) {
+        PROTECTIONS_DISABLED("protectionDisabled"),
+        OWNED_BY_FIRST_PARTY("ownedByFirstParty"),
+        RULE_EXCEPTION("ruleException"),
+        AD_CLICK_ATTRIBUTION("adClickAttribution"),
+        OTHER_THIRD_PARTY_REQUEST("otherThirdPartyRequest"),
+    }
 
     data class UserSettingsViewState(
         val privacyProtectionEnabled: Boolean
@@ -171,6 +216,13 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     siteProtectionsViewState = siteProtectionsViewStateMapper.mapFromSite(site),
                     userSettingsViewState = UserSettingsViewState(
                         privacyProtectionEnabled = !site.userAllowList
+                    ),
+                    requestData = requestDataViewStateMapper.mapFromSite(site),
+                    protectionStatus = ProtectionStatusViewState(
+                        false,
+                        false,
+                        listOf("contentBlocking"),
+                        false
                     )
                 )
             )
