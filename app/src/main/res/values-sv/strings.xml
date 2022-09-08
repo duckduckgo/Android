@@ -721,6 +721,21 @@
     <string name="autoconsentSetting">Hantera popup-fönster för cookies</string>
     <string name="autoconsentAnimationText">Cookies hanteras</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Webbplatsbehörigheter</string>
+    <string name="sitePermissionsSettingsDescription">Webbplatser som du besöker kan begära åtkomst till din enhets plats, kamera eller mikrofon. De kan inte komma åt dessa om du inte uttryckligen tillåter det.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Tillåt alla webbplatser att be om:</string>
+    <string name="sitePermissionsSettingsLocation">Plats</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Hantera webbplatser</string>
+    <string name="sitePermissionsSettingsEmptyText">Inga webbplatser ännu</string>
+    <string name="permissionPerWebsiteText">Behörigheter för %1$s </string>
+    <string name="permissionsPerWebsiteAskSetting">Fråga</string>
+    <string name="permissionsPerWebsiteDenySetting">Neka</string>
+    <string name="permissionsPerWebsiteAllowSetting">Tillåt</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s-behörighet för %2$s</string>
+
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatisk ifyllning</string>
 

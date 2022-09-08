@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s chce získať prístup k fotoaparátu a mikrofónu</string>
+    <string name="sitePermissionsMicDialogTitle">%1$s chce získať prístup k mikrofónu</string>
+    <string name="sitePermissionsCameraDialogTitle">%1$s chce získať prístup k fotoaparátu</string>
+    <string name="sitePermissionsDialogContent">Spravujte udelené povolenia v nastaveniach</string>
+    <string name="sitePermissionsDialogDenyButton">Odmietnuť</string>
+    <string name="sitePermissionsDialogAllowButton">Povoliť</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Povoliť aplikácii DuckDuckGo žiadať o prístup k fotoaparátu a mikrofónu</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Povoliť aplikácii DuckDuckGo žiadať o prístup k fotoaparátu</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Povoliť aplikácii DuckDuckGo žiadať o prístup k mikrofónu</string>
+    <string name="sitePermissionsDeniedSnackBarAction">Povoliť</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Povoliť aplikácii DuckDuckGo žiadať o prístup k fotoaparátu v tomto zariadení</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Lokality môžu používať váš fotoaparát len vtedy, ak povolíte aplikácii DuckDuckGo žiadať o prístup.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Povoliť aplikácii DuckDuckGo žiadať o prístup k mikrofónu v tomto zariadení</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Lokality môžu používať váš mikrofón len vtedy, ak povolíte aplikácii DuckDuckGo žiadať o prístup.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Povoliť aplikácii DuckDuckGo žiadať o prístup k fotoaparátu a mikrofónu v tomto zariadení</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Lokality môžu používať váš fotoaparát a mikrofón len vtedy, ak povolíte aplikácii DuckDuckGo žiadať o prístup.</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Otvorte nastavenia</string>
+    <string name="systemPermissionsDeniedDialogNegativeButton">Zrušiť</string>
+</resources>

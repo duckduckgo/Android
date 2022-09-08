@@ -721,6 +721,21 @@
     <string name="autoconsentSetting">Administrer popup-vinduer om informasjonskapsler</string>
     <string name="autoconsentAnimationText">Informasjonskapsler administrert</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Nettstedstillatelser</string>
+    <string name="sitePermissionsSettingsDescription">Nettsteder du besøker, kan be om tilgang til enhetens plassering, kamera eller mikrofon. De får ikke tilgang til disse med mindre du uttrykkelig gir dem tillatelse.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Tillat alle nettsteder å be om:</string>
+    <string name="sitePermissionsSettingsLocation">Posisjon</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Administrer nettsteder</string>
+    <string name="sitePermissionsSettingsEmptyText">Ingen nettsteder ennå</string>
+    <string name="permissionPerWebsiteText">Tillatelser for «%1$s» </string>
+    <string name="permissionsPerWebsiteAskSetting">Spør</string>
+    <string name="permissionsPerWebsiteDenySetting">Avvis</string>
+    <string name="permissionsPerWebsiteAllowSetting">Tillat</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$stillatelse for %2$s</string>
+
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Autofyll</string>
 

@@ -721,8 +721,22 @@
     <string name="autoconsentSetting">Управление на изскачащите прозорци за бисквитки</string>
     <string name="autoconsentAnimationText">Бисквитките са настроени</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Разрешения за сайтове</string>
+    <string name="sitePermissionsSettingsDescription">Сайтовете, които посещавате, може да поискат достъп до местоположението, камерата или микрофона на устройството. Те няма да имат достъп до тях, освен ако не им дадете изрично разрешение.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Разрешаване на всички сайтове да искат:</string>
+    <string name="sitePermissionsSettingsLocation">Местоположение</string>
+    <string name="sitePermissionsSettingsCamera">Камера</string>
+    <string name="sitePermissionsSettingsMicrophone">Микрофон</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Управление на сайтове</string>
+    <string name="sitePermissionsSettingsEmptyText">Все още няма сайтове</string>
+    <string name="permissionPerWebsiteText">Разрешения за \"%1$s\" </string>
+    <string name="permissionsPerWebsiteAskSetting">Питане</string>
+    <string name="permissionsPerWebsiteDenySetting">Отказвам</string>
+    <string name="permissionsPerWebsiteAllowSetting">Разрешавам</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s разрешение за %2$s</string>
+
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Автоматично попълване</string>
-
 
 </resources>

@@ -721,13 +721,28 @@
     <string name="atp_SettingsDeviceShieldDisabled">Zakázané</string>
 
     <!-- Autoconsent -->
-    <string name="autoconsentDialogTitle">Zdá sa, že táto stránka má kontextové okno týkajúce sa súhlasu so súbormi cookie👇</string>
+    <string name="autoconsentDialogTitle">Zdá sa, že táto stránka má kontextové okno týkajúce sa súhlasu so súbormi cookie 👇</string>
     <string name="autoconsentDialogDescription">Chceš, aby som to riešil za teba? Môžem sa pokúsiť minimalizovať súbory cookie, maximalizovať ochranu súkromia a skryť kontextové okná, ako sú tieto.</string>
     <string name="autoconsentPrimaryCta">Správa kontextových okien súborov cookie</string>
     <string name="autoconsentSecondaryCta">Nie, ďakujem</string>
 
     <string name="autoconsentSetting">Správa kontextových okien súborov cookie</string>
     <string name="autoconsentAnimationText">Spravované súbory cookie</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Oprávnenia na lokalitu</string>
+    <string name="sitePermissionsSettingsDescription">Lokality, ktoré navštívite, môžu žiadať o prístup k polohe, fotoaparátu alebo mikrofónu vášho zariadenia. Nebudú mať k nim prístup, pokiaľ im to výslovne nepovolíte.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Povoliť všetkým lokalitám žiadať o:</string>
+    <string name="sitePermissionsSettingsLocation">Poloha</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofón</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Správa lokalít</string>
+    <string name="sitePermissionsSettingsEmptyText">Zatiaľ žiadne lokality</string>
+    <string name="permissionPerWebsiteText">Povolenia pre „%1$s” </string>
+    <string name="permissionsPerWebsiteAskSetting">Opýtať sa</string>
+    <string name="permissionsPerWebsiteDenySetting">Odmietnuť</string>
+    <string name="permissionsPerWebsiteAllowSetting">Povoliť</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s povolenie pre %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatické vypĺňanie</string>

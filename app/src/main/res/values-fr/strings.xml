@@ -721,6 +721,21 @@
     <string name="autoconsentSetting">Gérer les fenêtres contextuelles de cookies</string>
     <string name="autoconsentAnimationText">Cookies gérés</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Autorisations du site</string>
+    <string name="sitePermissionsSettingsDescription">Les sites que vous visitez peuvent demander l\'accès à la localisation, à l\'appareil photo ou au micro de votre appareil. Ils ne pourront y accéder que si vous leur en donnez explicitement la permission.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Autoriser tous les sites à demander :</string>
+    <string name="sitePermissionsSettingsLocation">Localisation</string>
+    <string name="sitePermissionsSettingsCamera">Appareil photo</string>
+    <string name="sitePermissionsSettingsMicrophone">Micro</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Gérer les sites</string>
+    <string name="sitePermissionsSettingsEmptyText">Pas encore de sites</string>
+    <string name="permissionPerWebsiteText">Autorisations pour « %1$s » </string>
+    <string name="permissionsPerWebsiteAskSetting">Demander</string>
+    <string name="permissionsPerWebsiteDenySetting">Refuser</string>
+    <string name="permissionsPerWebsiteAllowSetting">Autoriser</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">Autorisation de %1$s pour %2$s</string>
+
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Saisie automatique</string>
 

@@ -729,6 +729,21 @@
     <string name="autoconsentSetting">Upravljanje pojavnih oken za piškotke</string>
     <string name="autoconsentAnimationText">Upravljani piškotki</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Dovoljenja za spletno mesto</string>
+    <string name="sitePermissionsSettingsDescription">Spletna mesta, ki jih obiščete, lahko zahtevajo dostop do lokacije, kamere ali mikrofona vaše naprave. Do njih ne bodo mogli dostopati, razen če jim to izrecno dovolite.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Dovoli vsem mestom, da zahtevajo:</string>
+    <string name="sitePermissionsSettingsLocation">Lokacija</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Upravljanje spletnih mest</string>
+    <string name="sitePermissionsSettingsEmptyText">Spletnih mest še ni</string>
+    <string name="permissionPerWebsiteText">Dovoljenja za »%1$s« </string>
+    <string name="permissionsPerWebsiteAskSetting">Vprašaj</string>
+    <string name="permissionsPerWebsiteDenySetting">Zavrni</string>
+    <string name="permissionsPerWebsiteAllowSetting">Dovoli</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s dovoljenje za %2$s</string>
+
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Samodejno izpolnjevanje</string>
 

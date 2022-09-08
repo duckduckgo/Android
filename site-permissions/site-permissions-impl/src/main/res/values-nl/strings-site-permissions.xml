@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s wil toegang tot de camera en microfoon</string>
+    <string name="sitePermissionsMicDialogTitle">%1$s wil toegang tot de microfoon</string>
+    <string name="sitePermissionsCameraDialogTitle">%1$s wil toegang tot de camera</string>
+    <string name="sitePermissionsDialogContent">Verleende toestemmingen beheren in instellingen</string>
+    <string name="sitePermissionsDialogDenyButton">Weigeren</string>
+    <string name="sitePermissionsDialogAllowButton">Toestaan</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">DuckDuckGo toestaan om toegang tot de camera en microfoon te vragen</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">DuckDuckGo toestaan om toegang tot de camera te vragen</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">DuckDuckGo toestaan om toegang tot de microfoon te vragen</string>
+    <string name="sitePermissionsDeniedSnackBarAction">Toestaan</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">DuckDuckGo toestaan om toegang tot de camera op dit apparaat te vragen</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Sites kunnen je camera alleen gebruiken als je DuckDuckGo toestaat om toegang te vragen.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">DuckDuckGo toestaan om toegang tot de microfoon op dit apparaat te vragen</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Sites kunnen je microfoon alleen gebruiken als je DuckDuckGo toestaat om toegang te vragen.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">DuckDuckGo toestaan om toegang tot de microfoon en camera op dit apparaat te vragen</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Sites kunnen je camera en microfoon alleen gebruiken als je DuckDuckGo toestaat om toegang te vragen.</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Open instellingen</string>
+    <string name="systemPermissionsDeniedDialogNegativeButton">Annuleren</string>
+</resources>
