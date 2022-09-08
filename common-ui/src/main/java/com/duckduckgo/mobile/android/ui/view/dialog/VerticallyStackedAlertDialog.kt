@@ -16,23 +16,17 @@
 
 package com.duckduckgo.mobile.android.ui.view.dialog
 
-import android.animation.Animator
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
-import android.content.DialogInterface.OnClickListener
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.View
+import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.core.animation.addListener
 import androidx.fragment.app.DialogFragment
-import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
+import com.duckduckgo.mobile.android.databinding.DialogVerticallyStackedTextAlertBinding
+import com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
 import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.hide
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class VerticallyStackedAlertDialog(val builder: Builder) : DialogFragment() {
@@ -40,8 +34,7 @@ class VerticallyStackedAlertDialog(val builder: Builder) : DialogFragment() {
     abstract class EventListener {
         open fun onDialogShown() {}
         open fun onDialogDismissed() {}
-        open fun onPositiveButtonClicked() {}
-        open fun onNegativeButtonClicked() {}
+        open fun onButtonClicked(position: Int) {}
     }
     internal class DefaultEventListener: EventListener()
 
@@ -52,27 +45,39 @@ class VerticallyStackedAlertDialog(val builder: Builder) : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val binding: DialogTextAlertBinding = DialogTextAlertBinding.inflate(layoutInflater)
+
+        val binding: DialogVerticallyStackedTextAlertBinding = DialogVerticallyStackedTextAlertBinding.inflate(layoutInflater)
 
         if (builder.headerImageDrawableId > 0) {
-            binding.textAlertDialogImage.setImageResource(builder.headerImageDrawableId)
+            binding.stackedAlertDialogImage.setImageResource(builder.headerImageDrawableId)
         } else {
-            binding.textAlertDialogImage.gone()
+            binding.stackedAlertDialogImage.gone()
         }
 
-        binding.textAlertDialogTitle.text = builder.titleText
-        binding.textAlertDialogMessage.text = builder.messageText
+        binding.stackedAlertDialogTitle.text = builder.titleText
 
-        binding.textAlertDialogPositiveButton.text = builder.positiveButtonText
-        binding.textAlertDialogPositiveButton.setOnClickListener {
-            builder.listener.onPositiveButtonClicked()
-            dismiss()
+        if (builder.messageText.isEmpty()) {
+            binding.stackedlertDialogMessage.gone()
+        } else {
+            binding.stackedlertDialogMessage.text = builder.messageText
         }
 
-        binding.textAlertDialogCancelButton.text = builder.negativeButtonText
-        binding.textAlertDialogCancelButton.setOnClickListener {
-            builder.listener.onNegativeButtonClicked()
-            dismiss()
+        val buttonParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+
+        builder.stackedButtonList.forEachIndexed { index, text ->
+            val button = ButtonGhostLarge(builder.context, null)
+            button.text = text
+            button.layoutParams = buttonParams
+
+            button.setOnClickListener {
+                builder.listener.onButtonClicked(index)
+                dismiss()
+            }
+
+            binding.stackedAlertDialogButtonLayout.addView(button)
         }
 
         val alertDialog = MaterialAlertDialogBuilder(
@@ -80,8 +85,6 @@ class VerticallyStackedAlertDialog(val builder: Builder) : DialogFragment() {
             com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog
         )
             .setView(binding.root)
-
-        isCancelable = false
 
         return alertDialog.create()
     }
@@ -104,8 +107,7 @@ class VerticallyStackedAlertDialog(val builder: Builder) : DialogFragment() {
 
         var headerImageDrawableId = 0
 
-        var positiveButtonText: CharSequence = ""
-        var negativeButtonText: CharSequence = ""
+        var stackedButtonList: MutableList<CharSequence> = mutableListOf()
 
         fun setHeaderImageResource(
             @DrawableRes drawableId: Int
@@ -128,27 +130,25 @@ class VerticallyStackedAlertDialog(val builder: Builder) : DialogFragment() {
             return this
         }
 
-        fun setPositiveButton(@StringRes textId: Int): Builder {
-            positiveButtonText = context.getText(textId)
+        fun setStackedButtons(@StringRes stackedButtonTextId: List<Int>): Builder {
+            stackedButtonTextId.forEach {
+                stackedButtonList.add(context.getText(it))
+            }
             return this
         }
 
-        fun setNegativeButton(
-            @StringRes textId: Int
-        ): Builder {
-            negativeButtonText = context.getText(textId)
-            return this
-        }
-
-        fun addEventListener(eventListener: EventListener): Builder{
+        fun addEventListener(eventListener: EventListener): Builder {
             listener = eventListener
             return this
         }
 
         fun build(): VerticallyStackedAlertDialog {
             val builder = this
-            if (builder.positiveButtonText.isEmpty()) {
-
+            if (builder.stackedButtonList.isEmpty()) {
+                throw Exception("VerticallyStackedAlertDialog: You must always provide a list of buttons")
+            }
+            if (builder.titleText.isEmpty()) {
+                throw Exception("TextAlertDialog: You must always provide a Title")
             }
             return VerticallyStackedAlertDialog(this)
         }

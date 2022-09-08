@@ -19,7 +19,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -27,7 +26,7 @@
     android:padding="@dimen/keyline_5">
 
     <ImageView
-        android:id="@+id/textAlertDialogImage"
+        android:id="@+id/stackedAlertDialogImage"
         android:layout_width="@dimen/dialogImageSize"
         android:layout_height="@dimen/dialogImageSize"
         android:importantForAccessibility="no"
@@ -38,47 +37,34 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
-        android:id="@+id/textAlertDialogTitle"
+        android:id="@+id/stackedAlertDialogTitle"
         style="@style/Widget.DuckDuckGo.Dialog.Title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogImage"/>
+        app:layout_constraintTop_toBottomOf="@+id/stackedAlertDialogImage"/>
+
     <TextView
-        android:id="@+id/textAlertDialogMessage"
+        android:id="@+id/stackedlertDialogMessage"
         style="@style/TextAppearance.DuckDuckGo.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/atp_DisableConfirmationDialogMessage"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/textAlertDialogTitle"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stackedAlertDialogTitle"/>
 
     <LinearLayout
+        android:id="@+id/stackedAlertDialogButtonLayout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content">
-
-
-    </LinearLayout>
-
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
-        android:id="@+id/textAlertDialogPositiveButton"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Positive" app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
-
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
-        android:id="@+id/textAlertDialogCancelButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Cancel"
+        android:layout_marginTop="24dp" android:gravity="end"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textAlertDialogPositiveButton"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
+        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stackedlertDialogMessage"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

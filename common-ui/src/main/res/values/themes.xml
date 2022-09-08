@@ -406,7 +406,7 @@
         <item name="behavior_peekHeight">512dp</item>
     </style>
 
-    <style name="RadioButtonStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">
+    <style name="RadioButtonStyle" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
         <item name="android:textColor">?attr/normalTextColor</item>
         <item name="buttonTint">@color/cornflowerBlue</item>
     </style>

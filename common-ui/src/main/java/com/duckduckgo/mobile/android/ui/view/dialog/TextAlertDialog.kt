@@ -16,23 +16,15 @@
 
 package com.duckduckgo.mobile.android.ui.view.dialog
 
-import android.animation.Animator
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
-import android.content.DialogInterface.OnClickListener
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.core.animation.addListener
 import androidx.fragment.app.DialogFragment
-import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
 import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.hide
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class TextAlertDialog(val builder: Builder) : DialogFragment() {
@@ -61,7 +53,12 @@ class TextAlertDialog(val builder: Builder) : DialogFragment() {
         }
 
         binding.textAlertDialogTitle.text = builder.titleText
-        binding.textAlertDialogMessage.text = builder.messageText
+
+        if (builder.messageText.isEmpty()) {
+            binding.textAlertDialogMessage.gone()
+        } else {
+            binding.textAlertDialogMessage.text = builder.messageText
+        }
 
         binding.textAlertDialogPositiveButton.text = builder.positiveButtonText
         binding.textAlertDialogPositiveButton.setOnClickListener {
@@ -148,7 +145,13 @@ class TextAlertDialog(val builder: Builder) : DialogFragment() {
         fun build(): TextAlertDialog {
             val builder = this
             if (builder.positiveButtonText.isEmpty()) {
-
+                throw Exception("TextAlertDialog: You must always provide a Positive Button")
+            }
+            if (builder.negativeButtonText.isEmpty()) {
+                throw Exception("TextAlertDialog: You must always provide a Negative Button")
+            }
+            if (builder.titleText.isEmpty()) {
+                throw Exception("TextAlertDialog: You must always provide a Title")
             }
             return TextAlertDialog(this)
         }
