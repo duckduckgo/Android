@@ -43,7 +43,7 @@
         <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
-        <item name="radioButtonStyle">@style/RadioButtonStyle</item>
+        <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
         <item name="sliderStyle">@style/Widget.App.Slider</item>
 
@@ -408,7 +408,7 @@
 
     <style name="RadioButtonStyle" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
         <item name="android:textColor">?attr/normalTextColor</item>
-        <item name="buttonTint">@color/cornflowerBlue</item>
+        <item name="buttonTint">@color/radio_button_tint</item>
     </style>
 
     <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">

@@ -24,12 +24,12 @@ import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
-import com.duckduckgo.mobile.android.databinding.DialogVerticallyStackedTextAlertBinding
+import com.duckduckgo.mobile.android.databinding.DialogStackedAlertBinding
 import com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class VerticallyStackedAlertDialog(val builder: Builder) : DialogFragment() {
+class StackedAlertDialog(val builder: Builder) : DialogFragment() {
 
     abstract class EventListener {
         open fun onDialogShown() {}
@@ -46,7 +46,7 @@ class VerticallyStackedAlertDialog(val builder: Builder) : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val binding: DialogVerticallyStackedTextAlertBinding = DialogVerticallyStackedTextAlertBinding.inflate(layoutInflater)
+        val binding: DialogStackedAlertBinding = DialogStackedAlertBinding.inflate(layoutInflater)
 
         if (builder.headerImageDrawableId > 0) {
             binding.stackedAlertDialogImage.setImageResource(builder.headerImageDrawableId)
@@ -95,7 +95,7 @@ class VerticallyStackedAlertDialog(val builder: Builder) : DialogFragment() {
     }
 
     companion object {
-        const val TAG_TEXT_ALERT_DIALOG = "TextAlertDialog"
+        const val TAG_STACKED_ALERT_DIALOG = "VerticallyStackedAlertDialog"
     }
 
     class Builder(val context: Context) {
@@ -142,7 +142,7 @@ class VerticallyStackedAlertDialog(val builder: Builder) : DialogFragment() {
             return this
         }
 
-        fun build(): VerticallyStackedAlertDialog {
+        fun build(): StackedAlertDialog {
             val builder = this
             if (builder.stackedButtonList.isEmpty()) {
                 throw Exception("VerticallyStackedAlertDialog: You must always provide a list of buttons")
@@ -150,7 +150,7 @@ class VerticallyStackedAlertDialog(val builder: Builder) : DialogFragment() {
             if (builder.titleText.isEmpty()) {
                 throw Exception("TextAlertDialog: You must always provide a Title")
             }
-            return VerticallyStackedAlertDialog(this)
+            return StackedAlertDialog(this)
         }
     }
 }

@@ -22,6 +22,7 @@
     <attr name="secondaryButtonSmallStyle" format="reference"/>
     <attr name="ghostButtonLargeStyle" format="reference"/>
     <attr name="ghostButtonSmallStyle" format="reference"/>
+    <attr name="radioButtonStyle" format="reference"/>
 
     // Deprecated - This will be removed once we migrate all Components to the new Design System Spec"
     <attr name="primaryButtonRoundedStyle" format="reference"/>

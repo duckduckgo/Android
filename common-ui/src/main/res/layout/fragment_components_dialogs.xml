@@ -64,6 +64,13 @@
             android:layout_marginTop="16dp"
             android:text="Stacked Text Alert Dialog With 4 buttons"/>
 
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+            android:id="@+id/radioButtonAlertDialog"
+            android:text="Single Choice Alert Dialog"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
         <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
             android:id="@+id/label"
             android:layout_height="wrap_content"

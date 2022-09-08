@@ -46,6 +46,7 @@
     <string name="text_dialog_message">You can put as much text in here as you like. This dialog scales automagically.</string>
     <string name="text_dialog_positive">Positive</string>
     <string name="text_dialog_negative">Negative</string>
+    <string name="text_dialog_option">Option</string>
 
     <!-- Defaults Searchbar -->
     <string name="searchbar_cleartextaction_content_description_default">Collapse</string>
