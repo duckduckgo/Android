@@ -22,20 +22,13 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import android.view.LayoutInflater
-import android.view.View
 import android.webkit.PermissionRequest
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
-import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
-import com.duckduckgo.site.permissions.impl.R.layout
 import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelParameter
 import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelValue
 import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.SitePermissionsPixelName
@@ -43,8 +36,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesBinding(ActivityScope::class)
@@ -52,9 +43,6 @@ import javax.inject.Inject
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
     private val sitePermissionsRepository: SitePermissionsRepository,
-    private val faviconManager: FaviconManager,
-    private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel
 ) : SitePermissionsDialogLauncher {
 
@@ -106,17 +94,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         pixelParamValue: String
     ) {
         pixel.fire(SitePermissionsPixelName.SITE_PERMISSION_DIALOG_SHOWN, mapOf(PixelParameter.SITE_PERMISSION to pixelParamValue))
-        val dialog = AlertDialog.Builder(activity)
-        val view: View = LayoutInflater.from(activity).inflate(layout.dialog_site_permissions, null)
-        val title = view.findViewById<TextView>(R.id.sitePermissionsDialogTitle)
-        title.text = String.format(activity.getString(titleRes), url.websiteFromGeoLocationsApiOrigin())
-        val favicon = view.findViewById<ImageView>(R.id.sitePermissionDialogFavicon)
-        appCoroutineScope.launch(dispatcherProvider.main()) {
-            faviconManager.loadToViewFromLocalOrFallback(tabId, url, favicon)
-        }
-        dialog.apply {
-            setView(view)
-            setPositiveButton(R.string.sitePermissionsDialogAllowButton) { dialog, _ ->
+        AlertDialog.Builder(activity).apply {
+            setTitle(String.format(activity.getString(titleRes), url.websiteFromGeoLocationsApiOrigin()))
+            setPositiveButton(R.string.sitePermissionsDialogAllowButton) { _, _ ->
                 pixel.fire(SitePermissionsPixelName.SITE_PERMISSION_DIALOG_ALLOWED, mapOf(PixelParameter.SITE_PERMISSION to pixelParamValue))
                 onPermissionAllowed()
             }
@@ -257,7 +237,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         AlertDialog.Builder(activity).apply {
             setTitle(titleRes)
             setMessage(contentRes)
-            setPositiveButton(R.string.systemPermissionsDeniedDialogPositiveButton) { dialog, _ ->
+            setPositiveButton(R.string.systemPermissionsDeniedDialogPositiveButton) { _, _ ->
                 val intent = Intent()
                 intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                 val uri = Uri.fromParts("package", activity.packageName, null)
