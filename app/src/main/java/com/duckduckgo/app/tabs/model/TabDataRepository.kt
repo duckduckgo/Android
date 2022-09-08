@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.model
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.distinctUntilChanged
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -51,7 +52,7 @@ class TabDataRepository @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : TabRepository {
 
-    override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
+    override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
 
     override val flowTabs: Flow<List<TabEntity>> = tabsDao.flowTabs()
 
