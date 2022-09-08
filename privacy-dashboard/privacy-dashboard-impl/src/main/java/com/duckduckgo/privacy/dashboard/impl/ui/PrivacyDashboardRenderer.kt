@@ -18,6 +18,8 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 
 import android.webkit.WebView
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteProtectionsViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ViewState
 import com.squareup.moshi.Moshi
@@ -49,16 +51,29 @@ class PrivacyDashboardRenderer(
     fun render(viewState: ViewState) {
         Timber.i("PrivacyDashboard viewState $viewState")
         val adapter = moshi.adapter(SiteProtectionsViewState::class.java)
+
         val json = adapter.toJson(viewState.siteProtectionsViewState)
+
+        val newAdapter = moshi.adapter(RequestDataViewState::class.java)
+        val newJson = newAdapter.toJson(viewState.requestData)
+
+        val protectionsAdapter = moshi.adapter(ProtectionStatusViewState::class.java)
+        val protectionsJson = protectionsAdapter.toJson(viewState.protectionStatus)
 
         val adapterParententity = moshi.adapter(EntityViewState::class.java)
         val parentEntityJson = adapterParententity.toJson(viewState.siteProtectionsViewState.parentEntity)
 
+        Timber.i("PD: $newJson")
         onPrivacyProtectionSettingChanged(viewState.userChangedValues)
+        webView.evaluateJavascript("javascript:onChangeProtectionStatus($protectionsJson);", null)
+        webView.evaluateJavascript("javascript:onChangeRequestData(\"${viewState.siteProtectionsViewState.url}\", $newJson);", null)
+
+        // old calls
+        /*
         webView.evaluateJavascript("javascript:onChangeParentEntity($parentEntityJson);", null)
         webView.evaluateJavascript("javascript:onChangeCertificateData($json);", null)
-        webView.evaluateJavascript("javascript:onChangeTrackerBlockingData(\"${viewState.siteProtectionsViewState.url}\", $json);", null)
         webView.evaluateJavascript("javascript:onChangeUpgradedHttps(${viewState.siteProtectionsViewState.upgradedHttps});", null)
         webView.evaluateJavascript("javascript:onChangeProtectionStatus(${viewState.userSettingsViewState.privacyProtectionEnabled});", null)
+        */
     }
 }
