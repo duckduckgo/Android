@@ -215,18 +215,30 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun showPermissionsDeniedSnackBar() {
+        val onPermissionAllowed: () -> Unit
         val message =
             when (permissionRequested) {
-                SitePermissionsRequestedType.CAMERA -> R.string.sitePermissionsCameraDeniedSnackBarMessage
-                SitePermissionsRequestedType.AUDIO -> R.string.sitePermissionsMicDeniedSnackBarMessage
-                SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.sitePermissionsCameraAndMicDeniedSnackBarMessage
+                SitePermissionsRequestedType.CAMERA -> {
+                    onPermissionAllowed = this::askForCameraPermissions
+                    R.string.sitePermissionsCameraDeniedSnackBarMessage
+                }
+                SitePermissionsRequestedType.AUDIO -> {
+                    onPermissionAllowed = this::askForMicPermissions
+                    R.string.sitePermissionsMicDeniedSnackBarMessage
+                }
+                SitePermissionsRequestedType.CAMERA_AND_AUDIO -> {
+                    onPermissionAllowed = this::askForMicAndCameraPermissions
+                    R.string.sitePermissionsCameraAndMicDeniedSnackBarMessage
+                }
             }
 
         val snackbar = Snackbar.make(activity.window.decorView.rootView, message, Snackbar.LENGTH_LONG)
         val layout = snackbar.view as SnackbarLayout
         layout.setPadding(0, 0, 0, 40.toPx())
         snackbar.apply {
-            setAction(R.string.sitePermissionsDeniedSnackBarAction) { showSystemPermissionsDeniedDialog() }
+            setAction(R.string.sitePermissionsDeniedSnackBarAction) {
+                onPermissionAllowed()
+            }
             show()
         }
     }
