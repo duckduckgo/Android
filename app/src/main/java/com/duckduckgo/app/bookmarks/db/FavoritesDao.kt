@@ -27,6 +27,9 @@ interface FavoritesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(favorite: FavoriteEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertList(favorites: List<FavoriteEntity>)
+
     @Query("select * from favorites order by position")
     fun favorites(): Flow<List<FavoriteEntity>>
 

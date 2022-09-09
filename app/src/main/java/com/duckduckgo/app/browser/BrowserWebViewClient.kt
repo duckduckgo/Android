@@ -66,7 +66,7 @@ class BrowserWebViewClient(
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val browserAutofill: BrowserAutofill,
+    private val browserAutofillConfigurator: BrowserAutofill.Configurator,
     private val accessibilityManager: AccessibilityManager,
     private val ampLinks: AmpLinks,
     private val printInjector: PrintInjector,
@@ -262,7 +262,7 @@ class BrowserWebViewClient(
                 webViewClientListener?.pageRefreshed(url)
             }
             lastPageStarted = url
-            browserAutofill.configureAutofillForCurrentPage(webView, url)
+            browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
             injectGpcToDom(webView, url)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {

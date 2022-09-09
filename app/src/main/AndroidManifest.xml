@@ -459,6 +459,8 @@
 
         <service android:name="com.duckduckgo.app.notification.NotificationHandlerService" />
 
+        <receiver android:name=".shortcut.ShortcutReceiver" android:exported="false" />
+
         <receiver
             android:name="com.duckduckgo.widget.SearchWidget"
             android:exported="false"

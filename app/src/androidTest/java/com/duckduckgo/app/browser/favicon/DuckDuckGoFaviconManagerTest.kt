@@ -229,6 +229,42 @@ class DuckDuckGoFaviconManagerTest {
         verify(mockFaviconPersister).deleteAll(FAVICON_TEMP_DIR)
     }
 
+    @Test
+    fun whenSaveFaviconForUrlCalledForCachedFaviconThenFaviconIsNotDownloadedAndSavedAgain() = runTest {
+        givenFaviconExistsInDirectory(FAVICON_PERSISTED_DIR)
+        val url = "https://example.com"
+
+        testee.saveFaviconForUrl(url = url)
+
+        verify(mockFaviconDownloader, never()).getFaviconFromUrl(any())
+        verify(mockFaviconPersister, never()).store(any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenSaveFaviconForUrlCalledForNonCachedFaviconThenFaviconIsDownloadedAndSaved() = runTest {
+        val bitmap = asBitmap()
+        val url = "https://example.com"
+        whenever(mockFaviconPersister.faviconFile(any(), any(), any())).thenReturn(null)
+        whenever(mockFaviconDownloader.getFaviconFromUrl(any())).thenReturn(bitmap)
+
+        testee.saveFaviconForUrl(url = url)
+
+        verify(mockFaviconDownloader).getFaviconFromUrl(any())
+        verify(mockFaviconPersister).store(FAVICON_TEMP_DIR, "", bitmap, "example.com")
+    }
+
+    @Test
+    @UiThreadTest
+    fun whenLoadToViewFromLocalWithPlaceholderCalledThenFaviconLoadedFromDisk() = runTest {
+        givenFaviconExistsInDirectory(FAVICON_PERSISTED_DIR)
+        val url = "https://example.com"
+        val view = ImageView(context)
+
+        testee.loadToViewFromLocalWithPlaceholder(tabId = null, url = url, view = view)
+
+        verify(mockFaviconDownloader).getFaviconFromDisk(mockFile)
+    }
+
     private fun asBitmap(): Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
 
     private fun givenFaviconExistsInTemp() {

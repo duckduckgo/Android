@@ -187,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Ajustes</string>
     <string name="settingsMenuItemTitle">Ajustes</string>
-    <string name="settingsHeadingGeneral">General</string>
-    <string name="settingsHeadingOther">Otros</string>
     <string name="settingsHeadingPrivacy">Privacidad</string>
     <string name="settingsAboutDuckduckgo">Acerca de DuckDuckGo</string>
     <string name="settingsVersion">Versión</string>
@@ -206,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Preguntar cada vez</string>
     <string name="settingsAppLinksAlways">Siempre</string>
     <string name="settingsAppLinksNever">Nunca</string>
+    <string name="settingsHeadingAppearance">Apariencia</string>
+    <string name="settingsHeadingCustomize">Personalizar</string>
+    <string name="settingsHeadingAbout">Sobre</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Guardar</string>
@@ -720,5 +721,8 @@
 
     <string name="autoconsentSetting">Administrar ventanas emergentes de cookies</string>
     <string name="autoconsentAnimationText">Cookies gestionadas</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Autocompletar</string>
 
 </resources>
