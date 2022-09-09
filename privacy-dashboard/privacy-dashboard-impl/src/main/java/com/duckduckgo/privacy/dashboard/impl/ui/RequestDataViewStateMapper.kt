@@ -17,7 +17,9 @@
 package com.duckduckgo.privacy.dashboard.impl.ui
 
 import android.net.http.SslCertificate
+import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.BLOCKED
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Blocked
@@ -29,6 +31,7 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerEventViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerViewState
 import com.squareup.anvil.annotations.ContributesBinding
+import okhttp3.internal.publicsuffix.PublicSuffixDatabase
 import javax.inject.Inject
 
 interface RequestDataViewStateMapper {
@@ -39,6 +42,8 @@ interface RequestDataViewStateMapper {
 class AppSiteRequestDataViewStateMapper @Inject constructor(
     private val publicKeyInfoMapper: PublicKeyInfoMapper
 ) : RequestDataViewStateMapper {
+
+    private val publicSuffixDatabase = PublicSuffixDatabase()
 
     override fun mapFromSite(site: Site): RequestDataViewState {
         val trackingEvents = getTrackingEventsFrom(site)
@@ -52,23 +57,31 @@ class AppSiteRequestDataViewStateMapper @Inject constructor(
 
         val installedSurrogates = emptyList<String>()
 
-        val requests = listOf(
+        val requests: List<DetectedRequest> = site.trackingEvents.map {
+            val entity: Entity = if (it.entity == null) return@map null else it.entity!!
+
             DetectedRequest(
-                category = "Advertising",
-                url = "https://vrt.outbrain.com/",
-                eTLDplus1 = "",
-                pageUrl = "https://edition.cnn.com/",
-                ownerName = "Outbrain",
-                entityName = "Outbrain",
-                state = Blocked(Any()),
-                prevalence = 12.4,
+                category = it.categories?.firstOrNull(), //TrackerType? (ads and others)
+                url = it.trackerUrl,
+                eTLDplus1 = toTldPlusOne(it.trackerUrl), //should
+                pageUrl = it.documentUrl,
+                entityName = entity.displayName,
+                ownerName = entity.name,
+                prevalence = entity.prevalence,
+                state = Blocked(Any())
             )
-        )
+        }.filterNotNull()
 
         return RequestDataViewState(
             installedSurrogates = installedSurrogates,
             requests = requests
         )
+    }
+
+    private fun toTldPlusOne(url: String): String? {
+        val urlAdDomain = UriString.host(url)
+        if (urlAdDomain.isNullOrEmpty()) return urlAdDomain
+        return kotlin.runCatching { publicSuffixDatabase.getEffectiveTldPlusOne(urlAdDomain) }.getOrNull()
     }
 
     private fun getTrackingEventsFrom(

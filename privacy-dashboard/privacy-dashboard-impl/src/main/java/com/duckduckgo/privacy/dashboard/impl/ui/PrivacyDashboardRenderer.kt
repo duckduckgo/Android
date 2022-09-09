@@ -66,16 +66,12 @@ class PrivacyDashboardRenderer(
         Timber.i("PD: requests $newJson")
         Timber.i("PD: protections $protectionsJson")
         onPrivacyProtectionSettingChanged(viewState.userChangedValues)
-        webView.evaluateJavascript("javascript:onChangeProtectionStatus($protectionsSample);", null)
-        webView.evaluateJavascript("javascript:onChangeRequestData(\"${viewState.siteProtectionsViewState.url}\", $requestsSample);", null)
-
-        // old calls
-        /*
+        webView.evaluateJavascript("javascript:onChangeProtectionStatus($protectionsJson);", null)
         webView.evaluateJavascript("javascript:onChangeParentEntity($parentEntityJson);", null)
         webView.evaluateJavascript("javascript:onChangeCertificateData($json);", null)
         webView.evaluateJavascript("javascript:onChangeUpgradedHttps(${viewState.siteProtectionsViewState.upgradedHttps});", null)
         webView.evaluateJavascript("javascript:onChangeProtectionStatus(${viewState.userSettingsViewState.privacyProtectionEnabled});", null)
-        */
+        webView.evaluateJavascript("javascript:onChangeRequestData(\"${viewState.siteProtectionsViewState.url}\", $newJson);", null)
     }
 
     companion object {
