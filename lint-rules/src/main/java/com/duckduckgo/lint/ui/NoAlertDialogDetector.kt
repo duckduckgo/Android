@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.lint
+package com.duckduckgo.lint.ui
 
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Category
@@ -22,36 +22,60 @@ import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
 import com.android.tools.lint.detector.api.Issue
 import com.android.tools.lint.detector.api.JavaContext
-import com.android.tools.lint.detector.api.Scope.JAVA_FILE
-import com.android.tools.lint.detector.api.Scope.TEST_SOURCES
-import com.android.tools.lint.detector.api.Severity.ERROR
+import com.android.tools.lint.detector.api.Scope
+import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
+import com.android.tools.lint.detector.api.TextFormat
+import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Companion
+import com.intellij.psi.PsiMethod
+import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UElement
+import org.jetbrains.uast.ULiteralExpression
 import java.util.*
 
 @Suppress("UnstableApiUsage")
 class NoAlertDialogDetector : Detector(), SourceCodeScanner {
-    override fun getApplicableUastTypes() = listOf(UClass::class.java)
 
-    override fun createUastHandler(context: JavaContext): UElementHandler = NoInternalImportHandler(context)
+    override fun getApplicableMethodNames() = listOf("setView", "create")
 
-    internal class NoInternalImportHandler(private val context: JavaContext) : UElementHandler() {
-        override fun visitClass(node: UClass) {
-            if (node.extendsListTypes.any { it.className == "MaterialAlertDialogBuilder" }) {
-                context.report(NO_FRAGMENT_ISSUE, node, context.getNameLocation(node), "Fragment should not be directly extended")
-            }
+    override fun visitMethodCall(
+        context: JavaContext,
+        node: UCallExpression,
+        method: PsiMethod
+    ) {
+
+        val evaluator = context.evaluator
+        if (!evaluator.methodMatches(method, MATERIAL_ALERT_DIALOG_BUILDER, true)) {
+            return
         }
+        context.report(
+            issue = NO_DESIGN_SYSTEM_DIALOG,
+            location = context.getNameLocation(method),
+            message = NO_DESIGN_SYSTEM_DIALOG.getExplanation(TextFormat.RAW)
+        )
     }
 
     companion object {
-        val NO_FRAGMENT_ISSUE = Issue.create("NoFragment",
-            "The Fragment type should not be extended. Use DuckDuckGoFragment instead.",
-            """
-                The Fragment should not be used.
-                Use DuckDuckGoFragment instead.
-            """.trimIndent(),
-            Category.CORRECTNESS, 10, ERROR,
-            Implementation(NoAlertDialogDetector::class.java, EnumSet.of(JAVA_FILE, TEST_SOURCES))
-        )
+
+        private const val MATERIAL_ALERT_DIALOG_BUILDER = "com.google.android.material.dialog.MaterialAlertDialogBuilder"
+        private const val APP_COMPAT_ALERT_DIALOG_BUILDER = "androidx.appcompat.app.AlertDialog.Builder"
+        private const val ALERT_DIALOG_BUILDER = "android.app.AlertDialog.Builder"
+
+        val NO_DESIGN_SYSTEM_DIALOG = Issue
+            .create(
+                id = "NoDesignSystemDialog",
+                briefDescription = "Prohibits usages of AlertDialog and MaterialAlertDialog.",
+                explanation = "Android Dialog used instead of Design System Component. Always favor the use of the Design System Dialogs",
+                moreInfo = "https://app.asana.com/0/1202857801505092/1202943892847393",
+                category = Category.CUSTOM_LINT_CHECKS,
+                priority = 10,
+                severity = Severity.ERROR,
+                androidSpecific = true,
+                implementation = Implementation(
+                    NoAlertDialogDetector::class.java,
+                    Scope.RESOURCE_FILE_SCOPE
+                )
+            )
     }
 }

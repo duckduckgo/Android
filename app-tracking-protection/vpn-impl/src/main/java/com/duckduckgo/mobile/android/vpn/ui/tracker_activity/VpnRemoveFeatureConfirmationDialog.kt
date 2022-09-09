@@ -44,7 +44,7 @@ class VpnRemoveFeatureConfirmationDialog private constructor(private val listene
 
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
-            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog
+            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog
         )
             .setView(rootView)
 
