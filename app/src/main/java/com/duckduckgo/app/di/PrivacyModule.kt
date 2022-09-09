@@ -44,7 +44,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
-import com.duckduckgo.site.permissions.impl.SitePermissionsManagerImp
+import com.duckduckgo.site.permissions.impl.SitePermissionsManagerImpl
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepositoryImpl
 import dagger.Lazy
 import dagger.Module
@@ -146,6 +146,6 @@ object PrivacyModule {
 
     @Provides
     fun providesSitePermissionsManager(sitePermissionsRepository: SitePermissionsRepositoryImpl): SitePermissionsManager {
-        return SitePermissionsManagerImp(sitePermissionsRepository)
+        return SitePermissionsManagerImpl(sitePermissionsRepository)
     }
 }

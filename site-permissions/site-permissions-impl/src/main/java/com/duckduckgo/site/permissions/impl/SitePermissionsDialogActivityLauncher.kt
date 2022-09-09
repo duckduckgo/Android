@@ -20,6 +20,7 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.provider.Settings
 import android.webkit.PermissionRequest
@@ -103,6 +104,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             setNegativeButton(R.string.sitePermissionsDialogDenyButton) { _, _ ->
                 pixel.fire(SitePermissionsPixelName.SITE_PERMISSION_DIALOG_DENIED, mapOf(PixelParameter.SITE_PERMISSION to pixelParamValue))
             }
+            setCancelable(false)
             show()
         }
     }
@@ -214,7 +216,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
         val snackbar = Snackbar.make(activity.window.decorView.rootView, message, Snackbar.LENGTH_LONG)
         val layout = snackbar.view as SnackbarLayout
-        layout.setPadding(0, 0, 0, 40.toPx())
+        if (activity.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            layout.setPadding(0, 0, 0, 40.toPx())
+        }
         snackbar.apply {
             setAction(R.string.sitePermissionsDeniedSnackBarAction) {
                 onPermissionAllowed()
