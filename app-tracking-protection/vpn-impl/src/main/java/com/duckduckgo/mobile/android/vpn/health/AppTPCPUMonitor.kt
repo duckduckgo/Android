@@ -45,23 +45,27 @@ import kotlin.time.Duration.Companion.seconds
 @ContributesBinding(AppScope::class)
 class AppTPCPUMonitor @Inject constructor(
     private val workManager: WorkManager,
-): CPUMonitor {
+) : CPUMonitor {
+
+    companion object {
+        private const val APP_TRACKER_CPU_MONITOR_WORKER_TAG = "APP_TRACKER_CPU_MONITOR_WORKER_TAG"
+    }
 
     override fun startMonitoring() {
         Timber.v("AppTPCPU - startMonitoring")
-        val work = PeriodicWorkRequestBuilder<CPUMonitorWorker>(15, TimeUnit.MINUTES)
+        val work = PeriodicWorkRequestBuilder<CPUMonitorWorker>(1, TimeUnit.HOURS)
             .build()
 
-        workManager.enqueueUniquePeriodicWork("cpuMon", ExistingPeriodicWorkPolicy.KEEP, work)
+        workManager.enqueueUniquePeriodicWork(APP_TRACKER_CPU_MONITOR_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, work)
     }
 
     override fun stopMonitoring() {
         Timber.v("AppTPCPU - stopMonitoring")
-        workManager.cancelUniqueWork("cpuMon")
+        workManager.cancelUniqueWork(APP_TRACKER_CPU_MONITOR_WORKER_TAG)
     }
 
     override fun isMonitoringStarted(): Boolean {
-        val listenableFuture = workManager.getWorkInfosForUniqueWork("cpuMon")
+        val listenableFuture = workManager.getWorkInfosForUniqueWork(APP_TRACKER_CPU_MONITOR_WORKER_TAG)
         val workerList = listenableFuture.get()
 
         return workerList != null && workerList.size > 0 && workerList[0].state != CANCELLED
@@ -69,7 +73,8 @@ class AppTPCPUMonitor @Inject constructor(
 }
 
 @ContributesWorker(AppScope::class)
-class CPUMonitorWorker(context: Context,
+class CPUMonitorWorker(
+    context: Context,
     workerParams: WorkerParameters
 ) : Worker(context, workerParams) {
     @Inject

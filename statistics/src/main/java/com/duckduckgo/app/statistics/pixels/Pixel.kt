@@ -97,6 +97,10 @@ interface Pixel {
         const val FIRE_ANIMATION_NONE = "fann"
     }
 
+    object PixelPrefixes {
+        const val ATP_APP_CPU_MONITOR_REPORT_PREFIX = "m_atp_ev_cpu_usage_"
+    }
+
     fun fire(
         pixel: PixelName,
         parameters: Map<String, String> = emptyMap(),
