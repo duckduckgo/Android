@@ -16,36 +16,37 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
+import android.content.Context
 import android.os.SystemClock
 import android.system.Os
 import android.system.OsConstants
-import com.duckduckgo.app.utils.ConflatedJob
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo.State.CANCELLED
+import androidx.work.WorkManager
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.Duration.Companion.hours
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class AppTPCPUMonitor @Inject constructor(
-    @VpnCoroutineScope private val coroutineScope: CoroutineScope,
+    private val workManager: WorkManager,
 ): CPUMonitor {
 
     companion object {
-        val MONITORING_FREQUENCY_MS: Long =  1.hours.inWholeMilliseconds
-
         private val CLOCK_SPEED_HZ = Os.sysconf(OsConstants._SC_CLK_TCK)
         private val NUM_CORES = Os.sysconf(OsConstants._SC_NPROCESSORS_CONF)
 
@@ -58,45 +59,57 @@ class AppTPCPUMonitor @Inject constructor(
         private val PROC_SIZE = 44
     }
 
-    private val monitoringJob = ConflatedJob()
-
-    private fun collectCPUUsage() {
-        val pid = android.os.Process.myPid()
-        try {
-            val procFile = File("/proc/$pid/stat")
-
-            val statsText = (FileReader(procFile)).buffered().use(BufferedReader::readText)
-            val procArray = statsText.split(WHITE_SPACE)
-
-            if (procArray.size < PROC_SIZE) {
-                Timber.e("Unexpected /proc file size: " + procArray.size)
-                return
-            }
-
-            val procCPUTimeSec = (procArray[UTIME_IDX].toLong() + procArray[STIME_IDX].toLong()) / CLOCK_SPEED_HZ.toDouble()
-            val systemUptimeSec = SystemClock.elapsedRealtime() / 1.seconds.inWholeMilliseconds.toDouble()
-            val procTimeSec = systemUptimeSec - (procArray[STARTTIME_IDX].toLong() / CLOCK_SPEED_HZ.toDouble())
-
-            val avgCPUUsagePercent = (100 * (procCPUTimeSec / procTimeSec)) / NUM_CORES
-        } catch (e: IOException) {
-            Timber.e("error", e)
-        }
-    }
-
     override fun startMonitoring() {
-        monitoringJob += coroutineScope.launch {
-            while (isActive) {
-                delay(MONITORING_FREQUENCY_MS)
-                collectCPUUsage()
-            }
-        }
+        Timber.v("AppTPCPU - startMonitoring")
+        val work = PeriodicWorkRequestBuilder<CPUMonitorWorker>(15, TimeUnit.MINUTES)
+            .build()
+
+        workManager.enqueueUniquePeriodicWork("cpuMon", ExistingPeriodicWorkPolicy.KEEP, work)
     }
 
     override fun stopMonitoring() {
-        monitoringJob.cancel()
+        Timber.v("AppTPCPU - stopMonitoring")
+        workManager.cancelUniqueWork("cpuMon")
     }
 
     override fun isMonitoringStarted(): Boolean {
-        return monitoringJob.isActive
+        val listenableFuture = workManager.getWorkInfosForUniqueWork("cpuMon")
+        val workerList = listenableFuture.get()
+
+        return workerList != null && workerList.size > 0 && workerList[0].state != CANCELLED
+    }
+
+    class CPUMonitorWorker(context: Context,
+        workerParams: WorkerParameters
+    ) : Worker(context, workerParams) {
+        @Inject
+        lateinit var deviceShieldPixels: DeviceShieldPixels
+
+        override fun doWork(): Result {
+            val pid = android.os.Process.myPid()
+            try {
+                val procFile = File("/proc/$pid/stat")
+
+                val statsText = (FileReader(procFile)).buffered().use(BufferedReader::readText)
+                val procArray = statsText.split(WHITE_SPACE)
+
+                if (procArray.size < PROC_SIZE) {
+                    Timber.e("Unexpected /proc file size: " + procArray.size)
+                    return Result.failure()
+                }
+
+                val procCPUTimeSec = (procArray[UTIME_IDX].toLong() + procArray[STIME_IDX].toLong()) / CLOCK_SPEED_HZ.toDouble()
+                val systemUptimeSec = SystemClock.elapsedRealtime() / 1.seconds.inWholeMilliseconds.toDouble()
+                val procTimeSec = systemUptimeSec - (procArray[STARTTIME_IDX].toLong() / CLOCK_SPEED_HZ.toDouble())
+
+                val avgCPUUsagePercent = (100 * (procCPUTimeSec / procTimeSec)) / NUM_CORES
+                deviceShieldPixels.sendCPUUsage(avgCPUUsagePercent.roundToInt())
+            } catch (e: IOException) {
+                Timber.e("Could not read CPU usage", e)
+                return Result.failure()
+            }
+
+            return Result.success()
+        }
     }
 }
