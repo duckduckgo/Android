@@ -20,17 +20,14 @@ import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.databinding.DialogSingleChoiceAlertBinding
-import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
 import com.duckduckgo.mobile.android.ui.view.button.RadioButton
 import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog.Builder
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.toDp
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.radiobutton.MaterialRadioButton
 
 class RadioListAlertDialog(val builder: Builder) : DialogFragment() {
 

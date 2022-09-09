@@ -44,7 +44,6 @@ class NoAlertDialogDetector : Detector(), SourceCodeScanner {
         node: UCallExpression,
         method: PsiMethod
     ) {
-
         val evaluator = context.evaluator
         if (!evaluator.methodMatches(method, MATERIAL_ALERT_DIALOG_BUILDER, true)) {
             return
@@ -58,7 +57,7 @@ class NoAlertDialogDetector : Detector(), SourceCodeScanner {
 
     companion object {
 
-        private const val MATERIAL_ALERT_DIALOG_BUILDER = "com.google.android.material.dialog.MaterialAlertDialogBuilder"
+        private const val MATERIAL_ALERT_DIALOG_BUILDER = "MaterialAlertDialogBuilder"
         private const val APP_COMPAT_ALERT_DIALOG_BUILDER = "androidx.appcompat.app.AlertDialog.Builder"
         private const val ALERT_DIALOG_BUILDER = "android.app.AlertDialog.Builder"
 

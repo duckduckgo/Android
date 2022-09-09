@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
@@ -30,7 +29,6 @@ import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog.EventListener
 import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 
 /** Fragment to display a list of dialogs. */
@@ -84,7 +82,7 @@ class DialogsFragment : Fragment() {
                         .setPositiveButton(R.string.text_dialog_positive)
                         .setNegativeButton(R.string.text_dialog_negative)
                         .setOptions(listOf(R.string.text_dialog_option, R.string.text_dialog_option, R.string.text_dialog_option))
-                        .addEventListener(object: RadioListAlertDialog.EventListener() {
+                        .addEventListener(object : RadioListAlertDialog.EventListener() {
                             override fun onRadioItemSelected(selectedItem: Int) {
                                 Snackbar.make(it, "Radio Button $selectedItem selected", Snackbar.LENGTH_SHORT).show()
                             }

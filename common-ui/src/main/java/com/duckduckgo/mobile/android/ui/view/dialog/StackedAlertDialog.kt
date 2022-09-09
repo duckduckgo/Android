@@ -36,7 +36,7 @@ class StackedAlertDialog(val builder: Builder) : DialogFragment() {
         open fun onDialogDismissed() {}
         open fun onButtonClicked(position: Int) {}
     }
-    internal class DefaultEventListener: EventListener()
+    internal class DefaultEventListener : EventListener()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

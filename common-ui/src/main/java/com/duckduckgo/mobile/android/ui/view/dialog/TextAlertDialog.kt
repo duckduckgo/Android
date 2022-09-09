@@ -35,7 +35,7 @@ class TextAlertDialog(val builder: Builder) : DialogFragment() {
         open fun onPositiveButtonClicked() {}
         open fun onNegativeButtonClicked() {}
     }
-    internal class DefaultEventListener: EventListener()
+    internal class DefaultEventListener : EventListener()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,7 +137,7 @@ class TextAlertDialog(val builder: Builder) : DialogFragment() {
             return this
         }
 
-        fun addEventListener(eventListener: EventListener): Builder{
+        fun addEventListener(eventListener: EventListener): Builder {
             listener = eventListener
             return this
         }

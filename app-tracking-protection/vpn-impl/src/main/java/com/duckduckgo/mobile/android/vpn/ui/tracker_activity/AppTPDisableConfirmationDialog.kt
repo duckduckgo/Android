@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import android.app.Dialog
 import android.os.Bundle
 import android.widget.Button
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.vpn.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
