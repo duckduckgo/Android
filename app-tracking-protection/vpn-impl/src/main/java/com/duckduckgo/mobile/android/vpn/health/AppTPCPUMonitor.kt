@@ -26,6 +26,7 @@ import androidx.work.WorkInfo.State.CANCELLED
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesBinding
@@ -46,19 +47,6 @@ class AppTPCPUMonitor @Inject constructor(
     private val workManager: WorkManager,
 ): CPUMonitor {
 
-    companion object {
-        private val CLOCK_SPEED_HZ = Os.sysconf(OsConstants._SC_CLK_TCK)
-        private val NUM_CORES = Os.sysconf(OsConstants._SC_NPROCESSORS_CONF)
-
-        private val WHITE_SPACE = "\\s".toRegex()
-
-        // Indices in /proc/[pid]/stat (https://linux.die.net/man/5/proc)
-        private val UTIME_IDX = 13
-        private val STIME_IDX = 14
-        private val STARTTIME_IDX = 21
-        private val PROC_SIZE = 44
-    }
-
     override fun startMonitoring() {
         Timber.v("AppTPCPU - startMonitoring")
         val work = PeriodicWorkRequestBuilder<CPUMonitorWorker>(15, TimeUnit.MINUTES)
@@ -78,38 +66,52 @@ class AppTPCPUMonitor @Inject constructor(
 
         return workerList != null && workerList.size > 0 && workerList[0].state != CANCELLED
     }
+}
 
-    class CPUMonitorWorker(context: Context,
-        workerParams: WorkerParameters
-    ) : Worker(context, workerParams) {
-        @Inject
-        lateinit var deviceShieldPixels: DeviceShieldPixels
+@ContributesWorker(AppScope::class)
+class CPUMonitorWorker(context: Context,
+    workerParams: WorkerParameters
+) : Worker(context, workerParams) {
+    @Inject
+    lateinit var deviceShieldPixels: DeviceShieldPixels
 
-        override fun doWork(): Result {
-            val pid = android.os.Process.myPid()
-            try {
-                val procFile = File("/proc/$pid/stat")
+    companion object {
+        private val CLOCK_SPEED_HZ = Os.sysconf(OsConstants._SC_CLK_TCK)
+        private val NUM_CORES = Os.sysconf(OsConstants._SC_NPROCESSORS_CONF)
 
-                val statsText = (FileReader(procFile)).buffered().use(BufferedReader::readText)
-                val procArray = statsText.split(WHITE_SPACE)
+        private val WHITE_SPACE = "\\s".toRegex()
 
-                if (procArray.size < PROC_SIZE) {
-                    Timber.e("Unexpected /proc file size: " + procArray.size)
-                    return Result.failure()
-                }
+        // Indices in /proc/[pid]/stat (https://linux.die.net/man/5/proc)
+        private val UTIME_IDX = 13
+        private val STIME_IDX = 14
+        private val STARTTIME_IDX = 21
+        private val PROC_SIZE = 44
+    }
 
-                val procCPUTimeSec = (procArray[UTIME_IDX].toLong() + procArray[STIME_IDX].toLong()) / CLOCK_SPEED_HZ.toDouble()
-                val systemUptimeSec = SystemClock.elapsedRealtime() / 1.seconds.inWholeMilliseconds.toDouble()
-                val procTimeSec = systemUptimeSec - (procArray[STARTTIME_IDX].toLong() / CLOCK_SPEED_HZ.toDouble())
+    override fun doWork(): Result {
+        val pid = android.os.Process.myPid()
+        try {
+            val procFile = File("/proc/$pid/stat")
 
-                val avgCPUUsagePercent = (100 * (procCPUTimeSec / procTimeSec)) / NUM_CORES
-                deviceShieldPixels.sendCPUUsage(avgCPUUsagePercent.roundToInt())
-            } catch (e: IOException) {
-                Timber.e("Could not read CPU usage", e)
+            val statsText = (FileReader(procFile)).buffered().use(BufferedReader::readText)
+            val procArray = statsText.split(WHITE_SPACE)
+
+            if (procArray.size < PROC_SIZE) {
+                Timber.e("Unexpected /proc file size: " + procArray.size)
                 return Result.failure()
             }
 
-            return Result.success()
+            val procCPUTimeSec = (procArray[UTIME_IDX].toLong() + procArray[STIME_IDX].toLong()) / CLOCK_SPEED_HZ.toDouble()
+            val systemUptimeSec = SystemClock.elapsedRealtime() / 1.seconds.inWholeMilliseconds.toDouble()
+            val procTimeSec = systemUptimeSec - (procArray[STARTTIME_IDX].toLong() / CLOCK_SPEED_HZ.toDouble())
+
+            val avgCPUUsagePercent = (100 * (procCPUTimeSec / procTimeSec)) / NUM_CORES
+            deviceShieldPixels.sendCPUUsage(avgCPUUsagePercent.roundToInt())
+        } catch (e: IOException) {
+            Timber.e("Could not read CPU usage", e)
+            return Result.failure()
         }
+
+        return Result.success()
     }
 }
