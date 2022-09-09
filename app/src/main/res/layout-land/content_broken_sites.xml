@@ -102,9 +102,8 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.button.MaterialButton
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
             android:id="@+id/submitButton"
-            style="@style/BrokenSitesButton"
             android:layout_width="0dp"
             android:layout_height="70dp"
             android:layout_marginStart="25dp"

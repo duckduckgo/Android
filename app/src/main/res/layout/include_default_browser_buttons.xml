@@ -16,9 +16,8 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryRounded
         android:id="@+id/continueButton"
-        style="@style/Widget.DuckDuckGo.Button.Secondary.Rounded"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/defaultBrowserMaybeLater"
@@ -29,9 +28,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryRounded
         android:id="@+id/launchSettingsButton"
-        style="@style/Widget.DuckDuckGo.Button.Rounded"
         android:layout_width="0dp"
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
