@@ -90,7 +90,6 @@ class SecureStoreBackedAutofillStore(
             domain = url,
             username = credentials.username,
             domainTitle = credentials.domainTitle,
-            notes = credentials.notes,
             lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis()
         )
         val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(loginDetails, password = credentials.password)
@@ -186,7 +185,7 @@ class SecureStoreBackedAutofillStore(
             username = details.username,
             password = password,
             domainTitle = details.domainTitle,
-            notes = details.notes,
+            notes = notes,
             lastUpdatedMillis = details.lastUpdatedMillis
         )
     }
@@ -198,10 +197,10 @@ class SecureStoreBackedAutofillStore(
                 username = username,
                 id = id,
                 domainTitle = domainTitle,
-                notes = notes,
                 lastUpdatedMillis = lastUpdatedMillis
             ),
-            password = password
+            password = password,
+            notes = notes
         )
     }
 }
