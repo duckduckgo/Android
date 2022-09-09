@@ -187,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Ayarlar</string>
     <string name="settingsMenuItemTitle">Ayarlar</string>
-    <string name="settingsHeadingGeneral">Genel</string>
-    <string name="settingsHeadingOther">Diğer</string>
     <string name="settingsHeadingPrivacy">Gizlilik</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
     <string name="settingsVersion">Versiyon</string>
@@ -206,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Her seferinde sor</string>
     <string name="settingsAppLinksAlways">Her zaman</string>
     <string name="settingsAppLinksNever">Hiçbir zaman</string>
+    <string name="settingsHeadingAppearance">Görünüm</string>
+    <string name="settingsHeadingCustomize">Özelleştir</string>
+    <string name="settingsHeadingAbout">Hakkında</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
@@ -720,5 +721,8 @@
 
     <string name="autoconsentSetting">Çerez Açılır Pencerelerini Yönetin</string>
     <string name="autoconsentAnimationText">Yönetilen Çerezler</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Otomatik Doldurma</string>
 
 </resources>
