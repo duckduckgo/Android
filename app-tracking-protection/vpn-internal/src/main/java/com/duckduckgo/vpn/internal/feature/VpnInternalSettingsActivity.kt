@@ -33,7 +33,6 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.blocklist.AppTrackerListUpdateWorker
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
-import com.duckduckgo.mobile.android.vpn.health.CPUMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
@@ -54,9 +53,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var vpnBugReporter: VpnBugReporter
-
-    @Inject
-    lateinit var cpuMonitor: CPUMonitor
 
     @Inject
     lateinit var appHealthMonitor: AppHealthMonitor
@@ -84,14 +80,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         } else {
             TransparencyModeDebugReceiver.turnOffIntent()
         }.also { sendBroadcast(it) }
-    }
-
-    private val cpuMonitoringToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
-        if (toggleState) {
-            cpuMonitor.startMonitoring()
-        } else {
-            cpuMonitor.stopMonitoring()
-        }
     }
 
     private val badHealthMonitoringToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
@@ -138,7 +126,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        transparencyModeDebugReceiver?.let { it.unregister() }
+        transparencyModeDebugReceiver?.unregister()
     }
 
     private fun setupAppProtectionSection() {
@@ -189,6 +177,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             .onEach { isEnabled ->
                 binding.ipv6SupportToggle.isEnabled = isEnabled
                 binding.privateDnsToggle.isEnabled = isEnabled
+                binding.cpuMonitorToggle.isEnabled = isEnabled
                 binding.badHealthMonitorToggle.isEnabled = isEnabled
                 binding.badHealthMitigationToggle.isEnabled = isEnabled
                 binding.vpnUnderlyingNetworksToggle.isEnabled = isEnabled
@@ -273,9 +262,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupHealthMonitoring() {
-        binding.cpuMonitorToggle.isChecked = cpuMonitor.isMonitoringStarted()
-        binding.cpuMonitorToggle.setOnCheckedChangeListener(cpuMonitoringToggleListener)
-
         binding.badHealthMonitorToggle.isChecked = appHealthMonitor.isMonitoringStarted()
         binding.badHealthMonitorToggle.setOnCheckedChangeListener(badHealthMonitoringToggleListener)
 
@@ -284,6 +270,17 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupConfigSection() {
+        with(AppTpSetting.CPUMonitoring) {
+            binding.cpuMonitorToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.cpuMonitorToggle.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
+                } else {
+                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
+                }
+            }
+        }
+
         with(AppTpSetting.Ipv6Support) {
             binding.ipv6SupportToggle.isChecked = appTpConfig.isEnabled(this)
             binding.ipv6SupportToggle.setOnCheckedChangeListener { _, isChecked ->

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.health
+package com.duckduckgo.mobile.android.vpn.feature
 
-interface CPUMonitor {
-    fun startMonitoring()
-    fun stopMonitoring()
-    fun isMonitoringStarted(): Boolean
+import com.duckduckgo.mobile.android.vpn.remote_config.VpnConfigToggle
+import com.duckduckgo.mobile.android.vpn.remote_config.VpnConfigTogglesDao
+
+class FakeToggleConfigDao : VpnConfigTogglesDao {
+    private var cache = HashMap<String, VpnConfigToggle>()
+    override suspend fun insert(toggle: VpnConfigToggle) {
+        cache[toggle.name] = toggle
+    }
+
+    override fun getConfigToggles(): List<VpnConfigToggle> {
+        return cache.values.toList()
+    }
 }
