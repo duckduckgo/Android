@@ -35,6 +35,7 @@ class AppTpSettingTest {
                 AppTpSetting.VpnDdgBrowserTraffic -> assertFalse(setting.defaultValue)
                 AppTpSetting.ConnectivityChecks -> assertFalse(setting.defaultValue)
                 AppTpSetting.VpnNewNetworkingLayer -> assertTrue(setting.defaultValue)
+                AppTpSetting.ProtectGames -> assertFalse(setting.defaultValue)
                 else -> throw java.lang.IllegalStateException("Missing AppTpSetting default checks")
             }
         }
