@@ -22,6 +22,7 @@ import com.duckduckgo.privacy.dashboard.impl.ui.RendererViewHolder.WebviewRender
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
+import javax.inject.Named
 
 interface PrivacyDashboardRendererFactory {
     fun createRenderer(renderer: RendererViewHolder): PrivacyDashboardRenderer
@@ -39,7 +40,7 @@ sealed class RendererViewHolder {
 
 @ContributesBinding(ActivityScope::class)
 class BrowserPrivacyDashboardRendererFactory @Inject constructor(
-    val moshi: Moshi
+    @Named("privacyDashboard") val moshi: Moshi
 ) : PrivacyDashboardRendererFactory {
 
     override fun createRenderer(renderer: RendererViewHolder): PrivacyDashboardRenderer {

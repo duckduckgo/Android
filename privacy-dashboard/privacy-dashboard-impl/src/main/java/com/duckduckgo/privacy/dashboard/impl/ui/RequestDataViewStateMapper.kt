@@ -22,16 +22,18 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.BLOCKED
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Blocked
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CertificateViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.PublicKeyViewState
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Reason
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerEventViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerViewState
 import com.squareup.anvil.annotations.ContributesBinding
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
+import java.lang.Thread.State
 import javax.inject.Inject
 
 interface RequestDataViewStateMapper {
@@ -46,17 +48,7 @@ class AppSiteRequestDataViewStateMapper @Inject constructor(
     private val publicSuffixDatabase = PublicSuffixDatabase()
 
     override fun mapFromSite(site: Site): RequestDataViewState {
-        val trackingEvents = getTrackingEventsFrom(site)
-
-        val entityViewState = site.entity?.let {
-            EntityViewState(
-                displayName = it.displayName,
-                prevalence = site.entity?.prevalence ?: 0.toDouble()
-            )
-        }
-
         val installedSurrogates = emptyList<String>()
-
         val requests: List<DetectedRequest> = site.trackingEvents.map {
             val entity: Entity = if (it.entity == null) return@map null else it.entity!!
 
@@ -68,7 +60,7 @@ class AppSiteRequestDataViewStateMapper @Inject constructor(
                 entityName = entity.displayName,
                 ownerName = entity.name,
                 prevalence = entity.prevalence,
-                state = Blocked(Any())
+                state = PrivacyDashboardHybridViewModel.State.Blocked()
             )
         }.filterNotNull()
 
@@ -82,99 +74,6 @@ class AppSiteRequestDataViewStateMapper @Inject constructor(
         val urlAdDomain = UriString.host(url)
         if (urlAdDomain.isNullOrEmpty()) return urlAdDomain
         return kotlin.runCatching { publicSuffixDatabase.getEffectiveTldPlusOne(urlAdDomain) }.getOrNull()
-    }
-
-    private fun getTrackingEventsFrom(
-        site: Site
-    ): PrivacyDashboardSiteTrackingEvents {
-
-        val trackingEvents: MutableMap<String, TrackerViewState> = mutableMapOf()
-        val trackerUrls: MutableSet<String> = mutableSetOf()
-
-        site.trackingEvents.forEach {
-            val entity = it.entity?.let { it } ?: return@forEach
-
-            trackerUrls.add(it.trackerUrl)
-
-            val trackerViewState: TrackerViewState = trackingEvents[entity.displayName]?.let { trackerViewState ->
-                val urls = trackerViewState.urls + Pair(
-                    it.trackerUrl,
-                    TrackerEventViewState(
-                        isBlocked = it.status == BLOCKED,
-                        reason = DEFAULT_VIEW_STATE_TRACKER_REASON,
-                        categories = it.categories?.toSet() ?: emptySet()
-                    )
-                )
-                trackerViewState.copy(
-                    urls = urls,
-                    count = trackerViewState.count + 1
-                )
-            } ?: TrackerViewState(
-                displayName = entity.displayName,
-                prevalence = entity.prevalence,
-                urls = mutableMapOf(
-                    it.trackerUrl to TrackerEventViewState(
-                        isBlocked = it.status == BLOCKED,
-                        reason = DEFAULT_VIEW_STATE_TRACKER_REASON,
-                        categories = it.categories?.toSet() ?: emptySet()
-                    )
-                ),
-                count = 1,
-                type = DEFAULT_VIEW_STATE_TRACKER_TYPE
-            )
-
-            trackingEvents[entity.displayName] = trackerViewState
-        }
-
-        val trackersBlocked = getBlockedTrackingEvents(site)
-
-        return PrivacyDashboardSiteTrackingEvents(
-            trackerEvents = trackingEvents,
-            trackerUrls = trackerUrls,
-            blockedTrackerEvents = trackersBlocked
-        )
-    }
-
-    private fun getBlockedTrackingEvents(
-        site: Site
-    ): MutableMap<String, TrackerViewState> {
-
-        val trackersBlocked: MutableMap<String, TrackerViewState> = mutableMapOf()
-
-        site.trackingEvents.filter { it.status == BLOCKED }.forEach {
-            val entity = it.entity?.let { it } ?: return@forEach
-
-            val trackerViewState: TrackerViewState = trackersBlocked[entity.displayName]?.let { trackerViewState ->
-                val urls = trackerViewState.urls + Pair(
-                    it.trackerUrl,
-                    TrackerEventViewState(
-                        isBlocked = it.status == BLOCKED,
-                        reason = "first party",
-                        categories = it.categories?.toSet() ?: emptySet()
-                    )
-                )
-                trackerViewState.copy(
-                    urls = urls,
-                    count = trackerViewState.count + 1
-                )
-            } ?: TrackerViewState(
-                displayName = entity.displayName,
-                prevalence = entity.prevalence,
-                urls = mutableMapOf(
-                    it.trackerUrl to TrackerEventViewState(
-                        isBlocked = it.status == BLOCKED,
-                        reason = DEFAULT_VIEW_STATE_TRACKER_REASON,
-                        categories = it.categories?.toSet() ?: emptySet()
-                    )
-                ),
-                count = 1,
-                type = DEFAULT_VIEW_STATE_TRACKER_TYPE
-            )
-
-            trackersBlocked[entity.displayName] = trackerViewState
-        }
-
-        return trackersBlocked
     }
 
     private fun SslCertificate.map(): CertificateViewState {
@@ -202,16 +101,5 @@ class AppSiteRequestDataViewStateMapper @Inject constructor(
                 )
             }
         )
-    }
-
-    private data class PrivacyDashboardSiteTrackingEvents(
-        val trackerEvents: MutableMap<String, TrackerViewState>,
-        val trackerUrls: MutableSet<String>,
-        val blockedTrackerEvents: MutableMap<String, TrackerViewState>
-    )
-
-    companion object {
-        const val DEFAULT_VIEW_STATE_TRACKER_TYPE = "type"
-        const val DEFAULT_VIEW_STATE_TRACKER_REASON = "reason"
     }
 }
