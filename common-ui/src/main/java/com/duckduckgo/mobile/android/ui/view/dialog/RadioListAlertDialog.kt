@@ -145,7 +145,6 @@ class RadioListAlertDialog(val builder: Builder) : DialogFragment() {
             return this
         }
 
-
         fun setOptions(
             @StringRes stackedButtonTextId: List<Int>,
             selectedItem: Int = 0

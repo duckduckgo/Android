@@ -127,14 +127,6 @@ class TextAlertDialog(val builder: Builder) : DialogFragment() {
             return this
         }
 
-        fun newInstance(): {
-            val args = Bundle()
-            
-            val fragment = ()
-            fragment.arguments = args
-            return fragment
-        }
-
         fun setTitle(
             text: CharSequence,
         ): Builder {
