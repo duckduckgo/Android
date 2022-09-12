@@ -131,6 +131,21 @@ class RadioListAlertDialog(val builder: Builder) : DialogFragment() {
             return this
         }
 
+        fun setTitle(
+            text: CharSequence,
+        ): Builder {
+            titleText = text
+            return this
+        }
+
+        fun setMessage(
+            text: CharSequence,
+        ): Builder {
+            messageText = text
+            return this
+        }
+
+
         fun setOptions(
             @StringRes stackedButtonTextId: List<Int>,
             selectedItem: Int = 0

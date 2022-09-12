@@ -123,10 +123,24 @@ class StackedAlertDialog(val builder: Builder) : DialogFragment() {
             return this
         }
 
+        fun setTitle(
+            text: CharSequence,
+        ): Builder {
+            titleText = text
+            return this
+        }
+
         fun setMessage(
             @StringRes textId: Int,
         ): Builder {
             messageText = context.getText(textId)
+            return this
+        }
+
+        fun setMessage(
+            text: CharSequence,
+        ): Builder {
+            messageText = text
             return this
         }
 

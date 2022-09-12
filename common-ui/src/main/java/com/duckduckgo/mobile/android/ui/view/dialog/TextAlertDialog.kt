@@ -24,6 +24,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
+import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog.Builder
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -35,6 +36,7 @@ class TextAlertDialog(val builder: Builder) : DialogFragment() {
         open fun onPositiveButtonClicked() {}
         open fun onNegativeButtonClicked() {}
     }
+
     internal class DefaultEventListener : EventListener()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -122,6 +124,20 @@ class TextAlertDialog(val builder: Builder) : DialogFragment() {
             @StringRes textId: Int,
         ): Builder {
             messageText = context.getText(textId)
+            return this
+        }
+
+        fun setTitle(
+            text: CharSequence,
+        ): Builder {
+            titleText = text
+            return this
+        }
+
+        fun setMessage(
+            text: CharSequence,
+        ): Builder {
+            messageText = text
             return this
         }
 
