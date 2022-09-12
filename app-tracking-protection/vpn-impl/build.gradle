@@ -56,6 +56,7 @@ dependencies {
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':vpn-network-api')
+    implementation project(path: ':statistics')
 
     implementation Kotlin.stdlib.jdk7
 

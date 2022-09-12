@@ -63,6 +63,7 @@ class NgVpnNetworkStack @Inject constructor(
     private val appTrackerRecorder: AppTrackerRecorder,
     private val appTpFeatureConfig: AppTpFeatureConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val vpnNetworkStackVariantManager: VpnNetworkStackVariantManager,
     vpnDatabase: VpnDatabase,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
@@ -79,7 +80,8 @@ class NgVpnNetworkStack @Inject constructor(
     override val name: String = "ng"
 
     override fun isEnabled(): Boolean {
-        return appTpFeatureConfig.isEnabled(AppTpSetting.VpnNewNetworkingLayer)
+        val variant = vpnNetworkStackVariantManager.getVariant()
+        return appTpFeatureConfig.isEnabled(AppTpSetting.VpnNewNetworkingLayer) && variant == name
     }
 
     override fun shouldSetActiveNetworkDnsServers(): Boolean {
