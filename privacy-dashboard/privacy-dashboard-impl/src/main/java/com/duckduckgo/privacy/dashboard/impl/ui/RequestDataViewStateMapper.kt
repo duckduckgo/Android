@@ -20,15 +20,23 @@ import android.net.http.SslCertificate
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus.AD_ALLOWED
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus.ALLOWED
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.BLOCKED
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus.SAME_ENTITY_ALLOWED
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus.SITE_BREAKAGE_ALLOWED
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus.USER_ALLOWED
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons.PROTECTIONS_DISABLED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CertificateViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.PublicKeyViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Reason
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.*
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerEventViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerViewState
 import com.squareup.anvil.annotations.ContributesBinding
@@ -53,14 +61,14 @@ class AppSiteRequestDataViewStateMapper @Inject constructor(
             val entity: Entity = if (it.entity == null) return@map null else it.entity!!
 
             DetectedRequest(
-                category = it.categories?.firstOrNull(), //TrackerType? (ads and others)
+                category = it.categories?.firstOrNull(),
                 url = it.trackerUrl,
-                eTLDplus1 = toTldPlusOne(it.trackerUrl), //should
+                eTLDplus1 = toTldPlusOne(it.trackerUrl),
                 pageUrl = it.documentUrl,
                 entityName = entity.displayName,
                 ownerName = entity.name,
                 prevalence = entity.prevalence,
-                state = PrivacyDashboardHybridViewModel.State.Blocked()
+                state = it.status.mapToViewState()
             )
         }.filterNotNull()
 
@@ -68,6 +76,17 @@ class AppSiteRequestDataViewStateMapper @Inject constructor(
             installedSurrogates = installedSurrogates,
             requests = requests
         )
+    }
+
+    private fun TrackerStatus.mapToViewState(): PrivacyDashboardHybridViewModel.State {
+        return when(this) {
+            BLOCKED -> Blocked()
+            USER_ALLOWED -> Allowed(allowed = Reason(reason = AllowedReasons.PROTECTIONS_DISABLED.value))
+            AD_ALLOWED -> Allowed(allowed = Reason(reason = AllowedReasons.AD_CLICK_ATTRIBUTION.value))
+            SITE_BREAKAGE_ALLOWED -> Allowed(allowed = Reason(reason = AllowedReasons.RULE_EXCEPTION.value))
+            SAME_ENTITY_ALLOWED -> Allowed(allowed = Reason(reason = AllowedReasons.OWNED_BY_FIRST_PARTY.value))
+            ALLOWED -> Allowed(allowed = Reason(reason = AllowedReasons.OTHER_THIRD_PARTY_REQUEST.value))
+        }
     }
 
     private fun toTldPlusOne(url: String): String? {

@@ -53,7 +53,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val dispatcher: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val siteProtectionsViewStateMapper: SiteProtectionsViewStateMapper,
-    private val requestDataViewStateMapper: RequestDataViewStateMapper
+    private val requestDataViewStateMapper: RequestDataViewStateMapper,
+    private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -214,12 +215,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                         privacyProtectionEnabled = !site.userAllowList
                     ),
                     requestData = requestDataViewStateMapper.mapFromSite(site),
-                    protectionStatus = ProtectionStatusViewState(
-                        false,
-                        false,
-                        listOf("contentBlocking"),
-                        false
-                    )
+                    protectionStatus = protectionStatusViewStateMapper.mapFromSite(site)
                 )
             )
         }
