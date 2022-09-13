@@ -21,7 +21,6 @@ import com.duckduckgo.app.statistics.IndexRandomizer
 import com.duckduckgo.app.statistics.Probabilistic
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -68,9 +67,9 @@ object VpnIntegrationVariantManagerModule {
     @Provides
     fun provideVpnIntegrationVariantManager(
         vpnIntegrations: Provider<PluginPoint<VpnNetworkStack>>,
-        sharedPreferencesProvider: VpnSharedPreferencesProvider,
+        vpnNetworkStackVariantStore: VpnNetworkStackVariantStore,
         weightedRandomizer: IndexRandomizer
     ): VpnNetworkStackVariantManager {
-        return VpnNetworkStackVariantManagerImpl(vpnIntegrations, VpnNetworkStackVariantStoreImpl(sharedPreferencesProvider), weightedRandomizer)
+        return VpnNetworkStackVariantManagerImpl(vpnIntegrations, vpnNetworkStackVariantStore, weightedRandomizer)
     }
 }
