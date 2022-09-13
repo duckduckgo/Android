@@ -17,8 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.integration
 
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.statistics.IndexRandomizer
 import com.duckduckgo.app.statistics.Probabilistic
-import com.duckduckgo.app.statistics.WeightedRandomizer
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
@@ -34,7 +34,7 @@ interface VpnNetworkStackVariantManager {
 internal class VpnNetworkStackVariantManagerImpl constructor(
     private val vpnNetworkStackPluginPoint: Provider<PluginPoint<VpnNetworkStack>>,
     private val vpnNetworkStackVariantStore: VpnNetworkStackVariantStore,
-    private val weightedRandomizer: WeightedRandomizer,
+    private val weightedRandomizer: IndexRandomizer,
 ) : VpnNetworkStackVariantManager {
 
     override fun getVariant(): String {
@@ -69,7 +69,7 @@ object VpnIntegrationVariantManagerModule {
     fun provideVpnIntegrationVariantManager(
         vpnIntegrations: Provider<PluginPoint<VpnNetworkStack>>,
         sharedPreferencesProvider: VpnSharedPreferencesProvider,
-        weightedRandomizer: WeightedRandomizer
+        weightedRandomizer: IndexRandomizer
     ): VpnNetworkStackVariantManager {
         return VpnNetworkStackVariantManagerImpl(vpnIntegrations, VpnNetworkStackVariantStoreImpl(sharedPreferencesProvider), weightedRandomizer)
     }
