@@ -150,6 +150,9 @@ fladle {
 }
 
 dependencies {
+    implementation project(path: ':vpn-network-api')
+    implementation project(path: ':vpn-network-impl')
+
     implementation project(':library-loader-api')
 
     implementation project(':autofill-api')
