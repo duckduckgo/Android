@@ -41,7 +41,6 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -169,9 +168,8 @@ class NgVpnNetworkStack @Inject constructor(
             return true
         }
 
-        val type = runBlocking {
-            appTrackerRepository.findTracker(name, packageId)
-        }
+        val type = appTrackerRepository.findTracker(name, packageId)
+
         if (type is AppTrackerType.ThirdParty && !isTrackerInExceptionRules(packageId = packageId, hostname = name)) {
             Timber.d("shouldAllowDomain for $name/$packageId = false")
             val trackingApp = appNamesCache[packageId] ?: appNameResolver.getAppNameForPackageId(packageId)
