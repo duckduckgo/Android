@@ -17,13 +17,17 @@
 package com.duckduckgo.mobile.android.vpn.integration
 
 import androidx.core.content.edit
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
 interface VpnNetworkStackVariantStore {
     var variant: String?
 }
 
-internal class VpnNetworkStackVariantStoreImpl constructor(
+@ContributesBinding(AppScope::class)
+class VpnNetworkStackVariantStoreImpl @Inject constructor(
     sharedPreferencesProvider: VpnSharedPreferencesProvider
 ) : VpnNetworkStackVariantStore {
 
