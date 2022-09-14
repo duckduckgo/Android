@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,36 @@
 
 package com.duckduckgo.app.global.api
 
-import com.duckduckgo.app.global.api.AtpUnprotectedAppsBucketPixelRemovalInterceptor.Companion.PIXEL_PREFIX
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class AtpUnprotectedAppsBucketPixelRemovalInterceptorTest {
-    private lateinit var pixelRemovalInterceptor: AtpUnprotectedAppsBucketPixelRemovalInterceptor
+class AtbAndAppVersionPixelRemovalInterceptorTest {
+    private lateinit var pixelRemovalInterceptor: AtbAndAppVersionPixelRemovalInterceptor
 
     @Before
     fun setup() {
-        pixelRemovalInterceptor = AtpUnprotectedAppsBucketPixelRemovalInterceptor()
+        pixelRemovalInterceptor = AtbAndAppVersionPixelRemovalInterceptor()
     }
 
     @Test
-    fun whenSendPixelThenRemoveAppVersionInfoFromDefinedPixels() {
-        DeviceShieldPixelNames.values().map { it.pixelName }.forEach { pixelName ->
+    fun whenSendPixelTheRedactAtvInfoFromDefinedPixels() {
+        val appPixelNames = AppPixelName.values().map { it.pixelName }
+        val deviceShieldPixelNames = DeviceShieldPixelNames.values().map { it.pixelName }
+
+        (appPixelNames + deviceShieldPixelNames).forEach { pixelName ->
             val pixelUrl = String.format(PIXEL_TEMPLATE, pixelName)
-            val removalExpected = pixelName.startsWith(PIXEL_PREFIX)
+            val removalExpected = AtbAndAppVersionPixelRemovalInterceptor.pixels.firstOrNull { pixelName.startsWith(it) } != null
 
             val interceptedUrl = pixelRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
+            assertEquals(removalExpected, interceptedUrl.queryParameter("atb") == null)
             assertEquals(removalExpected, interceptedUrl.queryParameter("appVersion") == null)
         }
     }
 
     companion object {
-        private const val PIXEL_TEMPLATE = "https://improving.duckduckgo.com/t/%s_android_phone?atb=v255-7zu&appVersion=5.136.0&test=1"
+        private const val PIXEL_TEMPLATE = "https://improving.duckduckgo.com/t/%s_android_phone?atb=v255-7zu&appVersion=5.74.0&test=1"
     }
 }

@@ -89,13 +89,11 @@ class NetworkModule {
     fun pixelOkHttpClient(
         apiRequestInterceptor: ApiRequestInterceptor,
         pixelReQueryInterceptor: PixelReQueryInterceptor,
-        pixelEmailRemovalInterceptor: PixelEmailRemovalInterceptor,
         pixelInterceptorPlugins: PluginPoint<PixelInterceptorPlugin>,
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
             .addInterceptor(pixelReQueryInterceptor)
-            .addInterceptor(pixelEmailRemovalInterceptor)
             .apply {
                 pixelInterceptorPlugins.getPlugins().forEach { addInterceptor(it.getInterceptor()) }
             }
@@ -150,11 +148,6 @@ class NetworkModule {
     @Provides
     fun pixelReQueryInterceptor(): PixelReQueryInterceptor {
         return PixelReQueryInterceptor()
-    }
-
-    @Provides
-    fun pixelEmailRemovalInterceptor(): PixelEmailRemovalInterceptor {
-        return PixelEmailRemovalInterceptor()
     }
 
     @Provides

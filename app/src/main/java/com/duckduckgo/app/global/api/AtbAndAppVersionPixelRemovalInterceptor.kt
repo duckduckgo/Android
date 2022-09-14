@@ -18,16 +18,24 @@ package com.duckduckgo.app.global.api
 
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
 import okhttp3.Response
+import javax.inject.Inject
 
-class PixelEmailRemovalInterceptor : Interceptor {
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PixelInterceptorPlugin::class
+)
+class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInterceptorPlugin {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
-        val url = if (pixels.contains(pixel.substringBefore("_android_"))) {
+        val url = if (isInPixelsList(pixel)) {
             chain.request().url.newBuilder()
                 .removeAllQueryParameters(AppUrl.ParamKey.ATB)
                 .removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION)
@@ -39,14 +47,23 @@ class PixelEmailRemovalInterceptor : Interceptor {
         return chain.proceed(request.url(url).build())
     }
 
+    override fun getInterceptor(): Interceptor {
+        return this
+    }
+
+    private fun isInPixelsList(pixel: String): Boolean {
+        return pixels.firstOrNull { pixel.startsWith(it) } != null
+    }
+
     companion object {
-        // list of pixels for which we'll remove the ATB and App version information
+        // list of pixels (pixel name or prefix) for which we'll remove the ATB and App version information
         @VisibleForTesting
-        val pixels = listOf(
+        internal val pixels = listOf(
             AppPixelName.EMAIL_TOOLTIP_DISMISSED.pixelName,
             AppPixelName.EMAIL_USE_ALIAS.pixelName,
             AppPixelName.EMAIL_USE_ADDRESS.pixelName,
-            AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName
+            AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName,
+            "m_atp_unprotected_apps_bucket_"
         )
     }
 }
