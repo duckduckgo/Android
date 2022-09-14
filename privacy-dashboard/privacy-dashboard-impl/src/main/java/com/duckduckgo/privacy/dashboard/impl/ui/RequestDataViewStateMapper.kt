@@ -29,19 +29,14 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus.SITE_BREAKAGE_ALL
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.USER_ALLOWED
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons.PROTECTIONS_DISABLED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CertificateViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.PublicKeyViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Reason
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.*
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerEventViewState
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerViewState
 import com.squareup.anvil.annotations.ContributesBinding
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
-import java.lang.Thread.State
 import javax.inject.Inject
 
 interface RequestDataViewStateMapper {
@@ -57,11 +52,18 @@ class AppSiteRequestDataViewStateMapper @Inject constructor(
 
     override fun mapFromSite(site: Site): RequestDataViewState {
         val installedSurrogates = emptyList<String>()
-        val requests: List<DetectedRequest> = site.trackingEvents.map {
+        val allowedCategories = listOf(
+            "Analytics",
+            "Advertising",
+            "Social Network",
+            "Content Delivery",
+            "Embedded Content"
+        );
+        val requests: List<DetectedRequest> = site.trackingEvents.map { it ->
             val entity: Entity = if (it.entity == null) return@map null else it.entity!!
 
             DetectedRequest(
-                category = it.categories?.firstOrNull(),
+                category = it.categories?.firstOrNull { category -> allowedCategories.contains(category) },
                 url = it.trackerUrl,
                 eTLDplus1 = toTldPlusOne(it.trackerUrl),
                 pageUrl = it.documentUrl,
