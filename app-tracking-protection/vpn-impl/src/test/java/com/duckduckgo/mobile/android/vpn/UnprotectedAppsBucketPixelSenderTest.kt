@@ -47,7 +47,11 @@ class UnprotectedAppsBucketPixelSenderTest {
 
     @Before
     fun setup() {
-        testee = UnprotectedAppsBucketPixelSender(mockTrackingProtectionAppsRepository, mockDeviceShieldPixels)
+        testee = UnprotectedAppsBucketPixelSender(
+            mockTrackingProtectionAppsRepository,
+            mockDeviceShieldPixels,
+            coroutineRule.testDispatcherProvider
+        )
     }
 
     @Test

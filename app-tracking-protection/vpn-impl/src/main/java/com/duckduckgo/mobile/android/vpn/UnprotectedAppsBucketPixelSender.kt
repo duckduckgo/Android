@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn
 
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -33,11 +34,12 @@ import javax.inject.Inject
 )
 class UnprotectedAppsBucketPixelSender @Inject constructor(
     private val excludedApps: TrackingProtectionAppsRepository,
-    private val deviceShieldPixels: DeviceShieldPixels
+    private val deviceShieldPixels: DeviceShieldPixels,
+    private val dispatcherProvider: DispatcherProvider
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             excludedApps.getAppsAndProtectionInfo().collectLatest { list ->
                 val totalCount = list.size
                 if (totalCount != 0) {
