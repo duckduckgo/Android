@@ -318,6 +318,14 @@ class RealDeviceShieldPixelsTest {
         verify(pixel).fire(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME.pixelName)
     }
 
+    @Test
+    fun whenReportUnprotectedAppsBucketCalledThenFirePixels() {
+        val bucketSize = 20
+        deviceShieldPixels.reportUnprotectedAppsBucket(bucketSize)
+
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET.notificationVariant(bucketSize))
+    }
+
     private fun DeviceShieldPixelNames.notificationVariant(variant: Int): String {
         return String.format(Locale.US, pixelName, variant)
     }

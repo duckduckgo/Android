@@ -72,6 +72,7 @@ class CohortPixelInterceptor @Inject constructor(
         private const val PIXEL_PREFIX = "m_atp_"
         private val EXCEPTIONS = listOf(
             "m_atp_ev_enabled_onboarding_",
+            "m_atp_unprotected_apps_bucket_"
         )
     }
 }
