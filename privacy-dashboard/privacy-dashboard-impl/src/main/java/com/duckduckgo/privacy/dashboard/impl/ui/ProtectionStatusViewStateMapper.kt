@@ -28,6 +28,9 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus.SAME_ENTITY_ALLOW
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.SITE_BREAKAGE_ALLOWED
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.USER_ALLOWED
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName.ContentBlockingFeatureName
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons.PROTECTIONS_DISABLED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CertificateViewState
@@ -51,15 +54,23 @@ interface ProtectionStatusViewStateMapper {
 
 @ContributesBinding(AppScope::class)
 class AppProtectionStatusViewStateMapper @Inject constructor(
-    private val publicKeyInfoMapper: PublicKeyInfoMapper
+    private val publicKeyInfoMapper: PublicKeyInfoMapper,
+    private val contentBlocking: ContentBlocking,
+    private val unprotectedTemporary: UnprotectedTemporary
 ) : ProtectionStatusViewStateMapper {
 
     override fun mapFromSite(site: Site): ProtectionStatusViewState {
+        val enabledFeatures = mutableListOf<String>().apply {
+            if (!contentBlocking.isAnException(site.url)) {
+                add(ContentBlockingFeatureName.value)
+            }
+        }
+
         return ProtectionStatusViewState(
-            allowlisted = true,
+            allowlisted = site.userAllowList,
             denylisted = false,
-            enabledFeatures = listOf("contentBlocking"),
-            unprotectedTemporary = false
+            enabledFeatures = enabledFeatures,
+            unprotectedTemporary = unprotectedTemporary.isAnException(site.url)
         )
     }
 }
