@@ -21,6 +21,7 @@ import android.webkit.JavascriptInterface
 class PrivacyDashboardJavascriptInterface constructor(
     val onBrokenSiteClicked: () -> Unit,
     val onPrivacyProtectionsClicked: (Boolean) -> Unit,
+    val onUrlClicked: (String) -> Unit,
     val onClose: () -> Unit
 ) {
     @JavascriptInterface
@@ -36,6 +37,11 @@ class PrivacyDashboardJavascriptInterface constructor(
     @JavascriptInterface
     fun showBreakageForm() {
         onBrokenSiteClicked()
+    }
+
+    @JavascriptInterface
+    fun openInNewTab(payload: String) {
+        onUrlClicked(payload)
     }
 
     companion object {

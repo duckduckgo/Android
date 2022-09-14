@@ -34,6 +34,7 @@ sealed class RendererViewHolder {
         val onPrivacyProtectionSettingChanged: (Boolean) -> Unit,
         val onBrokenSiteClicked: () -> Unit,
         val onPrivacyProtectionsClicked: (Boolean) -> Unit,
+        val onUrlClicked: (String) -> Unit,
         val onClose: () -> Unit
     ) : RendererViewHolder()
 }
@@ -51,6 +52,7 @@ class BrowserPrivacyDashboardRendererFactory @Inject constructor(
                 moshi,
                 renderer.onBrokenSiteClicked,
                 renderer.onPrivacyProtectionsClicked,
+                renderer.onUrlClicked,
                 renderer.onClose
             )
         }

@@ -31,6 +31,7 @@ class PrivacyDashboardRenderer(
     private val moshi: Moshi,
     private val onBrokenSiteClicked: () -> Unit,
     private val onPrivacyProtectionsClicked: (Boolean) -> Unit,
+    private val onUrlClicked: (String) -> Unit,
     private val onClose: () -> Unit
 ) {
 
@@ -40,6 +41,9 @@ class PrivacyDashboardRenderer(
                 onBrokenSiteClicked = { onBrokenSiteClicked() },
                 onPrivacyProtectionsClicked = { newValue ->
                     onPrivacyProtectionsClicked(newValue)
+                },
+                onUrlClicked = {
+                    onUrlClicked(it)
                 },
                 onClose = { onClose() }
             ),

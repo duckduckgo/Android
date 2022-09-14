@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.webview.enableDarkMode
 import com.duckduckgo.app.browser.webview.enableLightMode
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
 import com.duckduckgo.browser.api.brokensite.BrokenSiteNav
@@ -42,6 +43,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.privacy.dashboard.impl.databinding.ActivityPrivacyHybridDashboardBinding
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -62,6 +64,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     lateinit var brokenSiteNav: BrokenSiteNav
 
     @Inject
+    lateinit var browserNav: BrowserNav
+
+    @Inject
     lateinit var appTheme: AppTheme
 
     private val binding: ActivityPrivacyHybridDashboardBinding by viewBinding()
@@ -76,6 +81,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 onPrivacyProtectionSettingChanged = { userChangedValues -> updateActivityResult(userChangedValues) },
                 onPrivacyProtectionsClicked = { newValue ->
                     viewModel.onPrivacyProtectionsClicked(newValue)
+                },
+                onUrlClicked = { payload ->
+                    viewModel.onUrlClicked(payload)
                 },
                 onBrokenSiteClicked = { viewModel.onReportBrokenSiteSelected() },
                 onClose = { this@PrivacyDashboardHybridActivity.finish() }
@@ -112,7 +120,13 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
             is LaunchReportBrokenSite -> {
                 startActivity(brokenSiteNav.navigate(this, it.data))
             }
+            is OpenURL -> openUrl(it.url)
         }
+    }
+
+    private fun openUrl(url: String) {
+        startActivity(browserNav.openInNewTab(this, url))
+        finish()
     }
 
     @SuppressLint("SetJavaScriptEnabled")

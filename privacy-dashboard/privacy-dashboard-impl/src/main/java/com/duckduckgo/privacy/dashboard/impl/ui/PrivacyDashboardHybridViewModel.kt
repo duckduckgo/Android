@@ -31,6 +31,8 @@ import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVA
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -54,13 +56,15 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val siteProtectionsViewStateMapper: SiteProtectionsViewStateMapper,
     private val requestDataViewStateMapper: RequestDataViewStateMapper,
-    private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper
+    private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
+    private val jsInterfaceMapper: JSInterfaceMapper
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
 
     sealed class Command {
         class LaunchReportBrokenSite(val data: BrokenSiteData) : Command()
+        class OpenURL(val url: String) : Command()
     }
 
     data class ViewState(
@@ -248,5 +252,13 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     private fun currentViewState(): ViewState {
         return viewState.value!!
+    }
+
+    fun onUrlClicked(payload: String) {
+        viewModelScope.launch(dispatcher.io()) {
+            jsInterfaceMapper.clickPayloadToUrl(payload).takeIf { it.isNotEmpty() }?.let {
+                command.send(OpenURL(it))
+            }
+        }
     }
 }
