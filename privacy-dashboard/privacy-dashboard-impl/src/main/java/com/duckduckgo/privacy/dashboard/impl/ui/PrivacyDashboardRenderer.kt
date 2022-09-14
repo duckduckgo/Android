@@ -70,7 +70,6 @@ class PrivacyDashboardRenderer(
         webView.evaluateJavascript("javascript:onChangeParentEntity($parentEntityJson);", null)
         webView.evaluateJavascript("javascript:onChangeCertificateData($json);", null)
         webView.evaluateJavascript("javascript:onChangeUpgradedHttps(${viewState.siteProtectionsViewState.upgradedHttps});", null)
-        webView.evaluateJavascript("javascript:onChangeProtectionStatus(${viewState.userSettingsViewState.privacyProtectionEnabled});", null)
         webView.evaluateJavascript("javascript:onChangeRequestData(\"${viewState.siteProtectionsViewState.url}\", $newJson);", null)
     }
 
