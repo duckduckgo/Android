@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.cohort
 
+import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
@@ -50,12 +51,13 @@ interface CohortStore {
     boundType = VpnServiceCallbacks::class
 )
 class RealCohortStore @Inject constructor(
-    sharedPreferencesProvider: VpnSharedPreferencesProvider
+    private val sharedPreferencesProvider: VpnSharedPreferencesProvider
 ) : CohortStore, VpnServiceCallbacks {
 
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-    private val preferences = sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = true)
+    private val preferences: SharedPreferences
+        get() = sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = true)
 
     override fun getCohortStoredLocalDate(): LocalDate? {
         return preferences.getString(KEY_COHORT_LOCAL_DATE, null)?.let {

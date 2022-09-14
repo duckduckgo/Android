@@ -44,6 +44,19 @@ allprojects {
 }
 
 subprojects {
+
+    String[] allowAndroidTestsIn = ["app"]
+    if (!allowAndroidTestsIn.contains(project.name)) {
+        project.projectDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
+            if (parent.name == "src") {
+                parent.eachFile(groovy.io.FileType.DIRECTORIES) { child ->
+                    if (child.name == "androidTest") {
+                        throw new GradleException("Only the app module can have Android Tests. Perhaps you could use Robolectric?")
+                    }
+                }
+            }
+        }
+    }
     def projectPath = path
     configurations.all {
         if (name == "compileClasspath" || name.endsWith("CompileClasspath")) {

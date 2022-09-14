@@ -187,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Instellingen</string>
     <string name="settingsMenuItemTitle">Instellingen</string>
-    <string name="settingsHeadingGeneral">Algemeen</string>
-    <string name="settingsHeadingOther">Overige</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
     <string name="settingsAboutDuckduckgo">Over DuckDuckGo</string>
     <string name="settingsVersion">Versie</string>
@@ -206,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Elke keer vragen</string>
     <string name="settingsAppLinksAlways">Altijd</string>
     <string name="settingsAppLinksNever">Nooit</string>
+    <string name="settingsHeadingAppearance">Uiterlijk</string>
+    <string name="settingsHeadingCustomize">Aanpassen</string>
+    <string name="settingsHeadingAbout">Over</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
@@ -720,5 +721,8 @@
 
     <string name="autoconsentSetting">Cookiepop-ups beheren</string>
     <string name="autoconsentAnimationText">Beheerde cookies</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automatisch invullen</string>
 
 </resources>

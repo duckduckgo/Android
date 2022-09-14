@@ -52,11 +52,11 @@ class BookmarksModule {
     fun savedSitesImporter(
         context: Context,
         bookmarksDao: BookmarksDao,
-        favoritesRepository: FavoritesRepository,
+        favoritesDao: FavoritesDao,
         bookmarksRepository: BookmarksRepository,
         savedSitesParser: SavedSitesParser,
     ): SavedSitesImporter {
-        return RealSavedSitesImporter(context.contentResolver, bookmarksDao, favoritesRepository, bookmarksRepository, savedSitesParser)
+        return RealSavedSitesImporter(context.contentResolver, bookmarksDao, favoritesDao, bookmarksRepository, savedSitesParser)
     }
 
     @Provides

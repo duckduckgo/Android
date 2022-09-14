@@ -19,7 +19,6 @@ package com.duckduckgo.autofill
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
@@ -38,8 +37,8 @@ import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType.AUT
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -52,11 +51,6 @@ interface AutofillJavascriptInterface {
     @JavascriptInterface
     fun getAutofillData(requestString: String)
 
-    suspend fun getRuntimeConfiguration(
-        rawJs: String,
-        url: String?
-    ): String
-
     fun injectCredentials(credentials: LoginCredentials)
     fun injectNoCredentials()
 
@@ -68,16 +62,14 @@ interface AutofillJavascriptInterface {
     }
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val requestParser: AutofillRequestParser,
     private val autofillStore: AutofillStore,
     private val autofillMessagePoster: AutofillMessagePoster,
     private val autofillResponseWriter: AutofillResponseWriter,
     private val autofillDomainFormatter: AutofillDomainFormatter,
-    private val emailManager: EmailManager,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
-    private val deviceAuthenticator: DeviceAuthenticator,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     private val currentUrlProvider: UrlProvider = WebViewUrlProvider(dispatcherProvider)
 ) : AutofillJavascriptInterface {
@@ -140,52 +132,6 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     ) {
         Timber.w("Autofill type %s unsupported", request.mainType)
         callback?.noCredentialsAvailable(url)
-    }
-
-    override suspend fun getRuntimeConfiguration(
-        rawJs: String,
-        url: String?
-    ): String {
-        Timber.v("BrowserAutofill: getRuntimeConfiguration called")
-
-        val contentScope = autofillResponseWriter.generateContentScope()
-        val userUnprotectedDomains = autofillResponseWriter.generateUserUnprotectedDomains()
-        val userPreferences = autofillResponseWriter.generateUserPreferences(
-            autofillCredentials = determineIfAutofillEnabled(),
-            showInlineKeyIcon = true
-        )
-        val availableInputTypes = generateAvailableInputTypes(url)
-
-        return rawJs
-            .replace("// INJECT contentScope HERE", contentScope)
-            .replace("// INJECT userUnprotectedDomains HERE", userUnprotectedDomains)
-            .replace("// INJECT userPreferences HERE", userPreferences)
-            .replace("// INJECT availableInputTypes HERE", availableInputTypes)
-    }
-
-    private suspend fun generateAvailableInputTypes(url: String?): String {
-        val credentialsAvailable = determineIfCredentialsAvailable(url)
-        val emailAvailable = determineIfEmailAvailable()
-
-        val json = autofillResponseWriter.generateResponseGetAvailableInputTypes(credentialsAvailable, emailAvailable).also {
-            Timber.v("availableInputTypes for %s: \n%s", url, it)
-        }
-        return "availableInputTypes = $json"
-    }
-
-    private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()
-
-    // in the future, we'll also tie this into feature toggles and remote config
-    private fun determineIfAutofillEnabled(): Boolean =
-        autofillStore.autofillAvailable && autofillStore.autofillEnabled && deviceAuthenticator.hasValidDeviceAuthentication()
-
-    private suspend fun determineIfCredentialsAvailable(url: String?): Boolean {
-        return if (url == null || !determineIfAutofillEnabled()) {
-            false
-        } else {
-            val savedCredentials = autofillStore.getCredentials(url)
-            savedCredentials.isNotEmpty()
-        }
     }
 
     @JavascriptInterface

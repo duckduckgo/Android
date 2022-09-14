@@ -187,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Iestatījumi</string>
     <string name="settingsMenuItemTitle">Iestatījumi</string>
-    <string name="settingsHeadingGeneral">Vispārīgi</string>
-    <string name="settingsHeadingOther">Citi</string>
     <string name="settingsHeadingPrivacy">Privātums</string>
     <string name="settingsAboutDuckduckgo">Par DuckDuckGo</string>
     <string name="settingsVersion">Versija</string>
@@ -206,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Jautāt katru reizi</string>
     <string name="settingsAppLinksAlways">Vienmēr</string>
     <string name="settingsAppLinksNever">Nekad</string>
+    <string name="settingsHeadingAppearance">Izskats</string>
+    <string name="settingsHeadingCustomize">Pielāgošana</string>
+    <string name="settingsHeadingAbout">Par</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
@@ -724,5 +725,8 @@
 
     <string name="autoconsentSetting">Pārvaldīt sīkfailu uznirstošos logus</string>
     <string name="autoconsentAnimationText">Pārvaldītie sīkfaili</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automātiska aizpilde</string>
 
 </resources>

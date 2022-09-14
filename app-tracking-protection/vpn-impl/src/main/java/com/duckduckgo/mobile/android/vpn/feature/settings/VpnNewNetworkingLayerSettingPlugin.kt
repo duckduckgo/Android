@@ -27,7 +27,7 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = AppTpSettingPlugin::class
 )
-class SetActiveNetworkSettingPlugin @Inject constructor(
+class VpnNewNetworkingLayerSettingPlugin @Inject constructor(
     private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : AppTpSettingPlugin {
     private val jsonAdapter = Moshi.Builder().build().adapter(JsonConfigModel::class.java)
@@ -46,7 +46,7 @@ class SetActiveNetworkSettingPlugin @Inject constructor(
         return false
     }
 
-    override val settingName: SettingName = AppTpSetting.SetActiveNetworkDns
+    override val settingName: SettingName = AppTpSetting.VpnNewNetworkingLayer
 
     private data class JsonConfigModel(val state: String?)
 }

@@ -61,11 +61,11 @@ class AppTpFeatureConfigImplTest {
                 AppTpSetting.BadHealthMitigation -> assertTrue(config.isEnabled(setting))
                 AppTpSetting.Ipv6Support -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.PrivateDnsSupport -> assertFalse(config.isEnabled(setting))
-                AppTpSetting.NetworkSwitchHandling -> assertFalse(config.isEnabled(setting))
-                AppTpSetting.SetActiveNetworkDns -> assertFalse(config.isEnabled(setting))
+                AppTpSetting.NetworkSwitchHandling -> assertTrue(config.isEnabled(setting))
                 AppTpSetting.AlwaysSetDNS -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.VpnDdgBrowserTraffic -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ConnectivityChecks -> assertFalse(config.isEnabled(setting))
+                AppTpSetting.VpnNewNetworkingLayer -> assertTrue(config.isEnabled(setting))
             }
         }
     }
