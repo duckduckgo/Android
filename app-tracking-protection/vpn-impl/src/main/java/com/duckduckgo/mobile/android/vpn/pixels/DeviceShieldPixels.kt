@@ -401,6 +401,8 @@ interface DeviceShieldPixels {
 
     /** Will fire when the user has VPN always-on lockdown setting enabled */
     fun reportAlwaysOnLockdownEnabled()
+
+    fun reportUnprotectedAppsBucket(bucketSize: Int)
 }
 
 @ContributesBinding(AppScope::class)
@@ -878,6 +880,10 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun reportAlwaysOnLockdownEnabled() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_ALWAYS_ON_LOCKDOWN_ENABLED_DAILY)
+    }
+
+    override fun reportUnprotectedAppsBucket(bucketSize: Int) {
+        firePixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET.pixelName, bucketSize))
     }
 
     private fun firePixel(
