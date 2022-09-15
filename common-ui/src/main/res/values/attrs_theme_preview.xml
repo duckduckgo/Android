@@ -23,7 +23,7 @@
     <!--Label view attributes-->
     <declare-styleable name="LabelLinkView">
         <attr name="android:text" />
-        <attr name="leadingIcon" format="integer" />
+        <attr name="leadingIcon"/>
         <attr name="linkUrl" format="string" />
     </declare-styleable>
 

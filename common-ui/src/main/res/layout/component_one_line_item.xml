@@ -27,29 +27,50 @@
         android:id="@+id/label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Two Line Item"
+        android:text="Single Line Item"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/twoLineListItemWithImage"
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
-        app:primaryText="Title"
-        app:secondaryText="Two line item with image"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label"/>
+        app:layout_constraintTop_toBottomOf="@id/label"
+        app:primaryText="This is a One Line List Item"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/twoLineListItemWithoutImage"
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithImage"
-        app:primaryText="Title"
-        app:secondaryText="Two line item without image"/>
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItem"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="This is a One Line List Item with Leading Image"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithTrailingIcon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithImage"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="This is a One Line List Item With Trailing Icon"
+        app:trailingIcon="@drawable/ic_overflow"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithLeadingAndTrailingIcons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithTrailingIcon"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="This is a One Line List Item With Leading and Trailing Icons"
+        app:trailingIcon="@drawable/ic_overflow"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

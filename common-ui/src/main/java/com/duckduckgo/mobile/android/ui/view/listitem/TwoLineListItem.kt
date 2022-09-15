@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package com.duckduckgo.mobile.android.ui.view
+package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
 import android.util.AttributeSet
@@ -25,6 +25,8 @@ import android.widget.LinearLayout
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class TwoLineListItem : LinearLayout {
@@ -43,16 +45,8 @@ class TwoLineListItem : LinearLayout {
         defStyle: Int
     ) : super(context, attrs, defStyle) {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.TwoLineListItem)
-        setTitle(attributes.getString(R.styleable.TwoLineListItem_twoLineItemTitle) ?: "")
-        setSubtitle(attributes.getString(R.styleable.TwoLineListItem_twoLineItemSubtitle) ?: "")
-        setImageVisibility(
-            attributes.getBoolean(R.styleable.TwoLineListItem_twoLineItemImageVisible, true)
-        )
-        setImageResource(
-            attributes.getResourceId(
-                R.styleable.TwoLineListItem_twoLineItemDrawable, R.drawable.ic_overflow
-            )
-        )
+        setTitle(attributes.getString(R.styleable.TwoLineListItem_primaryText) ?: "")
+        setSubtitle(attributes.getString(R.styleable.TwoLineListItem_secondaryText) ?: "")
         attributes.recycle()
     }
 

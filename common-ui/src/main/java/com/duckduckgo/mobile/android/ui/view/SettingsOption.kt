@@ -24,7 +24,6 @@ import android.widget.LinearLayout
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewSettingsOptionItemBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-
 class SettingsOption : LinearLayout {
 
     private val binding: ViewSettingsOptionItemBinding by viewBinding()

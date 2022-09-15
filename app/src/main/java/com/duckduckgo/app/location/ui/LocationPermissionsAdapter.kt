@@ -26,21 +26,21 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsEmptyHintBinding
-import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsEntryBinding
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsSectionTitleBinding
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsToggleBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.SectionDivider
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import com.duckduckgo.mobile.android.R as CommonR
 
 class LocationPermissionsAdapter(
     private val viewModel: LocationPermissionsViewModel,
@@ -118,7 +118,7 @@ class LocationPermissionsAdapter(
                 LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(SectionDivider(parent.context))
             }
             PRECISE_LOCATION_DOMAIN_TYPE -> {
-                val binding = ViewLocationPermissionsEntryBinding.inflate(inflater, parent, false)
+                val binding = RowOneLineListItemBinding.inflate(inflater, parent, false)
                 LocationPermissionsViewHolder.LocationPermissionsItemViewHolder(inflater, binding, viewModel, lifecycleOwner, faviconManager)
             }
             EMPTY_STATE_TYPE -> {
@@ -240,7 +240,7 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
 
     class LocationPermissionsItemViewHolder(
         private val layoutInflater: LayoutInflater,
-        private val binding: ViewLocationPermissionsEntryBinding,
+        private val binding: RowOneLineListItemBinding,
         private val viewModel: LocationPermissionsViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager
@@ -261,10 +261,10 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
                 website
             )
 
-            singleListItem.setTitle(website)
+            singleListItem.setPrimaryText(website)
             loadFavicon(entity.domain)
 
-            singleListItem.setOverflowClickListener { anchor ->
+            singleListItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, entity)
             }
         }
