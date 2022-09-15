@@ -20,19 +20,56 @@
     <attr name="listItemTitleColor" format="color"/>
     <attr name="listItemSubtitleColor" format="color"/>
 
-    <!--Single Line Item view-->
-    <declare-styleable name="SingleLineListItem">
-        <attr name="singleLineItemTitle" format="string" />
-        <attr name="singleLineItemDrawable" format="reference" />
-        <attr name="singleLineItemImageVisible" format="boolean" />
+    <attr name="oneLineListItemStyle" format="reference"/>
+    <attr name="oneLineListItemWithToggleStyle" format="reference"/>
+    <attr name="twoLineListItemStyle" format="reference"/>
+    <attr name="twoLineListItemWithToggleStyle" format="reference"/>
+    <attr name="twoLineRadioListIteWithmStyle" format="reference"/>
+
+    <attr name="primaryText" format="string"/>
+    <attr name="secondaryText" format="string"/>
+    <attr name="leadingIcon" format="integer"/>
+    <attr name="trailingIcon" format="integer"/>
+    <attr name="showBetaPill" format="reference"/>
+
+    <!--One Line Item view-->
+    <declare-styleable name="OneLineListItem">
+        <attr name="primaryText"/>
+        <attr name="leadingIcon"/>
+        <attr name="trailingIcon"/>
+    </declare-styleable>
+
+    <declare-styleable name="OneLineListItemWithToggle">
+        <attr name="primaryText"/>
+        <attr name="leadingIcon"/>
     </declare-styleable>
 
     <!--Two Line Item view-->
     <declare-styleable name="TwoLineListItem">
-        <attr name="twoLineItemTitle" format="string" />
-        <attr name="twoLineItemSubtitle" format="string" />
-        <attr name="twoLineItemDrawable" format="reference" />
-        <attr name="twoLineItemImageVisible" format="boolean" />
+        <attr name="primaryText"/>
+        <attr name="secondaryText"/>
+        <attr name="leadingIcon"/>
+        <attr name="trailingIcon"/>
+        <attr name="showBetaPill"/>
+    </declare-styleable>
+
+    <declare-styleable name="TwoLineListItemWithToggle">
+        <attr name="primaryText"/>
+        <attr name="secondaryText"/>
+        <attr name="trailingIcon"/>
+    </declare-styleable>
+
+    <declare-styleable name="RadioTwoLineListItem">
+        <attr name="primaryText"/>
+        <attr name="secondaryText"/>
+        <attr name="trailingIcon"/>
+    </declare-styleable>
+
+    <!--Single Line Item view-->
+    <declare-styleable name="SingleLineListItem">
+        <attr name="singleLineItemTitle" format="string"/>
+        <attr name="singleLineItemDrawable" format="reference"/>
+        <attr name="singleLineItemImageVisible" format="boolean"/>
     </declare-styleable>
 
 </resources>

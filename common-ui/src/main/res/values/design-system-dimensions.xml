@@ -40,6 +40,7 @@
     <!-- List Items -->
     <dimen name="listItemImageContainerSize">40dp</dimen>
     <dimen name="listItemImageSize">22dp</dimen>
+    <dimen name="oneLinelistItemHeight">48dp</dimen>
 
     <!-- PopupMenu -->
     <dimen name="popupMenuWidth">280dp</dimen>

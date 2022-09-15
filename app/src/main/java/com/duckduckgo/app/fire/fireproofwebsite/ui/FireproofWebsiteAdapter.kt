@@ -25,20 +25,20 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ViewFireproofTitleBinding
 import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteEmptyHintBinding
 import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteSettingsSelectionBinding
-import com.duckduckgo.app.browser.databinding.ViewListSingleItemEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ShowAutomaticFireproofSettingSelectionDialog
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
+import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import com.duckduckgo.mobile.android.R as CommonR
 
 class FireproofWebsiteAdapter(
     private val viewModel: FireproofWebsitesViewModel,
@@ -97,7 +97,7 @@ class FireproofWebsiteAdapter(
                 FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(binding)
             }
             FIREPROOF_WEBSITE_TYPE -> {
-                val binding = ViewListSingleItemEntryBinding.inflate(inflater, parent, false)
+                val binding = RowOneLineListItemBinding.inflate(inflater, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder(
                     inflater,
                     binding,
@@ -183,7 +183,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
 
     class FireproofWebsiteItemViewHolder(
         private val layoutInflater: LayoutInflater,
-        private val binding: ViewListSingleItemEntryBinding,
+        private val binding: RowOneLineListItemBinding,
         private val viewModel: FireproofWebsitesViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager
@@ -201,9 +201,9 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
                 entity.website()
             )
 
-            listItem.setTitle(entity.website())
+            listItem.setPrimaryText(entity.website())
             loadFavicon(entity.domain)
-            listItem.setOverflowClickListener { anchor ->
+            listItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, entity)
             }
         }

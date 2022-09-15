@@ -15,13 +15,15 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Widget.DuckDuckGo.SingleLineListItem"
-    android:id="@+id/item_container">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:id="@+id/item_container"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="@dimen/oneLinelistItemHeight"
+                                                   android:background="?attr/selectableItemBackground">
 
     <FrameLayout
-        android:id="@+id/image_container"
+        android:id="@+id/leadingIconContainer"
         android:layout_width="@dimen/listItemImageContainerSize"
         android:layout_height="@dimen/listItemImageContainerSize"
         android:background="@drawable/list_item_image_background"
@@ -30,7 +32,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/image"
+            android:id="@+id/leadingIcon"
             android:layout_width="@dimen/listItemImageSize"
             android:layout_height="@dimen/listItemImageSize"
             android:layout_gravity="center"
@@ -38,7 +40,7 @@
     </FrameLayout>
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/primaryText"
         style="@style/TextAppearance.DuckDuckGo.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -47,13 +49,13 @@
         android:maxLines="1"
         android:singleLine="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
-        app:layout_constraintStart_toEndOf="@id/image_container"
+        app:layout_constraintEnd_toStartOf="@+id/trailingIcon"
+        app:layout_constraintStart_toEndOf="@id/leadingIconContainer"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Title" />
+        tools:text="Title"/>
 
     <ImageView
-        android:id="@+id/overflowMenu"
+        android:id="@+id/trailingIcon"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:background="?selectableItemBackground"
@@ -65,6 +67,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
