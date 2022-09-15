@@ -29,7 +29,7 @@ interface JSInterfaceMapper {
 @ContributesBinding(AppScope::class)
 class AppJSInterfaceMapper @Inject constructor(
     @Named("privacyDashboard") private val moshi: Moshi
-): JSInterfaceMapper {
+) : JSInterfaceMapper {
     override fun clickPayloadToUrl(payload: String): String {
         val payloadAdapter = moshi.adapter(Payload::class.java)
         return kotlin.runCatching { payloadAdapter.fromJson(payload)?.url ?: "" }.getOrDefault("")

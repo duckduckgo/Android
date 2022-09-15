@@ -32,13 +32,10 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons.PROTECTIONS_DISABLED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CertificateViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.PublicKeyViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Reason
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.*
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerEventViewState
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerViewState
 import com.squareup.anvil.annotations.ContributesBinding
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
 import java.lang.Thread.State
@@ -79,7 +76,7 @@ class AppSiteRequestDataViewStateMapper @Inject constructor(
     }
 
     private fun TrackerStatus.mapToViewState(): PrivacyDashboardHybridViewModel.State {
-        return when(this) {
+        return when (this) {
             BLOCKED -> Blocked()
             USER_ALLOWED -> Allowed(allowed = Reason(reason = AllowedReasons.PROTECTIONS_DISABLED.value))
             AD_ALLOWED -> Allowed(allowed = Reason(reason = AllowedReasons.AD_CLICK_ATTRIBUTION.value))

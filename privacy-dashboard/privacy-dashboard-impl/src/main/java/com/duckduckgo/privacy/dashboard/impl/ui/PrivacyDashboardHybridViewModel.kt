@@ -32,7 +32,6 @@ import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVA
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -99,7 +98,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     )
 
     sealed class State {
-        data class Blocked(val blocked: Any = Any()): State()
+        data class Blocked(val blocked: Any = Any()) : State()
         data class Allowed(val allowed: Reason) : State()
     }
 
