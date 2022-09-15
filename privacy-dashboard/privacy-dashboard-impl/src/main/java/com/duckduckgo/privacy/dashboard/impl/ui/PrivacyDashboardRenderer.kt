@@ -55,7 +55,6 @@ class PrivacyDashboardRenderer(
     fun render(viewState: ViewState) {
         Timber.i("PrivacyDashboard viewState $viewState")
         val adapter = moshi.adapter(SiteProtectionsViewState::class.java)
-
         val json = adapter.toJson(viewState.siteProtectionsViewState)
 
         val newAdapter = moshi.adapter(RequestDataViewState::class.java)
@@ -64,8 +63,8 @@ class PrivacyDashboardRenderer(
         val protectionsAdapter = moshi.adapter(ProtectionStatusViewState::class.java)
         val protectionsJson = protectionsAdapter.toJson(viewState.protectionStatus)
 
-        val adapterParententity = moshi.adapter(EntityViewState::class.java)
-        val parentEntityJson = adapterParententity.toJson(viewState.siteProtectionsViewState.parentEntity)
+        val adapterParentEntity = moshi.adapter(EntityViewState::class.java)
+        val parentEntityJson = adapterParentEntity.toJson(viewState.siteProtectionsViewState.parentEntity)
 
         Timber.i("PD: requests $newJson")
         Timber.i("PD: protections $protectionsJson")
@@ -75,66 +74,5 @@ class PrivacyDashboardRenderer(
         webView.evaluateJavascript("javascript:onChangeCertificateData($json);", null)
         webView.evaluateJavascript("javascript:onChangeUpgradedHttps(${viewState.siteProtectionsViewState.upgradedHttps});", null)
         webView.evaluateJavascript("javascript:onChangeRequestData(\"${viewState.siteProtectionsViewState.url}\", $newJson);", null)
-    }
-
-    companion object {
-        val requestsSample = "{\n" +
-            "  \"requests\": [\n" +
-            "    {\n" +
-            "      \"category\": \"Advertising\",\n" +
-            "      \"url\": \"https:\\/\\/www.google.com\\/images\\/branding\\/googlelogo\\/2x\\/googlelogo_color_160x56dp.png\",\n" +
-            "      \"pageUrl\": \"https:\\/\\/www.google.com\\/\",\n" +
-            "      \"ownerName\": \"Google LLC\",\n" +
-            "      \"entityName\": \"Google\",\n" +
-            "      \"state\": {\n" +
-            "        \"allowed\": {\n" +
-            "          \"reason\": \"ownedByFirstParty\"\n" +
-            "        }\n" +
-            "      },\n" +
-            "      \"prevalence\": 80.099999999999994\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"category\": \"Advertising\",\n" +
-            "      \"url\": \"https:\\/\\/apis.google.com\\/_\\/scs\\/abc-static\\/_\\/js\\/k=gapi.gapi.en.t9z7VPsEMFg.O\\/m=gapi_iframes,googleapis_client\\/rt=j\\/sv=1\\/d=1\\/ed=1\\/rs=AHpOoo8oD_5FQW3kT3ksWwmXIWvhhqbKdw\\/cb=gapi.loaded_0\",\n" +
-            "      \"pageUrl\": \"https:\\/\\/www.google.com\\/\",\n" +
-            "      \"ownerName\": \"Google LLC\",\n" +
-            "      \"entityName\": \"Google\",\n" +
-            "      \"state\": {\n" +
-            "        \"allowed\": {\n" +
-            "          \"reason\": \"ownedByFirstParty\"\n" +
-            "        }\n" +
-            "      },\n" +
-            "      \"prevalence\": 80.099999999999994\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"category\": \"Content Delivery\",\n" +
-            "      \"url\": \"https:\\/\\/fonts.gstatic.com\\/s\\/i\\/productlogos\\/googleg\\/v6\\/24px.svg\",\n" +
-            "      \"pageUrl\": \"https:\\/\\/www.google.com\\/\",\n" +
-            "      \"ownerName\": \"Google LLC\",\n" +
-            "      \"entityName\": \"Google\",\n" +
-            "      \"state\": {\n" +
-            "        \"allowed\": {\n" +
-            "          \"reason\": \"ownedByFirstParty\"\n" +
-            "        }\n" +
-            "      },\n" +
-            "      \"prevalence\": 80.099999999999994\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"category\": \"Content Delivery\",\n" +
-            "      \"url\": \"https:\\/\\/www.gstatic.com\\/og\\/_\\/js\\/k=og.qtm.en_US.asUsweLQqwk.O\\/rt=j\\/m=qabr,q_dnp,qcwid,qapid\\/exm=qaaw,qadd,qaid,qein,qhaw,qhbr,qhch,qhga,qhid,qhin,qhpr\\/d=1\\/ed=1\\/rs=AA2YrTvH37iHjvnJ7NPFbMaGY1OZ0tqdnw\",\n" +
-            "      \"pageUrl\": \"https:\\/\\/www.google.com\\/\",\n" +
-            "      \"ownerName\": \"Google LLC\",\n" +
-            "      \"entityName\": \"Google\",\n" +
-            "      \"state\": {\n" +
-            "        \"allowed\": {\n" +
-            "          \"reason\": \"ownedByFirstParty\"\n" +
-            "        }\n" +
-            "      },\n" +
-            "      \"prevalence\": 80.099999999999994\n" +
-            "    }\n" +
-            "  ]\n" +
-            "}"
-
-        val protectionsSample = "{\"allowlisted\":false,\"denylisted\":false,\"enabledFeatures\":[\"contentBlocking\"],\"unprotectedTemporary\":false}"
     }
 }
