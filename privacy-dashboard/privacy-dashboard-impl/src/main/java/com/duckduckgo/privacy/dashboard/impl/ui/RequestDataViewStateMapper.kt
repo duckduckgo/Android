@@ -38,6 +38,7 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.*
 import com.squareup.anvil.annotations.ContributesBinding
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
+import timber.log.Timber
 import java.lang.Thread.State
 import javax.inject.Inject
 
@@ -53,9 +54,13 @@ class AppSiteRequestDataViewStateMapper @Inject constructor(
     private val publicSuffixDatabase = PublicSuffixDatabase()
 
     override fun mapFromSite(site: Site): RequestDataViewState {
-        val installedSurrogates = emptyList<String>()
+        val installedSurrogates = mutableListOf<String>()
         val requests: List<DetectedRequest> = site.trackingEvents.map {
             val entity: Entity = if (it.entity == null) return@map null else it.entity!!
+
+            if (it.surrogateId?.isNotEmpty() == true) {
+                installedSurrogates.add(it.trackerUrl)
+            }
 
             DetectedRequest(
                 category = it.categories?.firstOrNull(),
