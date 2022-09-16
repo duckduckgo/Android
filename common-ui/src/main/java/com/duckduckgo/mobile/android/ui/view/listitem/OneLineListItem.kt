@@ -22,7 +22,7 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.databinding.ViewSingleLineListItemBinding
+import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -32,7 +32,7 @@ class OneLineListItem @JvmOverloads constructor(
     defStyleAttr: Int = R.attr.oneLineListItemStyle
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    private val binding: ViewSingleLineListItemBinding by viewBinding()
+    private val binding: ViewOneLineListItemBinding by viewBinding()
 
     init {
         context.obtainStyledAttributes(
@@ -45,9 +45,9 @@ class OneLineListItem @JvmOverloads constructor(
             binding.primaryText.text = getString(R.styleable.OneLineListItem_primaryText)
 
             if (hasValue(R.styleable.OneLineListItem_leadingIcon)) {
-                binding.leadingIcon.setImageDrawable(getDrawable(R.styleable.OneLineListItem_leadingIcon))
+                binding.leadingIcon.setBackground(getDrawable(R.styleable.OneLineListItem_leadingIcon))
             } else {
-                binding.leadingIconContainer.gone()
+                binding.leadingIcon.gone()
             }
 
             if (hasValue(R.styleable.OneLineListItem_trailingIcon)) {

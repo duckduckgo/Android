@@ -48,7 +48,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.duckduckgo.mobile.android.ui.view.IconButton
+        <com.duckduckgo.mobile.android.ui.view.button.IconButton
             android:id="@+id/dismissButton"
             android:layout_width="24dp"
             android:layout_height="24dp"

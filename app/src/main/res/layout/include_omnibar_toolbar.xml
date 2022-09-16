@@ -168,7 +168,7 @@
                             app:layout_constraintTop_toTopOf="parent"
                             tools:text="https://duckduckgo.com/?q=areallylongexampleexample" />
 
-                        <com.duckduckgo.mobile.android.ui.view.IconButton
+                        <com.duckduckgo.mobile.android.ui.view.button.IconButton
                             android:id="@+id/voiceSearchButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
