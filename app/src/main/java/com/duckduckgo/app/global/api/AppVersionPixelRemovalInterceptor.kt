@@ -19,7 +19,6 @@ package com.duckduckgo.app.global.api
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelPrefixes
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
@@ -55,7 +54,7 @@ class AppVersionPixelRemovalInterceptor @Inject constructor() : Interceptor, Pix
         // list of pixels for which we'll remove App version information
         @VisibleForTesting
         val pixel_prefixes = listOf(
-            PixelPrefixes.ATP_APP_CPU_MONITOR_REPORT_PREFIX
+            "m_atp_ev_cpu_usage_"
         )
     }
 

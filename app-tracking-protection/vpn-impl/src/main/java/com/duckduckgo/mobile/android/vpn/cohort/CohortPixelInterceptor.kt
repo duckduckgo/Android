@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.cohort
 
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelPrefixes
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
@@ -71,11 +70,11 @@ class CohortPixelInterceptor @Inject constructor(
 
     companion object {
         @VisibleForTesting
-        const val COHORT_PARAM = "atp_cohort"
+        internal const val COHORT_PARAM = "atp_cohort"
         private const val PIXEL_PREFIX = "m_atp_"
         private val EXCEPTIONS = listOf(
             "m_atp_ev_enabled_onboarding_",
-            PixelPrefixes.ATP_APP_CPU_MONITOR_REPORT_PREFIX,
+            "m_atp_ev_cpu_usage_",
             "m_atp_unprotected_apps_bucket_"
         )
     }
