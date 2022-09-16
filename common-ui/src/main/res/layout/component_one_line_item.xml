@@ -47,7 +47,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItem"
-        app:leadingIcon="@drawable/ic_dax_icon"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
         app:primaryText="This is a One Line List Item with Leading Image"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -57,7 +57,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithImage"
-        app:leadingIcon="@drawable/ic_dax_icon"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
         app:primaryText="This is a One Line List Item With Trailing Icon"
         app:trailingIcon="@drawable/ic_overflow"/>
 
@@ -68,7 +68,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithTrailingIcon"
-        app:leadingIcon="@drawable/ic_dax_icon"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
         app:primaryText="This is a One Line List Item With Leading and Trailing Icons"
         app:trailingIcon="@drawable/ic_overflow"/>
 
