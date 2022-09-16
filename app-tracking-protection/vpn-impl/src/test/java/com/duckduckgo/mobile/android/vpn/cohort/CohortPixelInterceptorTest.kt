@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.cohort
 
 import com.duckduckgo.app.global.api.FakeChain
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import org.junit.Assert
 import org.junit.Before
