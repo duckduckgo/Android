@@ -30,25 +30,21 @@
         android:background="@color/slightlyTransparentDivider"
         app:layout_constraintBottom_toTopOf="@id/homeButton" />
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
         android:id="@+id/closeButton"
-        style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/addWidgetInstructionsButtonClose"
         android:textColor="@color/white"
-        android:textSize="13sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/homeButton" />
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
         android:id="@+id/homeButton"
-        style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/addWidgetInstructionsButtonGoHome"
         android:textColor="@color/white"
-        android:textSize="13sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

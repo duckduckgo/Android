@@ -17,6 +17,7 @@
 package com.duckduckgo.app.di
 
 import com.duckduckgo.app.statistics.ExperimentationVariantManager
+import com.duckduckgo.app.statistics.IndexRandomizer
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.WeightedRandomizer
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -33,11 +34,11 @@ object VariantModule {
     @SingleInstanceIn(AppScope::class)
     fun variantManager(
         statisticsDataStore: StatisticsDataStore,
-        weightedRandomizer: WeightedRandomizer,
+        weightedRandomizer: IndexRandomizer,
         appBuildConfig: AppBuildConfig,
     ): VariantManager =
         ExperimentationVariantManager(statisticsDataStore, weightedRandomizer, appBuildConfig)
 
     @Provides
-    fun weightedRandomizer() = WeightedRandomizer()
+    fun weightedRandomizer(): IndexRandomizer = WeightedRandomizer()
 }

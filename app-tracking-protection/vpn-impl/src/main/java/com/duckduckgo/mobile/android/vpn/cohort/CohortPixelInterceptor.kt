@@ -76,6 +76,7 @@ class CohortPixelInterceptor @Inject constructor(
         private val EXCEPTIONS = listOf(
             "m_atp_ev_enabled_onboarding_",
             PixelPrefixes.ATP_APP_CPU_MONITOR_REPORT_PREFIX,
+            "m_atp_unprotected_apps_bucket_"
         )
     }
 }

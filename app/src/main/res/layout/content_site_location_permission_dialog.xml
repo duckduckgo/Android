@@ -62,9 +62,8 @@
 
     <View style="@style/LocationPermissionDialogSplitter" />
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
         android:id="@+id/siteAllowAlwaysLocationPermission"
-        style="@style/LocationPermissionDialogButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/preciseLocationSiteDialogAllowAlways" />
@@ -73,9 +72,8 @@
         android:id="@+id/siteAllowOnceLocationPermissionDivider"
         style="@style/LocationPermissionDialogSplitter" />
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
         android:id="@+id/siteAllowOnceLocationPermission"
-        style="@style/LocationPermissionDialogButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/preciseLocationSiteDialogAllowOnce" />
@@ -83,18 +81,16 @@
     <View style="@style/LocationPermissionDialogSplitter"
         android:id="@+id/siteDenyLocationPermissionDivider"/>
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
         android:id="@+id/siteDenyOnceLocationPermission"
-        style="@style/LocationPermissionDialogButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/preciseLocationSiteDialogDenyOnce" />
 
     <View style="@style/LocationPermissionDialogSplitter" />
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
         android:id="@+id/siteDenyAlwaysLocationPermission"
-        style="@style/LocationPermissionDialogButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/preciseLocationSiteDialogDenyAlways" />

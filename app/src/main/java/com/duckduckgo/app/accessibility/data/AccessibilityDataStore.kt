@@ -40,7 +40,13 @@ class AccessibilitySettingsSharedPreferences(
     private val appCoroutineScope: CoroutineScope
 ) : AccessibilitySettingsDataStore {
 
-    private val accessibilityStateFlow = MutableStateFlow(AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
+    private val accessibilityStateFlow = MutableStateFlow(
+        AccessibilitySettings(
+            overrideSystemFontSize = false,
+            fontSize = FONT_SIZE_DEFAULT,
+            forceZoom = false
+        )
+    )
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)

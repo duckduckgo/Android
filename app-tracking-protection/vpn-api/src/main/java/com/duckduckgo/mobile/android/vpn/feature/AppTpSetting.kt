@@ -20,12 +20,12 @@ enum class AppTpSetting(override val value: String, override val defaultValue: B
     BadHealthMitigation("badHealthMitigation", defaultValue = true),
     Ipv6Support("ipv6Support"),
     PrivateDnsSupport("privateDnsSupport"),
-    NetworkSwitchHandling("networkSwitchSupport"),
-    SetActiveNetworkDns("setActiveNetworkDns"),
+    NetworkSwitchHandling("handleNetworkSwitching", defaultValue = true),
     VpnDdgBrowserTraffic("vpnDdgBrowserTraffic"),
     ConnectivityChecks("connectivityChecks"),
     AlwaysSetDNS("alwaysSetDNS"),
-    CPUMonitoring("cpuMonitoring")
+    CPUMonitoring("cpuMonitoring"),
+    VpnNewNetworkingLayer("vpnNewNetworkingLayer", defaultValue = true),
 }
 
 interface SettingName {

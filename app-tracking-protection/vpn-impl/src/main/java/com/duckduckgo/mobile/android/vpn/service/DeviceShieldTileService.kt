@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.service
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
+import android.os.Bundle
 import android.service.quicksettings.Tile.STATE_ACTIVE
 import android.service.quicksettings.Tile.STATE_INACTIVE
 import android.service.quicksettings.TileService
@@ -150,6 +151,11 @@ class DeviceShieldTileService : TileService() {
 @InjectWith(ActivityScope::class)
 class VpnPermissionRequesterActivity : AppCompatActivity() {
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        AndroidInjection.inject(this)
+    }
 
     override fun onStart() {
         super.onStart()

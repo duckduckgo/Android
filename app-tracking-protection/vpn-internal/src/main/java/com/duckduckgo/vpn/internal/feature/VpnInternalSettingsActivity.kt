@@ -33,6 +33,7 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.blocklist.AppTrackerListUpdateWorker
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
+import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackVariantManager
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
@@ -69,6 +70,8 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     @Inject lateinit var workManager: WorkManager
+
+    @Inject lateinit var vpnNetworkStackVariantManager: VpnNetworkStackVariantManager
 
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var transparencyModeDebugReceiver: TransparencyModeDebugReceiver? = null
@@ -183,9 +186,11 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.vpnUnderlyingNetworksToggle.isEnabled = isEnabled
                 binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
                 binding.vpnConnectivityChecksToggle.isEnabled = isEnabled
-                binding.setActiveNetworkDnsToggle.isEnabled = isEnabled
                 binding.debugLoggingToggle.isEnabled = isEnabled
                 binding.transparencyModeToggle.isEnabled = isEnabled
+                // only show this toggle when the variant is correct
+                binding.vpnNewNetworkingLayerToggle.isVisible = vpnNetworkStackVariantManager.getVariant() == "ng"
+                binding.vpnNewNetworkingLayerToggle.isEnabled = isEnabled
                 binding.settingsInfo.isVisible = !isEnabled
             }
             .launchIn(lifecycleScope)
@@ -325,9 +330,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        with(AppTpSetting.SetActiveNetworkDns) {
-            binding.setActiveNetworkDnsToggle.isChecked = appTpConfig.isEnabled(this)
-            binding.setActiveNetworkDnsToggle.setOnCheckedChangeListener { _, isChecked ->
+        with(AppTpSetting.ConnectivityChecks) {
+            binding.vpnConnectivityChecksToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.vpnConnectivityChecksToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
                 } else {
@@ -336,9 +341,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        with(AppTpSetting.ConnectivityChecks) {
-            binding.vpnConnectivityChecksToggle.isChecked = appTpConfig.isEnabled(this)
-            binding.vpnConnectivityChecksToggle.setOnCheckedChangeListener { _, isChecked ->
+        with(AppTpSetting.VpnNewNetworkingLayer) {
+            binding.vpnNewNetworkingLayerToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.vpnNewNetworkingLayerToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
                 } else {

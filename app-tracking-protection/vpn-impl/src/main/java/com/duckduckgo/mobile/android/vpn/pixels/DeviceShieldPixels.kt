@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.pixels
 
+import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
@@ -405,16 +406,19 @@ interface DeviceShieldPixels {
 
     /** Will fire when the user has VPN always-on lockdown setting enabled */
     fun reportAlwaysOnLockdownEnabled()
+
+    fun reportUnprotectedAppsBucket(bucketSize: Int)
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealDeviceShieldPixels @Inject constructor(
     private val pixel: Pixel,
-    vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : DeviceShieldPixels {
 
-    private val preferences = vpnSharedPreferencesProvider.getSharedPreferences(DS_PIXELS_PREF_FILE, multiprocess = true, migrate = true)
+    private val preferences: SharedPreferences
+        get() = vpnSharedPreferencesProvider.getSharedPreferences(DS_PIXELS_PREF_FILE, multiprocess = true, migrate = true)
 
     override fun deviceShieldEnabledOnSearch() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH_DAILY)
@@ -885,6 +889,10 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun reportAlwaysOnLockdownEnabled() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_ALWAYS_ON_LOCKDOWN_ENABLED_DAILY)
+    }
+
+    override fun reportUnprotectedAppsBucket(bucketSize: Int) {
+        firePixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET.pixelName, bucketSize))
     }
 
     private fun firePixel(
