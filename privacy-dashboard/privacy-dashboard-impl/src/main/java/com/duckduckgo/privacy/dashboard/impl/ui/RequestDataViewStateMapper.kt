@@ -29,7 +29,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus.SITE_BREAKAGE_ALL
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.USER_ALLOWED
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons.PROTECTIONS_DISABLED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CertificateViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.PublicKeyViewState
@@ -55,6 +54,13 @@ class AppSiteRequestDataViewStateMapper @Inject constructor(
 
     override fun mapFromSite(site: Site): RequestDataViewState {
         val installedSurrogates = mutableListOf<String>()
+        val allowedCategories = listOf(
+            "Analytics",
+            "Advertising",
+            "Social Network",
+            "Content Delivery",
+            "Embedded Content"
+        )
         val requests: List<DetectedRequest> = site.trackingEvents.map {
             val entity: Entity = if (it.entity == null) return@map null else it.entity!!
 
@@ -63,7 +69,7 @@ class AppSiteRequestDataViewStateMapper @Inject constructor(
             }
 
             DetectedRequest(
-                category = it.categories?.firstOrNull(),
+                category = it.categories?.firstOrNull { category -> allowedCategories.contains(category) },
                 url = it.trackerUrl,
                 eTLDplus1 = toTldPlusOne(it.trackerUrl),
                 pageUrl = it.documentUrl,
