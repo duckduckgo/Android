@@ -2166,8 +2166,6 @@ class BrowserTabViewModel @Inject constructor(
             val addToHomeSupported = addToHomeCapabilityDetector.isAddToHomeSupported()
             val showAutofill = autofillStore.autofillAvailable
             val showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch()
-            val fontSize = accessibilitySettingsDataStore.fontSize
-            val forceZoom = accessibilitySettingsDataStore.forceZoom
 
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(
@@ -2176,11 +2174,6 @@ class BrowserTabViewModel @Inject constructor(
                 )
                 omnibarViewState.value = currentOmnibarViewState().copy(
                     showVoiceSearch = showVoiceSearch
-                )
-                accessibilityViewState.value = currentAccessibilityViewState().copy(
-                    fontSize = fontSize,
-                    forceZoom = forceZoom,
-                    refreshWebView = false
                 )
             }
         }
