@@ -28,7 +28,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.layout
-import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsDescriptionBinding
+import com.duckduckgo.app.browser.databinding.ViewSitePermissionsDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewSitePermissionsEmptyListBinding
 import com.duckduckgo.app.browser.databinding.ViewSitePermissionsTitleBinding
 import com.duckduckgo.app.browser.databinding.ViewSitePermissionsToggleBinding
@@ -85,7 +85,7 @@ class SitePermissionsAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         when (SitePermissionsListViewType.values()[viewType]) {
             DESCRIPTION -> {
-                val binding = ViewLocationPermissionsDescriptionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                val binding = ViewSitePermissionsDescriptionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 SitePermissionsSimpleViewHolder(binding)
             }
             HEADER -> {
