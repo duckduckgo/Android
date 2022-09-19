@@ -15,6 +15,7 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/settingsSectionGeneral"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -28,9 +29,10 @@
         android:text="@string/settingsDefaultBrowserEnabled"
         android:theme="@style/SettingsSwitchTheme" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/homeScreenWidgetSetting"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsAddHomeScreenWidget" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsAddHomeScreenWidget"/>
 
 </LinearLayout>

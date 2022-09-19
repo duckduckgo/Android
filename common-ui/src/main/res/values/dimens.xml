@@ -28,7 +28,8 @@
     <dimen name="feedbackCardHorizontalMargin">16dp</dimen>
     <dimen name="feedbackTitleMarginTop">30dp</dimen>
 
-    <dimen name="settingsItemHorizontalPadding">20dp</dimen>
+    // Remove with new Section Header
+    <dimen name="settingsItemHorizontalPadding">@dimen/keyline_4</dimen>
 
     <dimen name="systemSearchResultsElevation">4dp</dimen>
 

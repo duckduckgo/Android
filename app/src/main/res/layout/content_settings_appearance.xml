@@ -29,7 +29,7 @@
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/selectedThemeSetting"
-        style="@style/SettingsItemClickable"
+        android:background="?attr/selectableItemBackground"
         android:paddingTop="0dp"
         android:paddingBottom="0dp"
         android:layout_width="match_parent"
@@ -43,16 +43,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
             android:id="@+id/changeAppIconLabel"
-            style="@style/SettingsItemClickable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:text="@string/changeIconCtaLabel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:primaryText="@string/changeIconCtaLabel"/>
 
         <ImageView
             android:id="@+id/changeAppIcon"
@@ -69,7 +67,7 @@
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/selectedFireAnimationSetting"
-        style="@style/SettingsItemClickable"
+        android:background="?attr/selectableItemBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="0dp"
@@ -79,9 +77,10 @@
         app:subtitle="@string/settingsHeroFireAnimation"
         app:title="@string/settingsFireAnimation" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/accessibilitySetting"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsAccessibility" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsAccessibility"/>
 
 </LinearLayout>

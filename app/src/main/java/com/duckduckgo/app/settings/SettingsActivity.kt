@@ -157,39 +157,38 @@ class SettingsActivity :
     private fun configureUiEventHandlers() {
         with(viewsGeneral) {
             setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
-            homeScreenWidgetSetting.setOnClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
+            homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
         }
 
         with(viewsAutofill) {
-            autofill.setOnClickListener { viewModel.onAutofillSettingsClick() }
+            autofill.setClickListener { viewModel.onAutofillSettingsClick() }
         }
 
         with(viewsAppearance) {
             selectedThemeSetting.setOnClickListener { viewModel.userRequestedToChangeTheme() }
-            changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
+            changeAppIconLabel.setClickListener { viewModel.userRequestedToChangeIcon() }
             selectedFireAnimationSetting.setOnClickListener { viewModel.userRequestedToChangeFireAnimation() }
-            accessibilitySetting.setOnClickListener { viewModel.onAccessibilitySettingClicked() }
+            accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
         }
 
         with(viewsPrivacy) {
             globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
             autoconsentSetting.setOnClickListener { viewModel.onAutoconsentClicked() }
-            fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
+            fireproofWebsites.setClickListener { viewModel.onFireproofWebsitesClicked() }
             automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
-            automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
-            whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
+            whitelist.setClickListener { viewModel.onManageWhitelistSelected() }
         }
 
         with(viewsCustomize) {
             autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
-            locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
+            locationPermissions.setClickListener { viewModel.onLocationClicked() }
             appLinksSetting.setOnClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
         }
 
         with(viewsOther) {
-            provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
-            about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
-            privacyPolicy.setOnClickListener {
+            provideFeedback.setClickListener { viewModel.userRequestedToSendFeedback() }
+            about.setClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
+            privacyPolicy.setClickListener {
                 startActivity(
                     WebViewActivity.intent(
                         this@SettingsActivity,

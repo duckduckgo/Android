@@ -49,7 +49,7 @@ class OneLineListItem @JvmOverloads constructor(
             if (hasValue(R.styleable.OneLineListItem_primaryTextColor)) {
                 binding.primaryText.setTextColor(
                     getColor(
-                        R.styleable.SettingsOption_settingsOptionColor,
+                        R.styleable.OneLineListItem_primaryTextColor,
                         context.getColorFromAttr(R.attr.normalTextColor)
                     )
                 )

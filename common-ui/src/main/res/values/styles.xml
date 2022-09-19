@@ -98,10 +98,6 @@
         <item name="android:selectable">false</item>
     </style>
 
-    <style name="SettingsItemClickable" parent="SettingsItem">
-        <item name="android:background">?attr/selectableItemBackground</item>
-    </style>
-
     <style name="SettingsMinorText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

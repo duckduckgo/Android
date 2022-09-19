@@ -26,10 +26,11 @@
         style="@style/SettingsSectionTitle"
         android:text="@string/settingsHeadingCustomize" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/locationPermissions"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsPreciseLocation" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsPreciseLocation"/>
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/autocompleteToggle"
