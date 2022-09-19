@@ -40,23 +40,31 @@ interface VpnNetworkStack {
 
     /**
      * Called before the networking layer is enabled
+     *
+     * @return `true` if the networking layer is successfully created, `false` otherwise
      */
-    fun onCreateVpn()
+    fun onCreateVpn(): Result<Unit>
 
     /**
      * Called before the VPN is started
+     *
+     * @return `true` if the VPN is successfully started, `false` otherwise
      */
-    fun onStartVpn(tunfd: ParcelFileDescriptor)
+    fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit>
 
     /**
      * Called before the VPN is stopped
+     *
+     * @return `true` if the VPN is successfully stopped, `false` otherwise
      */
-    fun onStopVpn()
+    fun onStopVpn(): Result<Unit>
 
     /**
      * Clean when the networking layer is destroyed. You can use this method to clean up resources
+     *
+     * @return `true` if the networking layer is successfully destroyed, `false` otherwise
      */
-    fun onDestroyVpn()
+    fun onDestroyVpn(): Result<Unit>
 
     /**
      * @return the MTU size you wish the VPN service to set
