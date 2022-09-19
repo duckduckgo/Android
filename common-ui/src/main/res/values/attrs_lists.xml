@@ -31,10 +31,12 @@
     <attr name="leadingIcon" format="integer"/>
     <attr name="trailingIcon" format="integer"/>
     <attr name="showBetaPill" format="reference"/>
+    <attr name="primaryTextColor" format="color"/>
 
     <!--One Line Item view-->
     <declare-styleable name="OneLineListItem">
         <attr name="primaryText"/>
+        <attr name="primaryTextColor"/>
         <attr name="leadingIcon"/>
         <attr name="trailingIcon"/>
     </declare-styleable>
