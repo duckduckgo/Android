@@ -21,7 +21,7 @@
     <attr name="listItemSubtitleColor" format="color"/>
 
     <attr name="oneLineListItemStyle" format="reference"/>
-    <attr name="oneLineListItemWithToggleStyle" format="reference"/>
+    <attr name="oneLineListItemSwitchStyle" format="reference"/>
     <attr name="twoLineListItemStyle" format="reference"/>
     <attr name="twoLineListItemWithToggleStyle" format="reference"/>
     <attr name="twoLineRadioListIteWithmStyle" format="reference"/>

@@ -25,6 +25,7 @@ import com.duckduckgo.lint.NoLifecycleObserverDetector.Companion.NO_LIFECYCLE_OB
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
 import com.duckduckgo.lint.ui.DeprecatedAndroidButtonUsedInXmlDetector.Companion.DEPRECATED_BUTTON_IN_XML
+import com.duckduckgo.lint.ui.DeprecatedSwitchUsedInXmlDetector.Companion.DEPRECATED_SWITCH_IN_XML
 import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Companion.STYLE_IN_DESIGN_SYSTEM_COMPONENT
 
 @Suppress("UnstableApiUsage")
@@ -37,6 +38,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_SYSTEM_LOAD_LIBRARY,
             DEPRECATED_BUTTON_IN_XML,
             STYLE_IN_DESIGN_SYSTEM_COMPONENT,
+            DEPRECATED_SWITCH_IN_XML,
         )
 
     override val api: Int
