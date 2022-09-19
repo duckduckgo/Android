@@ -64,7 +64,7 @@ class NoStyleAppliedToDesignSystemComponentDetector : LayoutDetector() {
         private const val BUTTON_GHOST_LARGE = "com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge"
         private const val BUTTON_GHOST_SMALL = "com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall"
         private const val ONE_LINE_LIST_ITEM = "com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem"
-        private const val SWITCH = "com.duckduckgo.mobile.android.ui.view.Switch"
+        private const val SWITCH = "com.duckduckgo.mobile.android.ui.view.SwitchView"
 
         val DESIGN_COMPONENTS =
             listOf(
