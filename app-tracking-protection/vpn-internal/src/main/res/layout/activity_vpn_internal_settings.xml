@@ -138,28 +138,25 @@
                 android:theme="@style/SettingsSwitchTheme"
             />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/exceptionRules"
-                style="@style/SettingsItemClickable"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:text="App/Tracker exception rules"
+                app:primaryText="App/Tracker exception rules"
             />
 
-            <TextView
-                    android:id="@+id/delete_tracking_history"
-                    style="@style/SettingsItemClickable"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:text="Delete Tracking History"
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/delete_tracking_history"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:primaryText="Delete Tracking History"
             />
 
-            <TextView
-                    android:id="@+id/force_update_blocklist"
-                    style="@style/SettingsItemClickable"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:text="🔄 Force Update Blocklist"
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/force_update_blocklist"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:primaryText="🔄 Force Update Blocklist"
             />
 
             <!-- Section Protection -->
@@ -175,19 +172,19 @@
                     android:text="App Protections"
             />
 
-            <TextView
-                    android:id="@+id/protectAllApps"
-                    style="@style/SettingsItemClickable"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:text="Protect all apps"/>
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/protectAllApps"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:primaryText="Protect all apps"
+            />
 
-            <TextView
-                    android:id="@+id/restoreDefaultAppProtections"
-                    style="@style/SettingsItemClickable"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:text="Restore default protections"/>
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/restoreDefaultAppProtections"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:primaryText="Restore default protections"
+            />
 
             <!-- Section Logging -->
             <com.duckduckgo.mobile.android.ui.view.SectionDivider
@@ -231,13 +228,13 @@
                 app:title="Generate AppTP bugreport"
             />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/viewDiagnostics"
-                style="@style/SettingsItemClickable"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:text="View Diagnostics Data"/>
-
+                app:primaryText="View Diagnostics Data"
+            />
+            
 
             <!-- Section Health -->
             <com.duckduckgo.mobile.android.ui.view.SectionDivider

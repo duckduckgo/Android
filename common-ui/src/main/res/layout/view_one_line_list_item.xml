@@ -37,10 +37,8 @@
         android:gravity="start|center"
         android:layout_width="0dp"
         android:layout_height="@dimen/oneLinelistItemHeight"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
-        android:maxLines="1"
-        android:singleLine="true"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_2"
         android:textColor="?attr/listItemTitleColor" app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/trailingIcon" app:layout_constraintStart_toEndOf="@id/leadingIcon"
         app:layout_constraintTop_toTopOf="parent" tools:text="Title"/>

@@ -28,15 +28,17 @@
         android:layout_height="wrap_content"
         android:text="@string/settingsHeadingAbout" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/about"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsAboutDuckduckgo" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsAboutDuckduckgo"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/privacyPolicy"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsPrivacyPolicyDuckduckgo" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsPrivacyPolicyDuckduckgo"/>
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/version"
@@ -45,9 +47,10 @@
         app:title="@string/settingsVersion"
         tools:subtitle="123.43.5456" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/provideFeedback"
-        style="@style/SettingsItemClickable"
-        android:text="@string/leaveFeedback" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/leaveFeedback"/>
 
 </LinearLayout>

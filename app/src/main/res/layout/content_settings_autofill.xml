@@ -15,16 +15,17 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/settingsSectionAutofill"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:id="@+id/settingsSectionAutofill"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/autofill"
-        style="@style/SettingsItemClickable"
-        android:gravity="center_vertical"
-        android:text="@string/autofillSettingsDisplayName" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/autofillSettingsDisplayName"/>
 
     <com.duckduckgo.mobile.android.ui.view.SectionDivider
         android:layout_width="match_parent"

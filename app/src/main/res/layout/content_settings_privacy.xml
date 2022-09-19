@@ -41,17 +41,17 @@
         android:layout_height="wrap_content"
         app:title="@string/autoconsentSetting" />
 
-
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/whitelist"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsPrivacyProtectionWhitelist" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsPrivacyProtectionWhitelist"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/fireproofWebsites"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsFireproofWebsites" />
-
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsFireproofWebsites"/>
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/automaticallyClearWhatSetting"
