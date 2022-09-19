@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.R.attr
-import android.R.attr.textSize
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
