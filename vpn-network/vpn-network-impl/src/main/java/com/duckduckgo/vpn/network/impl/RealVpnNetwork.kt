@@ -229,6 +229,7 @@ class RealVpnNetwork @Inject constructor(
 
     init {
         try {
+            Timber.v("Loading native VPN networking library")
             LibraryLoader.loadLibrary(context, "netguard")
         } catch (ignored: Throwable) {
             Timber.e(ignored, "Error loading netguard library")
