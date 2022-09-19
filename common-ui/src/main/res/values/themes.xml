@@ -45,7 +45,8 @@
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="radioButtonStyle">@style/RadioButtonStyle</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
-        <item name="sliderStyle">@style/Widget.App.Slider</item>
+        <item name="sliderStyle">@style/Widget.DuckDuckGo.Slider</item>
+        <item name="switchStyle">@style/Widget.DuckDuckGo.Switch</item>
 
         <!-- Design System Components -->
         <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
@@ -61,7 +62,7 @@
         <item name="oneLineListItemSwitchStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
         <item name="twoLineListItemWithToggleStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
-        <item name="twoLineRadioListIteWithmStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
+        <item name="twoLineRadioListIteWithStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -110,7 +111,6 @@
         <item name="settingsItemTextColor">@color/white</item>
         <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
-        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
         <item name="buttonOutlinedTextColor">@color/pinkishGrayThree</item>
         <item name="buttonOutlinedBorderColor">@color/brownishGrayTwo</item>
         <item name="callToActionTitleColor">@color/white</item>
@@ -434,17 +434,4 @@
         <item name="android:textColor">@color/cornflowerBlue</item>
     </style>
 
-    <style name="Widget.App.Slider" parent="Widget.MaterialComponents.Slider">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Slider</item>
-        <item name="trackHeight">6dp</item>
-        <item name="trackColorInactive">@color/slider_inactive_track</item>
-        <item name="trackColorActive">@color/accentBlue</item>
-        <item name="thumbColor">@color/accentBlue</item>
-    </style>
-
-    <style name="ThemeOverlay.App.Slider" parent="">
-        <item name="colorPrimary">@color/accentBlue</item>
-        <item name="colorOnPrimary">@color/accentBlue</item>
-        <item name="colorOnSurface">?attr/settingsSwitchBackgroundColor</item>
-    </style>
 </resources>

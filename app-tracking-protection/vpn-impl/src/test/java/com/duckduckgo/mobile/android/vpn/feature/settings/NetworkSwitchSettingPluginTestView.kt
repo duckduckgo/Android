@@ -25,7 +25,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 
-class NetworkSwitchSettingPluginTest {
+class NetworkSwitchSettingPluginTestView {
 
     private lateinit var featureConfig: NetworkSwitchingSettingPlugin
     private val appTpFeatureConfig: AppTpFeatureConfig = mock()

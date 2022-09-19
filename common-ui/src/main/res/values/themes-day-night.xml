@@ -67,7 +67,7 @@
         <item name="oneLineListItemSwitchStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
         <item name="twoLineListItemWithToggleStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
-        <item name="twoLineRadioListIteWithmStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
+        <item name="twoLineRadioListIteWithStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->

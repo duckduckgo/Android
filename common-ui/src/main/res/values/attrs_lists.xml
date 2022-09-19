@@ -24,7 +24,7 @@
     <attr name="oneLineListItemSwitchStyle" format="reference"/>
     <attr name="twoLineListItemStyle" format="reference"/>
     <attr name="twoLineListItemWithToggleStyle" format="reference"/>
-    <attr name="twoLineRadioListIteWithmStyle" format="reference"/>
+    <attr name="twoLineRadioListIteWithStyle" format="reference"/>
 
     <attr name="primaryText" format="string"/>
     <attr name="secondaryText" format="string"/>

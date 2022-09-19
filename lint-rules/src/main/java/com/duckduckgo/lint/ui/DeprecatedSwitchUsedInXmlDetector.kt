@@ -64,7 +64,7 @@ class DeprecatedSwitchUsedInXmlDetector : LayoutDetector() {
             .create(
                 id = "AndroidSwitchInXml",
                 briefDescription = "Default Android Switch used instead of Design System Component",
-                explanation = "Always favor the use of the Design System Component OneLineListItemSwitch",
+                explanation = "Always favor the use of the Design System Component Switch",
                 moreInfo = "https://app.asana.com/0/1202857801505092/list",
                 category = CUSTOM_LINT_CHECKS,
                 priority = 10,
