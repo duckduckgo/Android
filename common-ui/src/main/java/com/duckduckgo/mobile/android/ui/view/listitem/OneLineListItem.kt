@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.ui.view.listitem
 
+import android.R.attr
+import android.R.attr.textSize
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
@@ -23,6 +25,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
+import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -43,6 +46,14 @@ class OneLineListItem @JvmOverloads constructor(
         ).apply {
 
             binding.primaryText.text = getString(R.styleable.OneLineListItem_primaryText)
+            if (hasValue(R.styleable.OneLineListItem_primaryTextColor)) {
+                binding.primaryText.setTextColor(
+                    getColor(
+                        R.styleable.SettingsOption_settingsOptionColor,
+                        context.getColorFromAttr(R.attr.normalTextColor)
+                    )
+                )
+            }
 
             if (hasValue(R.styleable.OneLineListItem_leadingIcon)) {
                 binding.leadingIcon.setBackground(getDrawable(R.styleable.OneLineListItem_leadingIcon))

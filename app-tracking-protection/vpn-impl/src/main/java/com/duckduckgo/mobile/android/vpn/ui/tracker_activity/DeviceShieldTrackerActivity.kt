@@ -124,27 +124,27 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun bindViews() {
-        binding.ctaTrackerFaq.setOnClickListener {
+        binding.ctaTrackerFaq.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
         }
 
-        binding.ctaBetaInstructions.setOnClickListener {
+        binding.ctaBetaInstructions.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchBetaInstructions)
         }
 
-        binding.ctaWhatAreAppTrackers.setOnClickListener {
+        binding.ctaWhatAreAppTrackers.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchAppTrackersFAQ)
         }
 
-        binding.ctaManageProtection.setOnClickListener {
+        binding.ctaManageProtection.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
         }
 
-        binding.ctaRemoveFeature.setOnClickListener {
+        binding.ctaRemoveFeature.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.AskToRemoveFeature)
         }
 
-        binding.ctaShowAll.setOnClickListener {
+        binding.ctaShowAll.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
         }
     }

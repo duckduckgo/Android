@@ -117,13 +117,12 @@
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <com.duckduckgo.mobile.android.ui.view.SettingsOption
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_show_all"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="@dimen/keyline_4"
+                android:layout_height="@dimen/oneLinelistItemHeight"
+                android:layout_marginBottom="@dimen/keyline_4"
                 android:paddingStart="72dp"
-                android:text="@string/atp_ActivityCtaShowAll"
                 android:visibility="gone"/>
 
             <View
@@ -139,23 +138,23 @@
                 android:paddingStart="@dimen/keyline_4"
                 android:text="@string/atp_ActivityAbout" />
 
-            <com.duckduckgo.mobile.android.ui.view.SettingsOption
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_what_are_app_trackers"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/atp_ActivityAppTrackersFAQ"/>
+                android:layout_height="@dimen/oneLinelistItemHeight"
+                app:primaryText="@string/atp_ActivityAppTrackersFAQ"/>
 
-            <com.duckduckgo.mobile.android.ui.view.SettingsOption
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_tracker_faq"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/atp_FAQCta"/>
+                android:layout_height="@dimen/oneLinelistItemHeight"
+                app:primaryText="@string/atp_FAQCta"/>
 
-            <com.duckduckgo.mobile.android.ui.view.SettingsOption
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_beta_instructions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/atp_ActivityBetaInstructions"/>
+                app:primaryText="@string/atp_ActivityBetaInstructions"/>
 
             <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:layout_width="match_parent"
@@ -165,18 +164,18 @@
                 android:paddingStart="@dimen/keyline_4"
                 android:text="@string/atp_ActivityManage" />
 
-            <com.duckduckgo.mobile.android.ui.view.SettingsOption
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_manage_protection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/atp_ActivityManageProtection"/>
+                app:primaryText="@string/atp_ActivityManageProtection"/>
 
-            <com.duckduckgo.mobile.android.ui.view.SettingsOption
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_remove_feature"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:settingsOptionColor="@color/red50"
-                android:text="@string/atp_ActivityRemoveFeature"/>
+                app:primaryTextColor="@color/red50"
+                app:primaryText="@string/atp_ActivityRemoveFeature"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

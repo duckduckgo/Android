@@ -18,15 +18,14 @@
                                                    xmlns:app="http://schemas.android.com/apk/res-auto"
                                                    xmlns:tools="http://schemas.android.com/tools"
                                                    android:id="@+id/item_container"
+                                                   android:background="?selectableItemBackground"
                                                    android:layout_width="match_parent"
-                                                   android:layout_height="@dimen/oneLinelistItemHeight"
-                                                   android:background="?attr/selectableItemBackground">
+                                                   android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/leadingIcon"
         android:layout_width="@dimen/listItemImageContainerSize"
         android:layout_height="@dimen/listItemImageContainerSize"
-        android:paddingStart="14dp"
         android:scaleType="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
@@ -35,9 +34,10 @@
     <TextView
         android:id="@+id/primaryText"
         style="@style/TextAppearance.DuckDuckGo.Body1"
+        android:gravity="start|center"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_height="@dimen/oneLinelistItemHeight"
+        android:layout_marginStart="16dp"
         android:layout_marginEnd="8dp"
         android:maxLines="1"
         android:singleLine="true"
