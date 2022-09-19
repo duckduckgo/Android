@@ -72,8 +72,8 @@
     <style name="SettingsSectionTitle">
         <item name="android:paddingTop">14dp</item>
         <item name="android:paddingBottom">14dp</item>
-        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
-        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:paddingEnd">@dimen/keyline_4</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">@color/cornflowerBlue</item>
         <item name="android:textSize">14sp</item>
@@ -88,8 +88,8 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
-        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:paddingEnd">@dimen/keyline_4</item>
         <item name="android:paddingBottom">14dp</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textColor">@color/settings_title_color_selector</item>
@@ -102,8 +102,8 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">-11dp</item>
-        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
-        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:paddingEnd">@dimen/keyline_4</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textColor">@color/settings_subtitle_color_selector</item>
         <item name="android:textSize">14sp</item>
@@ -114,8 +114,8 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">10dp</item>
-        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
-        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:paddingEnd">@dimen/keyline_4</item>
         <item name="android:paddingBottom">10dp</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textColor">?attr/settingsItemTextColor</item>

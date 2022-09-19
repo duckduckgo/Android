@@ -57,8 +57,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/keyline_4"
-                    android:paddingStart="@dimen/settingsItemHorizontalPadding"
-                    android:paddingEnd="@dimen/settingsItemHorizontalPadding"
+                    android:paddingStart="@dimen/keyline_4"
+                    android:paddingEnd="@dimen/keyline_4"
                     android:text="@string/accessibilityFontSizeTitle"
                     tools:text="Text goes here" />
 
@@ -66,8 +66,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingStart="@dimen/settingsItemHorizontalPadding"
-                    android:paddingEnd="@dimen/settingsItemHorizontalPadding">
+                    android:paddingStart="@dimen/keyline_4"
+                    android:paddingEnd="@dimen/keyline_4">
 
                     <TextView
                         android:id="@+id/accessibilitySliderValue"
@@ -99,9 +99,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:layout_marginStart="@dimen/settingsItemHorizontalPadding"
+                    android:layout_marginStart="@dimen/keyline_4"
                     android:layout_marginTop="@dimen/keyline_4"
-                    android:layout_marginEnd="@dimen/settingsItemHorizontalPadding"
+                    android:layout_marginEnd="@dimen/keyline_4"
                     android:background="?lightContainerBackground"
                     android:ellipsize="end"
                     android:padding="@dimen/keyline_2"
