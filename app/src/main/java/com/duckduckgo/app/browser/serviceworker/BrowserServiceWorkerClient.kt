@@ -16,22 +16,25 @@
 
 package com.duckduckgo.app.browser.serviceworker
 
-import android.os.Build
-import android.webkit.ServiceWorkerClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
-import androidx.annotation.RequiresApi
+import androidx.webkit.ServiceWorkerClientCompat
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import javax.inject.Inject
 
-@RequiresApi(Build.VERSION_CODES.N)
-class BrowserServiceWorkerClient(
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class BrowserServiceWorkerClient @Inject constructor(
     private val requestInterceptor: RequestInterceptor,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository
-) : ServiceWorkerClient() {
+) : ServiceWorkerClientCompat() {
 
     override fun shouldInterceptRequest(request: WebResourceRequest): WebResourceResponse? {
         return runBlocking {

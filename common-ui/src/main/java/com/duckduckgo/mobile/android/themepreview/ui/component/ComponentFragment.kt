@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.themepreview.ui.component
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
 
+@SuppressLint("NoFragment") // we don't use DI here
 abstract class ComponentFragment : Fragment() {
 
     override fun onCreateView(

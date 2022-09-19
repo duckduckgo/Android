@@ -85,6 +85,7 @@ class AppIconModifier @Inject constructor(
     private val appBuildConfig: AppBuildConfig
 ) : IconModifier {
 
+    @Suppress("NewApi") // we use appBuildConfig
     override fun changeIcon(
         previousIcon: AppIcon,
         newIcon: AppIcon
@@ -92,7 +93,7 @@ class AppIconModifier @Inject constructor(
         disable(context, newIcon)
         enable(context, newIcon)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N_MR1) {
             appShortcutCreator.configureAppShortcuts()
         }
     }

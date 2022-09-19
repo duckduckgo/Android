@@ -17,6 +17,7 @@
 package com.duckduckgo.app.bookmarks.model
 
 import androidx.annotation.VisibleForTesting
+import androidx.room.Transaction
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
 import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
@@ -56,6 +57,7 @@ interface BookmarksRepository {
     fun getBookmark(url: String): Bookmark?
     suspend fun hasBookmarks(): Boolean
     suspend fun bookmarksCount(): Long
+    suspend fun deleteAll()
 }
 
 class BookmarksDataRepository(
@@ -119,6 +121,12 @@ class BookmarksDataRepository(
 
     override suspend fun bookmarksCount(): Long {
         return bookmarksDao.bookmarksCount()
+    }
+
+    @Transaction
+    override suspend fun deleteAll() {
+        bookmarksDao.deleteAll()
+        bookmarkFoldersDao.deleteAll()
     }
 
     @VisibleForTesting

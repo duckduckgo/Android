@@ -18,7 +18,6 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
-    id 'kotlin-android-extensions'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -33,7 +32,7 @@ dependencies {
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':app-store')
     implementation project(path: ':app-build-config-api')
-    api project(path: ':privacy-config-store')
+    implementation project(path: ':privacy-config-store')
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
@@ -84,5 +83,6 @@ android {
             includeAndroidResources = true
         }
     }
+  namespace 'com.duckduckgo.privacy.config.impl'
 }
 

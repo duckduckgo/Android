@@ -43,6 +43,7 @@ interface FavoritesRepository {
     fun userHasFavorites(): Boolean
     fun favorite(url: String): SavedSite.Favorite?
     suspend fun delete(favorite: SavedSite.Favorite)
+    fun deleteAll()
 }
 
 sealed class SavedSite(
@@ -123,6 +124,10 @@ class FavoritesDataRepository(
     override suspend fun delete(favorite: SavedSite.Favorite) {
         faviconManager.get().deletePersistedFavicon(favorite.url)
         favoritesDao.delete(FavoriteEntity(favorite.id, favorite.title, favorite.url, favorite.position))
+    }
+
+    override fun deleteAll() {
+        favoritesDao.deleteAll()
     }
 
     private fun SavedSite.Favorite.titleOrFallback(): String = this.title.takeIf { it.isNotEmpty() } ?: this.url

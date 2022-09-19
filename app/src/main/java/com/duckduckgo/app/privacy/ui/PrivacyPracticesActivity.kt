@@ -33,6 +33,7 @@ import com.duckduckgo.app.privacy.renderer.text
 import com.duckduckgo.app.tabs.tabId
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
@@ -60,7 +61,7 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             viewModel.privacyPractices(intent.tabId!!)
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect { render(it) }
+                .collectLatest { render(it) }
         }
     }
 

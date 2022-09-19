@@ -5,17 +5,16 @@ on:
     - cron: '0 3 * * *' # run at 3 AM UTC
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   privacy_tests:
     name: Privacy Tests
     runs-on: ubuntu-latest
 
     steps:
-      - name: Cancel previous
-        uses: styfle/cancel-workflow-action@0.7.0
-        with:
-          access_token: ${{ github.token }}
-
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
@@ -27,32 +26,28 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
-      - name: Gradle cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
-
       - name: Decode secret
         env:
           FLANK: ${{ secrets.FLANK }}
         run: echo $FLANK > flank.json
 
       - name: Build
-        run: ./gradlew androidTestsBuild
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: androidTestsBuild
 
-      - name: Run Privacy Tests
-        run: ./gradlew runFlankPrivacyTests
+      - name: Run Android Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: runFlankPrivacyTests
 
-      - name: Bundle the Android CI checks report
+      - name: Bundle the Android CI tests report
         if: always()
-        run: find . -type d -name 'fladleResults' | zip -@ -r android-checks-report.zip
+        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
 
-      - name: Upload the Android CI checks report
+      - name: Upload the Android CI tests report
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: android-checks-report
-          path: android-checks-report.zip
+          name: android-tests-report
+          path: android-tests-report.zip

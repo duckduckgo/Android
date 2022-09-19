@@ -155,4 +155,14 @@ class BookmarkFoldersDaoTest {
         assertEquals(1, list.size)
         assertEquals(bookmarkFolderEntity, list.first())
     }
+
+    @Test
+    fun whenAllBookmarkFoldersDeletedThenDeleteAllBookmarkFolders() = runTest {
+        bookmarkFoldersDao.insertList(bookmarkFolderList)
+
+        bookmarkFoldersDao.deleteAll()
+
+        val list = bookmarkFoldersDao.getBookmarkFolders().first()
+        assertTrue(list.isEmpty())
+    }
 }

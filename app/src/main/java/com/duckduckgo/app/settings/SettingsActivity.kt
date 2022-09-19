@@ -35,10 +35,11 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.accessibility.AccessibilityActivity
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.browser.webview.WebViewActivity
-import com.duckduckgo.app.email.ui.EmailProtectionActivity
+import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -58,11 +59,12 @@ import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
+import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_api.MacWaitlistState
-import com.duckduckgo.macos_api.MacWaitlistState.InBeta
-import com.duckduckgo.macos_api.MacWaitlistState.JoinedWaitlist
-import com.duckduckgo.macos_api.MacWaitlistState.NotJoinedQueue
+import com.duckduckgo.macos_api.MacWaitlistState.*
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
@@ -97,6 +99,12 @@ class SettingsActivity :
     @Inject
     lateinit var addWidgetLauncher: AddWidgetLauncher
 
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
+
     private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onDefaultBrowserToggled(isChecked)
     }
@@ -108,8 +116,17 @@ class SettingsActivity :
     private val viewsGeneral
         get() = binding.includeSettings.contentSettingsGeneral
 
+    private val viewsAutofill
+        get() = binding.includeSettings.contentSettingsAutofill
+
+    private val viewsAppearance
+        get() = binding.includeSettings.contentSettingsAppearance
+
     private val viewsPrivacy
         get() = binding.includeSettings.contentSettingsPrivacy
+
+    private val viewsCustomize
+        get() = binding.includeSettings.contentSettingsCustomize
 
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
@@ -139,22 +156,33 @@ class SettingsActivity :
 
     private fun configureUiEventHandlers() {
         with(viewsGeneral) {
-            selectedThemeSetting.setOnClickListener { viewModel.userRequestedToChangeTheme() }
-            autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
             setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
-            changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
             homeScreenWidgetSetting.setOnClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
+        }
+
+        with(viewsAutofill) {
+            autofill.setOnClickListener { viewModel.onAutofillSettingsClick() }
+        }
+
+        with(viewsAppearance) {
+            selectedThemeSetting.setOnClickListener { viewModel.userRequestedToChangeTheme() }
+            changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
             selectedFireAnimationSetting.setOnClickListener { viewModel.userRequestedToChangeFireAnimation() }
             accessibilitySetting.setOnClickListener { viewModel.onAccessibilitySettingClicked() }
         }
 
         with(viewsPrivacy) {
             globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
+            autoconsentSetting.setOnClickListener { viewModel.onAutoconsentClicked() }
             fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
-            locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
             automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
             automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
             whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
+        }
+
+        with(viewsCustomize) {
+            autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
+            locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
             appLinksSetting.setOnClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
         }
 
@@ -193,8 +221,8 @@ class SettingsActivity :
     }
 
     private fun configureAppLinksSettingVisibility() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            viewsPrivacy.appLinksSetting.visibility = View.GONE
+        if (appBuildConfig.sdkInt < Build.VERSION_CODES.N) {
+            viewsCustomize.appLinksSetting.visibility = View.GONE
         }
     }
 
@@ -205,16 +233,18 @@ class SettingsActivity :
                 viewState.let {
                     viewsOther.version.setSubtitle(it.version)
                     updateSelectedTheme(it.theme)
-                    viewsGeneral.autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
+                    viewsCustomize.autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                     updateDefaultBrowserViewVisibility(it)
                     updateAutomaticClearDataOptions(it.automaticallyClearData)
                     setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
-                    viewsGeneral.changeAppIcon.setImageResource(it.appIcon.icon)
+                    viewsAppearance.changeAppIcon.setImageResource(it.appIcon.icon)
+                    setAutoconsentSetting(it.autoconsentEnabled)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
                     updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
                     updateEmailSubtitle(it.emailAddress)
                     updateMacOsSettings(it.macOsWaitlistState)
+                    updateAutofill(it.showAutofill)
                 }
             }.launchIn(lifecycleScope)
 
@@ -222,6 +252,14 @@ class SettingsActivity :
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    private fun updateAutofill(autofillEnabled: Boolean) = with(viewsAutofill.settingsSectionAutofill) {
+        visibility = if (autofillEnabled) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
     }
 
     private fun updateEmailSubtitle(emailAddress: String?) {
@@ -238,9 +276,18 @@ class SettingsActivity :
         viewsPrivacy.globalPrivacyControlSetting.setSubtitle(stateText)
     }
 
+    private fun setAutoconsentSetting(enabled: Boolean) {
+        val stateText = if (enabled) {
+            getString(R.string.enabled)
+        } else {
+            getString(R.string.disabled)
+        }
+        viewsPrivacy.autoconsentSetting.setSubtitle(stateText)
+    }
+
     private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
         val subtitle = getString(fireAnimation.nameResId)
-        viewsGeneral.selectedFireAnimationSetting.setSubtitle(subtitle)
+        viewsAppearance.selectedFireAnimationSetting.setSubtitle(subtitle)
     }
 
     private fun updateSelectedTheme(selectedTheme: DuckDuckGoTheme) {
@@ -251,7 +298,7 @@ class SettingsActivity :
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> R.string.settingsSystemTheme
             }
         )
-        viewsGeneral.selectedThemeSetting.setSubtitle(subtitle)
+        viewsAppearance.selectedThemeSetting.setSubtitle(subtitle)
     }
 
     private fun updateAppLinkBehavior(appLinkSettingType: AppLinkSettingType) {
@@ -262,7 +309,7 @@ class SettingsActivity :
                 AppLinkSettingType.NEVER -> R.string.settingsAppLinksNever
             }
         )
-        viewsPrivacy.appLinksSetting.setSubtitle(subtitle)
+        viewsCustomize.appLinksSetting.setSubtitle(subtitle)
     }
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
@@ -293,6 +340,7 @@ class SettingsActivity :
             is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
             is Command.LaunchFeedback -> launchFeedback()
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
+            is Command.LaunchAutofillSettings -> launchAutofillSettings()
             is Command.LaunchAccessibilitySettings -> launchAccessibilitySettings()
             is Command.LaunchLocation -> launchLocation()
             is Command.LaunchWhitelist -> launchWhitelist()
@@ -302,7 +350,8 @@ class SettingsActivity :
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
             is Command.LaunchAppTPWaitlist -> launchAppTPWaitlist()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
-            is Command.LaunchEmailProtection -> launchEmailProtectionScreen()
+            is Command.LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
+            is Command.LaunchEmailProtectionNotSUpported -> launchEmailProtectionNotSupported()
             is Command.LaunchThemeSettings -> launchThemeSelector(it.theme)
             is Command.LaunchAppLinkSettings -> launchAppLinksSettingSelector(it.appLinksSettingType)
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
@@ -310,6 +359,7 @@ class SettingsActivity :
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
             is Command.LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is Command.LaunchMacOs -> launchMacOsScreen()
+            is Command.LaunchAutoconsent -> launchAutoconsent()
             null -> TODO()
         }
     }
@@ -352,8 +402,9 @@ class SettingsActivity :
         }
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun launchDefaultAppScreen() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             launchDefaultAppActivity()
         } else {
             throw IllegalStateException("Unable to launch default app activity on this OS")
@@ -368,6 +419,11 @@ class SettingsActivity :
     private fun launchFireproofWebsites() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(FireproofWebsitesActivity.intent(this), options)
+    }
+
+    private fun launchAutofillSettings() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(autofillSettingsActivityLauncher.intent(this), options)
     }
 
     private fun launchAccessibilitySettings() {
@@ -410,14 +466,25 @@ class SettingsActivity :
         startActivity(GlobalPrivacyControlActivity.intent(this), options)
     }
 
-    private fun launchEmailProtectionScreen() {
+    private fun launchEmailProtectionScreen(url: String) {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(EmailProtectionActivity.intent(this), options)
+        startActivity(BrowserActivity.intent(this, url), options)
+        this.finish()
+    }
+
+    private fun launchEmailProtectionNotSupported() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(EmailProtectionUnsupportedActivity.intent(this), options)
     }
 
     private fun launchMacOsScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(MacOsWaitlistActivity.intent(this), options)
+    }
+
+    private fun launchAutoconsent() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(AutoconsentSettingsActivity.intent(this), options)
     }
 
     private fun launchAppTPTrackersScreen() {

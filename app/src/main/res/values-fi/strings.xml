@@ -121,30 +121,6 @@
     <string name="httpsMixed">Salaukseltaan vaihteleva yhteys</string>
     <string name="httpsBad">Salaamaton yhteys</string>
 
-    <string name="networksActivityTitle">Seurantaverkostot</string>
-    <string name="networksContentDescription">Seurantaverkostot</string>
-    <string name="networksOverview">Seurantaverkostot kokoavat verkkohistoriasi sinua koskevaksi tietoprofiiliksi. Merkittävät seurantaverkostot ovat haitallisempia, koska ne voivat seurata toimiasi ja harjoittaa kohdennusta useammassa osassa verkkoa.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s seurantapalvelin löytynyt</item>
-        <item quantity="other">%1$s seurantapalvelinta löytynyt</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s seurantapalvelin estetty</item>
-        <item quantity="other">%1$s seurantapalvelinta estetty</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s merkittävä seurantaverkosto löytynyt</item>
-        <item quantity="other">%1$s merkittävää seurantaverkostoa löytynyt</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s merkittävä seurantaverkosto estetty</item>
-        <item quantity="other">%1$s merkittävää seurantaverkostoa estetty</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Tietosuoja-arvosana</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Sivusto on merkittävä seurantaverkosto</string>
     <string name="scorecardPrivacyGrade">Tietosuoja-arvosana</string>
@@ -163,6 +139,45 @@
     <string name="networkTrackerSummaryHeader">PAHIMMAT SEURANTAVERKOSTOT</string>
     <string name="networkTrackerSummaryNotReady">Keräämme edelleen tietoja näyttääksemme, kuinka monta seurantapalvelinta olemme estäneet.</string>
 
+    <string name="trackersActivityTitle">Estetyt seurantapyynnöt</string>
+    <string name="trackersContentDescription">Estetyt seurantapyynnöt</string>
+    <string name="trackersOverview">Seuraavien kolmansien osapuolten verkkotunnusten pyyntöjen lataaminen estettiin, koska ne tunnistettiin seurantapyynnöiksi. Jos yrityksen pyynnöt ladataan, se voi antaa niille mahdollisuuden profiloida sinut.</string>
+    <string name="trackersOverviewProtectionsOff">Seurantapyyntöjä ei estetty latautumasta, koska suojaukset on poistettu käytöstä tältä sivustolta. Jos yrityksen pyynnöt ladataan, yritys voi mahdollisesti profiloida sinut.</string>
+
+    <string name="domainsLoadedActivityTitle">Kolmannen osapuolen pyynnöt ladattu</string>
+    <string name="domainsLoadedContentDescription">Kolmannen osapuolen pyynnöt ladattu</string>
+    <string name="domainsLoadedOverview">Seuraavat kolmannen osapuolen verkkotunnusten pyynnöt ladattiin. Jos yrityksen pyynnöt ladataan, se voi antaa heidän profiloida sinut, vaikka muut verkkoseurannan suojauksemme ovat edelleen voimassa.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Kolmannen osapuolen pyyntöjä ei estetty latautumasta, koska suojaukset on poistettu käytöstä tältä sivustolta. Jos yrityksen pyynnöt ladataan, yritys voi mahdollisesti profiloida sinut.</string>
+    <string name="domainsLoadedOverviewEmpty">Emme havainneet pyyntöjä kolmannen osapuolen verkkotunnuksilta.</string>
+    <string name="domainsLoadedHeadingText">Ei ladattuja kolmannen osapuolen verkkotunnuksia</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Tietoja verkkoseurantasuojauksistamme</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Seuraavien verkkotunnusten pyynnöt ladattiin.</string>
+
+    <string name="adLoadedSectionDescription">Seuraavat verkkotunnuksen pyynnöt ladattiin, koska %1$s-mainosta DuckDuckGossa napsautettiin äskettäin. Nämä pyynnöt auttavat arvioimaan mainosten tehokkuutta. Kaikki DuckDuckGon mainokset ovat ei-profiloivia.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Miten hakumainoksemme vaikuttavat suojauksiimme</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Myös seuraavat verkkotunnuksen pyynnöt ladattiin.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Seuraavien verkkotunnusten seurantapyynnöt ladattiin.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Emme havainneet pyyntöjä kolmannen osapuolen verkkotunnuksilta.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Seuraavan verkkotunnuksen pyynnöt ladattiin sivuston rikkoutumisen estämiseksi.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Seuraavan verkkotunnuksen pyynnöt ladattiin, koska ne liittyvät kohteeseen %1$s.</string>
+
+    <string name="trackersBlockedText">Pyynnöt, joiden lataaminen estetty</string>
+    <string name="trackersNotBlockedText">Ei estettyjä seurantapyyntöjä</string>
+    <string name="trackersNoFoundText">Seurantapyyntöjä ei löytynyt</string>
+    <string name="trackersFoundText">Löydetyt seurantapyynnöt</string>
+
+    <string name="domainsLoadedText">Kolmannen osapuolen pyynnöt ladattu</string>
+    <string name="domainsNotLoadedText">Kolmannen osapuolen pyyntöjä ei ole ladattu</string>
+
+    <string name="majorNetworksNoFound">Merkittäviä seurantaverkostoja ei löytynyt</string>
+    <string name="majorNetworksFound">Merkittäviä seurantaverkostoja löytynyt</string>
+
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
     <string name="fireClearAll">Poista kaikki välilehdet ja tiedot</string>
@@ -172,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Asetukset</string>
     <string name="settingsMenuItemTitle">Asetukset</string>
-    <string name="settingsHeadingGeneral">Yleistä</string>
-    <string name="settingsHeadingOther">Muu</string>
     <string name="settingsHeadingPrivacy">Tietosuoja</string>
     <string name="settingsAboutDuckduckgo">Tietoa DuckDuckGosta</string>
     <string name="settingsVersion">Versio</string>
@@ -191,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Kysy joka kerta</string>
     <string name="settingsAppLinksAlways">Aina</string>
     <string name="settingsAppLinksNever">Ei koskaan</string>
+    <string name="settingsHeadingAppearance">Ulkoasu</string>
+    <string name="settingsHeadingCustomize">Mukauta</string>
+    <string name="settingsHeadingAbout">Tietoa meistä</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
@@ -563,11 +579,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Yhteys keskeytetty. Verkkosivusto voi vahingoittaa laitettasi.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Lataustenhallinta ei ole käytössä</string>
-    <string name="downloadManagerIncompatible">Lataustenhallintaa ei ole saatavilla tällä laitteella</string>
-    <string name="enable">Ota käyttöön</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Otetaanko laitteen sijainti käyttöön DuckDuckGon yksityiselle selaimelle?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s pyytää saada tietää laitteesi sijainnin. Sinun on ensin annettava sovellukselle lupa lähettää laitteesi sijainti, jonka jälkeen %2$s voi pyytää lupaa.</string>
@@ -599,7 +610,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo estää monet seurannat automaattisesti. GPC:n (Global Privacy Control) avulla voit myös pyytää osallistuvia sivustoja rajoittamaan henkilötietojesi myyntiä tai jakamista muiden yritysten kanssa. <u><a href="">Lue lisää</a><u/>]]>
+        <![CDATA[DuckDuckGo estää monet seurannat automaattisesti. GPC:n (Global Privacy Control) avulla voit myös pyytää osallistuvia sivustoja rajoittamaan henkilötietojesi myyntiä tai jakamista muiden yritysten kanssa. <u><a href=\"\">Lue lisää</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -625,52 +636,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Estää sähköpostiseurannan ja piilottaa osoitteesi</string>
     <string name="newEmailAliasMenuTitle">Luo Duck-osoite</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Poistetaanko sähköpostin suojaukset?</string>
-    <string name="emailSignOutDialogText">Huomaa: Sähköpostin suojausten poistaminen tältä laitteelta ei poista Duck-osoitettasi.</string>
-    <string name="emailSignOutDialogCancel">Peruuta</string>
-    <string name="emailSignOutDialogDisable">Poista</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Sähköpostin odotuslista</string>
-    <string name="waitlistNotificationTitle">Sähköpostisuojaus on valmis!</string>
-    <string name="waitlistNotificationDescription">Avaa kutsusi</string>
-
     <string name="waitlistNotificationDialogDescription">Haluatko saada ilmoituksen, kun on sinun vuorosi?</string>
     <string name="waitlistNotificationDialogNoThanks">Ei kiitos</string>
     <string name="waitlistNotificationDialogNotifyMe">HALUAN ILMOITUKSEN</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Sähköpostisuojaus (beta)</string>
     <string name="emailProtectionActivityTitle">Sähköpostisuojaus (beta)</string>
-    <string name="emailProtectionFooterDescription">Sinun ei tarvitse jakaa henkilökohtaisia tietoja liittyäksesi jonotuslistalle. Varmistat paikkasi jonossa aikaleimalla, joka on olemassa vain laitteessasi. Näin voimme ilmoittaa sinulle, kun on sinun vuorosi.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Odotuslistalle liityttäessä tapahtui virhe, yritä myöhemmin uudelleen</string>
-    <string name="emailProtectionDuckAddressCta">Minulla on jo Duck-osoite</string>
-    <string name="emailProtectionInviteCodeCta">Minulla on kutsukoodi</string>
-    <string name="emailProtectionWaitlistCta">Liity yksityiselle odotuslistalle</string>
-    <string name="emailProtectionGetStartedCta">Aloita</string>
     <string name="emailNotSupported">Laitetta ei tueta</string>
     <string name="emailNotSupportedExplanation">Sähköpostisuojauksen avulla voit luoda yksityisiä sähköpostiosoitteita, jotka poistavat sähköpostiseuraajat. Meidän on salattava ja tallennettava nämä luomasi osoitteet paikallisesti laitteellesi. Koska laitteesi ei tue salattua tallennusta, sähköpostisuojaus ei ole käytettävissä.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Sähköpostin tietosuoja, yksinkertaisesti.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Estä sähköpostiseuraajat ja piilota osoitteesi vaihtamatta sähköpostintarjoajaasi.<br/><a href=""><b>Lue lisää</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Olet listalla!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Lähetämme sinulle ilmoituksen, kun<br/> voit kokeilla sähköpostisuojausta. <a href=""><b>Lue lisää</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Kutsusi näkyy täällä, kun on sinun vuorosi. Haluatko saada <a href=""><b>ilmoituksen</b></a>, kun kutsusi saapuu?<br/><a href=""><b>Lue lisää</b></a> sähköpostin suojauksesta.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Sinut on kutsuttu!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Estä sähköpostiseuraajat ja piilota osoitteesi<br/> vaihtamatta sähköpostintarjoajaasi.<br/><a href=""><b>Lue lisää</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Yksityinen Duck-osoite</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Sähköpostisuojauksen poistaminen tältä laitteelta poistaa mahdollisuuden kirjoittaa yksityinen Duck-osoitteesi tai juuri luotu yksityinen Duck-osoite sähköpostikenttään verkkoa selatessasi.<br/><br/>Ota yhteyttä osoitteeseen <a href=\"mailto:support@duck.com\">support@duck.com</a>, jos haluat poistaa Duck-osoitteesi kokonaan tai jos sinulla on kysymyksiä tai palautetta.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Poista laitteelta</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Muokkaa kirjanmerkkiä</string>
@@ -738,5 +712,17 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Estä sovellusseuranta laitteessa</string>
     <string name="atp_SettingsDeviceShieldEnabled">Käytössä</string>
     <string name="atp_SettingsDeviceShieldDisabled">Pois käytöstä</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Näyttää siltä, että tällä sivustolla on evästeiden hallinnan ponnahdusikkuna👇</string>
+    <string name="autoconsentDialogDescription">Haluatko, että hoidan nämä puolestasi? Voin yrittää minimoida evästeet, maksimoida yksityisyyden ja piilottaa tällaiset ponnahdusikkunat.</string>
+    <string name="autoconsentPrimaryCta">Evästeiden hallinnan ponnahdusikkunat</string>
+    <string name="autoconsentSecondaryCta">Ei kiitos</string>
+
+    <string name="autoconsentSetting">Evästeiden hallinnan ponnahdusikkunat</string>
+    <string name="autoconsentAnimationText">Hallitut evästeet</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automaattinen täyttö</string>
 
 </resources>

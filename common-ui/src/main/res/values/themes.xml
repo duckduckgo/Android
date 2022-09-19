@@ -36,6 +36,7 @@
         <item name="windowNoTitle">true</item>
         <item name="android:colorEdgeEffect">@color/newBlack</item>
 
+        <!-- Old System Components (will be refactored soon) -->
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
         <item name="actionOverflowMenuStyle">@style/PopUpOverflowMenu</item>
         <item name="actionOverflowButtonStyle">@style/PopUpOverflowButton</item>
@@ -45,6 +46,17 @@
         <item name="radioButtonStyle">@style/RadioButtonStyle</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
         <item name="sliderStyle">@style/Widget.App.Slider</item>
+
+        <!-- Design System Components -->
+        <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
+        <item name="primaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Primary.Small</item>
+        <item name="secondaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
+        <item name="secondaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
+        <item name="ghostButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Borderless</item>
+        <item name="ghostButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Borderless.Small</item>
+        <item name="primaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Rounded</item>
+        <item name="secondaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Secondary.Rounded</item>
+        <item name="primaryButtonLowercaseStyle">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -70,6 +82,7 @@
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
         <item name="browserMenuTextColor">@color/white</item>
         <item name="browserMenuTextColorDisabled">@color/warGreyTwo</item>
+        <item name="cookiesRoundedFieldBackgroundColor">@color/almostBlackDark</item>
         <item name="omnibarRoundedFieldBackgroundColor">@color/almostBlack</item>
         <item name="omnibarTextColor">@color/white</item>
         <item name="omnibarHintColor">@color/paleBrownishGray</item>
@@ -93,7 +106,6 @@
         <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
         <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
-        <item name="settingsDividerColor">@color/almostBlack</item>
         <item name="buttonOutlinedTextColor">@color/pinkishGrayThree</item>
         <item name="buttonOutlinedBorderColor">@color/brownishGrayTwo</item>
         <item name="callToActionTitleColor">@color/white</item>
@@ -138,11 +150,16 @@
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
-        <item name="overflowMenuDividerColor">@color/gray80</item>
+        <item name="sectionDividerColor">@color/gray80</item>
         <item name="bottomShadowBackground">@null</item>
+        <item name="appTPHeaderBackground">@color/darkThemePrimaryDark</item>
 
         <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorDark</item>
         <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorDark</item>
+
+        <item name="autofillDialogTitleColor">@color/white</item>
+        <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
+        <item name="autofillCredentialListSubtitleColor">@color/paleBrownishGray</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -192,6 +209,7 @@
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
         <item name="browserMenuTextColor">@color/almostBlackDark</item>
         <item name="browserMenuTextColorDisabled">@color/pinkish_grey_two</item>
+        <item name="cookiesRoundedFieldBackgroundColor">@color/whiteFive</item>
         <item name="omnibarRoundedFieldBackgroundColor">@color/whiteFour</item>
         <item name="omnibarTextColor">@color/almostBlackDark</item>
         <item name="omnibarHintColor">@color/brownishGrayTwo</item>
@@ -215,7 +233,6 @@
         <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="settingsMinorTextColor">@color/warmerGray</item>
         <item name="settingsSwitchBackgroundColor">@color/brownishGrayTwo</item>
-        <item name="settingsDividerColor">@color/whiteSix</item>
         <item name="buttonOutlinedTextColor">@color/cornflowerBlue</item>
         <item name="buttonOutlinedBorderColor">@color/grayishThree</item>
         <item name="callToActionTitleColor">@color/almostBlackDark</item>
@@ -259,11 +276,16 @@
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
-        <item name="overflowMenuDividerColor">@color/gray30</item>
+        <item name="sectionDividerColor">@color/gray30</item>
         <item name="bottomShadowBackground">@drawable/divider_shadow_background</item>
 
         <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorLight</item>
         <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorLight</item>
+
+        <item name="autofillDialogTitleColor">@color/gray90</item>
+        <item name="autofillDialogOnboardingExplanationColor">@color/gray70</item>
+        <item name="autofillCredentialListSubtitleColor">@color/brownishGrayTwo</item>
+        <item name="appTPHeaderBackground">@color/light_blue</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">

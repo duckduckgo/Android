@@ -153,14 +153,13 @@ platform :android do
     # This dependency could be removed with a little more time to tidy up this script to do the branching/merging manually.
 
     desc "Create new release"
-      lane :release do
+    lane :release do
 
         ensure_git_status_clean
         ensure_git_branch( branch: 'develop' )
 
+        newVersion = determine_version_number()
         releaseNotes = determine_release_notes()
-
-        newVersion = prompt(text: "\nLast release was: #{last_git_tag}\nEnter New Version Number:")
 
         if UI.confirm("Are you sure you're happy with this release?\n\nVersion=#{newVersion}\nRelease Notes:\n#{releaseNotes}\n")
           UI.success "Creating release branch for release/#{newVersion}"
@@ -201,32 +200,86 @@ platform :android do
 
         end
 
+
+
+
         private_lane :determine_release_notes do
+            commits = changelog_from_git_commits(
+                between: [last_git_tag, "HEAD"],
+                pretty: "- %s",
+                date_format: "short",
+                match_lightweight_tag: false,
+                merge_commit_filtering: "exclude_merges"
+            )
 
-        commits = changelog_from_git_commits(
-            between: [last_git_tag, "HEAD"],
-            pretty: "- %s",
-            date_format: "short",
-            match_lightweight_tag: false,
-            merge_commit_filtering: "exclude_merges"
-        )
+                existingReleaseNotes = File.read(releaseNotesFileBody)
+                UI.important("Existing release notes:\n")
+                UI.message("#{existingReleaseNotes}\n")
+                choice = UI.select "What do you want to do for release notes?", ["KEEP EXISTING", "CUSTOM",
+                  "Bug fixes and other improvements",
+                ]
 
-            existingReleaseNotes = File.read(releaseNotesFileBody)
-            UI.important("Existing release notes:\n")
-            UI.message("#{existingReleaseNotes}\n")
-            choice = UI.select "What do you want to do for release notes?", ["KEEP EXISTING", "CUSTOM",
-              "Bug fixes and other improvements",
-            ]
-
-            rl = case choice
-                when "KEEP EXISTING"
-                    existingReleaseNotes
-                when "CUSTOM"
-                    prompt(text: "Release Notes: ", multi_line_end_keyword: "END")
-                else
-                    choice
-            end
+                rl = case choice
+                    when "KEEP EXISTING"
+                        existingReleaseNotes
+                    when "CUSTOM"
+                        prompt(text: "Release Notes: ", multi_line_end_keyword: "END")
+                    else
+                        choice
+                end
         end
 
+
+       desc "Start new hotfix"
+       lane :"hotfix-start" do
+            UI.important("Starting a new hotfix")
+
+            ensure_git_status_clean
+            sh('git checkout develop && git pull')
+            sh('git checkout main && git pull')
+
+            newVersion = determine_version_number()
+            releaseNotes = determine_release_notes()
+
+            sh("git flow hotfix start #{newVersion}")
+
+            File.open('../app/version/version.properties', 'w') do |file|
+                file.write("VERSION=#{newVersion}")
+            end
+
+            File.open('../app/version/release-notes', 'w') do |file|
+                file.write("""#{releaseNotes}""")
+            end
+
+            git_commit(
+                message: "Updated release notes and version number for new release - #{newVersion}",
+                path: "*",
+                allow_nothing_to_commit: true,
+                skip_git_hooks: true
+            )
+
+            UI.important(text:"Hotfix branch created. Apply your changes that need to be included in the hotfix now. Run `fastlane hotfix-finish` when you've made your changes and are happy it all works.")
+       end
+
+       desc "Finish a hotfix in progress"
+       lane :"hotfix-finish" do
+            ensure_git_status_clean
+            ensure_git_branch( branch: '^hotfix/*' )
+
+            version = property_file_read(file: "app/version/version.properties")["VERSION"]
+            sh("git flow hotfix finish -m '#{version}' '#{version}'")
+
+            sh "git push origin #{version}"
+            sh "git push origin main"
+            sh "git push origin develop"
+
+            UI.header("🎉 #{version} tag has been successfully created, and hotfix has been merged back into main and develop. Everything has been pushed.")
+
+       end
+
+       desc "Prompt for version number"
+       private_lane :"determine_version_number" do
+            prompt(text: "\nLast release was: #{last_git_tag}\nEnter New Version Number:")
+       end
 
 end

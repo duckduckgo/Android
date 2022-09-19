@@ -33,6 +33,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import dagger.Lazy
+import kotlinx.coroutines.flow.first
 import org.mockito.Mockito.verify
 
 @ExperimentalCoroutinesApi
@@ -200,5 +201,16 @@ class FavoritesDataRepositoryTest {
         assertEquals(storedFavorite.title, favorite.title)
         assertEquals(storedFavorite.url, favorite.url)
         assertEquals(storedFavorite.position, favorite.position)
+    }
+
+    @Test
+    fun whenAllFavoritesDeletedThenDeleteAllFavorites() = runTest {
+        val favorite = Favorite(1, "Favorite", "http://favexample.com", 1)
+        val favorite2 = Favorite(2, "Favorite2", "http://favexample2.com", 2)
+        givenFavorite(favorite, favorite2)
+
+        repository.deleteAll()
+
+        assertFalse(repository.userHasFavorites())
     }
 }

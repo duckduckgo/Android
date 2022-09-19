@@ -52,9 +52,9 @@ class PrivacyFeatureTogglesSharedPreferences constructor(private val context: Co
 
     override fun insert(toggle: PrivacyFeatureToggles) {
         preferences.edit {
-            putBoolean(toggle.featureName.value, toggle.enabled)
+            putBoolean(toggle.featureName, toggle.enabled)
             toggle.minSupportedVersion?.let {
-                putInt("${toggle.featureName.value}$MIN_SUPPORTED_VERSION", it)
+                putInt("${toggle.featureName}$MIN_SUPPORTED_VERSION", it)
             }
         }
     }
@@ -70,7 +70,7 @@ class PrivacyFeatureTogglesSharedPreferences constructor(private val context: Co
 }
 
 data class PrivacyFeatureToggles(
-    val featureName: PrivacyFeatureName,
+    val featureName: String,
     val enabled: Boolean,
     val minSupportedVersion: Int?
 )

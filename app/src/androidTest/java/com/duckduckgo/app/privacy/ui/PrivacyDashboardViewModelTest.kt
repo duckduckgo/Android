@@ -35,6 +35,7 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchMan
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchTrackerNetworksActivity
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -244,6 +245,14 @@ class PrivacyDashboardViewModelTest {
         verify(mockPixel).fire(PRIVACY_DASHBOARD_REPORT_BROKEN_SITE)
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is LaunchReportBrokenSite)
+    }
+
+    @Test
+    fun whenNetworksContainerClickedThenPixelIsFiredAndCommandIsLaunchTrackerNetworksActivity() {
+        testee.onNetworksContainerClicked()
+        verify(mockPixel).fire(PRIVACY_DASHBOARD_NETWORKS)
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is LaunchTrackerNetworksActivity)
     }
 
     @Test

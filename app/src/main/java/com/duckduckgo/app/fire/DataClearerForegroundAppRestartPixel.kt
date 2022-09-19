@@ -22,17 +22,16 @@ import android.content.SharedPreferences
 import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.di.scopes.AppScope
+import dagger.SingleInstanceIn
 import timber.log.Timber
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 /**
  * Stores information about unsent automatic data clearer restart Pixels, detecting if user started the app from an external Intent.
@@ -44,7 +43,7 @@ import dagger.SingleInstanceIn
 class DataClearerForegroundAppRestartPixel @Inject constructor(
     private val context: Context,
     private val pixel: Pixel
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
     private var detectedUserIntent: Boolean = false
 
     private val pendingAppForegroundRestart: Int
@@ -54,15 +53,13 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
         get() = preferences.getInt(KEY_UNSENT_CLEAR_APP_RESTARTED_WITH_INTENT_PIXELS, 0)
 
     @UiThread
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun onAppCreated() {
+    override fun onCreate(owner: LifecycleOwner) {
         Timber.i("onAppCreated firePendingPixels")
         firePendingPixels()
     }
 
     @UiThread
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onAppBackgrounded() {
+    override fun onStop(owner: LifecycleOwner) {
         Timber.i("Registered App on_stop")
         detectedUserIntent = false
     }

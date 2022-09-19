@@ -19,24 +19,42 @@ package com.duckduckgo.app.brokensite
 import android.net.Uri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 
 data class BrokenSiteData(
     val url: String,
     val blockedTrackers: String,
     val surrogates: String,
     val upgradedToHttps: Boolean,
-    val urlParametersRemoved: Boolean
+    val urlParametersRemoved: Boolean,
+    val consentManaged: Boolean,
+    val consentOptOutFailed: Boolean,
+    val consentSelfTestFailed: Boolean,
 ) {
 
     companion object {
         fun fromSite(site: Site?): BrokenSiteData {
             val events = site?.trackingEvents
-            val blockedTrackers = events?.map { Uri.parse(it.trackerUrl).host }.orEmpty().distinct().joinToString(",")
+            val blockedTrackers = events?.filter { it.status == TrackerStatus.BLOCKED }
+                ?.map { Uri.parse(it.trackerUrl).host }
+                .orEmpty().distinct().joinToString(",")
             val upgradedHttps = site?.upgradedHttps ?: false
             val surrogates = site?.surrogates?.map { Uri.parse(it.name).baseHost }.orEmpty().distinct().joinToString(",")
             val url = site?.url.orEmpty()
             val urlParametersRemoved = site?.urlParametersRemoved ?: false
-            return BrokenSiteData(url, blockedTrackers, surrogates, upgradedHttps, urlParametersRemoved)
+            val consentManaged = site?.consentManaged ?: false
+            val consentOptOutFailed = site?.consentOptOutFailed ?: false
+            val consentSelfTestFailed = site?.consentSelfTestFailed ?: false
+            return BrokenSiteData(
+                url = url,
+                blockedTrackers = blockedTrackers,
+                surrogates = surrogates,
+                upgradedToHttps = upgradedHttps,
+                urlParametersRemoved = urlParametersRemoved,
+                consentManaged = consentManaged,
+                consentOptOutFailed = consentOptOutFailed,
+                consentSelfTestFailed = consentSelfTestFailed,
+            )
         }
     }
 }

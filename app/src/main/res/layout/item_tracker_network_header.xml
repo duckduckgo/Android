@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -23,6 +22,7 @@
     android:paddingTop="26dp"
     android:paddingEnd="24dp"
     android:paddingBottom="6dp"
+    android:orientation="horizontal"
     tools:background="@android:color/white">
 
     <TextView
@@ -37,20 +37,15 @@
         android:textIsSelectable="true"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/icon"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_weight="0.9"
         tools:text="Google" />
 
     <ImageView
         android:id="@+id/icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
+        android:layout_gravity="center"
         android:importantForAccessibility="no"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         tools:src="@drawable/network_pill_facebook_inc" />
 
     <TextView
@@ -59,13 +54,11 @@
         android:layout_height="24dp"
         android:background="@drawable/other_tracker_privacy_dashboard_bg"
         android:gravity="center"
+        android:layout_gravity="center"
         android:importantForAccessibility="no"
         android:textAppearance="@style/UnknownTrackerText"
         android:textColor="?attr/privacyDashboardLogoLetterTextColor"
         android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         tools:text="S" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

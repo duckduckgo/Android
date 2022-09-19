@@ -121,38 +121,6 @@
     <string name="httpsMixed">Соединение со смешанным шифрованием</string>
     <string name="httpsBad">Незашифрованное соединение</string>
 
-    <string name="networksActivityTitle">Трекерные сети</string>
-    <string name="networksContentDescription">Трекерные сети</string>
-    <string name="networksOverview">Сети трекеров собирают историю вашей активности в Интернете и формируют ваш информационный профиль. Крупные сети трекеров более опасны, так как могут отслеживать вас и показывать адресную рекламу на большем количестве сайтов.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">Найден %1$s трекер</item>
-        <item quantity="few">Найдено %1$s трекера</item>
-        <item quantity="many">Найдено %1$s трекеров</item>
-        <item quantity="other">Найдены %1$s трекеры</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">Заблокирован %1$s трекер</item>
-        <item quantity="few">Заблокировано %1$s трекера</item>
-        <item quantity="many">Заблокировано %1$s трекеров</item>
-        <item quantity="other">Заблокированы %1$s трекеры</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">Обнаружена %1$s крупная сеть отслеживания</item>
-        <item quantity="few">Обнаружено %1$s крупные сети отслеживания</item>
-        <item quantity="many">Обнаружено %1$s крупных сетей отслеживания</item>
-        <item quantity="other">Обнаружено %1$s крупные сети отслеживания</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">Заблокирована %1$s крупная сеть отслеживания</item>
-        <item quantity="few">Заблокировано %1$s крупные сети отслеживания</item>
-        <item quantity="many">Заблокировано %1$s крупных сетей отслеживания</item>
-        <item quantity="other">Заблокированы %1$s крупные сети отслеживания</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Рейтинг конфиденциальности</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Этот сайт — крупная сеть трекеров</string>
     <string name="scorecardPrivacyGrade">Рейтинг конфиденциальности</string>
@@ -171,6 +139,45 @@
     <string name="networkTrackerSummaryHeader">ОСНОВНЫЕ ТРЕКЕРНЫЕ СЕТИ, ПРЕДСТАВЛЯЮЩИЕ УГРОЗУ КОНФИДЕНЦИАЛЬНОСТИ</string>
     <string name="networkTrackerSummaryNotReady">Мы продолжаем собирать данные, чтобы показать, сколько трекеров мы заблокировали.</string>
 
+    <string name="trackersActivityTitle">Запросы на отслеживание заблокированы</string>
+    <string name="trackersContentDescription">Запросы на отслеживание заблокированы</string>
+    <string name="trackersOverview">Мы заблокировали загрузку следующих запросов сторонних доменов, так как распознали в них трекинг-запросы. Загруженные запросы позволяют компаниям вас профилировать.</string>
+    <string name="trackersOverviewProtectionsOff">Мы не заблокировали ни одного трекинг-запроса, так как защита на этом сайте отключена. Загруженные запросы позволяют компаниям вас профилировать.</string>
+
+    <string name="domainsLoadedActivityTitle">Загружены сторонние запросы</string>
+    <string name="domainsLoadedContentDescription">Загружены сторонние запросы</string>
+    <string name="domainsLoadedOverview">Ниже приведен список загруженных запросов сторонних доменов. Благодаря этим запросам компании могут вас профилировать, однако мы по-прежнему защищаем вас от отслеживания в Сети другими способами.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Мы не заблокировали ни одной загрузки сторонних запросов, так как защита на этом сайте отключена. Загруженные запросы позволяют компаниям вас профилировать.</string>
+    <string name="domainsLoadedOverviewEmpty">Запросов от сторонних доменов не обнаружено.</string>
+    <string name="domainsLoadedHeadingText">Не загружено ни одного стороннего домена</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">О защите от веб-слежки</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Загружены запросы следующих доменов.</string>
+
+    <string name="adLoadedSectionDescription">Запросы этого домена были загружены в результате недавнего нажатия на рекламу %1$s в DuckDuckGo. Такие запросы помогают оценить эффективность рекламы. Рекламные объявления в DuckDuckGo не профилируют пользователей.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Как реклама при поиске влияет на защиту</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Также загружены запросы следующего домена.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Загружены трекинг-запросы следующих доменов.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Запросов от сторонних доменов не обнаружено.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Запросы этого домена были загружены для предотвращения неполадок в работе сайта.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Запросы этого домена были загружены, так как они связаны с %1$s.</string>
+
+    <string name="trackersBlockedText">Заблокирована загрузка запросов</string>
+    <string name="trackersNotBlockedText">Трекинг-запросы не заблокированы</string>
+    <string name="trackersNoFoundText">Трекинг-запросы не обнаружены</string>
+    <string name="trackersFoundText">Обнаружены трекинг-запросы</string>
+
+    <string name="domainsLoadedText">Загружены сторонние запросы</string>
+    <string name="domainsNotLoadedText">Не загружено ни одного стороннего запроса</string>
+
+    <string name="majorNetworksNoFound">Не обнаружено ни одной крупной сети трекеров</string>
+    <string name="majorNetworksFound">Обнаружены крупные сети трекеров</string>
+
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
     <string name="fireClearAll">Закрыть вкладки и удалить данные</string>
@@ -180,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Настройки</string>
     <string name="settingsMenuItemTitle">Настройки</string>
-    <string name="settingsHeadingGeneral">Общие настройки</string>
-    <string name="settingsHeadingOther">Дополнительные настройки</string>
     <string name="settingsHeadingPrivacy">Конфиденциальность</string>
     <string name="settingsAboutDuckduckgo">Сведения о DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
@@ -199,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Спрашивать каждый раз</string>
     <string name="settingsAppLinksAlways">Всегда</string>
     <string name="settingsAppLinksNever">Никогда</string>
+    <string name="settingsHeadingAppearance">Внешний вид</string>
+    <string name="settingsHeadingCustomize">Собственная настройка</string>
+    <string name="settingsHeadingAbout">О нас</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
@@ -575,11 +583,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Соединение прервано. Этот сайт может навредить вашему устройству.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Диспетчер загрузок отключен</string>
-    <string name="downloadManagerIncompatible">Диспетчер загрузок недоступен на этом устройстве</string>
-    <string name="enable">Включить</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Включить определение местоположения устройства для браузера DuckDuckGo с защитой данных?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s запрашивает местоположение вашего устройства. Сначала вам нужно разрешить приложению отправлять местоположение вашего устройства, затем %2$s может запрашивать разрешение.</string>
@@ -611,7 +614,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Глобальный контроль конфиденциальности (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo блокирует многие трекеры автоматически. Функция «Глобальный контроль конфиденциальности» (GPC) позволяет затребовать от участвующих в программе сайтов остановить передачу и продажу ваших личных данных другим компаниям. <u><a href="">Подробнее…</a><u/>]]>
+        <![CDATA[DuckDuckGo блокирует многие трекеры автоматически. Функция «Глобальный контроль конфиденциальности» (GPC) позволяет затребовать от участвующих в программе сайтов остановить передачу и продажу ваших личных данных другим компаниям. <u><a href=\"\">Подробнее…</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Глобальный контроль конфиденциальности (GPC)</string>
     <string name="globalPrivacyControlToggle">Глобальный контроль конфиденциальности (GPC)</string>
@@ -637,52 +640,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Блокирует почтовые трекеры и скрывает ваш адрес</string>
     <string name="newEmailAliasMenuTitle">Создать адрес на Duck</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Удалить защиту почты?</string>
-    <string name="emailSignOutDialogText">Внимание: снятие почтовой защиты на этом устройстве не ведет к удалению вашего адреса на Duck.</string>
-    <string name="emailSignOutDialogCancel">Отменить</string>
-    <string name="emailSignOutDialogDisable">Удалить</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Очередь на защиту почты</string>
-    <string name="waitlistNotificationTitle">Защита почты включена!</string>
-    <string name="waitlistNotificationDescription">Откройте приглашение</string>
-
     <string name="waitlistNotificationDialogDescription">Хотите получить уведомление, когда настанет ваша очередь?</string>
     <string name="waitlistNotificationDialogNoThanks">Нет, спасибо</string>
     <string name="waitlistNotificationDialogNotifyMe">ОПОВЕСТИТЬ</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Защита почты (бета)</string>
     <string name="emailProtectionActivityTitle">Защита почты (бета)</string>
-    <string name="emailProtectionFooterDescription">Чтобы записаться в список ожидания, не нужно делиться личной информацией. Временная метка, хранящаяся только на вашем устройстве, позволит нам определить, когда подойдет ваша очередь, о чем мы сообщим вам дополнительно.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">При постановке в очередь произошла ошибка. Пожалуйста, повторите попытку позже.</string>
-    <string name="emailProtectionDuckAddressCta">У меня уже есть адрес на Duck</string>
-    <string name="emailProtectionInviteCodeCta">У меня есть пригласительный код</string>
-    <string name="emailProtectionWaitlistCta">Приглашаем встать в очередь</string>
-    <string name="emailProtectionGetStartedCta">Приступим!</string>
     <string name="emailNotSupported">Устройство не поддерживается</string>
     <string name="emailNotSupportedExplanation">Функция защиты почты позволяет создавать закрытые адреса электронной почты, где удаляются трекеры в письмах. Нам необходимо шифровать такие адреса и хранить их локально на вашем устройстве. Поскольку данное устройство не поддерживает хранение зашифрованной информации, вы не сможете воспользоваться защитой почты.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Надежная защита почты и ничего лишнего.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Чтобы блокировать трекеры и скрывать свой адрес, вовсе не нужно менять почтовый сервис.<br/><a href=""><b>Подробнее</b></a>...]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Теперь вы в списке!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Мы отправим вам уведомление, когда<br/> защита почты будет доступна и вам. <a href=""><b>Подробнее</b></a>...]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Когда настанет время, ваше приглашение появится здесь. Хотите также <a href=""><b>получить уведомление</b></a>?<br/><a href=""><b>Подробнее</b></a> о защите почты...]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Приглашение</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Чтобы блокировать трекеры <br/>и скрывать свой адрес, вовсе не нужно менять почтовый сервис.<br/><a href=""><b>Подробнее</b></a>...]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Личный адрес на Duck</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Снятие почтовой защиты на данном устройстве лишит вас возможности вносить свой личный адрес на Duck или свежесгенерированный приватный Duck-адрес в поле для электронной почты при посещении сайтов.<br/><br/>Если вы хотите полностью удалить свои Duck-адреса, задать нам вопрос или отправить отзывы и предложения, пишите нам: <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Удалить с этого устройства</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Редактировать закладку</string>
@@ -755,5 +721,16 @@
     <string name="atp_SettingsDeviceShieldEnabled">Включено</string>
     <string name="atp_SettingsDeviceShieldDisabled">Отключено</string>
 
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Похоже, на этом сайте есть всплывающее окно выбора куки-файлов👇</string>
+    <string name="autoconsentDialogDescription">Мы можем попытаться минимизировать выбор куки-файлов для большей безопасности ваших данных и автоматически закрывать такие окна.</string>
+    <string name="autoconsentPrimaryCta">Разрешить управление окнами выбора куки-файлов</string>
+    <string name="autoconsentSecondaryCta">Нет, спасибо</string>
+
+    <string name="autoconsentSetting">Управление окнами выбора куки-файлов</string>
+    <string name="autoconsentAnimationText">Kуки-файлы выбраны</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Автозаполнение</string>
 
 </resources>

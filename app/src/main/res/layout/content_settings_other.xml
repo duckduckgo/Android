@@ -16,7 +16,6 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/settingsSectionOther"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -26,41 +25,43 @@
         style="@style/SettingsSectionTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:text="@string/settingsHeadingMore"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/settingsHeadingOther" />
-
-    <TextView
-        android:id="@+id/privacyPolicy"
-        style="@style/SettingsItemClickable"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/settingsPrivacyPolicyDuckduckgo"
-        app:layout_constraintTop_toBottomOf="@id/settingsOtherTitle" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/about"
-        style="@style/SettingsItemClickable"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/settingsAboutDuckduckgo"
-        app:layout_constraintTop_toBottomOf="@id/privacyPolicy" />
-
-    <TextView
-        android:id="@+id/provideFeedback"
-        style="@style/SettingsItemClickable"
-        android:text="@string/leaveFeedback"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/about" />
-
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-        android:id="@+id/version"
+    <com.duckduckgo.app.settings.SettingsPillWithSubtitle
+        android:id="@+id/macOsSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/provideFeedback"
-        app:title="@string/settingsVersion"
-        tools:subtitle="123.43.5456" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settingsOtherTitle"
+        app:pillDrawable="@drawable/ic_beta_pill"
+        app:pillSubtitle="@string/macos_settings_description"
+        app:pillTitle="@string/macos_settings_title" />
+
+    <com.duckduckgo.app.settings.SettingsPillWithSubtitle
+        android:id="@+id/emailSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/macOsSetting"
+        app:pillDrawable="@drawable/ic_beta_pill"
+        app:pillSubtitle="@string/settingsEmailProtectionSubtitle"
+        app:pillTitle="@string/settingsEmailProtectionTitle" />
+
+    <com.duckduckgo.app.settings.SettingsPillWithSubtitle
+        android:id="@+id/vpnSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/emailSetting"
+        app:pillDrawable="@drawable/ic_beta_pill"
+        app:pillSubtitle="@string/atp_SettingsDeviceShieldDisabled"
+        app:pillTitle="@string/atp_SettingsTitle" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

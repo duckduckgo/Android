@@ -54,4 +54,8 @@
 
     <dimen name="messageCtaCloseButtonSize">40dp</dimen>
     <dimen name="messageCtaIllustrationSize">64dp</dimen>
+
+    <dimen name="outlinedTextPasswordIconSize">54dp</dimen>
+    <dimen name="outlinedTextPasswordEndMarginWithEndIcon">50dp</dimen>
+    <dimen name="outlinedTextPasswordEndMarginWithoutEndIcon">@dimen/keyline_1</dimen>
 </resources>

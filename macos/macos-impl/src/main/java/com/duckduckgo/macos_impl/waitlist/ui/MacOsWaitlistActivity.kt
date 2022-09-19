@@ -164,7 +164,7 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
         val pi = PendingIntent.getBroadcast(
             this, 0,
             Intent(this, MacOsInviteShareBroadcastReceiver::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         try {
             startActivity(Intent.createChooser(share, getString(R.string.macos_waitlist_share_invite), pi.intentSender))

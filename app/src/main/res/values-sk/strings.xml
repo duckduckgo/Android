@@ -121,38 +121,6 @@
     <string name="httpsMixed">Zmiešané šifrované pripojenie</string>
     <string name="httpsBad">Nezašifrované pripojenie</string>
 
-    <string name="networksActivityTitle">Siete sledovacích zariadení</string>
-    <string name="networksContentDescription">Siete sledovacích zariadení</string>
-    <string name="networksOverview">Siete sledovacích zariadení zhrnú vašu webovú históriu do vášho dátového profilu. Veľké siete sledovacích zariadení sú nebezpečnejšie, pretože sa na vás môžu zamerať a sledovať vás na viacerých internetových stránkach.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">Našlo sa %1$s sledovacie zariadenie</item>
-        <item quantity="few">Našli sa %1$s sledovacie zariadenia</item>
-        <item quantity="many">Našlo sa %1$s sledovacieho zariadenia</item>
-        <item quantity="other">Našlo sa %1$s sledovacích zariadení</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">Zablokovalo sa %1$s sledovacie zariadenie</item>
-        <item quantity="few">Zablokovali sa %1$s sledovacie zariadenia</item>
-        <item quantity="many">Zablokovalo sa %1$s sledovacieho zariadenia</item>
-        <item quantity="other">Zablokovalo sa %1$s sledovacích zariadení</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">Našla sa %1$s hlavná sieť sledovacích zariadení</item>
-        <item quantity="few">Našli sa %1$s hlavné siete sledovacích zariadení</item>
-        <item quantity="many">Našlo sa %1$s hlavnej siete sledovacích zariadení</item>
-        <item quantity="other">Našlo sa %1$s hlavných sietí sledovacích zariadení</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">Zablokovala sa %1$s hlavná sieť sledovacích zariadení</item>
-        <item quantity="few">Zablokovali sa %1$s hlavné siete sledovacích zariadení</item>
-        <item quantity="many">Zablokovala sa %1$s hlavnej siete sledovacích zariadení</item>
-        <item quantity="other">Zablokovalo sa %1$s hlavných sietí sledovacích zariadení</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Stupeň ochrany súkromia</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Webová stránka je veľkou monitorovacou sieťou</string>
     <string name="scorecardPrivacyGrade">Stupeň ochrany súkromia</string>
@@ -171,6 +139,45 @@
     <string name="networkTrackerSummaryHeader">SLEDOVACIE SIETE S NAJVÄČŠÍMI PRIESTUPKAMI</string>
     <string name="networkTrackerSummaryNotReady">Naďalej zhromažďujeme údaje s cieľom zistiť, koľko sledovacích zariadení sme zablokovali.</string>
 
+    <string name="trackersActivityTitle">Žiadosti o sledovanie sú blokované</string>
+    <string name="trackersContentDescription">Žiadosti o sledovanie sú blokované</string>
+    <string name="trackersOverview">Načítanie požiadaviek nasledujúcich domén tretích strán bolo zablokované, pretože boli identifikované ako požiadavky na sledovanie. Ak sú požiadavky spoločnosti načítané, môže im to umožniť profilovať vás.</string>
+    <string name="trackersOverviewProtectionsOff">Nebolo zablokované žiadne načítavanie požiadaviek na sledovanie, pretože ochrana je pre túto stránku vypnutá. Ak sú požiadavky spoločnosti načítané, môže im to umožniť profilovať vás.</string>
+
+    <string name="domainsLoadedActivityTitle">Požiadavky tretích strán boli načítané</string>
+    <string name="domainsLoadedContentDescription">Požiadavky tretích strán boli načítané</string>
+    <string name="domainsLoadedOverview">Boli načítané nasledujúce požiadavky na domény tretích strán. Ak sú požiadavky spoločnosti načítané, môže im to umožniť profilovať vás, hoci naše ostatné ochrany sledovania webu stále platia.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Načítanie žiadnych požiadaviek tretích strán nebolo zablokované, pretože ochrana je pre túto stránku vypnutá. Ak sú požiadavky spoločnosti načítané, môže im to umožniť profilovať vás.</string>
+    <string name="domainsLoadedOverviewEmpty">Nezistili sme požiadavky zo žiadnych domén tretích strán.</string>
+    <string name="domainsLoadedHeadingText">Nie sú načítané žiadne domény tretích strán</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">O našej ochrane pred sledovaním činnosti na webe</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Boli načítané požiadavky nasledujúcich domén.</string>
+
+    <string name="adLoadedSectionDescription">Požiadavky nasledujúcej domény boli načítané, pretože nedávno ste klikli na reklamu %1$s na DuckDuckGo. Tieto žiadosti pomáhajú vyhodnotiť účinnosť reklám. Všetky reklamy na DuckDuckGo sú neprofilujúce.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Ako naše reklamy vo vyhľadávaní ovplyvňujú našu ochranu</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Boli načítané aj nasledujúce požiadavky domény.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Boli načítané nasledujúce požiadavky na sledovanie domén.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Nezistili sme požiadavky zo žiadnych domén tretích strán.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Požiadavky nasledujúcej domény boli načítané, aby sa zabránilo rozbitiu stránky.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Nasledujúce požiadavky domény boli načítané, pretože sú spojené s %1$s.</string>
+
+    <string name="trackersBlockedText">Načítavanie žiadostí je zablokované</string>
+    <string name="trackersNotBlockedText">Nie sú blokované žiadne žiadosti o sledovanie</string>
+    <string name="trackersNoFoundText">Nenašli sa žiadne požiadavky na sledovanie</string>
+    <string name="trackersFoundText">Našli sa požiadavky na sledovanie</string>
+
+    <string name="domainsLoadedText">Požiadavky tretích strán boli načítané</string>
+    <string name="domainsNotLoadedText">Neboli načítané žiadne požiadavky tretích strán</string>
+
+    <string name="majorNetworksNoFound">Nenašla sa žiadna veľká sieť sledovacích zariadení</string>
+    <string name="majorNetworksFound">Našli sa hlavné siete sledovacích zariadení</string>
+
     <!-- Fire -->
     <string name="fireMenu">Vymazať údaje</string>
     <string name="fireClearAll">Vymazať všetky karty a údaje</string>
@@ -180,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nastavenia</string>
     <string name="settingsMenuItemTitle">Nastavenia</string>
-    <string name="settingsHeadingGeneral">Všeobecné</string>
-    <string name="settingsHeadingOther">Iné</string>
     <string name="settingsHeadingPrivacy">Súkromie</string>
     <string name="settingsAboutDuckduckgo">Informácie o DuckDuckGo</string>
     <string name="settingsVersion">Verzia</string>
@@ -199,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Vždy sa opýtať</string>
     <string name="settingsAppLinksAlways">Vždy</string>
     <string name="settingsAppLinksNever">Nikdy</string>
+    <string name="settingsHeadingAppearance">Vzhľad</string>
+    <string name="settingsHeadingCustomize">Prispôsobiť</string>
+    <string name="settingsHeadingAbout">O</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložiť</string>
@@ -575,11 +583,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Spojenie bolo prerušené. Táto webová stránka môže byť pre vaše zariadenie škodlivá.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Správca sťahovania je zakázaný</string>
-    <string name="downloadManagerIncompatible">Správca sťahovania nie je na tomto zariadení k dispozícií</string>
-    <string name="enable">Povoliť</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Povoliť polohu zariadenia pre súkromný prehliadač DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s žiada o polohu vášho zariadenia. Najskôr budete musieť aplikácii povoliť odosielanie polohy vášho zariadenia a potom bude môcť %2$s požiadať o povolenie.</string>
@@ -611,7 +614,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globálna kontrola súkromia (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automaticky blokuje množstvo trackerov. Vďaka Globálnej kontrole súkromia (GPC) môžete tiež požiadať partnerské webové lokality o obmedzenie predaja alebo zdieľania vašich osobných údajov s inými spoločnosťami. <u><a href="">Ďalšie informácie</a><u/>]]>
+        <![CDATA[DuckDuckGo automaticky blokuje množstvo trackerov. Vďaka Globálnej kontrole súkromia (GPC) môžete tiež požiadať partnerské webové lokality o obmedzenie predaja alebo zdieľania vašich osobných údajov s inými spoločnosťami. <u><a href=\"\">Ďalšie informácie</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globálna kontrola súkromia (GPC)</string>
     <string name="globalPrivacyControlToggle">Globálna kontrola súkromia (GPC)</string>
@@ -637,52 +640,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokuje e mailové trackery a skryje vašu adresu</string>
     <string name="newEmailAliasMenuTitle">Vytvoriť adresu Duck</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Odstrániť ochranu e‑mailu?</string>
-    <string name="emailSignOutDialogText">Poznámka: Odstránením ochrany e‑mailu z tohto zariadenia sa neodstráni vaša adresa Duck.</string>
-    <string name="emailSignOutDialogCancel">Zrušiť</string>
-    <string name="emailSignOutDialogDisable">Odstrániť</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Zoznam čakateľov na ochranu e‑mailu</string>
-    <string name="waitlistNotificationTitle">Ochrana e‑mailov je pripravená!</string>
-    <string name="waitlistNotificationDescription">Otvorte svoju pozvánku</string>
-
     <string name="waitlistNotificationDialogDescription">Chcete, aby sme vám poslali upozornenie, keď na vás príde rad?</string>
     <string name="waitlistNotificationDialogNoThanks">Nie, ďakujem</string>
     <string name="waitlistNotificationDialogNotifyMe">UPOZORNITE MA</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Ochrana e‑mailu (beta)</string>
     <string name="emailProtectionActivityTitle">Ochrana e‑mailu (beta)</string>
-    <string name="emailProtectionFooterDescription">Na zaradenie do poradovníka nemusíte zdieľať žiadne osobné údaje. Svoje miesto si zabezpečíte časovou pečiatkou, ktorá existuje výlučne vo vašom zariadení, aby sme vás mohli upozorniť, keď budete na rade.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Počas pridávania na zoznam čakateľov došlo k chybe. Skúste to znova neskôr.</string>
-    <string name="emailProtectionDuckAddressCta">Už mám adresu Duck</string>
-    <string name="emailProtectionInviteCodeCta">Mám pozývací kód</string>
-    <string name="emailProtectionWaitlistCta">Pridajte sa do súkromného zoznamu čakateľov</string>
-    <string name="emailProtectionGetStartedCta">Začnite</string>
     <string name="emailNotSupported">Nepodporované zariadenia</string>
     <string name="emailNotSupportedExplanation">Ochrana e‑mailov vám umožňuje vytvárať súkromné e‑mailové adresy, ktoré odstraňujú nástroje na sledovanie e‑mailov. Tieto adresy, ktoré vytvárate, musíme šifrovať a ukladať lokálne vo vašom zariadení. Keďže vaše zariadenie nepodporuje šifrované úložisko, ochrana e‑mailov nie je k dispozícii.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Zjednodušená ochrana súkromia v e‑mailoch.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokujte nástroje na sledovanie e‑mailov bez zmeny poskytovateľa e‑mailu.<b><a href="">Zistite viac</a></b>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Ste na zozname!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Keď budete mať pripravenú ochranu e‑mailu,<br/>pošleme vám upozornenie. <b><a href="">Zistite viac</a></b>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tu sa zobrazí vaša pozvánka, keď budeme na vás pripravení. Chcete <a href=""><b>dostať upozornenie</b></a>, keď dorazí?<br/><a href=""><b>Zistite viac</b></a> o ochrane e‑mailu.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Dostali ste pozvánku!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokujte nástroje na sledovanie e‑mailov bez zmeny poskytovateľa e‑mailu.<b><a href="">Zistite viac</a></b>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Osobná adresa Duck</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Odstránením ochrany e‑mailu z tohto zariadenia stratíte možnosť vyplniť svoju osobnú adresu Duck alebo novovygenerovanú súkromnú adresu Duck do e‑mailových polí pri prehliadaní webu.<br/><br/>Ak si chcete úplne odstrániť adresy Duck alebo ak máte iné otázky či pripomienky, obráťte sa na nás na adrese <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Odstrániť zo zariadenia</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Upraviť záložku</string>
@@ -754,5 +720,17 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blokovanie sledovacích nástrojov aplikácií vo vašom zariadení</string>
     <string name="atp_SettingsDeviceShieldEnabled">Povolené</string>
     <string name="atp_SettingsDeviceShieldDisabled">Zakázané</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Zdá sa, že táto stránka má kontextové okno týkajúce sa súhlasu so súbormi cookie👇</string>
+    <string name="autoconsentDialogDescription">Chceš, aby som to riešil za teba? Môžem sa pokúsiť minimalizovať súbory cookie, maximalizovať ochranu súkromia a skryť kontextové okná, ako sú tieto.</string>
+    <string name="autoconsentPrimaryCta">Správa kontextových okien súborov cookie</string>
+    <string name="autoconsentSecondaryCta">Nie, ďakujem</string>
+
+    <string name="autoconsentSetting">Správa kontextových okien súborov cookie</string>
+    <string name="autoconsentAnimationText">Spravované súbory cookie</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automatické vypĺňanie</string>
 
 </resources>

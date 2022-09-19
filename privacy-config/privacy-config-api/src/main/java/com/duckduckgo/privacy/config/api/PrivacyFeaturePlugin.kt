@@ -16,8 +16,6 @@
 
 package com.duckduckgo.privacy.config.api
 
-import com.duckduckgo.feature.toggles.api.FeatureName
-
 /**
  * Implement this interface and contribute it as a multibinding to get called upon downloading remote privacy config
  *
@@ -32,15 +30,15 @@ import com.duckduckgo.feature.toggles.api.FeatureName
  */
 interface PrivacyFeaturePlugin {
     /**
-     * @return `true` when the feature config was stored, otherwise `false`
+     * @return `true` when the feature was stored, otherwise `false`
      */
     fun store(
-        name: FeatureName,
+        featureName: String,
         jsonString: String
     ): Boolean
 
     /**
-     * @return the [FeatureName] of this feature
+     * @return the [featureName] of this feature
      */
-    val featureName: FeatureName
+    val featureName: String
 }

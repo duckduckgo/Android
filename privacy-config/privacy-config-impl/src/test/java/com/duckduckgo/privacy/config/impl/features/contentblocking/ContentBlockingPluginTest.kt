@@ -42,53 +42,54 @@ class ContentBlockingPluginTest {
     @Test
     fun whenFeatureNameDoesNotMatchContentBlockingThenReturnFalse() {
         PrivacyFeatureName.values().filter { it != FEATURE_NAME }.forEach {
-            assertFalse(testee.store(it, EMPTY_JSON_STRING))
+            assertFalse(testee.store(it.value, EMPTY_JSON_STRING))
         }
     }
 
     @Test
     fun whenFeatureNameMatchesContentBlockingThenReturnTrue() {
-        assertTrue(testee.store(FEATURE_NAME, EMPTY_JSON_STRING))
+        assertTrue(testee.store(FEATURE_NAME_VALUE, EMPTY_JSON_STRING))
     }
 
     @Test
     fun whenFeatureNameMatchesContentBlockingAndIsEnabledThenStoreFeatureEnabled() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/content_blocking.json")
 
-        testee.store(FEATURE_NAME, jsonString)
+        testee.store(FEATURE_NAME_VALUE, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, null))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME_VALUE, true, null))
     }
 
     @Test
     fun whenFeatureNameMatchesContentBlockingAndIsNotEnabledThenStoreFeatureDisabled() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/content_blocking_disabled.json")
 
-        testee.store(FEATURE_NAME, jsonString)
+        testee.store(FEATURE_NAME_VALUE, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false, null))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME_VALUE, false, null))
     }
 
     @Test
     fun whenFeatureNameMatchesContentBlockingAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/content_blocking_min_supported_version.json")
 
-        testee.store(FEATURE_NAME, jsonString)
+        testee.store(FEATURE_NAME_VALUE, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, 1234))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME_VALUE, true, 1234))
     }
 
     @Test
     fun whenFeatureNameMatchesContentBlockingThenUpdateAllExistingExceptions() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/content_blocking.json")
 
-        testee.store(FEATURE_NAME, jsonString)
+        testee.store(FEATURE_NAME_VALUE, jsonString)
 
         verify(mockContentBlockingRepository).updateAll(anyList())
     }
 
     companion object {
         private val FEATURE_NAME = PrivacyFeatureName.ContentBlockingFeatureName
+        private val FEATURE_NAME_VALUE = FEATURE_NAME.value
         private const val EMPTY_JSON_STRING = "{}"
     }
 }

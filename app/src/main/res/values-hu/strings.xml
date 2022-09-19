@@ -121,30 +121,6 @@
     <string name="httpsMixed">Vegyes titkosítású kapcsolat</string>
     <string name="httpsBad">Titkosítatlan kapcsolat</string>
 
-    <string name="networksActivityTitle">Nyomkövető hálózatok</string>
-    <string name="networksContentDescription">Nyomkövető hálózatok</string>
-    <string name="networksOverview">A nyomkövető hálózatok gyűjtik internetes előzményeidet egy rólad szóló adatprofilban. A nagy nyomkövető hálózatok károsabbak, mert az internet több területén képesek téged nyomon követni és megcélozni.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s nyomkövető megtalálva</item>
-        <item quantity="other">%1$s nyomkövető megtalálva</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s nyomkövető letiltva</item>
-        <item quantity="other">%1$s nyomkövető letiltva</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s nagy nyomkövető-hálózat megtalálva</item>
-        <item quantity="other">%1$s nagy nyomkövető-hálózat megtalálva</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s nagy nyomkövető-hálózat letiltva</item>
-        <item quantity="other">%1$s nagy nyomkövető-hálózat letiltva</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Adatvédelmi fokozat</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">A weboldal egy nagy nyomkövető-hálózat</string>
     <string name="scorecardPrivacyGrade">Adatvédelmi fokozat</string>
@@ -163,6 +139,45 @@
     <string name="networkTrackerSummaryHeader">A NYOMKÖVETŐ-HÁLÓZAT LEGNAGYOBB BŰNELKÖVETŐI</string>
     <string name="networkTrackerSummaryNotReady">Folyamatosan gyűjtjük az adatokat, hogy bemutathassuk, hány követőt tiltottunk le.</string>
 
+    <string name="trackersActivityTitle">Nyomkövetési kérések blokkolva</string>
+    <string name="trackersContentDescription">Nyomkövetési kérések blokkolva</string>
+    <string name="trackersOverview">A következő harmadik fél tartományok kéréseinek betöltése blokkolva van, mivel nyomkövetési kérésként lettek beazonosítva. Ha egy cég kérései betöltődnek, az lehetővé teheti számukra, hogy profilokat készítsenek a felhasználóról.</string>
+    <string name="trackersOverviewProtectionsOff">A nyomkövető kérések betöltése nincs blokkolva, mert a végelem ki van kapcsolva ehhez a webhelyhez. Ha egy cég kérései betöltődnek, az lehetővé teheti számukra, hogy profilokat készítsenek a felhasználóról.</string>
+
+    <string name="domainsLoadedActivityTitle">A harmadik féltől származó kérések be lettek töltve</string>
+    <string name="domainsLoadedContentDescription">A harmadik féltől származó kérések be lettek töltve</string>
+    <string name="domainsLoadedOverview">A következő harmadik fél tartományok kérései kerültek betöltésre. Ha egy cég kérései betöltődnek, ez lehetővé teheti számukra, hogy profilokat készítsenek a felhasználóról, bár a többi webes nyomkövetési védelmünk továbbra is érvényben van.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">A harmadik féltől származó kérések betöltése nincs blokkolva, mert a végelem ki van kapcsolva ehhez a webhelyhez. Ha egy cég kérései betöltődnek, az lehetővé teheti számukra, hogy profilokat készítsenek a felhasználóról.</string>
+    <string name="domainsLoadedOverviewEmpty">Nem észleltünk harmadik fél tartományából származó kéréseket.</string>
+    <string name="domainsLoadedHeadingText">Nincsenek betöltve harmadik fél tartományok</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">A webes nyomkövetés elleni védelemről</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">A következő tartomány kérései kerületek betöltésre.</string>
+
+    <string name="adLoadedSectionDescription">A következő tartomány kérései azért lettek betöltve, mert a DuckDuckGo-n nemrég rákattintottak egy %1$s hirdetésre. Ezek a kérések segítenek értékelni a hirdetések hatékonyságát. A DuckDuckGo összes hirdetése nem profilozó.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Hogyan hatnak a keresési hirdetéseink a védelmünkre</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">A következő tartomány kérései is betöltésre kerültek.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">A következő tartományok követési kérelmei kerültek betöltésre.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Nem észleltünk harmadik fél tartományából származó kéréseket.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">A következő tartomány kérései a webhely összeomlásának megelőzése érdekében kerültek betöltésre.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">A következő tartomány kérései azért kerültek betöltésre, mert a következőhöz vannak társítva: %1$s.</string>
+
+    <string name="trackersBlockedText">Kérések betöltése blokkolva</string>
+    <string name="trackersNotBlockedText">Nyomkövető kérések nincsenek blokkolva</string>
+    <string name="trackersNoFoundText">Nem találhatók nyomkövetési kérések</string>
+    <string name="trackersFoundText">Nyomkövető kérések találhatók</string>
+
+    <string name="domainsLoadedText">A harmadik féltől származó kérések be lettek töltve</string>
+    <string name="domainsNotLoadedText">Harmadik féltől származó kérések nincsenek betöltve</string>
+
+    <string name="majorNetworksNoFound">Nem található nagyobb nyomkövető hálózat</string>
+    <string name="majorNetworksFound">Nagy nyomkövető hálózatok találhatók</string>
+
     <!-- Fire -->
     <string name="fireMenu">Adatok törlése</string>
     <string name="fireClearAll">Összes lap és adat törlése</string>
@@ -172,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Beállítások</string>
     <string name="settingsMenuItemTitle">Beállítások</string>
-    <string name="settingsHeadingGeneral">Általános</string>
-    <string name="settingsHeadingOther">Egyéb</string>
     <string name="settingsHeadingPrivacy">Adatvédelem</string>
     <string name="settingsAboutDuckduckgo">A DuckDuckGo névjegye</string>
     <string name="settingsVersion">Változat</string>
@@ -191,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Kérdezzen rá minden alkalommal</string>
     <string name="settingsAppLinksAlways">Mindig</string>
     <string name="settingsAppLinksNever">Soha</string>
+    <string name="settingsHeadingAppearance">Megjelenés</string>
+    <string name="settingsHeadingCustomize">Testreszabás</string>
+    <string name="settingsHeadingAbout">További információ</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>
@@ -563,11 +579,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Kapcsolat megszakadt. Ez a weboldal káros lehet az eszközödre.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Letöltéskezelő letiltva</string>
-    <string name="downloadManagerIncompatible">A letöltéskezelő nem érhető el ezen az eszközön.</string>
-    <string name="enable">Engedélyezés</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Engedélyezed az eszköz helyének elérését a DuckDuckGo adatvédelmi böngésző számára?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s az eszközöd helyét kéri. Először engedélyezned kell az alkalmazás számára, hogy elküldje az eszközöd helyét, majd a %2$s engedélyt kérhet.</string>
@@ -599,7 +610,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href="">További részletek</a><u/>]]>
+        <![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href=\"\">További részletek</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlToggle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
@@ -625,52 +636,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Letiltja az e-mail nyomkövetőket, és elrejti a címedet</string>
     <string name="newEmailAliasMenuTitle">Duck cím létrehozása</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Eltávolítod az e-mail védelmet?</string>
-    <string name="emailSignOutDialogText">Megjegyzés: az e-mail védelem eltávolítása erről az eszközről nem törli a Duck címedet.</string>
-    <string name="emailSignOutDialogCancel">Mégsem</string>
-    <string name="emailSignOutDialogDisable">Eltávolítás</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">E-mail várólista</string>
-    <string name="waitlistNotificationTitle">Az e-mail-védelem készen áll.</string>
-    <string name="waitlistNotificationDescription">Meghívó megnyitása</string>
-
     <string name="waitlistNotificationDialogDescription">Szeretnéd, hogy értesítést küldjünk neked, amikor rád kerül a sor?</string>
     <string name="waitlistNotificationDialogNoThanks">Nem, köszönöm</string>
     <string name="waitlistNotificationDialogNotifyMe">ÉRTESÍTSETEK</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">E-mail védelem (béta)</string>
     <string name="emailProtectionActivityTitle">E-mail védelem (béta)</string>
-    <string name="emailProtectionFooterDescription">Nem kell megosztanod a személyes adataid a várólistához való csatlakozáshoz. A sorban elfoglalt helyedet egy olyan időbélyegző igazolja, amely kizárólag az eszközödön található meg, így értesíteni tudunk, amikor sorra kerülsz.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Hiba történt a várólistához való csatlakozás közben. Kérjük, próbáld újra később.</string>
-    <string name="emailProtectionDuckAddressCta">Már van Duck címem</string>
-    <string name="emailProtectionInviteCodeCta">Van meghívókódom</string>
-    <string name="emailProtectionWaitlistCta">Csatlakozz a privát várólistához</string>
-    <string name="emailProtectionGetStartedCta">Első lépések</string>
     <string name="emailNotSupported">Az eszköz nem támogatott</string>
     <string name="emailNotSupportedExplanation">Az e-mail-védelem lehetővé teszi olyan privát e-mail-címek létrehozását, amelyek eltávolítják az e-mail nyomkövetőket. Ezeket a címeket helyileg az eszközödön kell titkosítanunk és tárolnunk. Mivel az eszközöd nem támogatja a titkosított tárhelyet, az e-mail-védelem nem érhető el.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">E-mail adatvédelem, egyszerűsítve.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet anélkül, hogy e-mail-szolgáltatót váltanál.<br/><a href=""><b>További részletek</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Rajta vagy a listán!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Értesítést küldünk, amikor<br/> az e-mail védelem készen áll számodra. <a href=""><b>További részletek</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Meghívód itt jelenik meg, amikor készen állunk. Szeretnél <a href=""><b>értesítést kapni</b></a>, amikor megérkezik?<br/><a href=""><b>További tudnivalók</b></a> az e-mail védelemről.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Meghívót kaptál!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet<br/>anélkül, hogy e-mail-szolgáltatót váltanál.<br/><a href=""><b>További részletek</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Személyes Duck cím</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Az e-mail védelem eltávolítása erről az eszközről megszünteti azt a lehetőséget, hogy a webes böngészés során a rendszer automatikusan beírja a személyes Duck címedet vagy egy újonnan létrehozott privát Duck címet az e-mail mezőkbe.<br/><br/>A Duck címeid teljes törléséhez, vagy bármilyen más kérdés vagy visszajelzés esetén fordulj hozzánk a <a href=\"mailto:support@duck.com\">support@duck.com</a> címen.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Eltávolítás az eszközről</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Könyvjelző szerkesztése</string>
@@ -738,5 +712,17 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Alkalmazáskövetők letiltása az eszközödön</string>
     <string name="atp_SettingsDeviceShieldEnabled">Engedélyezve</string>
     <string name="atp_SettingsDeviceShieldDisabled">Letiltva</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Úgy tűnik, hogy az oldalon sütik elfogadására szolgáló felugró ablak van👇</string>
+    <string name="autoconsentDialogDescription">Elintézzem helyetted? Megpróbálhatom minimalizálni a sütiket, maximalizálni az adatvédelmet, illetve elrejteni az ilyen felugró ablakokat.</string>
+    <string name="autoconsentPrimaryCta">Felugró sütiablakok kezelése</string>
+    <string name="autoconsentSecondaryCta">Nem, köszönöm</string>
+
+    <string name="autoconsentSetting">Felugró sütiablakok kezelése</string>
+    <string name="autoconsentAnimationText">Kezelt sütik</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automatikus kitöltés</string>
 
 </resources>

@@ -28,6 +28,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.DialogFragment
+import androidx.webkit.ServiceWorkerClientCompat
+import androidx.webkit.ServiceWorkerControllerCompat
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
@@ -75,6 +78,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
@@ -108,8 +112,13 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     lateinit var userEventsStore: UserEventsStore
 
     @Inject
+    lateinit var serviceWorkerClientCompat: ServiceWorkerClientCompat
+
+    @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    private val lastActiveTabs = TabList()
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -147,6 +156,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
             renderer.renderBrowserViewState(it)
         }
         viewModel.awaitClearDataFinishedNotification()
+        initializeServiceWorker()
     }
 
     override fun onStop() {
@@ -173,6 +183,16 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         } else {
             Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
             lastIntent = intent
+        }
+    }
+
+    private fun initializeServiceWorker() {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_BASIC_USAGE)) {
+            try {
+                ServiceWorkerControllerCompat.getInstance().setServiceWorkerClient(serviceWorkerClientCompat)
+            } catch (e: Throwable) {
+                Timber.w(e.localizedMessage)
+            }
         }
     }
 
@@ -218,6 +238,8 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
         if (tab.tabId == currentTab?.tabId) return
 
+        lastActiveTabs.add(tab.tabId)
+
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
             openNewTab(tab.tabId, tab.url, tab.skipHome)
@@ -234,7 +256,10 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     private fun removeTabs(fragments: List<BrowserTabFragment>) {
         val transaction = supportFragmentManager.beginTransaction()
-        fragments.forEach { transaction.remove(it) }
+        fragments.forEach {
+            transaction.remove(it)
+            lastActiveTabs.remove(it.tabId)
+        }
         transaction.commit()
     }
 
@@ -314,10 +339,13 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
             processCommand(it)
         }
         viewModel.selectedTab.observe(this) {
-            if (it != null) selectTab(it)
+            if (it != null) {
+                selectTab(it)
+            }
         }
         viewModel.tabs.observe(this) {
             clearStaleTabs(it)
+            removeOldTabs()
             launch { viewModel.onTabsUpdated(it) }
         }
     }
@@ -342,7 +370,20 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         }
     }
 
-    private fun processCommand(command: Command?) {
+    private fun removeOldTabs() {
+        val candidatesToRemove = lastActiveTabs.dropLast(MAX_ACTIVE_TABS)
+        if (candidatesToRemove.isEmpty()) return
+
+        val tabsToRemove = supportFragmentManager.fragments
+            .mapNotNull { it as? BrowserTabFragment }
+            .filter { candidatesToRemove.contains(it.tabId) }
+
+        if (tabsToRemove.isNotEmpty()) {
+            removeTabs(tabsToRemove)
+        }
+    }
+
+    private fun processCommand(command: Command) {
         Timber.i("Processing command: $command")
         when (command) {
             is Query -> currentTab?.submitQuery(command.query)
@@ -490,6 +531,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 
         private const val DASHBOARD_REQUEST_CODE = 100
+        private const val MAX_ACTIVE_TABS = 40
     }
 
     inner class BrowserStateRenderer {
@@ -551,4 +593,14 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         val originalInstanceState: Bundle?,
         val newInstanceState: Bundle?
     )
+}
+
+// Temporary class to keep track of latest visited tabs, keeping unique ids.
+private class TabList() : ArrayList<String>() {
+    override fun add(element: String): Boolean {
+        if (this.contains(element)) {
+            this.remove(element)
+        }
+        return super.add(element)
+    }
 }

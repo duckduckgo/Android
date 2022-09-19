@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
+        android:maxSdkVersion="29" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -32,6 +32,7 @@
         android:roundIcon="${appIconRound}"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:requestLegacyExternalStorage="true"
         tools:ignore="GoogleAppIndexingWarning">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
@@ -305,7 +306,7 @@
         <activity
             android:name="com.duckduckgo.app.privacy.ui.TrackerNetworksActivity"
             android:exported="false"
-            android:label="@string/networksActivityTitle"
+            android:label="@string/trackersActivityTitle"
             android:parentActivityName="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity" />
         <activity
             android:name="com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity"
@@ -388,18 +389,11 @@
             android:label="@string/accessibilityActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
-            android:name="com.duckduckgo.app.email.ui.EmailProtectionActivity"
+            android:name="com.duckduckgo.app.email.ui.EmailProtectionUnsupportedActivity"
             android:exported="false"
             android:label="@string/emailProtectionActivityTitle"
+            android:screenOrientation="portrait"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.duckduckgo.app.email.ui.EmailWebViewActivity"
-            android:exported="false"
-            android:label="@string/emailProtectionWebViewActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.email.ui.EmailProtectionActivity"
-            android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
             android:name="com.duckduckgo.app.settings.FireAnimationActivity"
@@ -464,6 +458,8 @@
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <service android:name="com.duckduckgo.app.notification.NotificationHandlerService" />
+
+        <receiver android:name=".shortcut.ShortcutReceiver" android:exported="false" />
 
         <receiver
             android:name="com.duckduckgo.widget.SearchWidget"

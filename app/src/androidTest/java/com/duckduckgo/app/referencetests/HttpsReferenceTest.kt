@@ -169,7 +169,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         val isEnabled = httpsFeature?.state == "enabled"
         val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(config?.unprotectedTemporary ?: emptyList())
 
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName, isEnabled)).thenReturn(isEnabled)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName.value, isEnabled)).thenReturn(isEnabled)
         whenever(mockHttpsRepository.exceptions).thenReturn(CopyOnWriteArrayList(httpsExceptions))
         whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(exceptionsUnprotectedTemporary)
 
@@ -201,7 +201,8 @@ class HttpsReferenceTest(private val testCase: TestCase) {
             binaryDataStore,
             embeddedDataPersister,
             httpsDataPersister,
-            mockPixel
+            mockPixel,
+            InstrumentationRegistry.getInstrumentation().targetContext,
         )
     }
 

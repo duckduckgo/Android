@@ -17,8 +17,8 @@
 package com.duckduckgo.privacy.config.impl.features.useragent
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.api.UserAgentException
-import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
 import org.junit.Assert.*
 import org.junit.Before

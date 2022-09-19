@@ -20,7 +20,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Rect
-import android.os.Build
 import android.text.Editable
 import android.text.Selection
 import android.util.AttributeSet
@@ -110,13 +109,7 @@ class KeyboardAwareEditText : AppCompatEditText {
      * Overrides to paste clip data without rich text formatting.
      */
     override fun onTextContextMenuItem(id: Int): Boolean = when (id) {
-        android.R.id.paste ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                super.onTextContextMenuItem(android.R.id.pasteAsPlainText)
-            } else {
-                context.getClipboardManager().convertClipToPlainText()
-                super.onTextContextMenuItem(id)
-            }
+        android.R.id.paste -> super.onTextContextMenuItem(android.R.id.pasteAsPlainText)
         else -> super.onTextContextMenuItem(id)
     }
 

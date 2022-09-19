@@ -24,7 +24,7 @@ import android.view.MenuItem
 import android.webkit.WebSettings
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserWebViewClient
-import com.duckduckgo.app.browser.databinding.ActivityEmailWebviewBinding
+import com.duckduckgo.app.browser.databinding.ActivityWebviewBinding
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
@@ -40,7 +40,7 @@ class WebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var webViewClient: BrowserWebViewClient
 
-    private val binding: ActivityEmailWebviewBinding by viewBinding()
+    private val binding: ActivityWebviewBinding by viewBinding()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar

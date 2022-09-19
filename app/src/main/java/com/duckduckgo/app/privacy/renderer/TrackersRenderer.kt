@@ -26,30 +26,56 @@ class TrackersRenderer {
 
     fun trackersText(
         context: Context,
-        trackerCount: Int,
-        allTrackersBlocked: Boolean
+        trackersBlockedCount: Int,
+        specialDomainsLoadedCount: Int
     ): String {
-        val resource = if (allTrackersBlocked) R.plurals.trackerBlocked else R.plurals.trackersFound
-        return context.resources.getQuantityString(resource, trackerCount, trackerCount)
+
+        val resource = if (trackersBlockedCount > 0) {
+            R.string.trackersBlockedText
+        } else if (trackersBlockedCount == 0 && specialDomainsLoadedCount > 0) {
+            R.string.trackersNotBlockedText
+        } else {
+            R.string.trackersNoFoundText
+        }
+        return context.resources.getString(resource)
+    }
+
+    fun domainsLoadedText(
+        context: Context,
+        domainsLoadedCount: Int,
+    ): String {
+
+        val resource = if (domainsLoadedCount > 0) {
+            R.string.domainsLoadedText
+        } else {
+            R.string.domainsNotLoadedText
+        }
+        return context.resources.getString(resource)
     }
 
     fun majorNetworksText(
         context: Context,
-        networkCount: Int,
-        allTrackersBlocked: Boolean
+        majorNetworkCount: Int
     ): String {
-        val resource = if (allTrackersBlocked) R.plurals.majorNetworksBlocked else R.plurals.majorNetworksFound
-        return context.resources.getQuantityString(resource, networkCount, networkCount)
+        val resource = if (majorNetworkCount > 0) R.string.majorNetworksFound else R.string.majorNetworksNoFound
+        return context.resources.getString(resource)
     }
 
     @DrawableRes
-    fun networksBanner(allTrackersBlocked: Boolean): Int {
-        return if (allTrackersBlocked) R.drawable.networks_banner_good else R.drawable.networks_banner_bad
-    }
-
-    @DrawableRes
-    fun networksIcon(allTrackersBlocked: Boolean): Int {
-        return if (allTrackersBlocked) R.drawable.networks_icon_good else R.drawable.networks_icon_bad
+    fun networksIcon(
+        trackersBlockedCount: Int,
+        specialDomainsLoadedCount: Int,
+        toggleEnabled: Boolean?,
+        largeIcon: Boolean = false
+    ): Int {
+        return when {
+            toggleEnabled == false && trackersBlockedCount + specialDomainsLoadedCount > 0 ->
+                if (largeIcon) R.drawable.networks_icon_bad_large else R.drawable.networks_icon_bad
+            toggleEnabled == true && specialDomainsLoadedCount > 0 && trackersBlockedCount == 0 ->
+                if (largeIcon) R.drawable.networks_icon_neutral_large else R.drawable.networks_icon_neutral
+            else ->
+                if (largeIcon) R.drawable.networks_icon_good_large else R.drawable.networks_icon_good
+        }
     }
 
     @DrawableRes

@@ -20,7 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -98,7 +98,7 @@ class RealContentBlockingTest {
     private fun givenFeatureIsEnabled() {
         whenever(
             mockFeatureToggle.isFeatureEnabled(
-                PrivacyFeatureName.ContentBlockingFeatureName, true
+                PrivacyFeatureName.ContentBlockingFeatureName.value, true
             )
         )
             .thenReturn(true)
@@ -107,7 +107,7 @@ class RealContentBlockingTest {
     private fun givenFeatureIsDisabled() {
         whenever(
             mockFeatureToggle.isFeatureEnabled(
-                PrivacyFeatureName.ContentBlockingFeatureName, true
+                PrivacyFeatureName.ContentBlockingFeatureName.value, true
             )
         )
             .thenReturn(false)

@@ -17,8 +17,7 @@
 package com.duckduckgo.app.email.di
 
 import android.content.Context
-import androidx.lifecycle.LifecycleObserver
-import androidx.work.WorkManager
+import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.AppEmailManager
@@ -29,17 +28,12 @@ import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.email.db.EmailEncryptedSharedPreferences
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.notification.NotificationSender
-import com.duckduckgo.app.notification.model.EmailWaitlistCodeNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.waitlist.email.AppEmailWaitlistCodeFetcher
-import com.duckduckgo.app.waitlist.email.EmailWaitlistCodeFetcher
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Autofill
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import dagger.SingleInstanceIn
 
@@ -63,9 +57,10 @@ class EmailModule {
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
         dispatcherProvider: DispatcherProvider,
         featureToggle: FeatureToggle,
+        javascriptInjector: JavascriptInjector,
         autofill: Autofill
     ): EmailInjector {
-        return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider, featureToggle, autofill)
+        return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider, featureToggle, javascriptInjector, autofill)
     }
 
     @Provides
@@ -75,22 +70,4 @@ class EmailModule {
     ): EmailDataStore {
         return EmailEncryptedSharedPreferences(context, pixel)
     }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun providesWaitlistCodeFetcher(
-        workManager: WorkManager,
-        emailManager: EmailManager,
-        notification: EmailWaitlistCodeNotification,
-        notificationSender: NotificationSender,
-        dispatcherProvider: DispatcherProvider,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
-    ): EmailWaitlistCodeFetcher {
-        return AppEmailWaitlistCodeFetcher(workManager, emailManager, notification, notificationSender, dispatcherProvider, appCoroutineScope)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    @IntoSet
-    fun providesWaitlistCodeFetcherObserver(emailWaitlistCodeFetcher: EmailWaitlistCodeFetcher): LifecycleObserver = emailWaitlistCodeFetcher
 }

@@ -19,8 +19,5 @@
 
     <string name="notificationChannelFileDownloading">Stahování souboru</string>
     <string name="notificationChannelFileDownloaded">Soubor stažen</string>
-
-    <string name="downloadComplete">Stahování dokončeno</string>
-    <string name="downloadFailed">Stahování se nezdařilo.</string>
     <string name="downloadInProgress">Stahování</string>
 </resources>

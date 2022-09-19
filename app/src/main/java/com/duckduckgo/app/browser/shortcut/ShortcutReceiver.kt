@@ -19,58 +19,49 @@ package com.duckduckgo.app.browser.shortcut
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import android.widget.Toast
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.DefaultLifecycleObserver
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_TITLE_ARG
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import com.duckduckgo.di.scopes.ReceiverScope
+import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = LifecycleObserver::class
-)
-@SingleInstanceIn(AppScope::class)
-class ShortcutReceiver @Inject constructor(
-    private val context: Context,
-    private val pixel: Pixel,
-    private val dispatcher: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
-) : BroadcastReceiver(), LifecycleObserver {
+@InjectWith(ReceiverScope::class)
+class ShortcutReceiver : BroadcastReceiver(), DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun registerShortcutReceiver() {
-        Timber.v("Registering shortcut receiver")
-        // ensure we unregister the receiver first
-        kotlin.runCatching { context.unregisterReceiver(this) }
-        context.registerReceiver(this, IntentFilter(ShortcutBuilder.SHORTCUT_ADDED_ACTION))
-    }
+    @Inject
+    lateinit var pixel: Pixel
+
+    @Inject lateinit var dispatcher: DispatcherProvider
+
+    @Inject @AppCoroutineScope lateinit var appCoroutineScope: CoroutineScope
 
     override fun onReceive(
-        context: Context?,
+        context: Context,
         intent: Intent?
     ) {
-        val title = intent?.getStringExtra(SHORTCUT_TITLE_ARG)
+        AndroidInjection.inject(this, context)
+        onShortcutAdded(context, intent)
+    }
 
+    @VisibleForTesting
+    fun onShortcutAdded(context: Context?, intent: Intent?) {
+        val title = intent?.getStringExtra(SHORTCUT_TITLE_ARG)
         if (!IGNORE_MANUFACTURERS_LIST.contains(Build.MANUFACTURER)) {
             context?.let {
                 Toast.makeText(it, it.getString(R.string.shortcutAddedText, title), Toast.LENGTH_SHORT).show()
             }
         }
-
         appCoroutineScope.launch(dispatcher.io()) {
             pixel.fire(AppPixelName.SHORTCUT_ADDED)
         }

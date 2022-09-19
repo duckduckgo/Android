@@ -33,3 +33,6 @@ dependencies {
 
     kapt AndroidX.room.compiler
 }
+android {
+  namespace 'com.duckduckgo.app'
+}

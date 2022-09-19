@@ -23,15 +23,22 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserActivity.Companion.FAVORITES_ONBOARDING_EXTRA
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.THEME_EXTRAS
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -63,6 +70,16 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     @Inject
     lateinit var voiceSearchWidgetConfigurator: VoiceSearchWidgetConfigurator
 
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    @AppCoroutineScope
+    lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
+
     private var layoutId: Int = R.layout.search_favorites_widget_daynight_auto
 
     override fun onReceive(
@@ -79,8 +96,10 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetIds: IntArray
     ) {
         Timber.i("SearchAndFavoritesWidget - onUpdate")
-        appWidgetIds.forEach { id ->
-            updateWidget(context, appWidgetManager, id, null)
+        appCoroutineScope.launch {
+            appWidgetIds.forEach { id ->
+                updateWidget(context, appWidgetManager, id, null)
+            }
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds)
     }
@@ -92,7 +111,9 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         newOptions: Bundle
     ) {
         Timber.i("SearchAndFavoritesWidget - onAppWidgetOptionsChanged")
-        updateWidget(context, appWidgetManager, appWidgetId, newOptions)
+        appCoroutineScope.launch {
+            updateWidget(context, appWidgetManager, appWidgetId, newOptions)
+        }
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
     }
 
@@ -100,37 +121,46 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         context: Context,
         appWidgetIds: IntArray
     ) {
-        appWidgetIds.forEach {
-            widgetPrefs.removeWidgetSettings(it)
+        appCoroutineScope.launch(dispatchers.io()) {
+            appWidgetIds.forEach {
+                widgetPrefs.removeWidgetSettings(it)
+            }
         }
         super.onDeleted(context, appWidgetIds)
     }
 
-    private fun updateWidget(
+    private suspend fun updateWidget(
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int,
         newOptions: Bundle?
     ) {
-        val widgetTheme = widgetPrefs.widgetTheme(appWidgetId)
+        val widgetTheme = withContext(dispatchers.io()) {
+            widgetPrefs.widgetTheme(appWidgetId)
+        }
         Timber.i("SearchAndFavoritesWidget theme for $appWidgetId is $widgetTheme")
 
         val (columns, rows) = getCurrentWidgetSize(context, appWidgetManager.getAppWidgetOptions(appWidgetId), newOptions)
         layoutId = getLayoutThemed(columns, widgetTheme)
-        widgetPrefs.storeWidgetSize(appWidgetId, columns, rows)
 
-        val remoteViews = RemoteViews(context.packageName, layoutId)
+        withContext(dispatchers.io()) {
+            widgetPrefs.storeWidgetSize(appWidgetId, columns, rows)
+        }
 
-        remoteViews.setViewVisibility(R.id.searchInputBox, if (columns == 2) View.INVISIBLE else View.VISIBLE)
-        remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
+        withContext(dispatchers.main()) {
+            val remoteViews = RemoteViews(context.packageName, layoutId)
 
-        voiceSearchWidgetConfigurator.configureVoiceSearch(context, remoteViews, true)
-        configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
-        configureEmptyWidgetCta(context, appWidgetId, remoteViews, widgetTheme)
+            remoteViews.setViewVisibility(R.id.searchInputBox, if (columns == 2) View.INVISIBLE else View.VISIBLE)
+            remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
 
-        appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
-        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
-        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.emptyfavoritesGrid)
+            voiceSearchWidgetConfigurator.configureVoiceSearch(context, remoteViews, true)
+            configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
+            configureEmptyWidgetCta(context, appWidgetId, remoteViews, widgetTheme)
+
+            appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.emptyfavoritesGrid)
+        }
     }
 
     private fun getLayoutThemed(
@@ -215,7 +245,8 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         widgetTheme: WidgetTheme
     ) {
         val favoriteItemClickIntent = Intent(context, BrowserActivity::class.java)
-        val favoriteClickPendingIntent = PendingIntent.getActivity(context, 0, favoriteItemClickIntent, 0)
+        val pendingIntentFlags = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
+        val favoriteClickPendingIntent = PendingIntent.getActivity(context, 0, favoriteItemClickIntent, pendingIntentFlags)
 
         val extras = Bundle()
         extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -249,7 +280,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
 
     private fun buildPendingIntent(context: Context): PendingIntent {
         val intent = SystemSearchActivity.fromFavWidget(context)
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun buildOnboardingPendingIntent(
@@ -258,7 +289,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     ): PendingIntent {
         val intent = BrowserActivity.intent(context, newSearch = true)
         intent.putExtra(FAVORITES_ONBOARDING_EXTRA, true)
-        return PendingIntent.getActivity(context, appWidgetId, intent, 0)
+        return PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun inject(context: Context) {

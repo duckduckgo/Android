@@ -62,10 +62,10 @@ class FireAnimationActivity : DuckDuckGoActivity() {
         fireAnimationView.setAndPropagateUpFitsSystemWindows(false)
         fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
         fireAnimationView.addAnimatorListener(object : Animator.AnimatorListener {
-            override fun onAnimationRepeat(animation: Animator?) {}
-            override fun onAnimationCancel(animation: Animator?) {}
-            override fun onAnimationStart(animation: Animator?) {}
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationRepeat(animation: Animator) {}
+            override fun onAnimationCancel(animation: Animator) {}
+            override fun onAnimationStart(animation: Animator) {}
+            override fun onAnimationEnd(animation: Animator) {
                 finish()
                 overridePendingTransition(0, R.anim.tab_anim_fade_out)
             }
@@ -73,7 +73,7 @@ class FireAnimationActivity : DuckDuckGoActivity() {
     }
 
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
-        override fun onAnimationUpdate(animation: ValueAnimator?) {
+        override fun onAnimationUpdate(animation: ValueAnimator) {
             binding.fireAnimationView.speed += ANIMATION_SPEED_INCREMENT
             if (binding.fireAnimationView.speed > ANIMATION_MAX_SPEED) {
                 binding.fireAnimationView.removeUpdateListener(this)

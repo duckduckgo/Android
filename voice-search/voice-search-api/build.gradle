@@ -24,3 +24,6 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     implementation AndroidX.appCompat
 }
+android {
+  namespace 'com.duckduckgo.voice.api'
+}

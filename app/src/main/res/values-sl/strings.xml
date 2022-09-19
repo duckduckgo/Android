@@ -121,38 +121,6 @@
     <string name="httpsMixed">Mešana šifrirna povezava</string>
     <string name="httpsBad">Nešifrirana povezava</string>
 
-    <string name="networksActivityTitle">Sledilna omrežja</string>
-    <string name="networksContentDescription">Sledilna omrežja</string>
-    <string name="networksOverview">Sledilna omrežja združijo vašo spletno zgodovino v podatkovni profil o vas. Glavna sledilna omrežja so bolj škodljiva, ker vas lahko spremljajo in ciljajo na večjem delu interneta.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">Najden %1$s sledilnik</item>
-        <item quantity="two">Najdena %1$s sledilnika</item>
-        <item quantity="few">Najdeni %1$s sledilniki</item>
-        <item quantity="other">Najdenih %1$s sledilnikov</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">Blokiran %1$s sledilnik</item>
-        <item quantity="two">Blokirana %1$s sledilnika</item>
-        <item quantity="few">Blokiranih %1$s sledilnikov</item>
-        <item quantity="other">Blokiranih %1$s sledilnikov</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">Najdeno %1$s glavno sledilno omrežje</item>
-        <item quantity="two">Najdeni %1$s glavni omrežji</item>
-        <item quantity="few">Najdenih %1$s glavnih omrežij</item>
-        <item quantity="other">Najdenih %1$s glavnih sledilnih omrežij</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">Blokirano %1$s glavno sledilno omrežje</item>
-        <item quantity="two">Blokirani %1$s glavni omrežji</item>
-        <item quantity="few">Blokiranih %1$s glavnih omrežij</item>
-        <item quantity="other">Blokiranih %1$s glavnih sledilnih omrežij</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Ocena zasebnosti</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Spletno mesto je glavno sledilno omrežje</string>
     <string name="scorecardPrivacyGrade">Ocena zasebnosti</string>
@@ -171,6 +139,45 @@
     <string name="networkTrackerSummaryHeader">GLAVNI KRŠITELJI MED SLEDILNIMI OMREŽJI</string>
     <string name="networkTrackerSummaryNotReady">Še vedno zbiramo podatke za prikaz, koliko sledilnikov smo blokirali.</string>
 
+    <string name="trackersActivityTitle">Zahtevki za sledenje so blokirani</string>
+    <string name="trackersContentDescription">Zahtevki za sledenje so blokirani</string>
+    <string name="trackersOverview">Nalaganje naslednjih zahtevkov domen tretjih oseb je bilo blokirano, ker so bili prepoznani kot zahtevki za sledenje. Če so zahtevki podjetja naloženi, lahko na podlagi tega oblikujejo vaš profil.</string>
+    <string name="trackersOverviewProtectionsOff">Nalaganje zahtevkov za sledenje ni bilo blokirano, ker so zaščite za to spletno mesto izklopljene. Če so zahtevki podjetja naloženi, lahko na podlagi tega oblikujejo vaš profil.</string>
+
+    <string name="domainsLoadedActivityTitle">Nalaganje zahtevkov tretjih oseb</string>
+    <string name="domainsLoadedContentDescription">Nalaganje zahtevkov tretjih oseb</string>
+    <string name="domainsLoadedOverview">Naloženi so bili naslednji zahtevki domen tretjih oseb. Če so zahtevki podjetja izpolnjeni, lahko podjetje na podlagi tega oblikuje vaš profil, čeprav še vedno veljajo naša druga zaščitna pravila za sledenje v spletu.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Noben zahtevek tretjih oseb ni bil blokiran zaradi izklopa zaščite za to mesto. Če so zahtevki podjetja naloženi, lahko podjetje na podlagi tega oblikuje vaš profil.</string>
+    <string name="domainsLoadedOverviewEmpty">Nismo zaznali zahtevkov iz domen tretjih oseb.</string>
+    <string name="domainsLoadedHeadingText">Naložene niso nobene domene tretjih oseb</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">O naši zaščiti pred spletnim sledenjem</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Naloženi so bili naslednji zahtevki domen.</string>
+
+    <string name="adLoadedSectionDescription">Naslednji zahtevki domen so bili naloženi, ker ste pred kratkim kliknili oglas %1$s na portalu DuckDuckGo. Ti zahtevki pomagajo oceniti učinkovitost oglasa. Vsi oglasi na DuckDuckGo so neprofilirani.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Kako naši oglasi v iskalnem omrežju vplivajo na našo zaščito</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Naloženi so bili tudi naslednji zahtevki domen.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Naloženi so bili naslednji zahtevki za sledenje domenam.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Nismo zaznali zahtevkov iz domen tretjih oseb.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Naloženi so bili naslednji zahtevki domen, da se prepreči prekinitev spletnega mesta.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Naloženi so bili naslednji zahtevki domen, ker so povezani z %1$s.</string>
+
+    <string name="trackersBlockedText">Zahtevki, katerih nalaganje je blokirano</string>
+    <string name="trackersNotBlockedText">Noben zahtevek za sledenje ni blokiran</string>
+    <string name="trackersNoFoundText">Ni najdenih zahtevkov za sledenje</string>
+    <string name="trackersFoundText">Najdeni zahtevki za sledenje</string>
+
+    <string name="domainsLoadedText">Nalaganje zahtevkov tretjih oseb</string>
+    <string name="domainsNotLoadedText">Ni naloženih zahtevkov tretjih oseb</string>
+
+    <string name="majorNetworksNoFound">Glavnega sledilnega omrežja ni mogoče najti+</string>
+    <string name="majorNetworksFound">Najdeno je več sledenj omrežjem</string>
+
     <!-- Fire -->
     <string name="fireMenu">Počisti podatke</string>
     <string name="fireClearAll">Počisti vse zavihke in podatke</string>
@@ -180,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nastavitve</string>
     <string name="settingsMenuItemTitle">Nastavitve</string>
-    <string name="settingsHeadingGeneral">Splošno</string>
-    <string name="settingsHeadingOther">Drugo</string>
     <string name="settingsHeadingPrivacy">Zasebnost</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Različica</string>
@@ -199,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Vprašaj vsakič</string>
     <string name="settingsAppLinksAlways">Vedno</string>
     <string name="settingsAppLinksNever">Nikoli</string>
+    <string name="settingsHeadingAppearance">Izgled</string>
+    <string name="settingsHeadingCustomize">Prilagodi</string>
+    <string name="settingsHeadingAbout">O nas</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Shrani</string>
@@ -575,11 +583,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Povezava prekinjena. To spletno mesto lahko škoduje vaši napravi.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Upravitelj prenosov je onemogočen</string>
-    <string name="downloadManagerIncompatible">Upravitelj prenosov ni na voljo v tej napravi</string>
-    <string name="enable">Omogoči</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Želite omogočiti lokacijo naprave za zasebnost brskalnika DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s zahteva lokacijo vaše naprave. Najprej boste morali aplikaciji dovoliti, da pošlje lokacijo vaše naprave, nato lahko %2$s zahteva dovoljenje.</string>
@@ -611,7 +614,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalni nadzor zasebnosti (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href="">Več</a><u/>]]>
+        <![CDATA[DuckDuckGo samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href=\"\">Več</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globalni nadzor zasebnosti (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalni nadzor zasebnosti (GPC)</string>
@@ -637,52 +640,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokira sledilce e-pošte in skrije vaš naslov</string>
     <string name="newEmailAliasMenuTitle">Ustvari naslov Duck</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Želite odstraniti zaščito e-pošte?</string>
-    <string name="emailSignOutDialogText">Opomba: Če odstranite zaščito e-pošte iz te naprave, s tem ne boste izbrisali naslova Duck.</string>
-    <string name="emailSignOutDialogCancel">Preklic</string>
-    <string name="emailSignOutDialogDisable">Odstrani</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Čakalni seznam e-pošte</string>
-    <string name="waitlistNotificationTitle">Zaščita e-pošte je pripravljena!</string>
-    <string name="waitlistNotificationDescription">Odprite svoje povabilo</string>
-
     <string name="waitlistNotificationDialogDescription">Želite, da vam pošljemo obvestilo, ko ste na vrsti?</string>
     <string name="waitlistNotificationDialogNoThanks">Ne, hvala</string>
     <string name="waitlistNotificationDialogNotifyMe">OBVESTI ME</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Zaščita e-pošte (Beta)</string>
     <string name="emailProtectionActivityTitle">Zaščita e-pošte (Beta)</string>
-    <string name="emailProtectionFooterDescription">Za pridružitev čakalnemu seznamu vam ne bo treba posredovati nobenih osebnih podatkov. Svoje mesto si boste zagotovili v skladu s časovnim žigom, ki obstaja samo v vaši napravi, tako da vas lahko obvestimo, ko boste na vrsti.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Pri dodajanju na čakalni seznam je prišlo do napake. Poskusite znova pozneje.</string>
-    <string name="emailProtectionDuckAddressCta">Naslov Duck že imam</string>
-    <string name="emailProtectionInviteCodeCta">Imam kodo povabila</string>
-    <string name="emailProtectionWaitlistCta">Pridruži se zasebnemu čakalnemu seznamu</string>
-    <string name="emailProtectionGetStartedCta">Začni</string>
     <string name="emailNotSupported">Naprava ni podprta</string>
     <string name="emailNotSupportedExplanation">Zaščita e-pošte vam omogoča ustvarjanje zasebnih e-poštnih naslovov, ki odstranijo sledilnike e-pošte. Te naslove, ki jih ustvarite lokalno, moramo šifrirati in shraniti v vaši napravi. Ker vaša naprava ne podpira šifriranega pomnilnika, zaščita e-pošte ni na voljo.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Poenostavljena zasebnost e-pošte.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokirajte sledilnike e-pošte in skrijte svoj naslov, brez zamenjave ponudnika e-pošte.<a href=""><b>Več</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Ste na seznamu!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Obvestili vas bomo, ko bo<br/> zaščita e-pošte pripravljena za vas. <a href=""><b>Več</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaše povabilo se bo prikazalo tukaj, ko bomo pripravljeni. Želite <a href=""><b>prejeti obvestilo</b></a>, ko prispe?<br/><a href=""><b>Preberite več</b></a> o zaščiti e-pošte.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Povabljeni ste!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokirajte sledilnike e-pošte in skrijte svoj naslov, brez zamenjave ponudnika e-pošte.<a href=""><b>Več</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Osebni naslov Duck</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Odstranitev zaščite e-pošte iz te naprave odstrani možnost, da med brskanjem po spletu v e-poštna polja vpišete svoj osebni naslov Duck ali na novo ustvarjeni zasebni naslov Duck.<br/><br/>Če želite v celoti izbrisati svoje naslove Duck ali za kakršna koli druga vprašanja ali povratne informacije, se obrnite na nas na <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Odstrani iz naprave</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Uredi zaznamek</string>
@@ -754,5 +720,17 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blokiraj sledilnike aplikacij v napravi</string>
     <string name="atp_SettingsDeviceShieldEnabled">Omogočeno</string>
     <string name="atp_SettingsDeviceShieldDisabled">Onemogočeno</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Videti je, da ima to spletno mesto pojavno okno s soglasjem za piškotke👇</string>
+    <string name="autoconsentDialogDescription">Želite, da jih uredim namesto vas? Poskušam zmanjšati piškotke, povečati zasebnost in skriti pojavna okna, kot so ta.</string>
+    <string name="autoconsentPrimaryCta">Upravljanje pojavnih oken za piškotke</string>
+    <string name="autoconsentSecondaryCta">Ne, hvala</string>
+
+    <string name="autoconsentSetting">Upravljanje pojavnih oken za piškotke</string>
+    <string name="autoconsentAnimationText">Upravljani piškotki</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Samodejno izpolnjevanje</string>
 
 </resources>

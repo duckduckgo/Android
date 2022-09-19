@@ -20,6 +20,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.lifecycle.LifecycleObserver
+import androidx.work.WorkManager
+import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -40,7 +42,6 @@ import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.*
 import com.duckduckgo.app.browser.print.PrintInjector
-import com.duckduckgo.app.browser.serviceworker.ServiceWorkerLifecycleObserver
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -53,7 +54,6 @@ import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -77,14 +77,18 @@ import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
+import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.api.Autoconsent
+import com.duckduckgo.autofill.BrowserAutofill
+import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
 import com.duckduckgo.downloads.impl.DataUriDownloader
 import com.duckduckgo.downloads.impl.DownloadFileService
-import com.duckduckgo.downloads.impl.NetworkFileDownloader
+import com.duckduckgo.downloads.impl.FileDownloadCallback
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -128,11 +132,14 @@ class BrowserModule {
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        emailInjector: EmailInjector,
         accessibilityManager: AccessibilityManager,
         viewportMod: ViewportMod,
+        browserAutofillConfigurator: BrowserAutofill.Configurator,
         ampLinks: AmpLinks,
-        printInjector: PrintInjector
+        printInjector: PrintInjector,
+        internalTestUserChecker: InternalTestUserChecker,
+        adClickManager: AdClickManager,
+        autoconsent: Autoconsent,
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -149,11 +156,14 @@ class BrowserModule {
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
-            emailInjector,
+            browserAutofillConfigurator,
             accessibilityManager,
             viewportMod,
             ampLinks,
-            printInjector
+            printInjector,
+            internalTestUserChecker,
+            adClickManager,
+            autoconsent,
         )
     }
 
@@ -167,7 +177,7 @@ class BrowserModule {
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        urlExtractor: DOMUrlExtractor
+        urlExtractor: DOMUrlExtractor,
     ): UrlExtractingWebViewClient {
         return UrlExtractingWebViewClient(
             webViewHttpAuthStore,
@@ -178,7 +188,7 @@ class BrowserModule {
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
-            urlExtractor
+            urlExtractor,
         )
     }
 
@@ -238,8 +248,9 @@ class BrowserModule {
     fun specialUrlDetector(
         packageManager: PackageManager,
         ampLinks: AmpLinks,
-        trackingParameters: TrackingParameters
-    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters)
+        trackingParameters: TrackingParameters,
+        appBuildConfig: AppBuildConfig,
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, appBuildConfig)
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -270,9 +281,20 @@ class BrowserModule {
         httpsUpgrader: HttpsUpgrader,
         privacyProtectionCountDao: PrivacyProtectionCountDao,
         gpc: Gpc,
-        userAgentProvider: UserAgentProvider
+        userAgentProvider: UserAgentProvider,
+        adClickManager: AdClickManager,
+        cloakedCnameDetector: CloakedCnameDetector
     ): RequestInterceptor =
-        WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao, gpc, userAgentProvider)
+        WebViewRequestInterceptor(
+            resourceSurrogates,
+            trackerDetector,
+            httpsUpgrader,
+            privacyProtectionCountDao,
+            gpc,
+            userAgentProvider,
+            adClickManager,
+            cloakedCnameDetector
+        )
 
     @Provides
     fun cookieManager(
@@ -390,9 +412,12 @@ class BrowserModule {
     @Provides
     fun fileDownloader(
         dataUriDownloader: DataUriDownloader,
-        networkFileDownloader: NetworkFileDownloader
+        callback: FileDownloadCallback,
+        workManager: WorkManager,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
     ): FileDownloader {
-        return AndroidFileDownloader(dataUriDownloader, networkFileDownloader)
+        return AndroidFileDownloader(dataUriDownloader, callback, workManager, coroutineScope, dispatcherProvider)
     }
 
     @Provides
@@ -420,10 +445,4 @@ class BrowserModule {
     ): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository)
     }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    @IntoSet
-    fun serviceWorkerLifecycleObserver(serviceWorkerLifecycleObserver: ServiceWorkerLifecycleObserver): LifecycleObserver =
-        serviceWorkerLifecycleObserver
 }

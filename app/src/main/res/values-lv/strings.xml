@@ -121,34 +121,6 @@
     <string name="httpsMixed">Jaukts šifrēšanas savienojums</string>
     <string name="httpsBad">Nešifrēts savienojums</string>
 
-    <string name="networksActivityTitle">Izsekotāju tīkli</string>
-    <string name="networksContentDescription">Izsekotāju tīkli</string>
-    <string name="networksOverview">Izsekotāju tīkli apkopo jūsu tīmekļa vēsturi datu profilā par jums. Lielākie izsekotāju tīkli ir kaitīgāki, jo tie var izsekot un atlasīt jūs kā mērķauditoriju internetā plašākā mērogā.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="zero">%1$s Atrasti izsekotāji</item>
-        <item quantity="one">%1$s Atrasts izsekotājs</item>
-        <item quantity="other">%1$s Atrasti izsekotāji</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="zero">%1$s Izsekotāji ir bloķēti</item>
-        <item quantity="one">%1$s Izsekotājs ir bloķēts</item>
-        <item quantity="other">%1$s Izsekotāji ir bloķēti</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="zero">Atrasti %1$s lielākie izsekotāju tīkli</item>
-        <item quantity="one">%1$s Atrasts lielākais izsekotāju tīkls</item>
-        <item quantity="other">Atrasti %1$s lielākie izsekotāju tīkli</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="zero">%1$s Lielākie izsekotāju tīkli ir bloķēti</item>
-        <item quantity="one">%1$s Galvenais izsekotāju tīkls ir bloķēts</item>
-        <item quantity="other">%1$s Lielākie izsekotāju tīkli ir bloķēti</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Privātuma līmenis</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Vietne ir lielākais izsekotāju tīkls</string>
     <string name="scorecardPrivacyGrade">Privātuma līmenis</string>
@@ -167,6 +139,45 @@
     <string name="networkTrackerSummaryHeader">IZSEKOTĀJU TĪKLA LIELĀKIE PĀRKĀPĒJI</string>
     <string name="networkTrackerSummaryNotReady">Mēs joprojām apkopojam datus, lai parādītu, cik daudz izsekotāju esam nobloķējuši.</string>
 
+    <string name="trackersActivityTitle">Bloķētie izsekošanas pieprasījumi</string>
+    <string name="trackersContentDescription">Bloķētie izsekošanas pieprasījumi</string>
+    <string name="trackersOverview">Turpmāk norādīto trešo pušu domēnu pieprasījumu ielāde tika bloķēta, jo tie tika identificēti kā izsekošanas pieprasījumi. Ja uzņēmuma pieprasījumi tiek ielādēti, tas var ļaut tiem izveidot tavu profilu.</string>
+    <string name="trackersOverviewProtectionsOff">Neviens izsekošanas pieprasījums netika bloķēts, jo šai vietnei ir izslēgta aizsardzība. Ja uzņēmuma pieprasījumi tiek ielādēti, tas var ļaut tiem izveidot tavu profilu.</string>
+
+    <string name="domainsLoadedActivityTitle">Ielādēti trešo pušu pieprasījumi</string>
+    <string name="domainsLoadedContentDescription">Ielādētie trešo pušu pieprasījumi</string>
+    <string name="domainsLoadedOverview">Tika ielādēti šādu trešo pušu domēnu pieprasījumi. Ja tiek ielādēti uzņēmuma pieprasījumi, tas var ļaut tiem veidot tavu profilu, lai gan joprojām ir spēkā mūsu pārējās tīmekļa izsekošanas aizsardzības prasības.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Netika bloķēta trešo pušu pieprasījumu ielāde, jo šai vietnei ir izslēgta aizsardzība. Ja uzņēmuma pieprasījumi tiek ielādēti, tas var ļaut tiem izveidot tavu profilu.</string>
+    <string name="domainsLoadedOverviewEmpty">Mēs neatradām pieprasījumus no neviena trešās puses domēna.</string>
+    <string name="domainsLoadedHeadingText">Nav ielādēts neviens trešās puses domēns</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Par mūsu tīmekļa izsekošanas aizsardzību</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Tika ielādēti šādu domēnu pieprasījumi.</string>
+
+    <string name="adLoadedSectionDescription">Šā domēna pieprasījumi tika ielādēti, jo nesen tika nospiests uz %1$s reklāmas DuckDuckGo. Šie pieprasījumi palīdz novērtēt reklāmu efektivitāti. Neviena reklāma DuckDuckGo nav profilējoša.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Kā mūsu meklēšanas reklāmas ietekmē mūsu aizsardzību</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Tika ielādēti arī šāda domēna pieprasījumi.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Tika ielādēti šādu domēnu izsekošanas pieprasījumi.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Mēs neatradām pieprasījumus no neviena trešās puses domēna.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Šī domēna pieprasījumi tika ielādēti, lai novērstu vietnes darbības traucējumus.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Tika ielādēti šā domēna pieprasījumi, jo tie ir saistīti ar %1$s.</string>
+
+    <string name="trackersBlockedText">Pieprasījumu ielādēšana bloķēta</string>
+    <string name="trackersNotBlockedText">Neviens izsekošanas pieprasījums nav bloķēts</string>
+    <string name="trackersNoFoundText">Nav atrasts neviens izsekošanas pieprasījums</string>
+    <string name="trackersFoundText">Atrasti izsekošanas pieprasījumi</string>
+
+    <string name="domainsLoadedText">Ielādētie trešo pušu pieprasījumi</string>
+    <string name="domainsNotLoadedText">Nav ielādēts neviens trešo pušu pieprasījums</string>
+
+    <string name="majorNetworksNoFound">Nav atrasts neviens lielāko izsekotāju tīkls</string>
+    <string name="majorNetworksFound">Atrasti lielāko izsekotāju tīkli</string>
+
     <!-- Fire -->
     <string name="fireMenu">Izdzēst datus</string>
     <string name="fireClearAll">Notīrīt visas cilnes un datus</string>
@@ -176,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Iestatījumi</string>
     <string name="settingsMenuItemTitle">Iestatījumi</string>
-    <string name="settingsHeadingGeneral">Vispārīgi</string>
-    <string name="settingsHeadingOther">Citi</string>
     <string name="settingsHeadingPrivacy">Privātums</string>
     <string name="settingsAboutDuckduckgo">Par DuckDuckGo</string>
     <string name="settingsVersion">Versija</string>
@@ -195,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Jautāt katru reizi</string>
     <string name="settingsAppLinksAlways">Vienmēr</string>
     <string name="settingsAppLinksNever">Nekad</string>
+    <string name="settingsHeadingAppearance">Izskats</string>
+    <string name="settingsHeadingCustomize">Pielāgošana</string>
+    <string name="settingsHeadingAbout">Par</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
@@ -569,11 +581,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Savienojums pārtraukts. Šī vietne var kaitēt tavai ierīcei.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Lejupielāžu pārvaldnieks ir atspējots</string>
-    <string name="downloadManagerIncompatible">Lejupielāžu pārvaldnieks šajā ierīcē nav pieejams</string>
-    <string name="enable">Iespējot</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vai iespējot ierīces atrašanās vietu DuckDuckGo privātuma pārlūkprogrammai?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s pieprasa tavas ierīces atrašanās vietu. Vispirms tev ir jāatļauj lietotnei nosūtīt tavas ierīces atrašanās vietu, pēc tam %2$s var pieprasīt atļauju.</string>
@@ -605,7 +612,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globālā privātuma kontrole (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automātiski bloķē daudzus izsekotājus. Izmantojot globālo privātuma kontroli (GPC), vari arī lūgt iesaistītajām vietnēm ierobežot savu personas datu pārdošanu vai kopīgošanu ar citiem uzņēmumiem. <u><a href="">Uzzini vairāk</a><u/>]]>
+        <![CDATA[DuckDuckGo automātiski bloķē daudzus izsekotājus. Izmantojot globālo privātuma kontroli (GPC), vari arī lūgt iesaistītajām vietnēm ierobežot savu personas datu pārdošanu vai kopīgošanu ar citiem uzņēmumiem. <u><a href=\"\">Uzzini vairāk</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globālā privātuma kontrole (GPC)</string>
     <string name="globalPrivacyControlToggle">Globālā privātuma kontrole (GPC)</string>
@@ -631,52 +638,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Bloķē e-pasta izsekotājus un paslēpj tavu adresi</string>
     <string name="newEmailAliasMenuTitle">Izveidot Duck adresi</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Vai noņemt e-pasta aizsardzību?</string>
-    <string name="emailSignOutDialogText">Piezīme: noņemot e-pasta aizsardzību no šīs ierīces, tava Duck adrese netiks dzēsta.</string>
-    <string name="emailSignOutDialogCancel">Atcelt</string>
-    <string name="emailSignOutDialogDisable">Noņemt</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">E-pasta nogaides saraksts</string>
-    <string name="waitlistNotificationTitle">E-pasta aizsardzība ir gatava!</string>
-    <string name="waitlistNotificationDescription">Atver savu ielūgumu</string>
-
     <string name="waitlistNotificationDialogDescription">Vai vēlies, lai mēs nosūtām tev paziņojumu, kad pienāks tava kārta?</string>
     <string name="waitlistNotificationDialogNoThanks">Nē, paldies</string>
     <string name="waitlistNotificationDialogNotifyMe">INFORMĒT MANI</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">E-pasta aizsardzība (Beta)</string>
     <string name="emailProtectionActivityTitle">E-pasta aizsardzība (Beta)</string>
-    <string name="emailProtectionFooterDescription">Lai pievienotos gaidīšanas sarakstam, tev nav jādalās ar personisku informāciju. Tu ieņemsi vietu rindā, izmantojot laikspiedolu, kas pastāv tikai tavā ierīcē, lai mēs varētu tevi informēt, kad pienāks tava kārta.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Radās kļūda, pievienojoties nogaides sarakstam. Lūdzu, mēģini vēlāk vēlreiz.</string>
-    <string name="emailProtectionDuckAddressCta">Man jau ir Duck adrese</string>
-    <string name="emailProtectionInviteCodeCta">Man ir uzaicinājuma kods</string>
-    <string name="emailProtectionWaitlistCta">Pievienojies privātajam nogaides sarakstam</string>
-    <string name="emailProtectionGetStartedCta">Sākt darbu</string>
     <string name="emailNotSupported">Ierīce netiek atbalstīta</string>
     <string name="emailNotSupportedExplanation">E-pasta aizsardzība ļauj izveidot privātas e-pasta adreses, kas noņem e-pasta izsekotājus. Mums ir jāšifrē un jāsaglabā šīs tavā ierīcē vietēji izveidotās adreses. Tā kā tava ierīce neatbalsta šifrētu krātuvi, e-pasta aizsardzība nav pieejama.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">E-pasta konfidencialitāte, vienkāršota.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi, nemainot e-pasta pakalpojumu sniedzēju.<br /><a href=""><b>Uzzini vairāk</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Tu esi sarakstā!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Mēs nosūtīsim tev paziņojumu, kad<br/> e-pasta aizsardzība būs sagatavota. <a href=""><b>Uzzini vairāk</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tavs uzaicinājums būs redzams šeit, kad tas būs sagatavots. Vai vēlies <a href=""><b>saņemt paziņojumu</b></a>, kad tas tiks nosūtīts?<br/><a href=""><b>Uzzini vairāk</b></a> par e-pasta aizsardzību.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Tu esi uzaicināts(-ta)!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi,<br/>nemainot e-pasta pakalpojumu sniedzēju.<br/><a href=""><b>Uzzini vairāk</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Personīgā Duck adrese</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Noņemot e-pasta aizsardzību no šīs ierīces, tīmekļa pārlūkošanas laikā tiek noņemta iespēja e-pasta laukos ievadīt tavu personisko Duck adresi vai tikko ģenerēto privāto Duck adresi.<br/><br/>Lai pilnībā dzēstu savas Duck adreses vai gadījumā, ja tev ir kādi citi jautājumi vai atsauksmes, sazinies ar mums pa e-pastu <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Noņemt no ierīces</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Rediģēt grāmatzīmi</string>
@@ -746,5 +716,17 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Lietotņu izsekotāju bloķēšana ierīcē</string>
     <string name="atp_SettingsDeviceShieldEnabled">Iespējots</string>
     <string name="atp_SettingsDeviceShieldDisabled">Atspējots</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Izskatās, ka šajā vietnē ir sīkfailu piekrišanas uznirstošais logs👇</string>
+    <string name="autoconsentDialogDescription">Vai vēlies, lai es tos apstrādāju tavā vietā? Es varu mēģināt samazināt sīkfailus, maksimāli palielināt konfidencialitāti un paslēpt šādus uznirstošos logus.</string>
+    <string name="autoconsentPrimaryCta">Pārvaldīt sīkfailu uznirstošos logus</string>
+    <string name="autoconsentSecondaryCta">Nē, paldies</string>
+
+    <string name="autoconsentSetting">Pārvaldīt sīkfailu uznirstošos logus</string>
+    <string name="autoconsentAnimationText">Pārvaldītie sīkfaili</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automātiska aizpilde</string>
 
 </resources>

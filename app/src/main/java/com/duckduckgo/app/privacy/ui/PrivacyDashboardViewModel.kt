@@ -35,6 +35,7 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchManageWhitelist
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchTrackerNetworksActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -59,6 +60,8 @@ class PrivacyDashboardViewModel @Inject constructor(
         val afterGrade: PrivacyGrade,
         val httpsStatus: HttpsStatus,
         val trackerCount: Int,
+        val otherDomainsLoadedCount: Int = 0,
+        val specialDomainsLoadedCount: Int = 0,
         val allTrackersBlocked: Boolean,
         val practices: PrivacyPractices.Summary,
         val toggleEnabled: Boolean?,
@@ -72,6 +75,7 @@ class PrivacyDashboardViewModel @Inject constructor(
     sealed class Command {
         object LaunchManageWhitelist : Command()
         class LaunchReportBrokenSite(val data: BrokenSiteData) : Command()
+        class LaunchTrackerNetworksActivity(val trackersBlockedCount: Int, val specialDomainsLoadedCount: Int, val toggleEnabled: Boolean) : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -115,6 +119,13 @@ class PrivacyDashboardViewModel @Inject constructor(
         )
     }
 
+    fun onNetworksContainerClicked() {
+        pixel.fire(PRIVACY_DASHBOARD_NETWORKS)
+        viewState.value?.let {
+            command.value = LaunchTrackerNetworksActivity(it.trackerCount, it.specialDomainsLoadedCount, it.toggleEnabled ?: false)
+        }
+    }
+
     private fun showTrackerNetworkLeaderboard(
         siteVisitedCount: Int,
         networkCount: Int
@@ -138,6 +149,8 @@ class PrivacyDashboardViewModel @Inject constructor(
             afterGrade = PrivacyGrade.UNKNOWN,
             httpsStatus = HttpsStatus.SECURE,
             trackerCount = 0,
+            specialDomainsLoadedCount = 0,
+            otherDomainsLoadedCount = 0,
             allTrackersBlocked = true,
             toggleEnabled = null,
             practices = UNKNOWN,
@@ -164,6 +177,8 @@ class PrivacyDashboardViewModel @Inject constructor(
                 afterGrade = grades.improvedGrade,
                 httpsStatus = site.https,
                 trackerCount = site.trackerCount,
+                otherDomainsLoadedCount = site.otherDomainsLoadedCount,
+                specialDomainsLoadedCount = site.specialDomainsLoadedCount,
                 allTrackersBlocked = site.allTrackersBlocked,
                 toggleEnabled = toggleEnabled,
                 practices = site.privacyPractices.summary,

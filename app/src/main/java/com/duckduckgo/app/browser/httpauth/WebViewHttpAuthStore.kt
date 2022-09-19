@@ -19,22 +19,23 @@ package com.duckduckgo.app.browser.httpauth
 import android.webkit.WebView
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.WebViewDatabaseProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.DatabaseCleaner
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
-import dagger.SingleInstanceIn
 
 data class WebViewHttpAuthCredentials(
     val username: String,
@@ -81,20 +82,21 @@ class RealWebViewHttpAuthStore @Inject constructor(
     private val databaseCleaner: DatabaseCleaner,
     @Named("authDbLocator") private val authDatabaseLocator: DatabaseLocator,
     private val dispatcherProvider: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
-) : WebViewHttpAuthStore, LifecycleObserver {
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val appBuildConfig: AppBuildConfig,
+) : WebViewHttpAuthStore, DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun onAppCreated() {
+    override fun onCreate(owner: LifecycleOwner) {
         // API 28 seems to use WAL for the http_auth db and changing the journal mode does not seem
         // to work properly
-        if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.P) return
+        if (appBuildConfig.sdkInt == android.os.Build.VERSION_CODES.P) return
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
             databaseCleaner.changeJournalModeToDelete(authDatabaseLocator.getDatabasePath())
         }
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     override fun setHttpAuthUsernamePassword(
         webView: WebView,
         host: String,
@@ -102,19 +104,20 @@ class RealWebViewHttpAuthStore @Inject constructor(
         username: String,
         password: String
     ) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.O) {
             webViewDatabaseProvider.get().setHttpAuthUsernamePassword(host, realm, username, password)
         } else {
             webView.setHttpAuthUsernamePassword(host, realm, username, password)
         }
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     override fun getHttpAuthUsernamePassword(
         webView: WebView,
         host: String,
         realm: String
     ): WebViewHttpAuthCredentials? {
-        val credentials = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        val credentials = if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.O) {
             webViewDatabaseProvider.get().getHttpAuthUsernamePassword(host, realm)
         } else {
             @Suppress("DEPRECATION")

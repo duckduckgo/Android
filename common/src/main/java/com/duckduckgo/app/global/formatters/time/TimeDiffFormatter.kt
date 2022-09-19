@@ -110,7 +110,7 @@ class RealTimeDiffFormatter @Inject constructor(private val context: Context) : 
         val timeDifferenceDate = (endDate.time - startDate.time).run { TimeUnit.DAYS.convert(this, TimeUnit.MILLISECONDS) }
 
         return when (timeDifferenceDate) {
-            0L, 1L -> TimePassed.fromMilliseconds(timeDifferenceMillis).shortFormat()
+            0L, 1L -> TimePassed.fromMilliseconds(timeDifferenceMillis).shortFormat(context.resources)
             else -> context.getString(R.string.common_DaysAgo, timeDifferenceDate)
         }
     }

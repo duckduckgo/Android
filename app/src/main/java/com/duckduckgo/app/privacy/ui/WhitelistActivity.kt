@@ -29,7 +29,7 @@ import com.duckduckgo.app.browser.databinding.ActivityWhitelistBinding
 import com.duckduckgo.app.browser.databinding.EditWhitelistBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import com.duckduckgo.di.scopes.ActivityScope
@@ -97,7 +97,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun processCommand(command: WhitelistViewModel.Command?) {
+    private fun processCommand(command: WhitelistViewModel.Command) {
         when (command) {
             is ShowAdd -> showAddDialog()
             is ShowEdit -> showEditDialog(command.entry)

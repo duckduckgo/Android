@@ -50,7 +50,7 @@ class BrokenSiteSubmitter(
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
-        val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName) && gpc.isEnabled()).toString()
+        val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value) && gpc.isEnabled()).toString()
         val absoluteUrl = Uri.parse(brokenSite.siteUrl).absoluteString
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -67,7 +67,10 @@ class BrokenSiteSubmitter(
                 WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
                 SITE_TYPE_KEY to brokenSite.siteType,
                 GPC to isGpcEnabled,
-                URL_PARAMETERS_REMOVED to brokenSite.urlParametersRemoved.toString()
+                URL_PARAMETERS_REMOVED to brokenSite.urlParametersRemoved.toString(),
+                CONSENT_MANAGED to brokenSite.consentManaged.toString(),
+                CONSENT_OPT_OUT_FAILED to brokenSite.consentOptOutFailed.toString(),
+                CONSENT_SELF_TEST_FAILED to brokenSite.consentSelfTestFailed.toString(),
             )
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
@@ -101,5 +104,8 @@ class BrokenSiteSubmitter(
         private const val SITE_TYPE_KEY = "siteType"
         private const val GPC = "gpc"
         private const val URL_PARAMETERS_REMOVED = "urlParametersRemoved"
+        private const val CONSENT_MANAGED = "consentManaged"
+        private const val CONSENT_OPT_OUT_FAILED = "consentOptoutFailed"
+        private const val CONSENT_SELF_TEST_FAILED = "consentSelftestFailed"
     }
 }

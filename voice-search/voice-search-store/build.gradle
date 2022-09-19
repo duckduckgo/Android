@@ -25,3 +25,6 @@ dependencies {
     implementation AndroidX.core.ktx
     testImplementation Testing.junit4
 }
+android {
+  namespace 'com.duckduckgo.voice.store'
+}

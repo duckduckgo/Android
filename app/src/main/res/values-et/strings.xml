@@ -121,30 +121,6 @@
     <string name="httpsMixed">Erinevate krüpteeringutega ühendus</string>
     <string name="httpsBad">Krüptimata ühendus</string>
 
-    <string name="networksActivityTitle">Jälgimisvõrgud</string>
-    <string name="networksContentDescription">Jälgimisvõrgud</string>
-    <string name="networksOverview">Jälgimisvõrgud koondavad teie veebiajaloo teie kohta käivaks andmeprofiiliks. Suured jälgimisvõrgud on kahjulikumad, kuna nad saavad teid jälgida ja sihtida kogu Internetis.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s jälitaja leitud</item>
-        <item quantity="other">%1$s jälitajat leitud</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s jälgija on blokeeritud</item>
-        <item quantity="other">%1$s jälgijat on blokeeritud</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s leitud suur jälgimisvõrk</item>
-        <item quantity="other">%1$s leitud suurt jälgimisvõrku</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s suur jälgimisvõrk blokeeritud</item>
-        <item quantity="other">%1$s suurt jälgimisvõrku blokeeritud</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Privaatsusaste</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Sait on peamine jälgimisvõrk</string>
     <string name="scorecardPrivacyGrade">Privaatsusaste</string>
@@ -163,6 +139,45 @@
     <string name="networkTrackerSummaryHeader">JÄLGIMISVÕRGU SUURIMAD RIKKUJAD</string>
     <string name="networkTrackerSummaryNotReady">Kogume endiselt andmeid, et näidata, kui palju jälgijaid oleme blokeerinud.</string>
 
+    <string name="trackersActivityTitle">Blokeeritud jälgimispäringud</string>
+    <string name="trackersContentDescription">Blokeeritud jälgimispäringud</string>
+    <string name="trackersOverview">Järgmiste kolmanda poole domeenide päringute laadimine blokeeriti, sest need tuvastati jälgimispäringutena. Kui ettevõtte päringud laaditakse, võib see võimaldada neil sind profileerida.</string>
+    <string name="trackersOverviewProtectionsOff">Jälgimispäringute laadimist ei blokeeritud, sest selle saidi jaoks on kaitsed välja lülitatud. Kui ettevõtte päringud laaditakse, võib see võimaldada neil sind profileerida.</string>
+
+    <string name="domainsLoadedActivityTitle">Kolmanda poole päringud on laaditud</string>
+    <string name="domainsLoadedContentDescription">Kolmanda poole päringud on laaditud</string>
+    <string name="domainsLoadedOverview">Laaditi järgmiste kolmanda poole domeenide päringud. Kui ettevõtte päringud laaditakse, võib see võimaldada neil sind profileerida, kuigi meie teised veebi jälgimise kaitsemeetmed kehtivad endiselt.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Kolmandate poolte päringute laadimist ei blokeeritud, sest selle saidi jaoks on kaitsed välja lülitatud. Kui ettevõtte päringud laaditakse, võib see võimaldada neil sind profileerida.</string>
+    <string name="domainsLoadedOverviewEmpty">Me ei tuvastanud kolmanda poole domeenide päringuid.</string>
+    <string name="domainsLoadedHeadingText">Kolmanda poole domeene pole laaditud</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Meie veebijälgimise kaitsete teave</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Laaditi järgmiste domeenide päringud.</string>
+
+    <string name="adLoadedSectionDescription">Järgmise domeeni päringud laaditi, sest hiljuti klõpsati DuckDuckGo kaudu %1$s reklaamil. Need päringud aitavad hinnata reklaamide tõhusust. Kõik DuckDuckGo reklaamid on mitteprofileerivad.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Kuidas meie otsingu reklaamid meie kaitset mõjutavad?</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Laaditi ka järgmise domeeni päringud.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Laaditi järgmiste domeenide jälgimispäringud.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Me ei tuvastanud kolmanda poole domeenide päringuid.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Laaditi järgmise domeeni päringud, et vältida saidi töö häirimist.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Laaditi järgmise domeeni päringud, sest nendega on seotud %1$s.</string>
+
+    <string name="trackersBlockedText">Päringute laadimine on blokeeritud</string>
+    <string name="trackersNotBlockedText">Ühtegi jälgimispäringut pole blokeeritud</string>
+    <string name="trackersNoFoundText">Jälgimispäringuid ei leitud</string>
+    <string name="trackersFoundText">Leitud jälgimispäringud</string>
+
+    <string name="domainsLoadedText">Kolmanda poole päringud on laaditud</string>
+    <string name="domainsNotLoadedText">Kolmanda poole päringud pole laaditud</string>
+
+    <string name="majorNetworksNoFound">Ühtegi peamist jälgimisvõrku ei leitud</string>
+    <string name="majorNetworksFound">Leitud peamised jälgimisvõrgud</string>
+
     <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>
     <string name="fireClearAll">Kustuta kõik vahekaardid ja andmed</string>
@@ -172,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Sätted</string>
     <string name="settingsMenuItemTitle">Sätted</string>
-    <string name="settingsHeadingGeneral">Üldine</string>
-    <string name="settingsHeadingOther">Muu</string>
     <string name="settingsHeadingPrivacy">Privaatsus</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
     <string name="settingsVersion">Versioon</string>
@@ -191,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Küsi iga kord</string>
     <string name="settingsAppLinksAlways">Alati</string>
     <string name="settingsAppLinksNever">Mitte kunagi</string>
+    <string name="settingsHeadingAppearance">Välimus</string>
+    <string name="settingsHeadingCustomize">Kohanda</string>
+    <string name="settingsHeadingAbout">Teave</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
@@ -563,11 +579,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Ühendus on katkestatud. See veebileht võib kahjustada sinu seadet.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Download Manager on keelatud</string>
-    <string name="downloadManagerIncompatible">Download Manager ei ole saadaval selles seadmes</string>
-    <string name="enable">Luba</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Kas lubada seadme asukoht DuckDuckGo privaatses brauseris?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s küsib sinu seadme asukohta. Kõigepealt pead lubama rakendusel saata oma seadme asukoht, seejärel saab %2$s küsida luba.</string>
@@ -599,7 +610,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blokeerib automaatselt paljud jälitajad. Üleilmse privaatsuskontrolli (GPC) abil saate paluda osalevatel veebisaitidel piirata teie isikuandmete müümist või jagamist teiste ettevõtetega. <u><a href="">Loe edasi</a><u/>]]>
+        <![CDATA[DuckDuckGo blokeerib automaatselt paljud jälitajad. Üleilmse privaatsuskontrolli (GPC) abil saate paluda osalevatel veebisaitidel piirata teie isikuandmete müümist või jagamist teiste ettevõtetega. <u><a href=\"\">Loe edasi</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="globalPrivacyControlToggle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
@@ -625,52 +636,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokeerib e-posti jälgijad ja peidab teie aadressi</string>
     <string name="newEmailAliasMenuTitle">Looge Ducki aadress</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Kas eemaldada e-posti kaitsed?</string>
-    <string name="emailSignOutDialogText">Märkus. E-posti kaitsete eemaldamine sellest seadmest ei kustuta teie Ducki aadressi.</string>
-    <string name="emailSignOutDialogCancel">Tühista</string>
-    <string name="emailSignOutDialogDisable">Eemaldage</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">E-posti järjekord</string>
-    <string name="waitlistNotificationTitle">Meilikaitse on valmis.</string>
-    <string name="waitlistNotificationDescription">Ava oma kutse</string>
-
     <string name="waitlistNotificationDialogDescription">Kas soovite, et me saadame teile teavituse, kui on teie kord?</string>
     <string name="waitlistNotificationDialogNoThanks">Ei aitäh</string>
     <string name="waitlistNotificationDialogNotifyMe">TEAVITAGE MIND</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">E-posti kaitse (beeta)</string>
     <string name="emailProtectionActivityTitle">E-posti kaitse (beeta)</string>
-    <string name="emailProtectionFooterDescription">Ootenimekirjaga liitumiseks ei pea isikuandmeid jagama. Sinu järjekorrakoht on kinnitatud ainult sinu seadmes oleva ajatempliga ja me teavitame sind, kui on sinu kord.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Ooteloendiga liitumisel tekkis tõrge, proovige hiljem uuesti</string>
-    <string name="emailProtectionDuckAddressCta">Mul on juba Ducki aadress</string>
-    <string name="emailProtectionInviteCodeCta">Mul on kutse kood</string>
-    <string name="emailProtectionWaitlistCta">Liituge privaatse ootenimekirjaga</string>
-    <string name="emailProtectionGetStartedCta">Alustage</string>
     <string name="emailNotSupported">Seadet ei toetata</string>
     <string name="emailNotSupportedExplanation">Meilikaitse võimaldab luua privaatseid ja jälguritest vabasid meiliaadresse. Me peame need aadressid krüptima ja sinu seadmesse salvestama. Meilikaitset ei saa kasutada, sest sinu seade ei toeta krüptitud salvestamist.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">E-posti privaatsus, lihtsustatud.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokeeri meilijälgurid ja peida oma aadress ilma meiliteenuse pakkujat vahetamata.<br/><b><a href="">Lisateave</a></b>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Olete nimekirjas!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Saadame teile teate, kui<br/> E-posti kaitse on teie jaoks valmis. <a href=""><b>Lisateave</b></a> .]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Teie kutse kuvatakse siin, kui oleme teie jaoks valmis. Kas soovite <a href=""><b>saada teavitust</b></a> selle saabumise kohta?<br/><a href=""><b>Lisateave</b></a> e-posti kaitse kohta.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Olete kutsutud!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokeeri meilijälgurid ja peida oma aadress <br/>ilma meiliteenuse pakkujat vahetamata.<br/><b><a href="">Lisateave</a></b>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Isiklik Ducki aadress</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[E-posti kaitse eemaldamine sellest seadmest eemaldab veebis sirvimise ajal võimaluse sisestada oma isiklik Ducki aadress või äsja loodud isiklik Ducki aadress e-posti väljadele.<br/><br/>Oma Ducki aadresside täielikuks kustutamiseks või muude küsimuste või tagasiside saamiseks pöörduge meie poole aadressil <a href=\"mailto:support@duck.com\">support@duck.com</a> .]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Eemaldage seadmest</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Redigeeri järjehoidjat</string>
@@ -738,5 +712,17 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blokeeri oma seadmes rakenduste jälgurid</string>
     <string name="atp_SettingsDeviceShieldEnabled">Lubatud</string>
     <string name="atp_SettingsDeviceShieldDisabled">Keelatud</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Paistab, et sellel saidil on küpsiste nõusoleku hüpikaken👇</string>
+    <string name="autoconsentDialogDescription">Kas soovid, et ma need sinu eest lahendaksin? Ma võin proovida minimeerida küpsiseid, maksimeerida privaatsust ja sellised hüpikaknad peita.</string>
+    <string name="autoconsentPrimaryCta">Halda küpsiste hüpikaknaid</string>
+    <string name="autoconsentSecondaryCta">Ei aitäh</string>
+
+    <string name="autoconsentSetting">Halda küpsiste hüpikaknaid</string>
+    <string name="autoconsentAnimationText">Hallatavad küpsised</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automaatne täitmine</string>
 
 </resources>

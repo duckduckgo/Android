@@ -18,7 +18,6 @@ package com.duckduckgo.privacy.config.impl.plugins
 
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import org.mockito.kotlin.mock
@@ -49,7 +48,7 @@ class PrivacyFeatureTogglesPluginTest {
 
     @Test
     fun whenIsEnabledAndFeatureIsNotAPrivacyFeatureThenReturnNull() = runTest {
-        assertNull(testee.isEnabled(NonPrivacyFeature(), true))
+        assertNull(testee.isEnabled(NonPrivacyFeature().value, true))
     }
 
     @Test
@@ -57,7 +56,7 @@ class PrivacyFeatureTogglesPluginTest {
         runTest {
             givenPrivacyFeatureIsEnabled()
 
-            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName, true)
+            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value, true)
 
             assertTrue(isEnabled!!)
         }
@@ -67,7 +66,7 @@ class PrivacyFeatureTogglesPluginTest {
         runTest {
             givenPrivacyFeatureIsDisabled()
 
-            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName, true)
+            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value, true)
 
             assertFalse(isEnabled!!)
         }
@@ -79,7 +78,7 @@ class PrivacyFeatureTogglesPluginTest {
             givenPrivacyFeatureReturnsDefaultValue(defaultValue)
 
             val isEnabled =
-                testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName, defaultValue)
+                testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value, defaultValue)
 
             assertEquals(defaultValue, isEnabled)
         }
@@ -90,7 +89,7 @@ class PrivacyFeatureTogglesPluginTest {
             givenPrivacyFeatureIsEnabled()
             givenAppVersionIsEqualToMinSupportedVersion()
 
-            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName, true)
+            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value, true)
 
             assertTrue(isEnabled!!)
         }
@@ -101,7 +100,7 @@ class PrivacyFeatureTogglesPluginTest {
             givenPrivacyFeatureIsEnabled()
             givenAppVersionIsGreaterThanMinSupportedVersion()
 
-            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName, true)
+            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value, true)
 
             assertTrue(isEnabled!!)
         }
@@ -112,7 +111,7 @@ class PrivacyFeatureTogglesPluginTest {
             givenPrivacyFeatureIsEnabled()
             givenAppVersionIsSmallerThanMinSupportedVersion()
 
-            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName, true)
+            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value, true)
 
             assertFalse(isEnabled!!)
         }
@@ -171,5 +170,5 @@ class PrivacyFeatureTogglesPluginTest {
         whenever(mockAppBuildConfig.versionCode).thenReturn(123)
     }
 
-    data class NonPrivacyFeature(override val value: String = "test") : FeatureName
+    data class NonPrivacyFeature(val value: String = "test")
 }

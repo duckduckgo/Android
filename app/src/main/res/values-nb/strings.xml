@@ -121,30 +121,6 @@
     <string name="httpsMixed">Tilkobling med blandet kryptering</string>
     <string name="httpsBad">Ukryptert tilkobling</string>
 
-    <string name="networksActivityTitle">Sporingsnettverk</string>
-    <string name="networksContentDescription">Sporingsnettverk</string>
-    <string name="networksOverview">Sporingsnettverk samler netthistorikken din i en dataprofil om deg. Større sporingsnettverk gjør mer skade fordi de kan spore og peile seg inn på deg på flere steder på Internett.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%% sporing oppdaget</item>
-        <item quantity="other">%% sporinger oppdaget</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s sporing blokkert</item>
-        <item quantity="other">%1$s sporinger blokkert</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s stort sporingsnettverk oppdaget</item>
-        <item quantity="other">%1$s store sporingsnettverk oppdaget</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s stort sporingsnettverk blokkert</item>
-        <item quantity="other">%1$s store sporingsnettverk blokkert</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Grad av personvern</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Nettstedet er et stort sporingsnettverk</string>
     <string name="scorecardPrivacyGrade">Grad av personvern</string>
@@ -163,6 +139,45 @@
     <string name="networkTrackerSummaryHeader">DE VERSTE SPORINGSNETTVERKENE</string>
     <string name="networkTrackerSummaryNotReady">Vi samler fortsatt data for å vise deg hvor mange sporinger vi har blokkert.</string>
 
+    <string name="trackersActivityTitle">Sporingsforespørsler blokkert</string>
+    <string name="trackersContentDescription">Sporingsforespørsler blokkert</string>
+    <string name="trackersOverview">Forespørslene fra følgende tredjepartsdomener ble blokkert fra lasting, fordi de ble identifisert som sporingsforespørsler. Hvis forespørslene fra et selskap blir lastet, har selskapet mulighet til å profilere deg.</string>
+    <string name="trackersOverviewProtectionsOff">Ingen sporingsforespørsler ble blokkert fra lasting, fordi beskyttelse er slått av for dette nettstedet. Hvis forespørslene fra et selskap blir lastet, har selskapet mulighet til å profilere deg.</string>
+
+    <string name="domainsLoadedActivityTitle">Tredjepartsforespørsler er lastet</string>
+    <string name="domainsLoadedContentDescription">Tredjepartsforespørsler er lastet</string>
+    <string name="domainsLoadedOverview">Forespørslene fra følgende tredjepartsdomener ble lastet. Hvis forespørslene fra et selskap blir lastet, har selskapet mulighet til å profilere deg, selv om de andre nettsporingsbeskyttelsene våre fremdeles gjelder.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Ingen tredjepartsforespørsler ble blokkert fra lasting, fordi beskyttelse er slått av for dette nettstedet. Hvis forespørslene fra et selskap blir lastet, har selskapet mulighet til å profilere deg.</string>
+    <string name="domainsLoadedOverviewEmpty">Vi oppdaget ingen forespørsler fra tredjepartsdomener.</string>
+    <string name="domainsLoadedHeadingText">Ingen tredjepartsdomener er lastet</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Om nettsporingsbeskyttelsen vår</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Forespørslene fra følgende domener ble lastet.</string>
+
+    <string name="adLoadedSectionDescription">Forespørslene fra følgende domene ble lastet fordi en %1$s-annonse på DuckDuckGo nylig ble klikket på. Disse forespørslene bidrar til å evaluere annonseeffektiviteten. Alle annonser på DuckDuckGo er ikke-profilerende.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Hvordan søkeannonsene våre påvirker beskyttelsen vår</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Forespørslene fra følgende domene ble også lastet.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Sporingsforespørslene fra følgende domener ble lastet.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Vi oppdaget ingen forespørsler fra tredjepartsdomener.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Forespørslene fra følgende domene ble lastet for å forhindre brudd på nettstedet.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Forespørslene fra følgende domene ble lastet fordi de er tilknyttet %1$s.</string>
+
+    <string name="trackersBlockedText">Forespørsler blokkert fra lasting</string>
+    <string name="trackersNotBlockedText">Ingen sporingsforespørsler er blokkert</string>
+    <string name="trackersNoFoundText">Ingen sporingsforespørsler er funnet</string>
+    <string name="trackersFoundText">Sporingsforespørsler funnet</string>
+
+    <string name="domainsLoadedText">Tredjepartsforespørsler er lastet</string>
+    <string name="domainsNotLoadedText">Ingen tredjepartsforespørsler er lastet</string>
+
+    <string name="majorNetworksNoFound">Ingen større sporingsnettverk ble oppdaget</string>
+    <string name="majorNetworksFound">Store sporingsnettverk er oppdaget</string>
+
     <!-- Fire -->
     <string name="fireMenu">Tøm data</string>
     <string name="fireClearAll">Lukk alle faner og slett data</string>
@@ -172,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Innstillinger</string>
     <string name="settingsMenuItemTitle">Innstillinger</string>
-    <string name="settingsHeadingGeneral">Generelt</string>
-    <string name="settingsHeadingOther">Annet</string>
     <string name="settingsHeadingPrivacy">Personvern</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Versjon</string>
@@ -191,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Spør hver gang</string>
     <string name="settingsAppLinksAlways">Alltid</string>
     <string name="settingsAppLinksNever">Aldri</string>
+    <string name="settingsHeadingAppearance">Utseende</string>
+    <string name="settingsHeadingCustomize">Tilpass</string>
+    <string name="settingsHeadingAbout">Om</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Lagre</string>
@@ -563,11 +579,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Tilkobling avbrutt. Dette nettstedet kan skade enheten din.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Nedlastingsbehandler er deaktivert</string>
-    <string name="downloadManagerIncompatible">Nedlastingsbehandler er ikke tilgjengelig på denne enheten</string>
-    <string name="enable">Aktiver</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vil du aktivere posisjonstjenester for DuckDuckGo privatnettleser?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s ber om tillatelse til å se posisjonen til enheten din. Først må du gi appen tillatelse til å sende enhetens posisjon, deretter kan %2$s be om tillatelse.</string>
@@ -599,7 +610,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blokkerer mange sporere automatisk. Med Global Privacy Control (GPC) kan du også be deltakende nettsteder om å begrense salg eller deling av dine personopplysninger med andre selskaper. <u><a href="">Finn ut mer</a><u/>]]>
+        <![CDATA[DuckDuckGo blokkerer mange sporere automatisk. Med Global Privacy Control (GPC) kan du også be deltakende nettsteder om å begrense salg eller deling av dine personopplysninger med andre selskaper. <u><a href=\"\">Finn ut mer</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -625,52 +636,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokkerer e-postsporere og skjuler adressen din</string>
     <string name="newEmailAliasMenuTitle">Opprett Duck-adresse</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Vil du fjerne e-postbeskyttelse?</string>
-    <string name="emailSignOutDialogText">Merk: Duck-adressen din slettes ikke ved at du fjerner e-postbeskyttelse fra denne enheten.</string>
-    <string name="emailSignOutDialogCancel">Avbryt</string>
-    <string name="emailSignOutDialogDisable">Fjern</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Venteliste for e-post</string>
-    <string name="waitlistNotificationTitle">E-postbeskyttelse er klar!</string>
-    <string name="waitlistNotificationDescription">Åpne invitasjonen din</string>
-
     <string name="waitlistNotificationDialogDescription">Skal vi sende et varsel til deg når det er din tur?</string>
     <string name="waitlistNotificationDialogNoThanks">Nei takk</string>
     <string name="waitlistNotificationDialogNotifyMe">VARSLE MEG</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">E-postbeskyttelse (Beta)</string>
     <string name="emailProtectionActivityTitle">E-postbeskyttelse (Beta)</string>
-    <string name="emailProtectionFooterDescription">Du behøver ikke å dele noen personopplysninger for å sette deg på ventelisten. Du sikrer plassen din i køen med et tidsstempel som kun eksisterer på enheten din, så vi kan varsle deg når det er din tur.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Det oppstod en feil under registrering for ventelisten. Prøv igjen senere.</string>
-    <string name="emailProtectionDuckAddressCta">Jeg har allerede en Duck-adresse</string>
-    <string name="emailProtectionInviteCodeCta">Jeg har en invitasjonskode</string>
-    <string name="emailProtectionWaitlistCta">Sett deg på den private ventelisten</string>
-    <string name="emailProtectionGetStartedCta">Kom i gang</string>
     <string name="emailNotSupported">Enheten støttes ikke</string>
     <string name="emailNotSupportedExplanation">Med e-postbeskyttelse kan du opprette private e-postadresser som fjerner e-postsporere. Vi må kryptere og lagre disse adressene du oppretter, lokalt på enheten din. Fordi enheten din ikke støtter kryptert lagring, er e-postbeskyttelse utilgjengelig.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Personvern for e-post gjort enkelt.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokker e-postsporere og skjul adressen din, uten å bytte e-postleverandør.<br/><a href=""><b>Finn ut mer</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Du er satt på listen!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Vi sender deg et varsel når<br/> e-postbeskyttelse er klar for deg. <a href=""><b>Finn ut mer</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Invitasjonen vises her når vi er klare for deg. Vil du <a href=""><b>få et varsel</b></a> når den kommer?<br/><a href=""><b>Finn ut mer om</b></a> e-postbeskyttelse.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Du er invitert!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokker e-postsporere og skjul adressen din,<br/>uten å bytte e-postleverandør.<br/><a href=""><b>Finn ut mer</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Personlig Duck-adresse</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Hvis du fjerner e-postbeskyttelse fra denne enheten, fjerner du muligheten til å fylle inn din personlige Duck-adresse eller en nygenerert privat Duck-adresse i e-postfelt når du surfer på nettet.<br/><br/>Hvis du vil slette Duck-adressene dine helt, eller har andre spørsmål eller tilbakemeldinger, kan du kontakte oss på <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Fjern fra enheten</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Rediger bokmerke</string>
@@ -738,5 +712,17 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">Blokker appsporere på enheten din</string>
     <string name="atp_SettingsDeviceShieldEnabled">Aktivert</string>
     <string name="atp_SettingsDeviceShieldDisabled">Deaktivert</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Det ser ut til at dette nettstedet har et popup-vindu om samtykke til informasjonskapsler👇</string>
+    <string name="autoconsentDialogDescription">Skal jeg håndtere dette for deg? Jeg kan prøve å minimere informasjonskapslene, maksimere personvernet og skjule popup-vinduer som dette.</string>
+    <string name="autoconsentPrimaryCta">Administrer popup-vinduer om informasjonskapsler</string>
+    <string name="autoconsentSecondaryCta">Nei takk</string>
+
+    <string name="autoconsentSetting">Administrer popup-vinduer om informasjonskapsler</string>
+    <string name="autoconsentAnimationText">Informasjonskapsler administrert</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Autofyll</string>
 
 </resources>

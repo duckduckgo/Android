@@ -122,7 +122,17 @@ class RealSavedSitesParser : SavedSitesParser {
         document: Document,
         bookmarksRepository: BookmarksRepository
     ): List<SavedSite> {
-        return parseElement(document, 0, bookmarksRepository, mutableListOf(), false)
+        val body = document.select("body").first() ?: return emptyList()
+        val children = body.childNodes()
+            .filterIsInstance<Element>()
+            .filter { it.select("DT").isNotEmpty() }
+
+        var rootElement: Element = document
+
+        if (children.size > 1) {
+            rootElement = Element("DL").appendChildren(children)
+        }
+        return parseElement(rootElement, 0, bookmarksRepository, mutableListOf(), false)
     }
 
     private suspend fun parseElement(

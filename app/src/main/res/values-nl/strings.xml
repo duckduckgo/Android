@@ -121,30 +121,6 @@
     <string name="httpsMixed">Verbinding met gemengde codering</string>
     <string name="httpsBad">Niet-gecodeerde verbinding</string>
 
-    <string name="networksActivityTitle">Trackernetwerken</string>
-    <string name="networksContentDescription">Trackernetwerken</string>
-    <string name="networksOverview">Trackernetwerken voegen je webgeschiedenis samen tot een gegevensprofiel over jou. Grote trackernetwerken zijn schadelijker omdat ze je verder op het internet kunnen volgen en zich op je kunnen richten.</string>
-
-    <plurals name="trackersFound">
-        <item quantity="one">%1$s tracker gevonden</item>
-        <item quantity="other">%1$s trackers gevonden</item>
-    </plurals>
-
-    <plurals name="trackerBlocked">
-        <item quantity="one">%1$s tracker geblokkeerd</item>
-        <item quantity="other">%1$s trackers geblokkeerd</item>
-    </plurals>
-
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s groot trackernetwerk gevonden</item>
-        <item quantity="other">%1$s grote trackernetwerken gevonden</item>
-    </plurals>
-
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s groot trackernetwerk geblokkeerd</item>
-        <item quantity="other">%1$s grote trackernetwerken geblokkeerd</item>
-    </plurals>
-
     <string name="scorecardActivityTitle">Privacyniveau</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Site is groot trackernetwerk</string>
     <string name="scorecardPrivacyGrade">Privacyniveau</string>
@@ -163,6 +139,45 @@
     <string name="networkTrackerSummaryHeader">TOPOVERTREDERS TRACKERNETWERK</string>
     <string name="networkTrackerSummaryNotReady">We verzamelen nog steeds gegevens om te laten zien hoeveel trackers we hebben geblokkeerd.</string>
 
+    <string name="trackersActivityTitle">Trackingverzoeken geblokkeerd</string>
+    <string name="trackersContentDescription">Trackingverzoeken geblokkeerd</string>
+    <string name="trackersOverview">De volgende verzoeken van domeinen van derden werden geblokkeerd omdat ze werden geïdentificeerd als trackingverzoeken. Als de verzoeken van een bedrijf worden geladen, kunnen ze een profiel van je maken.</string>
+    <string name="trackersOverviewProtectionsOff">Trackingverzoeken werden niet verhinderd om te laden omdat beschermingen zijn uitgeschakeld voor deze site. Als de verzoeken van een bedrijf worden geladen, kunnen ze een profiel van je maken. Als de verzoeken van een bedrijf worden geladen, kunnen ze een profiel van je maken.</string>
+
+    <string name="domainsLoadedActivityTitle">Verzoeken van derden geladen</string>
+    <string name="domainsLoadedContentDescription">Verzoeken van derden geladen</string>
+    <string name="domainsLoadedOverview">De volgende verzoeken van domeinen van derden zijn geladen. Als de verzoeken van een bedrijf worden geladen, kunnen ze een profiel van je maken, hoewel onze andere beschermingen tegen webtracking nog steeds van toepassing zijn.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Verzoeken van derden werden niet verhinderd om te laden omdat beschermingen zijn uitgeschakeld voor deze site. Als de verzoeken van een bedrijf worden geladen, kunnen ze een profiel van je maken.</string>
+    <string name="domainsLoadedOverviewEmpty">We hebben geen verzoeken van domeinen van derden gedetecteerd.</string>
+    <string name="domainsLoadedHeadingText">Geen domeinen van derden geladen</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Over onze bescherming tegen webtracking</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">De verzoeken van de volgende domeinen zijn geladen.</string>
+
+    <string name="adLoadedSectionDescription">De verzoeken van het volgende domein zijn geladen omdat er onlangs op een advertentie van %1$s op DuckDuckGo is geklikt. Deze verzoeken helpen de effectiviteit van advertenties te evalueren. Geen enkele advertentie op DuckDuckGo maakt een profiel van je.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Hoe onze zoekadvertenties onze bescherming beïnvloeden</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">De verzoeken van het volgende domein zijn ook geladen.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">De trackingverzoeken van de volgende domeinen zijn geladen.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">We hebben geen verzoeken van domeinen van derden gedetecteerd.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">De verzoeken van het volgende domein werden geladen om te voorkomen dat de site niet meer geladen zou worden.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">De verzoeken van het volgende domein zijn geladen omdat ze zijn gekoppeld aan %1$s.</string>
+
+    <string name="trackersBlockedText">Verzoeken geblokkeerd bij laden</string>
+    <string name="trackersNotBlockedText">Geen trackingverzoeken geblokkeerd</string>
+    <string name="trackersNoFoundText">Geen trackingverzoeken gevonden</string>
+    <string name="trackersFoundText">Trackingverzoeken gevonden</string>
+
+    <string name="domainsLoadedText">Verzoeken van derden geladen</string>
+    <string name="domainsNotLoadedText">Geen verzoeken van derden geladen</string>
+
+    <string name="majorNetworksNoFound">Geen grote trackernetwerken gevonden</string>
+    <string name="majorNetworksFound">Grote trackernetwerken gevonden</string>
+
     <!-- Fire -->
     <string name="fireMenu">Gegevens wissen</string>
     <string name="fireClearAll">Alle tabbladen en gegevens wissen</string>
@@ -172,8 +187,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Instellingen</string>
     <string name="settingsMenuItemTitle">Instellingen</string>
-    <string name="settingsHeadingGeneral">Algemeen</string>
-    <string name="settingsHeadingOther">Overige</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
     <string name="settingsAboutDuckduckgo">Over DuckDuckGo</string>
     <string name="settingsVersion">Versie</string>
@@ -191,6 +204,9 @@
     <string name="settingsAppLinksAskEveryTime">Elke keer vragen</string>
     <string name="settingsAppLinksAlways">Altijd</string>
     <string name="settingsAppLinksNever">Nooit</string>
+    <string name="settingsHeadingAppearance">Uiterlijk</string>
+    <string name="settingsHeadingCustomize">Aanpassen</string>
+    <string name="settingsHeadingAbout">Over</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
@@ -563,11 +579,6 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Verbinding verbroken. Deze website kan schadelijk zijn voor je apparaat.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Downloadbeheerder is uitgeschakeld</string>
-    <string name="downloadManagerIncompatible">Downloadbeheerder is niet beschikbaar op dit apparaat</string>
-    <string name="enable">Inschakelen</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Apparaatlocatie inschakelen voor DuckDuckGo Privacy Browser?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s vraagt om de locatie van je apparaat. Je moet eerst de app toestemming geven om je apparaatlocatie te versturen, waarna %2$s toestemming kan vragen.</string>
@@ -599,7 +610,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[Veel trackers worden automatisch geblokkeerd door DuckDuckGo. Met Global Privacy Control (GPC) kun je deelnemende websites ook vragen om je persoonsgegevens niet te verkopen aan of te delen met andere bedrijven. <u><a href="">Meer informatie</a><u/>]]>
+        <![CDATA[Veel trackers worden automatisch geblokkeerd door DuckDuckGo. Met Global Privacy Control (GPC) kun je deelnemende websites ook vragen om je persoonsgegevens niet te verkopen aan of te delen met andere bedrijven. <u><a href=\"\">Meer informatie</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -625,52 +636,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokkeert e-mailtrackers en verbergt je adres</string>
     <string name="newEmailAliasMenuTitle">Duck-adres aanmaken</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">E-mailbescherming verwijderen?</string>
-    <string name="emailSignOutDialogText">Let op: als je E-mailbescherming van dit apparaat verwijdert, wordt je Duck-adres niet verwijderd.</string>
-    <string name="emailSignOutDialogCancel">Annuleren</string>
-    <string name="emailSignOutDialogDisable">Verwijderen</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">E-mailwachtlijst</string>
-    <string name="waitlistNotificationTitle">E-mailbescherming is klaar!</string>
-    <string name="waitlistNotificationDescription">Open je uitnodiging</string>
-
     <string name="waitlistNotificationDialogDescription">Wil je dat we je een melding sturen als je aan de beurt bent?</string>
     <string name="waitlistNotificationDialogNoThanks">Nee, bedankt</string>
     <string name="waitlistNotificationDialogNotifyMe">MELDING STUREN</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">E-mailbescherming (bèta)</string>
     <string name="emailProtectionActivityTitle">E-mailbescherming (bèta)</string>
-    <string name="emailProtectionFooterDescription">Je hoeft geen persoonsgegevens te delen om op de wachtlijst te komen. Je beveiligt je plaats met een tijdstempel die alleen op jouw apparaat bestaat. Zo kunnen we je informeren wanneer je aan de beurt bent.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Er is een fout opgetreden bij het inschrijven op de wachtlijst. Probeer het later opnieuw</string>
-    <string name="emailProtectionDuckAddressCta">Ik heb al een Duck-adres</string>
-    <string name="emailProtectionInviteCodeCta">Ik heb een uitnodigingscode</string>
-    <string name="emailProtectionWaitlistCta">Schrijf je in voor de privéwachtlijst</string>
-    <string name="emailProtectionGetStartedCta">Aan de slag</string>
     <string name="emailNotSupported">Apparaat wordt niet ondersteund</string>
     <string name="emailNotSupportedExplanation">Met E-mailbescherming maak je privémailadressen die e-mailtrackers verwijderen. De adressen die je lokaal op je apparaat maakt, dienen we te versleutelen en opslaan. E-mailbescherming is niet beschikbaar omdat je apparaat geen versleutelde opslag ondersteunt.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">E-mailprivacy, vereenvoudigd.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=""><b>Meer informatie</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Je staat op de lijst!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We sturen je een melding wanneer<br/> E-mailbescherming voor je klaar staat. <a href=""><b>Meer informatie</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Je uitnodiging wordt hier weergegeven als je aan de beurt bent. Wil <a href=""><b>je een melding krijgen</b></a> wanneer deze binnen is?<br/><a href=""><b>Meer informatie</b></a> over E-mailbescherming.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Je bent uitgenodigd!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=""><b>Meer informatie</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Persoonlijk Duck-adres</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Als je E-mailbescherming van dit apparaat verwijdert, kun je je persoonlijke Duck-adres niet meer invullen en geen nieuwe privé-Duck-adressen genereren in e-mailvelden terwijl je op het internet browset.<br/><br/>Als je je Duck-adressen volledig wilt verwijderen of als je andere vragen of feedback hebt, neem dan contact met ons op via <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Verwijderen van apparaat</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Bladwijzer bewerken</string>
@@ -738,5 +712,17 @@
     <string name="atp_SettingsDeviceShieldNeverEnabled">App trackers blokkeren op je apparaat</string>
     <string name="atp_SettingsDeviceShieldEnabled">Ingeschakeld</string>
     <string name="atp_SettingsDeviceShieldDisabled">Uitgeschakeld</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Het lijkt erop dat deze site een pop-up met toestemming voor cookies heeft👇</string>
+    <string name="autoconsentDialogDescription">Wil je dat ik deze voor je afhandel? Ik kan proberen cookies te minimaliseren, privacy te maximaliseren en pop-ups zoals deze te verbergen.</string>
+    <string name="autoconsentPrimaryCta">Cookiepop-ups beheren</string>
+    <string name="autoconsentSecondaryCta">Nee, bedankt</string>
+
+    <string name="autoconsentSetting">Cookiepop-ups beheren</string>
+    <string name="autoconsentAnimationText">Beheerde cookies</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automatisch invullen</string>
 
 </resources>

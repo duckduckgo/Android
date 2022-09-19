@@ -20,9 +20,9 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -45,10 +45,10 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
     init {
         fragment.viewLifecycleOwnerLiveData.observe(fragment) { lifecycleOwner ->
             lifecycleOwner.lifecycle.addObserver(
-                object : LifecycleObserver {
-                    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-                    fun onDestroy() {
+                object : DefaultLifecycleObserver {
+                    override fun onDestroy(owner: LifecycleOwner) {
                         nullifyBindingHandler.post { binding = null }
+                        super.onDestroy(owner)
                     }
                 })
         }

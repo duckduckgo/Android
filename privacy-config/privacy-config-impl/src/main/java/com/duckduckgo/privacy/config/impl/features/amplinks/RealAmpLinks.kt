@@ -23,7 +23,7 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinkType
-import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -50,7 +50,7 @@ class RealAmpLinks @Inject constructor(
     }
 
     override fun extractCanonicalFromAmpLink(url: String): AmpLinkType? {
-        if (!featureToggle.isFeatureEnabled(PrivacyFeatureName.AmpLinksFeatureName)) return null
+        if (!featureToggle.isFeatureEnabled(PrivacyFeatureName.AmpLinksFeatureName.value)) return null
         if (url == lastExtractedUrl) return null
 
         val extractedUrl = extractCanonical(url)

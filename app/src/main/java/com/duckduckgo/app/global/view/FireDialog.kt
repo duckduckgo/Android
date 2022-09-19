@@ -72,7 +72,7 @@ class FireDialog(
         get() = if (this::fireCtaBinding.isInitialized) fireCtaBinding.daxCtaContainer.isVisible else false
 
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
-        override fun onAnimationUpdate(animation: ValueAnimator?) {
+        override fun onAnimationUpdate(animation: ValueAnimator) {
             binding.fireAnimationView.speed += ANIMATION_SPEED_INCREMENT
             if (binding.fireAnimationView.speed > ANIMATION_MAX_SPEED) {
                 binding.fireAnimationView.removeUpdateListener(this)
@@ -171,10 +171,10 @@ class FireDialog(
         binding.fireAnimationView.show()
         binding.fireAnimationView.playAnimation()
         binding.fireAnimationView.addAnimatorListener(object : Animator.AnimatorListener {
-            override fun onAnimationRepeat(animation: Animator?) {}
-            override fun onAnimationCancel(animation: Animator?) {}
-            override fun onAnimationStart(animation: Animator?) {}
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationRepeat(animation: Animator) {}
+            override fun onAnimationCancel(animation: Animator) {}
+            override fun onAnimationStart(animation: Animator) {}
+            override fun onAnimationEnd(animation: Animator) {
                 onFireDialogClearAllEvent(AnimationFinished)
             }
         })
