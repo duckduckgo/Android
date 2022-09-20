@@ -14,36 +14,32 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.lint
+package com.duckduckgo.lint.ui
 
 import com.android.tools.lint.client.api.IssueRegistry
 import com.android.tools.lint.client.api.Vendor
 import com.android.tools.lint.detector.api.CURRENT_API
 import com.android.tools.lint.detector.api.Issue
-import com.duckduckgo.lint.NoFragmentDetector.Companion.NO_FRAGMENT_ISSUE
-import com.duckduckgo.lint.NoLifecycleObserverDetector.Companion.NO_LIFECYCLE_OBSERVER_ISSUE
-import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
-import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
 import com.duckduckgo.lint.ui.DeprecatedAndroidButtonUsedInXmlDetector.Companion.DEPRECATED_BUTTON_IN_XML
+import com.duckduckgo.lint.ui.NoAlertDialogDetector.Companion.NO_DESIGN_SYSTEM_DIALOG
 import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Companion.STYLE_IN_DESIGN_SYSTEM_COMPONENT
 
 @Suppress("UnstableApiUsage")
-class DuckDuckGoIssueRegistry : IssueRegistry() {
+class DuckDuckGoDesignSystemRegistry : IssueRegistry() {
     override val issues: List<Issue>
         get() = listOf(
-            NO_SINGLETON_ISSUE,
-            NO_LIFECYCLE_OBSERVER_ISSUE,
-            NO_FRAGMENT_ISSUE,
-            NO_SYSTEM_LOAD_LIBRARY
+            DEPRECATED_BUTTON_IN_XML,
+            STYLE_IN_DESIGN_SYSTEM_COMPONENT,
+            NO_DESIGN_SYSTEM_DIALOG
         )
 
     override val api: Int
         get() = CURRENT_API
 
     override val vendor = Vendor(
-        vendorName = "DuckDuckGo",
-        identifier = "com.duckduckgo:lint",
-        feedbackUrl = "https://github.com/duckduckgo/android/issues",
+        vendorName = "DuckDuckGo Design System",
+        identifier = "com.duckduckgo:lint:ui",
+        feedbackUrl = "https://app.asana.com/0/1202857801505092/1202858029631618",
         contact = "https://github.com/duckduckgo/android"
     )
 }

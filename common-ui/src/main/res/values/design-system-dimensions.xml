@@ -50,5 +50,6 @@
 
     <!-- Dialogs -->
     <dimen name="dialogButtonHeight">40dp</dimen>
+    <dimen name="dialogImageSize">40dp</dimen>
 
 </resources>

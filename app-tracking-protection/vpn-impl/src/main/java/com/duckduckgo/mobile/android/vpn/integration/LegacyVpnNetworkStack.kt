@@ -66,12 +66,14 @@ class LegacyVpnNetworkStack @Inject constructor(
         return appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)
     }
 
-    override fun onCreateVpn() {
+    override fun onCreateVpn(): Result<Unit> {
         udpPacketProcessor = udpPacketProcessorFactory.build()
         tcpPacketProcessor = tcpPacketProcessorFactory.build(coroutineScope)
+
+        return Result.success(Unit)
     }
 
-    override fun onStartVpn(tunfd: ParcelFileDescriptor) {
+    override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
         queues.clearAll()
 
         executorService?.shutdownNow()
@@ -84,17 +86,22 @@ class LegacyVpnNetworkStack @Inject constructor(
         executorService = Executors.newFixedThreadPool(processors.size).also { executorService ->
             processors.forEach { executorService.submit(it) }
         }
+
+        return Result.success(Unit)
     }
 
-    override fun onStopVpn() {
+    override fun onStopVpn(): Result<Unit> {
         queues.clearAll()
         executorService?.shutdownNow()
         udpPacketProcessor.stop()
         tcpPacketProcessor.stop()
+
+        return Result.success(Unit)
     }
 
-    override fun onDestroyVpn() {
+    override fun onDestroyVpn(): Result<Unit> {
         // noop
+        return Result.success(Unit)
     }
 
     override fun mtu(): Int = 16_384

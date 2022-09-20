@@ -38,6 +38,7 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType
 import com.duckduckgo.vpn.network.api.*
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -56,7 +57,7 @@ import javax.inject.Inject
 class NgVpnNetworkStack @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
-    private val vpnNetwork: VpnNetwork,
+    private val vpnNetwork: Lazy<VpnNetwork>,
     private val appTrackerRepository: AppTrackerRepository,
     private val appNameResolver: AppNameResolver,
     private val appTrackerRecorder: AppTrackerRecorder,
@@ -92,7 +93,9 @@ class NgVpnNetworkStack @Inject constructor(
         return appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)
     }
 
-    override fun onCreateVpn() {
+    override fun onCreateVpn(): Result<Unit> {
+        val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
+
         vpnNetwork.addCallback(this)
 
         if (jniContext != 0L) {
@@ -104,26 +107,32 @@ class NgVpnNetworkStack @Inject constructor(
 
         }
         jniContext = vpnNetwork.create()
+
+        return Result.success(Unit)
     }
 
-    override fun onStartVpn(tunfd: ParcelFileDescriptor) {
-        startNative(tunfd.fd)
+    override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
+        return startNative(tunfd.fd)
     }
 
-    override fun onStopVpn() {
-        stopNative()
+    override fun onStopVpn(): Result<Unit> {
+        return stopNative()
     }
 
-    override fun onDestroyVpn() {
+    override fun onDestroyVpn(): Result<Unit> {
+        val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
+
         synchronized(jniLock) {
             vpnNetwork.destroy(jniContext)
             jniContext = 0
         }
         vpnNetwork.addCallback(null)
+
+        return Result.success(Unit)
     }
 
     override fun mtu(): Int {
-        return vpnNetwork.mtu()
+        return vpnNetwork.get().mtu()
     }
 
     override fun onExit(reason: String) {
@@ -222,8 +231,8 @@ class NgVpnNetworkStack @Inject constructor(
         return packages.first()
     }
 
-    private fun startNative(tunfd: Int) {
-
+    private fun startNative(tunfd: Int): Result<Unit> {
+        val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
         if (tunnelThread == null) {
             Timber.d("Start native runtime")
             val level = if (appBuildConfig.isDebug || appBuildConfig.isInternalBuild()) VpnNetworkLog.DEBUG else VpnNetworkLog.ASSERT
@@ -238,10 +247,13 @@ class NgVpnNetworkStack @Inject constructor(
 
             Timber.d("Started tunnel thread")
         }
+
+        return Result.success(Unit)
     }
 
-    private fun stopNative() {
+    private fun stopNative(): Result<Unit> {
         Timber.d("Stop native runtime")
+        val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
 
         tunnelThread?.let {
             Timber.d("Stopping tunnel thread")
@@ -261,6 +273,17 @@ class NgVpnNetworkStack @Inject constructor(
             tunnelThread = null
 
             Timber.d("Stopped tunnel thread")
+        }
+
+        return Result.success(Unit)
+    }
+
+    private fun Lazy<VpnNetwork>.safeGet(): Result<VpnNetwork> {
+        return runCatching {
+            get()
+        }.onFailure {
+            Timber.e(it, "Failed to get VpnNetwork")
+            Result.failure<VpnNetwork>(it)
         }
     }
 }

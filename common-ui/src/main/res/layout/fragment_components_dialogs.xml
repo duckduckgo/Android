@@ -30,10 +30,53 @@
         android:paddingEnd="@dimen/keyline_4">
 
         <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
-            android:id="@+id/label"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="Dialogs"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+            android:id="@+id/textAlertDialogWithImageButton"
+            android:text="Text Alert Dialog With Image"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+            android:id="@+id/textAlertDialogButton"
+            android:text="Text Alert Dialog"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+            android:id="@+id/stackedAlertDialogWithImageButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Stacked Text Alert Dialog With Image and 3 buttons"/>
+
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+            android:id="@+id/stackedAlertDialogWithButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Stacked Text Alert Dialog With 4 buttons"/>
+
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+            android:id="@+id/radioButtonAlertDialog"
+            android:text="Single Choice Alert Dialog"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+            android:id="@+id/label"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="Dax Dialogs"
+            android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
@@ -42,40 +85,35 @@
             android:text="Dialog with animated text"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"/>
+            android:layout_height="wrap_content"/>
 
         <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
             android:id="@+id/not_dimmed_button"
             android:text="Dialog not dimmed"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"/>
+            android:layout_height="wrap_content"/>
 
         <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
             android:id="@+id/dismissible_button"
             android:text="Dialog that can be dismissed without an action"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"/>
+            android:layout_height="wrap_content"/>
 
         <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
             android:id="@+id/no_hide_button"
             android:text="Dialog without hide button"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"/>
+            android:layout_height="wrap_content"/>
 
         <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
             android:id="@+id/custom_typing_button"
             android:text="Dialog with custom typing delay"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"/>
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 

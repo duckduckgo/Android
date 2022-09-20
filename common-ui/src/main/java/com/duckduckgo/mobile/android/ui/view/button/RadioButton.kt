@@ -19,13 +19,13 @@ package com.duckduckgo.mobile.android.ui.view.button
 import android.content.Context
 import android.util.AttributeSet
 import com.duckduckgo.mobile.android.R
-import com.google.android.material.button.MaterialButton
+import com.google.android.material.radiobutton.MaterialRadioButton
 
-class ButtonGhostLarge @JvmOverloads constructor(
+class RadioButton @JvmOverloads constructor(
     ctx: Context,
     attrs: AttributeSet?,
-    defStyleAttr: Int = R.attr.ghostButtonLargeStyle
-) : MaterialButton(
+    defStyleAttr: Int = R.attr.radioButtonStyle
+) : MaterialRadioButton(
     ctx,
     attrs,
     defStyleAttr
