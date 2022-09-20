@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <string name="vpnDevSettingsTitle">AppTp Dev Settings</string>
-    <string name="vpnExceptionRulesDebugActivityTitle">AppTp Exception Rules</string>
-    <string name="exceptionRulesPanelTitle">Exclusion rules defaults will be restored automatically when VPN is turned OFF and back ON</string>
+    <string name="vpnDevSettingsTitle" translatable="false">AppTp Dev Settings</string>
+    <string name="vpnExceptionRulesDebugActivityTitle" translatable="false">AppTp Exception Rules</string>
+    <string name="exceptionRulesPanelTitle" translatable="false">Exclusion rules defaults will be restored automatically when VPN is turned OFF and back ON</string>
 </resources>
