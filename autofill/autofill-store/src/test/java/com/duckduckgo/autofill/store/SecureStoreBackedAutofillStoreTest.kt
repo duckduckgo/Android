@@ -253,7 +253,12 @@ class SecureStoreBackedAutofillStoreTest {
 
         assertEquals(
             LoginCredentials(
-                id = 1, domain = url, username = "username1", password = "password123", lastUpdatedMillis = DEFAULT_INITIAL_LAST_UPDATED
+                id = 1,
+                domain = url,
+                username = "username1",
+                password = "password123",
+                lastUpdatedMillis = DEFAULT_INITIAL_LAST_UPDATED,
+                notes = "notes"
             ),
             testee.getCredentialsWithId(1)
         )
@@ -331,10 +336,11 @@ class SecureStoreBackedAutofillStoreTest {
         domain: String,
         username: String,
         password: String,
-        lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED
+        lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED,
+        notes: String = "notes"
     ) {
         val details = WebsiteLoginDetails(domain = domain, username = username, id = id, lastUpdatedMillis = lastUpdatedTimeMillis)
-        val credentials = WebsiteLoginDetailsWithCredentials(details, password)
+        val credentials = WebsiteLoginDetailsWithCredentials(details, password, notes)
         secureStore.addWebsiteLoginDetailsWithCredentials(credentials)
     }
 
