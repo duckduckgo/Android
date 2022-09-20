@@ -32,7 +32,9 @@ import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.GeoLocationPermissionsManager
+import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPracticesImpl
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
@@ -147,5 +149,14 @@ object PrivacyModule {
     @Provides
     fun providesSitePermissionsManager(sitePermissionsRepository: SitePermissionsRepositoryImpl): SitePermissionsManager {
         return SitePermissionsManagerImpl(sitePermissionsRepository)
+    }
+
+    @Provides
+    fun providesLocationPermissionsRepository(
+        locationPermissionsDao: LocationPermissionsDao,
+        faviconManager: Lazy<FaviconManager>,
+        dispatchers: DispatcherProvider
+    ): LocationPermissionsRepositoryAPI {
+        return LocationPermissionsRepository(locationPermissionsDao, faviconManager, dispatchers)
     }
 }
