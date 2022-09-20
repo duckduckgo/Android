@@ -18,12 +18,22 @@ package com.duckduckgo.actions
 
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.longClick
+import androidx.test.espresso.action.ViewActions.openLinkWithUri
 import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
+import com.duckduckgo.utils.uiDevice
 import org.hamcrest.CoreMatchers
+import org.hamcrest.CoreMatchers.allOf
+
+private val device: UiDevice = uiDevice
 
 fun tapOnButton(@IdRes viewId: Int) {
     onView(withId(viewId)).perform(click())
@@ -34,12 +44,42 @@ fun scrollAndTapButton(@IdRes viewId: Int) {
 }
 
 fun tapOnTheView(@IdRes viewId: Int, @StringRes stringId: String) {
+    onView(allOf(withId(viewId), ViewMatchers.withText(stringId)))
     onView(CoreMatchers.allOf(withId(viewId), ViewMatchers.withText(stringId)))
         .perform(click())
 }
 
 fun tapOnSpecificText(@IdRes viewId: Int, @StringRes stringId: Int) {
-    onView(CoreMatchers.allOf(withId(viewId), ViewMatchers.withText(stringId)))
+    onView(allOf(withId(viewId), ViewMatchers.withText(stringId)))
         .perform(scrollTo(), click())
 }
 
+fun clickOnItemAtPosition(@IdRes viewId: Int, position: Int) {
+    onView(allOf(withId(viewId)))
+        .perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(position, click()))
+}
+
+fun tapOnTheUrl(@IdRes viewId: Int, @StringRes stringId: String) {
+    onView(allOf(withId(viewId), ViewMatchers.withText(stringId)))
+        .perform(openLinkWithUri(stringId))
+}
+
+fun longHoldTap(@IdRes viewId: Int) {
+    onView(withId(viewId)).perform(longClick())
+}
+
+fun pinchInPinchOut(@IdRes viewId: Int) {
+    onView(withId(viewId)).perform()
+}
+
+fun pinchIn(@IdRes viewId: Int, position: Int, steps: Int) {
+    device.findObject(UiSelector().index(viewId)).pinchIn(position, steps)
+}
+
+fun pinchOut(@IdRes viewId: Int, position: Int, steps: Int) {
+    device.findObject(UiSelector().index(viewId)).pinchOut(position, steps)
+}
+
+    onView(CoreMatchers.allOf(withId(viewId), ViewMatchers.withText(stringId)))
+        .perform(scrollTo(), click())
+}

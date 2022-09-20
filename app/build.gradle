@@ -126,6 +126,7 @@ fulladleModuleConfig {
 }
 
 dependencies {
+    implementation 'androidx.test.espresso:espresso-contrib:3.4.0'
     implementation 'androidx.preference:preference-ktx:1.1.1'
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
