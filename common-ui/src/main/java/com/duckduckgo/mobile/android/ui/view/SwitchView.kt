@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.widget.CompoundButton
 import com.google.android.material.R
 import com.google.android.material.switchmaterial.SwitchMaterial
 
@@ -30,3 +31,12 @@ class SwitchView @JvmOverloads constructor(
     attrs,
     defStyleAttr
 )
+
+fun SwitchView.quietlySetIsChecked(
+    newCheckedState: Boolean,
+    changeListener: CompoundButton.OnCheckedChangeListener?
+) {
+    setOnCheckedChangeListener(null)
+    isChecked = newCheckedState
+    setOnCheckedChangeListener(changeListener)
+}

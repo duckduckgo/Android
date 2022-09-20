@@ -20,13 +20,17 @@ import android.R.attr
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.CompoundButton
+import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewOneLineListSwitchItemBinding
+import com.duckduckgo.mobile.android.ui.view.SwitchView
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class OneLineListItemSwitch @JvmOverloads constructor(
@@ -87,7 +91,26 @@ class OneLineListItemSwitch @JvmOverloads constructor(
     }
 
     /** Sets the checked change listener for the switch */
-    fun setOnCheckedChangeListener(onCheckedChangeListener: (View, Boolean) -> Unit) {
-        binding.trailingSwitch.setOnCheckedChangeListener { buttonView, isChecked -> onCheckedChangeListener(buttonView, isChecked) }
+    fun setOnCheckedChangeListener(onCheckedChangeListener: OnCheckedChangeListener) {
+        binding.trailingSwitch.setOnCheckedChangeListener(onCheckedChangeListener)
     }
+
+    /** Sets the switch value */
+    fun setIsChecked(isChecked: Boolean) {
+        binding.trailingSwitch.isChecked = isChecked
+    }
+
+    /** Sets the switch as enabled or not */
+    fun setIsEnabled(isEnabled: Boolean) {
+        binding.trailingSwitch.isEnabled = isEnabled
+    }
+
+    /** Allows to set a new value to the switch, without triggering the onChangeListener */
+    fun quietlySetIsChecked(
+        newCheckedState: Boolean,
+        changeListener: CompoundButton.OnCheckedChangeListener?
+    ) {
+        binding.trailingSwitch.quietlySetIsChecked(newCheckedState, changeListener)
+    }
+
 }

@@ -26,12 +26,12 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ViewItemDownloadsEmptyBinding
 import com.duckduckgo.app.browser.databinding.ViewItemDownloadsHeaderBinding
-import com.duckduckgo.app.browser.databinding.ViewItemDownloadsItemBinding
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
 import com.duckduckgo.app.global.formatters.data.DataSizeFormatter
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
+import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
@@ -51,7 +51,7 @@ class DownloadsAdapter @Inject constructor(
             VIEW_TYPE_HEADER -> HeaderViewHolder(binding = ViewItemDownloadsHeaderBinding.inflate(inflater, parent, false))
             VIEW_TYPE_ITEM -> ItemViewHolder(
                 layoutInflater = inflater,
-                binding = ViewItemDownloadsItemBinding.inflate(inflater, parent, false),
+                binding = RowTwoLineItemBinding.inflate(inflater, parent, false),
                 listener = downloadsItemListener,
                 formatter = dataSizeFormatter
             )
@@ -102,7 +102,7 @@ class DownloadsAdapter @Inject constructor(
 
     class ItemViewHolder(
         val layoutInflater: LayoutInflater,
-        val binding: ViewItemDownloadsItemBinding,
+        val binding: RowTwoLineItemBinding,
         val listener: DownloadsItemListener,
         val formatter: DataSizeFormatter
     ) :
