@@ -132,7 +132,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         AndroidInjection.inject(this)
 
         vpnNetworkStack = vpnNetworkStackPluginPoint.getPlugins().first { it.isEnabled() }.apply {
-            onCreateVpn()
+            onCreateVpn().getOrThrow()
         }
 
         Timber.d("VPN log onCreate")
@@ -198,7 +198,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             Timber.v("NetworkSwitchHandling disabled...skip setting underlying network")
         }
 
-        vpnNetworkStack.onStartVpn(tunInterface!!)
+        vpnNetworkStack.onStartVpn(tunInterface!!).getOrThrow()
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             Timber.v("VPN log: starting ${it.javaClass} callback")

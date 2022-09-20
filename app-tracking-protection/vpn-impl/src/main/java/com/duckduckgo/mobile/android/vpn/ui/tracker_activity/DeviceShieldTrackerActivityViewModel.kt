@@ -32,12 +32,12 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -52,12 +52,15 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
+    private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
     private var lastVpnRequestTime = -1L
 
     internal suspend fun getRunningState(): Flow<VpnState> = withContext(dispatcherProvider.io()) {
-        return@withContext vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN)
+        return@withContext vpnStateMonitor
+            .getStateFlow(AppTpVpnFeature.APPTP_VPN)
+            .combine(refreshVpnRunningState.asStateFlow()) { state, _ -> state }
     }
 
     internal suspend fun getTrackingAppsCount(): Flow<TrackingAppCount> = withContext(dispatcherProvider.io()) {
@@ -75,6 +78,12 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             enabled && vpnDetector.isVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
             enabled == true -> sendCommand(Command.CheckVPNPermission)
             enabled == false -> sendCommand(Command.ShowDisableVpnConfirmationDialog)
+        }
+        // If the VPN is not started due to any issue, the getRunningState() won't be updated and the toggle is kept (wrongly) in ON state
+        // Check after 1 second to ensure this doesn't happen
+        viewModelScope.launch {
+            delay(TimeUnit.SECONDS.toMillis(1))
+            refreshVpnRunningState.emit(System.currentTimeMillis())
         }
     }
 

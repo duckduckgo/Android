@@ -60,10 +60,10 @@ class RealSecureStorageTest {
             username = "user@test.com",
             id = 1,
             domainTitle = "test",
-            notes = "notes",
             lastUpdatedMillis = 1000L
         ),
-        password = expectedDecryptedData
+        password = expectedDecryptedData,
+        notes = expectedDecryptedData
     )
 
     private val testEntity = WebsiteLoginCredentialsEntity(
@@ -71,8 +71,9 @@ class RealSecureStorageTest {
         domain = "test.com",
         username = "user@test.com",
         password = expectedEncryptedData,
-        iv = expectedEncryptedIv,
-        notes = "notes",
+        passwordIv = expectedEncryptedIv,
+        notes = expectedEncryptedData,
+        notesIv = expectedEncryptedIv,
         domainTitle = "test",
         lastUpdatedInMillis = 1000L
     )
