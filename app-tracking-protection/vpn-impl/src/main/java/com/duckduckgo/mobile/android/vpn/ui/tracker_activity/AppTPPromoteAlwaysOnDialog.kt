@@ -46,7 +46,7 @@ class AppTPPromoteAlwaysOnDialog private constructor(private val listener: Liste
 
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
-            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog
+            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog
         )
             .setView(rootView)
 

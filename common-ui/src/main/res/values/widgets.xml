@@ -146,15 +146,6 @@
         <item name="colorControlActivated">@color/cornflowerGreen</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.RoundedDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.DialogCorners</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.DialogCorners">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">8dp</item>
-    </style>
-
     <!-- Styles for App Components -->
 
     <style name="Widget.DuckDuckGo.MenuItemView">
@@ -252,6 +243,14 @@
         <item name="android:padding">@dimen/keyline_5</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.RadioButton" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="buttonTint">@color/radio_button_tint</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceBody1</item>
+    </style>
+
+    <!-- SearchBarView -->
     <style name="Widget.DuckDuckGo.SearchBarView">
         <item name="android:background">@drawable/omnibar_field_background</item>
         <item name="android:layout_margin">@dimen/keyline_2</item>
@@ -277,7 +276,17 @@
     </style>
 
     <!-- Dialogs -->
-    <style name="Widget.DuckDuckGo.Dialog"/>
+    <style name="Widget.DuckDuckGo.Dialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.DialogCorners</item>
+        <item name="windowFixedWidthMajor">90%</item>
+        <item name="windowFixedWidthMinor">90%</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DialogCorners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.Dialog.Title">
         <item name="android:textAppearance">@style/TextAppearance.DuckDuckGo.Headline2</item>
         <item name="android:fontFamily">sans-serif-medium</item>
