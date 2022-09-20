@@ -14,7 +14,12 @@
   ~ limitations under the License.
   -->
 
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-
-
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="downloadsDownloadStartedMessage">Download started for %s</string>
+    <string name="downloadsDownloadFinishedMessage">Download complete for %s</string>
+    <string name="downloadsDownloadGenericErrorMessage">Failed to download.</string>
+    <string name="downloadsCancel">Cancel</string>
+    <string name="downloadsRetry">Retry</string>
+    <string name="notificationDownloadComplete">Download complete.</string>
+    <string name="notificationDownloadFailed">Failed to download.</string>
 </resources>

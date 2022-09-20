@@ -715,8 +715,11 @@
     <string name="atp_SettingsDeviceShieldDisabled">Disabled</string>
 
     <!-- Autoconsent -->
+    <!-- smartling.character_limit = 25 -->
     <string name="autoconsentDialogTitle">Looks like this site has a cookie consent pop-up 👇</string>
+    <!-- smartling.character_limit = 25 -->
     <string name="autoconsentDialogDescription">Want me to handle these for you? I can try to minimize cookies, maximize privacy, and hide pop-ups like these.</string>
+    <!-- smartling.character_limit = 25 -->
     <string name="autoconsentPrimaryCta">Manage Cookie Pop-ups</string>
     <string name="autoconsentSecondaryCta">No Thanks</string>
 
