@@ -103,6 +103,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             }
             setNegativeButton(R.string.sitePermissionsDialogDenyButton) { _, _ ->
                 pixel.fire(SitePermissionsPixelName.SITE_PERMISSION_DIALOG_DENIED, mapOf(PixelParameter.SITE_PERMISSION to pixelParamValue))
+                sitePermissionRequest.deny()
             }
             setCancelable(false)
             show()

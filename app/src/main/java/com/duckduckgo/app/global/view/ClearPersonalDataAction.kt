@@ -85,7 +85,7 @@ class ClearPersonalDataAction(
         shouldFireDataClearPixel: Boolean
     ) {
         withContext(Dispatchers.IO) {
-            val fireproofWebsites = fireproofWebsiteRepository.getFireproofWebsites().value?.map { it.domain } ?: listOf()
+            val fireproofWebsites = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
             cookieManager.flush()
             geoLocationPermissions.clearAllButFireproofed()
             sitePermissionsManager.clearAllButFireproof(fireproofWebsites)

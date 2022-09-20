@@ -18,11 +18,11 @@ package com.duckduckgo.site.permissions.impl
 
 import android.webkit.PermissionRequest
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferencesImp
-import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.ALLOW_ALWAYS
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity.Companion.allowedWithin24h
@@ -70,7 +70,8 @@ class SitePermissionsRepositoryImpl @Inject constructor(
         }
 
     override fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
-        val sitePermissionsForDomain = sitePermissionsDao.getSitePermissionsByDomain(url)
+        val domain = url.extractDomain() ?: url
+        val sitePermissionsForDomain = sitePermissionsDao.getSitePermissionsByDomain(domain)
         return when (permission) {
             PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
                 val isAskCameraSettingDenied = sitePermissionsForDomain?.askCameraSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
@@ -85,8 +86,9 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     }
 
     override fun isDomainGranted(url: String, tabId: String, permission: String): Boolean {
-        val sitePermissionForDomain = sitePermissionsDao.getSitePermissionsByDomain(url)
-        val permissionAllowedId = SitePermissionAllowedEntity.getPermissionAllowedId(url, tabId, permission)
+        val domain = url.extractDomain() ?: url
+        val sitePermissionForDomain = sitePermissionsDao.getSitePermissionsByDomain(domain)
+        val permissionAllowedId = SitePermissionAllowedEntity.getPermissionAllowedId(domain, tabId, permission)
         val permissionAllowedEntity = sitePermissionsAllowedDao.getSitePermissionAllowed(permissionAllowedId)
         val permissionGrantedWithin24h = permissionAllowedEntity?.allowedWithin24h() == true
 
@@ -105,13 +107,14 @@ class SitePermissionsRepositoryImpl @Inject constructor(
 
     override fun sitePermissionGranted(url: String, tabId: String, permission: String) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val existingPermission = sitePermissionsDao.getSitePermissionsByDomain(url)
+            val domain = url.extractDomain() ?: url
+            val existingPermission = sitePermissionsDao.getSitePermissionsByDomain(domain)
             if (existingPermission == null) {
-                sitePermissionsDao.insert(SitePermissionsEntity(domain = url))
+                sitePermissionsDao.insert(SitePermissionsEntity(domain = domain))
             }
             val sitePermissionAllowed = SitePermissionAllowedEntity(
-                SitePermissionAllowedEntity.getPermissionAllowedId(url, tabId, permission),
-                url,
+                SitePermissionAllowedEntity.getPermissionAllowedId(domain, tabId, permission),
+                domain,
                 tabId,
                 permission,
                 System.currentTimeMillis()
@@ -141,13 +144,15 @@ class SitePermissionsRepositoryImpl @Inject constructor(
 
     override suspend fun getSitePermissionsForWebsite(url: String): SitePermissionsEntity? {
         return withContext(dispatcherProvider.io()) {
-            sitePermissionsDao.getSitePermissionsByDomain(url)
+            val domain = url.extractDomain() ?: url
+            sitePermissionsDao.getSitePermissionsByDomain(domain)
         }
     }
 
     override suspend fun deletePermissionsForSite(url: String) {
         return withContext(dispatcherProvider.io()) {
-            val entity = sitePermissionsDao.getSitePermissionsByDomain(url)
+            val domain = url.extractDomain() ?: url
+            val entity = sitePermissionsDao.getSitePermissionsByDomain(domain)
             entity?.let { sitePermissionsDao.delete(it) }
         }
     }

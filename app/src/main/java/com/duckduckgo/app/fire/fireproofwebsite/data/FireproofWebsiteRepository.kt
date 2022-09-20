@@ -28,6 +28,7 @@ import javax.inject.Inject
 interface FireproofWebsiteRepositoryAPI {
     suspend fun fireproofWebsite(domain: String): FireproofWebsiteEntity?
     fun getFireproofWebsites(): LiveData<List<FireproofWebsiteEntity>>
+    fun fireproofWebsitesSync(): List<FireproofWebsiteEntity>
     fun isDomainFireproofed(domain: String): Boolean
     suspend fun removeFireproofWebsite(fireproofWebsiteEntity: FireproofWebsiteEntity)
     suspend fun fireproofWebsitesCountByDomain(domain: String): Int
@@ -55,6 +56,10 @@ class FireproofWebsiteRepository @Inject constructor(
     }
 
     override fun getFireproofWebsites(): LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteDao.fireproofWebsitesEntities()
+
+    override fun fireproofWebsitesSync(): List<FireproofWebsiteEntity> {
+        return fireproofWebsiteDao.fireproofWebsitesSync()
+    }
 
     override fun isDomainFireproofed(domain: String): Boolean {
         val uri = Uri.parse(domain)
