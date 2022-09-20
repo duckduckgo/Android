@@ -59,7 +59,6 @@
         <item name="secondaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Secondary.Rounded</item>
         <item name="primaryButtonLowercaseStyle">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
         <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
-        <item name="oneLineListItemSwitchStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
         <item name="twoLineListItemWithToggleStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
         <item name="twoLineRadioListIteWithStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>

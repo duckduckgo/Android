@@ -28,6 +28,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
 import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.google.android.material.snackbar.Snackbar
 
@@ -86,6 +87,18 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
                 setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<OneLineListItemSwitch>(R.id.oneLineListItemSwitch).apply {
+                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+                setOnCheckedChangeListener { view, isChecked -> Snackbar.make(view, "Switch checked: $isChecked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<OneLineListItemSwitch>(R.id.oneLineListSwitchItemWithLeadingIcon).apply {
+                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+                setOnCheckedChangeListener { view, isChecked -> Snackbar.make(view, "Switch checked: $isChecked", Snackbar.LENGTH_SHORT).show() }
             }
         }
     }

@@ -21,7 +21,6 @@
     <attr name="listItemSubtitleColor" format="color"/>
 
     <attr name="oneLineListItemStyle" format="reference"/>
-    <attr name="oneLineListItemSwitchStyle" format="reference"/>
     <attr name="twoLineListItemStyle" format="reference"/>
     <attr name="twoLineListItemWithToggleStyle" format="reference"/>
     <attr name="twoLineRadioListIteWithStyle" format="reference"/>
@@ -41,8 +40,9 @@
         <attr name="trailingIcon"/>
     </declare-styleable>
 
-    <declare-styleable name="OneLineListItemWithToggle">
+    <declare-styleable name="OneLineListItemSwitch">
         <attr name="primaryText"/>
+        <attr name="primaryTextColor"/>
         <attr name="leadingIcon"/>
     </declare-styleable>
 

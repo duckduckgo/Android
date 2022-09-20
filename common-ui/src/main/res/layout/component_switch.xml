@@ -33,7 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
+    <com.duckduckgo.mobile.android.ui.view.SwitchView
         android:id="@+id/switch_one"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -55,15 +55,5 @@
         app:layout_constraintBottom_toBottomOf="@+id/switch_one"
         app:layout_constraintStart_toEndOf="@+id/switch_one"
         app:layout_constraintTop_toTopOf="@+id/switch_one"/>
-
-    <com.duckduckgo.mobile.android.ui.view.SwitchView
-        android:id="@+id/switch_three"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:checked="true"
-        app:layout_constraintBottom_toBottomOf="@+id/switch_one"
-        app:layout_constraintStart_toEndOf="@+id/switch_two"
-        app:layout_constraintTop_toTopOf="@+id/switch_one" app:layout_constraintVertical_bias="0.0"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
