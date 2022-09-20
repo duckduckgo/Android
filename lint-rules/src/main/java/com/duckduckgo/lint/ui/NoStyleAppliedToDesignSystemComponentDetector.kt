@@ -74,7 +74,8 @@ class NoStyleAppliedToDesignSystemComponentDetector : LayoutDetector() {
                 BUTTON_SECONDARY_SMALL,
                 BUTTON_GHOST_LARGE,
                 BUTTON_GHOST_SMALL,
-                ONE_LINE_LIST_ITEM
+                ONE_LINE_LIST_ITEM,
+                SWITCH
             )
 
         val STYLE_IN_DESIGN_SYSTEM_COMPONENT = Issue

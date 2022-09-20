@@ -58,13 +58,14 @@ class DeprecatedSwitchUsedInXmlDetector : LayoutDetector() {
 
         private const val APP_COMPAT_SWITCH = "androidx.appcompat.widget.SwitchCompat"
         private const val MATERIAL_SWITCH = "com.google.android.material.switchmaterial.SwitchMaterial"
+        private const val SWITCH = "Switch"
 
-        val SWITCHES = listOf(APP_COMPAT_SWITCH, MATERIAL_SWITCH)
+        val SWITCHES = listOf(APP_COMPAT_SWITCH, MATERIAL_SWITCH, SWITCH)
         val DEPRECATED_SWITCH_IN_XML = Issue
             .create(
                 id = "AndroidSwitchInXml",
                 briefDescription = "Default Android Switch used instead of Design System Component",
-                explanation = "Always favor the use of the Design System Component Switch",
+                explanation = "Always favor the use of the Design System Component SwitchView",
                 moreInfo = "https://app.asana.com/0/1202857801505092/list",
                 category = CUSTOM_LINT_CHECKS,
                 priority = 10,

@@ -28,7 +28,7 @@ class DeprecatedSwitchUsedInXmlDetectorTest {
         lint()
             .files(
                 TestFiles.xml(
-                    "res/layout/buttons.xml",
+                    "res/layout/switch.xml",
                     """
                 <android.support.design.widget.CoordinatorLayout
                     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -63,7 +63,7 @@ class DeprecatedSwitchUsedInXmlDetectorTest {
             .run()
             .expect(
                 """
-                res/layout/buttons.xml:17: Error: Always favor the use of the Design System Component OneLineListItemSwitch [AndroidSwitchInXml]
+                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component SwitchView [AndroidSwitchInXml]
                 <androidx.appcompat.widget.SwitchCompat
                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
@@ -76,7 +76,7 @@ class DeprecatedSwitchUsedInXmlDetectorTest {
         lint()
             .files(
                 TestFiles.xml(
-                    "res/layout/buttons.xml",
+                    "res/layout/switch.xml",
                     """
                 <android.support.design.widget.CoordinatorLayout
                     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -113,10 +113,58 @@ class DeprecatedSwitchUsedInXmlDetectorTest {
             .run()
             .expect(
                 """
-                res/layout/buttons.xml:17: Error: Always favor the use of the Design System Component OneLineListItemSwitch [AndroidSwitchInXml]
+                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component SwitchView [AndroidSwitchInXml]
                     <com.google.android.material.switchmaterial.SwitchMaterial
                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings      
+            """.trimMargin()
+            )
+    }
+
+    @Test
+    fun whenLegacySwitchFoundThenFailWithError() {
+        lint()
+            .files(
+                TestFiles.xml(
+                    "res/layout/switch.xml",
+                    """
+                <android.support.design.widget.CoordinatorLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#eeeeee">
+
+                  <android.support.design.bottomappbar.BottomAppBar
+                      android:id="@+id/bottom_app_bar"
+                      style="@style/Widget.MaterialComponents.BottomAppBar"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="bottom"
+                      app:navigationIcon="@drawable/ic_menu_black_24dp"/>
+
+                <Switch
+                    android:id="@+id/setAsDefaultBrowserSetting"
+                    style="@style/SettingsSwitch"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="14dp"
+                    android:text="@string/settingsDefaultBrowserEnabled"
+                    android:theme="@style/SettingsSwitchTheme" />
+
+
+                </android.support.design.widget.CoordinatorLayout>
+            """
+                ).indented()
+            )
+            .issues(DeprecatedSwitchUsedInXmlDetector.DEPRECATED_SWITCH_IN_XML)
+            .run()
+            .expect(
+                """
+                res/layout/switch.xml:17: Error: Always favor the use of the Design System Component SwitchView [AndroidSwitchInXml]
+                <Switch
+                 ~~~~~~
+                1 errors, 0 warnings
             """.trimMargin()
             )
     }
@@ -126,7 +174,7 @@ class DeprecatedSwitchUsedInXmlDetectorTest {
         lint()
             .files(
                 TestFiles.xml(
-                    "res/layout/buttons.xml",
+                    "res/layout/switch.xml",
                     """
                 <android.support.design.widget.CoordinatorLayout
                     xmlns:android="http://schemas.android.com/apk/res/android"
