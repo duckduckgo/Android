@@ -31,6 +31,7 @@ class AppTpSettingTest {
                 AppTpSetting.PrivateDnsSupport -> assertFalse(setting.defaultValue)
                 AppTpSetting.NetworkSwitchHandling -> assertTrue(setting.defaultValue)
                 AppTpSetting.AlwaysSetDNS -> assertFalse(setting.defaultValue)
+                AppTpSetting.CPUMonitoring -> assertFalse(setting.defaultValue)
                 AppTpSetting.VpnDdgBrowserTraffic -> assertFalse(setting.defaultValue)
                 AppTpSetting.ConnectivityChecks -> assertFalse(setting.defaultValue)
                 AppTpSetting.VpnNewNetworkingLayer -> assertTrue(setting.defaultValue)

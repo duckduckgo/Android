@@ -24,6 +24,7 @@ enum class AppTpSetting(override val value: String, override val defaultValue: B
     VpnDdgBrowserTraffic("vpnDdgBrowserTraffic"),
     ConnectivityChecks("connectivityChecks"),
     AlwaysSetDNS("alwaysSetDNS"),
+    CPUMonitoring("cpuMonitoring"),
     VpnNewNetworkingLayer("vpnNewNetworkingLayer", defaultValue = true),
 }
 

@@ -121,7 +121,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupDeleteTrackingHistory()
         setupForceUpdateBlocklist()
         setupViewDiagnosticsView()
-        setupBadHealthMonitoring()
+        setupHealthMonitoring()
         setupConfigSection()
         setupUiElementsState()
         setupAppProtectionSection()
@@ -129,7 +129,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        transparencyModeDebugReceiver?.let { it.unregister() }
+        transparencyModeDebugReceiver?.unregister()
     }
 
     private fun setupAppProtectionSection() {
@@ -180,6 +180,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             .onEach { isEnabled ->
                 binding.ipv6SupportToggle.isEnabled = isEnabled
                 binding.privateDnsToggle.isEnabled = isEnabled
+                binding.cpuMonitorToggle.isEnabled = isEnabled
                 binding.badHealthMonitorToggle.isEnabled = isEnabled
                 binding.badHealthMitigationToggle.isEnabled = isEnabled
                 binding.vpnUnderlyingNetworksToggle.isEnabled = isEnabled
@@ -265,7 +266,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         binding.transparencyModeToggle.setOnCheckedChangeListener(transparencyToggleListener)
     }
 
-    private fun setupBadHealthMonitoring() {
+    private fun setupHealthMonitoring() {
         binding.badHealthMonitorToggle.isChecked = appHealthMonitor.isMonitoringStarted()
         binding.badHealthMonitorToggle.setOnCheckedChangeListener(badHealthMonitoringToggleListener)
 
@@ -274,6 +275,17 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupConfigSection() {
+        with(AppTpSetting.CPUMonitoring) {
+            binding.cpuMonitorToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.cpuMonitorToggle.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
+                } else {
+                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
+                }
+            }
+        }
+
         with(AppTpSetting.Ipv6Support) {
             binding.ipv6SupportToggle.isChecked = appTpConfig.isEnabled(this)
             binding.ipv6SupportToggle.setOnCheckedChangeListener { _, isChecked ->
