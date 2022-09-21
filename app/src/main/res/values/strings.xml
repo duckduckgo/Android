@@ -157,7 +157,7 @@
 
     <string name="adLoadedSectionDescription">The following domain\'s requests were loaded because a %s ad on DuckDuckGo was recently clicked. These requests help evaluate ad effectiveness. All ads on DuckDuckGo are non-profiling.</string>
     <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">How our search ads impact our protections</annotation></string>
-    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
 
     <string name="domainsLoadedSectionDescription">The following domain\'s requests were also loaded.</string>
     <string name="domainsLoadedSectionSingleSectionDescription">The following domains\' tracking requests were loaded.</string>
@@ -712,11 +712,8 @@
     <string name="atp_SettingsDeviceShieldDisabled">Disabled</string>
 
     <!-- Autoconsent -->
-    <!-- smartling.character_limit = 25 -->
     <string name="autoconsentDialogTitle">Looks like this site has a cookie consent pop-up 👇</string>
-    <!-- smartling.character_limit = 25 -->
     <string name="autoconsentDialogDescription">Want me to handle these for you? I can try to minimize cookies, maximize privacy, and hide pop-ups like these.</string>
-    <!-- smartling.character_limit = 25 -->
     <string name="autoconsentPrimaryCta">Manage Cookie Pop-ups</string>
     <string name="autoconsentSecondaryCta">No Thanks</string>
 
@@ -740,6 +737,5 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Autofill</string>
-
 
 </resources>
