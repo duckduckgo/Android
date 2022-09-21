@@ -43,12 +43,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/auditSettingsScreenPrivacyAuditSection" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/step1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/auditStep1Title"
-                app:subtitle="@string/auditStep1Subtitle" />
+                app:primaryText="@string/auditStep1Title"
+                app:secondaryText="@string/auditStep1Subtitle" />
 
             <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
                 android:id="@+id/step2"

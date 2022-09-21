@@ -263,7 +263,7 @@ class SettingsActivity :
 
     private fun updateEmailSubtitle(emailAddress: String?) {
         val subtitle = emailAddress ?: getString(R.string.settingsEmailProtectionSubtitle)
-        viewsMore.emailSetting.setSubtitle(subtitle)
+        viewsMore.emailSetting.setSecondaryText(subtitle)
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {
@@ -286,7 +286,7 @@ class SettingsActivity :
 
     private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
         val subtitle = getString(fireAnimation.nameResId)
-        viewsAppearance.selectedFireAnimationSetting.setSubtitle(subtitle)
+        viewsAppearance.selectedFireAnimationSetting.setSecondaryText(subtitle)
     }
 
     private fun updateSelectedTheme(selectedTheme: DuckDuckGoTheme) {
@@ -297,7 +297,7 @@ class SettingsActivity :
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> R.string.settingsSystemTheme
             }
         )
-        viewsAppearance.selectedThemeSetting.setSubtitle(subtitle)
+        viewsAppearance.selectedThemeSetting.setSecondaryText(subtitle)
     }
 
     private fun updateAppLinkBehavior(appLinkSettingType: AppLinkSettingType) {
@@ -394,9 +394,9 @@ class SettingsActivity :
     private fun updateMacOsSettings(waitlistState: MacWaitlistState) {
         with(viewsMore) {
             when (waitlistState) {
-                InBeta -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description_ready))
-                JoinedWaitlist -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description_list))
-                NotJoinedQueue -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description))
+                InBeta -> macOsSetting.setSecondaryText(getString(R.string.macos_settings_description_ready))
+                JoinedWaitlist -> macOsSetting.setSecondaryText(getString(R.string.macos_settings_description_list))
+                NotJoinedQueue -> macOsSetting.setSecondaryText(getString(R.string.macos_settings_description))
             }
         }
     }

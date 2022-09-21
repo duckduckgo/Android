@@ -20,6 +20,7 @@
                                                    android:id="@+id/item_container"
                                                    android:background="?attr/selectableItemBackground"
                                                    android:layout_width="match_parent"
+                                                   android:minHeight="@dimen/oneLineItemHeight"
                                                    android:layout_height="wrap_content">
 
     <ImageView
@@ -38,7 +39,6 @@
         android:gravity="start|center"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:minHeight="@dimen/oneLineItemHeight"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_2"
         android:paddingTop="@dimen/oneLineItemPadding"

@@ -108,27 +108,27 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     ) : ComponentViewHolder(inflate(parent, R.layout.component_two_line_item)) {
         override fun bind(component: Component) {
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithoutImage).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setOnClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithImage).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setOnClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
                 setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithImageAndTrailingIcon).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setOnClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
                 setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithTrailingIcon).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setOnClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithBetaPill).apply {
-                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setOnClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
             }
         }

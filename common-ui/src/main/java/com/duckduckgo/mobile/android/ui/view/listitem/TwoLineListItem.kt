@@ -22,6 +22,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
@@ -128,5 +129,10 @@ class TwoLineListItem @JvmOverloads constructor(
     /** Sets the trailing image content description */
     fun setTrailingContentDescription(description: String) {
         binding.trailingIcon.contentDescription = description
+    }
+
+    /** Sets the trailing image content description */
+    fun setPillVisible(isVisible: Boolean) {
+        binding.pill.isVisible = isVisible
     }
 }
