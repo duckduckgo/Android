@@ -67,6 +67,7 @@ class AppTpFeatureConfigImplTest {
                 AppTpSetting.VpnDdgBrowserTraffic -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ConnectivityChecks -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.VpnNewNetworkingLayer -> assertTrue(config.isEnabled(setting))
+                AppTpSetting.ProtectGames -> assertFalse(config.isEnabled(setting))
             }
         }
     }
