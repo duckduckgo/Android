@@ -43,7 +43,12 @@ interface BrowserTrackersAnimatorHelper {
         entities: List<Entity>?
     )
 
-    fun createCookiesAnimation(context: Context)
+    fun createCookiesAnimation(
+        context: Context,
+        omnibarViews: List<View>,
+        cookieBackground: View,
+        cookieAnimationView: LottieAnimationView
+    )
 
     /**
      * Cancel a running animation.

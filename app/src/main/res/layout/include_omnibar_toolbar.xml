@@ -105,6 +105,17 @@
                             android:padding="4dp"
                             android:src="@drawable/ic_loupe_24dp" />
 
+                        <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|center_vertical"
+                            android:visibility="gone"
+                            android:layout_marginStart="17dp"
+                            android:layout_marginEnd="4dp"
+                            android:id="@+id/scene_root">
+                            <include layout="@layout/cookie_scene_1" />
+                        </FrameLayout>
+
                         <ImageView
                             android:id="@+id/placeholder"
                             android:layout_width="24dp"
@@ -114,6 +125,27 @@
                             android:padding="4dp" />
 
                     </FrameLayout>
+
+                    <View
+                        android:id="@+id/cookieDummyView"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:alpha="0"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/omniBarContainer"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_gravity="start|center_vertical"
+                        android:background="@drawable/cookies_dummy_background" />
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/cookieAnimation"
+                        android:layout_gravity="start|center_vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/omnibarIconContainer"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:lottie_loop="false" />
 
                     <com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
                         android:id="@+id/omnibarTextInput"
