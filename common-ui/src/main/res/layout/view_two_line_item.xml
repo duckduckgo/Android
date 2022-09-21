@@ -27,11 +27,10 @@
         android:id="@+id/leadingIcon"
         android:layout_width="@dimen/listItemImageContainerSize"
         android:layout_height="@dimen/listItemImageContainerSize"
-        android:scaleType="center"
         android:layout_marginStart="@dimen/keyline_4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription"/>
+        android:layout_marginTop="16dp"
+        android:scaleType="center" app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" tools:ignore="ContentDescription"/>
 
     <TextView
         android:id="@+id/primaryText"
@@ -39,14 +38,20 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
-        android:maxLines="1"
-        android:singleLine="true"
+        android:layout_marginTop="@dimen/oneLineItemPadding"
         android:textColor="?attr/listItemTitleColor"
         app:layout_constraintBottom_toTopOf="@+id/secondaryText"
-        app:layout_constraintEnd_toStartOf="@+id/trailingIcon"
         app:layout_constraintStart_toEndOf="@id/leadingIcon"
         app:layout_constraintTop_toTopOf="parent" tools:text="Title"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/pill"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/primaryText" app:layout_constraintStart_toEndOf="@id/primaryText"
+        app:srcCompat="@drawable/ic_beta_pill"/>
 
     <TextView
         android:id="@+id/secondaryText"
@@ -54,8 +59,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:paddingTop="2dp"
-        android:paddingBottom="4dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="@dimen/oneLineItemPadding"
         android:textColor="?attr/listItemSubtitleColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/trailingIcon"
@@ -66,13 +71,12 @@
         android:id="@+id/trailingIcon"
         android:layout_width="@dimen/listItemImageContainerSize"
         android:layout_height="@dimen/listItemImageContainerSize"
-        android:scaleType="center"
+        android:layout_marginEnd="8dp"
         android:background="?selectableItemBackground"
+        android:scaleType="center"
         android:src="@drawable/ic_overflow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        tools:ignore="ContentDescription"/>
+        app:layout_constraintTop_toTopOf="parent" tools:ignore="ContentDescription"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

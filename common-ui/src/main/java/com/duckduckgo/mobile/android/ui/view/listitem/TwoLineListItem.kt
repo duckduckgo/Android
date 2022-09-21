@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class TwoLineListItem @JvmOverloads constructor(
@@ -76,6 +77,13 @@ class TwoLineListItem @JvmOverloads constructor(
                 binding.trailingIcon.gone()
             }
 
+            val showBetaPill = getBoolean(R.styleable.TwoLineListItem_showBetaPill, false)
+            if (showBetaPill){
+                binding.pill.show()
+            } else {
+                binding.pill.gone()
+            }
+
             recycle()
         }
     }
@@ -100,6 +108,11 @@ class TwoLineListItem @JvmOverloads constructor(
     /** Sets the item click listener */
     fun setClickListener(onClick: () -> Unit) {
         binding.itemContainer.setOnClickListener { onClick() }
+    }
+
+    /** Sets the item overflow menu click listener */
+    fun setLeadingIconClickListener(onClick: (View) -> Unit) {
+        binding.leadingIcon.setOnClickListener { onClick(binding.leadingIcon) }
     }
 
     /** Sets the leading image content description */

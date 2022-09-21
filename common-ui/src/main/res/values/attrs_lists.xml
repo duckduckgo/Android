@@ -29,7 +29,7 @@
     <attr name="secondaryText" format="string"/>
     <attr name="leadingIcon" format="integer"/>
     <attr name="trailingIcon" format="integer"/>
-    <attr name="showBetaPill" format="reference"/>
+    <attr name="showBetaPill" format="boolean"/>
     <attr name="primaryTextColor" format="color"/>
     <attr name="secondaryTextColor" format="color"/>
 
