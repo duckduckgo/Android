@@ -236,7 +236,6 @@
         <item name="settingsItemTextColor">@color/almostBlackDark</item>
         <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="settingsMinorTextColor">@color/warmerGray</item>
-        <item name="settingsSwitchBackgroundColor">@color/brownishGrayTwo</item>
         <item name="buttonOutlinedTextColor">@color/cornflowerBlue</item>
         <item name="buttonOutlinedBorderColor">@color/grayishThree</item>
         <item name="callToActionTitleColor">@color/almostBlackDark</item>
@@ -319,21 +318,8 @@
         <item name="colorControlHighlight">@color/subtleGrayTwo</item>
     </style>
 
-    <style name="ToolbarTheme.Green">
-        <item name="colorAccent">@color/cornflowerGreen</item>
-        <item name="colorControlActivated">@color/cornflowerGreen</item>
-        <item name="colorSwitchThumbNormal">@color/white</item>
-        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
-    </style>
-
     <style name="OmnibarToolbarTheme">
         <item name="colorControlHighlight">@color/subtleGrayTwo</item>
-    </style>
-
-    <style name="SettingsSwitchTheme">
-        <item name="colorControlActivated">@color/cornflowerBlue</item>
-        <item name="colorSwitchThumbNormal">@color/white</item>
-        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
     </style>
 
     <style name="TextInputLayoutTheme" parent="Widget.Design.TextInputLayout">
@@ -364,7 +350,7 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="PopUpMenuSwitchTheme">
+    <style name="PopUpMenuCheckBoxTheme">
         <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
     </style>

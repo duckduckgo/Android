@@ -49,6 +49,6 @@
         android:layout_gravity="center"
         android:button="@null"
         android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
-        android:theme="@style/PopUpMenuSwitchTheme" />
+        android:theme="@style/PopUpMenuCheckBoxTheme" />
 
 </LinearLayout>
