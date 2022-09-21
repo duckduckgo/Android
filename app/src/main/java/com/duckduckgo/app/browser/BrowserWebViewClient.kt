@@ -45,6 +45,7 @@ import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
 import kotlinx.coroutines.*
@@ -73,6 +74,7 @@ class BrowserWebViewClient(
     private val internalTestUserChecker: InternalTestUserChecker,
     private val adClickManager: AdClickManager,
     private val autoconsent: Autoconsent,
+    private val contentScopeScripts: ContentScopeScripts
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -263,6 +265,7 @@ class BrowserWebViewClient(
             }
             lastPageStarted = url
             browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
+            webView.evaluateJavascript("javascript:${contentScopeScripts.getScript()}", null)
             injectGpcToDom(webView, url)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {
