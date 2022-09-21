@@ -27,6 +27,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.mobile.android.ui.view.hide
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
@@ -150,8 +152,8 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 val canProtect = it.first
                 val canRestoreDefaults = it.second
 
-                binding.restoreDefaultAppProtections.setIsEnabled(canRestoreDefaults)
-                binding.protectAllApps.setIsEnabled(canProtect)
+                binding.restoreDefaultAppProtections.isEnabled = canRestoreDefaults
+                binding.protectAllApps.isEnabled = canProtect
             }
             .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
@@ -178,18 +180,17 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .map { it.state == VpnStateMonitor.VpnRunningState.ENABLED }
             .onEach { isEnabled ->
-                binding.ipv6SupportToggle.setisEnabled(isEnabled)
-                binding.privateDnsToggle.setisEnabled(isEnabled)
-                binding.badHealthMonitorToggle.setisEnabled(isEnabled)
-                binding.badHealthMitigationToggle.setisEnabled(isEnabled)
-                binding.vpnUnderlyingNetworksToggle.setisEnabled(isEnabled)
-                binding.vpnAlwaysSetDNSToggle.setisEnabled(isEnabled)
-                binding.vpnConnectivityChecksToggle.setisEnabled(isEnabled)
-                binding.debugLoggingToggle.setisEnabled(isEnabled)
-                binding.transparencyModeToggle.setisEnabled(isEnabled)
+                binding.ipv6SupportToggle.isEnabled = isEnabled
+                binding.privateDnsToggle.isEnabled = isEnabled
+                binding.badHealthMonitorToggle.isEnabled = isEnabled
+                binding.badHealthMitigationToggle.isEnabled = isEnabled
+                binding.vpnUnderlyingNetworksToggle.isEnabled = isEnabled
+                binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
+                binding.vpnConnectivityChecksToggle.isEnabled = isEnabled
+                binding.debugLoggingToggle.isEnabled = isEnabled
+                binding.transparencyModeToggle.isEnabled = isEnabled
                 // only show this toggle when the variant is correct
-                binding.vpnNewNetworkingLayerToggle.setisEnabled(vpnNetworkStackVariantManager.getVariant() == "ng")
-                binding.vpnNewNetworkingLayerToggle.setisEnabled(isEnabled)
+                binding.vpnNewNetworkingLayerToggle.isEnabled = vpnNetworkStackVariantManager.getVariant() == "ng"
                 if (isEnabled){
                     binding.settingsInfo.show()
                 } else {

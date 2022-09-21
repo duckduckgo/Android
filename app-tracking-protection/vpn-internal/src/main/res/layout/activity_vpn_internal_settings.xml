@@ -137,6 +137,8 @@
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/exceptionRules"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:primaryText="App/Tracker exception rules"
@@ -144,6 +146,8 @@
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/delete_tracking_history"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:primaryText="Delete Tracking History"
@@ -151,6 +155,8 @@
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/force_update_blocklist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:primaryText="🔄 Force Update Blocklist"
@@ -172,6 +178,8 @@
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/protectAllApps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:primaryText="Protect all apps"
@@ -179,6 +187,8 @@
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/restoreDefaultAppProtections"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:primaryText="Restore default protections"
@@ -228,6 +238,8 @@
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/viewDiagnostics"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:primaryText="View Diagnostics Data"

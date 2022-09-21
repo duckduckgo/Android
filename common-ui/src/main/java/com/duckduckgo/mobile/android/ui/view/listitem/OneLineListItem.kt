@@ -101,8 +101,4 @@ class OneLineListItem @JvmOverloads constructor(
     fun setTrailingIconClickListener(onClick: (View) -> Unit) {
         binding.trailingIcon.setOnClickListener { onClick(binding.trailingIcon) }
     }
-
-    fun setIsEnabled(isEnabled: Boolean) {
-        binding.trailingSwitch.isEnabled = isEnabled
-    }
 }
