@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.CompoundButton
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -191,7 +190,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.transparencyModeToggle.isEnabled = isEnabled
                 // only show this toggle when the variant is correct
                 binding.vpnNewNetworkingLayerToggle.isEnabled = vpnNetworkStackVariantManager.getVariant() == "ng"
-                if (isEnabled){
+                if (isEnabled) {
                     binding.settingsInfo.show()
                 } else {
                     binding.settingsInfo.hide()

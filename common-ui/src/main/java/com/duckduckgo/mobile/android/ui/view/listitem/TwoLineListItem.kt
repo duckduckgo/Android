@@ -21,70 +21,80 @@ package com.duckduckgo.mobile.android.ui.view.listitem
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.widget.LinearLayout
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
+import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class TwoLineListItem : LinearLayout {
+class TwoLineListItem @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = R.attr.twoLineListItemStyle
+) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewTwoLineItemBinding by viewBinding()
 
-    constructor(context: Context) : this(context, null)
-    constructor(
-        context: Context,
-        attrs: AttributeSet?
-    ) : this(context, attrs, R.style.Widget_DuckDuckGo_TwoLineListItem)
+    init {
+        context.obtainStyledAttributes(
+            attrs,
+            R.styleable.TwoLineListItem,
+            0,
+            R.style.Widget_DuckDuckGo_TwoLineListItem
+        ).apply {
 
-    constructor(
-        context: Context,
-        attrs: AttributeSet?,
-        defStyle: Int
-    ) : super(context, attrs, defStyle) {
-        val attributes = context.obtainStyledAttributes(attrs, R.styleable.TwoLineListItem)
-        setTitle(attributes.getString(R.styleable.TwoLineListItem_primaryText) ?: "")
-        setSubtitle(attributes.getString(R.styleable.TwoLineListItem_secondaryText) ?: "")
-        attributes.recycle()
-    }
+            binding.primaryText.text = getString(R.styleable.TwoLineListItem_primaryText)
+            if (hasValue(R.styleable.TwoLineListItem_primaryTextColor)) {
+                binding.primaryText.setTextColor(
+                    getColor(
+                        R.styleable.TwoLineListItem_primaryTextColor,
+                        context.getColorFromAttr(R.attr.normalTextColor)
+                    )
+                )
+            }
 
-    /** Sets the item title */
-    fun setTitle(title: String) {
-        binding.title.text = title
-    }
+            binding.secondaryText.text = getString(R.styleable.TwoLineListItem_secondaryText)
+            if (hasValue(R.styleable.TwoLineListItem_secondaryTextColor)) {
+                binding.secondaryText.setTextColor(
+                    getColor(
+                        R.styleable.TwoLineListItem_secondaryTextColor,
+                        context.getColorFromAttr(R.attr.normalTextColor)
+                    )
+                )
+            }
 
-    /** Sets the item subtitle */
-    fun setSubtitle(subtitle: String) {
-        binding.subtitle.text = subtitle
-    }
+            if (hasValue(R.styleable.TwoLineListItem_leadingIcon)) {
+                binding.leadingIcon.setBackground(getDrawable(R.styleable.TwoLineListItem_leadingIcon))
+            } else {
+                binding.leadingIcon.gone()
+            }
 
-    fun imageView() = binding.image
+            if (hasValue(R.styleable.TwoLineListItem_trailingIcon)) {
+                binding.trailingIcon.setImageDrawable(getDrawable(R.styleable.TwoLineListItem_trailingIcon))
+            } else {
+                binding.trailingIcon.gone()
+            }
 
-    /** Sets the item image resource */
-    fun setImageResource(idRes: Int) {
-        binding.image.setImageResource(idRes)
-    }
-
-    /** Sets the item image drawable */
-    fun setImageDrawable(idRes: Int) {
-        val drawable = VectorDrawableCompat.create(resources, idRes, null)
-        binding.image.setImageDrawable(drawable)
-    }
-
-    /** Sets the item title */
-    fun setImageVisibility(isVisible: Boolean) {
-        if (isVisible) {
-            binding.imageContainer.show()
-        } else {
-            binding.imageContainer.gone()
+            recycle()
         }
     }
 
-    /** Sets the item image content description */
-    fun setContentDescription(description: String) {
-        binding.image.contentDescription = description
+    /** Sets the item title */
+    fun setPrimaryText(title: String) {
+        binding.primaryText.text = title
+    }
+
+    /** Sets the item subtitle */
+    fun setSecondaryText(subtitle: String) {
+        binding.secondaryText.text = subtitle
+    }
+
+    fun leadingIcon() = binding.leadingIcon
+
+    /** Sets the item image resource */
+    fun setLeadingIcon(idRes: Int) {
+        binding.leadingIcon.setImageResource(idRes)
     }
 
     /** Sets the item click listener */
@@ -92,8 +102,18 @@ class TwoLineListItem : LinearLayout {
         binding.itemContainer.setOnClickListener { onClick() }
     }
 
+    /** Sets the leading image content description */
+    fun setLeadingIconContentDescription(description: String) {
+        binding.leadingIcon.contentDescription = description
+    }
+
     /** Sets the item overflow menu click listener */
-    fun setOverflowClickListener(onClick: (View) -> Unit) {
-        binding.overflowMenu.setOnClickListener { onClick(binding.overflowMenu) }
+    fun setTrailingIconClickListener(onClick: (View) -> Unit) {
+        binding.trailingIcon.setOnClickListener { onClick(binding.trailingIcon) }
+    }
+
+    /** Sets the trailing image content description */
+    fun setTrailingContentDescription(description: String) {
+        binding.trailingIcon.contentDescription = description
     }
 }

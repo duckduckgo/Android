@@ -108,11 +108,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     ) : ComponentViewHolder(inflate(parent, R.layout.component_two_line_item)) {
         override fun bind(component: Component) {
             val twoLineListItemWithImage = view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithImage)
-            twoLineListItemWithImage.setOverflowClickListener {
+            twoLineListItemWithImage.setTrailingIconClickListener {
                 Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show()
             }
             val twoLineListItemWithoutImage = view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithoutImage)
-            twoLineListItemWithoutImage.setOverflowClickListener {
+            twoLineListItemWithoutImage.setTrailingIconClickListener {
                 Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show()
             }
         }

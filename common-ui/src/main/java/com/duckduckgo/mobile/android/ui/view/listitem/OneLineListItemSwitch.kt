@@ -25,9 +25,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewOneLineListSwitchItemBinding
-import com.duckduckgo.mobile.android.ui.view.SwitchView
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
@@ -88,6 +86,11 @@ class OneLineListItemSwitch @JvmOverloads constructor(
     /** Sets the item overflow menu click listener */
     fun setLeadingIconClickListener(onClick: (View) -> Unit) {
         binding.leadingIcon.setOnClickListener { onClick(binding.leadingIcon) }
+    }
+
+    /** Sets the leading image content description */
+    fun setLeadingIcongContentDescription(description: String) {
+        binding.leadingIcon.contentDescription = description
     }
 
     /** Sets the checked change listener for the switch */

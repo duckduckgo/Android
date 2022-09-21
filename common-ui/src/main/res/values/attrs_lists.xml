@@ -31,6 +31,7 @@
     <attr name="trailingIcon" format="integer"/>
     <attr name="showBetaPill" format="reference"/>
     <attr name="primaryTextColor" format="color"/>
+    <attr name="secondaryTextColor" format="color"/>
 
     <!--One Line Item view-->
     <declare-styleable name="OneLineListItem">
@@ -49,7 +50,9 @@
     <!--Two Line Item view-->
     <declare-styleable name="TwoLineListItem">
         <attr name="primaryText"/>
+        <attr name="primaryTextColor"/>
         <attr name="secondaryText"/>
+        <attr name="secondaryTextColor"/>
         <attr name="leadingIcon"/>
         <attr name="trailingIcon"/>
         <attr name="showBetaPill"/>

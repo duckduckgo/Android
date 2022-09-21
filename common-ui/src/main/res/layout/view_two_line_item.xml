@@ -14,71 +14,65 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/Widget.DuckDuckGo.TwoLineListItem"
+    android:background="?attr/selectableItemBackground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_container">
 
-    <FrameLayout
-        android:id="@+id/image_container"
+    <ImageView
+        android:id="@+id/leadingIcon"
         android:layout_width="@dimen/listItemImageContainerSize"
         android:layout_height="@dimen/listItemImageContainerSize"
-        android:background="@drawable/list_item_image_background"
+        android:scaleType="center"
+        android:layout_marginStart="@dimen/keyline_4"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/image"
-            android:layout_width="@dimen/listItemImageSize"
-            android:layout_height="@dimen/listItemImageSize"
-            android:layout_gravity="center"
-            android:importantForAccessibility="no"/>
-    </FrameLayout>
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription"/>
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/primaryText"
         style="@style/TextAppearance.DuckDuckGo.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:textColor="?attr/listItemTitleColor"
+        android:layout_marginEnd="8dp"
         android:maxLines="1"
         android:singleLine="true"
-        app:layout_constraintBottom_toTopOf="@+id/subtitle"
-        app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
-        app:layout_constraintStart_toEndOf="@id/image_container"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Title" />
+        android:textColor="?attr/listItemTitleColor"
+        app:layout_constraintBottom_toTopOf="@+id/secondaryText"
+        app:layout_constraintEnd_toStartOf="@+id/trailingIcon"
+        app:layout_constraintStart_toEndOf="@id/leadingIcon"
+        app:layout_constraintTop_toTopOf="parent" tools:text="Title"/>
 
     <TextView
-        android:id="@+id/subtitle"
+        android:id="@+id/secondaryText"
         style="@style/TextAppearance.DuckDuckGo.Body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:paddingTop="2dp"
         android:paddingBottom="4dp"
         android:textColor="?attr/listItemSubtitleColor"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
-        app:layout_constraintStart_toStartOf="@id/title"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        tools:text="Subtitle" />
+        app:layout_constraintEnd_toStartOf="@+id/trailingIcon"
+        app:layout_constraintStart_toStartOf="@id/primaryText"
+        app:layout_constraintTop_toBottomOf="@id/primaryText" tools:text="Subtitle"/>
 
     <ImageView
-        android:id="@+id/overflowMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:background="?selectableItemBackground"
-        android:paddingStart="14dp"
-        android:paddingEnd="@dimen/toolbarOverflowPadding"
+        android:id="@+id/trailingIcon"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
         android:scaleType="center"
+        android:background="?selectableItemBackground"
         android:src="@drawable/ic_overflow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

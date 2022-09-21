@@ -68,7 +68,6 @@ import com.duckduckgo.macos_api.MacWaitlistState.*
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
-import com.duckduckgo.mobile.android.ui.view.SwitchView
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity

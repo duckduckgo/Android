@@ -27,7 +27,6 @@ import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.CompoundButton
-import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope

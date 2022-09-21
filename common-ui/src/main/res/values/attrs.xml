@@ -83,7 +83,6 @@
     <attr name="textInputOutlinedBoxColorHighlight" format="color" />
 
     <attr name="normalTextColor" format="color" />
-    <attr name="secondaryTextColor" format="color" />
     <attr name="accentTextColor" format="color" />
     <attr name="primaryIconColor" format="color" />
     <attr name="primaryIconDisabledColor" format="color" />

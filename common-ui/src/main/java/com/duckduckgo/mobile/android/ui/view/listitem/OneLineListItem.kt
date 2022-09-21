@@ -87,6 +87,11 @@ class OneLineListItem @JvmOverloads constructor(
         binding.trailingIcon.setImageDrawable(drawable)
     }
 
+    /** Sets the item image content description */
+    fun setLeadingIconContentDescription(description: String) {
+        binding.leadingIcon.contentDescription = description
+    }
+
     /** Sets the item click listener */
     fun setClickListener(onClick: () -> Unit) {
         binding.itemContainer.setOnClickListener { onClick() }
@@ -100,5 +105,10 @@ class OneLineListItem @JvmOverloads constructor(
     /** Sets the item overflow menu click listener */
     fun setTrailingIconClickListener(onClick: (View) -> Unit) {
         binding.trailingIcon.setOnClickListener { onClick(binding.trailingIcon) }
+    }
+
+    /** Sets the trailing image content description */
+    fun setTrailingContentDescription(description: String) {
+        binding.leadingIcon.contentDescription = description
     }
 }
