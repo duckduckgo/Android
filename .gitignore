@@ -61,9 +61,9 @@ report
 
 .DS_Store
 
-# Ignore everything in node_modules except:
-# - autofill dist, license and readme
-# - config-scope-scripts build/android, license and readme
+# Ignore everything in node_modules except
+# - autofill: dist, license and readme
+# - config-scope-scripts: contentScope.js, license and readme
 # Info on the weird syntax here: https://stackoverflow.com/a/54870120/1948947
 !/node_modules/
 /node_modules/*
