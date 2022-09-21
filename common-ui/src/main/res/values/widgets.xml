@@ -303,6 +303,17 @@
         <item name="colorSecondary">@color/cornflowerBlue</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.Switch.White" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="colorControlActivated">@android:color/white</item>
+    </style>
+
+
+    <style name="ThemeOverlay.DuckDuckGo.Switch.White">
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/gray70</item>
+        <item name="colorSecondary">@color/white</item>
+    </style>
+
     <!-- Slider -->
     <style name="Widget.DuckDuckGo.Slider" parent="Widget.MaterialComponents.Slider">
         <item name="materialThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Slider</item>

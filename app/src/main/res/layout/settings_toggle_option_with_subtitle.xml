@@ -39,13 +39,10 @@
             tools:text="Subtitle" />
     </LinearLayout>
 
-    <androidx.appcompat.widget.SwitchCompat
+    <com.duckduckgo.mobile.android.ui.view.SwitchView
         android:id="@+id/toggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        style="@style/SettingsSwitch"
-        android:theme="@style/SettingsSwitchTheme"
-        />
+        android:layout_gravity="center"/>
 
 </LinearLayout>

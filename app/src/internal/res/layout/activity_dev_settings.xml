@@ -90,11 +90,11 @@
                 android:layout_height="wrap_content"
                 android:text="@string/devSettingsScreenUserAgentSection" />
 
-            <androidx.appcompat.widget.SwitchCompat
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
                 android:id="@+id/overrideUserAgentToggle"
-                style="@style/SettingsSwitch"
-                android:text="@string/devSettingsScreenUserAgentOverride"
-                android:theme="@style/SettingsSwitchTheme" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenUserAgentOverride"/>
 
             <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
                 android:id="@+id/overrideUserAgentSelector"
