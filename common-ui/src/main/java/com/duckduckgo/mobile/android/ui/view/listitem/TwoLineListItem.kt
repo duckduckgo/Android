@@ -106,7 +106,7 @@ class TwoLineListItem @JvmOverloads constructor(
     }
 
     /** Sets the item click listener */
-    fun setClickListener(onClick: () -> Unit) {
+    fun setOnClickListener(onClick: () -> Unit) {
         binding.itemContainer.setOnClickListener { onClick() }
     }
 

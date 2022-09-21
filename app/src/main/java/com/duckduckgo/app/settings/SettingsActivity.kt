@@ -380,12 +380,12 @@ class SettingsActivity :
     ) {
         with(viewsMore) {
             if (waitlistState != WaitlistState.InBeta) {
-                vpnSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
+                vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
             } else {
                 if (appTPEnabled) {
-                    vpnSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldEnabled))
+                    vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldEnabled))
                 } else {
-                    vpnSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldDisabled))
+                    vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
                 }
             }
         }
