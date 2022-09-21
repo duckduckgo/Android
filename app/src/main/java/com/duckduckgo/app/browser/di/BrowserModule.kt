@@ -79,6 +79,7 @@ import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
@@ -135,6 +136,7 @@ class BrowserModule {
         internalTestUserChecker: InternalTestUserChecker,
         adClickManager: AdClickManager,
         autoconsent: Autoconsent,
+        contentScopeScripts: ContentScopeScripts
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -158,6 +160,7 @@ class BrowserModule {
             internalTestUserChecker,
             adClickManager,
             autoconsent,
+            contentScopeScripts
         )
     }
 
