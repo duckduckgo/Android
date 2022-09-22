@@ -18,16 +18,19 @@ package com.duckduckgo.mobile.android.ui.view.divider
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.ViewGroup.LayoutParams
 import android.widget.FrameLayout
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewVerticalDividerBinding
+import com.duckduckgo.mobile.android.ui.view.toDp
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class VerticalDivider @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = R.style.Widget_DuckDuckGo_Divider
+    defStyleAttr: Int = R.attr.verticalDividerStyle,
+    defStyleRes: Int = R.style.Widget_DuckDuckGo_VerticalDivider
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
     init {
         viewBinding<ViewVerticalDividerBinding>()

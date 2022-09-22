@@ -27,7 +27,7 @@ class HorizontalDivider @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-    defStyleRes: Int = R.style.Widget_DuckDuckGo_Divider
+    defStyleRes: Int = R.style.Widget_DuckDuckGo_HorizontalDivider
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
     init {
         viewBinding<ViewHorizontalDividerBinding>()

@@ -305,9 +305,16 @@
         <item name="android:theme">@style/TextInputEditTextTheme</item>
     </style>
 
-    <!-- Dialogs -->
-    <style name="Widget.DuckDuckGo.Divider">
+    <!-- Dividers -->
+    <style name="Widget.DuckDuckGo.HorizontalDivider">
         <item name="android:paddingTop">@dimen/keyline_5</item>
         <item name="android:paddingBottom">@dimen/keyline_5</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.VerticalDivider">
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:paddingEnd">@dimen/keyline_4</item>
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
 </resources>
