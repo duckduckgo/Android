@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:text="Section divider"/>
 
-    <com.duckduckgo.mobile.android.ui.view.SectionDivider
+    <com.duckduckgo.mobile.android.ui.view.Divider
         android:layout_height="wrap_content"
         android:layout_width="match_parent"/>
 

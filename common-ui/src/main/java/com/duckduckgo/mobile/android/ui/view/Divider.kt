@@ -20,16 +20,16 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.databinding.ViewSectionDividerBinding
+import com.duckduckgo.mobile.android.databinding.ViewDividerBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class SectionDivider @JvmOverloads constructor(
+class Divider @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-    defStyleRes: Int = R.style.SectionDivider
+    defStyleRes: Int = R.style.Widget_DuckDuckGo_Divider
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
     init {
-        viewBinding<ViewSectionDividerBinding>()
+        viewBinding<ViewDividerBinding>()
     }
 }

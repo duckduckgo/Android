@@ -63,7 +63,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.duckduckgo.mobile.android.ui.view.SectionDivider
+    <com.duckduckgo.mobile.android.ui.view.Divider
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingTop="8dp"
@@ -95,7 +95,7 @@
                 app:labelText="@string/newTabMenuItem"
                 app:iconDrawable="@drawable/ic_add_16" />
 
-            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+            <com.duckduckgo.mobile.android.ui.view.Divider
                 android:id="@+id/siteOptionsMenuDivider"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
@@ -132,7 +132,7 @@
                 app:labelText="@string/bookmarksMenuTitle"
                 app:iconDrawable="@drawable/ic_library_16" />
 
-            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+            <com.duckduckgo.mobile.android.ui.view.Divider
                 android:id="@+id/browserOptionsMenuDivider"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
@@ -205,7 +205,7 @@
                 app:labelText="@string/brokenSiteReportBrokenSiteMenuItem"
                 app:iconDrawable="@drawable/ic_feedback_16" />
 
-            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+            <com.duckduckgo.mobile.android.ui.view.Divider
                 android:id="@+id/settingsMenuDivider"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"

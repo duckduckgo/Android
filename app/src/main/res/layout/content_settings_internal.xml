@@ -20,7 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.duckduckgo.mobile.android.ui.view.SectionDivider
+    <com.duckduckgo.mobile.android.ui.view.Divider
         android:id="@+id/settingsInternalSectionBottomDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

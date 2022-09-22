@@ -304,4 +304,10 @@
         <item name="hintTextColor">@color/outlined_text_input_hint_color_selector</item>
         <item name="android:theme">@style/TextInputEditTextTheme</item>
     </style>
+
+    <!-- Dialogs -->
+    <style name="Widget.DuckDuckGo.Divider">
+        <item name="android:paddingTop">@dimen/keyline_5</item>
+        <item name="android:paddingBottom">@dimen/keyline_5</item>
+    </style>
 </resources>

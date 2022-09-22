@@ -32,7 +32,7 @@ import com.duckduckgo.app.browser.databinding.ViewListSingleItemEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.SectionDivider
+import com.duckduckgo.mobile.android.ui.view.Divider
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -107,7 +107,7 @@ class WebsitesAdapter(
                 WebsiteViewHolder.SimpleViewHolder(binding.root)
             }
             DIVIDER_TYPE -> {
-                WebsiteViewHolder.SimpleViewHolder(SectionDivider(parent.context))
+                WebsiteViewHolder.SimpleViewHolder(Divider(parent.context))
             }
             SECTION_TITLE_TYPE -> {
                 val binding = ViewListItemSectionTitleBinding.inflate(inflater, parent, false)
