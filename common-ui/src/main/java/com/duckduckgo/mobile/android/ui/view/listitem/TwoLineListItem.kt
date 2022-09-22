@@ -79,7 +79,7 @@ class TwoLineListItem @JvmOverloads constructor(
             }
 
             val showBetaPill = getBoolean(R.styleable.TwoLineListItem_showBetaPill, false)
-            if (showBetaPill){
+            if (showBetaPill) {
                 binding.pill.show()
             } else {
                 binding.pill.gone()
