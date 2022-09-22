@@ -69,7 +69,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     override fun onMainProcessCreate() {
         configureLogging()
-        Timber.d("onMainProcessCreate ${ProcessName.currentProcessName}")
+        Timber.d("onMainProcessCreate $currentProcessName")
 
         configureDependencyInjection()
         setupActivityLifecycleCallbacks()

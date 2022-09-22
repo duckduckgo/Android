@@ -16,16 +16,15 @@
 
 package com.duckduckgo.app.global
 
+import android.app.ActivityManager
 import android.app.Application
+import android.content.Context
 import android.os.Build
 import android.os.Process
-import android.os.StrictMode
-import java.io.BufferedReader
-import java.io.FileReader
 
 abstract class MultiProcessApplication : Application() {
     private val shortProcessName: String by lazy {
-        ProcessName.currentProcessName?.substring(packageName.length) ?: "UNKNOWN"
+        currentProcessName?.substring(packageName.length) ?: "UNKNOWN"
     }
     private val isMainProcessCached: Boolean by lazy { isMainProcess }
 
@@ -44,41 +43,18 @@ abstract class MultiProcessApplication : Application() {
 }
 
 inline val Application.isMainProcess: Boolean
-    get() = packageName == ProcessName.currentProcessName
+    get() = packageName == currentProcessName
 
-inline fun Application.runInSecondaryProcessNamed(name: String, block: () -> Unit) {
-    if (ProcessName.currentProcessName == "$packageName:$name") {
+inline fun Context.runInSecondaryProcessNamed(name: String, block: () -> Unit) {
+    if (currentProcessName == "$packageName:$name") {
         block()
     }
 }
 
-object ProcessName {
+val Context.currentProcessName: String?
+    get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) { Application.getProcessName() } else { processNameFromSystemService() }
 
-    val currentProcessName: String?
-        get() {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                Application.getProcessName()
-            } else {
-                processNameFromProc(Process.myPid())
-            }
-        }
-
-    private fun processNameFromProc(pid: Int): String? {
-        if (pid <= 0) return null
-
-        return runCatching {
-            val reader: BufferedReader
-            val savedThreadPolicy = StrictMode.allowThreadDiskReads()
-
-            try {
-                reader = BufferedReader(FileReader("/proc/$pid/cmdline"))
-            } finally {
-                StrictMode.setThreadPolicy(savedThreadPolicy)
-            }
-
-            val processName = reader.readLine().trim { it <= ' ' }
-            runCatching { reader.close() }
-            return@runCatching processName
-        }.getOrNull()
-    }
+private fun Context.processNameFromSystemService(): String {
+    val am = this.getSystemService(Application.ACTIVITY_SERVICE) as ActivityManager?
+    return am?.runningAppProcesses?.firstOrNull { it.pid == Process.myPid() }?.processName.orEmpty()
 }
