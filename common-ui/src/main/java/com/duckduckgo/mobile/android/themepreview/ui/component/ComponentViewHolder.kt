@@ -30,6 +30,7 @@ import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineSwitchListItem
 import com.google.android.material.snackbar.Snackbar
 
 sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
@@ -130,6 +131,33 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithBetaPill).apply {
                 setOnClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<TwoLineSwitchListItem>(R.id.twoLineSwitchListItem).apply {
+                setOnClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setOnCheckedChangeListener { view, isChecked -> Snackbar.make(view, "Switch checked: $isChecked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<TwoLineSwitchListItem>(R.id.twoLineSwitchListItemWithImage).apply {
+                setOnClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+                setOnCheckedChangeListener { view, isChecked -> Snackbar.make(view, "Switch checked: $isChecked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<TwoLineSwitchListItem>(R.id.twoLineSwitchListItemWithPill).apply {
+                setOnClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setOnCheckedChangeListener { view, isChecked -> Snackbar.make(view, "Switch checked: $isChecked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<TwoLineSwitchListItem>(R.id.twoLineSwitchListItemWithPillAndImage).apply {
+                setOnClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+                setOnCheckedChangeListener { view, isChecked -> Snackbar.make(view, "Switch checked: $isChecked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<TwoLineSwitchListItem>(R.id.twoLineSwitchListItemWithDisabledSwitch).apply {
+                setOnClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                setIsEnabled(false)
             }
         }
     }

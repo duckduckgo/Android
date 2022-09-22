@@ -86,5 +86,60 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithTrailingIcon"/>
 
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineSwitchListItem
+        android:id="@+id/twoLineSwitchListItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Title"
+        app:secondaryText="Two line item"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithBetaPill"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineSwitchListItem
+        android:id="@+id/twoLineSwitchListItemWithImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Title"
+        app:secondaryText="Two line item with leading image"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItem"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineSwitchListItem
+        android:id="@+id/twoLineSwitchListItemWithPill"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Title"
+        app:secondaryText="Two line item with beta pill"
+        app:showBetaPill="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithImage"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineSwitchListItem
+        android:id="@+id/twoLineSwitchListItemWithPillAndImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Title"
+        app:secondaryText="Two line item with leading image and beta pill"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:showBetaPill="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithPill"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineSwitchListItem
+        android:id="@+id/twoLineSwitchListItemWithDisabledSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Title"
+        app:secondaryText="Two line item with disabled switch"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:showBetaPill="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithPillAndImage"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

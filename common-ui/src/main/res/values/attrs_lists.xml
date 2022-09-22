@@ -58,10 +58,13 @@
         <attr name="showBetaPill"/>
     </declare-styleable>
 
-    <declare-styleable name="TwoLineListItemWithToggle">
+    <declare-styleable name="TwoLineSwitchListItem">
         <attr name="primaryText"/>
+        <attr name="primaryTextColor"/>
         <attr name="secondaryText"/>
-        <attr name="trailingIcon"/>
+        <attr name="secondaryTextColor"/>
+        <attr name="leadingIcon"/>
+        <attr name="showBetaPill"/>
     </declare-styleable>
 
     <declare-styleable name="RadioTwoLineListItem">
