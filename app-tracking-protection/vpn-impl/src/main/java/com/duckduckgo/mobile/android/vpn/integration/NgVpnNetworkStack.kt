@@ -183,6 +183,10 @@ class NgVpnNetworkStack @Inject constructor(
             Timber.d("shouldAllowDomain for $name/$packageId = false")
             val trackingApp = appNamesCache[packageId] ?: appNameResolver.getAppNameForPackageId(packageId)
             appNamesCache.put(packageId, trackingApp)
+
+            // if the app name is unknown, skip inserting the tracker but still block the tracker
+            if (trackingApp.isUnknown()) return false
+
             VpnTracker(
                 trackerCompanyId = type.tracker.trackerCompanyId,
                 company = type.tracker.owner.name,
