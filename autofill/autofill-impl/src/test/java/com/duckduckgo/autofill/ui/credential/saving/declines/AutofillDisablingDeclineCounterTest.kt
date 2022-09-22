@@ -48,6 +48,7 @@ class AutofillDisablingDeclineCounterTest {
     fun before() {
         whenever(autofillStore.autofillDeclineCount).thenReturn(0)
         whenever(autofillStore.monitorDeclineCounts).thenReturn(true)
+        configureAutofillState(enabled = true, available = true)
     }
 
     @Test
@@ -149,6 +150,20 @@ class AutofillDisablingDeclineCounterTest {
         assertFalse(testee.shouldPromptToDisableAutofill())
     }
 
+    @Test
+    fun whenAutofillNotAvailableThenCounterNotActive() = runTest {
+        whenever(autofillStore.autofillAvailable).thenReturn(false)
+        initialiseDeclineCounter()
+        assertFalse(testee.isActive)
+    }
+
+    @Test
+    fun whenAutofillNotEnabledThenCounterNotActive() = runTest {
+        whenever(autofillStore.autofillEnabled).thenReturn(false)
+        initialiseDeclineCounter()
+        assertFalse(testee.isActive)
+    }
+
     private fun configureGlobalDeclineCountAtThreshold() {
         whenever(autofillStore.autofillDeclineCount).thenReturn(3)
     }
@@ -174,11 +189,15 @@ class AutofillDisablingDeclineCounterTest {
     }
 
     private fun TestScope.initialiseDeclineCounter() {
-        whenever(autofillStore.autofillEnabled).thenReturn(true)
         testee = AutofillDisablingDeclineCounter(
             autofillStore = autofillStore,
             appCoroutineScope = this,
             dispatchers = coroutineTestRule.testDispatcherProvider
         )
+    }
+
+    private fun configureAutofillState(enabled: Boolean = true, available: Boolean = true) {
+        whenever(autofillStore.autofillEnabled).thenReturn(enabled)
+        whenever(autofillStore.autofillAvailable).thenReturn(available)
     }
 }

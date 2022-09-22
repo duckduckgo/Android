@@ -114,7 +114,7 @@ class AutofillDisablingDeclineCounter @Inject constructor(
 
     private suspend fun determineIfDeclineCounterIsActive(): Boolean {
         return withContext(dispatchers.io()) {
-            autofillStore.autofillEnabled && autofillStore.monitorDeclineCounts
+            autofillStore.autofillEnabled && autofillStore.monitorDeclineCounts && autofillStore.autofillAvailable
         }
     }
 
