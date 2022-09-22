@@ -55,6 +55,18 @@ class SecureStoreBackedAutofillStore(
             autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin = value
         }
 
+    override var autofillDeclineCount: Int
+        get() = autofillPrefsStore.autofillDeclineCount
+        set(value) {
+            autofillPrefsStore.autofillDeclineCount = value
+        }
+
+    override var monitorDeclineCounts: Boolean
+        get() = autofillPrefsStore.monitorDeclineCounts
+        set(value) {
+            autofillPrefsStore.monitorDeclineCounts = value
+        }
+
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
         return withContext(dispatcherProvider.io()) {
             return@withContext if (autofillEnabled && autofillAvailable) {
@@ -94,8 +106,10 @@ class SecureStoreBackedAutofillStore(
         )
         val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(loginDetails, password = credentials.password)
 
-        return secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials().also {
-            showOnboardingWhenOfferingToSaveLogin = false
+        return withContext(dispatcherProvider.io()) {
+            secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials().also {
+                showOnboardingWhenOfferingToSaveLogin = false
+            }
         }
     }
 
