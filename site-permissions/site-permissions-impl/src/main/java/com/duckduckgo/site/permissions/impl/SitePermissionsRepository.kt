@@ -75,11 +75,15 @@ class SitePermissionsRepositoryImpl @Inject constructor(
         return when (permission) {
             PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
                 val isAskCameraSettingDenied = sitePermissionsForDomain?.askCameraSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
-                askCameraEnabled && !isAskCameraSettingDenied
+                val isAskCameraDisabled =
+                    askCameraEnabled || sitePermissionsForDomain?.askCameraSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                isAskCameraDisabled && !isAskCameraSettingDenied
             }
             PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
                 val isAskMicSettingDenied = sitePermissionsForDomain?.askMicSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
-                askMicEnabled && !isAskMicSettingDenied
+                val isAskMicDisabled =
+                    askMicEnabled || sitePermissionsForDomain?.askMicSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                isAskMicDisabled && !isAskMicSettingDenied
             }
             else -> false
         }
