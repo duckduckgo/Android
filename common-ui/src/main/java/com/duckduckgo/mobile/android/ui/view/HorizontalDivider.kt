@@ -23,7 +23,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewDividerBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class Divider @JvmOverloads constructor(
+class HorizontalDivider @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,

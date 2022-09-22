@@ -22,7 +22,8 @@ import com.android.tools.lint.detector.api.CURRENT_API
 import com.android.tools.lint.detector.api.Issue
 import com.duckduckgo.lint.ui.DeprecatedAndroidButtonUsedInXmlDetector.Companion.DEPRECATED_BUTTON_IN_XML
 import com.duckduckgo.lint.ui.DividerDetector.Companion
-import com.duckduckgo.lint.ui.DividerDetector.Companion.MISSING_DIVIDER
+import com.duckduckgo.lint.ui.DividerDetector.Companion.MISSING_HORIZONTAL_DIVIDER
+import com.duckduckgo.lint.ui.DividerDetector.Companion.MISSING_VERTICAL_DIVIDER
 import com.duckduckgo.lint.ui.NoAlertDialogDetector.Companion.NO_DESIGN_SYSTEM_DIALOG
 import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Companion.STYLE_IN_DESIGN_SYSTEM_COMPONENT
 
@@ -33,7 +34,8 @@ class DuckDuckGoDesignSystemRegistry : IssueRegistry() {
             DEPRECATED_BUTTON_IN_XML,
             STYLE_IN_DESIGN_SYSTEM_COMPONENT,
             NO_DESIGN_SYSTEM_DIALOG,
-            MISSING_DIVIDER
+            MISSING_VERTICAL_DIVIDER,
+            MISSING_HORIZONTAL_DIVIDER,
         )
 
     override val api: Int

@@ -19,7 +19,7 @@ package com.duckduckgo.app.global.view
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.mobile.android.ui.view.Divider
+import com.duckduckgo.mobile.android.ui.view.HorizontalDivider
 
 class DividerAdapter : RecyclerView.Adapter<DividerAdapter.DividerViewHolder>() {
 
@@ -29,7 +29,7 @@ class DividerAdapter : RecyclerView.Adapter<DividerAdapter.DividerViewHolder>() 
         parent: ViewGroup,
         viewType: Int
     ): DividerViewHolder {
-        return DividerViewHolder(Divider(parent.context))
+        return DividerViewHolder(HorizontalDivider(parent.context))
     }
 
     override fun onBindViewHolder(

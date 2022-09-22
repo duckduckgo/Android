@@ -41,33 +41,46 @@ class DividerDetector : LayoutDetector() {
     ) {
         val heightNode = element.getAttributeNodeNS(ANDROID_URI, ATTR_LAYOUT_HEIGHT)
         if (heightNode.value == "1dp"){
-            reportUsage(context, element)
+            context.report(
+                issue = MISSING_HORIZONTAL_DIVIDER,
+                location = context.getNameLocation(element),
+                message = MISSING_HORIZONTAL_DIVIDER.getExplanation(TextFormat.RAW)
+            )
         }
 
         val widthNode = element.getAttributeNodeNS(ANDROID_URI, ATTR_LAYOUT_WIDTH)
         if (widthNode.value == "1dp"){
-            reportUsage(context, element)
+            context.report(
+                issue = MISSING_VERTICAL_DIVIDER,
+                location = context.getNameLocation(element),
+                message = MISSING_VERTICAL_DIVIDER.getExplanation(TextFormat.RAW)
+            )
         }
-    }
-
-    private fun reportUsage(
-        context: XmlContext,
-        element: Element
-    ) {
-        context.report(
-            issue = MISSING_DIVIDER,
-            location = context.getNameLocation(element),
-            message = MISSING_DIVIDER.getExplanation(TextFormat.RAW)
-        )
     }
 
     companion object {
 
-        val MISSING_DIVIDER = Issue
+        val MISSING_VERTICAL_DIVIDER = Issue
             .create(
-                id = "MissingDividerView",
-                briefDescription = "View used instead of Divider Component from the Design System",
-                explanation = "1dp height or width used in a View. Please, use the Divider Component from the Design System",
+                id = "MissingVerticalDividerView",
+                briefDescription = "View used instead of [VerticalDivider] Component from the Design System",
+                explanation = "1dp width used in a View. Please, use the [VerticalDivider] Component from the Design System",
+                moreInfo = "https://app.asana.com/0/1202857801505092/1203028257237192",
+                category = CUSTOM_LINT_CHECKS,
+                priority = 10,
+                severity = Severity.ERROR,
+                androidSpecific = true,
+                implementation = Implementation(
+                    DividerDetector::class.java,
+                    Scope.RESOURCE_FILE_SCOPE
+                )
+            )
+
+        val MISSING_HORIZONTAL_DIVIDER = Issue
+            .create(
+                id = "MissingHorizontalDividerView",
+                briefDescription = "View used instead of [HorizontalDivider] Component from the Design System",
+                explanation = "1dp height used in a View. Please, use the [HorizontalDivider] Component from the Design System",
                 moreInfo = "https://app.asana.com/0/1202857801505092/1203028257237192",
                 category = CUSTOM_LINT_CHECKS,
                 priority = 10,

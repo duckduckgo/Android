@@ -46,14 +46,14 @@ class DividerDetectorTest {
             """
                 ).indented()
             )
-            .issues(DividerDetector.MISSING_DIVIDER)
+            .issues(DividerDetector.MISSING_HORIZONTAL_DIVIDER)
             .run()
             .expect(
                 """
-                res/layout/view.xml:9: Error: 1dp height or width used in a View. Please, use the Divider Component from the Design System [MissingDividerView]
+                res/layout/view.xml:9: Error: 1dp height used in a View. Please, use the [HorizontalDivider] Component from the Design System [MissingHorizontalDividerView]
                   <View
                    ~~~~
-                1 errors, 0 warnings   
+                1 errors, 0 warnings
             """.trimMargin()
             )
     }
@@ -82,14 +82,14 @@ class DividerDetectorTest {
             """
                 ).indented()
             )
-            .issues(DividerDetector.MISSING_DIVIDER)
+            .issues(DividerDetector.MISSING_VERTICAL_DIVIDER)
             .run()
             .expect(
                 """
-                res/layout/view.xml:9: Error: 1dp height or width used in a View. Please, use the Divider Component from the Design System [MissingDividerView]
+                res/layout/view.xml:9: Error: 1dp width used in a View. Please, use the [VerticalDivider] Component from the Design System [MissingVerticalDividerView]
                   <View
                    ~~~~
-                1 errors, 0 warnings    
+                1 errors, 0 warnings
             """.trimMargin()
             )
     }
