@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.ui.view
+package com.duckduckgo.mobile.android.ui.view.divider
 
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.databinding.ViewDividerBinding
+import com.duckduckgo.mobile.android.databinding.ViewHorizontalDividerBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class VerticalDivider @JvmOverloads constructor(
+class HorizontalDivider @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = R.style.Widget_DuckDuckGo_Divider
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
     init {
-        viewBinding<ViewDividerBinding>()
+        viewBinding<ViewHorizontalDividerBinding>()
     }
 }

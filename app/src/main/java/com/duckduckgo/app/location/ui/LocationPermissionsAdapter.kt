@@ -38,7 +38,7 @@ import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.HorizontalDivider
+import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
 import kotlinx.coroutines.launch
 import timber.log.Timber
 

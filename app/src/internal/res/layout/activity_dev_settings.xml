@@ -78,7 +78,7 @@
                 app:toggleSubTitle="@string/devSettingsScreenTdsVersion"
                 app:toggleTitle="@string/devSettingsScreenTdsVersionSubtitle" />
 
-            <com.duckduckgo.mobile.android.ui.view.HorizontalDivider
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>

@@ -32,7 +32,7 @@ import com.duckduckgo.app.browser.databinding.ViewListSingleItemEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.HorizontalDivider
+import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
