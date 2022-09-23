@@ -18,6 +18,7 @@ package com.duckduckgo.privacy.dashboard.api.animations
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.trackerdetection.model.Entity
 
@@ -47,7 +48,8 @@ interface BrowserTrackersAnimatorHelper {
         context: Context,
         omnibarViews: List<View>,
         cookieBackground: View,
-        cookieAnimationView: LottieAnimationView
+        cookieAnimationView: LottieAnimationView,
+        cookieScene: ViewGroup
     )
 
     /**

@@ -111,6 +111,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                     if (!runPartialAnimation) {
                         animateOmnibarIn(omnibarViews).start()
                         completePartialAnimation = false
+                        tryToStartCookiesAnimation(context, omnibarViews)
                         listener?.onAnimationFinished()
                     }
                 }
@@ -138,8 +139,10 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         context: Context,
         omnibarViews: List<View>,
         cookieBackground: View,
-        cookieAnimationView: LottieAnimationView
+        cookieAnimationView: LottieAnimationView,
+        cookieScene: ViewGroup
     ) {
+        this.cookieScene = cookieScene
         this.dummyCookieView = cookieBackground
         this.cookieView = cookieAnimationView
 
@@ -191,7 +194,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         hasCookiesAnimationBeenCanceled = false
         val allOmnibarViews: List<View> = (omnibarViews + this.shieldAnimation).toList()
         cookieView.show()
-        cookieView.alpha = 1F
+        cookieView.alpha = 0F
         if (theme.isLightModeEnabled()) {
             cookieView.setAnimation(R.raw.cookie_icon_animated_light)
         } else {
@@ -271,7 +274,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
         // Here the animations begins. Fade out omnibar, fade in dummy view and after that start lottie animation
         AnimatorSet().apply {
-            play(animateOmnibarOut(allOmnibarViews)).with(animateFadeIn(dummyCookieView))
+            play(animateOmnibarOut(allOmnibarViews)).with(animateFadeIn(dummyCookieView)).with(animateFadeIn(cookieView))
             addListener(onEnd = {
                 cookieScene.show()
                 cookieScene.alpha = 1F

@@ -456,7 +456,7 @@ class BrowserTabFragment :
 
         override fun onPopUpHandled() {
             launch {
-                context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation) }
+                context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation, scene_root) }
             }
         }
 
