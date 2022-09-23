@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.ui.credential.management
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command
@@ -43,7 +44,8 @@ class AutofillSettingsViewModelTest {
 
     private val mockStore: AutofillStore = mock()
     private val clipboardInteractor: AutofillClipboardInteractor = mock()
-    private val testee = AutofillSettingsViewModel(mockStore, clipboardInteractor)
+    private val pixel: Pixel = mock()
+    private val testee = AutofillSettingsViewModel(mockStore, clipboardInteractor, pixel)
 
     @Test
     fun whenUserEnablesAutofillThenViewStateUpdatedToReflectChange() = runTest {
@@ -378,6 +380,7 @@ class AutofillSettingsViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
     @Test
     fun whenAuthWasLaunchAndThenDeviceAuthDisabledThenEmitViewStateWithIsAuthenticatingFalse() = runTest {
         testee.launchDeviceAuth()

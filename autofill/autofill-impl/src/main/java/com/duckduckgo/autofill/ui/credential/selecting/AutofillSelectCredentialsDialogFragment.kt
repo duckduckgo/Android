@@ -32,16 +32,26 @@ import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.domain.app.LoginTriggerType.AUTOPROMPT
-import com.duckduckgo.autofill.impl.AutofillPixelNames
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSelectCredentialsTooltipBinding
+import com.duckduckgo.autofill.pixel.AutofillPixelNames
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_SELECT_LOGIN_AUTOPROMPT_DISMISSED
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_SELECT_LOGIN_AUTOPROMPT_SELECTED
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_SELECT_LOGIN_AUTOPROMPT_SHOWN
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_SELECT_LOGIN_PROMPT_DISMISSED
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_SELECT_LOGIN_PROMPT_SELECTED
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_SELECT_LOGIN_PROMPT_SHOWN
 import com.duckduckgo.autofill.ui.credential.dialog.animateClosed
+import com.duckduckgo.autofill.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Dismissed
+import com.duckduckgo.autofill.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Selected
+import com.duckduckgo.autofill.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Shown
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
@@ -49,6 +59,12 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     @Inject
     lateinit var pixel: Pixel
+
+    /**
+     * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it
+     * This flag is set to true when taking an action which dismisses the dialog, but should not be treated as a cancellation.
+     */
+    private var ignoreCancellationEvents = false
 
     override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
 
@@ -65,6 +81,8 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        pixelNameDialogEvent(Shown)?.let { pixel.fire(it) }
+
         val binding = ContentAutofillSelectCredentialsTooltipBinding.inflate(inflater, container, false)
         configureViews(binding)
         return binding.root
@@ -78,9 +96,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     private fun configureCloseButton(binding: ContentAutofillSelectCredentialsTooltipBinding) {
-        binding.closeButton.setOnClickListener {
-            (dialog as BottomSheetDialog).animateClosed()
-        }
+        binding.closeButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
     }
 
     private fun configureSiteDetails(binding: ContentAutofillSelectCredentialsTooltipBinding) {
@@ -105,28 +121,54 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             credentialTextExtractor = CredentialTextExtractor(requireContext()),
             credentials = getAvailableCredentials()
         ) { selectedCredentials ->
+
+            pixelNameDialogEvent(Selected)?.let { pixel.fire(it) }
+
             val result = Bundle().also {
                 it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, false)
                 it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
                 it.putParcelable(CredentialAutofillPickerDialog.KEY_CREDENTIALS, selectedCredentials)
             }
             parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.resultKey(getTabId()), result)
+
+            ignoreCancellationEvents = true
             dismiss()
         }
     }
 
     override fun onCancel(dialog: DialogInterface) {
+        if (ignoreCancellationEvents) {
+            Timber.v("onCancel: Ignoring cancellation event")
+            return
+        }
+
+        Timber.v("onCancel: AutofillSelectCredentialsDialogFragment. User declined to autofill credentials")
+
+        pixelNameDialogEvent(Dismissed)?.let { pixel.fire(it) }
+
         val result = Bundle().also {
             it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, true)
             it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
         }
 
-        when (getTriggerType()) {
-            AUTOPROMPT -> pixel.fire(AutofillPixelNames.AUTOFILL_LOGINS_AUTOPROMPT_DISMISSED)
-            else -> {}
-        }
-
         parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.resultKey(getTabId()), result)
+    }
+
+    private fun pixelNameDialogEvent(dialogEvent: DialogEvent): AutofillPixelNames? {
+        val autoPrompted = getTriggerType() == AUTOPROMPT
+
+        return when (dialogEvent) {
+            is Shown -> if (autoPrompted) AUTOFILL_SELECT_LOGIN_AUTOPROMPT_SHOWN else AUTOFILL_SELECT_LOGIN_PROMPT_SHOWN
+            is Selected -> if (autoPrompted) AUTOFILL_SELECT_LOGIN_AUTOPROMPT_SELECTED else AUTOFILL_SELECT_LOGIN_PROMPT_SELECTED
+            is Dismissed -> if (autoPrompted) AUTOFILL_SELECT_LOGIN_AUTOPROMPT_DISMISSED else AUTOFILL_SELECT_LOGIN_PROMPT_DISMISSED
+            else -> null
+        }
+    }
+
+    private interface DialogEvent {
+        object Shown : DialogEvent
+        object Dismissed : DialogEvent
+        object Selected : DialogEvent
     }
 
     private fun getAvailableCredentials() = arguments?.getParcelableArrayList<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS)!!

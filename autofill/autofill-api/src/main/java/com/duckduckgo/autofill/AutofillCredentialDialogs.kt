@@ -45,7 +45,7 @@ interface CredentialSavePickerDialog {
 
     companion object {
         fun resultKeyUserChoseToSaveCredentials(tabId: String) = "$tabId/CredentialSavePickerDialogResultSave"
-        fun resultKeyUserDeclinedToSaveCredentials(tabId: String) = "$tabId/CredentialSavePickerDialogResultDecline"
+        fun resultKeyShouldPromptToDisableAutofill(tabId: String) = "$tabId/CredentialSavePickerDialogResultShouldPromptToDisableAutofill"
 
         const val TAG = "CredentialSavePickerDialog"
         const val KEY_URL = "url"

@@ -247,6 +247,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onAutofillSettingsClick() {
         viewModelScope.launch { command.send(Command.LaunchAutofillSettings) }
+        pixel.fire(SETTINGS_AUTOFILL_MANAGEMENT_OPENED)
     }
 
     fun onSitePermissionsClicked() {
