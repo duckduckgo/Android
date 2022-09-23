@@ -53,8 +53,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 ) : BrowserTrackersAnimatorHelper {
 
     private var listener: TrackersAnimatorListener? = null
-    private lateinit var trackersAnimation: LottieAnimationView
-    private lateinit var shieldAnimation: LottieAnimationView
+    private var trackersAnimation: LottieAnimationView? = null
+    private var shieldAnimation: LottieAnimationView? = null
     private lateinit var cookieView: LottieAnimationView
     private lateinit var cookieScene: ViewGroup
     private lateinit var dummyCookieView: View
@@ -146,7 +146,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         this.dummyCookieView = cookieBackground
         this.cookieView = cookieAnimationView
 
-        if (!this.trackersAnimation.isAnimating && !runPartialAnimation) {
+        if (this.trackersAnimation?.isAnimating != true && !runPartialAnimation) {
             startCookiesAnimation(context, omnibarViews)
         } else {
             enqueueCookiesAnimation = true
@@ -170,13 +170,16 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     }
 
     override fun finishPartialTrackerAnimation() {
+        val trackersAnimation = this.trackersAnimation ?: return
+        val shieldAnimation = this.shieldAnimation ?: return
+
         runPartialAnimation = false
         completePartialAnimation = true
 
-        this.trackersAnimation.setMinAndMaxProgress(0.5f, 1f)
-        this.shieldAnimation.setMinAndMaxProgress(0.5f, 1f)
-        this.trackersAnimation.playAnimation()
-        this.shieldAnimation.playAnimation()
+        trackersAnimation.setMinAndMaxProgress(0.5f, 1f)
+        shieldAnimation.setMinAndMaxProgress(0.5f, 1f)
+        trackersAnimation.playAnimation()
+        shieldAnimation.playAnimation()
     }
 
     private fun tryToStartCookiesAnimation(context: Context, omnibarViews: List<View>) {
@@ -192,7 +195,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_scene_2, context)
 
         hasCookiesAnimationBeenCanceled = false
-        val allOmnibarViews: List<View> = (omnibarViews + this.shieldAnimation).toList()
+        val allOmnibarViews: List<View> = (omnibarViews).filterNotNull().toList()
         cookieView.show()
         cookieView.alpha = 0F
         if (theme.isLightModeEnabled()) {
@@ -332,8 +335,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     }
 
     private fun stopTrackersAnimation() {
-
-        if (!::trackersAnimation.isInitialized || !::shieldAnimation.isInitialized) return
+        val trackersAnimation = this.trackersAnimation ?: return
+        val shieldAnimation = this.shieldAnimation ?: return
 
         if (trackersAnimation.isAnimating) {
             trackersAnimation.cancelAnimation()
@@ -352,7 +355,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         if (this::firstScene.isInitialized) {
             TransitionManager.go(firstScene)
         }
-        shieldAnimation.alpha = 1f
+        shieldAnimation?.alpha = 1f
         dummyCookieView.alpha = 0f
         cookieScene.gone()
         cookieView.gone()
