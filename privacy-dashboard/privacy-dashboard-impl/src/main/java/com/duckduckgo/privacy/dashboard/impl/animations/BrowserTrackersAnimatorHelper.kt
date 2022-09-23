@@ -77,7 +77,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         entities: List<Entity>?
     ) {
         if (isCookiesAnimationRunning) return // If cookies animation is running let it finish to avoid weird glitches with the other animations
-        if (trackersAnimationView.isAnimating) return
+        if (trackersAnimationView.isAnimating || this.runPartialAnimation) return
 
         this.runPartialAnimation = shouldRunPartialAnimation
         this.trackersAnimation = trackersAnimationView
