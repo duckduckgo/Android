@@ -31,7 +31,7 @@ class BookmarksEntityQueryListener(
         viewModel.viewState.value?.bookmarks?.let { bookmarks ->
             viewModel.viewState.value?.bookmarkFolders?.let { bookmarkFolders ->
                 val filteredFolders = filterBookmarkFolders(newText, bookmarkFolders)
-                bookmarksAdapter.setItems(filterBookmarks(newText, bookmarks), filteredFolders.isEmpty())
+                bookmarksAdapter.setItems(filterBookmarks(newText, bookmarks), filteredFolders.isEmpty(), true)
                 bookmarkFoldersAdapter.bookmarkFolderItems = filteredFolders
             }
         }
