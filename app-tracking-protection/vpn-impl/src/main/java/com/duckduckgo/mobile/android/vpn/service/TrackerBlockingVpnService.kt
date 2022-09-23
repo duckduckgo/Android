@@ -43,6 +43,7 @@ import com.duckduckgo.mobile.android.vpn.network.util.isLocal
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
+import com.duckduckgo.mobile.android.vpn.service.state.VpnTrampolineService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
@@ -492,6 +493,26 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
 
         internal fun startService(context: Context) {
+            startTrampolineService(context.applicationContext)
+        }
+
+        private fun startTrampolineService(context: Context) {
+            val applicationContext = context.applicationContext
+
+            if (isServiceRunning(applicationContext)) return
+
+            runCatching {
+                Intent(applicationContext, VpnTrampolineService::class.java).also { i ->
+                    applicationContext.startService(i)
+                }
+            }.onFailure {
+                // fallback for when both browser and vpn processes are not up, as we can't start a non-foreground service in the background
+                Timber.w(it, "VPN log: Failed to start trampoline service")
+                startVpnService(applicationContext)
+            }
+        }
+
+        internal fun startVpnService(context: Context) {
             val applicationContext = context.applicationContext
 
             if (isServiceRunning(applicationContext)) return
@@ -528,7 +549,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 }
 
                 Timber.v("VPN log: re-starting service")
-                startService(applicationContext)
+                startTrampolineService(applicationContext)
             }
         }
 

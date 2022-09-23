@@ -105,6 +105,11 @@
             android:exported="false"/>
 
         <service
+            android:name=".service.state.VpnTrampolineService"
+            android:exported="false"
+            android:process=":vpn"/>
+
+        <service
             android:name=".service.TrackerBlockingVpnService"
             android:exported="false"
             android:permission="android.permission.BIND_VPN_SERVICE"
