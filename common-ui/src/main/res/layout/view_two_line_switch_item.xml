@@ -30,8 +30,10 @@
         android:layout_height="@dimen/listItemImageContainerSize"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginTop="16dp"
-        android:scaleType="center" app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" tools:ignore="ContentDescription"/>
+        android:scaleType="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription"/>
 
     <TextView
         android:id="@+id/primaryText"
@@ -43,7 +45,8 @@
         android:textColor="?attr/listItemTitleColor"
         app:layout_constraintBottom_toTopOf="@+id/secondaryText"
         app:layout_constraintStart_toEndOf="@id/leadingIcon"
-        app:layout_constraintTop_toTopOf="parent" tools:text="Title"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Title"/>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/pill"
@@ -51,7 +54,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="2dp"
-        app:layout_constraintBottom_toBottomOf="@+id/primaryText" app:layout_constraintStart_toEndOf="@id/primaryText"
+        app:layout_constraintBottom_toBottomOf="@+id/primaryText"
+        app:layout_constraintStart_toEndOf="@id/primaryText"
         app:srcCompat="@drawable/ic_beta_pill"/>
 
     <TextView
@@ -66,7 +70,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/trailingSwitch"
         app:layout_constraintStart_toStartOf="@id/primaryText"
-        app:layout_constraintTop_toBottomOf="@id/primaryText" tools:text="Subtitle"/>
+        app:layout_constraintTop_toBottomOf="@id/primaryText"
+        tools:text="Subtitle"/>
 
     <com.duckduckgo.mobile.android.ui.view.SwitchView
         android:id="@+id/trailingSwitch"
