@@ -32,6 +32,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -49,7 +50,12 @@ class RealVpnStateMonitor @Inject constructor(
             .combine(
                 vpnFeaturesRegistry.registryChanges()
                     .filter { it.first == vpnFeature.featureName }
-                    .onStart { emit(vpnFeature.featureName to vpnFeaturesRegistry.isFeatureRegistered(vpnFeature)) }
+                    .onStart {
+                        // when all app processes are killed and user opens the app, the VPN can take some time to start
+                        // we delay a bit here to give the VPN time to start then we call isFeatureRegistered()
+                        delay(1000)
+                        emit(vpnFeature.featureName to vpnFeaturesRegistry.isFeatureRegistered(vpnFeature))
+                    }
                     .onEach { Timber.v("feature $it") }
             ) { vpnState, feature ->
                 val isFeatureEnabled = feature.second
@@ -59,7 +65,7 @@ class RealVpnStateMonitor @Inject constructor(
                 else if (isFeatureEnabled) VpnState(VpnRunningState.ENABLED)
                 else VpnState(VpnRunningState.DISABLED)
             }.flowOn(dispatcherProvider.io())
-            .onEach { Timber.v("$it") }
+            .onStart { emit(VpnState(VpnRunningState.DISABLED)) }
             .distinctUntilChanged()
     }
 
