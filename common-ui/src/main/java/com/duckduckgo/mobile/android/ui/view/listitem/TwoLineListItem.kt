@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class TwoLineListItem @JvmOverloads constructor(
@@ -95,6 +96,7 @@ class TwoLineListItem @JvmOverloads constructor(
     /** Sets the item image resource */
     fun setLeadingIcon(idRes: Int) {
         binding.leadingIcon.setImageResource(idRes)
+        binding.leadingIcon.show()
     }
 
     /** Sets the item click listener */

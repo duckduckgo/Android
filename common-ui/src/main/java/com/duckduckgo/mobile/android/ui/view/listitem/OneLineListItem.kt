@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class OneLineListItem @JvmOverloads constructor(
@@ -79,12 +80,14 @@ class OneLineListItem @JvmOverloads constructor(
     fun setLeadingIcon(idRes: Int) {
         val drawable = VectorDrawableCompat.create(resources, idRes, null)
         binding.leadingIcon.setImageDrawable(drawable)
+        binding.leadingIcon.show()
     }
 
     /** Sets the trailing icon image resource */
     fun setTrailingIcon(idRes: Int) {
         val drawable = VectorDrawableCompat.create(resources, idRes, null)
         binding.trailingIcon.setImageDrawable(drawable)
+        binding.trailingIcon.show()
     }
 
     /** Sets the item image content description */

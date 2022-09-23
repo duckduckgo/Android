@@ -29,6 +29,7 @@ import com.duckduckgo.mobile.android.databinding.ViewOneLineListSwitchItemBindin
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class OneLineListItemSwitch @JvmOverloads constructor(
@@ -76,6 +77,8 @@ class OneLineListItemSwitch @JvmOverloads constructor(
     fun setLeadingIcon(idRes: Int) {
         val drawable = VectorDrawableCompat.create(resources, idRes, null)
         binding.leadingIcon.setImageDrawable(drawable)
+        binding.leadingIcon.show()
+
     }
 
     /** Sets the item click listener */

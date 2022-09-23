@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.CompoundButton
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -189,7 +190,8 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.debugLoggingToggle.isEnabled = isEnabled
                 binding.transparencyModeToggle.isEnabled = isEnabled
                 // only show this toggle when the variant is correct
-                binding.vpnNewNetworkingLayerToggle.isEnabled = vpnNetworkStackVariantManager.getVariant() == "ng"
+                binding.vpnNewNetworkingLayerToggle.isVisible = vpnNetworkStackVariantManager.getVariant() == "ng"
+                binding.vpnNewNetworkingLayerToggle.isEnabled = isEnabled
                 if (isEnabled) {
                     binding.settingsInfo.show()
                 } else {
@@ -278,7 +280,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     private fun setupConfigSection() {
         with(AppTpSetting.Ipv6Support) {
             binding.ipv6SupportToggle.setIsChecked(appTpConfig.isEnabled(this))
-            binding.ipv6SupportToggle.setOnCheckedChangeListener { view, isChecked ->
+            binding.ipv6SupportToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
                 } else {

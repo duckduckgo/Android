@@ -300,8 +300,9 @@
         <item name="colorSecondary">@color/cornflowerBlue</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.Switch.White" parent="Widget.MaterialComponents.CompoundButton.Switch">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Switch.White</item>
+    <!-- Deprecated, will be deleted when all new styles are applied -->
+    <style name="Widget.DuckDuckGo.Switch.White" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="colorControlActivated">@android:color/white</item>
     </style>
 
     <style name="ThemeOverlay.DuckDuckGo.Switch.White">

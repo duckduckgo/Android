@@ -40,6 +40,8 @@
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
         android:id="@+id/autoconsentToggle"
-        app:primaryText="@string/autoconsentToggle"/>
+        app:primaryText="@string/autoconsentToggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>
