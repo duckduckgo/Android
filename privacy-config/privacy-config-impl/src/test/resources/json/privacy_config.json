@@ -1,0 +1,439 @@
+{
+  "readme": "https://github.com/duckduckgo/privacy-configuration",
+  "features": {
+    "https": {
+      "state": "enabled",
+      "exceptions": []
+    },
+    "contentBlocking": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "www.livenewsnow.com",
+          "reason": "Adblocker wall"
+        },
+        {
+          "domain": "rp5.ru",
+          "reason": "Adblocker wall"
+        }
+      ]
+    },
+    "trackerAllowlist": {
+      "state": "enabled",
+      "settings": {
+        "allowlistedTrackers": {}
+      },
+      "exceptions": []
+    },
+    "trackingCookies3p": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "hangouts.google.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "docs.google.com",
+          "reason": "site breakage"
+        }
+      ],
+      "settings": {
+        "excludedCookieDomains": [
+          {
+            "domain": "hangouts.google.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "docs.google.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "accounts.google.com",
+            "reason": "SSO which needs cookies for auth"
+          },
+          {
+            "domain": "googleapis.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "login.live.com",
+            "reason": "SSO which needs cookies for auth"
+          },
+          {
+            "domain": "apis.google.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "pay.google.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "payments.amazon.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "payments.amazon.de",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "microsoft.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "atlassian.net",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "atlassian.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "paypal.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "paypal.com",
+            "reason": "site breakage"
+          },
+          {
+            "domain": "bat.bing.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "bingapis.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "c.bing.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "bing.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "salesforce.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "salesforceliveagent.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "force.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "disqus.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "spotify.com",
+            "reason": "Site breakage"
+          },
+          {
+            "domain": "hangouts.google.com",
+            "reason": "site breakage"
+          },
+          {
+            "domain": "docs.google.com",
+            "reason": "site breakage"
+          }
+        ]
+      }
+    },
+    "trackingCookies1p": {
+      "state": "enabled",
+      "settings": {
+        "firstPartyTrackerCookiePolicy": {
+          "threshold": 86400,
+          "maxAge": 86400
+        }
+      },
+      "exceptions": []
+    },
+    "clickToPlay": {
+      "state": "enabled",
+      "exceptions": []
+    },
+    "fingerprintingCanvas": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "www.delta.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "www.johnlewis.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "warzone.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "skribbl.io",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "kroger.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "bakersplus.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "citymarket.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "dillons.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "food4less.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "foodsco.net",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "fredmeyer.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "frysfood.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "gerbes.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "jaycfoods.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "kingsoopers.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "marianos.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "metromarket.net",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "pay-less.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "picknsave.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "qfc.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "ralphs.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "smithsfoodanddrug.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "pnc.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "www.coolmathgames.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "textfree.us",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "www.academy.com",
+          "reason": "site breakage"
+        },
+        {
+          "domain": "edd.ca.gov",
+          "reason": "login issues"
+        },
+        {
+          "domain": "chase.com",
+          "reason": "Login"
+        }
+      ]
+    },
+    "fingerprintingAudio": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "youtube.com"
+        },
+        {
+          "domain": "meet.google.com"
+        }
+      ]
+    },
+    "fingerprintingTemporaryStorage": {
+      "state": "enabled",
+      "exceptions": []
+    },
+    "referrer": {
+      "state": "enabled",
+      "exceptions": []
+    },
+    "fingerprintingBattery": {
+      "state": "enabled",
+      "exceptions": []
+    },
+    "fingerprintingScreenSize": {
+      "state": "enabled",
+      "exceptions": []
+    },
+    "fingerprintingHardware": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "play.geforcenow.com"
+        },
+        {
+          "domain": "stadia.google.com"
+        }
+      ]
+    },
+    "floc": {
+      "state": "enabled",
+      "exceptions": []
+    },
+    "gpc": {
+      "state": "enabled",
+      "exceptions": []
+    },
+    "userAgentRotation": {
+      "state": "disabled",
+      "settings": {
+        "agentExcludePatterns": [
+          {
+            "agent": "Brave Chrome",
+            "reason": "Uncommon UA"
+          }
+        ]
+      },
+      "exceptions": [
+        {
+          "domain": "duosecurity.com",
+          "reason": "Two factor auth that verifies device pathes using user agent"
+        },
+        {
+          "domain": "okta.com",
+          "reason": "Two factor auth that verifies device pathes using user agent"
+        },
+        {
+          "domain": "pingidentity.com",
+          "reason": "Two factor auth that verifies device pathes using user agent"
+        },
+        {
+          "domain": "googleapis.com",
+          "reason": "Causes site breakage"
+        },
+        {
+          "domain": "recaptcha.net",
+          "reason": "Causes login breakage on some sites"
+        },
+        {
+          "domain": "google.com",
+          "reason": "If recaptcha is loaded from google, spoofed UA breaks recaptcha"
+        },
+        {
+          "domain": "gstatic.com",
+          "reason": "Sometimes hosts recaptcha"
+        },
+        {
+          "domain": "weather.com",
+          "reason": "Can break weather sites that depend on weather.com api's"
+        },
+        {
+          "domain": "dzcdn.net",
+          "reason": "Breaks images on deezer"
+        }
+      ]
+    }
+  },
+  "version": 1628840233003,
+  "unprotectedTemporary": [
+    {
+      "domain": "inlandbank.com",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "bank.barclays.co.uk",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "capitalone.ca",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "capitalone.com",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "nbarizona.com",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "sberbank.ru",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "td.com",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "ameritrade.com",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "santander.com",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "santander.co.uk",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "usbank.com",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "www.x-kom.pl",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "www.merriam-webster.com",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "tiaa.org",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "53.com",
+      "reason": "site breakage"
+    },
+    {
+      "domain": "fidelity.com",
+      "reason": "site breakage"
+    }
+  ]
+}

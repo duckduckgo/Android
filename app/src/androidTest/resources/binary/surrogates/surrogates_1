@@ -1,0 +1,6 @@
+# Some comments here
+# This comment is also here
+google-analytics.com/ga.js application/javascript
+(function() {
+	alert("surrogates_1");
+})();

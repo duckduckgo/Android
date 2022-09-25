@@ -1,0 +1,86 @@
+{
+  "trackers": {
+    "1dmp.io": {
+      "domain": "1dmp.io",
+      "owner": {
+        "name": "CleverDATA LLC",
+        "displayName": "CleverDATA",
+        "privacyPolicy": "https://hermann.ai/privacy-en",
+        "url": "http://hermann.ai"
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.002,
+      "fingerprinting": 0,
+      "cookies": 0.002,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cpu": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Advertising",
+        "Analytics",
+        "Third-Party Analytics Marketing"
+      ]
+    },
+    "1rx.io": {
+      "domain": "1rx.io",
+      "default": "block",
+      "owner": {
+        "name": "RhythmOne",
+        "displayName": "RhythmOne",
+        "privacyPolicy": "https://www.rhythmone.com/privacy-policy",
+        "url": "http://rhythmone.com"
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.066,
+      "fingerprinting": 0,
+      "cookies": 0.033,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Advertising",
+        "Ad Fraud",
+        "Third-Party Analytics Marketing"
+      ]
+    },
+    "254a.com": {
+      "domain": "254a.com",
+      "default": "block",
+      "owner": {
+        "name": "Yieldr",
+        "displayName": "Yieldr",
+        "privacyPolicy": "https://www.yieldr.com/privacy/",
+        "url": "http://yieldr.com"
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.014,
+      "fingerprinting": 0,
+      "cookies": 0.014,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Advertising",
+        "Third-Party Analytics Marketing",
+        "Action Pixels",
+        "Obscure Ownership"
+      ]
+    }
+  }
+}

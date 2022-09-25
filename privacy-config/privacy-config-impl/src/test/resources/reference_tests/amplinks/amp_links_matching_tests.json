@@ -1,0 +1,94 @@
+{
+    "ampFormats": {
+        "name": "A URL is able to be extracted from a google formatted URL.",
+        "desc": "Those tests use config_reference.json where the trackingLinks feature contains regexes",
+        "referenceConfig": "config_reference.json",
+        "tests": [
+            {
+                "name": "A URL is able to be extracted from a google formatted URL.",
+                "ampURL": "https://www.google.com/amp/s/www.example.com/some/article",
+                "expectURL": "https://www.example.com/some/article",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "A URL is able to be extracted from a google formatted URL with a different TLD.",
+                "ampURL": "https://www.google.fr/amp/s/www.example.com/some/article",
+                "expectURL": "https://www.example.com/some/article",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "A URL is able to be extracted from a google formatted URL with a TLD containing 2 dots.",
+                "ampURL": "https://www.google.co.uk/amp/s/www.example.com/some/article",
+                "expectURL": "https://www.example.com/some/article",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "A URL is able to be extracted from a google formatted URL and preserve URL parameters.",
+                "ampURL": "https://www.google.com/amp/s/www.example.com/some/article?bla=bla&q=test#header",
+                "expectURL": "https://www.example.com/some/article?bla=bla&q=test#header",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "A URL is able to be extracted from a google ampproject.org formatted URL.",
+                "ampURL": "https://example.ampproject.org/v/s/www.example.com/some/article",
+                "expectURL": "https://www.example.com/some/article",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "A URL is not extracted from a google formatted URL because the resulting URL is in the exceptions.",
+                "ampURL": "https://www.google.com/amp/s/www.example2.com/some/article",
+                "expectURL": "",
+                "exceptPlatforms": []
+            }
+        ]
+    },
+    "ampKeywords": {
+        "name": "A URL is able to be detected as a potential AMP link",
+        "desc": "Those tests use config_reference.json where the trackingLinks feature contains regexes and AMP keywords",
+        "referenceConfig": "config_reference.json",
+        "tests": [
+            {
+                "name": "A URL is able to be detected using /amp or amp/ patterns",
+                "ampURL": "https://www.euronews.com/green/amp/2021/11/05/warm-water-how-climate-change-is-affecting-the-baltic-sea",
+                "expectAmpDetected": true,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "A URL is able to be detected using .amp patterns",
+                "ampURL": "https://www.bbc.com/news/world-asia-china-19432800.amp",
+                "expectAmpDetected": true,
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension",
+                    "android-browser",
+                    "macos-browser",
+                    "windows-browser"
+                ]
+            },
+            {
+                "name": "A URL is able to be detected using amp. patterns",
+                "ampURL": "https://amp.theguardian.com/environment/2021/nov/05/british-firm-to-unveil-technology-for-zero-carbon-emission-flights-at-cop26",
+                "expectAmpDetected": true,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "A URL is able to be detected using ?amp patterns",
+                "ampURL": "https://www.independent.co.uk/news/world/americas/us-politics/fauci-dog-tests-congress-letter-b1944407.html?amp",
+                "expectAmpDetected": true,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "A URL is not able to be detected using amp patterns",
+                "ampURL": "https://example.com/some/article",
+                "expectAmpDetected": false,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "A URL is not able to be detected because the domain is in the exceptions",
+                "ampURL": "https://example2.com/amp/some/article",
+                "expectAmpDetected": false,
+                "exceptPlatforms": []
+            }
+        ]
+    }
+}

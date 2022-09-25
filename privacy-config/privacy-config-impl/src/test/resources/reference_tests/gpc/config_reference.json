@@ -1,0 +1,21 @@
+{
+  "readme": "This configuration has gpc feature only with some exceptions",
+  "features": {
+    "gpc": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "washingtonpost.com",
+          "reason": "This is a domain where our iOS/Android apps inject the Sec-GPC request header"
+        }
+      ]
+    }
+  },
+  "version": 1635943904459,
+  "unprotectedTemporary": [
+    {
+      "domain": "globalprivacycontrol.org",
+      "reason": "This exception should disable all features"
+    }
+  ]
+}

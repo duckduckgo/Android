@@ -1,0 +1,728 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGos logotyp</string>
+    <string name="duckDuckGoPrivacySimplified">Personlig integritet, förenklad</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nej</string>
+    <string name="open">Öppna</string>
+    <string name="cancel">Avbryt</string>
+    <string name="search">Sökning</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingDefaultBrowserDescription">Gå till Inställningar för att söka och bläddra med DuckDuckGo varje gång.</string>
+    <string name="onboardingDefaultBrowserTitle">Ställ in DuckDuckGo som standard</string>
+
+    <!-- Default Browser -->
+    <string name="cannotLaunchDefaultAppSettings">Kan inte starta standardinställningssidan för appar</string>
+    <string name="settingsDefaultBrowserEnabled">Ställ in som standardwebbläsare</string>
+    <string name="defaultBrowserMaybeLater">Kanske senare</string>
+    <string name="defaultBrowserLetsDoIt">Ställ in som standardwebbläsare</string>
+    <string name="defaultBrowserDescriptionNoDefault">Öppna länkar utan att behöva oroa dig, varje gång.</string>
+    <string name="defaultBrowserInstructions">Välj DuckDuckGo och tryck på <font color="#678fff">Alltid</font>.</string>
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">Webbläsarmeny</string>
+    <string name="refresh">Uppdatera</string>
+    <string name="back">Tillbaka</string>
+    <string name="forward">Framåt</string>
+
+    <string name="omnibarInputHint">Sök eller skriv in URL</string>
+    <string name="clearButtonContentDescription">Rensa sökfältet</string>
+    <string name="no_compatible_third_party_app_installed">Ingen kompatibel app installerad</string>
+    <string name="addBookmarkMenuTitle">Lägg till bokmärke</string>
+    <string name="editBookmarkMenuTitle">Redigera bokmärke</string>
+    <string name="addFavoriteMenuTitle">Lägg till favorit</string>
+    <string name="removeFavoriteMenuTitle">Ta bort favorit</string>
+    <string name="favoriteAddedMessage">Favorit har lagts till</string>
+    <string name="bookmarkAddedMessage">Bokmärke sparat</string>
+    <string name="requestDesktopSiteMenuTitle">Stationär datorwebbplats</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Ta bort brandsäkring</string>
+    <string name="requestMobileSiteMenuTitle">Webbplats för mobil</string>
+    <string name="downloadsMenuTitle">Nerladdningar</string>
+    <string name="printMenuTitle">Skriv ut sidan</string>
+    <string name="favoriteDeleteConfirmationMessage">Favorit borttagen</string>
+    <string name="fireproofDeleteConfirmationMessage">Brandsäkring har tagits bort</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Integritetsskydd aktiverat för %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Integritetsskydd inaktiverat för %1$s</string>
+    <string name="undoSnackbarAction">Återställ</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">Ladda ned bild</string>
+    <string name="permissionRequiredToDownload">Nedladdning kräver lagringstillstånd</string>
+
+    <!-- Sharing options -->
+    <string name="options">Alternativ</string>
+    <string name="shareLink">Dela länk</string>
+    <string name="shareMenuTitle">Dela</string>
+    <string name="copyUrl">Kopia länkadress</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">Hitta på sidan</string>
+    <string name="nextSearchTermDescription">Hitta nästa</string>
+    <string name="previousSearchTermDescription">Hitta föregående</string>
+    <string name="closeFindInPageButtonDescription">Stäng sökning i sidvy</string>
+    <string name="findInPageHint">Hitta på sidan</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Redigera förfrågan innan sökning</string>
+    <string name="settingsAutocompleteEnabled">Visa Autoslutför förslag</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">Öppna extern app</string>
+    <string name="launchingExternalApp">Öppna i annan app</string>
+    <string name="confirmOpenExternalApp">Vill du lämna DuckDuckGo för att se detta innehåll?</string>
+    <string name="unableToOpenLink">Kunde inte öppna den här länktypen</string>
+
+    <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="tabActivityTitle">Flikar</string>
+    <string name="tabsMenuItem">Flikar</string>
+    <string name="newTabMenuItem">Ny flik</string>
+    <string name="openInNewTab">Öppna i ny flik</string>
+    <string name="openInNewBackgroundTab">Öppna i bakgrundsflik</string>
+    <string name="openImageInNewTab">Öppna bild i bakgrundsflik</string>
+    <string name="faviconContentDescription">Favicon</string>
+    <string name="closeContentDescription">Stäng</string>
+    <string name="closeAllTabsMenuItem">Stäng alla flikar</string>
+    <string name="closeTab">Stäng flik</string>
+    <string name="tabClosed">Fliken är stängd</string>
+    <string name="tabClosedUndo">Återställ</string>
+    <string name="downloadsMenuItemTitle">Nerladdningar</string>
+
+    <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionToggle">Webbplatsens integritetsskydd</string>
+    <string name="privacyProtectionEnabled">WEBBPLATSSKYDD AKTIVERAT</string>
+    <string name="privacyProtectionDisabled">WEBBPLATSSKYDD INAKTIVERAT</string>
+    <string name="privacyDashboardActivityTitle">Sekretesspanel</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FÖRBÄTTRAD FRÅN &lt;img src=\"%1$d\" /&gt; TILL &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyGradeContentDescription">Sekretessklass</string>
+    <string name="privacyProtectionTemporarilyDisabled">Vi har tillfälligt inaktiverat integritetsskydd eftersom det verkade göra att denna webbplats inte fungerade.</string>
+
+    <string name="httpsGood">Krypterad anslutning</string>
+    <string name="httpsMixed">Blandad krypteringsanslutning</string>
+    <string name="httpsBad">Okrypterad anslutning</string>
+
+    <string name="scorecardActivityTitle">Sekretessklass</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Webbplatsen är ett större spårningsnätverk</string>
+    <string name="scorecardPrivacyGrade">Sekretessklass</string>
+    <string name="scorecardEnhancedGrade">Förbättrad klass</string>
+
+    <string name="privacyTermsActivityTitle">Integritetspraxis</string>
+    <string name="practicesGood">God integritetspraxis</string>
+    <string name="practicesMixed">Halvgod integritetspraxis</string>
+    <string name="practicesBad">Dålig integritetspraxis</string>
+    <string name="practicesUnknown">Okänd integritetspraxis</string>
+    <string name="practicesOverview">Integritetspraxis anger hur mycket den personliga information du delar med dig av till en webbplats är skyddad.</string>
+    <string name="practicesTosdrLink">Integritetspraxis från <b><u>ToS;DR</u></b>.</string>
+    <string name="practicesIconContentGood">Ikon för god praxis</string>
+    <string name="practicesIconContentBad">Ikon för dålig praxis</string>
+
+    <string name="networkTrackerSummaryHeader">SPÅRARNÄTVERKETS FRÄMSTA BROTTSLINGAR</string>
+    <string name="networkTrackerSummaryNotReady">Vi samlar fortfarande in data för att visa hur många spårare vi har blockerat.</string>
+
+    <string name="trackersActivityTitle">Spårningsförfrågningar blockerades</string>
+    <string name="trackersContentDescription">Spårningsförfrågningar blockerades</string>
+    <string name="trackersOverview">Följande tredjepartsdomäners förfrågningar blockerades från att läsas in eftersom de identifierades som spårningsförfrågningar. Om ett företags förfrågningar läses in kan det göra det möjligt för företaget att profilera dig.</string>
+    <string name="trackersOverviewProtectionsOff">Inga spårningsförfrågningar blockerades från att läsas in eftersom skyddet är avstängt för den här webbplatsen. Om ett företags förfrågningar läses in kan det göra det möjligt för företaget att profilera dig.</string>
+
+    <string name="domainsLoadedActivityTitle">Förfrågningar från tredje part lästes in</string>
+    <string name="domainsLoadedContentDescription">Förfrågningar från tredje part lästes in</string>
+    <string name="domainsLoadedOverview">Följande tredjepartsdomäners förfrågningar lästes in. Om ett företags förfrågningar läses in kan det göra det möjligt för företaget att profilera dig, även om våra övriga webbspårningsskydd fortfarande gäller.</string>
+    <string name="domainsLoadedOverviewProtectionsOff">Inga förfrågningar från tredje part blockerades från att läsas in eftersom skyddet är avstängt för den här webbplatsen. Om ett företags förfrågningar läses in kan det göra det möjligt för företaget att profilera dig.</string>
+    <string name="domainsLoadedOverviewEmpty">Vi upptäckte inga förfrågningar från några tredjepartsdomäner.</string>
+    <string name="domainsLoadedHeadingText">Inga tredjepartsdomäner har lästs in</string>
+
+    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Om våra webbspårningsskydd</annotation></string>
+    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+
+    <string name="trackersBlockedNoSectionDescription">Följande domäns förfrågningar lästes in.</string>
+
+    <string name="adLoadedSectionDescription">Följande domäns förfrågningar lästes in eftersom du nyligen klickade på en annons från %1$s på DuckDuckGo. Dessa förfrågningar hjälper till att utvärdera annonsens effektivitet. Alla annonser på DuckDuckGo är icke-profilerande.</string>
+    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Hur våra sökannonser påverkar vårt skydd</annotation></string>
+    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+
+    <string name="domainsLoadedSectionDescription">Följande domäns förfrågningar lästes också in.</string>
+    <string name="domainsLoadedSectionSingleSectionDescription">Följande domäners spårningsförfrågningar lästes in.</string>
+    <string name="domainsLoadedSectionEmptyListDescription">Vi upptäckte inga förfrågningar från några tredjepartsdomäner.</string>
+
+    <string name="domainsLoadedBreakageSectionDescription">Följande domäns förfrågningar lästes in för att förhindra fel på webbplatsen.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Följande domäns förfrågningar lästes in eftersom de är kopplade till %1$s.</string>
+
+    <string name="trackersBlockedText">Förfrågningar blockerades från att läsas in</string>
+    <string name="trackersNotBlockedText">Inga spårningsförfrågningar blockerades</string>
+    <string name="trackersNoFoundText">Inga spårningsförfrågningar hittades</string>
+    <string name="trackersFoundText">Spårningsförfrågningar hittades</string>
+
+    <string name="domainsLoadedText">Förfrågningar från tredje part lästes in</string>
+    <string name="domainsNotLoadedText">Inga förfrågningar från tredje part lästes in</string>
+
+    <string name="majorNetworksNoFound">Inga större spårningsnätverk hittades</string>
+    <string name="majorNetworksFound">Större spårningsnätverk hittades</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">Rensa data</string>
+    <string name="fireClearAll">Rensa alla flikar och data</string>
+    <string name="fireCancel">Avbryt</string>
+    <string name="fireDataCleared">Data rensad</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">Inställningar</string>
+    <string name="settingsMenuItemTitle">Inställningar</string>
+    <string name="settingsHeadingPrivacy">Sekretess</string>
+    <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
+    <string name="settingsVersion">Version</string>
+    <string name="leaveFeedback">Berätta vad du tycker</string>
+    <string name="settingsEmailProtectionTitle">E-postskydd</string>
+    <string name="settingsEmailProtectionSubtitle">Blockera e-postspårare och dölj din adress</string>
+    <string name="settingsHeadingMore">Mer från DuckDuckGo</string>
+    <string name="settingsLightTheme">Ljus</string>
+    <string name="settingsTheme">Tema</string>
+    <string name="settingsDarkTheme">Mörk</string>
+    <string name="settingsSystemTheme">Systemstandard</string>
+    <string name="settingsThemeDialogSave">Ställ in tema</string>
+    <string name="settingsTitleAppLinks">Öppna länkar i appar</string>
+    <string name="settingsTitleAppLinksDialog">Öppna länkar i appar</string>
+    <string name="settingsAppLinksAskEveryTime">Fråga varje gång</string>
+    <string name="settingsAppLinksAlways">Alltid</string>
+    <string name="settingsAppLinksNever">Aldrig</string>
+    <string name="settingsHeadingAppearance">Utseende</string>
+    <string name="settingsHeadingCustomize">Anpassa</string>
+    <string name="settingsHeadingAbout">Om</string>
+
+    <!-- Settings - Automatically clearing data -->
+    <string name="settingsAutomaticallyClearingDialogSave">Spara</string>
+
+    <string name="settingsAutomaticallyClearWhat">Autorensning …</string>
+    <string name="settingsAutomaticallyClearWhatDialogTitle">Autorensning …</string>
+    <string name="settingsAutomaticallyClearWhatOptionNone">Inga</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabs">Flikar</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Flikar och data</string>
+
+    <string name="settingsAutomaticallyClearWhen">Rensa den …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Rensa den …</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Gå bara ur appen</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Avsluta app, inaktiv i 5 sekunder</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Avsluta app, inaktiv i 5 minuter</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Avsluta app, inaktiv i 15 minuter</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Avsluta app, inaktiv i 30 minuter</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Avsluta app, inaktiv i 1 timme</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">Om DuckDuckGo</string>
+    <string name="aboutDescription">
+        På DuckDuckGo sätter vi en ny standard för förtroende på nätet.\n\nDuckDuckGo Privacy Browser tillhandahåller alla de grundläggande sekretesstjänster du behöver för att skydda dig själv när du söker och surfar på nätet, inklusive blockering av spårare, smartare kryptering och DuckDuckGo privat sökning.\n\nInternet borde ju trots allt inte kännas så skrämmande och det bör vara lika enkelt att få det integritetsskydd du förtjänar som det är att dra ner rullgardinen.</string>
+    <string name="aboutMoreLink">Mer på duckduckgo.com/about</string>
+    <string name="no_suggestions">Inga förslag</string>
+
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteReportBrokenSiteMenuItem">Rapportera skadad webbplats</string>
+    <string name="brokenSiteHeading">Rapportera bruten webbplats</string>
+    <string name="brokenSiteSubmitted">Tack! Återkopplingen har skickats.</string>
+    <string name="brokenSitesCategoriesTitle">Berätta vad som hände:</string>
+    <string name="brokenSitesCategoriesHint">Berätta vad som hände:</string>
+    <string name="brokenSiteSubmitButton">Skicka anmälan</string>
+    <string name="brokenSiteDescription">Om du skickar in en anonym anmälan om att webbplatsen inte fungerar hjälper det oss att åtgärda problemet och förbättra appen.</string>
+
+    <string name="brokenSiteCategoryImages">Bilderna kunde inte laddas</string>
+    <string name="brokenSiteCategoryPaywall">Webbplatsen bad mig att avaktivera</string>
+    <string name="brokenSiteCategoryComments">Inlägg kunde inte laddas</string>
+    <string name="brokenSiteCategoryVideos">Videon kunde inte spelas upp</string>
+    <string name="brokenSiteCategoryLinks">Länkar eller knappar fungerar inte</string>
+    <string name="brokenSiteCategoryContent">Innehåll saknas</string>
+    <string name="brokenSiteCategoryLogin">Jag kan inte logga in</string>
+    <string name="brokenSiteCategoryUnsupported">Webbläsaren är inte kompatibel</string>
+    <string name="brokenSiteCategoryOther">Övrigt</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Bokmärken</string>
+    <string name="bookmarksActivityTitle">Bokmärken</string>
+    <string name="noBookmarks">Inga bokmärken har lagts till ännu</string>
+    <string name="bookmarkOverflowContentDescription">Fler alternativ för bokmärke %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage">Borttagen &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="exportBookmarksMenu">Exportera</string>
+    <string name="exportBookmarksEmpty">Du har inga bokmärken, ingenting kommer att exporteras</string>
+    <string name="exportBookmarksError">Det gick inte att exportera några bokmärken, något gick fel</string>
+    <string name="exportBookmarksSuccess">Alla bokmärken har exporterats</string>
+    <string name="importBookmarksMenu">Importera</string>
+    <string name="importBookmarksFileTitle">Välj en bokmärkesfil att importera</string>
+    <string name="importBookmarksError">Det gick inte att importera några bokmärken, något gick fel</string>
+    <string name="importBookmarksEmpty">Filen har inga bokmärken att importera</string>
+    <string name="importBookmarksSuccess">%1$d bokmärken har importerats</string>
+    <string name="savedSiteDialogTitleHint">Rubrik</string>
+    <string name="savedSiteDialogUrlHint">Webbadress</string>
+    <string name="savedSiteDialogTitleEdit">Redigera</string>
+    <string name="bookmarksSectionTitle">Bokmärken</string>
+    <string name="favoritesSectionTitle">Favoriter</string>
+    <string name="bookmarksEmptyHint">Inga bokmärken har lagts till ännu</string>
+    <string name="favoritesEmptyHint">Inga favoriter har lagts till ännu</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Bekräfta</string>
+    <string name="dialogSave">Spara</string>
+    <string name="delete">Ta bort</string>
+    <string name="edit">Redigera</string>
+    <string name="remove">Ta bort</string>
+    <string name="removeAll">Ta bort alla</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">Sök DuckDuckGo</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Lägg till favorit</string>
+    <string name="widgetConfigurationTitleText">Välj tema</string>
+    <string name="widgetConfigurationSystemThemeOption">Systemstandard</string>
+    <string name="widgetConfigurationLightThemeOption">Ljus</string>
+    <string name="widgetConfigurationDarkThemeOption">Mörk</string>
+    <string name="widgetConfigurationAddWidgetOption">Lägg till widget</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Inga favoriter har lagts till ännu</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Lägg till favorit</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Besök dina favoritsidor på ett ögonblick!<br/><br/>Gå till en webbplats du gillar. Tryck sedan på ikonen \"⠇\" och välj Lägg till favorit.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Besök dina favoritsidor på ett ögonblick! Gå till en webbplats du gillar. Tryck sedan på webbläsarens menyikon och välj Lägg till favorit.</string>
+    <string name="widgetConfigurationActivityTitle">Konfigurering av widget</string>
+    <string name="favoritesWidgetLabel">Favoriter</string>
+    <string name="searchWidgetLabel">Sökning</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">Lägg till på hemskärmen</string>
+    <string name="shortcutAddedText">Klart! %1$s har lagts till på din startsida.</string>
+
+    <!-- User Survey -->
+    <string name="surveyCtaTitle">Hjälp oss förbättra appen!</string>
+    <string name="surveyCtaDescription">Delta i vår korta undersökning och dela med dig av dina åsikter.</string>
+    <string name="surveyCtaLaunchButton">Delta i undersökningen</string>
+    <string name="surveyCtaDismissButton">Nej tack</string>
+    <string name="surveyActivityTitle">Användarundersökning</string>
+    <string name="surveyTitle">DUCKDUCKGO UNDERSÖKNING</string>
+    <string name="surveyDismissContentDescription">Avvisa undersökning</string>
+    <string name="surveyLoadingErrorTitle">Åh nej!</string>
+    <string name="surveyLoadingErrorText">Vår undersökning läses för närvarande inte in.\nFörsök igen senare.</string>
+
+    <!-- Add widget -->
+    <string name="addWidgetCtaTitle">Testa vår gränssnittskomponent för sökningar!</string>
+    <string name="addWidgetCtaDescription">Lägg till vår sökgränssnittskomponent på din startsida för snabb och enkel åtkomst.</string>
+    <string name="addWidgetCtaAutoLaunchButton">Lägg till gränssnittskomponent</string>
+    <string name="addWidgetCtaInstructionsLaunchButton">Visa mig</string>
+    <string name="addWidgetCtaDismissButton">Avvisa</string>
+    <string name="addWidgetInstructionsActivityTitle">Lägg till gränssnittskomponent</string>
+    <string name="addWidgetInstruction1Label">1</string>
+    <string name="addWidgetInstruction1">Tryck några sekunder på startsidan och öppna sedan menyn för widgeten.</string>
+    <string name="addWidgetInstruction2Label">2</string>
+    <string name="addWidgetInstruction2">Hitta DuckDuckGo-widgeten.</string>
+    <string name="addWidgetInstruction3Label">3</string>
+    <string name="addWidgetInstruction3">Dra widgeten till startsidan.</string>
+    <string name="addWidgetInstructionsButtonGoHome">Gå till startsidan</string>
+    <string name="addWidgetInstructionsButtonClose">Stäng</string>
+
+    <!-- App Enjoyment / Rating / Feedback -->
+    <string name="appEnjoymentDialogTitle">Gillar du DuckDuckGo?</string>
+    <string name="appEnjoymentDialogMessage">Vi skulle väldigt gärna vilja veta vad du tycker.</string>
+    <string name="appEnjoymentDialogPositiveButton">Jag gillar den</string>
+    <string name="appEnjoymentDialogNegativeButton">Den behöver förbättras</string>
+
+    <string name="rateAppDialogTitle">Betygsätt appen</string>
+    <string name="rateAppDialogMessage">Dina åsikter är viktiga. Dela med dig av det du gillar, skriv en recension!</string>
+    <string name="rateAppDialogPositiveButton">Betygsätt appen</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
+
+    <string name="giveFeedbackDialogTitle">Det var tråkigt att höra</string>
+    <string name="giveFeedbackDialogMessage">Berätta hur vi kan förbättra appen för dig.</string>
+    <string name="giveFeedbackDialogPositiveButton">Berätta vad du tycker</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
+
+    <string name="noThanks">Nej tack</string>
+
+    <!-- Notification Channel Names -->
+    <string name="notificationChannelTutorials">Handledningar</string>
+
+    <!-- Clear Notification -->
+    <string name="clearNotificationTitle">Datarensning inställd på manuell</string>
+    <string name="clearNotificationDescription">Anpassa DuckDuckGo för att automatiskt rensa webbläsardata efter varje session.</string>
+
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationDefaultTitle">Vi skyddar din integritet</string>
+    <string name="privacyProtectionNotificationReportTitle">Din sekretessrapport</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Genom att använda DuckDuckGo-appen skyddar du dina data genom att blockera spårare och kryptera anslutningar.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Du skyddade dina data genom att säkra %1$d okrypterade anslutningar medan du använde DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Du skyddade dina data genom att blockera %1$d spårare när du använde DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription">Du skyddade dina data genom att blockera %1$d spårare och säkra %2$d okrypterade anslutningar medan du använde DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationLaunchButton">Återuppta bläddring</string>
+
+    <!-- Authentication -->
+    <string name="authenticationDialogTitle">Logga in</string>
+    <string name="authenticationDialogMessage">%1$s kräver ett användarnamn och ett lösenord.</string>
+    <string name="authenticationDialogPositiveButton">Logga in</string>
+    <string name="authenticationDialogNegativeButton">Avbryt</string>
+    <string name="authenticationDialogUsernameHint">Användarnamn</string>
+    <string name="authenticationDialogPasswordHint">Lösenord</string>
+
+    <!-- User-facing label for when a user selects text and might want to search for that text -->
+    <string name="systemTextSearchMessage">Sök DuckDuckGo</string>
+
+    <!-- App feedback disambiguation -->
+    <string name="feedbackActivityTitle">Berätta vad du tycker</string>
+    <string name="missingBrowserFeaturesTitleLong">Webbläsarfunktionerna saknas eller hindras</string>
+    <string name="missingBrowserFeaturesTitleShort">Problem med webbläsarfunktionen</string>
+    <string name="missingBrowserFeaturesSubtitle">Vilken webbläsarfunktion kan vi lägga till eller förbättra?</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Navigering framåt och bakåt och/eller uppdatering</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">Skapa och hantera flikar</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Blockering av annonser och poppuppfönster</string>
+    <string name="missingBrowserFeatureSubReasonVideos">Visning av videoklipp</string>
+    <string name="missingBrowserFeatureSubReasonImages">Interagering med bilder</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">Skapa och hantera bokmärken</string>
+    <string name="missingBrowserFeatureSubReasonOther">Inget av ovanstående</string>
+
+    <string name="websiteNotLoadingTitleLong">Problem med webbplatser som inte laddas korrekt</string>
+    <string name="websiteNotLoadingTitleShort">Problem med webbplatser som inte laddas korrekt</string>
+    <string name="websiteNotLoadingSubtitle">Vilken webbplats är skadad?</string>
+
+    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-sökning är inte tillräckligt bra</string>
+    <string name="searchNotGoodEnoughTitleShort">Problem med DuckDuckGo-sökning</string>
+    <string name="searchNotGoodEnoughSubtitle">Vilken sökfunktion kan vi lägga till eller förbättra?</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmering/teknisk sökning</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Layouten ska vara mer lik Googles</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Snabbare laddningstid</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Sökning på ett specifikt språk eller i en viss region</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Bättre autoslutförfunktion</string>
+    <string name="searchNotGoodEnoughSubReasonOther">Inget av ovanstående</string>
+
+    <string name="needMoreCustomizationTitleLong">Det finns inte tillräckligt många sätt att anpassa appen på</string>
+    <string name="needMoreCustomizationTitleShort">Problem med personanpassningsfunktion</string>
+    <string name="needMoreCustomizationSubtitle">Vilket anpassningsalternativ kan vi lägga till eller förbättra?</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Startsidans konfiguration</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">Hur flikar visas</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">Hur appen ser ut</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Vilka data som rensas</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">När data rensas</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Hur bokmärken visas</string>
+    <string name="needMoreCustomizationSubReasonOther">Inget av ovanstående</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">Appen är långsam, har många buggar eller kraschar</string>
+    <string name="appIsSlowOrBuggyTitleShort">Prestandaproblem</string>
+    <string name="appIsSlowOrBuggySubtitle">Vilket problem upplever du?</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">Webbsidor eller sökresultat laddas långsamt</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Appen kraschar eller låser sig</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Video- eller medieuppspelningsfel</string>
+    <string name="appIsSlowOrBuggySubReasonOther">Inget av ovanstående</string>
+
+    <string name="otherMainReasonTitleLong">Inget av ovanstående</string>
+    <string name="otherMainReasonTitleShort">Andra problem</string>
+
+    <string name="openEndedInputHint">Beskriv så noggrant som möjligt</string>
+    <string name="submitFeedback">SKICKA</string>
+
+    <string name="tellUsHowToImprove">Berätta vad vi kan förbättra.</string>
+    <string name="thanksForTheFeedback">Tack för din återkoppling!</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">Vad anser du vara mest frustrerande?</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Det var tråkigt att höra</string>
+    <string name="feedbackShareDetails">Berätta mer om dina upplevelser</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Finns det några detaljer du vill dela med teamet?</string>
+    <string name="whatHaveYouBeenEnjoying">Vad har du uppskattat med appen?</string>
+    <string name="awesomeToHear">Kul att höra!</string>
+    <string name="shareTheLoveWithARating">Dela din uppskattning, betygsätt appen på Play Store!</string>
+    <string name="rateTheApp">BETYGSÄTT APPEN</string>
+    <string name="declineFurtherFeedback">NEJ TACK, JAG ÄR KLAR</string>
+    <string name="whichBrokenSites">Var ser du dessa problem?</string>
+    <string name="whichBrokenSitesHint">På vilken webbplats finns problemen?</string>
+    <string name="feedbackSpecificAsPossible">Beskriv så noggrant som möjligt</string>
+    <string name="feedbackInitialDisambiguationTitle">Då sätter vi igång!</string>
+    <string name="feedbackInitialDisambiguationSubtitle">Hur skulle du kategorisera din återkoppling?</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knappen för positiv återkoppling</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knappen för negativ återkoppling</string>
+    <string name="feedbackIsImportantToUs">Din anonyma återkoppling är viktig för oss.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">"Webbsidan kunde inte visas."</string>
+    <string name="crashedWebViewErrorAction">"Ladda om"</string>
+
+    <!-- System Search-->
+    <string name="systemSearchDeviceAppLabel">Från den här enheten</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Sök eller skriv in URL</font></string>
+    <string name="systemSearchAppNotFound">Appen kunde inte hittas</string>
+    <string name="systemSearchOnboardingText">Tack för att du valde DuckDuckGo!\nNär du använder vår sökning eller app är dina sökningar skyddade.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-appen också:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blockerar osäkra spårare.</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Tvingar kryptering på webbplatser.</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Rensar data med ett tryck.</string>
+    <string name="systemSearchOnboardingButtonMore">Visa mer</string>
+    <string name="systemSearchOnboardingButtonLess">Dölj</string>
+    <string name="systemSearchOnboardingButtonOk">Jag fattar</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">DÖLJ</string>
+    <string name="daxDialogPhew">Puh!</string>
+    <string name="daxDialogNext">Nästa</string>
+    <string name="daxDialogHighFive">High Five!</string>
+    <string name="daxDialogGotIt">Jag fattar</string>
+    <string name="hideTipsTitle">Dölj återstående tips?</string>
+    <string name="hideTipsText">Det finns bara några få, och vi försökte göra dem informativa.</string>
+    <string name="hideTipsButton">Dölj tipsen för alltid</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">"VÄLKOMMEN TILL DUCKDUCKGO"</string>
+    <string name="onboardingDaxText"><![CDATA[Internet kan vara lite läskigt.<br/><br/>Oroa dig inte! Att söka och surfa privat är lättare än du tror.]]></string>
+    <string name="onboardingLetsDoItButton">Vi kör!</string>
+    <string name="daxIntroCtaText"><![CDATA[Prova sedan att besöka en av dina favoritwebbplatser! <br/><br/>Jag blockerar trackers så att de inte kan spionera på dig. Jag ska också uppgradera säkerheten för din uppkoppling om det är möjligt. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[Du klarar det här!<br/><br/>Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👍]]></string>
+    <string name="daxSerpCtaText">Dina DuckDuckGo-sökningar är anonyma. Alltid. 🙌</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one"><![CDATA[ och <b>%1$d annan</b> försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera adressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
+        <item quantity="other"><![CDATA[ och <b>%1$d andra</b> försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera adressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
+    </plurals>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one"><![CDATA[ försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera webbadressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
+        <item quantity="other"><![CDATA[ försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera webbadressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
+    </plurals>
+    <string name="daxNonSerpCtaText"><![CDATA[Medan du pekar och bläddrar kommer jag att blockera irriterande spårare. <br/><br/>Fortsätt - surfa vidare!]]></string>
+    <string name="daxMainNetworkCtaText">Bra att veta! Jag kan inte hindra %1$s från att se din aktivitet på %2$s&lt;br/&gt;&lt;br/&gt;Men om du surfar med hjälp av mig kan jag se till att %3$s får veta mindre om dig genom att blockera deras spårare på många andra webbplatser.</string>
+    <string name="daxMainNetworkOwnedCtaText">Bra att veta! Eftersom %1$s äger %2$s kan jag inte hindra dem från att se din aktivitet här.&lt;br/&gt;&lt;br/&gt;Men om du surfar med hjälp av mig kan jag se till att %3$s får veta mindre om dig genom att blockera deras spårare på många andra webbplatser.</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Spara till Nerladdningar</string>
+    <string name="downloadConfirmationSaveFileTitle">Spara %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Behåll båda</string>
+    <string name="downloadConfirmationReplaceOldFileText">Byt ut</string>
+    <string name="downloadConfirmationOpenFileText">Öppna</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Kunde inte öppna filen</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Det gick inte att ta bort den gamla filen</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">App-ikon</string>
+    <string name="changeIconCtaLabel">App-ikon</string>
+    <string name="changeIconCtaAccept">Tillämpa</string>
+    <string name="changeIconCtaCancel">Avbryt</string>
+    <string name="changeIconDialogTitle">Tillämpa ny ikon?</string>
+    <string name="changeIconDialogMessage">Appen kanske måste stängas för att tillämpa ändringar. Kom tillbaka när du har tillämpat din nya ikon.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Oskyddade webbplatser</string>
+    <string name="reportBrokenSite">Rapportera bruten webbplats</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Lägg till</string>
+    <string name="dialogEditTitle">Redigera</string>
+    <string name="dialogSaveAction">Spara</string>
+
+    <!-- Whitelist -->
+    <string name="whitelistActivityTitle">Oskyddade webbplatser</string>
+    <string name="enablePrivacyProtection">Aktivera integritetsskydd</string>
+    <string name="disablePrivacyProtection">Inaktivera integritetsskydd</string>
+    <string name="whitelistEntryOverflowContentDescription">Fler alternativ för den oskyddade webbplatsen %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt; från de oskyddade webbplatserna?</string>
+    <string name="whitelistExplanation">Dessa webbplatser kommer inte att förbättras av integritetsskydd.</string>
+    <string name="whitelistNoEntries">Integritetsskydd aktiverat för alla webbplatser</string>
+    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="whitelistFormatError">Ange en domän som <b>example.com</b> och försök igen</string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">Oskyddade webbplatser</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Brandsäkra webbplatser</string>
+    <string name="settingsFireproofWebsites">Brandsäkra webbplatser</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Brandsäkra den här webbplatsen</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; är nu brandsäkrad</string>
+    <string name="fireproofWebsiteSnackbarAction">Återställ</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteFeatureDescription">Webbplatser använder kakor för att hålla dig inloggad. Om du brandsäkrar en webbplats kommer kakor inte att raderas och du förblir inloggad även efter att du har använt brännarknappen. Vi blockerar fortfarande tredje parters spårare som finns på brandsäkrade webbplatser.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Fler alternativ för brandsäker webbplats %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Vill du brandsäkra %1$s?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Om du brandsäkrar denna webbplats förblir du inloggad även efter att du har använt brännarknappen.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Brandsäkra</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Inte nu</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Brandsäkra webbplatser</string>
+    <string name="fireproofWebsiteEmptyListHint">Inga brandsäkra webbplatser ännu</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Brandsäkra webbplatser vid inloggning</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Brandsäkring har tagits bort för alla webbplatser</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Brandsäkring har tagits bort för &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Fråga varje gång</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Alltid</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Aldrig</string>
+    <string name="disableLoginDetectionDialogTitle">Vill du inaktivera påminnelse om brandsäkring när du loggar in på webbplatser?</string>
+    <string name="disableLoginDetectionDialogDescription">Du kan när som helst ändra denna inställning i Inställningar.</string>
+    <string name="disableLoginDetectionDialogPositive">INAKTIVERA</string>
+    <string name="disableLoginDetectionDialogNegative">AVBRYT</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Brandsäkra webbplatser automatiskt vid inloggning?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Om du brandsäkrar webbplatser förblir du inloggad även efter att du har använt brännarknappen. Du kan alltid ändra det här senare i inställningarna. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Brandsäkra alltid</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Brandsäkra den här webbplatsen</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Inte nu</string>
+
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animation för brännarknapp</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Virvel</string>
+    <string name="settingsHeroAbstractAnimation">Luftström</string>
+    <string name="settingsNoneAnimation">Inga</string>
+    <string name="settingsSelectFireAnimationDialog">Animation för brännarknapp</string>
+    <string name="settingsSelectFireAnimationDialogSave">Spara</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Anslutningen avbröts. Denna webbplats kan vara skadlig för din enhet.</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Aktivera åtkomst till enhetsplats för DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s begär åtkomst till din enhetsplats. Du måste tillåta att appen skickar din enhetsplats innan %2$s kan be om åtkomst.</string>
+    <string name="preciseLocationSystemDialogAllow">Aktivera</string>
+    <string name="preciseLocationSystemDialogDeny">Kanske senare</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Fråga inte igen för denna webbplats</string>
+    <string name="preciseLocationSiteDialogTitle">Bevilja åtkomst till enhetsplats för %1$s?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Vi använder bara din anonyma plats för att ge dig bättre resultat, närmare dig. Du kan alltid ändra dig senare.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Du kan gå till Inställningar för att hantera åtkomster till enhetsplats som du har beviljat för enskilda webbplatser.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Alltid</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Endast för denna session</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Neka alltid</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Neka för denna session</string>
+    <string name="settingsPreciseLocation">Position</string>
+    <string name="preciseLocationFeatureDescription">Webbplatser du besöker kan begära åtkomst till din enhetsplats. De får inte åtkomst till din enhetsplats innan du uttryckligen beviljat detta. DuckDuckGo använder bara din enhetsplats anonymt för att tillhandahålla lokala sökresultat.</string>
+    <string name="preciseLocationToggleText">Webbplatser kan be om åtkomst till min platsinf\bormation</string>
+    <string name="preciseLocationEmptyListHint">Inga webbplatser har fått åtkomst till enhetsplats</string>
+    <string name="preciseLocationNoSystemPermission">Aktivera åtkomst till enhetsplats för denna app i Androids Inställningar för att hantera åtkomst till enhetsplats som du har beviljat för enskilda webbplatser.</string>
+    <string name="preciseLocationActivityTitle">Position</string>
+    <string name="preciseLocationDeleteConfirmMessage">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Fler alternativ för åtkomst till enhetsplats i domänen %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Beviljas</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Nekas</string>
+    <string name="preciseLocationSnackbarMessage">Du har tidigare beviljat åtkomst till din enhetsplats för %1$s.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Personuppgifter kan samlas i din webbläsare. Usch. Använd brännarknappen för att bränna alltihopa. Prova nu! 👇</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        <![CDATA[DuckDuckGo blockerar många spårare automatiskt. Med Global Privacy Control (GPC) kan du dessutom be deltagande webbplatser att begränsa försäljning eller delning av dina personuppgifter till andra företag. <u><a href=\"\">Läs mer</a><u/>]]>
+    </string>
+    <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
+    <string name="disabled">Inaktiverad</string>
+    <string name="enabled">Aktiverad</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Öppna länkar i associerade appar</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Inaktivera för att förhindra att länkar automatiskt öppnas i andra installerade appar.</string>
+    <string name="appLinkDialogTitle">Öppna i en annan app?</string>
+    <string name="appLinkSnackBarAction">Öppna i appen</string>
+    <string name="appLinkMultipleSnackBarAction">Välj app</string>
+    <string name="appLinkSnackBarMessage">Du kan öppna den här länken i %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">Du kan öppna den här länken i andra appar.</string>
+    <string name="appLinkIntentChooserTitle">Öppna med</string>
+    <string name="appLinkMenuItemTitle">Öppna i appen</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Ny adress har kopierats till Urklipp</string>
+    <string name="autofillTooltipUseYourAlias">Använd %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blockerar e-postspårare</string>
+    <string name="autofillTooltipGenerateAddress">Skapa en privat adress</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blockerar e-postspårare och döljer din adress</string>
+    <string name="newEmailAliasMenuTitle">Skapa en Duck-adress</string>
+
+    <!-- Waitlist Notification -->
+    <string name="waitlistNotificationDialogDescription">Vill du att vi ska skicka ett meddelande när det är din tur?</string>
+    <string name="waitlistNotificationDialogNoThanks">Nej tack</string>
+    <string name="waitlistNotificationDialogNotifyMe">MEDDELA MIG</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionActivityTitle">E-postskydd (beta)</string>
+    <string name="emailNotSupported">Enheten stöds inte</string>
+    <string name="emailNotSupportedExplanation">Med e-postskydd kan du skapa privata e-postadresser som tar bort e-postspårare. Vi måste kryptera och lagra de adresser du skapar lokalt på din enhet. Eftersom din enhet inte stöder krypterad lagring är e-postskydd inte tillgängligt.</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Redigera bokmärke</string>
+    <string name="favoriteDialogTitleEdit">Redigera favorit</string>
+    <string name="locationLabel">Plats</string>
+    <string name="folderLocationTitle">Välj plats</string>
+    <string name="addFolder">Lägg till mapp</string>
+    <string name="editFolder">Redigera mapp</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Är du säker att du vill ta bort "</string>
+    <string name="bookmarkFolderEmpty">Tom</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s och %3$d objekt?</item>
+        <item quantity="other">%1$s%2$s och %3$d objekt?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d objekt</item>
+        <item quantity="other">%1$d objekt</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Tillgänglighet</string>
+    <string name="accessibilityActivityTitle">Tillgänglighet</string>
+    <string name="accessibilityFontSizeTitle">Textstorlek</string>
+    <string name="accessibilityFontSizeHint">Dra reglaget tills du kan läsa det här bekvämt. Webbplatser som du visar i DuckDuckGo anpassas efter din inställning.</string>
+    <string name="accessibilityForceZoomTitle">Tvinga manuell zoomning av sidan</string>
+    <string name="accessibilityForceZoomSubtitle">Nyp och zooma på vilken webbplats som helst, även de som normalt inte tillåter det</string>
+    <string name="accessibilityTextSizeOverrideTitle">Hantera textstorlek</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Text på webbplatser du tittar på i DuckDuckGo justeras för att matcha inställningen nedan</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Integritetspolicy</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">Widgeten %1$s har lagts till på startsidan</string>
+    <string name="settingsAddHomeScreenWidget">Widget på startsidan</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Surfa privat med vår app för Mac</string>
+    <string name="macos_settings_description_list">Du står på listan!</string>
+    <string name="macos_settings_description_ready">Tillgänglig för nerladdning på Mac</string>
+    <string name="macos_settings_title">DuckDuckGo-appen för dator</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Nerladdningar</string>
+    <string name="downloadsActivityTitle">Nerladdningar</string>
+    <string name="downloadsActivityNoItemsDescription">Inga filer har laddats ner ännu</string>
+    <string name="downloadsShareTitle">Dela med …</string>
+    <string name="downloadsDownloadFinishedActionName">Öppna</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Filen finns inte längre</string>
+    <string name="downloadsItemMenuShare">Dela</string>
+    <string name="downloadsItemMenuDelete">Ta bort</string>
+    <string name="downloadsItemMenuCancel">Avbryt</string>
+    <string name="downloadsActivityMenuDeleteAll">Radera allt</string>
+    <string name="downloadsFileDeletedMessage">Raderade %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Alla filer raderade</string>
+    <string name="downloadsMoreOptionsContentDescription">Fler alternativ för %1$s</string>
+    <string name="downloadsUndoActionName">Återställ</string>
+    <string name="downloadsStateInProgress">Pågår …</string>
+
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Skydd mot appspårning</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Blockera appspårare på din enhet</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Aktiverad</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Inaktiverad</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle">Den här webbplatsen verkar ha ett popup-fönster för godkännande av cookies👇</string>
+    <string name="autoconsentDialogDescription">Vill du att jag ska hantera dessa åt dig? Jag kan försöka minimera cookies, maximera integriteten och dölja sådana här popup-fönster.</string>
+    <string name="autoconsentPrimaryCta">Hantera popup-fönster för cookies</string>
+    <string name="autoconsentSecondaryCta">Nej tack</string>
+
+    <string name="autoconsentSetting">Hantera popup-fönster för cookies</string>
+    <string name="autoconsentAnimationText">Cookies hanteras</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automatisk ifyllning</string>
+
+</resources>

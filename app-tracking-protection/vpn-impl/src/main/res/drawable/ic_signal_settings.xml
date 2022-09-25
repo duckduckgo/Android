@@ -1,0 +1,25 @@
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+  <path
+      android:pathData="M12.6281,8C12.6281,7.862 12.6219,7.73 12.6095,7.592L13.7573,6.746C14.0041,6.566 14.072,6.23 13.9177,5.966L12.7638,4.028C12.6095,3.764 12.2763,3.656 11.9925,3.776L10.6658,4.322C10.4374,4.166 10.1968,4.028 9.9438,3.914L9.7648,2.528C9.7278,2.228 9.4625,2 9.1539,2H6.8522C6.5375,2 6.2722,2.228 6.2352,2.528L6.0562,3.914C5.8032,4.028 5.5626,4.166 5.3342,4.322L4.0075,3.776C3.7237,3.656 3.3905,3.764 3.2362,4.028L2.0823,5.972C1.928,6.236 1.9959,6.566 2.2427,6.752L3.3905,7.598C3.3781,7.73 3.3719,7.862 3.3719,8C3.3719,8.138 3.3781,8.27 3.3905,8.408L2.2427,9.254C1.9959,9.434 1.928,9.77 2.0823,10.034L3.2362,11.972C3.3905,12.236 3.7237,12.344 4.0075,12.224L5.3342,11.678C5.5626,11.834 5.8032,11.972 6.0562,12.086L6.2352,13.472C6.2722,13.772 6.5375,14 6.8461,14H9.1478C9.4563,14 9.7216,13.772 9.7587,13.472L9.9376,12.086C10.1906,11.972 10.4313,11.834 10.6596,11.678L11.9863,12.224C12.2702,12.344 12.6034,12.236 12.7576,11.972L13.9116,10.034C14.0658,9.77 13.998,9.44 13.7511,9.254L12.6034,8.408C12.6219,8.27 12.6281,8.138 12.6281,8ZM8.0247,10.1C6.8337,10.1 5.8649,9.158 5.8649,8C5.8649,6.842 6.8337,5.9 8.0247,5.9C9.2156,5.9 10.1844,6.842 10.1844,8C10.1844,9.158 9.2156,10.1 8.0247,10.1Z"
+      android:fillColor="?attr/primaryIconColor"/>
+</vector>

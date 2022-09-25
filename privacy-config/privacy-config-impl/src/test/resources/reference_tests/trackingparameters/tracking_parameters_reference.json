@@ -1,0 +1,19 @@
+{
+    "trackingParameters": {
+        "state": "enabled",
+        "exceptions": [
+            {
+                "domain": "allowlisted.com",
+                "reason": "site breakage"
+            }
+        ],
+        "settings": {
+            "parameters": [
+                "utm_[a-z]+",
+                "reg*exp",
+                "gclid",
+                "fbclid"
+            ]
+        }
+    }
+}

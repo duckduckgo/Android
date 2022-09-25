@@ -1,0 +1,33 @@
+{
+  "entities": {
+    "21 Productions Inc": {
+      "domains": [
+        "truoptik.com"
+      ],
+      "displayName": "21 Productions",
+      "prevalence": 0.348
+    },
+    "33Across, Inc.": {
+      "domains": [
+        "33across.com",
+        "tynt.com"
+      ],
+      "displayName": "33Across"
+    },
+    "4Cite Marketing": {
+      "domains": [
+        "securedvisit.com"
+      ],
+      "prevalence": 0.341
+    },
+    "AT Internet": {
+      "domains": [
+        "xiti.com",
+        "aticdn.net",
+        "ati-host.net"
+      ],
+      "displayName": "",
+      "prevalence": 0.718
+    }
+  }
+}

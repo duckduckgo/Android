@@ -1,0 +1,17 @@
+{
+  "state": "disabled",
+  "exceptions": [
+    {
+      "domain": "example.com",
+      "reason": "reason"
+    }
+  ],
+  "settings": {
+    "linkFormats": [
+      "linkFormat"
+    ],
+    "keywords": [
+      "keyword"
+    ]
+  }
+}

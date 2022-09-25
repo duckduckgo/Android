@@ -1,0 +1,86 @@
+[
+  {
+    "description": "should allow single resource on single site",
+    "site": "https://testsite.com",
+    "request": "https://allowlist-tracker-1.com/videos.js",
+    "isAllowlisted": true
+  },
+  {
+    "description": "should match on all subdomains of an allowlisted site",
+    "site": "https://a.b.c.testsite.com",
+    "request": "https://allowlist-tracker-1.com/videos.js",
+    "isAllowlisted": true
+  },
+  {
+    "description": "should remove port from the tracker request",
+    "site": "https://a.b.c.testsite.com",
+    "request": "https://allowlist-tracker-1.com:5000/videos.js",
+    "isAllowlisted": true
+  },
+  {
+    "description": "should remove parameter string from the tracker request",
+    "site": "https://a.b.c.testsite.com",
+    "request": "https://allowlist-tracker-1.com/videos.js;a=123&b=abc",
+    "isAllowlisted": true
+  },
+  {
+    "description": "should not remove port from url paths",
+    "site": "https://a.b.c.testsite.com",
+    "request": "https://allowlist-tracker-1.com/allowlist-tracker-1.com:5000/videos.js",
+    "isAllowlisted": false
+  },
+  {
+    "description": "should match on all subdomains of an allowlisted tracker",
+    "site": "https://testsite.com",
+    "request": "https://a.b.c.allowlist-tracker-1.com/videos.js",
+    "isAllowlisted": true
+  },
+  {
+    "description": "should not match on a substring of the domain",
+    "site": "https://anothertestsite.com",
+    "request": "https://allowlist-tracker-1.com/videos.js",
+    "isAllowlisted": false
+  },
+  {
+    "description": "should not match on a site not listed in the allowlist entry domains list",
+    "site": "https://testsite2.com",
+    "request": "https://allowlist-tracker-1.com/videos.js",
+    "isAllowlisted": false
+  },
+  {
+    "description": "should remove query strings from request",
+    "site": "https://testsite.com",
+    "request": "https://allowlist-tracker-1.com/videos.js?a=123&b=456",
+    "isAllowlisted": true
+  },
+  {
+    "description": "should match random paths",
+    "site": "https://someothersite.com",
+    "request": "https://allowlist-tracker-2.com/comments/1234asdf/comment.js",
+    "isAllowlisted": true
+  },
+  {
+    "description": "should match all requests for a whole domain rule",
+    "site": "https://testsite.com",
+    "request": "https://allowlist-tracker-3.com/tracker.js",
+    "isAllowlisted": true
+  },
+  {
+    "description": "should match on specific subdomain rules",
+    "site": "https://testsite.com",
+    "request": "http://videos.allowlist-tracker-2.com/a.js",
+    "isAllowlisted": true
+  },
+  {
+    "description": "should not match on root domain for a subdomain rule",
+    "site": "https://testsite.com",
+    "request": "http://allowlist-tracker-2.com/a.js",
+    "isAllowlisted": false
+  },
+  {
+    "description": "should match on subdomain of a subdomain rule",
+    "site": "https://testsite.com",
+    "request": "http://a.b.c.videos.allowlist-tracker-2.com/a.js",
+    "isAllowlisted": true
+  }
+]

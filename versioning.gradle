@@ -1,0 +1,100 @@
+ext {
+
+    buildVersionCode = {
+        def versionName = getVersionName()
+        def (major, minor, patch) = versionName.toLowerCase().tokenize('.')
+        (major, minor, patch) = [major, minor, patch].collect { it.toInteger() }
+        (major * 10_000_000) + (minor * 10_000) + (patch * 1_000) + buildNumberCode()
+    }
+
+    getVersionName = {
+        def props = new Properties()
+        file("version/version.properties").withInputStream { props.load(it) }
+        return props.getProperty("VERSION")
+    }
+
+    getVersionNameSuffix = {
+        if (project.hasProperty("versionNameSuffix")) {
+            return project["versionNameSuffix"]
+        } else {
+            return ""
+        }
+    }
+
+    buildVersionName = {
+        def suffix = getVersionNameSuffix()
+        if (suffix?.trim()) {
+            return getVersionName() + "." + buildNumberCode() + getVersionNameSuffix()
+        } else {
+            return getVersionName()
+        }
+    }
+
+    buildNumberCode = {
+        filePath = "${CI_HOME_DIR}/build_number.properties"
+        if(!new File(filePath).exists()) return 0
+
+        def suffix = getVersionNameSuffix()
+        if (suffix?.trim()) {
+            def props = new Properties()
+            props.load(new FileInputStream(filePath))
+            String buildNumber = props["build"]
+            if (buildNumber == null) return 0 else return Integer.valueOf(buildNumber)
+        } else {
+            return 0
+        }
+    }
+}
+
+tasks.register("setBuildNumber") {
+    doLast {
+        if(!project.hasProperty("number")) {
+            throw new IllegalArgumentException("Missing argument: 'number' must be provided")
+        }
+
+        filePath = "${CI_HOME_DIR}/build_number.properties"
+        if(!new File(filePath).exists()) {
+            throw new IllegalStateException("build number file could not be found at: $filePath")
+        }
+
+        String buildNumberString = project["number"]
+        Integer buildNumberInt = Integer.parseInt(buildNumberString)
+        if(buildNumberInt >= 1000) {
+            throw new IllegalStateException("Build number limited to 3 digits; cannot exceed 1,000")
+        }
+        println("Setting build number to: $buildNumberInt")
+
+        def props = new Properties()
+        props.load(new FileInputStream(filePath))
+        props["build"] = buildNumberInt.toString()
+        def os = new FileOutputStream(filePath)
+        props.store(os, null)
+    }
+}
+
+tasks.register('incrementBuildNumber') {
+    doLast {
+        filePath = "${CI_HOME_DIR}/build_number.properties"
+        if(!new File(filePath).exists()) {
+            return
+        }
+
+        def props = new Properties()
+        props.load(new FileInputStream(filePath))
+        String currentBuildNumber = props["build"]
+        Integer buildNumber = Integer.parseInt(currentBuildNumber)
+        buildNumber++
+        if(buildNumber >= 1000) {
+            throw new IllegalStateException("Build number limited to 3 digits; cannot exceed 1,000")
+        }
+        props["build"] = buildNumber.toString()
+        def os = new FileOutputStream(filePath)
+        props.store(os, null)
+    }
+}
+
+tasks.register('getBuildVersionName') {
+    doLast {
+        print buildVersionName()
+    }
+}

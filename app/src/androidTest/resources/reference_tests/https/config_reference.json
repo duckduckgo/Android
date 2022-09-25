@@ -1,0 +1,21 @@
+{
+    "readme": "This configuration includes only the https upgrades feature.",
+    "features": {
+        "https": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "secure.thirdtest.com",
+                    "reason": "requests to this domain should not be upgraded to https"
+                }
+            ]
+        }
+    },
+    "version": 1635943904459,
+    "unprotectedTemporary": [
+        {
+            "domain": "s.fourthtest.com",
+            "reason": "requests to this domain should not be upgraded to https"
+        }
+    ]
+}

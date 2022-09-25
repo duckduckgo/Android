@@ -1,0 +1,144 @@
+name: CI Checks
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  spotless:
+    name: Spotless
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Spotless
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: spotless
+
+  unit_tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: JVM tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: jvm_tests
+
+      - name: Bundle the JVM checks report
+        if: always()
+        run: find . -type d -name 'reports' | zip -@ -r unit-tests-report.zip
+
+      - name: Upload the JVM checks report
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: unit-tests-report
+          path: unit-tests-report.zip
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Lint
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: lint
+
+      - name: Bundle the lint report
+        if: always()
+        run: find . -name lint-results\* | zip -@ -r lint-report.zip
+
+      - name: Upload the JVM lint report
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: lint-report
+          path: lint-report.zip
+
+  android_tests:
+    runs-on: ubuntu-latest
+    name: Android CI tests
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Decode secret
+        env:
+          FLANK: ${{ secrets.FLANK }}
+        run: echo $FLANK > flank.json
+
+      - name: Build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: androidTestsBuild
+
+      - name: Run Android Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: runFlankAndroidTests
+
+      - name: Bundle the Android CI tests report
+        if: always()
+        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
+
+      - name: Upload the Android CI tests report
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-tests-report
+          path: android-tests-report.zip

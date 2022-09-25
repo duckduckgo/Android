@@ -1,0 +1,14 @@
+# Some comments here
+# This comment is also here
+google-analytics.com/ga.js
+(function() {
+	alert("surrogates_1");
+})();
+
+google-analytics.com/analytics.js
+(function() {
+	// random comment
+	alert("surrogates_2");
+	alert("surrogates_2");
+})();
+

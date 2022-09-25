@@ -1,0 +1,162 @@
+{
+    "navigations": {
+        "name": "Navigations",
+        "desc": "Navigations should be upgraded to https",
+        "tests": [
+            {
+                "name": "bloom filter match - should be upgraded",
+                "siteURL": "http://firsttest.com/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://firsttest.com/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "https://firsttest.com/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "unknown subdomain - should not be upgraded",
+                "siteURL": "http://fake.firsttest.com/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://fake.firsttest.com/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "http://fake.firsttest.com/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "bloom filter allowlist match - should not be upgraded",
+                "siteURL": "http://secondtest.com/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://secondtest.com/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "http://secondtest.com/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "already https - should not be modified",
+                "siteURL": "https://firsttest.com/path/file.html?search=query&another=one#fragment",
+                "requestURL": "https://firsttest.com/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "https://firsttest.com/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "negative bloom filter match - should not be upgraded",
+                "siteURL": "http://negativetest.com/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://negativetest.com/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "http://negativetest.com/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": [
+                    "android-browser"
+                ]
+            },
+            {
+                "name": "negative bloom filter allowlist match - should be upgraded",
+                "siteURL": "http://s.secondnegative.com/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://s.secondnegative.com/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "https://s.secondnegative.com/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": [
+                    "android-browser"
+                ]
+            },
+            {
+                "name": "remote config local exception - should not be upgraded",
+                "siteURL": "http://secure.thirdtest.com/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://secure.thirdtest.com/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "http://secure.thirdtest.com/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "remote config unprotectedTemporary exception - should not be upgraded",
+                "siteURL": "http://s.fourthtest.com/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://s.fourthtest.com/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "http://s.fourthtest.com/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "localhost - should not be upgraded",
+                "siteURL": "http://localhost/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://localhost/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "http://localhost/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "localhost TLD - should not be upgraded",
+                "siteURL": "http://test.localhost/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://test.localhost/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "http://test.localhost/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "example TLD - should not be upgraded",
+                "siteURL": "http://test.example/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://test.example/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "http://test.example/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "test TLD - should not be upgraded",
+                "siteURL": "http://test.test/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://test.test/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "http://test.test/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Private IPv4 - should not be upgraded",
+                "siteURL": "http://169.254.1.1/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://169.254.1.1/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "http://169.254.1.1/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Private IPv6 - should not be upgraded",
+                "siteURL": "http://[fd7b:d40d:c3f5:4cfd::]/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://[fd7b:d40d:c3f5:4cfd::]/path/file.html?search=query&another=one#fragment",
+                "requestType": "main_frame",
+                "expectURL": "http://[fd7b:d40d:c3f5:4cfd::]/path/file.html?search=query&another=one#fragment",
+                "exceptPlatforms": []
+            }
+        ]
+    },
+    "subrequests": {
+        "name": "Subrequests",
+        "desc": "Subrequests should be upgraded to https",
+        "tests": [
+            {
+                "name": "bloom filter match - should be upgraded",
+                "siteURL": "http://test.site/path/file.html?search=query&another=one#fragment",
+                "requestURL": "http://firsttest.com/image.png",
+                "requestType": "image",
+                "expectURL": "https://firsttest.com/image.png",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "insecure web socket - should be upgraded",
+                "siteURL": "https://fifth-test.com/",
+                "requestURL": "ws://fifth-test.com/path/socket?search=query&another=one#fragment",
+                "requestType": "websocket",
+                "expectURL": "wss://fifth-test.com/path/socket?search=query&another=one#fragment",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Private IPv4 - should not be upgraded",
+                "siteURL": "http://test.site/",
+                "requestURL": "http://169.254.1.1/image.png",
+                "requestType": "image",
+                "expectURL": "http://169.254.1.1/image.png",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "remote config - site matches local exception - should not be upgraded",
+                "siteURL": "http://secure.thirdtest.com/",
+                "requestURL": "http://firsttest.com/script.js",
+                "requestType": "script",
+                "expectURL": "http://firsttest.com/script.js",
+                "exceptPlatforms": []
+            }
+        ]
+    }
+}

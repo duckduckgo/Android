@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.duckduckgo.app.dev.settings.DevSettingsActivity">
+
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/generalTitle"
+                style="@style/SettingsSectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/devSettingsScreenGeneralSection" />
+
+            <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
+                android:id="@+id/enableAppStartupTrace"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:toggleSubTitle="@string/devStartupTracingByline"
+                app:toggleTitle="@string/devStartupTracing" />
+
+            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+                android:id="@+id/triggerAnr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:subtitle="@string/devSettingsTriggerAnrSubtitle"
+                app:title="@string/devSettingsTriggerAnr" />
+
+            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+                android:id="@+id/clearSavedSites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:subtitle="@string/devSettingsClearSavedSitesSubtitle"
+                app:title="@string/devSettingsClearSavedSites" />
+
+            <TextView
+                android:id="@+id/privacyTitle"
+                style="@style/SettingsSectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/devSettingsScreenPrivacySection" />
+
+            <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
+                android:id="@+id/nextTdsEnabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:toggleSubTitle="@string/devSettingsScreenTdsVersion"
+                app:toggleTitle="@string/devSettingsScreenTdsVersionSubtitle" />
+
+            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="0dp"/>
+
+            <TextView
+                android:id="@+id/userAgentTitle"
+                style="@style/SettingsSectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/devSettingsScreenUserAgentSection" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/overrideUserAgentToggle"
+                style="@style/SettingsSwitch"
+                android:text="@string/devSettingsScreenUserAgentOverride"
+                android:theme="@style/SettingsSwitchTheme" />
+
+            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+                android:id="@+id/overrideUserAgentSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/devSettingsScreenUserAgentSelectorTitle" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
