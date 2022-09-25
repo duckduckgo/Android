@@ -46,7 +46,7 @@ package com.duckduckgo.contentscopescripts.api
  */
 interface ContentScopeConfigPlugin {
     /**
-     * @return `true` when the feature was stored, otherwise `false`
+     * @return a [String] containing the config to be used in content scope scripts
      */
     fun config(): String
 

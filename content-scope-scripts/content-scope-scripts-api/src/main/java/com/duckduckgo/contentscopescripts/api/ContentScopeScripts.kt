@@ -16,12 +16,12 @@
 
 package com.duckduckgo.contentscopescripts.api
 
-/** Public interface for the Gpc feature */
+/** Public interface for the Content Scope Scripts feature */
 interface ContentScopeScripts {
 
     /**
-     * This method returns a [String] which contains the JS code for GPC to be injected.
-     * @return a [String] containing the JS code gor GPC.
+     * This method returns a [String] which contains the content scope scripts JS code to be injected.
+     * @return a [String] containing the JS content scope code.
      */
     fun getScript(): String
 }
