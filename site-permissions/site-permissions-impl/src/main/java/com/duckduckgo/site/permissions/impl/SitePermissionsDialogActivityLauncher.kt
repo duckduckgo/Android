@@ -26,10 +26,12 @@ import android.provider.Settings
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
+import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
+import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelParameter
 import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelValue
 import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.SitePermissionsPixelName
@@ -50,6 +52,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private lateinit var sitePermissionRequest: PermissionRequest
     private lateinit var activity: Activity
     private lateinit var permissionRequested: SitePermissionsRequestedType
+    private lateinit var permissionsGrantedListener: SitePermissionsGrantedListener
     private var siteURL: String = ""
     private var tabId: String = ""
 
@@ -66,12 +69,14 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         url: String,
         tabId: String,
         permissionsRequested: Array<String>,
-        request: PermissionRequest
+        request: PermissionRequest,
+        permissionsGrantedListener: SitePermissionsGrantedListener
     ) {
         sitePermissionRequest = request
         siteURL = url
         this.tabId = tabId
         this.activity = activity
+        this.permissionsGrantedListener = permissionsGrantedListener
 
         when {
             permissionsRequested.size == 2 -> {
@@ -186,6 +191,16 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 sitePermissionRequest.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE))
                 sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
                 sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+            }
+        }
+        checkIfActionNeeded()
+    }
+
+    private fun checkIfActionNeeded() {
+        when (siteURL.extractDomain().orEmpty()) {
+            "whereby.com" -> permissionsGrantedListener.permissionsGrantedOnWhereby()
+            else -> {
+                // No action needed
             }
         }
     }

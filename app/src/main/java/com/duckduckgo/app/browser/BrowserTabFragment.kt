@@ -205,6 +205,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
+import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.coroutines.flow.cancellable
 import javax.inject.Provider
@@ -217,7 +218,8 @@ class BrowserTabFragment :
     TrackersAnimatorListener,
     DownloadConfirmationDialogListener,
     SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
-    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener {
+    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener,
+    SitePermissionsGrantedListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -3023,7 +3025,7 @@ class BrowserTabFragment :
 
     private fun showSitePermissionsDialog(permissionsToRequest: Array<String>, request: PermissionRequest) {
         activity?.let {
-            sitePermissionsDialogLauncher.askForSitePermission(it, webView?.url.orEmpty(), tabId, permissionsToRequest, request)
+            sitePermissionsDialogLauncher.askForSitePermission(it, webView?.url.orEmpty(), tabId, permissionsToRequest, request, this)
         }
     }
 
@@ -3065,5 +3067,10 @@ class BrowserTabFragment :
 
     override fun onSystemLocationPermissionNeverAllowed() {
         viewModel.onSystemLocationPermissionNeverAllowed()
+    }
+
+    override fun permissionsGrantedOnWhereby() {
+        val roomParameters = "?skipMediaPermissionPrompt"
+        webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
     }
 }
