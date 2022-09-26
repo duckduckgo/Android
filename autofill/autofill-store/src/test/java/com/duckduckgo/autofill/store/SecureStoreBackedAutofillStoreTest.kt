@@ -43,6 +43,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -226,6 +227,17 @@ class SecureStoreBackedAutofillStoreTest {
         testee.saveCredentials(url, credentials)
 
         assertEquals(credentials.copy(lastUpdatedMillis = UPDATED_INITIAL_LAST_UPDATED), testee.getCredentials(url)[0])
+    }
+
+    @Test
+    fun whenSaveCredentialsForFirstTimeThenDisableShowOnboardingFlag() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val url = "https://example.com"
+        val credentials = LoginCredentials(
+            domain = url, username = "username1", password = "password"
+        )
+        testee.saveCredentials(url, credentials)
+        verify(autofillPrefsStore).showOnboardingWhenOfferingToSaveLogin = false
     }
 
     @Test

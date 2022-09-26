@@ -17,8 +17,11 @@
 package com.duckduckgo.downloads.impl
 
 import android.content.Context
+import android.util.Base64
+import androidx.annotation.VisibleForTesting
 import androidx.work.CoroutineWorker
 import androidx.work.Data
+import androidx.work.Data.MAX_DATA_BYTES
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.global.DispatcherProvider
@@ -26,7 +29,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
 import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
@@ -52,28 +59,57 @@ class FileDownloadWorker(
     }
 }
 
-private const val URL = "URL"
+@VisibleForTesting
+internal const val URL = "URL"
 private const val CONTENT_DISPOSITION = "CONTENT_DISPOSITION"
 private const val MIME_TYPE = "MIME_TYPE"
 private const val SUBFOLDER = "SUBFOLDER"
 private const val DIRECTORY = "DIRECTORY"
+@VisibleForTesting
+internal const val IS_URL_COMPRESSED = "IS_URL_COMPRESSED"
+private const val MAX_URL_DATA_BYTES = MAX_DATA_BYTES * 0.9
+private const val BYTE_ARRAY_SIZE = 256
 
 fun FileDownloader.PendingFileDownload.toInputData(): Data {
+    val urlTooLarge = url.toByteArray().size > MAX_URL_DATA_BYTES
     return Data.Builder()
-        .putString(URL, url)
+        .putString(URL, if (urlTooLarge) compress(url) else url)
         .putString(CONTENT_DISPOSITION, contentDisposition)
         .putString(MIME_TYPE, mimeType)
         .putString(SUBFOLDER, subfolder)
         .putString(DIRECTORY, directory.absolutePath)
+        .putBoolean(IS_URL_COMPRESSED, urlTooLarge)
         .build()
 }
 
 fun Data.toPendingFileDownload(): FileDownloader.PendingFileDownload {
+    val isUrlCompressed = getBoolean(IS_URL_COMPRESSED, false)
+    val url = if (isUrlCompressed) decompress(getString(URL)!!) else getString(URL)!!
     return FileDownloader.PendingFileDownload(
-        url = getString(URL)!!,
+        url = url,
         contentDisposition = getString(CONTENT_DISPOSITION),
         mimeType = getString(MIME_TYPE),
         subfolder = getString(SUBFOLDER)!!,
-        directory = File(getString(DIRECTORY)!!)
+        directory = File(getString(DIRECTORY)!!),
+        isUrlCompressed = false
     )
+}
+
+private fun compress(str: String): String {
+    val out = ByteArrayOutputStream()
+    val gzip = GZIPOutputStream(out)
+    gzip.write(str.toByteArray())
+    gzip.close()
+    return Base64.encodeToString(out.toByteArray(), Base64.DEFAULT)
+}
+
+private fun decompress(str: String): String {
+    val gis = GZIPInputStream(ByteArrayInputStream(Base64.decode(str, Base64.DEFAULT)))
+    val out = ByteArrayOutputStream()
+    val buffer = ByteArray(BYTE_ARRAY_SIZE)
+    var len: Int
+    while (gis.read(buffer).also { len = it } >= 0) {
+        out.write(buffer, 0, len)
+    }
+    return String(out.toByteArray())
 }
