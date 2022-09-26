@@ -296,4 +296,17 @@
         <item name="hintTextColor">@color/outlined_text_input_hint_color_selector</item>
         <item name="android:theme">@style/TextInputEditTextTheme</item>
     </style>
+
+    <!-- Dividers -->
+    <style name="Widget.DuckDuckGo.HorizontalDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/horitonzalDividerHeight</item>
+        <item name="android:background">?attr/sectionDividerColor</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.VerticalDivider">
+        <item name="android:layout_width">@dimen/verticalDividerWidth</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">?attr/sectionDividerColor</item>
+    </style>
 </resources>
