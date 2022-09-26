@@ -14,12 +14,5 @@
   ~ limitations under the License.
   -->
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:tools="http://schemas.android.com/tools"
-       tools:parentTag="android.widget.FrameLayout"
-       tools:ignore="MissingVerticalDividerView">
-    <View
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        android:background="?attr/sectionDividerColor"/>
-</merge>
+<View xmlns:android="http://schemas.android.com/apk/res/android"
+      style="@style/Widget.DuckDuckGo.VerticalDivider"/>

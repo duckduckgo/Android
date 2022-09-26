@@ -26,9 +26,9 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 class HorizontalDivider @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = R.style.Widget_DuckDuckGo_HorizontalDivider
-) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
+    defStyleAttr: Int = 0
+) : FrameLayout(context, attrs, defStyleAttr) {
+
     init {
         viewBinding<ViewHorizontalDividerBinding>()
     }

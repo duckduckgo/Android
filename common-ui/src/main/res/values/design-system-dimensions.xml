@@ -51,4 +51,8 @@
     <dimen name="dialogButtonHeight">40dp</dimen>
     <dimen name="dialogImageSize">40dp</dimen>
 
+    <!-- Dividers -->
+    <dimen name="verticalDividerWidth">1dp</dimen>
+    <dimen name="horitonzalDividerHeight">1dp</dimen>
+
 </resources>

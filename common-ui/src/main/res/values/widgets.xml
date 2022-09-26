@@ -309,14 +309,18 @@
 
     <!-- Dividers -->
     <style name="Widget.DuckDuckGo.HorizontalDivider">
-        <item name="android:paddingTop">@dimen/keyline_5</item>
-        <item name="android:paddingBottom">@dimen/keyline_5</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/horitonzalDividerHeight</item>
+        <item name="android:layout_marginTop">@dimen/keyline_5</item>
+        <item name="android:layout_marginBottom">@dimen/keyline_5</item>
+        <item name="android:background">?attr/sectionDividerColor</item>
     </style>
 
     <style name="Widget.DuckDuckGo.VerticalDivider">
-        <item name="android:paddingStart">@dimen/keyline_4</item>
-        <item name="android:paddingEnd">@dimen/keyline_4</item>
-        <item name="android:layout_width">1dp</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">@dimen/verticalDividerWidth</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginStart">@dimen/keyline_5</item>
+        <item name="android:layout_marginEnd">@dimen/keyline_5</item>
+        <item name="android:background">?attr/sectionDividerColor</item>
     </style>
 </resources>

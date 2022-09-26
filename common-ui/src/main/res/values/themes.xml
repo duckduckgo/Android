@@ -58,7 +58,6 @@
         <item name="secondaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Secondary.Rounded</item>
         <item name="primaryButtonLowercaseStyle">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
 
-        <item name="verticalDividerStyle">@style/Widget.DuckDuckGo.VerticalDivider</item>
     </style>
 
     <style name="AppTheme.BaseDark">

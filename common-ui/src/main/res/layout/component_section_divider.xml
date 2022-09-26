@@ -29,17 +29,24 @@
         android:layout_width="match_parent"
         android:paddingStart="@dimen/keyline_4"
         android:paddingEnd="@dimen/keyline_4"
-        android:text="Section divider"/>
+        android:text="Horizontal Divider"/>
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_height="wrap_content"
         android:layout_width="match_parent"/>
 
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingEnd="@dimen/keyline_4"
+        android:text="Vertical Divider"
+        android:paddingTop="@dimen/keyline_5"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingTop="@dimen/keyline_5"
         android:gravity="center">
 
         <com.duckduckgo.mobile.android.ui.view.IconButton
@@ -48,7 +55,9 @@
             android:layout_height="48dp"
             app:srcCompat="@drawable/ic_union"/>
 
-        <com.duckduckgo.mobile.android.ui.view.divider.VerticalDivider/>
+        <com.duckduckgo.mobile.android.ui.view.divider.VerticalDivider
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
         <com.duckduckgo.mobile.android.ui.view.IconButton
             android:layout_gravity="center"
