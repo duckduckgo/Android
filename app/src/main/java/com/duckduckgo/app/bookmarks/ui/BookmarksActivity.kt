@@ -23,7 +23,6 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
-import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.ConcatAdapter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
@@ -45,15 +44,12 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.DividerAdapter
 import com.duckduckgo.app.global.extensions.html
-import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.mobile.android.ui.view.SearchBar
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -72,11 +68,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
     lateinit var bookmarksAdapter: BookmarksAdapter
     lateinit var favoritesAdapter: FavoritesAdapter
     lateinit var bookmarkFoldersAdapter: BookmarkFoldersAdapter
+    lateinit var searchListener: BookmarksEntityQueryListener
 
     private var deleteDialog: AlertDialog? = null
     private var searchMenuItem: MenuItem? = null
-
-    private var searchJob = ConflatedJob()
 
     private val viewModel: BookmarksViewModel by bindViewModel()
 
@@ -271,7 +266,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun initializeSearchBar() {
-        val listener = BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter)
+        searchListener = BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter)
         searchMenuItem?.setOnMenuItemClickListener {
             showSearchBar()
             return@setOnMenuItemClickListener true
@@ -280,12 +275,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         searchBar.onAction {
             when (it) {
                 is SearchBar.Action.PerformUpAction -> hideSearchBar()
-                is SearchBar.Action.PerformSearch -> {
-                    searchJob += lifecycle.coroutineScope.launch {
-                        delay(DEBOUNCE_PERIOD)
-                        listener.onQueryTextChange(it.searchText)
-                    }
-                }
+                is SearchBar.Action.PerformSearch -> searchListener.onQueryTextChange(it.searchText)
             }
         }
     }
@@ -385,7 +375,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     override fun onDestroy() {
         deleteDialog?.dismiss()
-        searchJob.cancel()
+        searchListener.cancelSearch()
         super.onDestroy()
     }
 
@@ -413,8 +403,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
         private const val KEY_BOOKMARK_FOLDER_NAME = "KEY_BOOKMARK_FOLDER_NAME"
         private const val ROOT_FOLDER_ID = 0L
-
-        private const val DEBOUNCE_PERIOD = 400L
 
         private const val IMPORT_BOOKMARKS_REQUEST_CODE = 111
         private const val EXPORT_BOOKMARKS_REQUEST_CODE = 112
