@@ -59,11 +59,10 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="App Tracking Protection is enabled and blocking tracking attempts across your apps" />
 
-    <View
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:id="@+id/deviceShieldCtaSplitter"
         android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="?splitterColor"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

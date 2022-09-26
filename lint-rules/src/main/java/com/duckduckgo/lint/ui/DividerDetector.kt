@@ -39,22 +39,26 @@ class DividerDetector : LayoutDetector() {
         context: XmlContext,
         element: Element
     ) {
-        val heightNode = element.getAttributeNodeNS(ANDROID_URI, ATTR_LAYOUT_HEIGHT)
-        if (heightNode.value == "1dp"){
-            context.report(
-                issue = MISSING_HORIZONTAL_DIVIDER,
-                location = context.getNameLocation(element),
-                message = MISSING_HORIZONTAL_DIVIDER.getExplanation(TextFormat.RAW)
-            )
+        if (element.hasAttributeNS(ANDROID_URI, ATTR_LAYOUT_HEIGHT)){
+            val heightNode = element.getAttributeNodeNS(ANDROID_URI, ATTR_LAYOUT_HEIGHT)
+            if (heightNode.value == "1dp"){
+                context.report(
+                    issue = MISSING_HORIZONTAL_DIVIDER,
+                    location = context.getNameLocation(element),
+                    message = MISSING_HORIZONTAL_DIVIDER.getExplanation(TextFormat.RAW)
+                )
+            }
         }
 
-        val widthNode = element.getAttributeNodeNS(ANDROID_URI, ATTR_LAYOUT_WIDTH)
-        if (widthNode.value == "1dp"){
-            context.report(
-                issue = MISSING_VERTICAL_DIVIDER,
-                location = context.getNameLocation(element),
-                message = MISSING_VERTICAL_DIVIDER.getExplanation(TextFormat.RAW)
-            )
+        if (element.hasAttributeNS(ANDROID_URI, ATTR_LAYOUT_WIDTH)){
+            val widthNode = element.getAttributeNodeNS(ANDROID_URI, ATTR_LAYOUT_WIDTH)
+            if (widthNode.value == "1dp"){
+                context.report(
+                    issue = MISSING_VERTICAL_DIVIDER,
+                    location = context.getNameLocation(element),
+                    message = MISSING_VERTICAL_DIVIDER.getExplanation(TextFormat.RAW)
+                )
+            }
         }
     }
 
@@ -62,7 +66,7 @@ class DividerDetector : LayoutDetector() {
 
         val MISSING_VERTICAL_DIVIDER = Issue
             .create(
-                id = "MissingVerticalDividerView",
+                id = "MissingVerticalDivider",
                 briefDescription = "View used instead of [VerticalDivider] Component from the Design System",
                 explanation = "1dp width used in a View. Please, use the [VerticalDivider] Component from the Design System",
                 moreInfo = "https://app.asana.com/0/1202857801505092/1203028257237192",
@@ -78,7 +82,7 @@ class DividerDetector : LayoutDetector() {
 
         val MISSING_HORIZONTAL_DIVIDER = Issue
             .create(
-                id = "MissingHorizontalDividerView",
+                id = "MissingHorizontalDivider",
                 briefDescription = "View used instead of [HorizontalDivider] Component from the Design System",
                 explanation = "1dp height used in a View. Please, use the [HorizontalDivider] Component from the Design System",
                 moreInfo = "https://app.asana.com/0/1202857801505092/1203028257237192",

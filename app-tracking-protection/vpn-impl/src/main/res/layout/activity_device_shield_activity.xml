@@ -78,13 +78,12 @@
                     android:layout_weight="1"
                     android:text="@string/atp_ActivityPastWeekBlocked" />
 
-                <View
+                <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                     android:id="@+id/vertical_divider"
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:background="?splitterColor" />
+                    android:layout_marginBottom="4dp"/>
 
                 <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.PastWeekTrackerActivityContentView
                     android:id="@+id/tracking_apps_count"
@@ -126,10 +125,9 @@
                 android:text="@string/atp_ActivityCtaShowAll"
                 android:visibility="gone"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="?splitterColor" />
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:layout_width="match_parent"

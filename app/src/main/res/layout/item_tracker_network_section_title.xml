@@ -20,15 +20,14 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <View
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:id="@+id/trackersTopDivider"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_5"
-        android:layout_marginTop="@dimen/keyline_3"
-        android:background="@color/divider" />
+        android:layout_marginTop="@dimen/keyline_3" />
 
     <TextView
         android:id="@+id/trackersSectionDescription"
@@ -51,12 +50,11 @@
         tools:text="Learn more"
         tools:visibility="visible" />
 
-    <View
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:id="@+id/trackersBottomDivider"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginTop="@dimen/keyline_5"
-        android:layout_marginEnd="@dimen/keyline_5"
-        android:background="@color/divider" />
+        android:layout_marginEnd="@dimen/keyline_5"/>
 </LinearLayout>
