@@ -38,7 +38,7 @@ import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.SectionDivider
+import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -115,7 +115,7 @@ class LocationPermissionsAdapter(
                 }
             }
             DIVIDER_TYPE -> {
-                LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(SectionDivider(parent.context))
+                LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(HorizontalDivider(parent.context))
             }
             PRECISE_LOCATION_DOMAIN_TYPE -> {
                 val binding = ViewLocationPermissionsEntryBinding.inflate(inflater, parent, false)

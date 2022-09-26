@@ -134,10 +134,9 @@
         android:layout_height="wrap_content"
         android:text="@string/atp_ReportBreakageFormCheckboxText" />
 
-    <View
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?splitterColor"/>
+        android:layout_height="wrap_content"/>
 
     <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
         android:id="@+id/ctaNextFormSubmit"
