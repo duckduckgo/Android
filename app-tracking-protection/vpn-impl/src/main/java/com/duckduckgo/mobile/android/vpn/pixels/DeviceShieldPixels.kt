@@ -892,6 +892,9 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun reportUnprotectedAppsBucket(bucketSize: Int) {
+        tryToFireDailyPixel(
+            String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY.pixelName, bucketSize)
+        )
         firePixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET.pixelName, bucketSize))
     }
 

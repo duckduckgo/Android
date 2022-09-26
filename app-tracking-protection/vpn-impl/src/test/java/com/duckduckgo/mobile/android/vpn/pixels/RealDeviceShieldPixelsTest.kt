@@ -324,6 +324,7 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.reportUnprotectedAppsBucket(bucketSize)
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET.notificationVariant(bucketSize))
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY.notificationVariant(bucketSize))
     }
 
     private fun DeviceShieldPixelNames.notificationVariant(variant: Int): String {

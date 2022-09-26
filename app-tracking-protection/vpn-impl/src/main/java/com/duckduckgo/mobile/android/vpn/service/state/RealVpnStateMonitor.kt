@@ -65,7 +65,13 @@ class RealVpnStateMonitor @Inject constructor(
                 else if (isFeatureEnabled) VpnState(VpnRunningState.ENABLED)
                 else VpnState(VpnRunningState.DISABLED)
             }.flowOn(dispatcherProvider.io())
-            .onStart { emit(VpnState(VpnRunningState.DISABLED)) }
+            .onStart {
+                if (vpnFeaturesRegistry.isFeatureRegistered(vpnFeature)) {
+                    emit(VpnState(VpnRunningState.ENABLED))
+                } else {
+                    emit(VpnState(VpnRunningState.DISABLED))
+                }
+            }
             .distinctUntilChanged()
     }
 
