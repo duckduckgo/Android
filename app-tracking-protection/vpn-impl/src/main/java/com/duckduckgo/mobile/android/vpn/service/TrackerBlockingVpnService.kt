@@ -89,9 +89,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     @Inject lateinit var appTpFeatureConfig: AppTpFeatureConfig
 
-    @Inject lateinit var vpnNetworkStackPluginPoint: PluginPoint<VpnNetworkStack>
-
-    private lateinit var vpnNetworkStack: VpnNetworkStack
+    @Inject lateinit var vpnNetworkStack: VpnNetworkStack
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -132,11 +130,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         super.onCreate()
         AndroidInjection.inject(this)
 
-        vpnNetworkStack = vpnNetworkStackPluginPoint.getPlugins().first { it.isEnabled() }.apply {
-            onCreateVpn().getOrThrow()
-        }
-
-        Timber.d("VPN log onCreate")
+        Timber.d("VPN log onCreate, creating the ${vpnNetworkStack.name} network stack")
+        vpnNetworkStack.onCreateVpn().getOrThrow()
     }
 
     override fun onBind(intent: Intent?): IBinder {
@@ -190,7 +185,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             return@withContext
         }
 
-        if (vpnNetworkStack.shouldSetUnderlyingNetworks()) {
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)) {
             applicationContext.getActiveNetwork()?.let { an ->
                 Timber.v("Setting underlying network $an")
                 setUnderlyingNetworks(arrayOf(an))
@@ -288,7 +283,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         val dns = mutableSetOf<InetAddress>()
 
         // System DNS
-        if (vpnNetworkStack.shouldSetActiveNetworkDnsServers()) {
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.SetActiveNetworkDns)) {
             kotlin.runCatching {
                 applicationContext.getSystemActiveNetworkDefaultDns()
                     .map { InetAddress.getByName(it) }
