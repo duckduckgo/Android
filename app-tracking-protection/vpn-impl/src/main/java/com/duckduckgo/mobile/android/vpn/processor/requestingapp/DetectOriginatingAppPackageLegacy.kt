@@ -85,10 +85,16 @@ class DetectOriginatingAppPackageLegacy(
                     val result = procNetFileConnectionMatcher.searchNetworkFile(File(it.filename), it.pattern, connectionInfo)
                     if (result is Found) {
                         searchResult = result
-                        jobs.forEach { it.cancel() }
+                        synchronized(this@runBlocking) {
+                            jobs.forEach { it.cancel() }
+                        }
                     }
                     Timber.v("Searched ${it.filename}. Connection was ${if (result !is Found) "not " else ""}found")
-                }.also { jobs.add(it) }
+                }.also {
+                    synchronized(this) {
+                        jobs.add(it)
+                    }
+                }
             }
 
             jobs.map { it.join() }
