@@ -68,6 +68,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     lateinit var bookmarksAdapter: BookmarksAdapter
     lateinit var favoritesAdapter: FavoritesAdapter
     lateinit var bookmarkFoldersAdapter: BookmarkFoldersAdapter
+    lateinit var searchListener: BookmarksEntityQueryListener
 
     private var deleteDialog: AlertDialog? = null
     private var searchMenuItem: MenuItem? = null
@@ -265,7 +266,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun initializeSearchBar() {
-        val listener = BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter)
+        searchListener = BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter)
         searchMenuItem?.setOnMenuItemClickListener {
             showSearchBar()
             return@setOnMenuItemClickListener true
@@ -274,7 +275,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         searchBar.onAction {
             when (it) {
                 is SearchBar.Action.PerformUpAction -> hideSearchBar()
-                is SearchBar.Action.PerformSearch -> listener.onQueryTextChange(it.searchText)
+                is SearchBar.Action.PerformSearch -> searchListener.onQueryTextChange(it.searchText)
             }
         }
     }
@@ -374,6 +375,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     override fun onDestroy() {
         deleteDialog?.dismiss()
+        searchListener.cancelSearch()
         super.onDestroy()
     }
 

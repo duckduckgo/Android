@@ -16,9 +16,13 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
+import com.duckduckgo.app.utils.ConflatedJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 class BookmarksEntityQueryListener(
@@ -27,15 +31,23 @@ class BookmarksEntityQueryListener(
     private val bookmarkFoldersAdapter: BookmarkFoldersAdapter
 ) {
 
-    fun onQueryTextChange(newText: String): Boolean {
-        viewModel.viewState.value?.bookmarks?.let { bookmarks ->
-            viewModel.viewState.value?.bookmarkFolders?.let { bookmarkFolders ->
-                val filteredFolders = filterBookmarkFolders(newText, bookmarkFolders)
-                bookmarksAdapter.setItems(filterBookmarks(newText, bookmarks), filteredFolders.isEmpty())
-                bookmarkFoldersAdapter.bookmarkFolderItems = filteredFolders
+    private var searchJob = ConflatedJob()
+
+    fun onQueryTextChange(newText: String) {
+        searchJob += viewModel.viewModelScope.launch {
+            delay(DEBOUNCE_PERIOD)
+            viewModel.viewState.value?.bookmarks?.let { bookmarks ->
+                viewModel.viewState.value?.bookmarkFolders?.let { bookmarkFolders ->
+                    val filteredFolders = filterBookmarkFolders(newText, bookmarkFolders)
+                    bookmarksAdapter.setItems(filterBookmarks(newText, bookmarks), filteredFolders.isEmpty(), true)
+                    bookmarkFoldersAdapter.bookmarkFolderItems = filteredFolders
+                }
             }
         }
-        return true
+    }
+
+    fun cancelSearch() {
+        searchJob.cancel()
     }
 
     private fun filterBookmarks(
@@ -58,5 +70,9 @@ class BookmarksEntityQueryListener(
             val lowercaseTitle = it.name.lowercase(Locale.getDefault())
             lowercaseTitle.contains(lowercaseQuery)
         }.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
+    }
+
+    companion object {
+        private const val DEBOUNCE_PERIOD = 400L
     }
 }
