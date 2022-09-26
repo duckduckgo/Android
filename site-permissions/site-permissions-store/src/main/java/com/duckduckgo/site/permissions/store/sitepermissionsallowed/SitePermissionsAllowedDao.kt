@@ -21,6 +21,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SitePermissionsAllowedDao {
@@ -29,11 +30,17 @@ interface SitePermissionsAllowedDao {
     fun insert(sitePermissionAllowed: SitePermissionAllowedEntity): Long
 
     @Query("select * from site_permission_allowed")
-    fun getAllSitesPermissions(): List<SitePermissionAllowedEntity>
+    fun getAllSitesPermissionsAllowedAsFlow(): Flow<List<SitePermissionAllowedEntity>>
 
     @Query("select * from site_permission_allowed where id = :id")
     fun getSitePermissionAllowed(id: String): SitePermissionAllowedEntity?
 
     @Delete
     fun delete(sitePermissionsEntity: SitePermissionAllowedEntity): Int
+
+    @Query("delete from site_permission_allowed")
+    fun deleteAll()
+
+    @Query("delete from site_permission_allowed where domain = :domain")
+    fun deleteAllowedSitesForDomain(domain: String): Int
 }

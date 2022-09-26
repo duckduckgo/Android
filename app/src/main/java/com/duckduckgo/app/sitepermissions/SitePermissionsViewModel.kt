@@ -34,6 +34,7 @@ import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelPar
 import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelValue
 import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.SitePermissionsPixelName
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
+import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,6 +58,8 @@ class SitePermissionsViewModel @Inject constructor(
 
     private val _commands = Channel<Command>()
     val commands: Flow<Command> = _commands.receiveAsFlow()
+
+    private var cachedAllowedSites: List<SitePermissionAllowedEntity> = listOf()
 
     data class ViewState(
         val askLocationEnabled: Boolean = true,
@@ -97,6 +100,9 @@ class SitePermissionsViewModel @Inject constructor(
         }
     }
 
+    fun combineAllPermissions(locationPermissions: List<LocationPermissionEntity>, sitePermissions: List<SitePermissionsEntity>): List<String> =
+        locationPermissions.map { it.domain }.union(sitePermissions.map { it.domain }).toList()
+
     fun permissionToggleSelected(
         isChecked: Boolean,
         textRes: Int
@@ -124,7 +130,6 @@ class SitePermissionsViewModel @Inject constructor(
     private fun removeLocationSites() {
         viewModelScope.launch {
             geolocationPermissions.clearAll()
-            _viewState.emit(_viewState.value.copy(locationPermissionsAllowed = listOf()))
         }
     }
 
@@ -146,9 +151,12 @@ class SitePermissionsViewModel @Inject constructor(
         val sitePermissions = _viewState.value.sitesPermissionsAllowed.toMutableList()
         val locationPermissions = _viewState.value.locationPermissionsAllowed.toMutableList()
         viewModelScope.launch(dispatcherProvider.io()) {
-            geolocationPermissions.clearAll()
-            sitePermissionsRepository.deleteAll()
-            _commands.send(ShowRemovedAllConfirmationSnackbar(sitePermissions, locationPermissions))
+            sitePermissionsRepository.sitePermissionsAllowedFlow().collect { sitePermissionsAllowed ->
+                geolocationPermissions.clearAll()
+                sitePermissionsRepository.deleteAll()
+                _commands.send(ShowRemovedAllConfirmationSnackbar(sitePermissions, locationPermissions))
+                cachedAllowedSites = sitePermissionsAllowed
+            }
         }
     }
 
@@ -157,14 +165,8 @@ class SitePermissionsViewModel @Inject constructor(
         removedLocationPermissions: List<LocationPermissionEntity>
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            sitePermissionsRepository.undoDeleteAll(removedSitePermissions)
+            sitePermissionsRepository.undoDeleteAll(removedSitePermissions, cachedAllowedSites)
             geolocationPermissions.undoClearAll(removedLocationPermissions)
-            _viewState.emit(
-                _viewState.value.copy(
-                    sitesPermissionsAllowed = removedSitePermissions,
-                    locationPermissionsAllowed = removedLocationPermissions
-                )
-            )
         }
     }
 }

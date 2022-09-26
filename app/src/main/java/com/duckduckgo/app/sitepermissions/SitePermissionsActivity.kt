@@ -49,7 +49,7 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
 
     private val viewModel: SitePermissionsViewModel by bindViewModel()
     private val binding: ActivityLocationPermissionsBinding by viewBinding()
-    private val adapter: SitePermissionsAdapter by lazy { SitePermissionsAdapter(viewModel, this, faviconManager) }
+    private lateinit var adapter: SitePermissionsAdapter
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -68,8 +68,7 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
             viewModel.viewState
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { state ->
-                    val sitePermissionsWebsites =
-                        state.locationPermissionsAllowed.map { it.domain }.union(state.sitesPermissionsAllowed.map { it.domain }).toList()
+                    val sitePermissionsWebsites = viewModel.combineAllPermissions(state.locationPermissionsAllowed, state.sitesPermissionsAllowed)
                     updateList(sitePermissionsWebsites, state.askLocationEnabled, state.askCameraEnabled, state.askMicEnabled)
                 }
         }
@@ -111,6 +110,7 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupRecyclerView() {
+        adapter = SitePermissionsAdapter(viewModel, this, faviconManager)
         binding.recycler.adapter = adapter
     }
 

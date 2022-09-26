@@ -42,7 +42,8 @@ interface SitePermissionsRepository {
     fun sitePermissionGranted(url: String, tabId: String, permission: String)
     fun sitePermissionsWebsitesFlow(): Flow<List<SitePermissionsEntity>>
     fun sitePermissionsForAllWebsites(): List<SitePermissionsEntity>
-    suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>)
+    fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>>
+    suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>, allowedSites: List<SitePermissionAllowedEntity>)
     suspend fun deleteAll()
     suspend fun getSitePermissionsForWebsite(url: String): SitePermissionsEntity?
     suspend fun deletePermissionsForSite(url: String)
@@ -135,15 +136,24 @@ class SitePermissionsRepositoryImpl @Inject constructor(
         return sitePermissionsDao.getAllSitesPermissions()
     }
 
-    override suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>) {
+    override fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>> {
+        return sitePermissionsAllowedDao.getAllSitesPermissionsAllowedAsFlow()
+    }
+
+    override suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>, allowedSites: List<SitePermissionAllowedEntity>) {
         withContext(dispatcherProvider.io()) {
             sitePermissions.forEach { entity ->
                 sitePermissionsDao.insert(entity)
             }
+            allowedSites.forEach { entity ->
+                sitePermissionsAllowedDao.insert(entity)
+            }
         }
     }
+
     override suspend fun deleteAll() {
         sitePermissionsDao.deleteAll()
+        sitePermissionsAllowedDao.deleteAll()
     }
 
     override suspend fun getSitePermissionsForWebsite(url: String): SitePermissionsEntity? {
@@ -158,6 +168,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
             val domain = url.extractDomain() ?: url
             val entity = sitePermissionsDao.getSitePermissionsByDomain(domain)
             entity?.let { sitePermissionsDao.delete(it) }
+            sitePermissionsAllowedDao.deleteAllowedSitesForDomain(domain)
         }
     }
 
