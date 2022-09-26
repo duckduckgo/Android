@@ -53,6 +53,6 @@
 
     <!-- Dividers -->
     <dimen name="horitonzalDividerHeight">1dp</dimen>
-    <dimen name="verticalDividerHeight">1dp</dimen>
+    <dimen name="verticalDividerWidth">1dp</dimen>
 
 </resources>
