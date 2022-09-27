@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.dashboard.impl.animations
+package com.duckduckgo.app.browser.omnibar.animations
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider

@@ -205,7 +205,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
 import com.duckduckgo.privacy.dashboard.api.animations.BrowserTrackersAnimatorHelper
-import com.duckduckgo.privacy.dashboard.api.animations.PrivacyShieldAnimationHelper
+import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.coroutines.flow.cancellable
 import javax.inject.Provider

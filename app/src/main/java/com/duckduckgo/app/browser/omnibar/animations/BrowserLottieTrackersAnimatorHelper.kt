@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.dashboard.impl.animations
+package com.duckduckgo.app.browser.omnibar.animations
 
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
@@ -32,6 +32,9 @@ import android.view.ViewGroup
 import androidx.core.animation.addListener
 import androidx.core.animation.doOnEnd
 import com.airbnb.lottie.LottieAnimationView
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.ImageLogo
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.LetterLogo
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.StackedLogo
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
@@ -40,9 +43,6 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.privacy.dashboard.api.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.privacy.dashboard.api.animations.TrackersAnimatorListener
 import com.duckduckgo.privacy.dashboard.impl.R
-import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.ImageLogo
-import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.LetterLogo
-import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.StackedLogo
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 

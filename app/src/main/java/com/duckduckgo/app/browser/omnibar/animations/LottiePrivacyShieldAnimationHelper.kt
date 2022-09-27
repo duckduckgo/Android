@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.dashboard.impl.animations
+package com.duckduckgo.app.browser.omnibar.animations
 
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.di.scopes.AppScope
@@ -24,7 +24,6 @@ import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.WARNING
-import com.duckduckgo.privacy.dashboard.api.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.privacy.dashboard.impl.R
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
