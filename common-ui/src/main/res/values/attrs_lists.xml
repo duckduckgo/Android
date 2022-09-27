@@ -32,6 +32,14 @@
     <attr name="showBetaPill" format="boolean"/>
     <attr name="primaryTextColor" format="color"/>
     <attr name="secondaryTextColor" format="color"/>
+    <attr name="imageBackground">
+        <!-- No background. -->
+        <enum name="none" value="0" />
+        <!-- Oval shape. -->
+        <enum name="circular" value="1" />
+        <!-- Rectangular shape, with optional rounded corners. -->
+        <enum name="round" value="2" />
+    </attr>
 
     <!--One Line Item view-->
     <declare-styleable name="OneLineListItem">
@@ -56,6 +64,7 @@
         <attr name="leadingIcon"/>
         <attr name="trailingIcon"/>
         <attr name="showBetaPill"/>
+        <attr name="imageBackground"/>
     </declare-styleable>
 
     <declare-styleable name="TwoLineSwitchListItem">
@@ -71,13 +80,6 @@
         <attr name="primaryText"/>
         <attr name="secondaryText"/>
         <attr name="trailingIcon"/>
-    </declare-styleable>
-
-    <!--Single Line Item view-->
-    <declare-styleable name="SingleLineListItem">
-        <attr name="singleLineItemTitle" format="string"/>
-        <attr name="singleLineItemDrawable" format="reference"/>
-        <attr name="singleLineItemImageVisible" format="boolean"/>
     </declare-styleable>
 
 </resources>

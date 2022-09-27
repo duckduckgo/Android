@@ -220,8 +220,11 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
 
             listItem.setPrimaryText(favorite.title)
             listItem.setSecondaryText(parseDisplayUrl(favorite.url))
+
+            listItem.setLeadingImageCircularBackground()
             loadFavicon(favorite.url, listItem.leadingIcon())
 
+            listItem.setTrailingIcon(R.drawable.ic_overflow)
             listItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, favorite)
             }

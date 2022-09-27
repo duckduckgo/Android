@@ -67,7 +67,7 @@ class TwoLineListItem @JvmOverloads constructor(
             }
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIcon)) {
-                binding.leadingIcon.setBackground(getDrawable(R.styleable.TwoLineListItem_leadingIcon))
+                binding.leadingIcon.setImageDrawable(getDrawable(R.styleable.TwoLineListItem_leadingIcon))
             } else {
                 binding.leadingIcon.gone()
             }
@@ -83,6 +83,16 @@ class TwoLineListItem @JvmOverloads constructor(
                 binding.pill.show()
             } else {
                 binding.pill.gone()
+            }
+
+            if (hasValue(R.styleable.TwoLineListItem_imageBackground)) {
+                val value = getInt(R.styleable.TwoLineListItem_imageBackground, 0)
+                if (value == 1) {
+                    binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_circular_background)
+                }
+                if (value == 2) {
+                    binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_round_background)
+                }
             }
 
             recycle()
@@ -120,6 +130,18 @@ class TwoLineListItem @JvmOverloads constructor(
     /** Sets the leading image content description */
     fun setLeadingIconContentDescription(description: String) {
         binding.leadingIcon.contentDescription = description
+    }
+
+    /** Sets a circular background in the leading icon */
+    fun setLeadingImageCircularBackground() {
+        binding.leadingIcon.setBackgroundResource(R.drawable.list_item_image_circular_background)
+        binding.leadingIcon.show()
+    }
+
+    /** Sets the item image resource */
+    fun setTrailingIcon(idRes: Int) {
+        binding.trailingIcon.setImageResource(idRes)
+        binding.trailingIcon.show()
     }
 
     /** Sets the item overflow menu click listener */

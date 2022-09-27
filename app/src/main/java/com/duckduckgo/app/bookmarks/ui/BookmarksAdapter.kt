@@ -202,8 +202,11 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             )
             twoListItem.setPrimaryText(bookmark.title)
             twoListItem.setSecondaryText(parseDisplayUrl(bookmark.url))
+
+            twoListItem.setLeadingImageCircularBackground()
             loadFavicon(bookmark.url, twoListItem.leadingIcon())
 
+            twoListItem.setTrailingIcon(R.drawable.ic_overflow)
             twoListItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, bookmark)
             }
