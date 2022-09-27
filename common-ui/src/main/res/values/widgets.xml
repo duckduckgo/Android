@@ -69,12 +69,6 @@
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.ListImage">
-        <item name="android:background">@drawable/list_item_image_background</item>
-        <item name="android:layout_height">@dimen/listItemImageContainerSize</item>
-        <item name="android:layout_width">@dimen/listItemImageContainerSize</item>
-    </style>
-
     <!-- Bottom Sheet -->
     <style name="Widget.DuckDuckGo.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.Dialog">
         <item name="bottomSheetStyle">@style/BottomSheetStyle</item>

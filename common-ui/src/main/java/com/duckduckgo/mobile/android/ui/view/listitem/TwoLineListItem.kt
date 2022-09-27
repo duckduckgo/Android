@@ -69,7 +69,7 @@ class TwoLineListItem @JvmOverloads constructor(
             if (hasValue(R.styleable.TwoLineListItem_leadingIcon)) {
                 binding.leadingIcon.setImageDrawable(getDrawable(R.styleable.TwoLineListItem_leadingIcon))
             } else {
-                binding.leadingIcon.gone()
+                binding.leadingIconBackground.gone()
             }
 
             if (hasValue(R.styleable.TwoLineListItem_trailingIcon)) {
@@ -85,14 +85,15 @@ class TwoLineListItem @JvmOverloads constructor(
                 binding.pill.gone()
             }
 
-            if (hasValue(R.styleable.TwoLineListItem_imageBackground)) {
-                val value = getInt(R.styleable.TwoLineListItem_imageBackground, 0)
+            if (hasValue(R.styleable.TwoLineListItem_leadingIconBackground)) {
+                val value = getInt(R.styleable.TwoLineListItem_leadingIconBackground, 0)
                 if (value == 1) {
                     binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_circular_background)
                 }
                 if (value == 2) {
                     binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_round_background)
                 }
+                binding.leadingIconBackground.show()
             }
 
             recycle()
@@ -130,12 +131,6 @@ class TwoLineListItem @JvmOverloads constructor(
     /** Sets the leading image content description */
     fun setLeadingIconContentDescription(description: String) {
         binding.leadingIcon.contentDescription = description
-    }
-
-    /** Sets a circular background in the leading icon */
-    fun setLeadingImageCircularBackground() {
-        binding.leadingIcon.setBackgroundResource(R.drawable.list_item_image_circular_background)
-        binding.leadingIcon.show()
     }
 
     /** Sets the item image resource */

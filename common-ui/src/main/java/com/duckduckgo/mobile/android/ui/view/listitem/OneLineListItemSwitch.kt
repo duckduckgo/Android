@@ -59,9 +59,20 @@ class OneLineListItemSwitch @JvmOverloads constructor(
             }
 
             if (hasValue(R.styleable.OneLineListItemSwitch_leadingIcon)) {
-                binding.leadingIcon.setBackground(getDrawable(R.styleable.OneLineListItemSwitch_leadingIcon))
+                binding.leadingIcon.setImageDrawable(getDrawable(R.styleable.OneLineListItemSwitch_leadingIcon))
             } else {
-                binding.leadingIcon.gone()
+                binding.leadingIconBackground.gone()
+            }
+
+            if (hasValue(R.styleable.OneLineListItemSwitch_leadingIconBackground)) {
+                val value = getInt(R.styleable.OneLineListItemSwitch_leadingIconBackground, 0)
+                if (value == 1) {
+                    binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_circular_background)
+                }
+                if (value == 2) {
+                    binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_round_background)
+                }
+                binding.leadingIconBackground.show()
             }
 
             recycle()

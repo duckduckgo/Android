@@ -20,6 +20,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -170,15 +171,18 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
             )
 
             listItem.setPrimaryText(entity.domain)
-            loadFavicon(entity.domain)
+            loadFavicon(entity.domain, listItem.leadingIcon())
             listItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, entity)
             }
         }
 
-        private fun loadFavicon(url: String) {
+        private fun loadFavicon(
+            url: String,
+            leadingIcon: ImageView
+        ) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(CommonR.id.image))
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = leadingIcon)
             }
         }
 

@@ -45,7 +45,7 @@
         android:id="@+id/twoLineListItemWithImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:leadingIcon="@drawable/ic_globe_gray_16dp"
         app:primaryText="Title"
         app:secondaryText="Two line item with leading image"
         app:layout_constraintEnd_toEndOf="parent"
@@ -56,7 +56,7 @@
         android:id="@+id/twoLineListItemWithImageAndTrailingIcon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:leadingIcon="@drawable/ic_globe_gray_16dp"
         app:primaryText="Title"
         app:secondaryText="Two line item with leading image and trailing menu"
         app:trailingIcon="@drawable/ic_overflow"
@@ -86,6 +86,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithTrailingIcon"/>
 
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/twoLineListItemWithCircularImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:leadingIcon="@drawable/ic_globe_gray_16dp"
+            app:leadingIconBackground="circular"
+            app:primaryText="Title"
+            app:secondaryText="Two line item with leading image over circular bg"
+            app:trailingIcon="@drawable/ic_overflow"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithBetaPill"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/twoLineListItemWitRoundImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:leadingIcon="@drawable/ic_globe_gray_16dp"
+            app:leadingIconBackground="rounded"
+            app:primaryText="Title"
+            app:secondaryText="Two line item with leading image over round bg"
+            app:trailingIcon="@drawable/ic_overflow"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithCircularImage"/>
+
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineSwitchListItem
         android:id="@+id/twoLineSwitchListItem"
         android:layout_width="match_parent"
@@ -94,7 +120,7 @@
         app:secondaryText="Two line item"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithBetaPill"/>
+        app:layout_constraintTop_toBottomOf="@id/twoLineListItemWitRoundImage"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineSwitchListItem
         android:id="@+id/twoLineSwitchListItemWithImage"
@@ -102,7 +128,7 @@
         android:layout_height="wrap_content"
         app:primaryText="Title"
         app:secondaryText="Two line item with leading image"
-        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:leadingIcon="@drawable/ic_globe_gray_16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItem"/>
@@ -124,7 +150,7 @@
         android:layout_height="wrap_content"
         app:primaryText="Title"
         app:secondaryText="Two line item with leading image and beta pill"
-        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:leadingIcon="@drawable/ic_globe_gray_16dp"
         app:showBetaPill="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -136,7 +162,7 @@
         android:layout_height="wrap_content"
         app:primaryText="Title"
         app:secondaryText="Two line item with disabled switch"
-        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:leadingIcon="@drawable/ic_globe_gray_16dp"
         app:showBetaPill="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

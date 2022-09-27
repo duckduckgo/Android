@@ -14,12 +14,12 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<layer-list1    xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/list_item_image_background"/>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/list_item_image_circular_background"/>
     <item
-        android:bottom="10dp"
-        android:drawable="@drawable/ic_file"
-        android:left="@dimen/keyline_3"
-        android:right="@dimen/keyline_3"
-        android:top="10dp"/>
-</layer-list1>
+            android:bottom="10dp"
+            android:drawable="@drawable/ic_file"
+            android:left="@dimen/keyline_3"
+            android:right="@dimen/keyline_3"
+            android:top="10dp"/>
+</layer-list>
