@@ -1,9 +1,0 @@
-[submodule "app/src/main/cpp/third-party/bloom_cpp"]
-	path = app/src/main/cpp/third-party/bloom_cpp
-	url = https://github.com/duckduckgo/bloom_cpp.git
-[submodule "submodules/privacy-grade"]
-	path = submodules/privacy-grade
-	url = https://github.com/duckduckgo/privacy-grade
-[submodule "vpn-network/vpn-network-impl/src/main/cpp/netguard"]
-	path = vpn-network/vpn-network-impl/src/main/cpp/netguard
-	url = https://github.com/duckduckgo/netguard.git
