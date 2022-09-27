@@ -57,7 +57,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private var shieldAnimation: LottieAnimationView? = null
     private lateinit var cookieView: LottieAnimationView
     private lateinit var cookieScene: ViewGroup
-    private lateinit var dummyCookieView: View
+    private lateinit var cookieViewBackground: View
 
     private var runPartialAnimation: Boolean = false
     private var completePartialAnimation: Boolean = false
@@ -143,7 +143,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         cookieScene: ViewGroup
     ) {
         this.cookieScene = cookieScene
-        this.dummyCookieView = cookieBackground
+        this.cookieViewBackground = cookieBackground
         this.cookieView = cookieAnimationView
 
         if (this.trackersAnimation?.isAnimating != true && !runPartialAnimation) {
@@ -220,7 +220,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                                 AnimatorSet().apply {
                                     TransitionManager.go(firstScene, slideOutCookiesTransition)
                                     play(animateFadeOut(cookieView, COOKIES_ANIMATION_FADE_OUT_DURATION))
-                                        .with(animateFadeOut(dummyCookieView, COOKIES_ANIMATION_FADE_OUT_DURATION))
+                                        .with(animateFadeOut(cookieViewBackground, COOKIES_ANIMATION_FADE_OUT_DURATION))
                                     addListener(
                                         doOnEnd {
                                             cookieView.gone()
@@ -277,7 +277,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
         // Here the animations begins. Fade out omnibar, fade in dummy view and after that start lottie animation
         AnimatorSet().apply {
-            play(animateOmnibarOut(allOmnibarViews)).with(animateFadeIn(dummyCookieView)).with(animateFadeIn(cookieView))
+            play(animateOmnibarOut(allOmnibarViews)).with(animateFadeIn(cookieViewBackground)).with(animateFadeIn(cookieView))
             addListener(onEnd = {
                 cookieScene.show()
                 cookieScene.alpha = 1F
@@ -349,14 +349,14 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     }
 
     private fun stopCookiesAnimation() {
-        if (!::dummyCookieView.isInitialized || !::cookieView.isInitialized) return
+        if (!::cookieViewBackground.isInitialized || !::cookieView.isInitialized) return
 
         hasCookiesAnimationBeenCanceled = true
         if (this::firstScene.isInitialized) {
             TransitionManager.go(firstScene)
         }
         shieldAnimation?.alpha = 1f
-        dummyCookieView.alpha = 0f
+        cookieViewBackground.alpha = 0f
         cookieScene.gone()
         cookieView.gone()
     }
