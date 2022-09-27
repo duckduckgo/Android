@@ -30,10 +30,12 @@ private const val IS_INITIALIZED = "IS_INITIALIZED"
 
 internal class VpnFeaturesRegistryImpl(
     private val vpnServiceWrapper: VpnServiceWrapper,
-    sharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : VpnFeaturesRegistry, SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private val preferences = sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME, multiprocess = true, migrate = false)
+    private val preferences: SharedPreferences
+        get() = sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME, multiprocess = true, migrate = false)
+
     private val registryInitialValue = Pair("", false)
     private val _registry = MutableStateFlow(registryInitialValue)
 

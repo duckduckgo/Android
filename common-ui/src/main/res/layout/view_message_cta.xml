@@ -70,15 +70,17 @@
         app:layout_goneMarginBottom="18dp"
         tools:text="Body text goes here. This component can be used with one or two buttons." />
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
         android:id="@+id/primaryActionButton"
-        style="@style/MessageCta.Button.Primary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_2"
         android:layout_marginTop="@dimen/keyline_2"
         android:layout_marginBottom="@dimen/keyline_4"
-        android:visibility="visible"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/secondaryActionButton"
@@ -86,12 +88,14 @@
         app:layout_goneMarginStart="0dp"
         tools:text="button" />
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
         android:id="@+id/secondaryActionButton"
-        style="@style/MessageCta.Button.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
         app:layout_constraintBottom_toBottomOf="@id/primaryActionButton"
         app:layout_constraintEnd_toStartOf="@id/primaryActionButton"
         app:layout_constraintHorizontal_chainStyle="packed"

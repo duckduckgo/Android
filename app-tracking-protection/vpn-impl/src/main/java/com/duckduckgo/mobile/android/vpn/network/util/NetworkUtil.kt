@@ -20,6 +20,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.VpnService
+import java.net.InetAddress
 
 fun Context.getSystemActiveNetworkDefaultDns(): List<String> {
     val dnsList = mutableListOf<String>()
@@ -36,6 +37,10 @@ fun Context.getSystemActiveNetworkDefaultDns(): List<String> {
     }
 
     return dnsList.toList()
+}
+
+fun InetAddress.isLocal(): Boolean {
+    return isLoopbackAddress
 }
 
 fun Context.getActiveNetwork(): Network? {

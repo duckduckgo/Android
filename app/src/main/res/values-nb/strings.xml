@@ -117,8 +117,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Innstillinger</string>
     <string name="settingsMenuItemTitle">Innstillinger</string>
-    <string name="settingsHeadingGeneral">Generelt</string>
-    <string name="settingsHeadingOther">Annet</string>
     <string name="settingsHeadingPrivacy">Personvern</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Versjon</string>
@@ -136,6 +134,9 @@
     <string name="settingsAppLinksAskEveryTime">Spør hver gang</string>
     <string name="settingsAppLinksAlways">Alltid</string>
     <string name="settingsAppLinksNever">Aldri</string>
+    <string name="settingsHeadingAppearance">Utseende</string>
+    <string name="settingsHeadingCustomize">Tilpass</string>
+    <string name="settingsHeadingAbout">Om</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Lagre</string>
@@ -650,5 +651,8 @@
 
     <string name="autoconsentSetting">Administrer popup-vinduer om informasjonskapsler</string>
     <string name="autoconsentAnimationText">Informasjonskapsler administrert</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Autofyll</string>
 
 </resources>

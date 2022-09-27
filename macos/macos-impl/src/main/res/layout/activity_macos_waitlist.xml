@@ -62,9 +62,8 @@
                 app:layout_constraintBottom_toTopOf="@id/waitlistDescription"
                 app:layout_constraintTop_toBottomOf="@+id/headerImage" />
 
-            <Button
+            <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLowercase
                 android:id="@+id/waitListButton"
-                style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"

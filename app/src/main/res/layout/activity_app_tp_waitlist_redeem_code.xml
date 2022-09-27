@@ -85,9 +85,8 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLowercase
         android:id="@+id/redeemButton"
-        style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"

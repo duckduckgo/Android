@@ -44,6 +44,27 @@ allprojects {
 }
 
 subprojects {
+
+    // Break build when using deprecated plugins
+    String[] allowDeprecatedModuleIn = ["app", "vpn-impl"]
+    project.plugins.withId('kotlin-android-extensions') {
+        if (!allowDeprecatedModuleIn.contains(project.name)) {
+            throw new GradleException("kotlin-android-extensions plugin is deprecated, DO NOT USE!")
+        }
+    }
+
+    String[] allowAndroidTestsIn = ["app"]
+    if (!allowAndroidTestsIn.contains(project.name)) {
+        project.projectDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
+            if (parent.name == "src") {
+                parent.eachFile(groovy.io.FileType.DIRECTORIES) { child ->
+                    if (child.name == "androidTest") {
+                        throw new GradleException("Only the app module can have Android Tests. Perhaps you could use Robolectric?")
+                    }
+                }
+            }
+        }
+    }
     def projectPath = path
     configurations.all {
         /*if (name == "compileClasspath" || name.endsWith("CompileClasspath")) {

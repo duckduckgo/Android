@@ -41,7 +41,7 @@ data class BrokenSiteData(
         fun fromSite(site: Site?): BrokenSiteData {
             val events = site?.trackingEvents
             val blockedTrackers = events?.filter { it.status == TrackerStatus.BLOCKED }
-                ?.map { Uri.parse(it.trackerUrl).host }
+                ?.map { Uri.parse(it.trackerUrl).baseHost.orEmpty() }
                 .orEmpty().distinct().joinToString(",")
             val upgradedHttps = site?.upgradedHttps ?: false
             val surrogates = site?.surrogates?.map { Uri.parse(it.name).baseHost }.orEmpty().distinct().joinToString(",")

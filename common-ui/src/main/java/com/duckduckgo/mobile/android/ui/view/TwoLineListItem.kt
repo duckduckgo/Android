@@ -66,6 +66,8 @@ class TwoLineListItem : LinearLayout {
         binding.subtitle.text = subtitle
     }
 
+    fun imageView() = binding.image
+
     /** Sets the item image resource */
     fun setImageResource(idRes: Int) {
         binding.image.setImageResource(idRes)

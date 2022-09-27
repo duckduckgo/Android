@@ -117,8 +117,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Sätted</string>
     <string name="settingsMenuItemTitle">Sätted</string>
-    <string name="settingsHeadingGeneral">Üldine</string>
-    <string name="settingsHeadingOther">Muu</string>
     <string name="settingsHeadingPrivacy">Privaatsus</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
     <string name="settingsVersion">Versioon</string>
@@ -136,6 +134,9 @@
     <string name="settingsAppLinksAskEveryTime">Küsi iga kord</string>
     <string name="settingsAppLinksAlways">Alati</string>
     <string name="settingsAppLinksNever">Mitte kunagi</string>
+    <string name="settingsHeadingAppearance">Välimus</string>
+    <string name="settingsHeadingCustomize">Kohanda</string>
+    <string name="settingsHeadingAbout">Teave</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
@@ -650,5 +651,8 @@
 
     <string name="autoconsentSetting">Halda küpsiste hüpikaknaid</string>
     <string name="autoconsentAnimationText">Hallatavad küpsised</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automaatne täitmine</string>
 
 </resources>

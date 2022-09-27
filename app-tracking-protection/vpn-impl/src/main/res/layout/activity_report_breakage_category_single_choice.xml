@@ -41,7 +41,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/FeedbackInputBoxStyle"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginStart="25dp"
@@ -49,8 +49,6 @@
                 android:layout_marginEnd="25dp"
                 android:hint="@string/atp_ReportBreakageCategoriesHint"
                 android:textColorHint="?attr/normalTextColor"
-                app:endIconDrawable="@drawable/ic_report_breakage_down_arrow_24dp"
-                app:endIconMode="custom"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/include_toolbar">
@@ -66,7 +64,7 @@
                     android:inputType="none"
                     android:labelFor="@id/categoriesSelection"
                     android:maxLines="1"
-                    android:paddingEnd="32dp"
+                    android:drawableEnd="@drawable/ic_report_breakage_down_arrow_24dp"
                     android:textColor="?attr/normalTextColor"
                     android:textIsSelectable="false"
                     tools:ignore="RtlSymmetry" />
@@ -141,9 +139,8 @@
         android:layout_height="1dp"
         android:background="?splitterColor"/>
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
         android:id="@+id/ctaNextFormSubmit"
-        style="@style/Widget.DuckDuckGo.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"

@@ -40,8 +40,9 @@ class RealSecureStorageRepositoryTest {
         domain = "test.com",
         username = "test",
         password = "pass123",
-        iv = "iv",
+        passwordIv = "iv",
         notes = "my notes",
+        notesIv = "notesIv",
         domainTitle = "test",
         lastUpdatedInMillis = 0L
     )

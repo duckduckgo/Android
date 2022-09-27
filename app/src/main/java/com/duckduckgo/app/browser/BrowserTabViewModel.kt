@@ -37,6 +37,7 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences.Companion.FONT_SIZE_DEFAULT
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -280,9 +281,9 @@ class BrowserTabViewModel @Inject constructor(
     )
 
     data class AccessibilityViewState(
-        val fontSize: Float,
-        val forceZoom: Boolean,
-        val refreshWebView: Boolean
+        val fontSize: Float = FONT_SIZE_DEFAULT,
+        val forceZoom: Boolean = false,
+        val refreshWebView: Boolean = false
     )
 
     data class FindInPageViewState(
@@ -2122,24 +2123,40 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun initializeViewStates() {
+        initializeDefaultViewStates()
+        viewModelScope.launch {
+            initializeViewStatesFromPersistedData()
+        }
+    }
+
+    private fun initializeDefaultViewStates() {
         globalLayoutState.value = Browser()
-        browserViewState.value = BrowserViewState().copy(
-            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
-            showAutofill = autofillStore.autofillAvailable
-        )
+        browserViewState.value = BrowserViewState()
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
-        omnibarViewState.value = OmnibarViewState(
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch()
-        )
+        omnibarViewState.value = OmnibarViewState()
         findInPageViewState.value = FindInPageViewState()
         ctaViewState.value = CtaViewState()
         privacyShieldViewState.value = PrivacyShieldViewState()
-        accessibilityViewState.value = AccessibilityViewState(
-            fontSize = accessibilitySettingsDataStore.fontSize,
-            forceZoom = accessibilitySettingsDataStore.forceZoom,
-            refreshWebView = false
-        )
+        accessibilityViewState.value = AccessibilityViewState()
+    }
+
+    private suspend fun initializeViewStatesFromPersistedData() {
+        withContext(dispatchers.io()) {
+            val addToHomeSupported = addToHomeCapabilityDetector.isAddToHomeSupported()
+            val showAutofill = autofillStore.autofillAvailable
+            val showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch()
+
+            withContext(dispatchers.main()) {
+                browserViewState.value = currentBrowserViewState().copy(
+                    addToHomeVisible = addToHomeSupported,
+                    showAutofill = showAutofill
+                )
+                omnibarViewState.value = currentOmnibarViewState().copy(
+                    showVoiceSearch = showVoiceSearch
+                )
+            }
+        }
     }
 
     fun onShareSelected() {

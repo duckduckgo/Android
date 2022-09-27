@@ -117,8 +117,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Postavke</string>
     <string name="settingsMenuItemTitle">Postavke</string>
-    <string name="settingsHeadingGeneral">Općenito</string>
-    <string name="settingsHeadingOther">Ostalo</string>
     <string name="settingsHeadingPrivacy">Zaštita privatnosti</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Inačica</string>
@@ -136,6 +134,9 @@
     <string name="settingsAppLinksAskEveryTime">Pitaj svaki puta</string>
     <string name="settingsAppLinksAlways">Uvijek</string>
     <string name="settingsAppLinksNever">Nikada</string>
+    <string name="settingsHeadingAppearance">Izgled</string>
+    <string name="settingsHeadingCustomize">Prilagodba</string>
+    <string name="settingsHeadingAbout">O</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spremi</string>
@@ -658,5 +659,8 @@
 
     <string name="autoconsentSetting">Upravljanje skočnim prozorima kolačića</string>
     <string name="autoconsentAnimationText">Upravlja se kolačićima</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automatsko popunjavanje</string>
 
 </resources>

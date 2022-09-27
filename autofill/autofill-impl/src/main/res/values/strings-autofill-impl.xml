@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <string name="managementScreenTitle">Autofill Logins</string>
+
+    <string name="managementLockedModeText">Unlock Autofill</string>
+
+    <string name="managementDisabledModeCta"><b>Set up in Settings</b></string>
+    <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics is required to protect your Autofill Login details.</string>
+    <string name="managementDisabledModeTitle">Secure your device to use Autofill</string>
+
+    <string name="saveLoginDialogTitle">Save Login?</string>
+    <string name="saveLoginMissingUsernameDialogTitle">Save Password?</string>
+    <string name="saveLoginDialogButtonSave">Save Login</string>
+    <string name="saveLoginMissingUsernameDialogButtonSave">Save Password</string>
+    <string name="saveLoginDialogNotNow">Not Now</string>
+    <string name="saveLoginDialogOnboardingExplanationSubtitle">Logins are stored securely on this device only, and can be managed from the Autofill menu in Settings.</string>
+    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Do you want DuckDuckGo to save your Login?</string>
+    <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
+
+    <string name="useSavedLoginDialogTitle">Use Saved Login?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Login for %s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Login for site</string>
+
+    <string name="updateLoginDialogTitle">Update Password?</string>
+    <string name="updateLoginDialogButtonUpdatePassword">Update Password</string>
+    <string name="updateLoginDialogButtonNotNow">Not Now</string>
+
+    <string name="autofillDialogCloseButtonContentDescription">Close Autofill Dialog</string>
+
+    <string name="credentialManagementEditLoginTitleHint">Login Title</string>
+    <string name="credentialManagementEditUsernameHint">Username</string>
+    <string name="credentialManagementEditPasswordHint">Password</string>
+    <string name="credentialManagementEditTitle">Edit Login</string>
+    <string name="credentialManagementEditWebsiteHint">Website URL</string>
+    <string name="credentialManagementEditNotesHint">Notes</string>
+    <string name="credentialManagementEditButtonDelete">Delete</string>
+    <string name="credentialManagementEditButtonSaveChanges">Save Changes</string>
+    <string name="credentialManagementEditButtonCopyUsername">Copy Username</string>
+    <string name="credentialManagementEditButtonCopyPassword">Copy Password</string>
+    <string name="credentialManagementEditLastUpdated">Login last updated %s</string>
+
+    <string name="credentialManagementAutofillToggleLabel">Save and Autofill Logins</string>
+    <string name="credentialManagementViewMenuEdit">Edit</string>
+    <string name="credentialManagementViewMenuDelete">Delete</string>
+
+</resources>
