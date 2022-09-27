@@ -127,6 +127,8 @@
         <item name="android:textStyle">normal</item>
         <item name="android:selectable">false</item>
         <item name="android:gravity">start</item>
+        <item name="android:layoutDirection">ltr</item>
+
     </style>
 
     <style name="SectionDivider">
