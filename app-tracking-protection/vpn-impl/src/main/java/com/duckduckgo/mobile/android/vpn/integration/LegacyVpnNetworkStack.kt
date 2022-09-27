@@ -18,22 +18,20 @@ package com.duckduckgo.mobile.android.vpn.integration
 
 import android.os.ParcelFileDescriptor
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesBinding(
     scope = VpnScope::class,
     boundType = VpnNetworkStack::class
 )
@@ -45,26 +43,12 @@ class LegacyVpnNetworkStack @Inject constructor(
     private val tunPacketWriterFactory: TunPacketWriter.Factory,
     private val queues: VpnQueues,
     private val coroutineScope: CoroutineScope,
-    private val ngVpnIntegration: NgVpnNetworkStack,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : VpnNetworkStack {
     private lateinit var udpPacketProcessor: UdpPacketProcessor
     private lateinit var tcpPacketProcessor: TcpPacketProcessor
     private var executorService: ExecutorService? = null
 
     override val name: String = "legacy"
-
-    override fun isEnabled(): Boolean {
-        return !ngVpnIntegration.isEnabled()
-    }
-
-    override fun shouldSetActiveNetworkDnsServers(): Boolean {
-        return shouldSetUnderlyingNetworks()
-    }
-
-    override fun shouldSetUnderlyingNetworks(): Boolean {
-        return appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)
-    }
 
     override fun onCreateVpn(): Result<Unit> {
         udpPacketProcessor = udpPacketProcessorFactory.build()
