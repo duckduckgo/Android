@@ -15,82 +15,89 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="?attr/selectableItemBackground"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="@dimen/twoLineItemHeight"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/item_container">
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="?attr/selectableItemBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/twoLineItemHeight"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/item_container">
 
     <FrameLayout
-        android:id="@+id/leadingIconBackground"
-        android:layout_width="@dimen/listItemImageSize"
-        android:layout_height="@dimen/listItemImageSize"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginTop="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+            android:id="@+id/leadingIconBackground"
+            android:layout_width="@dimen/listItemImageContainerSize"
+            android:layout_height="@dimen/listItemImageContainerSize"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/leadingIcon"
-            android:layout_width="@dimen/listItemImageSize"
-            android:layout_height="@dimen/listItemImageSize"
-            android:layout_gravity="center"
-            android:importantForAccessibility="no"/>
+                android:id="@+id/leadingIcon"
+                android:layout_width="@dimen/listItemImageSize"
+                android:layout_height="@dimen/listItemImageSize"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"/>
+
     </FrameLayout>
 
     <TextView
-        android:id="@+id/primaryText"
-        style="@style/TextAppearance.DuckDuckGo.Body1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="@dimen/oneLineItemPadding"
-        android:layout_marginEnd="8dp"
-        android:lines="1"
-        android:textColor="?attr/listItemTitleColor"
-        app:layout_constraintBottom_toTopOf="@+id/secondaryText" app:layout_constraintEnd_toStartOf="@+id/pill"
-        app:layout_constraintStart_toEndOf="@id/leadingIconBackground" app:layout_constraintTop_toTopOf="parent"
-        tools:text="Title"/>
+            android:id="@+id/primaryText"
+            style="@style/TextAppearance.DuckDuckGo.Body1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:textColor="?attr/listItemTitleColor"
+            app:layout_constraintBottom_toTopOf="@+id/secondaryText"
+            tools:text="Title" app:layout_constraintStart_toEndOf="@+id/leadingIconBackground"
+            android:layout_marginStart="16dp" app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="14dp"/>
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/pill"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="2dp"
-        app:layout_constraintBottom_toBottomOf="@+id/primaryText"
-        app:layout_constraintEnd_toStartOf="@+id/trailingIcon" app:srcCompat="@drawable/ic_beta_pill"/>
+            android:id="@+id/pill"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            app:layout_constraintBottom_toBottomOf="@+id/primaryText"
+            app:srcCompat="@drawable/ic_beta_pill"
+            app:layout_constraintEnd_toStartOf="@+id/trailingIcon"
+            app:layout_constraintStart_toEndOf="@+id/primaryText" android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"/>
 
     <TextView
-        android:id="@+id/secondaryText"
-        style="@style/TextAppearance.DuckDuckGo.Body2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="@dimen/oneLineItemPadding"
-        android:textColor="?attr/listItemSubtitleColor"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/trailingIcon"
-        app:layout_constraintStart_toStartOf="@id/primaryText"
-        app:layout_constraintTop_toBottomOf="@id/primaryText"
-        tools:text="Subtitle"/>
+            android:id="@+id/secondaryText"
+            style="@style/TextAppearance.DuckDuckGo.Body2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="@dimen/oneLineItemPadding"
+            android:textColor="?attr/listItemSubtitleColor"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/trailingIcon"
+            app:layout_constraintStart_toStartOf="@id/primaryText"
+            app:layout_constraintTop_toBottomOf="@id/primaryText"
+            tools:text="Subtitadasd asda sdas asd asdasdale"/>
+
+    <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toStartOf="@+id/trailingIcon"/>
 
     <ImageView
-        android:id="@+id/trailingIcon"
-        android:layout_width="@dimen/listItemImageContainerSize"
-        android:layout_height="@dimen/listItemImageContainerSize"
-        android:layout_marginEnd="8dp"
-        android:background="?selectableItemBackground"
-        android:scaleType="center"
-        android:src="@drawable/ic_overflow"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription"/>
+            android:id="@+id/trailingIcon"
+            android:layout_width="@dimen/listItemImageContainerSize"
+            android:layout_height="@dimen/listItemImageContainerSize"
+            android:layout_marginEnd="8dp"
+            android:background="?selectableItemBackground"
+            android:scaleType="center"
+            android:src="@drawable/ic_overflow"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,13 +32,13 @@
     <attr name="showBetaPill" format="boolean"/>
     <attr name="primaryTextColor" format="color"/>
     <attr name="secondaryTextColor" format="color"/>
-    <attr name="imageBackground">
+    <attr name="leadingIconBackground">
         <!-- No background. -->
         <enum name="none" value="0" />
         <!-- Oval shape. -->
         <enum name="circular" value="1" />
         <!-- Rectangular shape, with optional rounded corners. -->
-        <enum name="round" value="2" />
+        <enum name="rounded" value="2" />
     </attr>
 
     <!--One Line Item view-->
@@ -46,6 +46,7 @@
         <attr name="primaryText"/>
         <attr name="primaryTextColor"/>
         <attr name="leadingIcon"/>
+        <attr name="leadingIconBackground"/>
         <attr name="trailingIcon"/>
     </declare-styleable>
 
@@ -53,6 +54,7 @@
         <attr name="primaryText"/>
         <attr name="primaryTextColor"/>
         <attr name="leadingIcon"/>
+        <attr name="leadingIconBackground"/>
     </declare-styleable>
 
     <!--Two Line Item view-->
@@ -62,9 +64,9 @@
         <attr name="secondaryText"/>
         <attr name="secondaryTextColor"/>
         <attr name="leadingIcon"/>
+        <attr name="leadingIconBackground"/>
         <attr name="trailingIcon"/>
         <attr name="showBetaPill"/>
-        <attr name="imageBackground"/>
     </declare-styleable>
 
     <declare-styleable name="TwoLineSwitchListItem">
@@ -73,6 +75,7 @@
         <attr name="secondaryText"/>
         <attr name="secondaryTextColor"/>
         <attr name="leadingIcon"/>
+        <attr name="leadingIconBackground"/>
         <attr name="showBetaPill"/>
     </declare-styleable>
 

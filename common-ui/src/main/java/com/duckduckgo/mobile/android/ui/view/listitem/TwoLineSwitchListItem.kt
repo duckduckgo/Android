@@ -70,9 +70,9 @@ class TwoLineSwitchListItem @JvmOverloads constructor(
             }
 
             if (hasValue(R.styleable.TwoLineSwitchListItem_leadingIcon)) {
-                binding.leadingIcon.setBackground(getDrawable(R.styleable.TwoLineSwitchListItem_leadingIcon))
+                binding.leadingIcon.setImageDrawable(getDrawable(R.styleable.TwoLineSwitchListItem_leadingIcon))
             } else {
-                binding.leadingIcon.gone()
+                binding.leadingIconBackground.gone()
             }
 
             val showBetaPill = getBoolean(R.styleable.TwoLineSwitchListItem_showBetaPill, false)
@@ -80,6 +80,17 @@ class TwoLineSwitchListItem @JvmOverloads constructor(
                 binding.pill.show()
             } else {
                 binding.pill.gone()
+            }
+
+            if (hasValue(R.styleable.TwoLineSwitchListItem_leadingIconBackground)) {
+                val value = getInt(R.styleable.TwoLineSwitchListItem_leadingIconBackground, 0)
+                if (value == 1) {
+                    binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_circular_background)
+                }
+                if (value == 2) {
+                    binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_round_background)
+                }
+                binding.leadingIconBackground.show()
             }
 
             recycle()

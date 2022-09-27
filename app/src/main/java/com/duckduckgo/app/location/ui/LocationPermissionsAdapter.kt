@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import android.widget.ImageView
 import androidx.core.view.isGone
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -37,7 +38,6 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.SectionDivider
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import com.duckduckgo.mobile.android.R as CommonR
@@ -262,16 +262,19 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
             )
 
             singleListItem.setPrimaryText(website)
-            loadFavicon(entity.domain)
+            loadFavicon(entity.domain, singleListItem.leadingIcon())
 
             singleListItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, entity)
             }
         }
 
-        private fun loadFavicon(url: String) {
+        private fun loadFavicon(
+            url: String,
+            leadingIcon: ImageView
+        ) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(CommonR.id.image))
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = leadingIcon)
             }
         }
 

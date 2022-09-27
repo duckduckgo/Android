@@ -20,6 +20,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -36,6 +37,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Co
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import com.duckduckgo.mobile.android.R as CommonR
@@ -202,15 +204,18 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
             )
 
             listItem.setPrimaryText(entity.website())
-            loadFavicon(entity.domain)
+            loadFavicon(entity.domain, listItem.leadingIcon())
             listItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, entity)
             }
         }
 
-        private fun loadFavicon(url: String) {
+        private fun loadFavicon(
+            url: String,
+            image: ImageView
+        ) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(CommonR.id.image))
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = image)
             }
         }
 

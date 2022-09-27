@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.ui.view.listitem
 
-import android.R.attr
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
@@ -56,15 +55,26 @@ class OneLineListItem @JvmOverloads constructor(
             }
 
             if (hasValue(R.styleable.OneLineListItem_leadingIcon)) {
-                binding.leadingIcon.setBackground(getDrawable(R.styleable.OneLineListItem_leadingIcon))
+                binding.leadingIcon.setImageDrawable(getDrawable(R.styleable.OneLineListItem_leadingIcon))
             } else {
-                binding.leadingIcon.gone()
+                binding.leadingIconBackground.gone()
             }
 
             if (hasValue(R.styleable.OneLineListItem_trailingIcon)) {
                 binding.trailingIcon.setImageDrawable(getDrawable(R.styleable.OneLineListItem_trailingIcon))
             } else {
                 binding.trailingIcon.gone()
+            }
+
+            if (hasValue(R.styleable.OneLineListItem_leadingIconBackground)) {
+                val value = getInt(R.styleable.OneLineListItem_leadingIconBackground, 0)
+                if (value == 1) {
+                    binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_circular_background)
+                }
+                if (value == 2) {
+                    binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_round_background)
+                }
+                binding.leadingIconBackground.show()
             }
 
             recycle()
@@ -82,6 +92,8 @@ class OneLineListItem @JvmOverloads constructor(
         binding.leadingIcon.setImageDrawable(drawable)
         binding.leadingIcon.show()
     }
+
+    fun leadingIcon() = binding.leadingIcon
 
     /** Sets the trailing icon image resource */
     fun setTrailingIcon(idRes: Int) {
