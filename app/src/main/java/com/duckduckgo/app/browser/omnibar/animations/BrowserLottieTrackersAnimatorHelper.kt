@@ -32,6 +32,7 @@ import android.view.ViewGroup
 import androidx.core.animation.addListener
 import androidx.core.animation.doOnEnd
 import com.airbnb.lottie.LottieAnimationView
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.ImageLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.LetterLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.StackedLogo
@@ -40,9 +41,6 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.privacy.dashboard.api.animations.BrowserTrackersAnimatorHelper
-import com.duckduckgo.privacy.dashboard.api.animations.TrackersAnimatorListener
-import com.duckduckgo.privacy.dashboard.impl.R
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 

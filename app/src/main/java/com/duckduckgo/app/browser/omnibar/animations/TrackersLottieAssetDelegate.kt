@@ -28,9 +28,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.airbnb.lottie.ImageAssetDelegate
 import com.airbnb.lottie.LottieImageAsset
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.toPx
-import com.duckduckgo.privacy.dashboard.impl.R
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.ImageLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.LetterLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.StackedLogo
