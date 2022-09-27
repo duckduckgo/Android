@@ -77,7 +77,7 @@ class FolderViewHolder(
             binding.iconContainer.setBackgroundResource(R.drawable.selected_icon_background)
         } else {
             binding.icon.setImageResource(R.drawable.ic_folder)
-            binding.iconContainer.setBackgroundResource(CommonR.drawable.list_item_image_background)
+            binding.iconContainer.setBackgroundResource(CommonR.drawable.list_item_image_circular_background)
         }
 
         itemView.setOnClickListener {
