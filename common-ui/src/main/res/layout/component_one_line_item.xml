@@ -25,7 +25,7 @@
         android:id="@+id/label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Single Line Item"
+        android:text="Single Line Items"
         android:paddingStart="@dimen/keyline_4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

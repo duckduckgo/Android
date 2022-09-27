@@ -226,7 +226,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
                 showOverFlowMenu(anchor, favorite)
             }
 
-            listItem.setClickListener {
+            listItem.setOnClickListener {
                 viewModel.onSelected(favorite)
             }
         }

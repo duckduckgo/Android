@@ -18,38 +18,128 @@
                                                    android:layout_width="match_parent"
                                                    android:layout_height="wrap_content"
                                                    android:clipToPadding="false"
-                                                   android:paddingStart="@dimen/keyline_4"
                                                    android:paddingTop="@dimen/keyline_5"
-                                                   android:paddingEnd="@dimen/keyline_4"
                                                    android:paddingBottom="@dimen/keyline_5">
 
     <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
         android:id="@+id/label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Two Line Item"
+        android:text="Two Line Items"
+        android:paddingStart="@dimen/keyline_4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/twoLineListItemWithImage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
-        app:primaryText="Title"
-        app:secondaryText="Two line item with image"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/twoLineListItemWithoutImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithImage"
+        app:layout_constraintTop_toBottomOf="@id/label"
         app:primaryText="Title"
-        app:secondaryText="Two line item without image"/>
+        app:secondaryText="Two line item"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        android:id="@+id/twoLineListItemWithImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:primaryText="Title"
+        app:secondaryText="Two line item with leading image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithoutImage"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        android:id="@+id/twoLineListItemWithImageAndTrailingIcon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:primaryText="Title"
+        app:secondaryText="Two line item with leading image and trailing menu"
+        app:trailingIcon="@drawable/ic_overflow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithImage"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        android:id="@+id/twoLineListItemWithTrailingIcon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Title"
+        app:secondaryText="Two line item with trailing menu"
+        app:trailingIcon="@drawable/ic_overflow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithImageAndTrailingIcon"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        android:id="@+id/twoLineListItemWithBetaPill"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Title"
+        app:secondaryText="Two line item with beta pill"
+        app:showBetaPill="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithTrailingIcon"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineSwitchListItem
+        android:id="@+id/twoLineSwitchListItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Title"
+        app:secondaryText="Two line item"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithBetaPill"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineSwitchListItem
+        android:id="@+id/twoLineSwitchListItemWithImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Title"
+        app:secondaryText="Two line item with leading image"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItem"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineSwitchListItem
+        android:id="@+id/twoLineSwitchListItemWithPill"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Title"
+        app:secondaryText="Two line item with beta pill"
+        app:showBetaPill="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithImage"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineSwitchListItem
+        android:id="@+id/twoLineSwitchListItemWithPillAndImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Title"
+        app:secondaryText="Two line item with leading image and beta pill"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:showBetaPill="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithPill"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineSwitchListItem
+        android:id="@+id/twoLineSwitchListItemWithDisabledSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Title"
+        app:secondaryText="Two line item with disabled switch"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:showBetaPill="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithPillAndImage"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
