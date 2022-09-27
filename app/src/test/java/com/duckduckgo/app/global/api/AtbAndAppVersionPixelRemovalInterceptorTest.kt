@@ -17,25 +17,29 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class PixelEmailRemovalInterceptorTest {
-    private lateinit var pixelEmailRemovalInterceptor: PixelEmailRemovalInterceptor
+class AtbAndAppVersionPixelRemovalInterceptorTest {
+    private lateinit var pixelRemovalInterceptor: AtbAndAppVersionPixelRemovalInterceptor
 
     @Before
     fun setup() {
-        pixelEmailRemovalInterceptor = PixelEmailRemovalInterceptor()
+        pixelRemovalInterceptor = AtbAndAppVersionPixelRemovalInterceptor()
     }
 
     @Test
     fun whenSendPixelTheRedactAtvInfoFromDefinedPixels() {
-        AppPixelName.values().map { it.pixelName }.forEach { pixelName ->
-            val pixelUrl = String.format(PIXEL_TEMPLATE, pixelName)
-            val removalExpected = PixelEmailRemovalInterceptor.pixels.contains(pixelName)
+        val appPixelNames = AppPixelName.values().map { it.pixelName }
+        val deviceShieldPixelNames = DeviceShieldPixelNames.values().map { it.pixelName }
 
-            val interceptedUrl = pixelEmailRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
+        (appPixelNames + deviceShieldPixelNames).forEach { pixelName ->
+            val pixelUrl = String.format(PIXEL_TEMPLATE, pixelName)
+            val removalExpected = AtbAndAppVersionPixelRemovalInterceptor.pixels.firstOrNull { pixelName.startsWith(it) } != null
+
+            val interceptedUrl = pixelRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
             assertEquals(removalExpected, interceptedUrl.queryParameter("atb") == null)
             assertEquals(removalExpected, interceptedUrl.queryParameter("appVersion") == null)
         }

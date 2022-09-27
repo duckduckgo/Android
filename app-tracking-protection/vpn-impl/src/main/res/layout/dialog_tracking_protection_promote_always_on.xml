@@ -45,28 +45,26 @@
             android:layout_marginTop="@dimen/keyline_3"
             android:text="@string/atp_PromoteAlwaysOnDialogMessage"/>
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
             android:id="@+id/promoteAlwaysOnDialogSettings"
-            style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_gravity="end"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:textColor="@color/cornflowerBlue"
             android:layout_marginTop="@dimen/keyline_5"
             android:text="@string/atp_PromoteAlwaysOnDialogSettings"/>
-    <Button
+
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
             android:id="@+id/promoteAlwaysOnDialogLater"
-            style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_gravity="end"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:layout_marginTop="@dimen/keyline_2"
             android:text="@string/atp_PromoteAlwaysOnDialogLater"/>
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
             android:id="@+id/promoteAlwaysOnDialogForget"
             android:layout_gravity="end"
-            style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:textColor="@color/cornflowerBlue"

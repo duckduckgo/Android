@@ -117,8 +117,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Asetukset</string>
     <string name="settingsMenuItemTitle">Asetukset</string>
-    <string name="settingsHeadingGeneral">Yleistä</string>
-    <string name="settingsHeadingOther">Muu</string>
     <string name="settingsHeadingPrivacy">Tietosuoja</string>
     <string name="settingsAboutDuckduckgo">Tietoa DuckDuckGosta</string>
     <string name="settingsVersion">Versio</string>
@@ -136,6 +134,9 @@
     <string name="settingsAppLinksAskEveryTime">Kysy joka kerta</string>
     <string name="settingsAppLinksAlways">Aina</string>
     <string name="settingsAppLinksNever">Ei koskaan</string>
+    <string name="settingsHeadingAppearance">Ulkoasu</string>
+    <string name="settingsHeadingCustomize">Mukauta</string>
+    <string name="settingsHeadingAbout">Tietoa meistä</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
@@ -650,5 +651,8 @@
 
     <string name="autoconsentSetting">Evästeiden hallinnan ponnahdusikkunat</string>
     <string name="autoconsentAnimationText">Hallitut evästeet</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automaattinen täyttö</string>
 
 </resources>

@@ -117,8 +117,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Nastavení</string>
     <string name="settingsMenuItemTitle">Nastavení</string>
-    <string name="settingsHeadingGeneral">Obecné</string>
-    <string name="settingsHeadingOther">Jiné</string>
     <string name="settingsHeadingPrivacy">Soukromí</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
@@ -136,6 +134,10 @@
     <string name="settingsAppLinksAskEveryTime">Vždycky se ptát</string>
     <string name="settingsAppLinksAlways">Vždy</string>
     <string name="settingsAppLinksNever">Nikdy</string>
+    <string name="settingsHeadingAppearance">Vzhled</string>
+    <string name="settingsHeadingCustomize">Přizpůsobit</string>
+    <string name="settingsHeadingAbout">Informace</string>
+
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložit</string>
@@ -658,5 +660,8 @@
 
     <string name="autoconsentSetting">Správa vyskakovacích oken ohledně cookies</string>
     <string name="autoconsentAnimationText">O cookies je postaráno!</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automaticky vyplnit</string>
 
 </resources>

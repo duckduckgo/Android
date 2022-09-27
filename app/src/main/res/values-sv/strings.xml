@@ -117,8 +117,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Inställningar</string>
     <string name="settingsMenuItemTitle">Inställningar</string>
-    <string name="settingsHeadingGeneral">Allmänt</string>
-    <string name="settingsHeadingOther">Annat</string>
     <string name="settingsHeadingPrivacy">Sekretess</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
@@ -136,6 +134,9 @@
     <string name="settingsAppLinksAskEveryTime">Fråga varje gång</string>
     <string name="settingsAppLinksAlways">Alltid</string>
     <string name="settingsAppLinksNever">Aldrig</string>
+    <string name="settingsHeadingAppearance">Utseende</string>
+    <string name="settingsHeadingCustomize">Anpassa</string>
+    <string name="settingsHeadingAbout">Om</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spara</string>
@@ -650,5 +651,8 @@
 
     <string name="autoconsentSetting">Hantera popup-fönster för cookies</string>
     <string name="autoconsentAnimationText">Cookies hanteras</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Automatisk ifyllning</string>
 
 </resources>

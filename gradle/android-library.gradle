@@ -63,3 +63,15 @@ tasks.register('android_checks') {
 tasks.register('jvm_checks') {
     dependsOn 'spotlessCheck', 'lint', 'testDebugUnitTest'
 }
+
+tasks.register('jvm_tests') {
+    dependsOn 'testDebugUnitTest'
+}
+
+tasks.register('spotless') {
+    dependsOn 'spotlessCheck'
+}
+
+tasks.register('lint_check') {
+    dependsOn 'lint'
+}

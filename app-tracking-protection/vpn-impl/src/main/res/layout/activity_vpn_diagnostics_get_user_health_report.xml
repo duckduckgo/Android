@@ -123,11 +123,10 @@
             android:text="Information in this screen will be combined with anonymous diagnostics data and sent to DuckDuckGo to help improve App Tracking Protection."
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <Button
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
             android:id="@+id/doneButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Widget.DuckDuckGo.Button.Primary"
             app:layout_constraintTop_toBottomOf="@id/submissionInstructions"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

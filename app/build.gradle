@@ -153,6 +153,9 @@ fladle {
 }
 
 dependencies {
+    implementation project(path: ':vpn-network-api')
+    implementation project(path: ':vpn-network-impl')
+
     implementation project(':library-loader-api')
 
     implementation project(':autofill-api')
@@ -364,6 +367,18 @@ tasks.register('android_checks') {
 
 tasks.register('jvm_checks') {
     dependsOn 'spotlessCheck', 'lint', 'testPlayDebugUnitTest'
+}
+
+tasks.register('spotless') {
+    dependsOn 'spotlessCheck'
+}
+
+tasks.register('lint_check') {
+    dependsOn 'lint'
+}
+
+tasks.register('jvm_tests') {
+    dependsOn 'testPlayDebugUnitTest'
 }
 
 tasks.register('androidTestsBuild') {

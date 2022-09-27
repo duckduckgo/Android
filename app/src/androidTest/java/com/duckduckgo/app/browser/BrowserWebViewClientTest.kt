@@ -90,7 +90,7 @@ class BrowserWebViewClientTest {
     private val trustedCertificateStore: TrustedCertificateStore = mock()
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
-    private val browserAutofill: BrowserAutofill = mock()
+    private val browserAutofillConfigurator: BrowserAutofill.Configurator = mock()
     private val webResourceRequest: WebResourceRequest = mock()
     private val ampLinks: AmpLinks = mock()
     private val printInjector: PrintInjector = mock()
@@ -117,7 +117,7 @@ class BrowserWebViewClientTest {
             thirdPartyCookieManager,
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
-            browserAutofill,
+            browserAutofillConfigurator,
             accessibilitySettings,
             ampLinks,
             printInjector,
@@ -306,7 +306,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnPageStartedCalledThenInjectEmailAutofillJsCalled() {
         testee.onPageStarted(webView, null, null)
-        verify(browserAutofill).configureAutofillForCurrentPage(webView, null)
+        verify(browserAutofillConfigurator).configureAutofillForCurrentPage(webView, null)
     }
 
     @Test

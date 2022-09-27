@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.ui.credential.saving
 
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +27,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.autofill.CredentialSavePickerDialog
@@ -33,13 +35,16 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSaveNewCredentialsBinding
 import com.duckduckgo.autofill.ui.credential.dialog.animateClosed
+import com.duckduckgo.autofill.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
@@ -52,6 +57,13 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var autofillDeclineCounter: AutofillDeclineCounter
+
+    @Inject
+    @AppCoroutineScope
+    lateinit var appCoroutineScope: CoroutineScope
 
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[AutofillSavingCredentialsViewModel::class.java]
@@ -82,14 +94,30 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
                 it.putString(CredentialSavePickerDialog.KEY_URL, getOriginalUrl())
                 it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, getCredentialsToSave())
             }
-            parentFragment?.setFragmentResult(CredentialSavePickerDialog.resultKey(getTabId()), result)
-            (dialog as BottomSheetDialog).animateClosed()
+            parentFragment?.setFragmentResult(CredentialSavePickerDialog.resultKeyUserChoseToSaveCredentials(getTabId()), result)
+            animateClosed()
+        }
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        Timber.v("onCancel: AutofillSavingCredentialsDialogFragment. User declined to save credentials")
+
+        appCoroutineScope.launch {
+            autofillDeclineCounter.userDeclinedToSaveCredentials(getOriginalUrl().extractDomain())
+
+            if (autofillDeclineCounter.shouldPromptToDisableAutofill()) {
+                parentFragment?.setFragmentResult(CredentialSavePickerDialog.resultKeyUserDeclinedToSaveCredentials(getTabId()), Bundle())
+            }
         }
     }
 
     private fun configureCloseButtons(binding: ContentAutofillSaveNewCredentialsBinding) {
-        binding.closeButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
-        binding.cancelButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
+        binding.closeButton.setOnClickListener { animateClosed() }
+        binding.cancelButton.setOnClickListener { animateClosed() }
+    }
+
+    private fun animateClosed() {
+        (dialog as BottomSheetDialog).animateClosed()
     }
 
     private fun configureTitles(binding: ContentAutofillSaveNewCredentialsBinding, credentials: LoginCredentials) {

@@ -30,6 +30,7 @@ import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewBookmarkFolderEntryBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteSectionTitleBinding
+import timber.log.Timber
 
 class BookmarkFoldersAdapter(
     private val layoutInflater: LayoutInflater,
@@ -53,6 +54,7 @@ class BookmarkFoldersAdapter(
         }
 
     private fun generateNewList(value: List<BookmarkFoldersItemTypes>): List<BookmarkFoldersItemTypes> {
+        Timber.d("Bookmarks: generateNewList")
         return if (parentId == 0L) {
             listOf(Header) + value
         } else {
@@ -78,15 +80,13 @@ class BookmarkFoldersAdapter(
         }
     }
 
-    override fun getItemCount(): Int = bookmarkFolderItems.size
-
     override fun onBindViewHolder(
         holder: BookmarkFolderScreenViewHolders,
         position: Int
     ) {
         when (holder) {
             is BookmarkFolderScreenViewHolders.BookmarkFoldersViewHolder -> {
-                holder.update((bookmarkFolderItems[position] as BookmarkFolderItem).bookmarkFolder)
+                holder.update((currentList[position] as BookmarkFolderItem).bookmarkFolder)
             }
             is BookmarkFolderScreenViewHolders.SectionTitle -> {
                 holder.bind()
@@ -95,7 +95,8 @@ class BookmarkFoldersAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (bookmarkFolderItems[position]) {
+        Timber.d("Bookmarks: getItemViewType $bookmarkFolderItems")
+        return when (currentList[position]) {
             is Header -> BOOKMARK_FOLDERS_SECTION_TITLE_TYPE
             else -> BOOKMARK_FOLDER_TYPE
         }

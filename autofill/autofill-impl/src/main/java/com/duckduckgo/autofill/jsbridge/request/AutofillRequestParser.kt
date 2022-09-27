@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.jsbridge.request
 
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +28,7 @@ interface AutofillRequestParser {
     suspend fun parseStoreFormDataRequest(request: String): AutofillStoreFormDataRequest
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 class AutofillJsonRequestParser @Inject constructor(val moshi: Moshi) : AutofillRequestParser {
 
     private val autofillDataRequestParser by lazy { moshi.adapter(AutofillDataRequest::class.java) }

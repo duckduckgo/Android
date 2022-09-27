@@ -67,10 +67,10 @@ class BrokenSiteSubmitter(
                 WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
                 SITE_TYPE_KEY to brokenSite.siteType,
                 GPC to isGpcEnabled,
-                URL_PARAMETERS_REMOVED to brokenSite.urlParametersRemoved.toString(),
-                CONSENT_MANAGED to brokenSite.consentManaged.toString(),
-                CONSENT_OPT_OUT_FAILED to brokenSite.consentOptOutFailed.toString(),
-                CONSENT_SELF_TEST_FAILED to brokenSite.consentSelfTestFailed.toString(),
+                URL_PARAMETERS_REMOVED to brokenSite.urlParametersRemoved.toBinaryString(),
+                CONSENT_MANAGED to brokenSite.consentManaged.toBinaryString(),
+                CONSENT_OPT_OUT_FAILED to brokenSite.consentOptOutFailed.toBinaryString(),
+                CONSENT_SELF_TEST_FAILED to brokenSite.consentSelfTestFailed.toBinaryString(),
             )
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
@@ -109,3 +109,5 @@ class BrokenSiteSubmitter(
         private const val CONSENT_SELF_TEST_FAILED = "consentSelftestFailed"
     }
 }
+
+fun Boolean.toBinaryString(): String = if (this) "1" else "0"
