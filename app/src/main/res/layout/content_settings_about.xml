@@ -40,12 +40,12 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsPrivacyPolicyDuckduckgo"/>
 
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/version"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/settingsVersion"
-        tools:subtitle="123.43.5456" />
+        app:primaryText="@string/settingsVersion"
+        tools:secondaryText="123.43.5456" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/provideFeedback"

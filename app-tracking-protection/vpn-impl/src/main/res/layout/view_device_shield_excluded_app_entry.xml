@@ -56,12 +56,11 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Facebook"/>
 
-    <androidx.appcompat.widget.SwitchCompat
+    <com.duckduckgo.mobile.android.ui.view.SwitchView
         android:id="@+id/deviceShieldAppEntryShieldEnabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:theme="@style/Widget.DuckDuckGo.Switch.Blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

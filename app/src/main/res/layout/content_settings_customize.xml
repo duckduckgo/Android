@@ -33,16 +33,16 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsSitePermissions"/>
 
-    <androidx.appcompat.widget.SwitchCompat
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
         android:id="@+id/autocompleteToggle"
-        style="@style/SettingsSwitch"
-        android:text="@string/settingsAutocompleteEnabled"
-        android:theme="@style/SettingsSwitchTheme" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsAutocompleteEnabled" />
 
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/appLinksSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/settingsTitleAppLinks" />
+        app:primaryText="@string/settingsTitleAppLinks" />
 
 </LinearLayout>

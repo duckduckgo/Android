@@ -14,14 +14,6 @@
   ~ limitations under the License.
   -->
 
-<!--<androidx.appcompat.widget.SwitchCompat xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    android:id="@+id/fireproofWebsiteToggle"-->
-<!--    style="@style/FireproofWebsiteSwitch"-->
-<!--    android:paddingStart="16dp"-->
-<!--    android:paddingEnd="16dp"-->
-<!--    android:text="@string/fireproofWebsiteToogleText"-->
-<!--    android:theme="@style/SettingsSwitchTheme" />-->
-
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"

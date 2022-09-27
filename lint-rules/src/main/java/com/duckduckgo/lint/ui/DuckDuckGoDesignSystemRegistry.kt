@@ -21,6 +21,7 @@ import com.android.tools.lint.client.api.Vendor
 import com.android.tools.lint.detector.api.CURRENT_API
 import com.android.tools.lint.detector.api.Issue
 import com.duckduckgo.lint.ui.DeprecatedAndroidButtonUsedInXmlDetector.Companion.DEPRECATED_BUTTON_IN_XML
+import com.duckduckgo.lint.ui.DeprecatedSwitchUsedInXmlDetector.Companion.DEPRECATED_SWITCH_IN_XML
 import com.duckduckgo.lint.ui.NoAlertDialogDetector.Companion.NO_DESIGN_SYSTEM_DIALOG
 import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Companion.STYLE_IN_DESIGN_SYSTEM_COMPONENT
 
@@ -30,7 +31,8 @@ class DuckDuckGoDesignSystemRegistry : IssueRegistry() {
         get() = listOf(
             DEPRECATED_BUTTON_IN_XML,
             STYLE_IN_DESIGN_SYSTEM_COMPONENT,
-            NO_DESIGN_SYSTEM_DIALOG
+            NO_DESIGN_SYSTEM_DIALOG,
+            DEPRECATED_SWITCH_IN_XML
         )
 
     override val api: Int

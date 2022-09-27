@@ -28,17 +28,12 @@
         android:layout_height="wrap_content"
         android:text="@string/settingsHeadingAppearance" />
 
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/selectedThemeSetting"
-        android:background="?attr/selectableItemBackground"
-        android:paddingTop="0dp"
-        android:paddingBottom="0dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="0dp"
-        android:paddingEnd="0dp"
-        app:subtitle="@string/settingsSystemTheme"
-        app:title="@string/settingsTheme" />
+        app:secondaryText="@string/settingsSystemTheme"
+        app:primaryText="@string/settingsTheme" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -66,17 +61,12 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/selectedFireAnimationSetting"
-        android:background="?attr/selectableItemBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="0dp"
-        android:paddingBottom="0dp"
-        android:paddingStart="0dp"
-        android:paddingEnd="0dp"
-        app:subtitle="@string/settingsHeroFireAnimation"
-        app:title="@string/settingsFireAnimation" />
+        app:secondaryText="@string/settingsHeroFireAnimation"
+        app:primaryText="@string/settingsFireAnimation" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/accessibilitySetting"

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <declare-styleable name="SettingsPillWithSubtitle">
-        <attr name="pillTitle" format="string" />
-        <attr name="pillSubtitle" format="string" />
-        <attr name="pillDrawable" format="reference" />
-    </declare-styleable>
-</resources>
+<com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:id="@+id/locationPermissionsToggle"
+    app:primaryText="@string/preciseLocationToggleText" />
+
