@@ -24,21 +24,6 @@ interface VpnNetworkStack {
     val name: String
 
     /**
-     * @return `true` if the networking layer is enabled, `false` otherwise
-     */
-    fun isEnabled(): Boolean
-
-    /**
-     * @return `true` if you wish the VPN service to set active network DNS(es)
-     */
-    fun shouldSetActiveNetworkDnsServers(): Boolean
-
-    /**
-     * @return `true` if you wish the VPN service to set the underlying network
-     */
-    fun shouldSetUnderlyingNetworks(): Boolean
-
-    /**
      * Called before the networking layer is enabled
      *
      * @return `true` if the networking layer is successfully created, `false` otherwise

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.integration
 
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
@@ -26,13 +25,12 @@ import javax.inject.Inject
 
 @ContributesMultibinding(VpnScope::class)
 class VpnNetworkLayerStateCollector @Inject constructor(
-    private val vpnNetworkStackPluginPoint: PluginPoint<VpnNetworkStack>
+    private val vpnNetworkStack: VpnNetworkStack,
 ) : VpnStateCollectorPlugin {
 
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
-        val name = vpnNetworkStackPluginPoint.getPlugins().firstOrNull { it.isEnabled() }?.name ?: "unknown"
         return JSONObject().apply {
-            put("name", name)
+            put("name", vpnNetworkStack.name)
         }
     }
 
