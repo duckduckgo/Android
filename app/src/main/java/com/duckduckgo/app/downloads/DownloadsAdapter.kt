@@ -26,12 +26,12 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ViewItemDownloadsEmptyBinding
 import com.duckduckgo.app.browser.databinding.ViewItemDownloadsHeaderBinding
-import com.duckduckgo.app.browser.databinding.ViewItemDownloadsItemBinding
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
 import com.duckduckgo.app.global.formatters.data.DataSizeFormatter
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
+import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
@@ -44,22 +44,29 @@ class DownloadsAdapter @Inject constructor(
     private val items = mutableListOf<DownloadViewItem>()
     private lateinit var downloadsItemListener: DownloadsItemListener
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             VIEW_TYPE_EMPTY -> EmptyViewHolder(binding = ViewItemDownloadsEmptyBinding.inflate(inflater, parent, false))
             VIEW_TYPE_HEADER -> HeaderViewHolder(binding = ViewItemDownloadsHeaderBinding.inflate(inflater, parent, false))
             VIEW_TYPE_ITEM -> ItemViewHolder(
                 layoutInflater = inflater,
-                binding = ViewItemDownloadsItemBinding.inflate(inflater, parent, false),
+                binding = RowTwoLineItemBinding.inflate(inflater, parent, false),
                 listener = downloadsItemListener,
                 formatter = dataSizeFormatter
             )
+
             else -> throw IllegalArgumentException()
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int
+    ) {
         when (getItemViewType(position)) {
             VIEW_TYPE_EMPTY -> (holder as EmptyViewHolder)
             VIEW_TYPE_HEADER -> (holder as HeaderViewHolder).bind(items[position] as Header)
@@ -102,7 +109,7 @@ class DownloadsAdapter @Inject constructor(
 
     class ItemViewHolder(
         val layoutInflater: LayoutInflater,
-        val binding: ViewItemDownloadsItemBinding,
+        val binding: RowTwoLineItemBinding,
         val listener: DownloadsItemListener,
         val formatter: DataSizeFormatter
     ) :
@@ -112,27 +119,35 @@ class DownloadsAdapter @Inject constructor(
 
         fun bind(item: Item) {
             val twoListItem = binding.root
-            twoListItem.setContentDescription(context.getString(R.string.downloadsMoreOptionsContentDescription, item.downloadItem.fileName))
-            twoListItem.setTitle(item.downloadItem.fileName)
+            twoListItem.setLeadingIconContentDescription(
+                context.getString(
+                    R.string.downloadsMoreOptionsContentDescription,
+                    item.downloadItem.fileName
+                )
+            )
+            twoListItem.setPrimaryText(item.downloadItem.fileName)
             val subtitle = when {
                 item.downloadItem.contentLength > 0 -> formatter.format(item.downloadItem.contentLength)
                 else -> context.getString(R.string.downloadsStateInProgress)
             }
-            twoListItem.setSubtitle(subtitle)
-            twoListItem.setImageResource(R.drawable.ic_file)
+            twoListItem.setSecondaryText(subtitle)
+            twoListItem.setLeadingIcon(R.drawable.ic_file)
 
-            twoListItem.setClickListener {
+            twoListItem.setOnClickListener {
                 if (item.downloadItem.contentLength > 0) {
                     listener.onItemClicked(item.downloadItem)
                 }
             }
 
-            twoListItem.setOverflowClickListener { view ->
+            twoListItem.setTrailingIconClickListener { view ->
                 showPopupMenu(view, item)
             }
         }
 
-        private fun showPopupMenu(anchor: View, item: Item) {
+        private fun showPopupMenu(
+            anchor: View,
+            item: Item
+        ) {
             val popupMenu = PopupMenu(layoutInflater, layout.popup_window_download_item_menu)
             val view = popupMenu.contentView
             val shareItemView = view.findViewById<View>(R.id.share)
@@ -158,7 +173,10 @@ class DownloadsAdapter @Inject constructor(
         private val new: List<DownloadViewItem>
     ) : DiffUtil.Callback() {
 
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areItemsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return old[oldItemPosition] == new[newItemPosition]
         }
 
@@ -170,7 +188,10 @@ class DownloadsAdapter @Inject constructor(
             return new.size
         }
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areContentsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return old[oldItemPosition] == new[newItemPosition]
         }
     }
