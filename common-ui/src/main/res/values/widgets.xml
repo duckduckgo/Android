@@ -150,8 +150,8 @@
 
     <!-- Section Header -->
     <style name="Widget.DuckDuckGo.SectionHeader">
-        <item name="android:paddingTop">32dp</item>
-        <item name="android:paddingBottom">14dp</item>
+        <item name="android:paddingTop">@dimen/keyline_4</item>
+        <item name="android:paddingBottom">@dimen/keyline_4</item>
         <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
         <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
         <item name="android:textAppearance">@style/Widget.DuckDuckGo.SectionHeader.TextAppearance</item>

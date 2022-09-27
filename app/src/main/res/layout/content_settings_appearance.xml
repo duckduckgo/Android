@@ -24,6 +24,8 @@
 
     <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
         android:id="@+id/settingsAppearanceTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/settingsHeadingAppearance" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
