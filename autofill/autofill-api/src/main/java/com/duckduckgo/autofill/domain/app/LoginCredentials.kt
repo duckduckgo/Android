@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.domain.app
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 /**
  * Representation of login credentials used for autofilling into the browser.

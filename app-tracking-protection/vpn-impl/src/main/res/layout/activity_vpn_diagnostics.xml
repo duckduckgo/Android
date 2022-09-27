@@ -153,7 +153,7 @@
                         android:textStyle="bold" />
 
 
-                    <Button
+                    <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
                         android:id="@+id/sendBadHealthReportButton"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
@@ -205,7 +205,7 @@
                     android:textSize="16sp"
                     tools:text="queue write / TUN read: 10" />
 
-                <Button
+                <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
                     android:id="@+id/clearHealthMetricsButton"
                     android:layout_width="wrap_content"
                     android:layout_marginStart="32dp"
@@ -218,7 +218,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <Button
+                    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
                         android:id="@+id/startVpnButton"
                         android:layout_width="wrap_content"
                         android:layout_marginStart="32dp"
@@ -226,7 +226,7 @@
                         android:layout_height="wrap_content"
                         android:text="Start VPN" />
 
-                    <Button
+                    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
                         android:id="@+id/stopVpnButton"
                         android:layout_width="wrap_content"
                         android:layout_marginStart="32dp"
@@ -252,28 +252,28 @@
                     android:layout_marginEnd="32dp"
                     android:orientation="horizontal">
 
-                    <Button
+                    <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
                         android:id="@+id/simulateGoodHealth"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="match_parent"
                         android:text="Good Health" />
 
-                    <Button
+                    <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
                         android:id="@+id/simulateBadHealth"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="match_parent"
                         android:text="Bad Health" />
 
-                    <Button
+                    <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
                         android:id="@+id/simulateCriticalBadHealth"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="match_parent"
                         android:text="Critical Health" />
 
-                    <Button
+                    <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
                         android:id="@+id/noSimulation"
                         android:layout_width="0dp"
                         android:layout_weight="1"

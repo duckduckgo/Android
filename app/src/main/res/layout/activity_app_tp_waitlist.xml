@@ -63,9 +63,8 @@
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"/>
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLowercase
             android:id="@+id/waitListButton"
-            style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="@string/atp_WaitlistJoin" app:layout_constraintTop_toBottomOf="@+id/appTPDescription"
@@ -73,27 +72,24 @@
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="24dp"
             android:layout_marginStart="24dp" android:layout_marginTop="32dp"/>
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLowercase
             android:id="@+id/getStartedButton"
-            style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="@string/atp_WaitlistGetStartedCta" app:layout_constraintTop_toBottomOf="@+id/waitListButton"
             app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="32dp" android:layout_marginStart="24dp" android:layout_marginEnd="24dp"/>
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
             android:id="@+id/inviteCodeButton"
-            style="@style/Widget.DuckDuckGo.Button.Secondary"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="@string/atp_WaitlistCodeCta" app:layout_constraintTop_toBottomOf="@+id/getStartedButton"
             app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="8dp" android:layout_marginStart="24dp" android:layout_marginEnd="24dp"/>
 
-    <Button
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
             android:id="@+id/footerInviteCodeButton"
-            style="@style/Widget.DuckDuckGo.Button.Secondary"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="@string/atp_WaitlistCodeCta"

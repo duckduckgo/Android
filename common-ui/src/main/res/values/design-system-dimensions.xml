@@ -33,6 +33,10 @@
     <dimen name="toolbarIconContainerSize">48dp</dimen>
     <dimen name="toolbarOverflowPadding">10dp</dimen>
 
+    <!-- Buttons -->
+    <dimen name="buttonLargeHeight">48dp</dimen>
+    <dimen name="buttonSmallHeight">36dp</dimen>
+
     <!-- List Items -->
     <dimen name="listItemImageContainerSize">40dp</dimen>
     <dimen name="listItemImageSize">22dp</dimen>
@@ -45,5 +49,6 @@
 
     <!-- Dialogs -->
     <dimen name="dialogButtonHeight">40dp</dimen>
+    <dimen name="dialogImageSize">40dp</dimen>
 
 </resources>

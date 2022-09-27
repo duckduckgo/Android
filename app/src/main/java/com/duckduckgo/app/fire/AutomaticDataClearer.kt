@@ -21,12 +21,14 @@ import android.os.SystemClock
 import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.os.postDelayed
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.ApplicationClearDataState.FINISHED
 import com.duckduckgo.app.global.ApplicationClearDataState.INITIALIZING
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -36,7 +38,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -61,13 +66,14 @@ class AutomaticDataClearer @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val clearDataAction: ClearDataAction,
     private val dataClearerTimeKeeper: BackgroundTimeKeeper,
-    private val dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+    private val dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel,
+    private val dispatchers: DispatcherProvider
 ) : DataClearer, BrowserLifecycleObserver, CoroutineScope {
 
     private val clearJob: Job = Job()
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + clearJob
+        get() = dispatchers.main() + clearJob
 
     override val dataClearerState: MutableLiveData<ApplicationClearDataState> = MutableLiveData<ApplicationClearDataState>().also {
         it.postValue(INITIALIZING)
@@ -82,57 +88,71 @@ class AutomaticDataClearer @Inject constructor(
         }
     }
 
-    @UiThread
     @VisibleForTesting
     suspend fun onAppForegroundedAsync() {
-        dataClearerState.value = INITIALIZING
+        postDataClearerState(INITIALIZING)
 
         Timber.i("onAppForegrounded; is from fresh app launch? $isFreshAppLaunch")
 
         workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
 
-        val appUsedSinceLastClear = settingsDataStore.appUsedSinceLastClear
-        settingsDataStore.appUsedSinceLastClear = true
+        withContext(dispatchers.io()) {
 
-        val appIconChanged = settingsDataStore.appIconChanged
-        settingsDataStore.appIconChanged = false
+            val appUsedSinceLastClear = settingsDataStore.appUsedSinceLastClear
+            settingsDataStore.appUsedSinceLastClear = true
 
-        val clearWhat = settingsDataStore.automaticallyClearWhatOption
-        val clearWhen = settingsDataStore.automaticallyClearWhenOption
-        Timber.i("Currently configured to automatically clear $clearWhat / $clearWhen")
+            val appIconChanged = settingsDataStore.appIconChanged
+            settingsDataStore.appIconChanged = false
 
-        if (clearWhat == ClearWhatOption.CLEAR_NONE) {
-            Timber.i("No data will be cleared as it's configured to clear nothing automatically")
-            dataClearerState.value = FINISHED
-        } else {
-            if (shouldClearData(clearWhen, appUsedSinceLastClear, appIconChanged)) {
-                Timber.i("Decided data should be cleared")
-                clearDataWhenAppInForeground(clearWhat)
+            val clearWhat = settingsDataStore.automaticallyClearWhatOption
+            val clearWhen = settingsDataStore.automaticallyClearWhenOption
+            Timber.i("Currently configured to automatically clear $clearWhat / $clearWhen")
+
+            if (clearWhat == ClearWhatOption.CLEAR_NONE) {
+                Timber.i("No data will be cleared as it's configured to clear nothing automatically")
+                postDataClearerState(FINISHED)
             } else {
-                Timber.i("Decided not to clear data at this time")
-                dataClearerState.value = FINISHED
+                if (shouldClearData(clearWhen, appUsedSinceLastClear, appIconChanged)) {
+                    Timber.i("Decided data should be cleared")
+                    withContext(dispatchers.main()) {
+                        clearDataWhenAppInForeground(clearWhat)
+                    }
+                } else {
+                    Timber.i("Decided not to clear data at this time")
+                    postDataClearerState(FINISHED)
+                }
             }
-        }
 
-        isFreshAppLaunch = false
-        settingsDataStore.clearAppBackgroundTimestamp()
+            isFreshAppLaunch = false
+            settingsDataStore.clearAppBackgroundTimestamp()
+        }
+    }
+
+    private suspend fun postDataClearerState(state: ApplicationClearDataState) {
+        withContext(dispatchers.main()) {
+            dataClearerState.value = state
+        }
     }
 
     override fun onClose() {
-        val timeNow = SystemClock.elapsedRealtime()
-        Timber.i("Recording when app backgrounded ($timeNow)")
+        launch {
+            val timeNow = SystemClock.elapsedRealtime()
+            Timber.i("Recording when app backgrounded ($timeNow)")
 
-        dataClearerState.value = INITIALIZING
+            postDataClearerState(INITIALIZING)
 
-        settingsDataStore.appBackgroundedTimestamp = timeNow
+            withContext(dispatchers.io()) {
+                settingsDataStore.appBackgroundedTimestamp = timeNow
 
-        val clearWhenOption = settingsDataStore.automaticallyClearWhenOption
-        val clearWhatOption = settingsDataStore.automaticallyClearWhatOption
+                val clearWhenOption = settingsDataStore.automaticallyClearWhenOption
+                val clearWhatOption = settingsDataStore.automaticallyClearWhatOption
 
-        if (clearWhatOption == ClearWhatOption.CLEAR_NONE || clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
-            Timber.d("No background timer required for current configuration: $clearWhatOption / $clearWhenOption")
-        } else {
-            scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
+                if (clearWhatOption == ClearWhatOption.CLEAR_NONE || clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
+                    Timber.d("No background timer required for current configuration: $clearWhatOption / $clearWhenOption")
+                } else {
+                    scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
+                }
+            }
         }
     }
 
@@ -160,42 +180,45 @@ class AutomaticDataClearer @Inject constructor(
     @UiThread
     @Suppress("NON_EXHAUSTIVE_WHEN")
     private suspend fun clearDataWhenAppInForeground(clearWhat: ClearWhatOption) {
-        Timber.i("Clearing data when app is in the foreground: $clearWhat")
+        withContext(dispatchers.main()) {
 
-        when (clearWhat) {
-            ClearWhatOption.CLEAR_TABS_ONLY -> {
+            Timber.i("Clearing data when app is in the foreground: $clearWhat")
 
-                withContext(Dispatchers.IO) {
+            when (clearWhat) {
+                ClearWhatOption.CLEAR_TABS_ONLY -> {
+
                     clearDataAction.clearTabsAsync(true)
-                }
 
-                withContext(Dispatchers.Main) {
                     Timber.i("Notifying listener that clearing has finished")
-                    dataClearerState.value = FINISHED
+                    postDataClearerState(FINISHED)
                 }
-            }
 
-            ClearWhatOption.CLEAR_TABS_AND_DATA -> {
-                val processNeedsRestarted = !isFreshAppLaunch
-                Timber.i("App is in foreground; restart needed? $processNeedsRestarted")
+                ClearWhatOption.CLEAR_TABS_AND_DATA -> {
+                    val processNeedsRestarted = !isFreshAppLaunch
+                    Timber.i("App is in foreground; restart needed? $processNeedsRestarted")
 
-                clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = false)
+                    clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = false)
 
-                Timber.i("All data now cleared, will restart process? $processNeedsRestarted")
-                if (processNeedsRestarted) {
-                    clearDataAction.setAppUsedSinceLastClearFlag(false)
-                    dataClearerForegroundAppRestartPixel.incrementCount()
-                    // need a moment to draw background color (reduces flickering UX)
-                    Handler().postDelayed(100) {
-                        Timber.i("Will now restart process")
-                        clearDataAction.killAndRestartProcess(notifyDataCleared = true)
+                    Timber.i("All data now cleared, will restart process? $processNeedsRestarted")
+                    if (processNeedsRestarted) {
+                        withContext(dispatchers.io()) {
+                            clearDataAction.setAppUsedSinceLastClearFlag(false)
+                            dataClearerForegroundAppRestartPixel.incrementCount()
+                        }
+
+                        // need a moment to draw background color (reduces flickering UX)
+                        Handler().postDelayed(100) {
+                            Timber.i("Will now restart process")
+                            clearDataAction.killAndRestartProcess(notifyDataCleared = true)
+                        }
+                    } else {
+                        Timber.i("Will not restart process")
+                        postDataClearerState(FINISHED)
                     }
-                } else {
-                    Timber.i("Will not restart process")
-                    dataClearerState.value = FINISHED
                 }
+
+                else -> {}
             }
-            else -> {}
         }
     }
 

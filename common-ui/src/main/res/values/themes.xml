@@ -36,15 +36,27 @@
         <item name="windowNoTitle">true</item>
         <item name="android:colorEdgeEffect">@color/newBlack</item>
 
+        <!-- Old System Components (will be refactored soon) -->
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
         <item name="actionOverflowMenuStyle">@style/PopUpOverflowMenu</item>
         <item name="actionOverflowButtonStyle">@style/PopUpOverflowButton</item>
         <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
-        <item name="radioButtonStyle">@style/RadioButtonStyle</item>
+        <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
         <item name="sliderStyle">@style/Widget.App.Slider</item>
+
+        <!-- Design System Components -->
+        <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
+        <item name="primaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Primary.Small</item>
+        <item name="secondaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
+        <item name="secondaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
+        <item name="ghostButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Borderless</item>
+        <item name="ghostButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Borderless.Small</item>
+        <item name="primaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Rounded</item>
+        <item name="secondaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Secondary.Rounded</item>
+        <item name="primaryButtonLowercaseStyle">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -394,9 +406,9 @@
         <item name="behavior_peekHeight">512dp</item>
     </style>
 
-    <style name="RadioButtonStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">
+    <style name="RadioButtonStyle" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
         <item name="android:textColor">?attr/normalTextColor</item>
-        <item name="buttonTint">@color/cornflowerBlue</item>
+        <item name="buttonTint">@color/radio_button_tint</item>
     </style>
 
     <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">

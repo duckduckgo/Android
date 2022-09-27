@@ -117,8 +117,6 @@
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Ρυθμίσεις</string>
     <string name="settingsMenuItemTitle">Ρυθμίσεις</string>
-    <string name="settingsHeadingGeneral">Γενικά</string>
-    <string name="settingsHeadingOther">Άλλα</string>
     <string name="settingsHeadingPrivacy">Ιδιωτικότητα</string>
     <string name="settingsAboutDuckduckgo">Πληροφορίες για το DuckDuckGo</string>
     <string name="settingsVersion">Έκδοση</string>
@@ -136,6 +134,9 @@
     <string name="settingsAppLinksAskEveryTime">Να γίνεται ερώτηση κάθε φορά</string>
     <string name="settingsAppLinksAlways">Πάντα</string>
     <string name="settingsAppLinksNever">Ποτέ</string>
+    <string name="settingsHeadingAppearance">Εμφάνιση</string>
+    <string name="settingsHeadingCustomize">Προσαρμογή</string>
+    <string name="settingsHeadingAbout">Σχετικά</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Αποθήκευση</string>
@@ -650,5 +651,8 @@
 
     <string name="autoconsentSetting">Διαχείριση αναδυόμενων παραθύρων για cookies</string>
     <string name="autoconsentAnimationText">Διαχειριζόμενα cookies</string>
+
+    <!-- Autofill -->
+    <string name="autofillSettingsDisplayName">Αυτόματη συμπλήρωση</string>
 
 </resources>

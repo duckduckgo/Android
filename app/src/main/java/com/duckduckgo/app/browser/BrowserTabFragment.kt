@@ -1630,11 +1630,18 @@ class BrowserTabFragment :
             autofillCredentialsSelectionResultHandler.processAutofillCredentialSelectionResult(result, this, viewModel)
         }
 
-        setFragmentResultListener(CredentialSavePickerDialog.resultKey(tabId)) { _, result ->
-            Timber.i("Received result for saving credentials. $tabId handling it")
+        setFragmentResultListener(CredentialSavePickerDialog.resultKeyUserChoseToSaveCredentials(tabId)) { _, result ->
             launch {
                 autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)?.let {
                     showAuthenticationSavedOrUpdatedSnackbar(it, R.string.autofillLoginSavedSnackbarMessage)
+                }
+            }
+        }
+
+        setFragmentResultListener(CredentialSavePickerDialog.resultKeyUserDeclinedToSaveCredentials(tabId)) { _, _ ->
+            launch {
+                this@BrowserTabFragment.context?.let {
+                    autofillCredentialsSelectionResultHandler.processUserDeclined(this@BrowserTabFragment.requireContext(), viewModel)
                 }
             }
         }

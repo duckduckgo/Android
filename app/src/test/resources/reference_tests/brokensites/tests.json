@@ -20,9 +20,10 @@
           {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
           {"name": "surrogates", "value": "surrogate.domain.test"}
         ],
-        "consentManaged": false,
-        "consentOptoutFailed": false,
-        "consentSelftestFailed": false,
+        "urlParametersRemoved": "0",
+        "consentManaged": "0",
+        "consentOptoutFailed": "0",
+        "consentSelftestFailed": "0",
         "exceptPlatforms": []
       },
       {
@@ -43,9 +44,10 @@
           {"name": "blockedTrackers", "value": ""},
           {"name": "surrogates", "value": ""}
         ],
-        "consentManaged": false,
-        "consentOptoutFailed": false,
-        "consentSelftestFailed": false,
+        "urlParametersRemoved": "0",
+        "consentManaged": "0",
+        "consentOptoutFailed": "0",
+        "consentSelftestFailed": "0",
         "exceptPlatforms": []
       },
       {
@@ -74,9 +76,10 @@
           {"name": "os", "value": "12"},
           {"name": "gpc", "value": "true"}
         ],
-        "consentManaged": false,
-        "consentOptoutFailed": false,
-        "consentSelftestFailed": false,
+        "urlParametersRemoved": "0",
+        "consentManaged": "0",
+        "consentOptoutFailed": "0",
+        "consentSelftestFailed": "0",
         "exceptPlatforms": [
           "web-extension",
           "safari-extension"

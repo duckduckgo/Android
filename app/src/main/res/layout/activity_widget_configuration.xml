@@ -83,19 +83,13 @@
                 android:text="@string/widgetConfigurationDarkThemeOption" />
         </RadioGroup>
 
-        <Button
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
             android:id="@+id/widgetConfigAddWidgetButton"
-            style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
-            android:background="@drawable/button_contained_bg"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
             android:layout_gravity="end"
-            android:textAllCaps="true"
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
-            android:textColor="@color/white"
-            android:letterSpacing="0.0"
             android:layout_marginTop="16dp"
             android:text="@string/widgetConfigurationAddWidgetOption"/>
     </LinearLayout>

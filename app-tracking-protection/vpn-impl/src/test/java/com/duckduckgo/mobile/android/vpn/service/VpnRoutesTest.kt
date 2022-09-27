@@ -46,31 +46,11 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all private local addresses in 10·x·x·x range are excluded from VPN`() {
-        val fromRange = "10.0.0.0"
-        val toRange = "10.255.255.255"
-        assertNoRoutes(findRoutes(fromRange, toRange))
-    }
-
-    @Test
-    fun `all link-local addresses between 169·254·0·0 and 169·254·255·255 are excluded from VPN`() {
-        val fromRange = "169.254.0.0"
-        val toRange = "169.254.255.255"
-        assertNoRoutes(findRoutes(fromRange, toRange))
-    }
-
-    @Test
-    fun `all private local addresses between 172·16·0·0 and 172·31·255·255 are excluded from VPN`() {
-        val fromRange = "172.16.0.0"
-        val toRange = "172.31.255.255"
-        assertNoRoutes(findRoutes(fromRange, toRange))
-    }
-
-    @Test
-    fun `all private local addresses in 192·168·x·x range are excluded from VPN`() {
-        val fromRange = "192.168.0.0"
-        val toRange = "192.168.255.255"
-        assertNoRoutes(findRoutes(fromRange, toRange))
+    fun `all local IP addresses are excluded from VPN`() {
+        assertNoRoutes(findRoutes("10.0.0.0", "10.255.255.255"))
+        assertNoRoutes(findRoutes("169.254.0.0", "169.254.255.255"))
+        assertNoRoutes(findRoutes("172.16.0.0", "172.31.255.255"))
+        assertNoRoutes(findRoutes("192.168.0.0", "192.168.255.255"))
     }
 
     @Test
@@ -88,7 +68,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses below private 10·x·x·x range go through VPN`() {
+    fun `all addresses between 0-0-0-0 and 9-255-255-255 range go through VPN`() {
         val fromRange = "0.0.0.0"
         val toRange = "9.255.255.255"
         val routes = findRoutes(fromRange, toRange)
@@ -98,7 +78,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between private 10·x·x·x range and wifi calling range go through VPN`() {
+    fun `all addresses between 10-0-0-0 and 66-94-1-255 range go through VPN`() {
         val fromRange = "11.0.0.0"
         val toRange = "66.94.1.255"
         val routes = findRoutes(fromRange, toRange)
@@ -108,7 +88,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between 66·94·3·0 range and wifi calling range go through VPN`() {
+    fun `all addresses between 66·94·3·0 range and 66-94-5-255 range go through VPN`() {
         val fromRange = "66.94.3.0"
         val toRange = "66.94.5.255"
         val routes = findRoutes(fromRange, toRange)
@@ -118,7 +98,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between 66·94·12·0 range and wifi calling range go through VPN`() {
+    fun `all addresses between 66·94·12·0 range and 66-173-255-255 range go through VPN`() {
         val fromRange = "66.94.12.0"
         val toRange = "66.173.255.255"
         val routes = findRoutes(fromRange, toRange)
@@ -128,7 +108,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between 66·175·0·0 range and wifi calling range go through VPN`() {
+    fun `all addresses between 66·175·0·0 range and 69-81-255-255 range go through VPN`() {
         val fromRange = "66.175.0.0"
         val toRange = "69.81.255.255"
         val routes = findRoutes(fromRange, toRange)
@@ -138,7 +118,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between 69·84·0·0 range and wifi calling range go through VPN`() {
+    fun `all addresses between 69·84·0·0 range and 69-95-255-255 range go through VPN`() {
         val fromRange = "69.84.0.0"
         val toRange = "69.95.255.255"
         val routes = findRoutes(fromRange, toRange)
@@ -148,7 +128,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between 69·104·0·0 range and wifi calling range go through VPN`() {
+    fun `all addresses between 69·104·0·0 range and 70-191-255-255 range go through VPN`() {
         val fromRange = "69.104.0.0"
         val toRange = "70.191.255.255"
         val routes = findRoutes(fromRange, toRange)
@@ -158,7 +138,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between 70·224·0·0 range and wifi calling range go through VPN`() {
+    fun `all addresses between 70·224·0·0 range and 71-255-255-255 range go through VPN`() {
         val fromRange = "70.224.0.0"
         val toRange = "71.255.255.255"
         val routes = findRoutes(fromRange, toRange)
@@ -168,7 +148,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between 72·128·0·0 range and wifi calling range go through VPN`() {
+    fun `all addresses between 72·128·0·0 range and 75-127-255-255 range go through VPN`() {
         val fromRange = "72.128.0.0"
         val toRange = "75.127.255.255"
         val routes = findRoutes(fromRange, toRange)
@@ -178,7 +158,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between 76·0·0·0 range and wifi calling range go through VPN`() {
+    fun `all addresses between 76·0·0·0 range and 96·255·255·255 range go through VPN`() {
         val fromRange = "76.0.0.0"
         val toRange = "96.255.255.255"
         val routes = findRoutes(fromRange, toRange)
@@ -188,7 +168,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between 97·64·0·0 range and wifi calling range go through VPN`() {
+    fun `all addresses between 97·64·0·0 range and 97·127·255·255 range go through VPN`() {
         val fromRange = "97.64.0.0"
         val toRange = "97.127.255.255"
         val routes = findRoutes(fromRange, toRange)
@@ -198,7 +178,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between 98·0·0·0 range and wifi calling range go through VPN`() {
+    fun `all addresses between 98·0·0·0 range and 169·253·255·255 range go through VPN`() {
         val fromRange = "98.0.0.0"
         val toRange = "169.253.255.255"
         val routes = findRoutes(fromRange, toRange)
@@ -208,7 +188,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between link local range and 172 private range go through VPN`() {
+    fun `all addresses between 169·255·0·0 range and 172·15·255·255 range go through VPN`() {
         val fromRange = "169.255.0.0"
         val toRange = "172.15.255.255"
         val routes = findRoutes(fromRange, toRange)
@@ -218,7 +198,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between private 172 range and 174·191·255·255 range go through VPN`() {
+    fun `all addresses between 172·32·0·0 range and 174·191·255·255 range go through VPN`() {
         val fromRange = "172.32.0.0"
         val toRange = "174.191.255.255"
         val routes = findRoutes(fromRange, toRange)
@@ -228,7 +208,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between 175·0·0·0 range and private 192 range go through VPN`() {
+    fun `all addresses between 175·0·0·0 range and 192·167·255·255 range go through VPN`() {
         val fromRange = "175.0.0.0"
         val toRange = "192.167.255.255"
         val routes = findRoutes(fromRange, toRange)
@@ -238,7 +218,7 @@ class VpnRoutesTest {
     }
 
     @Test
-    fun `all addresses between private 192 range and 208·53·255·255 go through VPN`() {
+    fun `all addresses between 192·169·0·0 range and 208·53·255·255 range go through VPN`() {
         val fromRange = "192.169.0.0"
         val toRange = "208.53.255.255"
         val routes = findRoutes(fromRange, toRange)

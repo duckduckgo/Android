@@ -18,7 +18,10 @@ package com.duckduckgo.mobile.android.vpn.service
 
 import android.app.ActivityManager
 import android.app.Service
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.*
@@ -33,26 +36,22 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
 import com.duckduckgo.mobile.android.vpn.network.util.getSystemActiveNetworkDefaultDns
+import com.duckduckgo.mobile.android.vpn.network.util.isLocal
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
-import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
-import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import dagger.android.AndroidInjection
-import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.Inet4Address
 import java.net.InetAddress
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import javax.inject.Inject
 
 @InjectWith(VpnScope::class)
@@ -79,32 +78,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     @Inject
     lateinit var memoryCollectorPluginPoint: PluginPoint<VpnMemoryCollectorPlugin>
 
-    @Inject
-    lateinit var queues: VpnQueues
-
     private var tunInterface: ParcelFileDescriptor? = null
 
     private val binder: VpnServiceBinder = VpnServiceBinder()
 
-    @Inject
-    lateinit var udpPacketProcessorFactory: UdpPacketProcessor.Factory
-    lateinit var udpPacketProcessor: UdpPacketProcessor
-
-    @Inject
-    lateinit var tcpPacketProcessorFactory: TcpPacketProcessor.Factory
-    private lateinit var tcpPacketProcessor: TcpPacketProcessor
-    private var executorService: ExecutorService? = null
-
-    @Inject
-    lateinit var tunPacketReaderFactory: TunPacketReader.Factory
-
-    @Inject
-    lateinit var tunPacketWriterFactory: TunPacketWriter.Factory
     private var vpnStateServiceReference: IBinder? = null
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
     @Inject lateinit var appTpFeatureConfig: AppTpFeatureConfig
+
+    @Inject lateinit var vpnNetworkStack: VpnNetworkStack
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -145,24 +129,23 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         super.onCreate()
         AndroidInjection.inject(this)
 
-        udpPacketProcessor = udpPacketProcessorFactory.build()
-        tcpPacketProcessor = tcpPacketProcessorFactory.build(this)
-
-        Timber.e("VPN log onCreate")
+        Timber.d("VPN log onCreate, creating the ${vpnNetworkStack.name} network stack")
+        vpnNetworkStack.onCreateVpn().getOrThrow()
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        Timber.i("VPN log onBind invoked")
+        Timber.d("VPN log onBind invoked")
         return binder
     }
 
     override fun onUnbind(p0: Intent?): Boolean {
-        Timber.i("VPN log onUnbind invoked")
+        Timber.d("VPN log onUnbind invoked")
         return super.onUnbind(p0)
     }
 
     override fun onDestroy() {
-        Timber.e("VPN log onDestroy")
+        Timber.d("VPN log onDestroy")
+        vpnNetworkStack.onDestroyVpn()
         super.onDestroy()
     }
 
@@ -171,7 +154,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         flags: Int,
         startId: Int
     ): Int {
-        Timber.e("VPN log onStartCommand: ${intent?.action}")
+        Timber.d("VPN log onStartCommand: ${intent?.action}")
 
         var returnCode: Int = Service.START_NOT_STICKY
 
@@ -191,9 +174,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     }
 
     private suspend fun startVpn() = withContext(Dispatchers.IO) {
-        Timber.i("VPN log: Starting VPN")
-
-        queues.clearAll()
+        Timber.d("VPN log: Starting VPN")
 
         establishVpnInterface()
 
@@ -212,18 +193,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             Timber.v("NetworkSwitchHandling disabled...skip setting underlying network")
         }
 
-        tunInterface?.let { vpnInterface ->
-            executorService?.shutdownNow()
-            val processors = listOf(
-                tcpPacketProcessor,
-                udpPacketProcessor,
-                tunPacketReaderFactory.create(vpnInterface),
-                tunPacketWriterFactory.create(vpnInterface)
-            )
-            executorService = Executors.newFixedThreadPool(processors.size).also { executorService ->
-                processors.forEach { executorService.submit(it) }
-            }
-        }
+        vpnNetworkStack.onStartVpn(tunInterface!!).getOrThrow()
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             Timber.v("VPN log: starting ${it.javaClass} callback")
@@ -255,7 +225,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             setBlocking(true)
             // Cap the max MTU value to avoid backpressure issues in the socket
             // This is effectively capping the max segment size too
-            setMtu(16_384)
+            setMtu(vpnNetworkStack.mtu())
             configureMeteredConnection()
 
             // Set DNS
@@ -305,19 +275,24 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         fun Set<InetAddress>.containsIpv4(): Boolean {
             forEach {
                 if (it is Inet4Address) return true
-                return false
             }
             return false
         }
 
         val dns = mutableSetOf<InetAddress>()
 
-        // Default system DNS
+        // System DNS
         if (appTpFeatureConfig.isEnabled(AppTpSetting.SetActiveNetworkDns)) {
             kotlin.runCatching {
                 applicationContext.getSystemActiveNetworkDefaultDns()
                     .map { InetAddress.getByName(it) }
-            }.getOrNull()?.run { dns.addAll(this) }
+            }.getOrNull()?.run {
+                for (inetAddress in this) {
+                    if (!dns.contains(inetAddress) && !(inetAddress.isLocal())) {
+                        dns.add(inetAddress)
+                    }
+                }
+            }
         }
 
         // Android Private DNS (added by the user)
@@ -329,9 +304,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         // This is purely internal, never to go to production
         if (appBuildConfig.isInternalBuild() && appTpFeatureConfig.isEnabled(AppTpSetting.AlwaysSetDNS)) {
-            // Always add DNS
             if (dns.isEmpty()) {
                 kotlin.runCatching {
+                    Timber.d("Adding cloudflare DNS")
                     dns.add(InetAddress.getByName("1.1.1.1"))
                     dns.add(InetAddress.getByName("1.0.0.1"))
                     if (appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support)) {
@@ -345,6 +320,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
             // always add ipv4 DNS
             if (!dns.containsIpv4()) {
+                Timber.d("DNS set does not contain IPv4, adding cloudflare")
                 kotlin.runCatching {
                     dns.add(InetAddress.getByName("1.1.1.1"))
                     dns.add(InetAddress.getByName("1.0.0.1"))
@@ -385,12 +361,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     }
 
     private suspend fun stopVpn(reason: VpnStopReason) = withContext(Dispatchers.IO) {
-        Timber.i("VPN log: Stopping VPN. $reason")
+        Timber.d("VPN log: Stopping VPN. $reason")
 
-        queues.clearAll()
-        executorService?.shutdownNow()
-        udpPacketProcessor.stop()
-        tcpPacketProcessor.stop()
+        vpnNetworkStack.onStopVpn()
+
         tunInterface?.close()
         tunInterface = null
 
@@ -426,17 +400,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     }
 
     override fun onRevoke() {
-        Timber.e("VPN log onRevoke called")
+        Timber.w("VPN log onRevoke called")
         launch { stopVpn(VpnStopReason.REVOKED) }
     }
 
     override fun onLowMemory() {
-        Timber.e("VPN log onLowMemory called")
+        Timber.w("VPN log onLowMemory called")
     }
 
     // https://developer.android.com/reference/android/app/Service.html#onTrimMemory(int)
     override fun onTrimMemory(level: Int) {
-        Timber.e("VPN log onTrimMemory level $level called")
+        Timber.d("VPN log onTrimMemory level $level called")
 
         // Collect memory data info from memory collectors
         val memoryData = mutableMapOf<String, String>()
@@ -468,7 +442,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     }
 
     companion object {
-
         const val ACTION_VPN_REMINDER_RESTART = "com.duckduckgo.vpn.internaltesters.reminder.restart"
 
         const val VPN_REMINDER_NOTIFICATION_ID = 999
@@ -514,6 +487,27 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
 
         internal fun startService(context: Context) {
+            startVpnService(context.applicationContext)
+        }
+
+        // TODO commented out for now, we'll see if we need it once we enable the new networking layer
+//        private fun startTrampolineService(context: Context) {
+//            val applicationContext = context.applicationContext
+//
+//            if (isServiceRunning(applicationContext)) return
+//
+//            runCatching {
+//                Intent(applicationContext, VpnTrampolineService::class.java).also { i ->
+//                    applicationContext.startService(i)
+//                }
+//            }.onFailure {
+//                // fallback for when both browser and vpn processes are not up, as we can't start a non-foreground service in the background
+//                Timber.w(it, "VPN log: Failed to start trampoline service")
+//                startVpnService(applicationContext)
+//            }
+//        }
+
+        internal fun startVpnService(context: Context) {
             val applicationContext = context.applicationContext
 
             if (isServiceRunning(applicationContext)) return
