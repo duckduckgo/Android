@@ -26,15 +26,15 @@ import androidx.viewpager.widget.ViewPager
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.applyTheme
+import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.tabs.TabLayout
 
 class AppComponentsActivity : AppCompatActivity() {
 
     private lateinit var viewPager: ViewPager
     private lateinit var tabLayout: TabLayout
-    private lateinit var darkThemeSwitch: SwitchMaterial
+    private lateinit var darkThemeSwitch: OneLineListItemSwitch
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val themePreferences = AppComponentsSharedPreferences(this)

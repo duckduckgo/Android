@@ -20,7 +20,6 @@
                                                    android:id="@+id/item_container"
                                                    android:background="?attr/selectableItemBackground"
                                                    android:layout_width="match_parent"
-                                                   android:minHeight="@dimen/oneLineItemHeight"
                                                    android:layout_height="wrap_content">
 
     <ImageView
@@ -39,23 +38,22 @@
         android:gravity="start|center"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:minHeight="@dimen/oneLineItemHeight"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_2"
         android:paddingTop="@dimen/oneLineItemPadding"
         android:paddingBottom="@dimen/oneLineItemPadding"
         android:textColor="?attr/listItemTitleColor" app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/trailingIcon" app:layout_constraintStart_toEndOf="@id/leadingIcon"
+        app:layout_constraintEnd_toStartOf="@+id/trailingSwitch" app:layout_constraintStart_toEndOf="@id/leadingIcon"
         app:layout_constraintTop_toTopOf="parent" tools:text="Title"/>
 
-    <ImageView
-        android:id="@+id/trailingIcon"
-        android:layout_width="@dimen/listItemImageContainerSize"
-        android:layout_height="@dimen/listItemImageContainerSize"
-        android:layout_marginEnd="8dp"
-        android:background="?selectableItemBackground"
-        android:scaleType="center"
+    <com.duckduckgo.mobile.android.ui.view.SwitchView
+        android:id="@+id/trailingSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/keyline_4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" tools:ignore="ContentDescription"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

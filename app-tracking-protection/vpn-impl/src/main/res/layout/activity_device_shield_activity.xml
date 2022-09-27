@@ -120,7 +120,7 @@
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_show_all"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/oneLinelistItemHeight"
+                android:layout_height="@dimen/oneLineItemHeight"
                 android:layout_marginBottom="@dimen/keyline_4"
                 android:paddingStart="72dp"
                 android:visibility="gone"/>
@@ -141,13 +141,13 @@
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_what_are_app_trackers"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/oneLinelistItemHeight"
+                android:layout_height="@dimen/oneLineItemHeight"
                 app:primaryText="@string/atp_ActivityAppTrackersFAQ"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_tracker_faq"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/oneLinelistItemHeight"
+                android:layout_height="@dimen/oneLineItemHeight"
                 app:primaryText="@string/atp_FAQCta"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem

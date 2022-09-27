@@ -20,51 +20,48 @@ import android.R.attr
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.CompoundButton
+import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
+import com.duckduckgo.mobile.android.databinding.ViewOneLineListSwitchItemBinding
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class OneLineListItem @JvmOverloads constructor(
+class OneLineListItemSwitch @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.oneLineListItemStyle
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    private val binding: ViewOneLineListItemBinding by viewBinding()
+    private val binding: ViewOneLineListSwitchItemBinding by viewBinding()
 
     init {
         context.obtainStyledAttributes(
             attrs,
-            R.styleable.OneLineListItem,
+            R.styleable.OneLineListItemSwitch,
             0,
             R.style.Widget_DuckDuckGo_OneLineListItem
         ).apply {
 
-            binding.primaryText.text = getString(R.styleable.OneLineListItem_primaryText)
-            if (hasValue(R.styleable.OneLineListItem_primaryTextColor)) {
+            binding.primaryText.text = getString(R.styleable.OneLineListItemSwitch_primaryText)
+            if (hasValue(R.styleable.OneLineListItemSwitch_primaryTextColor)) {
                 binding.primaryText.setTextColor(
                     getColor(
-                        R.styleable.OneLineListItem_primaryTextColor,
+                        R.styleable.OneLineListItemSwitch_primaryTextColor,
                         context.getColorFromAttr(R.attr.normalTextColor)
                     )
                 )
             }
 
-            if (hasValue(R.styleable.OneLineListItem_leadingIcon)) {
-                binding.leadingIcon.setBackground(getDrawable(R.styleable.OneLineListItem_leadingIcon))
+            if (hasValue(R.styleable.OneLineListItemSwitch_leadingIcon)) {
+                binding.leadingIcon.setBackground(getDrawable(R.styleable.OneLineListItemSwitch_leadingIcon))
             } else {
                 binding.leadingIcon.gone()
-            }
-
-            if (hasValue(R.styleable.OneLineListItem_trailingIcon)) {
-                binding.trailingIcon.setImageDrawable(getDrawable(R.styleable.OneLineListItem_trailingIcon))
-            } else {
-                binding.trailingIcon.gone()
             }
 
             recycle()
@@ -81,18 +78,7 @@ class OneLineListItem @JvmOverloads constructor(
         val drawable = VectorDrawableCompat.create(resources, idRes, null)
         binding.leadingIcon.setImageDrawable(drawable)
         binding.leadingIcon.show()
-    }
 
-    /** Sets the trailing icon image resource */
-    fun setTrailingIcon(idRes: Int) {
-        val drawable = VectorDrawableCompat.create(resources, idRes, null)
-        binding.trailingIcon.setImageDrawable(drawable)
-        binding.trailingIcon.show()
-    }
-
-    /** Sets the item image content description */
-    fun setLeadingIconContentDescription(description: String) {
-        binding.leadingIcon.contentDescription = description
     }
 
     /** Sets the item click listener */
@@ -105,13 +91,32 @@ class OneLineListItem @JvmOverloads constructor(
         binding.leadingIcon.setOnClickListener { onClick(binding.leadingIcon) }
     }
 
-    /** Sets the item overflow menu click listener */
-    fun setTrailingIconClickListener(onClick: (View) -> Unit) {
-        binding.trailingIcon.setOnClickListener { onClick(binding.trailingIcon) }
-    }
-
-    /** Sets the trailing image content description */
-    fun setTrailingContentDescription(description: String) {
+    /** Sets the leading image content description */
+    fun setLeadingIcongContentDescription(description: String) {
         binding.leadingIcon.contentDescription = description
     }
+
+    /** Sets the checked change listener for the switch */
+    fun setOnCheckedChangeListener(onCheckedChangeListener: OnCheckedChangeListener) {
+        binding.trailingSwitch.setOnCheckedChangeListener(onCheckedChangeListener)
+    }
+
+    /** Sets the switch value */
+    fun setIsChecked(isChecked: Boolean) {
+        binding.trailingSwitch.isChecked = isChecked
+    }
+
+    /** Sets the switch as enabled or not */
+    fun setIsEnabled(isEnabled: Boolean) {
+        binding.trailingSwitch.isEnabled = isEnabled
+    }
+
+    /** Allows to set a new value to the switch, without triggering the onChangeListener */
+    fun quietlySetIsChecked(
+        newCheckedState: Boolean,
+        changeListener: CompoundButton.OnCheckedChangeListener?
+    ) {
+        binding.trailingSwitch.quietlySetIsChecked(newCheckedState, changeListener)
+    }
+
 }

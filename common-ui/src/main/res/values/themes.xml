@@ -45,7 +45,8 @@
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
-        <item name="sliderStyle">@style/Widget.App.Slider</item>
+        <item name="sliderStyle">@style/Widget.DuckDuckGo.Slider</item>
+        <item name="switchStyle">@style/Widget.DuckDuckGo.Switch</item>
 
         <!-- Design System Components -->
         <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
@@ -58,10 +59,9 @@
         <item name="secondaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Secondary.Rounded</item>
         <item name="primaryButtonLowercaseStyle">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
         <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
-        <item name="oneLineListItemWithToggleStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
         <item name="twoLineListItemWithToggleStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
-        <item name="twoLineRadioListIteWithmStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
+        <item name="twoLineRadioListIteWithStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -110,7 +110,6 @@
         <item name="settingsItemTextColor">@color/white</item>
         <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
-        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
         <item name="buttonOutlinedTextColor">@color/pinkishGrayThree</item>
         <item name="buttonOutlinedBorderColor">@color/brownishGrayTwo</item>
         <item name="callToActionTitleColor">@color/white</item>
@@ -237,7 +236,6 @@
         <item name="settingsItemTextColor">@color/almostBlackDark</item>
         <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="settingsMinorTextColor">@color/warmerGray</item>
-        <item name="settingsSwitchBackgroundColor">@color/brownishGrayTwo</item>
         <item name="buttonOutlinedTextColor">@color/cornflowerBlue</item>
         <item name="buttonOutlinedBorderColor">@color/grayishThree</item>
         <item name="callToActionTitleColor">@color/almostBlackDark</item>
@@ -320,25 +318,8 @@
         <item name="colorControlHighlight">@color/subtleGrayTwo</item>
     </style>
 
-    <style name="ToolbarTheme.Green">
-        <item name="colorAccent">@color/cornflowerGreen</item>
-        <item name="colorControlActivated">@color/cornflowerGreen</item>
-        <item name="colorSwitchThumbNormal">@color/white</item>
-        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
-    </style>
-
     <style name="OmnibarToolbarTheme">
         <item name="colorControlHighlight">@color/subtleGrayTwo</item>
-    </style>
-
-    <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
-        <item name="colorControlActivated">@android:color/white</item>
-    </style>
-
-    <style name="SettingsSwitchTheme">
-        <item name="colorControlActivated">@color/cornflowerBlue</item>
-        <item name="colorSwitchThumbNormal">@color/white</item>
-        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
     </style>
 
     <style name="TextInputLayoutTheme" parent="Widget.Design.TextInputLayout">
@@ -369,7 +350,7 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="PopUpMenuSwitchTheme">
+    <style name="PopUpMenuCheckBoxTheme">
         <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
     </style>
@@ -434,17 +415,4 @@
         <item name="android:textColor">@color/cornflowerBlue</item>
     </style>
 
-    <style name="Widget.App.Slider" parent="Widget.MaterialComponents.Slider">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Slider</item>
-        <item name="trackHeight">6dp</item>
-        <item name="trackColorInactive">@color/slider_inactive_track</item>
-        <item name="trackColorActive">@color/accentBlue</item>
-        <item name="thumbColor">@color/accentBlue</item>
-    </style>
-
-    <style name="ThemeOverlay.App.Slider" parent="">
-        <item name="colorPrimary">@color/accentBlue</item>
-        <item name="colorOnPrimary">@color/accentBlue</item>
-        <item name="colorOnSurface">?attr/settingsSwitchBackgroundColor</item>
-    </style>
 </resources>

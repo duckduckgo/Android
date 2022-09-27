@@ -68,6 +68,7 @@ import com.duckduckgo.macos_api.MacWaitlistState.*
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
+import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
@@ -210,9 +211,9 @@ class SettingsActivity :
         viewsInternal.settingsSectionInternal.visibility = if (internalFeaturePlugins.getPlugins().isEmpty()) View.GONE else View.VISIBLE
         internalFeaturePlugins.getPlugins().forEach { feature ->
             Timber.v("Adding internal feature ${feature.internalFeatureTitle()}")
-            val view = SettingsOptionWithSubtitle(this).apply {
-                setTitle(feature.internalFeatureTitle())
-                this.setSubtitle(feature.internalFeatureSubtitle())
+            val view = TwoLineListItem(this).apply {
+                setPrimaryText(feature.internalFeatureTitle())
+                setSecondaryText(feature.internalFeatureSubtitle())
             }
             viewsInternal.settingsInternalFeaturesContainer.addView(view)
             view.setOnClickListener { feature.onInternalFeatureClicked(this) }
@@ -230,7 +231,7 @@ class SettingsActivity :
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState.let {
-                    viewsOther.version.setSubtitle(it.version)
+                    viewsOther.version.setSecondaryText(it.version)
                     updateSelectedTheme(it.theme)
                     viewsCustomize.autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                     updateDefaultBrowserViewVisibility(it)
@@ -263,7 +264,7 @@ class SettingsActivity :
 
     private fun updateEmailSubtitle(emailAddress: String?) {
         val subtitle = emailAddress ?: getString(R.string.settingsEmailProtectionSubtitle)
-        viewsMore.emailSetting.setSubtitle(subtitle)
+        viewsMore.emailSetting.setSecondaryText(subtitle)
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {
@@ -272,7 +273,7 @@ class SettingsActivity :
         } else {
             getString(R.string.disabled)
         }
-        viewsPrivacy.globalPrivacyControlSetting.setSubtitle(stateText)
+        viewsPrivacy.globalPrivacyControlSetting.setSecondaryText(stateText)
     }
 
     private fun setAutoconsentSetting(enabled: Boolean) {
@@ -281,12 +282,12 @@ class SettingsActivity :
         } else {
             getString(R.string.disabled)
         }
-        viewsPrivacy.autoconsentSetting.setSubtitle(stateText)
+        viewsPrivacy.autoconsentSetting.setSecondaryText(stateText)
     }
 
     private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
         val subtitle = getString(fireAnimation.nameResId)
-        viewsAppearance.selectedFireAnimationSetting.setSubtitle(subtitle)
+        viewsAppearance.selectedFireAnimationSetting.setSecondaryText(subtitle)
     }
 
     private fun updateSelectedTheme(selectedTheme: DuckDuckGoTheme) {
@@ -297,7 +298,7 @@ class SettingsActivity :
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> R.string.settingsSystemTheme
             }
         )
-        viewsAppearance.selectedThemeSetting.setSubtitle(subtitle)
+        viewsAppearance.selectedThemeSetting.setSecondaryText(subtitle)
     }
 
     private fun updateAppLinkBehavior(appLinkSettingType: AppLinkSettingType) {
@@ -308,15 +309,15 @@ class SettingsActivity :
                 AppLinkSettingType.NEVER -> R.string.settingsAppLinksNever
             }
         )
-        viewsCustomize.appLinksSetting.setSubtitle(subtitle)
+        viewsCustomize.appLinksSetting.setSecondaryText(subtitle)
     }
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
         val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringResourceId())
-        viewsPrivacy.automaticallyClearWhatSetting.setSubtitle(clearWhatSubtitle)
+        viewsPrivacy.automaticallyClearWhatSetting.setSecondaryText(clearWhatSubtitle)
 
         val clearWhenSubtitle = getString(automaticallyClearData.clearWhenOption.nameStringResourceId())
-        viewsPrivacy.automaticallyClearWhenSetting.setSubtitle(clearWhenSubtitle)
+        viewsPrivacy.automaticallyClearWhenSetting.setSecondaryText(clearWhenSubtitle)
 
         val whenOptionEnabled = automaticallyClearData.clearWhenOptionEnabled
         viewsPrivacy.automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
@@ -380,12 +381,12 @@ class SettingsActivity :
     ) {
         with(viewsMore) {
             if (waitlistState != WaitlistState.InBeta) {
-                vpnSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
+                vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
             } else {
                 if (appTPEnabled) {
-                    vpnSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldEnabled))
+                    vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldEnabled))
                 } else {
-                    vpnSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldDisabled))
+                    vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
                 }
             }
         }
@@ -394,9 +395,9 @@ class SettingsActivity :
     private fun updateMacOsSettings(waitlistState: MacWaitlistState) {
         with(viewsMore) {
             when (waitlistState) {
-                InBeta -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description_ready))
-                JoinedWaitlist -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description_list))
-                NotJoinedQueue -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description))
+                InBeta -> macOsSetting.setSecondaryText(getString(R.string.macos_settings_description_ready))
+                JoinedWaitlist -> macOsSetting.setSecondaryText(getString(R.string.macos_settings_description_list))
+                NotJoinedQueue -> macOsSetting.setSecondaryText(getString(R.string.macos_settings_description))
             }
         }
     }
