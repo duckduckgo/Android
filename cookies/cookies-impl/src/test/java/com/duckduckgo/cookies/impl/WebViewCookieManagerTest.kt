@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.cookies.impl
 
 import android.webkit.CookieManager
 import android.webkit.ValueCallback
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.browser.cookies.CookieManagerProvider
+import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.cookies.api.RemoveCookiesStrategy
 import kotlinx.coroutines.test.runTest
 import org.mockito.kotlin.*
 import kotlinx.coroutines.Dispatchers

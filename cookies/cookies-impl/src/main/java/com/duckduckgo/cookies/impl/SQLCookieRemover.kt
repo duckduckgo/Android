@@ -14,29 +14,32 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.cookies.impl
 
 import android.database.DatabaseErrorHandler
 import android.database.DefaultDatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
-import com.duckduckgo.app.browser.cookies.CookieManagerProvider
+import com.duckduckgo.app.fire.DatabaseLocator
+import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.cookies.api.CookieRemover
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
 import javax.inject.Named
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-interface CookieRemover {
-    suspend fun removeCookies(): Boolean
-}
-
-class CookieManagerRemover(private val cookieManagerProvider: CookieManagerProvider) : CookieRemover {
+@ContributesBinding(AppScope::class)
+@Named("cookieManagerRemover")
+class CookieManagerRemover @Inject constructor(private val cookieManagerProvider: CookieManagerProvider) : CookieRemover {
     override suspend fun removeCookies(): Boolean {
-        suspendCoroutine<Unit> { continuation ->
+        suspendCoroutine { continuation ->
             cookieManagerProvider.get().removeAllCookies {
                 Timber.v("All cookies removed; restoring DDG cookies")
                 continuation.resume(Unit)
@@ -46,9 +49,11 @@ class CookieManagerRemover(private val cookieManagerProvider: CookieManagerProvi
     }
 }
 
-class SQLCookieRemover(
+@ContributesBinding(AppScope::class)
+@Named("sqlCookieRemover")
+class SQLCookieRemover @Inject constructor(
     @Named("webViewDbLocator") private val webViewDatabaseLocator: DatabaseLocator,
-    private val getCookieHostsToPreserve: GetCookieHostsToPreserve,
+    private val fireproofRepository: FireproofRepository,
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val exceptionPixel: ExceptionPixel,
     private val dispatcherProvider: DispatcherProvider
@@ -60,7 +65,7 @@ class SQLCookieRemover(
         return withContext(dispatcherProvider.io()) {
             val databasePath: String = webViewDatabaseLocator.getDatabasePath()
             if (databasePath.isNotEmpty()) {
-                val excludedHosts = getCookieHostsToPreserve()
+                val excludedHosts = fireproofRepository.fireproofWebsites()
                 return@withContext removeCookies(databasePath, excludedHosts)
             } else {
                 offlinePixelCountDataStore.cookieDatabaseNotFoundCount += 1
@@ -74,7 +79,7 @@ class SQLCookieRemover(
             SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE, databaseErrorHandler)
         } catch (exception: Exception) {
             offlinePixelCountDataStore.cookieDatabaseOpenErrorCount += 1
-            exceptionPixel.sendExceptionPixel(AppPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR, exception)
+            exceptionPixel.sendExceptionPixel(CookiesPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR, exception)
             null
         }
     }
@@ -94,7 +99,7 @@ class SQLCookieRemover(
             } catch (exception: Exception) {
                 Timber.e(exception)
                 offlinePixelCountDataStore.cookieDatabaseDeleteErrorCount += 1
-                exceptionPixel.sendExceptionPixel(AppPixelName.COOKIE_DATABASE_EXCEPTION_DELETE_ERROR, exception)
+                exceptionPixel.sendExceptionPixel(CookiesPixelName.COOKIE_DATABASE_EXCEPTION_DELETE_ERROR, exception)
             } finally {
                 close()
             }
@@ -107,15 +112,14 @@ class SQLCookieRemover(
             return ""
         }
         return excludedSites.foldIndexed(
-            "",
-            { pos, acc, _ ->
-                if (pos == 0) {
-                    "host_key NOT LIKE ?"
-                } else {
-                    "$acc AND host_key NOT LIKE ?"
-                }
+            ""
+        ) { pos, acc, _ ->
+            if (pos == 0) {
+                "host_key NOT LIKE ?"
+            } else {
+                "$acc AND host_key NOT LIKE ?"
             }
-        )
+        }
     }
 
     companion object {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,24 @@
 
 package com.duckduckgo.app.fire
 
-interface RemoveCookiesStrategy {
-    suspend fun removeCookies()
-}
+import android.content.Context
+import java.io.File
 
-class RemoveCookies(
-    private val cookieManagerRemover: CookieRemover,
-    private val selectiveCookieRemover: CookieRemover
-) : RemoveCookiesStrategy {
-    override suspend fun removeCookies() {
-        val removeSuccess = selectiveCookieRemover.removeCookies()
-        if (!removeSuccess) {
-            cookieManagerRemover.removeCookies()
+abstract class DatabaseLocator(private val context: Context) {
+
+    abstract val knownLocations: List<String>
+
+    open fun getDatabasePath(): String {
+        val dataDir = context.applicationInfo.dataDir
+        val detectedPath = knownLocations.find { knownPath ->
+            val file = File(dataDir, knownPath)
+            file.exists()
         }
+
+        return detectedPath
+            .takeUnless { it.isNullOrEmpty() }
+            ?.let { nonEmptyPath ->
+                "$dataDir$nonEmptyPath"
+            }.orEmpty()
     }
 }

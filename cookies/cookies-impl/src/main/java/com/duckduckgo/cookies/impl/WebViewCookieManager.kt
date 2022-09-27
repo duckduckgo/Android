@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.cookies.impl
 
-import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.cookies.api.RemoveCookiesStrategy
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Named
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-interface DuckDuckGoCookieManager {
-    suspend fun removeExternalCookies()
-    fun flush()
-}
-
-class WebViewCookieManager(
+@ContributesBinding(AppScope::class)
+class WebViewCookieManager @Inject constructor(
     private val cookieManager: CookieManagerProvider,
-    private val host: String,
+    @Named("cookiesUrl") private val host: String,
     private val removeCookies: RemoveCookiesStrategy,
     private val dispatcher: DispatcherProvider
 ) : DuckDuckGoCookieManager {
@@ -62,7 +64,7 @@ class WebViewCookieManager(
     }
 
     private suspend fun storeCookie(cookie: String) {
-        suspendCoroutine<Unit> { continuation ->
+        suspendCoroutine { continuation ->
             cookieManager.get().setCookie(host, cookie) { success ->
                 Timber.v("Cookie $cookie stored successfully: $success")
                 continuation.resume(Unit)
