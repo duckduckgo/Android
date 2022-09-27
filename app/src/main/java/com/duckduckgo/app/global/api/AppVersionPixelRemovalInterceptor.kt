@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.integration
+package com.duckduckgo.app.global.api
 
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
@@ -24,22 +26,23 @@ import okhttp3.Response
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * Removes app version information from select pixels
+ */
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = PixelInterceptorPlugin::class
 )
-class VpnNetworkStackVariantPixelInterceptor @Inject constructor(
-    private val vpnNetworkStackVariantStore: VpnNetworkStackVariantStore,
-) : Interceptor, PixelInterceptorPlugin {
+class AppVersionPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInterceptorPlugin {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
-        val url = if (isInPixelList(pixel)) {
+        val url = if (pixel_prefixes.firstOrNull { pixel.startsWith(it) } != null) {
             chain.request().url.newBuilder()
-                .addQueryParameter("networkLayer", vpnNetworkStackVariantStore.variant ?: "unknown")
+                .removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION)
                 .build()
         } else {
-            chain.request().url
+            chain.request().url.newBuilder().build()
         }
 
         Timber.d("Pixel interceptor: $url")
@@ -47,23 +50,11 @@ class VpnNetworkStackVariantPixelInterceptor @Inject constructor(
         return chain.proceed(request.url(url).build())
     }
 
-    private fun isInPixelList(pixel: String): Boolean {
-        return PIXELS.firstOrNull { pixel.startsWith(it) } != null
-    }
-
     companion object {
-        // list here the pixels that except from this interceptor
-        internal val PIXELS = listOf(
-            "m_atp_ev_enabled_d",
-            "m_atp_ev_enabled_tracker_activity_d",
-            "m_atp_ev_enabled_reminder_notification_d",
-            "m_atp_ev_sys_kill_c",
-            "m_atp_ev_sys_kill_d",
-            "m_atp_ev_selected_disable_protection_c",
-            "m_atp_ev_submit_disable_app_protection_dialog_c",
-            "m_atp_ev_submit_disable_app_protection_dialog_d",
-            "m_atp_did_restart_vpn_on_bad_health_c",
-            "m_atp_did_restart_vpn_on_bad_health_d",
+        // list of pixels for which we'll remove App version information
+        @VisibleForTesting
+        val pixel_prefixes = listOf(
+            "m_atp_ev_cpu_usage_"
         )
     }
 

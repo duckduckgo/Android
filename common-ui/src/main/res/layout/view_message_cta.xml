@@ -88,7 +88,7 @@
         app:layout_goneMarginStart="0dp"
         tools:text="button" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondarySmall
+    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
         android:id="@+id/secondaryActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

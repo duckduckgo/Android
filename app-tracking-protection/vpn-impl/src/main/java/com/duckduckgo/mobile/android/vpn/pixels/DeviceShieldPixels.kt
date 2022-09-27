@@ -297,6 +297,11 @@ interface DeviceShieldPixels {
     fun didPressWaitlistDialogDismiss()
 
     /**
+     * Will send CPU usage info
+     */
+    fun sendCPUUsage(cpuUsage: Int)
+
+    /**
      * Will fire when user submits a health monitor report
      */
     fun sendHealthMonitorReport(healthMetrics: Map<String, String>)
@@ -721,6 +726,10 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS)
     }
 
+    override fun sendCPUUsage(cpuUsage: Int) {
+        firePixel(String.format(DeviceShieldPixelNames.ATP_APP_CPU_MONITOR_REPORT.pixelName, cpuUsage))
+    }
+
     override fun sendHealthMonitorReport(healthMetrics: Map<String, String>) {
         firePixel(DeviceShieldPixelNames.ATP_APP_HEALTH_MONITOR_REPORT, healthMetrics)
     }
@@ -883,6 +892,9 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun reportUnprotectedAppsBucket(bucketSize: Int) {
+        tryToFireDailyPixel(
+            String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY.pixelName, bucketSize)
+        )
         firePixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET.pixelName, bucketSize))
     }
 

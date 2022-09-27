@@ -34,6 +34,7 @@ interface FileDownloader {
         val contentDisposition: String? = null,
         val mimeType: String? = null,
         val subfolder: String,
-        val directory: File = Environment.getExternalStoragePublicDirectory(subfolder)
+        val directory: File = Environment.getExternalStoragePublicDirectory(subfolder),
+        val isUrlCompressed: Boolean = false
     ) : Serializable
 }

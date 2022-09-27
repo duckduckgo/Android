@@ -129,6 +129,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
 
     ATP_APP_BREAKAGE_REPORT("m_atp_breakage_report"),
     ATP_APP_BREAKAGE_REPORT_UNIQUE("m_atp_breakage_report_u"),
+    ATP_APP_CPU_MONITOR_REPORT("m_atp_ev_cpu_usage_%d"),
     ATP_APP_HEALTH_MONITOR_REPORT("m_atp_health_monitor_report"),
     ATP_APP_HEALTH_ALERT_DAILY("m_atp_health_alert_%s_d"),
     ATP_APP_BAD_HEALTH_RESOLVED_BY_RESTART("m_atp_bad_health_resolved_by_restart_c"),
@@ -226,7 +227,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_REPORT_ALWAYS_ON_ENABLED_DAILY("m_atp_ev_always_on_enabled_d"),
     ATP_REPORT_ALWAYS_ON_LOCKDOWN_ENABLED_DAILY("m_atp_ev_always_on_lockdown_enabled_d"),
 
-    ATP_REPORT_UNPROTECTED_APPS_BUCKET("m_atp_unprotected_apps_bucket_%d"),
+    ATP_REPORT_UNPROTECTED_APPS_BUCKET("m_atp_unprotected_apps_bucket_%d_c"),
+    ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY("m_atp_unprotected_apps_bucket_%d_d"),
 
     ;
 }

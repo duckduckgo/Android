@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.network
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.di.scopes.VpnScope
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
-@ContributesPluginPoint(
-    scope = VpnScope::class,
-    boundType = VpnNetworkStack::class
-)
-@Suppress("unused")
-interface VpnNetworkStackPluginPoint
+dependencies {
+    implementation project(':vpn-store')
+    implementation Kotlin.stdlib.jdk7
+    implementation KotlinX.coroutines.core
+}
+android {
+  namespace 'com.duckduckgo.mobile.android.vpn.store.test'
+}
