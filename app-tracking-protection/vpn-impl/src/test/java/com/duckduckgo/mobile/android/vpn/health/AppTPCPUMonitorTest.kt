@@ -58,11 +58,13 @@ class AppTPCPUMonitorTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVpnRemoteConfigDatabase: VpnRemoteConfigDatabase = mock()
     private val mockWorkManager: WorkManager = mock()
+    private val mockCPUPerformanceLogger: CPUPerformanceLogger = mock()
 
     @Before
     fun setup() {
         toggleDao = FakeToggleConfigDao()
         whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+        whenever(mockAppBuildConfig.isPerformanceTest).thenReturn(false)
         whenever(mockVpnRemoteConfigDatabase.vpnConfigTogglesDao()).thenReturn(toggleDao)
 
         config = AppTpFeatureConfigImpl(
@@ -72,7 +74,7 @@ class AppTPCPUMonitorTest {
             coroutineRule.testDispatcherProvider
         )
 
-        cpuMonitor = AppTPCPUMonitor(mockWorkManager, config, mockAppBuildConfig, context)
+        cpuMonitor = AppTPCPUMonitor(mockWorkManager, config, mockAppBuildConfig, context, mockCPUPerformanceLogger)
     }
 
     @Test
@@ -85,6 +87,9 @@ class AppTPCPUMonitorTest {
             eq(ExistingPeriodicWorkPolicy.KEEP),
             any()
         )
+
+        // Never interact with performance logger in regular builds
+        verifyNoInteractions(mockCPUPerformanceLogger)
     }
 
     @Test
@@ -93,6 +98,9 @@ class AppTPCPUMonitorTest {
         cpuMonitor.onVpnStarted(coroutineRule.testScope)
 
         verifyNoInteractions(mockWorkManager)
+
+        // Never interact with performance logger in regular builds
+        verifyNoInteractions(mockCPUPerformanceLogger)
     }
 
     @Test
@@ -100,5 +108,19 @@ class AppTPCPUMonitorTest {
         cpuMonitor.onVpnStopped(coroutineRule.testScope, SELF_STOP)
 
         verify(mockWorkManager).cancelUniqueWork(AppTPCPUMonitor.APP_TRACKER_CPU_MONITOR_WORKER_TAG)
+
+        // Never interact with performance logger in regular builds
+        verifyNoInteractions(mockCPUPerformanceLogger)
+    }
+
+    @Test
+    fun whenPerformanceTestStartAndStopLogger() {
+        whenever(mockAppBuildConfig.isPerformanceTest).thenReturn(true)
+
+        cpuMonitor.onVpnStarted(coroutineRule.testScope)
+        verify(mockCPUPerformanceLogger).startLogging(coroutineRule.testScope)
+
+        cpuMonitor.onVpnStopped(coroutineRule.testScope, SELF_STOP)
+        verify(mockCPUPerformanceLogger).stopLogging(any())
     }
 }

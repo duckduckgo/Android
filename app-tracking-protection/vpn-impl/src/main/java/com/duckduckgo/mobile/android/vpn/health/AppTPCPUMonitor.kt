@@ -39,9 +39,8 @@ class AppTPCPUMonitor @Inject constructor(
     private val appTpFeatureConfig: AppTpFeatureConfig,
     private val appBuildConfig: AppBuildConfig,
     private val context: Context,
+    private val cpuPerformanceLogger: CPUPerformanceLogger
 ) : VpnServiceCallbacks {
-
-    private val cpuPerformanceLogger = CPUPerformanceLogger()
 
     companion object {
         @VisibleForTesting
