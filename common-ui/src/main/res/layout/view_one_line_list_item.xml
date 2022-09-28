@@ -44,6 +44,8 @@
     <TextView
             android:id="@+id/primaryText"
             style="@style/TextAppearance.DuckDuckGo.Body1"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:gravity="start|center"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
