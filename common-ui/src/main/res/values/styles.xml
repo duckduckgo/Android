@@ -84,32 +84,6 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
-    <style name="SettingsItem">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingStart">@dimen/keyline_4</item>
-        <item name="android:paddingEnd">@dimen/keyline_4</item>
-        <item name="android:paddingBottom">14dp</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/settings_title_color_selector</item>
-        <item name="android:textSize">17sp</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:selectable">false</item>
-    </style>
-
-    <style name="SettingsMinorText">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">-11dp</item>
-        <item name="android:paddingStart">@dimen/keyline_4</item>
-        <item name="android:paddingEnd">@dimen/keyline_4</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/settings_subtitle_color_selector</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textStyle">normal</item>
-    </style>
-
     <style name="SectionDivider">
         <item name="android:paddingTop">24dp</item>
         <item name="android:paddingBottom">24dp</item>
