@@ -20,5 +20,6 @@
     <string name="autoconsentToggle">Deja que DuckDuckGo gestione las ventanas emergentes de consentimiento de cookies</string>
 
     <string name="marcosTest">No, gracias</string>
+    <string name="anotherMarcosTest">No, gracias</string>
 
 </resources>
