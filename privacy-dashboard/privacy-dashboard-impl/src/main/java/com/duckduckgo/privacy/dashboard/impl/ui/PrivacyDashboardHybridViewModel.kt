@@ -26,7 +26,6 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
@@ -49,7 +48,6 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class PrivacyDashboardHybridViewModel @Inject constructor(
     private val userWhitelistDao: UserWhitelistDao,
-    private val contentBlocking: ContentBlocking,
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -93,7 +91,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val ownerName: String?,
         val pageUrl: String,
         val prevalence: Double,
-        val state: State, // TODO: temporary, this needs to be a sealed class
+        val state: State,
         val url: String
     )
 
@@ -208,9 +206,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     private suspend fun updateSite(site: Site) {
-
         withContext(dispatcher.main()) {
-
             viewState.emit(
                 ViewState(
                     siteProtectionsViewState = siteProtectionsViewStateMapper.mapFromSite(site),
