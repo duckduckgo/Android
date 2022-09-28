@@ -374,8 +374,8 @@ class BrowserModule {
     }
 
     @Provides
-    fun webViewPreviewGenerator(): WebViewPreviewGenerator {
-        return FileBasedWebViewPreviewGenerator()
+    fun webViewPreviewGenerator(dispatchers: DispatcherProvider): WebViewPreviewGenerator {
+        return FileBasedWebViewPreviewGenerator(dispatchers = dispatchers)
     }
 
     @Provides
