@@ -729,6 +729,21 @@
     <string name="autoconsentSetting">Upravljanje skočnim prozorima kolačića</string>
     <string name="autoconsentAnimationText">Upravlja se kolačićima</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Dozvole web lokacija</string>
+    <string name="sitePermissionsSettingsDescription">Web-lokacije koje posjećujete mogu tražiti pristup lokaciji vašeg uređaja, kamere ili mikrofona. Neće im moći pristupiti osim ako im za to izričito ne date dopuštenje.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Dopusti svim web-lokacijama da zatraže:</string>
+    <string name="sitePermissionsSettingsLocation">Lokacija</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Upravljanje web-lokacijama</string>
+    <string name="sitePermissionsSettingsEmptyText">Još nema ni jedne web-lokacije</string>
+    <string name="permissionPerWebsiteText">Dopuštenja za „%1$s“ </string>
+    <string name="permissionsPerWebsiteAskSetting">Zatraži</string>
+    <string name="permissionsPerWebsiteDenySetting">Odbij</string>
+    <string name="permissionsPerWebsiteAllowSetting">Dopusti</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s dopuštenje za %2$s</string>
+
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatsko popunjavanje</string>
 

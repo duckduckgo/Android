@@ -17,21 +17,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
     <!-- Site Permissions Settings -->
-    <string name="settingsSitePermissions">Site Permissions</string>
-    <string name="sitePermissionsSettingsDescription">Sites you visit may ask for access to your device’s location, camera, or microphone. They won’t be able to access these unless you explicitly give them permission.</string>
-    <string name="sitePermissionsSettingsEnablePermissionTitle">Allow all sites to ask for:</string>
-    <string name="sitePermissionsSettingsLocation">Location</string>
-    <string name="sitePermissionsSettingsCamera">Camera</string>
-    <string name="sitePermissionsSettingsMicrophone">Microphone</string>
-    <string name="sitePermissionsSettingsAllowedSitesTitle">Manage Sites</string>
-    <string name="sitePermissionsSettingsEmptyText">No sites yet</string>
-    <string name="permissionPerWebsiteText">Permissions for \"%s\" </string>
-    <string name="permissionsPerWebsiteAskSetting">Ask</string>
-    <string name="permissionsPerWebsiteDenySetting">Deny</string>
-    <string name="permissionsPerWebsiteAllowSetting">Allow</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle">%s permission for %s</string>
-
-    <!-- Site Permissions Settings -->
     <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permissions Removed for All Sites</string>
 
     <!-- Autofill -->

@@ -721,6 +721,21 @@
     <string name="autoconsentSetting">Διαχείριση αναδυόμενων παραθύρων για cookies</string>
     <string name="autoconsentAnimationText">Διαχειριζόμενα cookies</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Δικαιώματα ιστότοπου</string>
+    <string name="sitePermissionsSettingsDescription">Οι ιστότοποι που επισκέπτεστε ενδέχεται να αιτηθούν πρόσβαση στην τοποθεσία, στην κάμερα ή στο μικρόφωνο της συσκευής σας.« Δεν θα μπορούν να έχουν πρόσβαση σε αυτά εάν δεν τους παρέχετε ρητά την άδειά σας.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Να επιτρέπεται σε όλους τους ιστότοπους να αιτούνται:</string>
+    <string name="sitePermissionsSettingsLocation">Τοποθεσία</string>
+    <string name="sitePermissionsSettingsCamera">Κάμερα</string>
+    <string name="sitePermissionsSettingsMicrophone">Μικρόφωνο</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Διαχείριση ιστότοπων</string>
+    <string name="sitePermissionsSettingsEmptyText">Δεν υπάρχουν ακόμη ιστότοποι</string>
+    <string name="permissionPerWebsiteText">Δικαιώματα για «%1$s» </string>
+    <string name="permissionsPerWebsiteAskSetting">Αιτηθείτε</string>
+    <string name="permissionsPerWebsiteDenySetting">Απόρριψη</string>
+    <string name="permissionsPerWebsiteAllowSetting">Αποδοχή</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s άδεια για %2$s</string>
+
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Αυτόματη συμπλήρωση</string>
 

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s vil ha tilgang til kameraet og mikrofonen</string>
+    <string name="sitePermissionsMicDialogTitle">%1$s vil ha tilgang til mikrofonen</string>
+    <string name="sitePermissionsCameraDialogTitle">%1$s vil ha tilgang til kameraet</string>
+    <string name="sitePermissionsDialogContent">Administrer tillatelser i innstillingene</string>
+    <string name="sitePermissionsDialogDenyButton">Avvis</string>
+    <string name="sitePermissionsDialogAllowButton">Tillat</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Tillat DuckDuckGo å be om kamera- og mikrofontilgang</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Tillat DuckDuckGo å be om kameratilgang</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Tillat DuckDuckGo å be om mikrofontilgang</string>
+    <string name="sitePermissionsDeniedSnackBarAction">Tillat</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Tillat DuckDuckGo å be om kameratilgang på denne enheten</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Nettsteder kan bare bruke kameraet ditt hvis du lar DuckDuckGo be om tilgang.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Tillat DuckDuckGo å be om mikrofontilgang på denne enheten</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Nettsteder kan bare bruke mikrofonen din hvis du lar DuckDuckGo be om tilgang.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Tillat DuckDuckGo å be om kamera- og mikrofontilgang på denne enheten</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Nettsteder kan bare bruke kameraet og mikrofonen din hvis du lar DuckDuckGo be om tilgang.</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Åpne innstillinger</string>
+    <string name="systemPermissionsDeniedDialogNegativeButton">Avbryt</string>
+</resources>

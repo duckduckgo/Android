@@ -721,6 +721,21 @@
     <string name="autoconsentSetting">Gerir pop-ups de cookies</string>
     <string name="autoconsentAnimationText">Cookies geridos</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Permissões dos sites</string>
+    <string name="sitePermissionsSettingsDescription">Os sites que visitas podem pedir acesso à localização, câmara ou microfone do teu dispositivo. Não poderão aceder a estas funcionalidades sem que concedas permissão explicitamente.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Permitir que todos os sites peçam:</string>
+    <string name="sitePermissionsSettingsLocation">Localização</string>
+    <string name="sitePermissionsSettingsCamera">Câmara</string>
+    <string name="sitePermissionsSettingsMicrophone">Microfone</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Gerir sites</string>
+    <string name="sitePermissionsSettingsEmptyText">Ainda não há sites</string>
+    <string name="permissionPerWebsiteText">Permissões para \"%1$s\" </string>
+    <string name="permissionsPerWebsiteAskSetting">Perguntar</string>
+    <string name="permissionsPerWebsiteDenySetting">Recusar</string>
+    <string name="permissionsPerWebsiteAllowSetting">Permitir</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">Permissão para %2$s utilizar %1$s</string>
+
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Preenchimento automático</string>
 

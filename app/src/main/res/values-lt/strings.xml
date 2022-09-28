@@ -729,6 +729,21 @@
     <string name="autoconsentSetting">Valdyti slapukų iššokančiuosius langus</string>
     <string name="autoconsentAnimationText">Slapukai valdomi</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Svetainės leidimai</string>
+    <string name="sitePermissionsSettingsDescription">Svetainėse, kuriose lankotės, gali būti prašoma prieigos prie jūsų įrenginio vietos, kameros arba mikrofono. Jos negalės prie jų prisijungti, nebent aiškiai suteiksite joms leidimą.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Leisti visoms svetainėms prašyti:</string>
+    <string name="sitePermissionsSettingsLocation">Vieta</string>
+    <string name="sitePermissionsSettingsCamera">Fotoaparatas</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofonas</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Tvarkyti svetaines</string>
+    <string name="sitePermissionsSettingsEmptyText">Svetainių dar nėra</string>
+    <string name="permissionPerWebsiteText">Leidimai „%1$s“ </string>
+    <string name="permissionsPerWebsiteAskSetting">Klausti</string>
+    <string name="permissionsPerWebsiteDenySetting">Atsisakyti</string>
+    <string name="permissionsPerWebsiteAllowSetting">Leisti</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s leidimas %2$s</string>
+
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatinis pildymas</string>
 

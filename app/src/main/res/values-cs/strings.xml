@@ -730,6 +730,21 @@
     <string name="autoconsentSetting">Správa vyskakovacích oken ohledně cookies</string>
     <string name="autoconsentAnimationText">O cookies je postaráno!</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Oprávnění webu</string>
+    <string name="sitePermissionsSettingsDescription">Navštívené weby můžou žádat o přístup k poloze, fotoaparátu nebo mikrofonu tvého zařízení. Přístup mít nebudou, pokud jim ho výslovně nepovolíš.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Povolit všem webům, aby žádaly o:</string>
+    <string name="sitePermissionsSettingsLocation">Poloha</string>
+    <string name="sitePermissionsSettingsCamera">Fotoaparát</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Správa webů</string>
+    <string name="sitePermissionsSettingsEmptyText">Zatím žádné weby</string>
+    <string name="permissionPerWebsiteText">Oprávnění „%1$s“ </string>
+    <string name="permissionsPerWebsiteAskSetting">Zeptat se</string>
+    <string name="permissionsPerWebsiteDenySetting">Odmítnout</string>
+    <string name="permissionsPerWebsiteAllowSetting">Povolit</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s – povolení pro web %2$s</string>
+
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automaticky vyplnit</string>
 

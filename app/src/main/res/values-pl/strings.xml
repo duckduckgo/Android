@@ -721,13 +721,28 @@
     <string name="atp_SettingsDeviceShieldDisabled">Wyłączone</string>
 
     <!-- Autoconsent -->
-    <string name="autoconsentDialogTitle">Wygląda na to, że na tej stronie pojawia się okienko z prośbą o zgodę na używanie plików cookie👇</string>
+    <string name="autoconsentDialogTitle">Wygląda na to, że na tej stronie pojawia się okienko z prośbą o zgodę na używanie plików cookie 👇</string>
     <string name="autoconsentDialogDescription">Mamy się tym za Ciebie zająć? Możemy spróbować zminimalizować liczbę plików cookie, zmaksymalizować prywatność i ukryć takie wyskakujące okienka.</string>
     <string name="autoconsentPrimaryCta">Zarządzaj wyskakującymi okienkami z prośbą o używanie plików cookie</string>
     <string name="autoconsentSecondaryCta">Nie, dziękuję</string>
 
     <string name="autoconsentSetting">Zarządzaj wyskakującymi okienkami z prośbą o używanie plików cookie</string>
     <string name="autoconsentAnimationText">Zarządzane pliki cookie</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Uprawnienia witryny</string>
+    <string name="sitePermissionsSettingsDescription">Strony, które odwiedzasz, mogą prosić o dostęp do lokalizacji Twojego urządzenia, kamery lub mikrofonu. Nie będą miały do nich dostępu, jeśli nie udzielisz im zgody.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Pozwól wszystkim stronom prosić o:</string>
+    <string name="sitePermissionsSettingsLocation">Lokalizacja</string>
+    <string name="sitePermissionsSettingsCamera">Aparat</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Zarządzaj witrynami</string>
+    <string name="sitePermissionsSettingsEmptyText">Nie masz jeszcze witryn</string>
+    <string name="permissionPerWebsiteText">Uprawnienia dla: „%1$s” </string>
+    <string name="permissionsPerWebsiteAskSetting">Poproś</string>
+    <string name="permissionsPerWebsiteDenySetting">Odmów</string>
+    <string name="permissionsPerWebsiteAllowSetting">Zezwól</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">Pozwolenie dla witryny %2$s na dostęp do urządzenia: %1$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Autouzupełnianie</string>

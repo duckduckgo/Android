@@ -721,6 +721,21 @@
     <string name="autoconsentSetting">Felugró sütiablakok kezelése</string>
     <string name="autoconsentAnimationText">Kezelt sütik</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Webhelyengedélyek</string>
+    <string name="sitePermissionsSettingsDescription">A meglátogatott webhelyek hozzáférést kérhetnek az eszközöd helymeghatározásához, kamerájához vagy mikrofonjához. Ezekhez nem férhetnek hozzá, hacsak nem adsz rá kifejezett engedélyt.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Minden webhely kérheti a következőket:</string>
+    <string name="sitePermissionsSettingsLocation">Hely</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Webhelyek kezelése</string>
+    <string name="sitePermissionsSettingsEmptyText">Még nincsenek oldalak</string>
+    <string name="permissionPerWebsiteText">Engedélyek a következőhöz: „%1$s” </string>
+    <string name="permissionsPerWebsiteAskSetting">Rákérdezés</string>
+    <string name="permissionsPerWebsiteDenySetting">Megtagadás</string>
+    <string name="permissionsPerWebsiteAllowSetting">Engedélyezés</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s engedély a(z) %2$s számára</string>
+
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatikus kitöltés</string>
 

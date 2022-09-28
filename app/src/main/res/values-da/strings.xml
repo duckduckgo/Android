@@ -721,6 +721,22 @@
     <string name="autoconsentSetting">Administrer cookie pop op-vinduer</string>
     <string name="autoconsentAnimationText">Administrerede cookies</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Tilladelser til webstedet</string>
+    <string name="sitePermissionsSettingsDescription">De websteder, du besøger, kan bede om adgang til din enheds placering, kamera eller mikrofon. De vil ikke kunne få adgang til disse, medmindre du udtrykkeligt giver dem tilladelse.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Tillad, at alle websteder beder om:</string>
+    <string name="sitePermissionsSettingsLocation">Placering</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Administrer websteder</string>
+    <string name="sitePermissionsSettingsEmptyText">Ingen websteder endnu</string>
+    <string name="permissionPerWebsiteText">Tilladelser til \"%1$s\" </string>
+    <string name="permissionsPerWebsiteAskSetting">Spørg</string>
+    <string name="permissionsPerWebsiteDenySetting">Afvis</string>
+    <string name="permissionsPerWebsiteAllowSetting">Tillad</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s tilladelse til %2$s</string>
+
+    <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatisk udfyldning</string>
 
 </resources>

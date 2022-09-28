@@ -721,6 +721,21 @@
     <string name="autoconsentSetting">Cookie-Pop-ups verwalten</string>
     <string name="autoconsentAnimationText">Cookies verwaltet</string>
 
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Website-Berechtigungen</string>
+    <string name="sitePermissionsSettingsDescription">Von dir besuchte Websites bitten möglicherweise um Zugriff auf den Standort, die Kamera oder das Mikrofon deines Geräts. Sie können darauf nicht zugreifen, es sei denn, du erteilst ihnen ausdrücklich die Erlaubnis.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Allen Websites erlauben, um Folgendes zu bitten:</string>
+    <string name="sitePermissionsSettingsLocation">Standort</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Websites verwalten</string>
+    <string name="sitePermissionsSettingsEmptyText">Noch keine Websites</string>
+    <string name="permissionPerWebsiteText">Berechtigungen für „%1$s“ </string>
+    <string name="permissionsPerWebsiteAskSetting">Fragen</string>
+    <string name="permissionsPerWebsiteDenySetting">Ablehnen</string>
+    <string name="permissionsPerWebsiteAllowSetting">Zulassen</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s-Berechtigung für %2$s</string>
+
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Autofill</string>
 
