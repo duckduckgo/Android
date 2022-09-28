@@ -21,11 +21,11 @@ import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.WARNING
 import com.duckduckgo.mobile.android.ui.store.AppTheme
-import com.duckduckgo.privacy.dashboard.impl.R
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import com.duckduckgo.app.browser.R
 
 class LottiePrivacyShieldAnimationHelperTest {
 
