@@ -48,7 +48,6 @@ import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.TOGGLE
 import com.duckduckgo.mobile.android.databinding.ViewSingleLineListItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.SectionDivider
-import com.duckduckgo.mobile.android.ui.view.disable
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
@@ -153,7 +152,7 @@ class SitePermissionsAdapter(
         private fun showOverflowMenu(removeDisabled: Boolean) {
             val popupMenu = PopupMenu(layoutInflater, layout.popup_window_remove_all_menu)
             val menuItem = popupMenu.contentView.findViewById<TextView>(R.id.removeAll)
-            if (removeDisabled) menuItem.disable()
+            if (removeDisabled) menuItem.isEnabled = false
             popupMenu.apply {
                 onMenuItemClicked(menuItem) { viewModel.removeAllSitesSelected() }
                 show(binding.root, binding.overflowMenu)

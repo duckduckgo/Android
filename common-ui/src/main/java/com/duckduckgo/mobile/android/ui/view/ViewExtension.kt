@@ -148,9 +148,3 @@ fun Slider.quietlySetValue(
     value = newValue
     addOnChangeListener(listener)
 }
-
-fun View.disable() {
-    this.isClickable = false
-    this.isEnabled = false
-    this.alpha = 0.6f
-}
