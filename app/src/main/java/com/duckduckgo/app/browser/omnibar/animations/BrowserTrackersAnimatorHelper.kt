@@ -44,6 +44,15 @@ interface BrowserTrackersAnimatorHelper {
         entities: List<Entity>?
     )
 
+    /**
+     * This method creates or enqueues cookie consent animation.
+     *
+     * @param context indicates if animation should pause, at 50% of progress, until {@link finishPartialTrackerAnimation()} is called.
+     * @param omnibarViews are the views that should be hidden while the animation is running
+     * @param cookieBackground holder of the cookie consent animation background.
+     * @param cookieAnimationView holder of the cookie consent animation.
+     * @param cookieScene holder of cooki consent text animation.
+     */
     fun createCookiesAnimation(
         context: Context,
         omnibarViews: List<View>,
