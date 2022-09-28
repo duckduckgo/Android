@@ -26,9 +26,8 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestMultiple
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface SystemPermissionsHelper {
@@ -44,8 +43,7 @@ interface SystemPermissionsHelper {
     fun isPermissionsRejectedForever(activity: Activity): Boolean
 }
 
-@ContributesBinding(ActivityScope::class)
-@SingleInstanceIn(ActivityScope::class)
+@ContributesBinding(FragmentScope::class)
 class SystemPermissionsHelperImpl @Inject constructor(
     private val context: Context
 ) : SystemPermissionsHelper {

@@ -28,7 +28,7 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
@@ -41,8 +41,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-@ContributesBinding(ActivityScope::class)
-@SingleInstanceIn(ActivityScope::class)
+@ContributesBinding(FragmentScope::class)
+@SingleInstanceIn(FragmentScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
     private val sitePermissionsRepository: SitePermissionsRepository,
