@@ -25,7 +25,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ActivityLocationPermissionsBinding
+import com.duckduckgo.app.browser.databinding.ActivitySitePermissionsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.location.data.LocationPermissionEntity
@@ -48,7 +48,7 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
     lateinit var faviconManager: FaviconManager
 
     private val viewModel: SitePermissionsViewModel by bindViewModel()
-    private val binding: ActivityLocationPermissionsBinding by viewBinding()
+    private val binding: ActivitySitePermissionsBinding by viewBinding()
     private lateinit var adapter: SitePermissionsAdapter
 
     private val toolbar
