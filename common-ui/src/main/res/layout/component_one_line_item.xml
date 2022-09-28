@@ -75,7 +75,7 @@
         app:primaryText="This is a One Line List Item With Leading and Trailing Icons"
         app:trailingIcon="@drawable/ic_overflow"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -83,9 +83,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLeadingAndTrailingIcons"
-        app:primaryText="This is a One Line List Switch Item"/>
+        app:primaryText="This is a One Line List Switch Item"
+        app:showSwitch="true"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListSwitchItemWithLeadingIcon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -94,6 +95,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemSwitch"
         app:leadingIcon="@drawable/list_item_circular_background_sample"
-        app:primaryText="This is a One Line List Item Switch With Leading Icon"/>
+        app:primaryText="This is a One Line List Item Switch With Leading Icon"
+        app:showSwitch="true"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

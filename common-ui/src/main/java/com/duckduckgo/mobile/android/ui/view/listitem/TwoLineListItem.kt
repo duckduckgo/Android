@@ -21,12 +21,15 @@ package com.duckduckgo.mobile.android.ui.view.listitem
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.CompoundButton
+import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -72,19 +75,6 @@ class TwoLineListItem @JvmOverloads constructor(
                 binding.leadingIconBackground.gone()
             }
 
-            if (hasValue(R.styleable.TwoLineListItem_trailingIcon)) {
-                binding.trailingIcon.setImageDrawable(getDrawable(R.styleable.TwoLineListItem_trailingIcon))
-            } else {
-                binding.trailingIcon.gone()
-            }
-
-            val showBetaPill = getBoolean(R.styleable.TwoLineListItem_showBetaPill, false)
-            if (showBetaPill) {
-                binding.pill.show()
-            } else {
-                binding.pill.gone()
-            }
-
             if (hasValue(R.styleable.TwoLineListItem_leadingIconBackground)) {
                 val value = getInt(R.styleable.TwoLineListItem_leadingIconBackground, 0)
                 if (value == 1) {
@@ -94,6 +84,25 @@ class TwoLineListItem @JvmOverloads constructor(
                     binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_round_background)
                 }
                 binding.leadingIconBackground.show()
+            }
+
+            val showBetaPill = getBoolean(R.styleable.TwoLineListItem_showBetaPill, false)
+            if (showBetaPill) {
+                binding.primaryText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_beta_pill, 0)
+                binding.primaryText.compoundDrawablePadding = 24
+            }
+
+            val showTrailingIcon = hasValue(R.styleable.TwoLineListItem_trailingIcon)
+            val showSwitch = getBoolean(R.styleable.TwoLineListItem_showSwitch, false)
+            if (showSwitch) {
+                binding.trailingSwitch.show()
+                binding.trailingIcon.gone()
+            } else if (showTrailingIcon) {
+                binding.trailingSwitch.gone()
+                binding.trailingIcon.setImageDrawable(getDrawable(R.styleable.TwoLineListItem_trailingIcon))
+                binding.trailingIcon.show()
+            } else {
+                binding.trailingContainer.gone()
             }
 
             recycle()
@@ -151,6 +160,35 @@ class TwoLineListItem @JvmOverloads constructor(
 
     /** Sets the trailing image content description */
     fun setPillVisible(isVisible: Boolean) {
-        binding.pill.isVisible = isVisible
+        if (isVisible) {
+            binding.primaryText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_beta_pill, 0)
+            binding.primaryText.compoundDrawablePadding = 24
+        } else {
+            binding.primaryText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            binding.primaryText.compoundDrawablePadding = 0
+        }
+    }
+
+    /** Sets the checked change listener for the switch */
+    fun setOnCheckedChangeListener(onCheckedChangeListener: OnCheckedChangeListener) {
+        binding.trailingSwitch.setOnCheckedChangeListener(onCheckedChangeListener)
+    }
+
+    /** Sets the switch value */
+    fun setIsChecked(isChecked: Boolean) {
+        binding.trailingSwitch.isChecked = isChecked
+    }
+
+    /** Sets the switch as enabled or not */
+    fun setIsEnabled(isEnabled: Boolean) {
+        binding.trailingSwitch.isEnabled = isEnabled
+    }
+
+    /** Allows to set a new value to the switch, without triggering the onChangeListener */
+    fun quietlySetIsChecked(
+        newCheckedState: Boolean,
+        changeListener: CompoundButton.OnCheckedChangeListener?
+    ) {
+        binding.trailingSwitch.quietlySetIsChecked(newCheckedState, changeListener)
     }
 }

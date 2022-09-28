@@ -37,10 +37,8 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Co
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import com.duckduckgo.mobile.android.R as CommonR
 
 class FireproofWebsiteAdapter(
     private val viewModel: FireproofWebsitesViewModel,

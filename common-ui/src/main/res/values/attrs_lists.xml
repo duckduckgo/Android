@@ -22,7 +22,6 @@
 
     <attr name="oneLineListItemStyle" format="reference"/>
     <attr name="twoLineListItemStyle" format="reference"/>
-    <attr name="twoLineListItemWithToggleStyle" format="reference"/>
     <attr name="twoLineRadioListIteWithStyle" format="reference"/>
 
     <attr name="primaryText" format="string"/>
@@ -30,6 +29,7 @@
     <attr name="leadingIcon" format="integer"/>
     <attr name="trailingIcon" format="integer"/>
     <attr name="showBetaPill" format="boolean"/>
+    <attr name="showSwitch" format="boolean"/>
     <attr name="primaryTextColor" format="color"/>
     <attr name="secondaryTextColor" format="color"/>
     <attr name="leadingIconBackground">
@@ -48,13 +48,7 @@
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
         <attr name="trailingIcon"/>
-    </declare-styleable>
-
-    <declare-styleable name="OneLineListItemSwitch">
-        <attr name="primaryText"/>
-        <attr name="primaryTextColor"/>
-        <attr name="leadingIcon"/>
-        <attr name="leadingIconBackground"/>
+        <attr name="showSwitch"/>
     </declare-styleable>
 
     <!--Two Line Item view-->
@@ -67,22 +61,7 @@
         <attr name="leadingIconBackground"/>
         <attr name="trailingIcon"/>
         <attr name="showBetaPill"/>
-    </declare-styleable>
-
-    <declare-styleable name="TwoLineSwitchListItem">
-        <attr name="primaryText"/>
-        <attr name="primaryTextColor"/>
-        <attr name="secondaryText"/>
-        <attr name="secondaryTextColor"/>
-        <attr name="leadingIcon"/>
-        <attr name="leadingIconBackground"/>
-        <attr name="showBetaPill"/>
-    </declare-styleable>
-
-    <declare-styleable name="RadioTwoLineListItem">
-        <attr name="primaryText"/>
-        <attr name="secondaryText"/>
-        <attr name="trailingIcon"/>
+        <attr name="showSwitch"/>
     </declare-styleable>
 
 </resources>
