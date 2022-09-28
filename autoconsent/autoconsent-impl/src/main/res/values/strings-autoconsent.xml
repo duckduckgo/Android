@@ -20,5 +20,6 @@
     <string name="autoconsentToggle">Let DuckDuckGo manage cookie consent pop-ups</string>
 
     <string name="marcosTest">No Thanks</string>
+    <string name="anotherMarcosTest">No Thanks</string>
 
 </resources>

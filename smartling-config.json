@@ -101,8 +101,8 @@
     {
       "type": "android",
       "pathRegex": ".*.\\/values\\/strings-autoconsent.xml",
-      "translationPathExpression": "autoconsent/autoconsent-impl/src/main/res/values-es/strings-autoconsent.xml",
-      "translationCommitMessage": "Translate ${originalFile.fullName} to ${locale}",
+      "translationPathExpression": "${originalFile.path.replaceAll('values', locale)}",
+      "translationCommitMessage": "Translate ${originalFile.baseName} to ${locale}",
       "locales": [
         {
           "smartling": "es-ES",
