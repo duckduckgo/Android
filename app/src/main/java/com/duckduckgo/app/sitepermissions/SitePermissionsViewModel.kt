@@ -39,6 +39,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -87,15 +88,18 @@ class SitePermissionsViewModel @Inject constructor(
 
     fun allowedSites() {
         viewModelScope.launch {
-            locationPermissionsRepository.getLocationPermissionsFlow().collect { locationPermissionsList ->
-                sitePermissionsRepository.sitePermissionsWebsitesFlow().collect { sitePermissionsList ->
-                    _viewState.emit(
-                        _viewState.value.copy(
-                            sitesPermissionsAllowed = sitePermissionsList,
-                            locationPermissionsAllowed = locationPermissionsList
-                        )
+            val locationsPermissionsFlow = locationPermissionsRepository.getLocationPermissionsFlow()
+            val sitePermissionsFlow = sitePermissionsRepository.sitePermissionsWebsitesFlow()
+
+            sitePermissionsFlow.combine(locationsPermissionsFlow) { sitePermissionsList, locationPermissionsList ->
+                Pair(sitePermissionsList, locationPermissionsList)
+            }.collect {
+                _viewState.emit(
+                    _viewState.value.copy(
+                        sitesPermissionsAllowed = it.first,
+                        locationPermissionsAllowed = it.second
                     )
-                }
+                )
             }
         }
     }
