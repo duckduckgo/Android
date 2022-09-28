@@ -21,9 +21,9 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.location.GeoLocationPermissionsManager
+import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
@@ -46,8 +46,8 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class SitePermissionsViewModel @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository,
-    private val locationPermissionsRepository: LocationPermissionsRepository,
-    private val geolocationPermissions: GeoLocationPermissionsManager,
+    private val locationPermissionsRepository: LocationPermissionsRepositoryAPI,
+    private val geolocationPermissions: GeoLocationPermissions,
     private val settingsDataStore: SettingsDataStore,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel
