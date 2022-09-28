@@ -17,27 +17,22 @@
 package com.duckduckgo.site.permissions.store.sitepermissionsallowed
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import kotlin.math.abs
 
-@Entity(tableName = "site_permission_allowed")
+@Entity(
+    tableName = "site_permission_allowed",
+    primaryKeys = ["domain", "tabId", "permissionAllowed"]
+)
 data class SitePermissionAllowedEntity(
-    @PrimaryKey val id: String,
     val domain: String,
     val tabId: String,
     val permissionAllowed: String,
     val allowedAt: Long
 ) {
-    companion object {
 
-        fun getPermissionAllowedId(domain: String, tabId: String, permissionAllowed: String): String {
-            return "$domain$tabId$permissionAllowed"
-        }
-
-        fun SitePermissionAllowedEntity.allowedWithin24h(): Boolean {
-            val now = System.currentTimeMillis()
-            val diff = abs(now - this.allowedAt) / 3600000
-            return diff <= 24
-        }
+    fun allowedWithin24h(): Boolean {
+        val now = System.currentTimeMillis()
+        val diff = abs(now - this.allowedAt) / 3600000
+        return diff <= 24
     }
 }

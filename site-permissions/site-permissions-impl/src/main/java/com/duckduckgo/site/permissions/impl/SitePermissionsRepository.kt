@@ -25,7 +25,6 @@ import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEnti
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferencesImp
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
-import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity.Companion.allowedWithin24h
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
@@ -93,8 +92,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     override fun isDomainGranted(url: String, tabId: String, permission: String): Boolean {
         val domain = url.extractDomain() ?: url
         val sitePermissionForDomain = sitePermissionsDao.getSitePermissionsByDomain(domain)
-        val permissionAllowedId = SitePermissionAllowedEntity.getPermissionAllowedId(domain, tabId, permission)
-        val permissionAllowedEntity = sitePermissionsAllowedDao.getSitePermissionAllowed(permissionAllowedId)
+        val permissionAllowedEntity = sitePermissionsAllowedDao.getSitePermissionAllowed(domain, tabId, permission)
         val permissionGrantedWithin24h = permissionAllowedEntity?.allowedWithin24h() == true
 
         return when (permission) {
@@ -118,7 +116,6 @@ class SitePermissionsRepositoryImpl @Inject constructor(
                 sitePermissionsDao.insert(SitePermissionsEntity(domain = domain))
             }
             val sitePermissionAllowed = SitePermissionAllowedEntity(
-                SitePermissionAllowedEntity.getPermissionAllowedId(domain, tabId, permission),
                 domain,
                 tabId,
                 permission,

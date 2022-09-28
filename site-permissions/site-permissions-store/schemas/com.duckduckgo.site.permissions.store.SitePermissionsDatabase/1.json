@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4d831db12e9b0c1a6ff120a7b93e8a24",
+    "identityHash": "7587db58baa9b380b4afa473a59d4903",
     "entities": [
       {
         "tableName": "site_permissions",
@@ -38,14 +38,8 @@
       },
       {
         "tableName": "site_permission_allowed",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `domain` TEXT NOT NULL, `tabId` TEXT NOT NULL, `permissionAllowed` TEXT NOT NULL, `allowedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `tabId` TEXT NOT NULL, `permissionAllowed` TEXT NOT NULL, `allowedAt` INTEGER NOT NULL, PRIMARY KEY(`domain`, `tabId`, `permissionAllowed`))",
         "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
           {
             "fieldPath": "domain",
             "columnName": "domain",
@@ -73,7 +67,9 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "domain",
+            "tabId",
+            "permissionAllowed"
           ],
           "autoGenerate": false
         },
@@ -84,7 +80,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4d831db12e9b0c1a6ff120a7b93e8a24')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7587db58baa9b380b4afa473a59d4903')"
     ]
   }
 }
