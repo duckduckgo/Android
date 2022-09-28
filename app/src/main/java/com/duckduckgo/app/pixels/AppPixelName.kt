@@ -158,6 +158,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     APP_LINKS_SNACKBAR_SHOWN("m_app_links_snackbar_shown"),
     APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED("m_app_links_snackbar_open_action_pressed"),
+    APP_LINKS_SECURITY_EXCEPTION("m_app_links_security_exception"),
 
     FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
     FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
