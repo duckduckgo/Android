@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.duckduckgo.app.CoroutineTestRule
@@ -36,9 +38,12 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
+import org.junit.runner.RunWith
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verifyNoInteractions
 
+@ExperimentalCoroutinesApi
+@RunWith(AndroidJUnit4::class)
 class AppTPCPUMonitorTest {
     private lateinit var cpuMonitor: AppTPCPUMonitor
 
@@ -47,6 +52,8 @@ class AppTPCPUMonitorTest {
     var coroutineRule = CoroutineTestRule()
     private lateinit var config: AppTpFeatureConfigImpl
     private lateinit var toggleDao: VpnConfigTogglesDao
+
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
 
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVpnRemoteConfigDatabase: VpnRemoteConfigDatabase = mock()
@@ -65,7 +72,7 @@ class AppTPCPUMonitorTest {
             coroutineRule.testDispatcherProvider
         )
 
-        cpuMonitor = AppTPCPUMonitor(mockWorkManager, config)
+        cpuMonitor = AppTPCPUMonitor(mockWorkManager, config, mockAppBuildConfig, context)
     }
 
     @Test

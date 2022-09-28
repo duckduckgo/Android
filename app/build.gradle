@@ -42,6 +42,12 @@ android {
                 }
             }
         }
+
+        if (project.hasProperty('perf-test')) {
+            buildConfigField "boolean", "IS_PERFORMANCE_TEST", "true"
+        } else {
+            buildConfigField "boolean", "IS_PERFORMANCE_TEST", "false"
+        }
     }
     buildFeatures {
         viewBinding = true

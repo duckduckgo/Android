@@ -16,10 +16,12 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
+import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
@@ -35,7 +37,11 @@ import javax.inject.Inject
 class AppTPCPUMonitor @Inject constructor(
     private val workManager: WorkManager,
     private val appTpFeatureConfig: AppTpFeatureConfig,
+    private val appBuildConfig: AppBuildConfig,
+    private val context: Context,
 ) : VpnServiceCallbacks {
+
+    private val cpuPerformanceLogger = CPUPerformanceLogger()
 
     companion object {
         @VisibleForTesting
@@ -52,6 +58,10 @@ class AppTPCPUMonitor @Inject constructor(
         } else {
             Timber.d("AppTpSetting.CPUMonitoring is disabled")
         }
+
+        if (appBuildConfig.isPerformanceTest) {
+            cpuPerformanceLogger.startLogging(coroutineScope)
+        }
     }
 
     override fun onVpnStopped(
@@ -60,5 +70,9 @@ class AppTPCPUMonitor @Inject constructor(
     ) {
         Timber.v("AppTpSetting.CPUMonitoring - stopping")
         workManager.cancelUniqueWork(APP_TRACKER_CPU_MONITOR_WORKER_TAG)
+
+        if (appBuildConfig.isPerformanceTest) {
+            cpuPerformanceLogger.stopLogging(context)
+        }
     }
 }
