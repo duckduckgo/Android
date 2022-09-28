@@ -35,7 +35,6 @@ import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.SectionDivider
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import com.duckduckgo.mobile.android.R as CommonR
 
 class WebsitesAdapter(
     private val viewModel: WhitelistViewModel,

@@ -23,12 +23,13 @@
     android:background="?attr/colorPrimaryDark"
     tools:context="com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementListMode">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/enabledToggle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         app:primaryText="@string/credentialManagementAutofillToggleLabel"
+        app:showSwitch="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

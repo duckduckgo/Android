@@ -21,11 +21,12 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/setAsDefaultBrowserSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsDefaultBrowserEnabled"/>
+        app:primaryText="@string/settingsDefaultBrowserEnabled"
+        app:showSwitch="true"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/homeScreenWidgetSetting"

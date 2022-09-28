@@ -72,46 +72,52 @@
                 android:text="Config"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/ipv6SupportToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="IPv6 Support"
+                app:showSwitch="true"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/privateDnsToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="Private DNS support"
+                app:showSwitch="true"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/vpnUnderlyingNetworksToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="Network Switching handling"
+                app:showSwitch="true"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/vpnAlwaysSetDNSToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="Always set DNS"
+                app:showSwitch="true"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/vpnConnectivityChecksToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="VPN connectivity checks"
+                app:showSwitch="true"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/vpn_new_networking_layer_toggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="VPN new networking layer"
+                app:showSwitch="true"
             />
 
             <!-- Section Trackers -->
@@ -128,11 +134,12 @@
                 android:text="Trackers"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/transparencyModeToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="Transparency Mode"
+                app:showSwitch="true"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -208,11 +215,12 @@
                 android:text="Logging"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/debug_logging_toggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="VPN Debug Logging"
+                app:showSwitch="true"
             />
 
             <!-- Section Diagnostics -->
@@ -260,25 +268,28 @@
                 android:text="Health"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cpuMonitorToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="CPU monitoring"
+                app:showSwitch="true"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/badHealthMonitorToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="Bad health monitoring"
+                app:showSwitch="true"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/badHealthMitigationToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="Bad health mitigation action"
+                app:showSwitch="true"
             />
 
         </LinearLayout>

@@ -19,12 +19,15 @@ package com.duckduckgo.mobile.android.ui.view.listitem
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.CompoundButton
+import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -77,6 +80,19 @@ class OneLineListItem @JvmOverloads constructor(
                 binding.leadingIconBackground.show()
             }
 
+            val showTrailingIcon = hasValue(R.styleable.OneLineListItem_trailingIcon)
+            val showSwitch = getBoolean(R.styleable.OneLineListItem_showSwitch, false)
+            if (showSwitch) {
+                binding.trailingSwitch.show()
+                binding.trailingIcon.gone()
+            } else if (showTrailingIcon) {
+                binding.trailingSwitch.gone()
+                binding.trailingIcon.setImageDrawable(getDrawable(R.styleable.OneLineListItem_trailingIcon))
+                binding.trailingIcon.show()
+            } else {
+                binding.trailingContainer.gone()
+            }
+
             recycle()
         }
     }
@@ -125,5 +141,28 @@ class OneLineListItem @JvmOverloads constructor(
     /** Sets the trailing image content description */
     fun setTrailingContentDescription(description: String) {
         binding.leadingIcon.contentDescription = description
+    }
+
+    /** Sets the checked change listener for the switch */
+    fun setOnCheckedChangeListener(onCheckedChangeListener: OnCheckedChangeListener) {
+        binding.trailingSwitch.setOnCheckedChangeListener(onCheckedChangeListener)
+    }
+
+    /** Sets the switch value */
+    fun setIsChecked(isChecked: Boolean) {
+        binding.trailingSwitch.isChecked = isChecked
+    }
+
+    /** Sets the switch as enabled or not */
+    fun setIsEnabled(isEnabled: Boolean) {
+        binding.trailingSwitch.isEnabled = isEnabled
+    }
+
+    /** Allows to set a new value to the switch, without triggering the onChangeListener */
+    fun quietlySetIsChecked(
+        newCheckedState: Boolean,
+        changeListener: CompoundButton.OnCheckedChangeListener?
+    ) {
+        binding.trailingSwitch.quietlySetIsChecked(newCheckedState, changeListener)
     }
 }

@@ -14,11 +14,12 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItemSwitch
+<com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:id="@+id/locationPermissionsToggle"
-    app:primaryText="@string/preciseLocationToggleText" />
+    app:primaryText="@string/preciseLocationToggleText"
+    app:showSwitch="true"/>
 
