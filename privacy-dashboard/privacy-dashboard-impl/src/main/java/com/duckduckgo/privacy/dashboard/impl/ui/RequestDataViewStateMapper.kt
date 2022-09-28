@@ -37,7 +37,6 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.*
 import com.squareup.anvil.annotations.ContributesBinding
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
-import timber.log.Timber
 import java.lang.Thread.State
 import javax.inject.Inject
 
