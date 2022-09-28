@@ -24,8 +24,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
@@ -37,7 +35,6 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType
 import com.duckduckgo.vpn.network.api.*
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +42,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesBinding(
     scope = VpnScope::class,
     boundType = VpnNetworkStack::class
 )
@@ -61,9 +58,7 @@ class NgVpnNetworkStack @Inject constructor(
     private val appTrackerRepository: AppTrackerRepository,
     private val appNameResolver: AppNameResolver,
     private val appTrackerRecorder: AppTrackerRecorder,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val vpnNetworkStackVariantManager: VpnNetworkStackVariantManager,
     vpnDatabase: VpnDatabase,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
@@ -78,20 +73,6 @@ class NgVpnNetworkStack @Inject constructor(
     private val appNamesCache = LruCache<String, AppNameResolver.OriginatingApp>(100)
 
     override val name: String = "ng"
-
-    override fun isEnabled(): Boolean {
-        val variant = vpnNetworkStackVariantManager.getVariant()
-        return appTpFeatureConfig.isEnabled(AppTpSetting.VpnNewNetworkingLayer) && variant == name
-    }
-
-    override fun shouldSetActiveNetworkDnsServers(): Boolean {
-        // for native VPN network layer always set active network DNS
-        return shouldSetUnderlyingNetworks()
-    }
-
-    override fun shouldSetUnderlyingNetworks(): Boolean {
-        return appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)
-    }
 
     override fun onCreateVpn(): Result<Unit> {
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
@@ -183,6 +164,10 @@ class NgVpnNetworkStack @Inject constructor(
             Timber.d("shouldAllowDomain for $name/$packageId = false")
             val trackingApp = appNamesCache[packageId] ?: appNameResolver.getAppNameForPackageId(packageId)
             appNamesCache.put(packageId, trackingApp)
+
+            // if the app name is unknown, skip inserting the tracker but still block the tracker
+            if (trackingApp.isUnknown()) return false
+
             VpnTracker(
                 trackerCompanyId = type.tracker.trackerCompanyId,
                 company = type.tracker.owner.name,

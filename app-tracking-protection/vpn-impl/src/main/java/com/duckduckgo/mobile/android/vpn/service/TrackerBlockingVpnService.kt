@@ -88,9 +88,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     @Inject lateinit var appTpFeatureConfig: AppTpFeatureConfig
 
-    @Inject lateinit var vpnNetworkStackPluginPoint: PluginPoint<VpnNetworkStack>
-
-    private lateinit var vpnNetworkStack: VpnNetworkStack
+    @Inject lateinit var vpnNetworkStack: VpnNetworkStack
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -131,11 +129,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         super.onCreate()
         AndroidInjection.inject(this)
 
-        vpnNetworkStack = vpnNetworkStackPluginPoint.getPlugins().first { it.isEnabled() }.apply {
-            onCreateVpn().getOrThrow()
-        }
-
-        Timber.d("VPN log onCreate")
+        Timber.d("VPN log onCreate, creating the ${vpnNetworkStack.name} network stack")
+        vpnNetworkStack.onCreateVpn().getOrThrow()
     }
 
     override fun onBind(intent: Intent?): IBinder {
@@ -189,7 +184,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             return@withContext
         }
 
-        if (vpnNetworkStack.shouldSetUnderlyingNetworks()) {
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)) {
             applicationContext.getActiveNetwork()?.let { an ->
                 Timber.v("Setting underlying network $an")
                 setUnderlyingNetworks(arrayOf(an))
@@ -287,7 +282,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         val dns = mutableSetOf<InetAddress>()
 
         // System DNS
-        if (vpnNetworkStack.shouldSetActiveNetworkDnsServers()) {
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.SetActiveNetworkDns)) {
             kotlin.runCatching {
                 applicationContext.getSystemActiveNetworkDefaultDns()
                     .map { InetAddress.getByName(it) }
@@ -492,6 +487,27 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
 
         internal fun startService(context: Context) {
+            startVpnService(context.applicationContext)
+        }
+
+        // TODO commented out for now, we'll see if we need it once we enable the new networking layer
+//        private fun startTrampolineService(context: Context) {
+//            val applicationContext = context.applicationContext
+//
+//            if (isServiceRunning(applicationContext)) return
+//
+//            runCatching {
+//                Intent(applicationContext, VpnTrampolineService::class.java).also { i ->
+//                    applicationContext.startService(i)
+//                }
+//            }.onFailure {
+//                // fallback for when both browser and vpn processes are not up, as we can't start a non-foreground service in the background
+//                Timber.w(it, "VPN log: Failed to start trampoline service")
+//                startVpnService(applicationContext)
+//            }
+//        }
+
+        internal fun startVpnService(context: Context) {
             val applicationContext = context.applicationContext
 
             if (isServiceRunning(applicationContext)) return

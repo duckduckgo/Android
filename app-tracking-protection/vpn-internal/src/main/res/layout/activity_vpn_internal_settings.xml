@@ -117,15 +117,6 @@
                     android:theme="@style/SettingsSwitchTheme"
             />
 
-            <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/vpn_new_networking_layer_toggle"
-                    style="@style/SettingsSwitch"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="VPN new networking layer"
-                    android:theme="@style/SettingsSwitchTheme"
-            />
-
             <!-- Section Trackers -->
             <com.duckduckgo.mobile.android.ui.view.SectionDivider
                 android:layout_width="match_parent"
