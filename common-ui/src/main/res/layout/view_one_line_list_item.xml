@@ -53,7 +53,7 @@
             android:paddingBottom="@dimen/oneLineItemPadding"
             android:textColor="?attr/listItemTitleColor"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/trailingIcon"
+            app:layout_constraintEnd_toStartOf="@+id/trailingContainer"
             app:layout_constraintStart_toEndOf="@id/leadingIconBackground"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Title"/>
