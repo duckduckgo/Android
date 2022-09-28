@@ -39,13 +39,14 @@ import javax.inject.Inject
 class CPUPerformanceLoggerImpl @Inject constructor() : CPUPerformanceLogger {
 
     private val loggingJob = ConflatedJob()
-    private val samples = ArrayList<Double>(15)
+    private val samples: MutableList<Double> = mutableListOf()
 
     override fun startLogging(coroutineScope: CoroutineScope) {
         val cpuUsageReader = CPUUsageReader()
+        samples.clear()
         loggingJob += coroutineScope.launch(Dispatchers.IO) {
             while (isActive) {
-                delay(3_000)
+                delay(5_000)
                 try {
                     val avgCPUUsagePercent = cpuUsageReader.readCPUUsage()
                     samples.add(avgCPUUsagePercent)
