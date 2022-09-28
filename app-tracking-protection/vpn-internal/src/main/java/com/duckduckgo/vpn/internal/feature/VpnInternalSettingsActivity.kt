@@ -216,14 +216,11 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupBugReport() {
-        binding.apptpBugreport.setTitle("Generate AppTP bug report")
-        binding.apptpBugreport.setIsLoading(false)
         binding.apptpBugreport.setOnClickListener {
+            Snackbar.make(binding.root, "Generating AppTP Bug Report", Snackbar.LENGTH_LONG).show()
             lifecycleScope.launch {
-                binding.apptpBugreport.setIsLoading(true)
                 val bugreport = vpnBugReporter.generateBugReport()
                 shareBugReport(bugreport)
-                binding.apptpBugreport.setIsLoading(false)
             }
         }
     }

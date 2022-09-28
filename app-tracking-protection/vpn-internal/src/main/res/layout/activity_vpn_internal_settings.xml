@@ -232,11 +232,11 @@
                     android:text="Diagnostics"
             />
 
-            <com.duckduckgo.vpn.internal.feature.ui.SettingsToggleOptionWithLoadingState
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/apptp_bugreport"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="Generate AppTP bugreport"
+                app:primaryText="Generate AppTP bugreport"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
