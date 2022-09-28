@@ -22,6 +22,7 @@
     android:layout_height="wrap_content"
     android:minHeight="@dimen/twoLineItemHeight"
     xmlns:tools="http://schemas.android.com/tools"
+    android:paddingEnd="@dimen/keyline_4"
     android:id="@+id/item_container">
 
     <FrameLayout
@@ -50,7 +51,6 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="14dp"
         android:layout_marginEnd="16dp"
-        android:lines="1"
         android:textColor="?attr/listItemTitleColor"
         app:layout_constraintBottom_toTopOf="@+id/secondaryText"
         app:layout_constraintEnd_toStartOf="@+id/trailingContainer"
@@ -86,7 +86,6 @@
             android:id="@+id/trailingIcon"
             android:layout_width="@dimen/listItemImageContainerSize"
             android:layout_height="@dimen/listItemImageContainerSize"
-            android:layout_marginEnd="8dp"
             android:background="?selectableItemBackground"
             android:scaleType="center"
 
@@ -96,8 +95,7 @@
         <com.duckduckgo.mobile.android.ui.view.SwitchView
             android:id="@+id/trailingSwitch"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/keyline_4"/>
+            android:layout_height="wrap_content"/>
 
     </FrameLayout>
 
