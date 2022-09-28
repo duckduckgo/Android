@@ -29,15 +29,11 @@ interface WebViewPreviewGenerator {
 class FileBasedWebViewPreviewGenerator(private val dispatchers: DispatcherProvider) : WebViewPreviewGenerator {
 
     override suspend fun generatePreview(webView: WebView): Bitmap {
-        val fullSizeBitmap = convertWebViewToBitmap(webView)
-        return scaleBitmap(fullSizeBitmap)
-    }
-
-    private suspend fun convertWebViewToBitmap(webView: WebView): Bitmap {
         disableScrollbars(webView)
-        val bm = createBitmap(webView)
+        val fullSizeBitmap = createBitmap(webView)
+        val scaledBitmap = scaleBitmap(fullSizeBitmap)
         enableScrollbars(webView)
-        return bm
+        return scaledBitmap
     }
 
     private suspend fun createBitmap(webView: WebView): Bitmap {
