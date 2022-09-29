@@ -52,7 +52,8 @@
     <dimen name="dialogImageSize">40dp</dimen>
 
     <!-- Dividers -->
-    <dimen name="horitonzalDividerHeight">1dp</dimen>
+    <dimen name="horizontalDividerHeight">1dp</dimen>
+    <dimen name="horizontalDividerPadding">@dimen/keyline_3</dimen>
     <dimen name="verticalDividerWidth">1dp</dimen>
 
 </resources>
