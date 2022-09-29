@@ -24,10 +24,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.app.trackerdetection.model.TrackerStatus.ALLOWED
-import com.duckduckgo.app.trackerdetection.model.TrackerStatus.BLOCKED
-import com.duckduckgo.app.trackerdetection.model.TrackerType.AD
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.dashboard.impl.ui.AppSiteViewStateMapperTest.EntityMO.MAJOR_ENTITY_A
 import com.nhaarman.mockitokotlin2.mock

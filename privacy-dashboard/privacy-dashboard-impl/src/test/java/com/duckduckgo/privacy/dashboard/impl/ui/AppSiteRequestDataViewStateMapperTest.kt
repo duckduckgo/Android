@@ -39,7 +39,7 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.Blocked
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import  org.junit.Assert.assertEquals
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -83,7 +83,7 @@ class AppSiteRequestDataViewStateMapperTest {
         val viewState = testee.mapFromSite(site)
 
         assertTrue(viewState.requests.count() == 6)
-        assertTrue(viewState.requests.first { it.url == "test1.com" }.state is  Blocked)
+        assertTrue(viewState.requests.first { it.url == "test1.com" }.state is Blocked)
         assertTrue(viewState.requests.first { it.url == "test2.com" }.state == Allowed(Reason(AllowedReasons.PROTECTIONS_DISABLED.value)))
         assertTrue(viewState.requests.first { it.url == "test3.com" }.state == Allowed(Reason(AllowedReasons.AD_CLICK_ATTRIBUTION.value)))
         assertTrue(viewState.requests.first { it.url == "test4.com" }.state == Allowed(Reason(AllowedReasons.RULE_EXCEPTION.value)))
@@ -163,7 +163,6 @@ class AppSiteRequestDataViewStateMapperTest {
         whenever(site.entity).thenReturn(entity)
         whenever(site.trackingEvents).thenReturn(events)
 
-
         if (certificate != null) {
             val dName = mock<DName>().apply {
                 whenever(this.cName).thenReturn(certificate.cName)
@@ -181,6 +180,5 @@ class AppSiteRequestDataViewStateMapperTest {
         val MINOR_ENTITY_A = TestEntity("Minor A", "Minor A", 0.0)
         val MAJOR_ENTITY_A = TestEntity("Major A", "Major A", Entity.MAJOR_NETWORK_PREVALENCE)
     }
-
 
 }

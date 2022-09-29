@@ -16,7 +16,6 @@
 
 package com.duckduckgo.privacy.dashboard.impl.ui
 
-import android.net.http.SslCertificate
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -29,9 +28,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus.SITE_BREAKAGE_ALL
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.USER_ALLOWED
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CertificateViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.PublicKeyViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Reason
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.*

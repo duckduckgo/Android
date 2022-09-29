@@ -27,10 +27,7 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteViewState
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.Allowed
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.Blocked
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.UserSettingsViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.nhaarman.mockitokotlin2.any
@@ -38,9 +35,7 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import org.junit.Assert.assertNotNull
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.argumentCaptor
@@ -107,16 +102,18 @@ class PrivacyDashboardRendererTest {
         userChangedValues = false,
         requestData = RequestDataViewState(
             emptyList(),
-            listOf(DetectedRequest(
-                category = "Analytics",
-                eTLDplus1 = "example.com",
-                entityName = "Entity Name",
-                ownerName = "Owner name",
-                pageUrl = "test.com",
-                prevalence = 10.0,
-                state = Blocked(),
-                url = "tracker.com"
-            ))
+            listOf(
+                DetectedRequest(
+                    category = "Analytics",
+                    eTLDplus1 = "example.com",
+                    entityName = "Entity Name",
+                    ownerName = "Owner name",
+                    pageUrl = "test.com",
+                    prevalence = 10.0,
+                    state = Blocked(),
+                    url = "tracker.com"
+                )
+            )
         ),
         protectionStatus = ProtectionStatusViewState(true, true, emptyList(), true)
     )
