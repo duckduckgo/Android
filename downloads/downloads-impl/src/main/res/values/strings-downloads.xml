@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,16 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<resources>
+    <!-- smartling.placeholder_format = NONE -->
+    <string name="downloadsErrorMessage">Failed to download. Check internet connection.</string>
 
-<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="notificationChannelFileDownloading">File downloading</string>
+    <string name="notificationChannelFileDownloaded">File downloaded</string>
+
+    <string name="downloadInProgress">Downloading</string>
+
     <string name="downloadsDownloadStartedMessage">Download started for %s</string>
     <string name="downloadsDownloadFinishedMessage">Download complete for %s</string>
     <string name="downloadsDownloadGenericErrorMessage">Failed to download.</string>

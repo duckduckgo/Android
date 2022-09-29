@@ -14,16 +14,9 @@
   ~ limitations under the License.
   -->
 
+<!-- smartling.entity_escaping = false -->
 <resources>
-    <string name="common_Today">Today</string>
-    <string name="common_Yesterday">Yesterday</string>
-    <string name="common_DaysAgo">%d days ago</string>
-    <string name="common_PastWeek">Past Week</string>
-    <string name="common_PastMonth">Past Month</string>
-    <string name="common_MinutesAgo">%dm ago</string>
-    <string name="common_HoursAgo">%dh ago</string>
-    <string name="common_JustNow">Just Now</string>
-    <string name="common_hour_abbreviation">hr</string>
-    <string name="common_min_abbreviation">min</string>
-    <string name="common_seconds_abbreviation">sec</string>
+    <!-- smartling.placeholder_format = NONE -->
+    <string name="autofill_auth_text">Unlock to use Saved Logins</string>
+    <string name="biometric_prompt_title">Verify it\'s you</string>
 </resources>

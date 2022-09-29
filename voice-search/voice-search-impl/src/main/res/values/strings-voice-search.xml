@@ -14,7 +14,9 @@
   ~ limitations under the License.
   -->
 
+<!-- smartling.entity_escaping = false -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="voiceSearchIconContentDescription">Voice search</string>
     <string name="voiceSearchListening">Speak Now</string>
     <string name="voiceSearchListeningFooter">Audio is processed on-device. It\'s not stored or shared with anyone, including DuckDuckGo.</string>

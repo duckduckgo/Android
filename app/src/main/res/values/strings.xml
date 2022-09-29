@@ -13,10 +13,11 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo&#160;</string>
+    <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
     <string name="duckDuckGoPrivacySimplified">Privacy, simplified</string>
     <string name="yes">Yes</string>
@@ -112,7 +113,7 @@
     <string name="privacyProtectionEnabled">SITE PROTECTION ENABLED</string>
     <string name="privacyProtectionDisabled">SITE PROTECTION DISABLED</string>
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM <img src="%d" /> TO <img src="%d" /></string>
     <string name="privacyGradeContentDescription">Privacy Grade</string>
     <string name="privacyProtectionTemporarilyDisabled">We temporarily disabled Privacy Protection as it appears to be breaking this site.</string>
 
@@ -131,7 +132,7 @@
     <string name="practicesBad">Poor Privacy Practices</string>
     <string name="practicesUnknown">Unknown Privacy Practices</string>
     <string name="practicesOverview">Privacy practices indicate how much the personal information that you share with a website is protected.</string>
-    <string name="practicesTosdrLink">Privacy Practices from&#160;<b><u>ToS;DR</u></b>.</string>
+    <string name="practicesTosdrLink">Privacy Practices from<b><u>ToS;DR</u></b>.</string>
     <string name="practicesIconContentGood">Good Practice Icon</string>
     <string name="practicesIconContentBad">Bad Practice Icon</string>
 
@@ -151,7 +152,7 @@
     <string name="domainsLoadedHeadingText">No third-party domains loaded</string>
 
     <string name="webTrackingProtectionsText"><annotation type="learn_more_link">About our Web Tracking Protections</annotation></string>
-    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
 
     <string name="trackersBlockedNoSectionDescription">The following domains\' requests were loaded.</string>
 
@@ -258,7 +259,7 @@
     <string name="bookmarksActivityTitle">Bookmarks</string>
     <string name="noBookmarks">No bookmarks added yet</string>
     <string name="bookmarkOverflowContentDescription">More options for bookmark %s</string>
-    <string name="bookmarkDeleteConfirmationMessage">Deleted &lt;b>%s&lt;/b></string>
+    <string name="bookmarkDeleteConfirmationMessage">Deleted <b>%s</b></string>
     <string name="exportBookmarksMenu">Export</string>
     <string name="exportBookmarksEmpty">You don\'t have bookmarks, nothing will be exported</string>
     <string name="exportBookmarksError">Couldn\'t export any bookmarks, something went wrong</string>
@@ -493,8 +494,8 @@
         <item quantity="other"><![CDATA[&#160;were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[As you tap and scroll, I\'ll block pesky trackers. <br/><br/>Go ahead — keep browsing!]]></string>
-    <string name="daxMainNetworkCtaText">Heads up! I can\'t stop %s from seeing your activity on %s &lt;br/&gt;&lt;br/&gt;But browse with me, and I can reduce what %s knows about you overall by blocking their trackers on lots of other sites.</string>
-    <string name="daxMainNetworkOwnedCtaText">Heads up! Since %s owns %s, I can\'t stop them from seeing your activity here.&lt;br/&gt;&lt;br/&gt;But browse with me, and I can reduce what %s knows about you overall by blocking their trackers on lots of other sites.</string>
+    <string name="daxMainNetworkCtaText">Heads up! I can\'t stop %s from seeing your activity on %s <br/><br/>But browse with me, and I can reduce what %s knows about you overall by blocking their trackers on lots of other sites.</string>
+    <string name="daxMainNetworkOwnedCtaText">Heads up! Since %s owns %s, I can\'t stop them from seeing your activity here.<br/><br/>But browse with me, and I can reduce what %s knows about you overall by blocking their trackers on lots of other sites.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Save to Downloads</string>
@@ -527,7 +528,7 @@
     <string name="enablePrivacyProtection">Enable Privacy Protection</string>
     <string name="disablePrivacyProtection">Disable Privacy Protection</string>
     <string name="whitelistEntryOverflowContentDescription">More options for unprotected site %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Are you sure you want to remove &lt;b>%s&lt;/b> from Unprotected Sites?</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Are you sure you want to remove <b>%s</b> from Unprotected Sites?</string>
     <string name="whitelistExplanation">These sites will not be enhanced by Privacy Protection.</string>
     <string name="whitelistNoEntries">Privacy Protection enabled for all sites</string>
     <string name="whitelistDomainHint">www.example.com</string>
@@ -540,9 +541,9 @@
     <string name="fireproofWebsitesActivityTitle">Fireproof Sites</string>
     <string name="settingsFireproofWebsites">Fireproof Sites</string>
     <string name="fireproofWebsiteMenuTitleAdd">Fireproof This Site</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now Fireproof</string>
+    <string name="fireproofWebsiteSnackbarConfirmation"><b>%s</b> is now Fireproof</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Are you sure you want to delete <b>%s</b>?</string>
     <string name="fireproofWebsiteFeatureDescription">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won\'t be erased and you\'ll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
     <string name="fireproofWebsiteOverflowContentDescription">More options for fireproof website %s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Would you like to Fireproof %s?</string>
@@ -553,7 +554,7 @@
     <string name="fireproofWebsiteEmptyListHint">No Fireproof sites yet</string>
     <string name="fireproofWebsiteSettingSelectionTitle">Fireproof Websites on Sign-in</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Fireproofing removed for all sites</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Fireproofing removed for &lt;b>%s&lt;/b></string>
+    <string name="fireproofWebsiteRemovalConfirmation">Fireproofing removed for <b>%s</b></string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Ask every time</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Always</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Never</string>
@@ -599,7 +600,7 @@
     <string name="preciseLocationEmptyListHint">No websites granted permission to access location</string>
     <string name="preciseLocationNoSystemPermission">To manage the location access permissions you\’ve granted to individual sites, enable location for this app in Android Settings.</string>
     <string name="preciseLocationActivityTitle">Location</string>
-    <string name="preciseLocationDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
+    <string name="preciseLocationDeleteConfirmMessage">Are you sure you want to delete <b>%s</b>?</string>
     <string name="preciseLocationDeleteContentDescription">More options for location permissions in domain %s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Granted</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Denied</string>
@@ -715,9 +716,13 @@
     <string name="atp_SettingsDeviceShieldDisabled">Disabled</string>
 
     <!-- Autoconsent -->
+    <!-- smartling.character_limit = 82 -->
     <string name="autoconsentDialogTitle">Looks like this site has a cookie consent pop-up 👇</string>
+    <!-- smartling.character_limit = 160 -->
     <string name="autoconsentDialogDescription">Want me to handle these for you? I can try to minimize cookies, maximize privacy, and hide pop-ups like these.</string>
+    <!-- smartling.character_limit = 42 -->
     <string name="autoconsentPrimaryCta">Manage Cookie Pop-ups</string>
+    <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">No Thanks</string>
 
     <string name="autoconsentSetting">Manage Cookie Pop-ups</string>
