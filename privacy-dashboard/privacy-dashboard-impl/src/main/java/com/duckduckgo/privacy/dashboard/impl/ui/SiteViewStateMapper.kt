@@ -27,14 +27,14 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-interface SiteProtectionsViewStateMapper {
+interface SiteViewStateMapper {
     fun mapFromSite(site: Site): SiteViewState
 }
 
 @ContributesBinding(AppScope::class)
-class AppSiteProtectionsViewStateMapper @Inject constructor(
+class AppSiteViewStateMapper @Inject constructor(
     private val publicKeyInfoMapper: PublicKeyInfoMapper
-) : SiteProtectionsViewStateMapper {
+) : SiteViewStateMapper {
 
     override fun mapFromSite(site: Site): SiteViewState {
         val entityViewState = site.entity?.let {

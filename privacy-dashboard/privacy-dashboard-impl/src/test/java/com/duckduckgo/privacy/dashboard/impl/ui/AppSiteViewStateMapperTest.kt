@@ -43,7 +43,7 @@ class AppSiteViewStateMapperTest {
         whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)
     }
 
-    val testee = AppSiteProtectionsViewStateMapper(PublicKeyInfoMapper(androidQAppBuildConfig))
+    val testee = AppSiteViewStateMapper(PublicKeyInfoMapper(androidQAppBuildConfig))
 
     @Test
     fun whenSiteHasEntityThenViewStateHasParentEntity() {
@@ -73,9 +73,7 @@ class AppSiteViewStateMapperTest {
 
         assertEquals(site.url, siteProtectionsViewState.url)
         assertEquals(site.upgradedHttps, siteProtectionsViewState.upgradedHttps)
-        assertEquals(site.url, siteProtectionsViewState.site.url)
-        assertEquals(site.domain, siteProtectionsViewState.site.domain)
-        assertEquals(site.userAllowList, siteProtectionsViewState.site.allowlisted)
+        assertEquals(site.domain, siteProtectionsViewState.domain)
     }
 
     @Test
@@ -97,57 +95,9 @@ class AppSiteViewStateMapperTest {
         assertTrue(siteProtectionsViewState.secCertificateViewModels.isEmpty())
     }
 
-    @Test
-    fun whenSiteContainsTrackersEventsThenViewStateHasTrackerData() {
-        val site = site(
-            events = listOf(
-                TrackingEvent("test.com", "test.com", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
-                TrackingEvent("test2.com", "test2.com", null, MAJOR_ENTITY_A, null, BLOCKED, AD)
-            )
-        )
-
-        val siteProtectionsViewState = testee.mapFromSite(site)
-
-        assertTrue(siteProtectionsViewState.trackers.containsKey(MAJOR_ENTITY_A.displayName))
-        assertTrue(siteProtectionsViewState.trackers[MAJOR_ENTITY_A.displayName]!!.count == 2)
-        val eventsEntityA = siteProtectionsViewState.trackers[MAJOR_ENTITY_A.displayName]
-        assertTrue(eventsEntityA!!.urls["test.com"]!!.isBlocked)
-        assertTrue(eventsEntityA.urls["test2.com"]!!.isBlocked)
-    }
-
-    @Test
-    fun whenSiteContainsTrackersEventsThenSiteViewStateHasUrls() {
-        val site = site(
-            events = listOf(
-                TrackingEvent("test.com", "test.com", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
-                TrackingEvent("test2.com", "test2.com", null, MAJOR_ENTITY_A, null, ALLOWED, AD)
-            )
-        )
-
-        val siteProtectionsViewState = testee.mapFromSite(site)
-
-        assertTrue(siteProtectionsViewState.site.trackersUrls.count() == 2)
-        assertTrue(siteProtectionsViewState.site.trackersUrls.containsAll(listOf("test.com", "test2.com")))
-    }
-
-    @Test
-    fun whenAllTrackersEventsNotBlockedThenViewStateBlockedTrackersEmpty() {
-        val site = site(
-            events = listOf(
-                TrackingEvent("test.com", "test.com", null, MAJOR_ENTITY_A, null, ALLOWED, AD),
-                TrackingEvent("test2.com", "test2.com", null, MAJOR_ENTITY_A, null, ALLOWED, AD)
-            )
-        )
-
-        val siteProtectionsViewState = testee.mapFromSite(site)
-
-        assertTrue(siteProtectionsViewState.trackerBlocked.isEmpty())
-    }
-
     private fun site(
         url: String = "http://www.test.com",
         uri: Uri? = Uri.parse(url),
-        events: List<TrackingEvent> = emptyList(),
         entity: Entity? = null,
         certificate: TestCertificateInfo? = null
     ): Site {
@@ -155,7 +105,6 @@ class AppSiteViewStateMapperTest {
         whenever(site.url).thenReturn(url)
         whenever(site.uri).thenReturn(uri)
         whenever(site.entity).thenReturn(entity)
-        whenever(site.trackingEvents).thenReturn(events)
 
         if (certificate != null) {
             val dName = mock<DName>().apply {

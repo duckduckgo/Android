@@ -27,6 +27,7 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -46,7 +47,6 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
-@Ignore // TODO
 class PrivacyDashboardHybridViewModelTest {
 
     @ExperimentalCoroutinesApi
@@ -60,6 +60,7 @@ class PrivacyDashboardHybridViewModelTest {
     private val userWhitelistDao = mock<UserWhitelistDao>()
 
     private val contentBlocking = mock<ContentBlocking>()
+    private val unprotectedTemporary = mock<UnprotectedTemporary>()
 
     private val pixel = mock<Pixel>()
 
@@ -68,9 +69,9 @@ class PrivacyDashboardHybridViewModelTest {
         pixel = pixel,
         dispatcher = coroutineRule.testDispatcherProvider,
         appCoroutineScope = TestScope(),
-        siteProtectionsViewStateMapper = AppSiteProtectionsViewStateMapper(PublicKeyInfoMapper(androidQAppBuildConfig)),
-        requestDataViewStateMapper = mock(),
-        protectionStatusViewStateMapper = mock(),
+        siteViewStateMapper = AppSiteViewStateMapper(PublicKeyInfoMapper(androidQAppBuildConfig)),
+        requestDataViewStateMapper = AppSiteRequestDataViewStateMapper(),
+        protectionStatusViewStateMapper = AppProtectionStatusViewStateMapper(contentBlocking, unprotectedTemporary),
         jsInterfaceMapper = mock()
     )
 
@@ -91,7 +92,7 @@ class PrivacyDashboardHybridViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertNotNull(viewState)
-            assertEquals("https://example.com", viewState!!.siteViewState.site.url)
+            assertEquals("https://example.com", viewState!!.siteViewState.url)
         }
     }
 
@@ -104,7 +105,7 @@ class PrivacyDashboardHybridViewModelTest {
             awaitItem()
             val viewState = awaitItem()
             assertTrue(viewState!!.userChangedValues)
-            assertFalse(viewState.userSettingsViewState.privacyProtectionEnabled)
+            assertFalse(viewState.protectionStatus.allowlisted)
         }
     }
 

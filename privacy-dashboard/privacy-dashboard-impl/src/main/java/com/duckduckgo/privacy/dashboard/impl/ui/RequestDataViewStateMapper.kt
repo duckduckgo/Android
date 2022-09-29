@@ -45,21 +45,20 @@ interface RequestDataViewStateMapper {
 }
 
 @ContributesBinding(AppScope::class)
-class AppSiteRequestDataViewStateMapper @Inject constructor(
-    private val publicKeyInfoMapper: PublicKeyInfoMapper
-) : RequestDataViewStateMapper {
+class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewStateMapper {
 
     private val publicSuffixDatabase = PublicSuffixDatabase()
+    private val allowedCategories = listOf(
+        "Analytics",
+        "Advertising",
+        "Social Network",
+        "Content Delivery",
+        "Embedded Content"
+    )
 
     override fun mapFromSite(site: Site): RequestDataViewState {
         val installedSurrogates = mutableListOf<String>()
-        val allowedCategories = listOf(
-            "Analytics",
-            "Advertising",
-            "Social Network",
-            "Content Delivery",
-            "Embedded Content"
-        )
+
         val requests: List<DetectedRequest> = site.trackingEvents.map {
             val entity: Entity = if (it.entity == null) return@map null else it.entity!!
 
@@ -100,32 +99,5 @@ class AppSiteRequestDataViewStateMapper @Inject constructor(
         val urlAdDomain = UriString.host(url)
         if (urlAdDomain.isNullOrEmpty()) return urlAdDomain
         return kotlin.runCatching { publicSuffixDatabase.getEffectiveTldPlusOne(urlAdDomain) }.getOrNull()
-    }
-
-    private fun SslCertificate.map(): CertificateViewState {
-        val publicKeyInfo = publicKeyInfoMapper.mapFrom(this)
-
-        return CertificateViewState(
-            commonName = this.issuedTo.cName,
-            summary = this.issuedTo.cName,
-            publicKey = publicKeyInfo?.let {
-                PublicKeyViewState(
-                    blockSize = publicKeyInfo.blockSize,
-                    bitSize = publicKeyInfo.bitSize,
-                    canEncrypt = publicKeyInfo.canEncrypt,
-                    canSign = publicKeyInfo.canSign,
-                    canDerive = publicKeyInfo.canDerive,
-                    canUnwrap = publicKeyInfo.canUnwrap,
-                    canWrap = publicKeyInfo.canWrap,
-                    canDecrypt = publicKeyInfo.canDecrypt,
-                    canVerify = publicKeyInfo.canVerify,
-                    effectiveSize = publicKeyInfo.effectiveSize,
-                    isPermanent = publicKeyInfo.isPermanent,
-                    type = publicKeyInfo.type,
-                    externalRepresentation = publicKeyInfo.externalRepresentation,
-                    keyId = publicKeyInfo.keyId
-                )
-            }
-        )
     }
 }

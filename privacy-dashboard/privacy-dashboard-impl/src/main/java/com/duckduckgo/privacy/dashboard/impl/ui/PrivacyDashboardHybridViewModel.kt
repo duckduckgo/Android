@@ -51,7 +51,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val siteProtectionsViewStateMapper: SiteProtectionsViewStateMapper,
+    private val siteViewStateMapper: SiteViewStateMapper,
     private val requestDataViewStateMapper: RequestDataViewStateMapper,
     private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
     private val jsInterfaceMapper: JSInterfaceMapper
@@ -184,7 +184,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         withContext(dispatcher.main()) {
             viewState.emit(
                 ViewState(
-                    siteViewState = siteProtectionsViewStateMapper.mapFromSite(site),
+                    siteViewState = siteViewStateMapper.mapFromSite(site),
                     requestData = requestDataViewStateMapper.mapFromSite(site),
                     protectionStatus = protectionStatusViewStateMapper.mapFromSite(site)
                 )

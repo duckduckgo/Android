@@ -22,9 +22,14 @@ import androidx.core.net.toUri
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.domain
+import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteViewState
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.Allowed
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.Blocked
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.UserSettingsViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
@@ -33,6 +38,7 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import org.junit.Assert.assertNotNull
 import org.junit.Ignore
 import org.junit.Test
@@ -42,12 +48,11 @@ import org.mockito.kotlin.times
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-@Ignore
 class PrivacyDashboardRendererTest {
 
     private val context = ApplicationProvider.getApplicationContext<Context>()
     val spyWebView = spy(WebView(context))
-    val moshi = Moshi.Builder().build()
+    val moshi = getMoshiPD()
     val testee = PrivacyDashboardRenderer(
         spyWebView,
         {},
@@ -83,32 +88,38 @@ class PrivacyDashboardRendererTest {
 
         verify(spyWebView, times(5)).evaluateJavascript(captor.capture(), eq(null))
 
+        assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeProtectionStatus") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeParentEntity") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeCertificateData") })
-        assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeTrackerBlockingData") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeUpgradedHttps") })
-        assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeProtectionStatus") })
+        assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeRequestData") })
     }
 
     fun aViewState() = ViewState(
-        userSettingsViewState = UserSettingsViewState(privacyProtectionEnabled = true),
         siteViewState = SiteViewState(
             url = "http://example.com",
+            domain = "http://example.com".toUri().domain()!!,
             upgradedHttps = true,
-            site = SiteViewState(
-                url = "http://example.com",
-                domain = "http://example.com".toUri().domain()!!,
-                emptySet(),
-                false
-            ),
             parentEntity = null,
-            trackers = emptyMap(),
-            trackerBlocked = emptyMap(),
             secCertificateViewModels = emptyList(),
             locale = Locale.getDefault().language
         ),
         userChangedValues = false,
-        requestData = RequestDataViewState(emptyList(), emptyList()), // TODO
+        requestData = RequestDataViewState(
+            emptyList(),
+            listOf(DetectedRequest(
+                category = "Analytics",
+                eTLDplus1 = "example.com",
+                entityName = "Entity Name",
+                ownerName = "Owner name",
+                pageUrl = "test.com",
+                prevalence = 10.0,
+                state = Blocked(),
+                url = "tracker.com"
+            ))
+        ),
         protectionStatus = ProtectionStatusViewState(true, true, emptyList(), true)
     )
+
+    private fun getMoshiPD(): Moshi = JsonModule.moshi(Moshi.Builder().build())
 }
