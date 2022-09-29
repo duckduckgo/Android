@@ -19,6 +19,7 @@
 package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.CompoundButton
@@ -70,20 +71,14 @@ class TwoLineListItem @JvmOverloads constructor(
             }
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIcon)) {
-                binding.leadingIcon.setImageDrawable(getDrawable(R.styleable.TwoLineListItem_leadingIcon))
-            } else {
+                setLeadingIconDrawable(getDrawable(R.styleable.TwoLineListItem_leadingIcon)!!)
+            } else {1
                 binding.leadingIconBackground.gone()
             }
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIconBackground)) {
                 val value = getInt(R.styleable.TwoLineListItem_leadingIconBackground, 0)
-                if (value == 1) {
-                    binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_circular_background)
-                }
-                if (value == 2) {
-                    binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_round_background)
-                }
-                binding.leadingIconBackground.show()
+                setLeadingIconBackgroundType(value)
             }
 
             val showBetaPill = getBoolean(R.styleable.TwoLineListItem_showBetaPill, false)
@@ -124,7 +119,13 @@ class TwoLineListItem @JvmOverloads constructor(
     /** Sets the item image resource */
     fun setLeadingIcon(idRes: Int) {
         binding.leadingIcon.setImageResource(idRes)
-        binding.leadingIcon.show()
+        binding.leadingIconBackground.show()
+    }
+
+    /** Sets the item image resource */
+    fun setLeadingIconDrawable(drawable: Drawable) {
+        binding.leadingIcon.setImageDrawable(drawable)
+        binding.leadingIconBackground.show()
     }
 
     /** Sets the item click listener */
@@ -142,10 +143,21 @@ class TwoLineListItem @JvmOverloads constructor(
         binding.leadingIcon.contentDescription = description
     }
 
+    /** Sets the background image type */
+    fun setLeadingIconBackgroundType(value: Int){
+        if (value == 1) {
+            binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_circular_background)
+        }
+        if (value == 2) {
+            binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_round_background)
+        }
+        binding.leadingIconBackground.show()
+    }
+
     /** Sets the item image resource */
     fun setTrailingIcon(idRes: Int) {
         binding.trailingIcon.setImageResource(idRes)
-        binding.trailingIcon.show()
+        binding.trailingContainer.show()
     }
 
     /** Sets the item overflow menu click listener */
