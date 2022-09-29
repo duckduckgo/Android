@@ -32,7 +32,6 @@ interface ProtectionStatusViewStateMapper {
 
 @ContributesBinding(AppScope::class)
 class AppProtectionStatusViewStateMapper @Inject constructor(
-    private val publicKeyInfoMapper: PublicKeyInfoMapper,
     private val contentBlocking: ContentBlocking,
     private val unprotectedTemporary: UnprotectedTemporary
 ) : ProtectionStatusViewStateMapper {

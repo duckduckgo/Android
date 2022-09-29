@@ -51,7 +51,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val siteProtectionsViewStateMapper: SiteProtectionsViewStateMapper,
+    private val siteViewStateMapper: SiteViewStateMapper,
     private val requestDataViewStateMapper: RequestDataViewStateMapper,
     private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
     private val jsInterfaceMapper: JSInterfaceMapper
@@ -65,7 +65,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     data class ViewState(
-        val siteProtectionsViewState: SiteProtectionsViewState,
+        val siteViewState: SiteViewState,
         val userChangedValues: Boolean = false,
         val requestData: RequestDataViewState,
         val protectionStatus: ProtectionStatusViewState
@@ -113,7 +113,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val privacyProtectionEnabled: Boolean
     )
 
-    data class SiteProtectionsViewState(
+    data class SiteViewState(
         val url: String,
         val domain: String,
         val upgradedHttps: Boolean,
@@ -151,27 +151,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val prevalence: Double
     )
 
-    data class SiteViewState(
-        val url: String,
-        val domain: String,
-        val trackersUrls: Set<String>,
-        val allowlisted: Boolean,
-    )
-
-    data class TrackerViewState(
-        val displayName: String,
-        val prevalence: Double,
-        val urls: Map<String, TrackerEventViewState>,
-        val count: Int,
-        val type: String = ""
-    )
-
-    data class TrackerEventViewState(
-        val isBlocked: Boolean,
-        val reason: String,
-        val categories: Set<String> = emptySet()
-    )
-
     val viewState = MutableStateFlow<ViewState?>(null)
 
     private var site: Site? = null
@@ -205,7 +184,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         withContext(dispatcher.main()) {
             viewState.emit(
                 ViewState(
-                    siteProtectionsViewState = siteProtectionsViewStateMapper.mapFromSite(site),
+                    siteViewState = siteViewStateMapper.mapFromSite(site),
                     requestData = requestDataViewStateMapper.mapFromSite(site),
                     protectionStatus = protectionStatusViewStateMapper.mapFromSite(site)
                 )
@@ -218,10 +197,10 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
         viewModelScope.launch(dispatcher.io()) {
             if (enabled) {
-                userWhitelistDao.delete(currentViewState().siteProtectionsViewState.domain)
+                userWhitelistDao.delete(currentViewState().siteViewState.domain)
                 pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
             } else {
-                userWhitelistDao.insert(currentViewState().siteProtectionsViewState.domain)
+                userWhitelistDao.insert(currentViewState().siteViewState.domain)
                 pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
             }
             delay(CLOSE_DASHBOARD_ON_INTERACTION_DELAY)

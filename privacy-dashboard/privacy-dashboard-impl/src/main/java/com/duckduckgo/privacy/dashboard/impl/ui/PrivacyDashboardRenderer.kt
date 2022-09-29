@@ -20,7 +20,7 @@ import android.webkit.WebView
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteProtectionsViewState
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ViewState
 import com.squareup.moshi.Moshi
 import timber.log.Timber
@@ -54,25 +54,23 @@ class PrivacyDashboardRenderer(
 
     fun render(viewState: ViewState) {
         Timber.i("PrivacyDashboard viewState $viewState")
-        val adapter = moshi.adapter(SiteProtectionsViewState::class.java)
-        val json = adapter.toJson(viewState.siteProtectionsViewState)
+        val siteViewStateAdapter = moshi.adapter(SiteViewState::class.java)
+        val siteViewStateJson = siteViewStateAdapter.toJson(viewState.siteViewState)
 
-        val newAdapter = moshi.adapter(RequestDataViewState::class.java)
-        val newJson = newAdapter.toJson(viewState.requestData)
+        val requestDataAdapter = moshi.adapter(RequestDataViewState::class.java)
+        val requestDataJson = requestDataAdapter.toJson(viewState.requestData)
 
         val protectionsAdapter = moshi.adapter(ProtectionStatusViewState::class.java)
         val protectionsJson = protectionsAdapter.toJson(viewState.protectionStatus)
 
-        val adapterParentEntity = moshi.adapter(EntityViewState::class.java)
-        val parentEntityJson = adapterParentEntity.toJson(viewState.siteProtectionsViewState.parentEntity)
+        val parentEntityAdapter = moshi.adapter(EntityViewState::class.java)
+        val parentEntityJson = parentEntityAdapter.toJson(viewState.siteViewState.parentEntity)
 
-        Timber.i("PD: requests $newJson")
-        Timber.i("PD: protections $protectionsJson")
         onPrivacyProtectionSettingChanged(viewState.userChangedValues)
         webView.evaluateJavascript("javascript:onChangeProtectionStatus($protectionsJson);", null)
         webView.evaluateJavascript("javascript:onChangeParentEntity($parentEntityJson);", null)
-        webView.evaluateJavascript("javascript:onChangeCertificateData($json);", null)
-        webView.evaluateJavascript("javascript:onChangeUpgradedHttps(${viewState.siteProtectionsViewState.upgradedHttps});", null)
-        webView.evaluateJavascript("javascript:onChangeRequestData(\"${viewState.siteProtectionsViewState.url}\", $newJson);", null)
+        webView.evaluateJavascript("javascript:onChangeCertificateData($siteViewStateJson);", null)
+        webView.evaluateJavascript("javascript:onChangeUpgradedHttps(${viewState.siteViewState.upgradedHttps});", null)
+        webView.evaluateJavascript("javascript:onChangeRequestData(\"${viewState.siteViewState.url}\", $requestDataJson);", null)
     }
 }
