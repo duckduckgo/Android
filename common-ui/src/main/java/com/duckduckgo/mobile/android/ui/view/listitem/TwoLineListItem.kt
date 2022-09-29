@@ -77,25 +77,18 @@ class TwoLineListItem @JvmOverloads constructor(
             }
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIconBackground)) {
-                val value = getInt(R.styleable.TwoLineListItem_leadingIconBackground, 0)
-                setLeadingIconBackgroundType(value)
+                setLeadingIconBackgroundType(getInt(R.styleable.TwoLineListItem_leadingIconBackground, 0))
             }
 
-            val showBetaPill = getBoolean(R.styleable.TwoLineListItem_showBetaPill, false)
-            if (showBetaPill) {
-                binding.primaryText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_beta_pill, 0)
-                binding.primaryText.compoundDrawablePadding = 24
-            }
+            setPillVisible(getBoolean(R.styleable.TwoLineListItem_showBetaPill, false))
 
             val showTrailingIcon = hasValue(R.styleable.TwoLineListItem_trailingIcon)
             val showSwitch = getBoolean(R.styleable.TwoLineListItem_showSwitch, false)
             if (showSwitch) {
-                binding.trailingSwitch.show()
-                binding.trailingIcon.gone()
+                showSwitch()
             } else if (showTrailingIcon) {
-                binding.trailingSwitch.gone()
                 binding.trailingIcon.setImageDrawable(getDrawable(R.styleable.TwoLineListItem_trailingIcon))
-                binding.trailingIcon.show()
+                showTrailingIcon()
             } else {
                 binding.trailingContainer.gone()
             }
@@ -157,7 +150,7 @@ class TwoLineListItem @JvmOverloads constructor(
     /** Sets the item image resource */
     fun setTrailingIcon(idRes: Int) {
         binding.trailingIcon.setImageResource(idRes)
-        binding.trailingContainer.show()
+        showTrailingIcon()
     }
 
     /** Sets the item overflow menu click listener */
@@ -179,6 +172,20 @@ class TwoLineListItem @JvmOverloads constructor(
             binding.primaryText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
             binding.primaryText.compoundDrawablePadding = 0
         }
+    }
+
+    /** Sets the Switch Visible */
+    fun showSwitch(){
+        binding.trailingContainer.show()
+        binding.trailingSwitch.show()
+        binding.trailingIcon.gone()
+    }
+
+    /** Sets the Trailing Icon Visible */
+    fun showTrailingIcon(){
+        binding.trailingContainer.show()
+        binding.trailingIcon.show()
+        binding.trailingSwitch.gone()
     }
 
     /** Sets the checked change listener for the switch */

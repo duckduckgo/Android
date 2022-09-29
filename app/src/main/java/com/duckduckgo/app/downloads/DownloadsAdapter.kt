@@ -139,6 +139,7 @@ class DownloadsAdapter @Inject constructor(
                 }
             }
 
+            twoListItem.setTrailingIcon(R.drawable.ic_overflow)
             twoListItem.setTrailingIconClickListener { view ->
                 showPopupMenu(view, item)
             }
