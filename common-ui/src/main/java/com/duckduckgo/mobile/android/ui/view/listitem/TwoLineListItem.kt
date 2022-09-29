@@ -72,7 +72,7 @@ class TwoLineListItem @JvmOverloads constructor(
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIcon)) {
                 setLeadingIconDrawable(getDrawable(R.styleable.TwoLineListItem_leadingIcon)!!)
-            } else {1
+            } else {
                 binding.leadingIconBackground.gone()
             }
 
@@ -144,7 +144,7 @@ class TwoLineListItem @JvmOverloads constructor(
     }
 
     /** Sets the background image type */
-    fun setLeadingIconBackgroundType(value: Int){
+    fun setLeadingIconBackgroundType(value: Int) {
         if (value == 1) {
             binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_circular_background)
         }
