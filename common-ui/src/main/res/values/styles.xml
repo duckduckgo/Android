@@ -69,21 +69,6 @@
         <item name="android:paddingStart">20dp</item>
     </style>
 
-    <style name="SettingsSectionTitle">
-        <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingBottom">14dp</item>
-        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
-        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/cornflowerBlue</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:selectable">false</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
     <style name="SettingsItem">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -413,64 +398,9 @@
         <item name="android:gravity">start</item>
     </style>
 
-    <style name="LocationPermissionsSectionTitle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingBottom">16dp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/cornflowerBlue</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:selectable">false</item>
-    </style>
-
-    <style name="SavedSiteSectionTitle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingBottom">16dp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/cornflowerBlue</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:selectable">false</item>
-    </style>
-
     <style name="DeviceShield" />
 
     <style name="DeviceShield.PrivacyReport" />
-
-    <style name="DeviceShield.PrivacyReport.Title">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/almostBlackDark</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="DeviceShield.PrivacyReport.Label">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/almostBlackDark</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:lineSpacingExtra">6sp</item>
-        <item name="android:drawablePadding">18dp</item>
-    </style>
-
-    <style name="DeviceShield.PrivacyReport.Toggle">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/blue</item>
-        <item name="android:textSize">12sp</item>
-    </style>
-
-    <style name="DeviceShield.PrivacyReport.TrackerEntry.Company">
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="DeviceShield.PrivacyReport.TrackerEntry.Time">
-        <item name="android:textColor">?secondaryTextColor</item>
-    </style>
 
     <style name="DeviceShield.PrivacyReport.PastWeekCounters">
         <item name="android:fontFamily">sans-serif</item>
