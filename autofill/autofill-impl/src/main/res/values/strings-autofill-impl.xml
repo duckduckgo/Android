@@ -14,8 +14,9 @@
   ~ limitations under the License.
   -->
 
+<!-- smartling.entity_escaping = false -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Autofill Logins</string>
 
     <string name="managementLockedModeText">Unlock Autofill</string>
