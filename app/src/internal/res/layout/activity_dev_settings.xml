@@ -36,9 +36,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/generalTitle"
-                style="@style/SettingsSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/devSettingsScreenGeneralSection" />
@@ -64,9 +63,8 @@
                 app:subtitle="@string/devSettingsClearSavedSitesSubtitle"
                 app:title="@string/devSettingsClearSavedSites" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/privacyTitle"
-                style="@style/SettingsSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/devSettingsScreenPrivacySection" />
@@ -83,9 +81,8 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/userAgentTitle"
-                style="@style/SettingsSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/devSettingsScreenUserAgentSection" />

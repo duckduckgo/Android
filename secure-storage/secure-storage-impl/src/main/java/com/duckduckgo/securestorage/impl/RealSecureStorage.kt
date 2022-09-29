@@ -118,14 +118,16 @@ class RealSecureStorage @Inject constructor(
         }
 
     private fun WebsiteLoginDetailsWithCredentials.toDataEntity(): WebsiteLoginCredentialsEntity {
-        val encryptedData = encryptData(password)
+        val encryptedPassword = encryptData(password)
+        val encryptedNotes = encryptData(notes)
         return WebsiteLoginCredentialsEntity(
             id = details.id ?: 0,
             domain = details.domain,
             username = details.username,
-            password = encryptedData?.data,
-            iv = encryptedData?.iv,
-            notes = details.notes,
+            password = encryptedPassword?.data,
+            passwordIv = encryptedPassword?.iv,
+            notes = encryptedNotes?.data,
+            notesIv = encryptedNotes?.iv,
             domainTitle = details.domainTitle,
             lastUpdatedInMillis = details.lastUpdatedMillis
         )
@@ -134,7 +136,8 @@ class RealSecureStorage @Inject constructor(
     private fun WebsiteLoginCredentialsEntity.toCredentials(): WebsiteLoginDetailsWithCredentials =
         WebsiteLoginDetailsWithCredentials(
             details = toDetails(),
-            password = decryptData(password, iv)
+            password = decryptData(password, passwordIv),
+            notes = decryptData(notes, notesIv)
         )
 
     private fun WebsiteLoginCredentialsEntity.toDetails(): WebsiteLoginDetails =
@@ -143,7 +146,6 @@ class RealSecureStorage @Inject constructor(
             username = username,
             id = id,
             domainTitle = domainTitle,
-            notes = notes,
             lastUpdatedMillis = lastUpdatedInMillis
         )
 

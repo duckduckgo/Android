@@ -71,7 +71,8 @@ class BookmarksAdapter(
 
     fun setItems(
         bookmarkItems: List<BookmarkItem>,
-        showEmptyHint: Boolean
+        showEmptyHint: Boolean,
+        filteringMode: Boolean = false
     ) {
         val generatedList = generateNewList(bookmarkItems, showEmptyHint)
         val diffCallback = DiffCallback(old = this.bookmarkItems, new = generatedList)
@@ -79,7 +80,7 @@ class BookmarksAdapter(
         this.bookmarkItems.clear().also { this.bookmarkItems.addAll(generatedList) }
         diffResult.dispatchUpdatesTo(this)
 
-        if (bookmarkItems.isEmpty()) {
+        if (filteringMode || bookmarkItems.isEmpty()) {
             return
         }
 

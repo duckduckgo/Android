@@ -22,6 +22,7 @@ import android.util.LruCache
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
@@ -33,14 +34,24 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType
 import com.duckduckgo.vpn.network.api.*
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-// Make this class private to make sure we don't use it for now
-// we'll use it once we start testing the new VPN networking layer
-private class NgVpnNetworkStack constructor(
+@ContributesBinding(
+    scope = VpnScope::class,
+    boundType = VpnNetworkStack::class
+)
+@ContributesBinding(
+    scope = VpnScope::class,
+    boundType = VpnNetworkCallback::class
+)
+@SingleInstanceIn(VpnScope::class)
+class NgVpnNetworkStack @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
     private val vpnNetwork: Lazy<VpnNetwork>,
@@ -153,6 +164,10 @@ private class NgVpnNetworkStack constructor(
             Timber.d("shouldAllowDomain for $name/$packageId = false")
             val trackingApp = appNamesCache[packageId] ?: appNameResolver.getAppNameForPackageId(packageId)
             appNamesCache.put(packageId, trackingApp)
+
+            // if the app name is unknown, skip inserting the tracker but still block the tracker
+            if (trackingApp.isUnknown()) return false
+
             VpnTracker(
                 trackerCompanyId = type.tracker.trackerCompanyId,
                 company = type.tracker.owner.name,

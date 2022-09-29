@@ -96,8 +96,8 @@
     <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryRounded
         android:id="@+id/primaryCta"
         android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="@dimen/buttonLargeHeight"
+        android:layout_marginTop="@dimen/keyline_4"
         android:text="@string/onboardingLetsDoItButton"
         app:layout_constraintEnd_toEndOf="@id/cardView"
         app:layout_constraintStart_toStartOf="@id/cardView"

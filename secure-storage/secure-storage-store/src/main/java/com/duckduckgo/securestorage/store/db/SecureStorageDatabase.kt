@@ -22,7 +22,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    version = 2,
+    version = 3,
     entities = [WebsiteLoginCredentialsEntity::class]
 )
 abstract class SecureStorageDatabase : RoomDatabase() {
@@ -37,4 +37,12 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     }
 }
 
-val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("UPDATE `website_login_credentials` SET `notes` = null")
+        database.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `notesIv` TEXT")
+        database.execSQL("ALTER TABLE `website_login_credentials` RENAME COLUMN `iv` to `passwordIv`")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3)

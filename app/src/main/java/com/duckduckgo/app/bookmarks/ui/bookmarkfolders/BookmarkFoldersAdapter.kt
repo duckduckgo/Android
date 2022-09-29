@@ -29,7 +29,8 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewBookmarkFolderEntryBinding
-import com.duckduckgo.app.browser.databinding.ViewSavedSiteSectionTitleBinding
+import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
+import timber.log.Timber
 
 class BookmarkFoldersAdapter(
     private val layoutInflater: LayoutInflater,
@@ -53,6 +54,7 @@ class BookmarkFoldersAdapter(
         }
 
     private fun generateNewList(value: List<BookmarkFoldersItemTypes>): List<BookmarkFoldersItemTypes> {
+        Timber.d("Bookmarks: generateNewList")
         return if (parentId == 0L) {
             listOf(Header) + value
         } else {
@@ -71,14 +73,12 @@ class BookmarkFoldersAdapter(
                 BookmarkFolderScreenViewHolders.BookmarkFoldersViewHolder(layoutInflater, binding, viewModel)
             }
             BOOKMARK_FOLDERS_SECTION_TITLE_TYPE -> {
-                val binding = ViewSavedSiteSectionTitleBinding.inflate(inflater, parent, false)
+                val binding = ViewSectionHeaderBinding.inflate(inflater, parent, false)
                 BookmarkFolderScreenViewHolders.SectionTitle(binding)
             }
             else -> throw IllegalArgumentException("viewType not found")
         }
     }
-
-    override fun getItemCount(): Int = bookmarkFolderItems.size
 
     override fun onBindViewHolder(
         holder: BookmarkFolderScreenViewHolders,
@@ -86,7 +86,7 @@ class BookmarkFoldersAdapter(
     ) {
         when (holder) {
             is BookmarkFolderScreenViewHolders.BookmarkFoldersViewHolder -> {
-                holder.update((bookmarkFolderItems[position] as BookmarkFolderItem).bookmarkFolder)
+                holder.update((currentList[position] as BookmarkFolderItem).bookmarkFolder)
             }
             is BookmarkFolderScreenViewHolders.SectionTitle -> {
                 holder.bind()
@@ -95,7 +95,8 @@ class BookmarkFoldersAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (bookmarkFolderItems[position]) {
+        Timber.d("Bookmarks: getItemViewType $bookmarkFolderItems")
+        return when (currentList[position]) {
             is Header -> BOOKMARK_FOLDERS_SECTION_TITLE_TYPE
             else -> BOOKMARK_FOLDER_TYPE
         }
@@ -104,9 +105,9 @@ class BookmarkFoldersAdapter(
 
 sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class SectionTitle(private val binding: ViewSavedSiteSectionTitleBinding) : BookmarkFolderScreenViewHolders(binding.root) {
+    class SectionTitle(private val binding: ViewSectionHeaderBinding) : BookmarkFolderScreenViewHolders(binding.root) {
         fun bind() {
-            binding.savedSiteSectionTitle.setText(R.string.bookmarksSectionTitle)
+            binding.sectionHeader.setText(R.string.bookmarksSectionTitle)
         }
     }
 

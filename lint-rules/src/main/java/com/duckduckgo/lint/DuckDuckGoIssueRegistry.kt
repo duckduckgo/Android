@@ -34,9 +34,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_SINGLETON_ISSUE,
             NO_LIFECYCLE_OBSERVER_ISSUE,
             NO_FRAGMENT_ISSUE,
-            NO_SYSTEM_LOAD_LIBRARY,
-            DEPRECATED_BUTTON_IN_XML,
-            STYLE_IN_DESIGN_SYSTEM_COMPONENT,
+            NO_SYSTEM_LOAD_LIBRARY
         )
 
     override val api: Int

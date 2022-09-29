@@ -297,6 +297,11 @@ interface DeviceShieldPixels {
     fun didPressWaitlistDialogDismiss()
 
     /**
+     * Will send CPU usage info
+     */
+    fun sendCPUUsage(cpuUsage: Int)
+
+    /**
      * Will fire when user submits a health monitor report
      */
     fun sendHealthMonitorReport(healthMetrics: Map<String, String>)
@@ -401,6 +406,8 @@ interface DeviceShieldPixels {
 
     /** Will fire when the user has VPN always-on lockdown setting enabled */
     fun reportAlwaysOnLockdownEnabled()
+
+    fun reportUnprotectedAppsBucket(bucketSize: Int)
 }
 
 @ContributesBinding(AppScope::class)
@@ -719,6 +726,10 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS)
     }
 
+    override fun sendCPUUsage(cpuUsage: Int) {
+        firePixel(String.format(DeviceShieldPixelNames.ATP_APP_CPU_MONITOR_REPORT.pixelName, cpuUsage))
+    }
+
     override fun sendHealthMonitorReport(healthMetrics: Map<String, String>) {
         firePixel(DeviceShieldPixelNames.ATP_APP_HEALTH_MONITOR_REPORT, healthMetrics)
     }
@@ -878,6 +889,13 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun reportAlwaysOnLockdownEnabled() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_ALWAYS_ON_LOCKDOWN_ENABLED_DAILY)
+    }
+
+    override fun reportUnprotectedAppsBucket(bucketSize: Int) {
+        tryToFireDailyPixel(
+            String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY.pixelName, bucketSize)
+        )
+        firePixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET.pixelName, bucketSize))
     }
 
     private fun firePixel(

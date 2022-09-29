@@ -1184,7 +1184,14 @@ class BrowserTabFragment :
     private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
         if (appLink.appIntent != null) {
             appLink.appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(appLink.appIntent)
+            try {
+                startActivity(appLink.appIntent)
+            } catch (e: SecurityException) {
+                e.message?.let { message ->
+                    pixel.fire(AppPixelName.APP_LINKS_SECURITY_EXCEPTION, mapOf(Pixel.PixelParameter.APP_LINKS_SECURITY_EXCEPTION to message))
+                }
+                showToast(R.string.unableToOpenLink)
+            }
         } else if (appLink.excludedComponents != null && appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             val title = getString(R.string.appLinkIntentChooserTitle)
             val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents)
@@ -1620,11 +1627,18 @@ class BrowserTabFragment :
             autofillCredentialsSelectionResultHandler.processAutofillCredentialSelectionResult(result, this, viewModel)
         }
 
-        setFragmentResultListener(CredentialSavePickerDialog.resultKey(tabId)) { _, result ->
-            Timber.i("Received result for saving credentials. $tabId handling it")
+        setFragmentResultListener(CredentialSavePickerDialog.resultKeyUserChoseToSaveCredentials(tabId)) { _, result ->
             launch {
                 autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)?.let {
                     showAuthenticationSavedOrUpdatedSnackbar(it, R.string.autofillLoginSavedSnackbarMessage)
+                }
+            }
+        }
+
+        setFragmentResultListener(CredentialSavePickerDialog.resultKeyUserDeclinedToSaveCredentials(tabId)) { _, _ ->
+            launch {
+                this@BrowserTabFragment.context?.let {
+                    autofillCredentialsSelectionResultHandler.processUserDeclined(this@BrowserTabFragment.requireContext(), viewModel)
                 }
             }
         }

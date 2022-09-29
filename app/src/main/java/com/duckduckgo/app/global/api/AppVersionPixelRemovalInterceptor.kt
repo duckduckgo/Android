@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,36 +17,48 @@
 package com.duckduckgo.app.global.api
 
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
 import okhttp3.Response
+import timber.log.Timber
+import javax.inject.Inject
 
-class PixelEmailRemovalInterceptor : Interceptor {
+/**
+ * Removes app version information from select pixels
+ */
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PixelInterceptorPlugin::class
+)
+class AppVersionPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInterceptorPlugin {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
-        val url = if (pixels.contains(pixel.substringBefore("_android_"))) {
+        val url = if (pixel_prefixes.firstOrNull { pixel.startsWith(it) } != null) {
             chain.request().url.newBuilder()
-                .removeAllQueryParameters(AppUrl.ParamKey.ATB)
                 .removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION)
                 .build()
         } else {
             chain.request().url.newBuilder().build()
         }
 
+        Timber.d("Pixel interceptor: $url")
+
         return chain.proceed(request.url(url).build())
     }
 
     companion object {
-        // list of pixels for which we'll remove the ATB and App version information
+        // list of pixels for which we'll remove App version information
         @VisibleForTesting
-        val pixels = listOf(
-            AppPixelName.EMAIL_TOOLTIP_DISMISSED.pixelName,
-            AppPixelName.EMAIL_USE_ALIAS.pixelName,
-            AppPixelName.EMAIL_USE_ADDRESS.pixelName,
-            AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName
+        val pixel_prefixes = listOf(
+            "m_atp_ev_cpu_usage_"
         )
+    }
+
+    override fun getInterceptor(): Interceptor {
+        return this
     }
 }

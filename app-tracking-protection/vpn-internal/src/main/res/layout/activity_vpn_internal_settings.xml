@@ -64,9 +64,8 @@
                     android:layout_margin="16dp"/>
 
             <!-- Section Config -->
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/sectionConfigTitle"
-                style="@style/SettingsSectionTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Config"
@@ -123,9 +122,8 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/sectionTrackersTitle"
-                style="@style/SettingsSectionTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Trackers"
@@ -170,9 +168,8 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                     android:id="@+id/sectionAppProtection"
-                    style="@style/SettingsSectionTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="App Protections"
@@ -198,9 +195,8 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                     android:id="@+id/sectionTrackersLogging"
-                    style="@style/SettingsSectionTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Logging"
@@ -221,9 +217,8 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                     android:id="@+id/sectionDiagnosticsTitle"
-                    style="@style/SettingsSectionTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Diagnostics"
@@ -250,12 +245,20 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                     android:id="@+id/sectionHealthTitle"
-                    style="@style/SettingsSectionTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Health"
+            />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/cpuMonitorToggle"
+                style="@style/SettingsSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="CPU monitoring"
+                android:theme="@style/SettingsSwitchTheme"
             />
 
             <androidx.appcompat.widget.SwitchCompat

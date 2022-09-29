@@ -55,6 +55,18 @@ class SecureStoreBackedAutofillStore(
             autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin = value
         }
 
+    override var autofillDeclineCount: Int
+        get() = autofillPrefsStore.autofillDeclineCount
+        set(value) {
+            autofillPrefsStore.autofillDeclineCount = value
+        }
+
+    override var monitorDeclineCounts: Boolean
+        get() = autofillPrefsStore.monitorDeclineCounts
+        set(value) {
+            autofillPrefsStore.monitorDeclineCounts = value
+        }
+
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
         return withContext(dispatcherProvider.io()) {
             return@withContext if (autofillEnabled && autofillAvailable) {
@@ -90,13 +102,14 @@ class SecureStoreBackedAutofillStore(
             domain = url,
             username = credentials.username,
             domainTitle = credentials.domainTitle,
-            notes = credentials.notes,
             lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis()
         )
         val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(loginDetails, password = credentials.password)
 
-        return secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials().also {
-            showOnboardingWhenOfferingToSaveLogin = false
+        return withContext(dispatcherProvider.io()) {
+            secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials().also {
+                showOnboardingWhenOfferingToSaveLogin = false
+            }
         }
     }
 
@@ -186,7 +199,7 @@ class SecureStoreBackedAutofillStore(
             username = details.username,
             password = password,
             domainTitle = details.domainTitle,
-            notes = details.notes,
+            notes = notes,
             lastUpdatedMillis = details.lastUpdatedMillis
         )
     }
@@ -198,10 +211,10 @@ class SecureStoreBackedAutofillStore(
                 username = username,
                 id = id,
                 domainTitle = domainTitle,
-                notes = notes,
                 lastUpdatedMillis = lastUpdatedMillis
             ),
-            password = password
+            password = password,
+            notes = notes
         )
     }
 }
