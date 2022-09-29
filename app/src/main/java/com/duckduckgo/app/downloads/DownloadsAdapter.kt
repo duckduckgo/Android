@@ -131,7 +131,7 @@ class DownloadsAdapter @Inject constructor(
                 else -> context.getString(R.string.downloadsStateInProgress)
             }
             twoListItem.setSecondaryText(subtitle)
-            twoListItem.setLeadingIcon(R.drawable.ic_download_image)
+            twoListItem.setLeadingIcon(R.drawable.ic_file)
 
             twoListItem.setOnClickListener {
                 if (item.downloadItem.contentLength > 0) {
