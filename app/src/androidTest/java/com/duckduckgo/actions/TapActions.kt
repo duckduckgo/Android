@@ -79,7 +79,3 @@ fun pinchIn(@IdRes viewId: Int, position: Int, steps: Int) {
 fun pinchOut(@IdRes viewId: Int, position: Int, steps: Int) {
     device.findObject(UiSelector().index(viewId)).pinchOut(position, steps)
 }
-
-    onView(CoreMatchers.allOf(withId(viewId), ViewMatchers.withText(stringId)))
-        .perform(scrollTo(), click())
-}
