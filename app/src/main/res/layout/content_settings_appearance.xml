@@ -22,9 +22,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
         android:id="@+id/settingsAppearanceTitle"
-        style="@style/SettingsSectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/settingsHeadingAppearance" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle

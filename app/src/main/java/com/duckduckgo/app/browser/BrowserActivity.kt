@@ -575,7 +575,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         get() = (flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY
 
     private fun showAppEnjoymentPrompt(prompt: DialogFragment) {
-        (supportFragmentManager.findFragmentByTag(APP_ENJOYMENT_DIALOG_TAG) as? DialogFragment)?.dismiss()
+        (supportFragmentManager.findFragmentByTag(APP_ENJOYMENT_DIALOG_TAG) as? DialogFragment)?.dismissNow()
         prompt.show(supportFragmentManager, APP_ENJOYMENT_DIALOG_TAG)
     }
 
