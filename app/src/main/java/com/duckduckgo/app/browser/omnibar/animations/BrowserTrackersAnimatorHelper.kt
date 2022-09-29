@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.omnibar.animations
 
-import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
@@ -47,14 +46,12 @@ interface BrowserTrackersAnimatorHelper {
     /**
      * This method creates or enqueues cookie consent animation.
      *
-     * @param context indicates if animation should pause, at 50% of progress, until {@link finishPartialTrackerAnimation()} is called.
-     * @param omnibarViews are the views that should be hidden while the animation is running
+     * @param omnibarViews are the views that should be hidden while the animation is running.
      * @param cookieBackground holder of the cookie consent animation background.
      * @param cookieAnimationView holder of the cookie consent animation.
-     * @param cookieScene holder of cooki consent text animation.
+     * @param cookieScene holder of cookie consent text animation.
      */
     fun createCookiesAnimation(
-        context: Context,
         omnibarViews: List<View>,
         cookieBackground: View,
         cookieAnimationView: LottieAnimationView,
