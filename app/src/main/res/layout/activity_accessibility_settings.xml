@@ -57,8 +57,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/keyline_4"
-                    android:paddingStart="@dimen/settingsItemHorizontalPadding"
-                    android:paddingEnd="@dimen/settingsItemHorizontalPadding"
+                    android:paddingStart="@dimen/keyline_4"
+                    android:paddingEnd="@dimen/keyline_4"
                     android:text="@string/accessibilityFontSizeTitle"
                     tools:text="Text goes here" />
 

@@ -28,9 +28,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsDescriptionBinding
-import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsEmptyHintBinding
-import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsSectionTitleBinding
-import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsEntryBinding
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsToggleBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
@@ -123,7 +120,7 @@ class LocationPermissionsAdapter(
                 LocationPermissionsViewHolder.LocationPermissionsItemViewHolder(inflater, binding, viewModel, lifecycleOwner, faviconManager)
             }
             EMPTY_STATE_TYPE -> {
-                val binding = ViewLocationPermissionsEmptyHintBinding.inflate(inflater, parent, false)
+                val binding = com.duckduckgo.app.browser.databinding.ViewLocationPermissionsEmptyHintBinding.inflate(inflater, parent, false)
                 LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(binding.root)
             }
             ALLOWED_SITES_SECTION_TITLE_TYPE -> {
