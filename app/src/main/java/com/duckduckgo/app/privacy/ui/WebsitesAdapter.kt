@@ -25,13 +25,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ViewListItemDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewListItemEmptyHintBinding
-import com.duckduckgo.app.browser.databinding.ViewListItemSectionTitleBinding
-import com.duckduckgo.app.browser.databinding.ViewListSingleItemEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
+import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.SectionDivider
 import kotlinx.coroutines.launch
