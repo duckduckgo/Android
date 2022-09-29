@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.CompoundButton
@@ -58,9 +59,13 @@ class OneLineListItem @JvmOverloads constructor(
             }
 
             if (hasValue(R.styleable.OneLineListItem_leadingIcon)) {
-                binding.leadingIcon.setImageDrawable(getDrawable(R.styleable.OneLineListItem_leadingIcon))
+                setLeadingIconDrawable(getDrawable(R.styleable.OneLineListItem_leadingIcon)!!)
             } else {
                 binding.leadingIconBackground.gone()
+            }
+
+            if (hasValue(R.styleable.OneLineListItem_leadingIconBackground)) {
+                setLeadingIconBackgroundType(getInt(R.styleable.OneLineListItem_leadingIconBackground, 0))
             }
 
             if (hasValue(R.styleable.OneLineListItem_trailingIcon)) {
@@ -69,26 +74,13 @@ class OneLineListItem @JvmOverloads constructor(
                 binding.trailingIcon.gone()
             }
 
-            if (hasValue(R.styleable.OneLineListItem_leadingIconBackground)) {
-                val value = getInt(R.styleable.OneLineListItem_leadingIconBackground, 0)
-                if (value == 1) {
-                    binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_circular_background)
-                }
-                if (value == 2) {
-                    binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_round_background)
-                }
-                binding.leadingIconBackground.show()
-            }
-
             val showTrailingIcon = hasValue(R.styleable.OneLineListItem_trailingIcon)
             val showSwitch = getBoolean(R.styleable.OneLineListItem_showSwitch, false)
             if (showSwitch) {
-                binding.trailingSwitch.show()
-                binding.trailingIcon.gone()
+                showSwitch()
             } else if (showTrailingIcon) {
-                binding.trailingSwitch.gone()
                 binding.trailingIcon.setImageDrawable(getDrawable(R.styleable.OneLineListItem_trailingIcon))
-                binding.trailingIcon.show()
+                showTrailingIcon()
             } else {
                 binding.trailingContainer.gone()
             }
@@ -107,6 +99,12 @@ class OneLineListItem @JvmOverloads constructor(
         val drawable = VectorDrawableCompat.create(resources, idRes, null)
         binding.leadingIcon.setImageDrawable(drawable)
         binding.leadingIcon.show()
+    }
+
+    /** Sets the item image resource */
+    fun setLeadingIconDrawable(drawable: Drawable) {
+        binding.leadingIcon.setImageDrawable(drawable)
+        binding.leadingIconBackground.show()
     }
 
     fun leadingIcon() = binding.leadingIcon
@@ -133,6 +131,17 @@ class OneLineListItem @JvmOverloads constructor(
         binding.leadingIcon.setOnClickListener { onClick(binding.leadingIcon) }
     }
 
+    /** Sets the background image type */
+    fun setLeadingIconBackgroundType(value: Int) {
+        if (value == 1) {
+            binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_circular_background)
+        }
+        if (value == 2) {
+            binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_round_background)
+        }
+        binding.leadingIconBackground.show()
+    }
+
     /** Sets the item overflow menu click listener */
     fun setTrailingIconClickListener(onClick: (View) -> Unit) {
         binding.trailingIcon.setOnClickListener { onClick(binding.trailingIcon) }
@@ -146,6 +155,20 @@ class OneLineListItem @JvmOverloads constructor(
     /** Sets the checked change listener for the switch */
     fun setOnCheckedChangeListener(onCheckedChangeListener: OnCheckedChangeListener) {
         binding.trailingSwitch.setOnCheckedChangeListener(onCheckedChangeListener)
+    }
+
+    /** Sets the Switch Visible */
+    fun showSwitch(){
+        binding.trailingContainer.show()
+        binding.trailingSwitch.show()
+        binding.trailingIcon.gone()
+    }
+
+    /** Sets the Trailing Icon Visible */
+    fun showTrailingIcon(){
+        binding.trailingContainer.show()
+        binding.trailingIcon.show()
+        binding.trailingSwitch.gone()
     }
 
     /** Sets the switch value */
