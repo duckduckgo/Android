@@ -91,7 +91,7 @@ class PrivacyDashboardHybridViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertNotNull(viewState)
-            assertEquals("https://example.com", viewState!!.siteProtectionsViewState.site.url)
+            assertEquals("https://example.com", viewState!!.siteViewState.site.url)
         }
     }
 

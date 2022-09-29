@@ -29,7 +29,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus.BLOCKED
 import com.duckduckgo.app.trackerdetection.model.TrackerType.AD
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.privacy.dashboard.impl.ui.AppSiteProtectionsViewStateMapperTest.EntityMO.MAJOR_ENTITY_A
+import com.duckduckgo.privacy.dashboard.impl.ui.AppSiteViewStateMapperTest.EntityMO.MAJOR_ENTITY_A
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
@@ -37,7 +37,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class AppSiteProtectionsViewStateMapperTest {
+class AppSiteViewStateMapperTest {
 
     private val androidQAppBuildConfig = mock<AppBuildConfig>().apply {
         whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)

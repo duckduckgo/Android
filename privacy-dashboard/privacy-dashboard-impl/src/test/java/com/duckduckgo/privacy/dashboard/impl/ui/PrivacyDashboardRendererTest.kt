@@ -24,7 +24,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteProtectionsViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.UserSettingsViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ViewState
@@ -93,7 +92,7 @@ class PrivacyDashboardRendererTest {
 
     fun aViewState() = ViewState(
         userSettingsViewState = UserSettingsViewState(privacyProtectionEnabled = true),
-        siteProtectionsViewState = SiteProtectionsViewState(
+        siteViewState = SiteViewState(
             url = "http://example.com",
             upgradedHttps = true,
             site = SiteViewState(
