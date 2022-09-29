@@ -25,7 +25,6 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.PublicKeyViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteProtectionsViewState
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerEventViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.TrackerViewState
 import com.squareup.anvil.annotations.ContributesBinding
@@ -52,16 +51,9 @@ class AppSiteProtectionsViewStateMapper @Inject constructor(
 
         return SiteProtectionsViewState(
             url = site.url,
+            domain = site.domain!!,
             upgradedHttps = site.upgradedHttps,
             parentEntity = entityViewState,
-            site = SiteViewState(
-                url = site.url,
-                domain = site.domain!!,
-                trackersUrls = trackingEvents.trackerUrls,
-                allowlisted = site.userAllowList
-            ),
-            trackers = trackingEvents.trackerEvents,
-            trackerBlocked = trackingEvents.blockedTrackerEvents,
             secCertificateViewModels = site.certificate?.let { listOf(it.map()) } ?: emptyList()
         )
     }

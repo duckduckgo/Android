@@ -65,7 +65,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     data class ViewState(
-        val userSettingsViewState: UserSettingsViewState,
         val siteProtectionsViewState: SiteProtectionsViewState,
         val userChangedValues: Boolean = false,
         val requestData: RequestDataViewState,
@@ -116,12 +115,9 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     data class SiteProtectionsViewState(
         val url: String,
-        val status: String = "complete",
+        val domain: String,
         val upgradedHttps: Boolean,
         val parentEntity: EntityViewState?,
-        val site: SiteViewState,
-        val trackers: Map<String, TrackerViewState>,
-        val trackerBlocked: Map<String, TrackerViewState>,
         val secCertificateViewModels: List<CertificateViewState?> = emptyList(),
         val locale: String = Locale.getDefault().language
     )
@@ -210,9 +206,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             viewState.emit(
                 ViewState(
                     siteProtectionsViewState = siteProtectionsViewStateMapper.mapFromSite(site),
-                    userSettingsViewState = UserSettingsViewState(
-                        privacyProtectionEnabled = !site.userAllowList
-                    ),
                     requestData = requestDataViewStateMapper.mapFromSite(site),
                     protectionStatus = protectionStatusViewStateMapper.mapFromSite(site)
                 )
@@ -225,16 +218,16 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
         viewModelScope.launch(dispatcher.io()) {
             if (enabled) {
-                userWhitelistDao.delete(currentViewState().siteProtectionsViewState.site.domain)
+                userWhitelistDao.delete(currentViewState().siteProtectionsViewState.domain)
                 pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
             } else {
-                userWhitelistDao.insert(currentViewState().siteProtectionsViewState.site.domain)
+                userWhitelistDao.insert(currentViewState().siteProtectionsViewState.domain)
                 pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
             }
             delay(CLOSE_DASHBOARD_ON_INTERACTION_DELAY)
             withContext(dispatcher.main()) {
                 viewState.value = currentViewState().copy(
-                    userSettingsViewState = currentViewState().userSettingsViewState.copy(privacyProtectionEnabled = enabled),
+                    protectionStatus = currentViewState().protectionStatus.copy(allowlisted = enabled),
                     userChangedValues = true
                 )
             }
