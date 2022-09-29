@@ -36,12 +36,11 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-            <TextView
-                    android:id="@+id/generalTitle"
-                    style="@style/SettingsSectionTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/devSettingsScreenGeneralSection"/>
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+                android:id="@+id/generalTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/devSettingsScreenGeneralSection" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                     android:id="@+id/enableAppStartupTrace"
@@ -65,12 +64,11 @@
                     app:secondaryText="@string/devSettingsClearSavedSitesSubtitle"
                     app:primaryText="@string/devSettingsClearSavedSites"/>
 
-            <TextView
-                    android:id="@+id/privacyTitle"
-                    style="@style/SettingsSectionTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/devSettingsScreenPrivacySection"/>
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+                android:id="@+id/privacyTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/devSettingsScreenPrivacySection" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                     android:id="@+id/nextTdsEnabled"
@@ -85,12 +83,11 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="0dp"/>
 
-            <TextView
-                    android:id="@+id/userAgentTitle"
-                    style="@style/SettingsSectionTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/devSettingsScreenUserAgentSection"/>
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+                android:id="@+id/userAgentTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/devSettingsScreenUserAgentSection" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                     android:id="@+id/overrideUserAgentToggle"

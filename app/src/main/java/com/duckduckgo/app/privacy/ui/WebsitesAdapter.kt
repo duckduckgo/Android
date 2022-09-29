@@ -110,8 +110,8 @@ class WebsitesAdapter(
                 WebsiteViewHolder.SimpleViewHolder(SectionDivider(parent.context))
             }
             SECTION_TITLE_TYPE -> {
-                val binding = ViewListItemSectionTitleBinding.inflate(inflater, parent, false)
-                binding.listItemSectionTitle.setText(R.string.settingsPrivacyProtectionWhitelist)
+                val binding = ViewSectionHeaderBinding.inflate(inflater, parent, false)
+                binding.sectionHeader.setText(R.string.settingsPrivacyProtectionWhitelist)
                 WebsiteViewHolder.SimpleViewHolder(binding.root)
             }
             SITE_ENTRY -> {

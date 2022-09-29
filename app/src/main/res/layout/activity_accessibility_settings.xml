@@ -53,15 +53,14 @@
                     android:orientation="vertical"
                     tools:ignore="Overdraw">
 
-                <TextView
-                        style="@style/SettingsSectionTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="@dimen/keyline_4"
-                        android:paddingStart="@dimen/keyline_4"
-                        android:paddingEnd="@dimen/keyline_4"
-                        android:text="@string/accessibilityFontSizeTitle"
-                        tools:text="Text goes here"/>
+                <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/keyline_4"
+                    android:paddingStart="@dimen/settingsItemHorizontalPadding"
+                    android:paddingEnd="@dimen/settingsItemHorizontalPadding"
+                    android:text="@string/accessibilityFontSizeTitle"
+                    tools:text="Text goes here" />
 
                 <LinearLayout
                         android:layout_width="match_parent"

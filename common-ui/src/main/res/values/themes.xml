@@ -298,7 +298,7 @@
         <item name="android:statusBarColor">@color/atp_onboardingHeaderBg</item>
     </style>
 
-    <style name="ModalCardTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="ModalCardTheme" parent="AppTheme.BaseLight">
         <item name="colorPrimary">@color/darkThemePrimary</item>
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
         <item name="colorAccent">@color/cornflowerBlue</item>
@@ -307,6 +307,7 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation</item>
+        <item name="android:windowTranslucentStatus">true</item>
         <item name="toolbarIconColor">@color/white</item>
     </style>
 

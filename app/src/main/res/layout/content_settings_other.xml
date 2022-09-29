@@ -20,9 +20,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
         android:id="@+id/settingsOtherTitle"
-        style="@style/SettingsSectionTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/settingsHeadingMore"

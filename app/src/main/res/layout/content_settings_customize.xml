@@ -21,9 +21,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
         android:id="@+id/settingsCustomizeTitle"
-        style="@style/SettingsSectionTitle"
         android:text="@string/settingsHeadingCustomize" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem

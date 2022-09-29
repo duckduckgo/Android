@@ -17,26 +17,18 @@
 package com.duckduckgo.mobile.android.vpn.integration
 
 import android.os.ParcelFileDescriptor
-import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import javax.inject.Inject
 
-@ContributesBinding(
-    scope = VpnScope::class,
-    boundType = VpnNetworkStack::class
-)
-@SingleInstanceIn(VpnScope::class)
-class LegacyVpnNetworkStack @Inject constructor(
+// TODO we'll hopefully remove ths class once the VPN new networking stack is validated
+private class LegacyVpnNetworkStack constructor(
     private val udpPacketProcessorFactory: UdpPacketProcessor.Factory,
     private val tcpPacketProcessorFactory: TcpPacketProcessor.Factory,
     private val tunPacketReaderFactory: TunPacketReader.Factory,

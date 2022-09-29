@@ -22,10 +22,14 @@
 
     <include
         android:id="@+id/includeToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         layout="@layout/include_default_toolbar" />
 
     <include
         android:id="@+id/includeSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         layout="@layout/content_settings" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
