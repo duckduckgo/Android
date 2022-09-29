@@ -15,87 +15,104 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="?attr/selectableItemBackground"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="@dimen/twoLineItemHeight"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:paddingEnd="@dimen/keyline_4"
-    android:id="@+id/item_container">
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="?attr/selectableItemBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/twoLineItemHeight"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:paddingEnd="@dimen/keyline_4"
+        android:id="@+id/item_container">
 
     <FrameLayout
-        android:id="@+id/leadingIconBackground"
-        android:layout_width="@dimen/listItemImageContainerSize"
-        android:layout_height="@dimen/listItemImageContainerSize"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+            android:id="@+id/leadingIconBackground"
+            android:layout_width="@dimen/listItemImageContainerSize"
+            android:layout_height="@dimen/listItemImageContainerSize"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/leadingIcon"
-            android:layout_width="@dimen/listItemImageSize"
-            android:layout_height="@dimen/listItemImageSize"
-            android:layout_gravity="center"
-            android:importantForAccessibility="no"/>
+                android:id="@+id/leadingIcon"
+                android:layout_width="@dimen/listItemImageSize"
+                android:layout_height="@dimen/listItemImageSize"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"/>
 
     </FrameLayout>
 
-    <TextView
-        android:id="@+id/primaryText"
-        style="@style/TextAppearance.DuckDuckGo.Body1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="16dp"
-        android:textColor="?attr/listItemTitleColor"
-        app:layout_constraintBottom_toTopOf="@+id/secondaryText"
-        app:layout_constraintEnd_toStartOf="@+id/trailingContainer"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/leadingIconBackground"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Tiasdazstle"/>
+    <LinearLayout
+            android:id="@+id/primaryTextContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintStart_toEndOf="@+id/leadingIconBackground"
+            app:layout_constraintEnd_toStartOf="@id/trailingContainer"
+            app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/secondaryText"
-        style="@style/TextAppearance.DuckDuckGo.Body2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="@dimen/oneLineItemPadding"
-        android:textColor="?attr/listItemSubtitleColor"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/trailingContainer"
-        app:layout_constraintStart_toStartOf="@id/primaryText"
-        app:layout_constraintTop_toBottomOf="@id/primaryText"
-        tools:text="Subtitadasd asda sdas asd asdasdale"/>
-
-    <FrameLayout
-        android:id="@+id/trailingContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        <TextView
+                android:id="@+id/primaryText"
+                style="@style/TextAppearance.DuckDuckGo.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/listItemTitleColor"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="asdasdasdadsassd"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/guideline3"/>
 
         <ImageView
-            android:id="@+id/trailingIcon"
-            android:layout_width="@dimen/listItemImageContainerSize"
-            android:layout_height="@dimen/listItemImageContainerSize"
-            android:background="?selectableItemBackground"
-            android:scaleType="center"
+                android:id="@+id/betaPill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_beta_pill"/>
 
-            android:src="@drawable/ic_overflow"
-            tools:ignore="ContentDescription" />
+    </LinearLayout>
+
+    <TextView
+            android:id="@+id/secondaryText"
+            style="@style/TextAppearance.DuckDuckGo.Body2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="@dimen/oneLineItemPadding"
+            android:textColor="?attr/listItemSubtitleColor"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/trailingContainer"
+            app:layout_constraintStart_toStartOf="@id/primaryTextContainer"
+            app:layout_constraintTop_toBottomOf="@id/primaryTextContainer"
+            tools:text="Subtitadasd asda sdas asd asdasdale"/>
+
+    <FrameLayout
+            android:id="@+id/trailingContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+                android:id="@+id/trailingIcon"
+                android:layout_width="@dimen/listItemImageContainerSize"
+                android:layout_height="@dimen/listItemImageContainerSize"
+                android:background="?selectableItemBackground"
+                android:scaleType="center"
+                android:src="@drawable/ic_overflow"
+                tools:ignore="ContentDescription"/>
 
         <com.duckduckgo.mobile.android.ui.view.SwitchView
-            android:id="@+id/trailingSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+                android:id="@+id/trailingSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
     </FrameLayout>
 

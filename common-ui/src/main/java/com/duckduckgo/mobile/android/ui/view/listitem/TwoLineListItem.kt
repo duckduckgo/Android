@@ -166,11 +166,9 @@ class TwoLineListItem @JvmOverloads constructor(
     /** Sets the trailing image content description */
     fun setPillVisible(isVisible: Boolean) {
         if (isVisible) {
-            binding.primaryText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_beta_pill, 0)
-            binding.primaryText.compoundDrawablePadding = 24
+            binding.betaPill.show()
         } else {
-            binding.primaryText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-            binding.primaryText.compoundDrawablePadding = 0
+            binding.betaPill.gone()
         }
     }
 
