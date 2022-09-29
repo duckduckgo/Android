@@ -18,8 +18,12 @@ package com.duckduckgo.mobile.android.ui.view.divider
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.ViewGroup
 import android.widget.FrameLayout
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewHorizontalDividerBinding
+import com.duckduckgo.mobile.android.ui.view.toDp
+import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class HorizontalDivider @JvmOverloads constructor(
@@ -28,8 +32,10 @@ class HorizontalDivider @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    init {
-        viewBinding<ViewHorizontalDividerBinding>()
-    }
+    private val binding: ViewHorizontalDividerBinding by viewBinding()
+    override fun onFinishInflate() {
+        super.onFinishInflate()
 
+        (binding.root.layoutParams as MarginLayoutParams).topMargin = resources.getDimension(R.dimen.horizontalDividerPadding).toInt()
+    }
 }

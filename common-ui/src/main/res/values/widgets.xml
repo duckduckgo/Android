@@ -300,7 +300,7 @@
     <!-- Dividers -->
     <style name="Widget.DuckDuckGo.HorizontalDivider">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/horitonzalDividerHeight</item>
+        <item name="android:layout_height">@dimen/horizontalDividerHeight</item>
         <item name="android:background">?attr/sectionDividerColor</item>
     </style>
 

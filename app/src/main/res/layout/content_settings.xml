@@ -37,9 +37,7 @@
 
         <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp" />
+            android:layout_height="wrap_content"/>
 
         <include
             android:id="@+id/contentSettingsAutofill"
@@ -55,9 +53,7 @@
 
         <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp" />
+            android:layout_height="wrap_content"/>
 
         <include
             android:id="@+id/contentSettingsPrivacy"
@@ -67,9 +63,7 @@
 
         <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp" />
+            android:layout_height="wrap_content"/>
 
         <include
             android:id="@+id/contentSettingsCustomize"
@@ -79,9 +73,7 @@
 
         <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp" />
+            android:layout_height="wrap_content"/>
 
         <include
             android:id="@+id/contentSettingsMore"
@@ -92,9 +84,7 @@
         <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
             android:id="@+id/settingsSectionMoreBottomDivider"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp" />
+            android:layout_height="wrap_content"/>
 
         <include
             android:id="@+id/contentSettingsOther"
