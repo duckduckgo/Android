@@ -26,7 +26,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 class VerticalDivider @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.style.Widget_DuckDuckGo_VerticalDivider
+    defStyleAttr: Int = R.attr.verticalDividerStyle
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewVerticalDividerBinding by viewBinding()
