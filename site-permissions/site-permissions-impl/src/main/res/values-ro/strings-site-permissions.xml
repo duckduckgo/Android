@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s dorește să acceseze camera și microfonul</string>
+    <string name="sitePermissionsMicDialogTitle">%1$s dorește să acceseze microfonul</string>
+    <string name="sitePermissionsCameraDialogTitle">%1$s dorește să acceseze camera</string>
+    <string name="sitePermissionsDialogContent">Gestionează permisiunile acordate din setări</string>
+    <string name="sitePermissionsDialogDenyButton">Refuză</string>
+    <string name="sitePermissionsDialogAllowButton">Permite</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Permite ca DuckDuckGo să solicite accesul la cameră și microfon</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Permite ca DuckDuckGo să solicite accesul la cameră</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Permite ca DuckDuckGo să solicite accesul la microfon</string>
+    <string name="sitePermissionsDeniedSnackBarAction">Permite</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Permite ca DuckDuckGo să solicite accesul la cameră pe acest dispozitiv</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Site-urile îți pot utiliza camera numai dacă permiți ca DuckDuckGo să solicite accesul.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Permite ca DuckDuckGo să solicite accesul la microfon pe acest dispozitiv</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Site-urile îți pot utiliza microfonul numai dacă permiți ca DuckDuckGo să solicite accesul.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Permite ca DuckDuckGo să solicite accesul la cameră și microfon pe acest dispozitiv</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Site-urile îți pot utiliza camera și microfonul numai dacă permiți ca DuckDuckGo să solicite accesul.</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Deschide Setări</string>
+    <string name="systemPermissionsDeniedDialogNegativeButton">Anulează</string>
+</resources>

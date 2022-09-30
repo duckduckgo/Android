@@ -594,7 +594,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Numai pentru această sesiune</string>
     <string name="preciseLocationSiteDialogDenyAlways">Respinge întotdeauna</string>
     <string name="preciseLocationSiteDialogDenyOnce">Respinge pentru această sesiune</string>
-    <string name="settingsPreciseLocation">Locație</string>
     <string name="preciseLocationFeatureDescription">Site-urile pe care le vizitezi pot solicita să îți cunoască locația dispozitivului. Acestea nu vor putea să-l acceseze până când nu acorzi în mod explicit permisiunea. DuckDuckGo utilizează locația ta doar în mod anonim pentru a furniza rezultate de căutare locale.</string>
     <string name="preciseLocationToggleText">Site-urile îmi pot cere locația</string>
     <string name="preciseLocationEmptyListHint">Niciun site web nu a acordat permisiunea de a accesa locația</string>
@@ -724,7 +723,22 @@
     <string name="autoconsentSecondaryCta">Nu, mulțumesc</string>
 
     <string name="autoconsentSetting">Gestionează ferestrele pop-up cu privire la modulele cookie</string>
-    <string name="autoconsentAnimationText">Cookie-uri Gestionate</string>
+    <string name="autoconsentAnimationText">Modulele cookie au fost gestionate</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Permisiuni pentru site</string>
+    <string name="sitePermissionsSettingsDescription">Site-urile pe care le vizitezi pot solicita accesul la locația, camera sau microfonul dispozitivului tău. Acestea nu vor putea accesa aceste date decât dacă le oferi în mod explicit permisiunea.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Permite tuturor site-urilor să solicite:</string>
+    <string name="sitePermissionsSettingsLocation">Locație</string>
+    <string name="sitePermissionsSettingsCamera">Aparat foto</string>
+    <string name="sitePermissionsSettingsMicrophone">Microfon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Gestionează site-urile</string>
+    <string name="sitePermissionsSettingsEmptyText">Niciun site încă</string>
+    <string name="permissionPerWebsiteText">Permisiuni pentru „%1$s” </string>
+    <string name="permissionsPerWebsiteAskSetting">Cere</string>
+    <string name="permissionsPerWebsiteDenySetting">Refuză</string>
+    <string name="permissionsPerWebsiteAllowSetting">Permite</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">Permisiune %1$s pentru %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Completare automată</string>

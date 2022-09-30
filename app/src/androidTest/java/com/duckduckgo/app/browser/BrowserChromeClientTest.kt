@@ -35,6 +35,7 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Drm
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import org.mockito.kotlin.*
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -57,6 +58,7 @@ class BrowserChromeClientTest {
     private lateinit var mockFileChooserParams: WebChromeClient.FileChooserParams
     private lateinit var mockDrm: Drm
     private lateinit var mockAppBuildConfig: AppBuildConfig
+    private lateinit var mockSitePermissionsManager: SitePermissionsManager
     private val fakeView = View(getInstrumentation().targetContext)
 
     @get:Rule
@@ -69,18 +71,22 @@ class BrowserChromeClientTest {
         mockUncaughtExceptionRepository = mock()
         mockDrm = mock()
         mockAppBuildConfig = mock()
+        mockSitePermissionsManager = mock()
         testee = BrowserChromeClient(
             mockUncaughtExceptionRepository,
             mockDrm,
             mockAppBuildConfig,
             TestScope(),
-            coroutineTestRule.testDispatcherProvider
+            coroutineTestRule.testDispatcherProvider,
+            mockSitePermissionsManager
         )
         mockWebViewClientListener = mock()
         mockFilePathCallback = mock()
         mockFileChooserParams = mock()
         testee.webViewClientListener = mockWebViewClientListener
         webView = TestWebView(getInstrumentation().targetContext)
+        whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(arrayOf())
+        mockSitePermissionsManager.stub { onBlocking { getSitePermissionsAllowedToAsk(any(), any()) }.thenReturn(arrayOf()) }
     }
 
     @Test
@@ -212,20 +218,19 @@ class BrowserChromeClientTest {
     }
 
     @Test
-    fun whenOnPermissionRequestIfDomainIsInAllowedListThenPermissionIsGranted() {
+    fun whenOnMediaPermissionRequestIfDomainIsInAllowedListThenPermissionIsGranted() {
         val permissions = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://open.spotify.com".toUri())
         whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(permissions)
-
         testee.onPermissionRequest(mockPermission)
 
         verify(mockPermission).grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
     }
 
     @Test
-    fun whenOnPermissionRequestIfDomainIsNotInAllowedListThenPermissionIsNotGranted() {
+    fun whenOnMediaPermissionRequestIfDomainIsNotInAllowedListThenPermissionIsNotGranted() {
         val permissions = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
@@ -235,6 +240,48 @@ class BrowserChromeClientTest {
         testee.onPermissionRequest(mockPermission)
 
         verify(mockPermission, never()).grant(any())
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun whenOnCameraPermissionRequestIfDomainIsAllowToAskThenRequestPermission() = runTest {
+        val permissions = arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+        val mockRequest: PermissionRequest = mock()
+        whenever(mockRequest.resources).thenReturn(permissions)
+        whenever(mockRequest.origin).thenReturn("https://www.example.com".toUri())
+        whenever(mockSitePermissionsManager.getSitePermissionsAllowedToAsk(any(), any())).thenReturn(permissions)
+
+        testee.onPermissionRequest(mockRequest)
+
+        verify(mockWebViewClientListener).onSitePermissionRequested(mockRequest, permissions)
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun whenOnMicPermissionRequestIfDomainIsAllowToAskThenRequestPermission() = runTest {
+        val permissions = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        val mockRequest: PermissionRequest = mock()
+        whenever(mockRequest.resources).thenReturn(permissions)
+        whenever(mockRequest.origin).thenReturn("https://www.example.com".toUri())
+        whenever(mockSitePermissionsManager.getSitePermissionsAllowedToAsk(any(), any())).thenReturn(permissions)
+
+        testee.onPermissionRequest(mockRequest)
+
+        verify(mockWebViewClientListener).onSitePermissionRequested(mockRequest, permissions)
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun whenNotSitePermissionsAreRequestedThenRequestPermissionIsNotCalled() = runTest {
+        val permissions = arrayOf<String>()
+        val mockRequest: PermissionRequest = mock()
+        whenever(mockRequest.resources).thenReturn(permissions)
+        whenever(mockRequest.origin).thenReturn("https://www.example.com".toUri())
+        whenever(mockSitePermissionsManager.getSitePermissionsAllowedToAsk(any(), any())).thenReturn(permissions)
+
+        testee.onPermissionRequest(mockRequest)
+
+        verify(mockWebViewClientListener, never()).onSitePermissionRequested(mockRequest, permissions)
     }
 
     private val mockMsg = Message().apply {

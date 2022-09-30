@@ -162,6 +162,9 @@
         <item name="autofillDialogTitleColor">@color/white</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
         <item name="autofillCredentialListSubtitleColor">@color/paleBrownishGray</item>
+
+        <!-- TODO: For Noelia to remove -->
+        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -287,6 +290,9 @@
         <item name="autofillDialogOnboardingExplanationColor">@color/gray70</item>
         <item name="autofillCredentialListSubtitleColor">@color/brownishGrayTwo</item>
         <item name="appTPHeaderBackground">@color/light_blue</item>
+
+        <!-- TODO: For Noelia to remove -->
+        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
@@ -382,6 +388,12 @@
     <style name="Theme.AndroidVpn.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
 
     <style name="Theme.AndroidVpn.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
+
+    <style name="SettingsSwitchTheme">
+        <item name="colorControlActivated">@color/cornflowerBlue</item>
+        <item name="colorSwitchThumbNormal">@color/white</item>
+        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
+    </style>
 
     <style name="BottomSheetDialog" parent="Theme.Design.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/BottomSheetStyle</item>

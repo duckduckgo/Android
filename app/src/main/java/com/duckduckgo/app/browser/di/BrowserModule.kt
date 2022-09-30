@@ -56,7 +56,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -299,7 +298,7 @@ class BrowserModule {
         removeCookies: RemoveCookies,
         dispatcherProvider: DispatcherProvider
     ): DuckDuckGoCookieManager {
-        return WebViewCookieManager(cookieManagerProvider, AppUrl.Url.COOKIES, removeCookies, dispatcherProvider)
+        return WebViewCookieManager(cookieManagerProvider, removeCookies, dispatcherProvider)
     }
 
     @Provides

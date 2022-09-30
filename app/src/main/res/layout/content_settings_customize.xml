@@ -28,10 +28,10 @@
         android:text="@string/settingsHeadingCustomize" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/locationPermissions"
+        android:id="@+id/sitePermissions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsPreciseLocation"/>
+        app:primaryText="@string/settingsSitePermissions"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/autocompleteToggle"

@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Alleen voor deze sessie</string>
     <string name="preciseLocationSiteDialogDenyAlways">Altijd weigeren</string>
     <string name="preciseLocationSiteDialogDenyOnce">Weigeren voor deze sessie</string>
-    <string name="settingsPreciseLocation">Locatie</string>
     <string name="preciseLocationFeatureDescription">Sites die je bezoekt, kunnen om je apparaatlocatie vragen. Ze kunnen deze pas gebruiken als je hiervoor expliciet toestemming geeft. DuckDuckGo gebruikt je locatie alleen anoniem om lokale zoekresultaten te leveren.</string>
     <string name="preciseLocationToggleText">Sites mogen om mijn locatie vragen</string>
     <string name="preciseLocationEmptyListHint">Geen websites hebben toestemming om je locatie te gebruiken</string>
@@ -714,13 +713,28 @@
     <string name="atp_SettingsDeviceShieldDisabled">Uitgeschakeld</string>
 
     <!-- Autoconsent -->
-    <string name="autoconsentDialogTitle">Het lijkt erop dat deze site een pop-up met toestemming voor cookies heeft👇</string>
+    <string name="autoconsentDialogTitle">Het lijkt erop dat deze site een pop-up heeft om toestemming voor cookies te vragen👇</string>
     <string name="autoconsentDialogDescription">Wil je dat ik deze voor je afhandel? Ik kan proberen cookies te minimaliseren, privacy te maximaliseren en pop-ups zoals deze te verbergen.</string>
     <string name="autoconsentPrimaryCta">Cookiepop-ups beheren</string>
     <string name="autoconsentSecondaryCta">Nee, bedankt</string>
 
     <string name="autoconsentSetting">Cookiepop-ups beheren</string>
     <string name="autoconsentAnimationText">Beheerde cookies</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Sitetoestemmingen</string>
+    <string name="sitePermissionsSettingsDescription">Sites die je bezoekt, kunnen om toegang vragen tot de locatie, camera of microfoon van je apparaat. Ze krijgen die toegang alleen als je daar expliciet toestemming voor geeft.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Sta alle sites toe om het volgende vragen:</string>
+    <string name="sitePermissionsSettingsLocation">Locatie</string>
+    <string name="sitePermissionsSettingsCamera">Camera</string>
+    <string name="sitePermissionsSettingsMicrophone">Microfoon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Sites beheren</string>
+    <string name="sitePermissionsSettingsEmptyText">Nog geen sites</string>
+    <string name="permissionPerWebsiteText">Toestemmingen voor \'%1$s\' </string>
+    <string name="permissionsPerWebsiteAskSetting">Vragen</string>
+    <string name="permissionsPerWebsiteDenySetting">Weigeren</string>
+    <string name="permissionsPerWebsiteAllowSetting">Toestaan</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">Toestemming voor %1$s voor %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatisch invullen</string>
