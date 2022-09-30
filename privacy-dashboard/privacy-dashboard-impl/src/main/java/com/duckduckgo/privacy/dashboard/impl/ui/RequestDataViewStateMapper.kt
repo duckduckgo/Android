@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.dashboard.impl.ui
 
 import com.duckduckgo.app.global.UriString
+import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
@@ -26,6 +27,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus.BLOCKED
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.SAME_ENTITY_ALLOWED
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.SITE_BREAKAGE_ALLOWED
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.USER_ALLOWED
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
@@ -56,12 +58,15 @@ class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewS
     override fun mapFromSite(site: Site): RequestDataViewState {
         val installedSurrogates = mutableListOf<String>()
 
+        val uniqueEntityDomainState = mutableMapOf<String, List<TrackerStatus>>()
         val requests: List<DetectedRequest> = site.trackingEvents.map {
             val entity: Entity = if (it.entity == null) return@map null else it.entity!!
 
             if (it.surrogateId?.isNotEmpty() == true) {
                 installedSurrogates.add(it.trackerUrl)
             }
+
+            if (uniqueEntityDomainState.shouldSkipEvent(entity, it)) return@map null
 
             DetectedRequest(
                 category = it.categories?.firstOrNull { category -> allowedCategories.contains(category) },
@@ -79,6 +84,25 @@ class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewS
             installedSurrogates = installedSurrogates,
             requests = requests
         )
+    }
+
+    private fun MutableMap<String, List<TrackerStatus>>.shouldSkipEvent(entity: Entity, trackerEvent: TrackingEvent): Boolean {
+        val entityName = entity.displayName
+        val trackerDomain = trackerEvent.trackerUrl.extractDomain() ?: return true
+        val trackerStatus = trackerEvent.status
+        val hash = "$entityName$trackerDomain"
+
+        val mappedTrackerEvent = this[hash]
+        if (mappedTrackerEvent == null) {
+            this[hash] = listOf(trackerStatus)
+        } else {
+            if (mappedTrackerEvent.contains(trackerStatus)) return true
+            else{
+                this[hash] = this[hash]!! + listOf(trackerStatus)
+            }
+        }
+
+        return false
     }
 
     private fun TrackerStatus.mapToViewState(): PrivacyDashboardHybridViewModel.State {

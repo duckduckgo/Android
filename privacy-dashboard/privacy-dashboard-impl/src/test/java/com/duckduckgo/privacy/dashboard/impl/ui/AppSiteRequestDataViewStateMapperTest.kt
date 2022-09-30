@@ -31,6 +31,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus.USER_ALLOWED
 import com.duckduckgo.app.trackerdetection.model.TrackerType.AD
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.dashboard.impl.ui.AppSiteRequestDataViewStateMapperTest.EntityMO.MAJOR_ENTITY_A
+import com.duckduckgo.privacy.dashboard.impl.ui.AppSiteRequestDataViewStateMapperTest.EntityMO.MINOR_ENTITY_A
 import com.duckduckgo.privacy.dashboard.impl.ui.AppSiteViewStateMapperTest.TestCertificateInfo
 import com.duckduckgo.privacy.dashboard.impl.ui.AppSiteViewStateMapperTest.TestEntity
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons
@@ -148,6 +149,53 @@ class AppSiteRequestDataViewStateMapperTest {
         assertEquals(MAJOR_ENTITY_A.name, viewState.requests.first().ownerName)
         assertEquals(MAJOR_ENTITY_A.prevalence, viewState.requests.first().prevalence, 0.0)
         assertTrue(viewState.requests.first().state is Blocked)
+    }
+
+    @Test
+    fun whenSiteHasTrackersFromSameDomainAndSameStateThenRequestDataViewStateContainsFirstEvent() {
+        val site = site(
+            events = listOf(
+                TrackingEvent("test.com", "test.com/a.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
+                TrackingEvent("test.com", "test.com/b.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD)
+            )
+        )
+
+        val viewState = testee.mapFromSite(site)
+
+        assertTrue(viewState.requests.count() == 1)
+        assertNotNull(viewState.requests.find { it.url == "test.com/a.js" })
+    }
+
+    @Test
+    fun whenSiteHasTrackersFromSameDomainAndSameStateButDifferentEntityThenRequestDataViewStateContainsBothEvent() {
+        val site = site(
+            events = listOf(
+                TrackingEvent("test.com", "test.com/a.js", null, MINOR_ENTITY_A, null, BLOCKED, AD),
+                TrackingEvent("test.com", "test.com/b.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD)
+            )
+        )
+
+        val viewState = testee.mapFromSite(site)
+
+        assertTrue(viewState.requests.count() == 2)
+        assertNotNull(viewState.requests.find { it.url == "test.com/a.js" })
+        assertNotNull(viewState.requests.find { it.url == "test.com/b.js" })
+    }
+
+    @Test
+    fun whenSiteHasTrackersFromSameDomainButDifferentStateThenRequestDataViewStateContainsBothEvent() {
+        val site = site(
+            events = listOf(
+                TrackingEvent("test.com", "test.com/a.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
+                TrackingEvent("test.com", "test.com/b.js", null, MAJOR_ENTITY_A, null, SAME_ENTITY_ALLOWED, AD)
+            )
+        )
+
+        val viewState = testee.mapFromSite(site)
+
+        assertTrue(viewState.requests.count() == 2)
+        assertTrue(viewState.requests.find { it.url == "test.com/a.js" }!!.state is Blocked)
+        assertTrue(viewState.requests.find { it.url == "test.com/b.js" }!!.state is Allowed)
     }
 
     private fun site(
