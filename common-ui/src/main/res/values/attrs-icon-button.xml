@@ -15,8 +15,8 @@
   -->
 
 <resources>
-
-    <attr name="horizontalDividerStyle" format="reference"/>
-    <attr name="verticalDividerStyle" format="reference"/>
-
+    <declare-styleable name="IconButton">
+        <attr name="android:background"/>
+        <attr name="srcCompat"/>
+    </declare-styleable>
 </resources>
