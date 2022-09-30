@@ -16,6 +16,9 @@
 
 <resources>
 
+    <attr name="horizontalDividerStyle" format="reference"/>
+    <attr name="verticalDividerStyle" format="reference"/>
+
     <attr name="defaultPadding" format="boolean" />
 
     <!--Horizontal Divider-->
