@@ -16,8 +16,6 @@
 
 package com.duckduckgo.cookies.impl
 
-import android.database.DatabaseErrorHandler
-import android.database.DefaultDatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.fire.FireproofRepository
@@ -26,6 +24,7 @@ import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.CookieRemover
+import com.duckduckgo.cookies.impl.db.PixelSenderDatabaseErrorHandler
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
@@ -123,18 +122,6 @@ class SQLCookieRemover @Inject constructor(
     }
 
     companion object {
-        private const val COOKIES_TABLE_NAME = "cookies"
-    }
-
-    private class PixelSenderDatabaseErrorHandler(
-        private val offlinePixelCountDataStore: OfflinePixelCountDataStore
-    ) : DatabaseErrorHandler {
-
-        private val delegate = DefaultDatabaseErrorHandler()
-
-        override fun onCorruption(dbObj: SQLiteDatabase?) {
-            delegate.onCorruption(dbObj)
-            offlinePixelCountDataStore.cookieDatabaseCorruptedCount += 1
-        }
+        const val COOKIES_TABLE_NAME = "cookies"
     }
 }
