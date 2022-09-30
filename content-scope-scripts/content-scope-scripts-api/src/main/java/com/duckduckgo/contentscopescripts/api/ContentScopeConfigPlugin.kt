@@ -48,7 +48,7 @@ interface ContentScopeConfigPlugin {
     /**
      * @return a [String] containing the config to be used in content scope scripts
      */
-    fun config(): String
+    fun config(): String?
 
     /**
      * @return the [featureName] of this feature

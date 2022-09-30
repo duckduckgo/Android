@@ -16,53 +16,51 @@
 
 package com.duckduckgo.privacy.config.impl.features.gpc
 
+import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
-import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
-import com.duckduckgo.privacy.config.store.GpcHeaderEnabledSiteEntity
-import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import okhttp3.internal.trimSubstring
 
 @ContributesMultibinding(AppScope::class)
 class GpcContentScopeConfigPlugin @Inject constructor(
     private val gpcRepository: GpcRepository,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
-) : PrivacyFeaturePlugin {
+) : ContentScopeConfigPlugin {
 
-    override fun store(
-        featureName: String,
-        jsonString: String
-    ): Boolean {
+    override fun config(): String? {
         @Suppress("NAME_SHADOWING")
-        val privacyFeature = privacyFeatureValueOf(featureName) ?: return false
+        val privacyFeature = privacyFeatureValueOf(featureName) ?: return null
         if (privacyFeature.value == this.featureName) {
-            val gpcExceptions = mutableListOf<GpcExceptionEntity>()
-            val gpcHeaders = mutableListOf<GpcHeaderEnabledSiteEntity>()
             val moshi = Moshi.Builder().build()
-            val jsonAdapter: JsonAdapter<GpcFeature> =
-                moshi.adapter(GpcFeature::class.java)
-
-            val gpcFeature: GpcFeature? = jsonAdapter.fromJson(jsonString)
-            gpcFeature?.exceptions?.map {
-                gpcExceptions.add(GpcExceptionEntity(it.domain))
-            }
-            gpcFeature?.settings?.gpcHeaderEnabledSites?.map {
-                gpcHeaders.add(GpcHeaderEnabledSiteEntity(it))
-            }
-            gpcRepository.updateAll(gpcExceptions, gpcHeaders)
-            val isEnabled = gpcFeature?.state == "enabled"
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(this.featureName, isEnabled, gpcFeature?.minSupportedVersion))
-            return true
+            val jsonAdapter: JsonAdapter<Gpc> =
+                moshi.adapter(Gpc::class.java)
+            val gpcFeature = GpcFeature(
+                state = getJsonBoolean(gpcRepository.isGpcEnabled()),
+                minSupportedVersion = privacyFeatureTogglesRepository.getMinSupportedVersion(privacyFeature),
+                exceptions = gpcRepository.exceptions.map { GpcExceptionEntity(it.domain) },
+                settings = GpcSettings(gpcHeaderEnabledSites = gpcRepository.headerEnabledSites.map { it.domain })
+            )
+            val json = jsonAdapter.toJson(Gpc(gpc = gpcFeature))
+            return json.trimSubstring(1, json.length - 1)
         }
-        return false
+        return null
+    }
+
+    private fun getJsonBoolean(boolean: Boolean): String {
+        return if (boolean) "enabled" else "disabled"
     }
 
     override val featureName: String = PrivacyFeatureName.GpcFeatureName.value
 }
+
+data class Gpc(
+    val gpc: GpcFeature
+)
