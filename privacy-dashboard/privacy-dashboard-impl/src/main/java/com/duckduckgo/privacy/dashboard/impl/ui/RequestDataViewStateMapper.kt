@@ -16,11 +16,11 @@
 
 package com.duckduckgo.privacy.dashboard.impl.ui
 
+import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.global.addScheme
 import com.duckduckgo.app.global.extractDomain
-import com.duckduckgo.app.global.extractSchemeAndDomain
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.withScheme
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.AD_ALLOWED
@@ -35,10 +35,10 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Reason
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.*
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.Allowed
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.Blocked
 import com.squareup.anvil.annotations.ContributesBinding
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
-import java.lang.Thread.State
 import javax.inject.Inject
 
 interface RequestDataViewStateMapper {
@@ -62,7 +62,8 @@ class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewS
 
         val uniqueEntityDomainState = mutableMapOf<String, List<TrackerStatus>>()
         val requests: List<DetectedRequest> = site.trackingEvents.map {
-            val trackerEvent = it.copy(trackerUrl = it.trackerUrl.addScheme())
+            val withSchemeTrackeUrl =  kotlin.runCatching { it.trackerUrl.toUri().withScheme().toString() }.getOrNull() ?: return@map null
+            val trackerEvent = it.copy(trackerUrl = withSchemeTrackeUrl)
             val entity: Entity = if (trackerEvent.entity == null) return@map null else trackerEvent.entity!!
 
             if (trackerEvent.surrogateId?.isNotEmpty() == true) {

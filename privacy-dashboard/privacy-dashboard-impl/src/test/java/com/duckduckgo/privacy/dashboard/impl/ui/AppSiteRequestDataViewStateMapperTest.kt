@@ -64,8 +64,8 @@ class AppSiteRequestDataViewStateMapperTest {
         val viewState = testee.mapFromSite(site)
 
         assertTrue(viewState.requests.count() == 2)
-        assertNotNull(viewState.requests.find { it.url == "https://test.com" })
-        assertNotNull(viewState.requests.find { it.url == "https://test2.com" })
+        assertNotNull(viewState.requests.find { it.url == "http://test.com" })
+        assertNotNull(viewState.requests.find { it.url == "http://test2.com" })
     }
 
     @Test
@@ -84,12 +84,12 @@ class AppSiteRequestDataViewStateMapperTest {
         val viewState = testee.mapFromSite(site)
 
         assertTrue(viewState.requests.count() == 6)
-        assertTrue(viewState.requests.first { it.url == "https://test1.com" }.state is Blocked)
-        assertTrue(viewState.requests.first { it.url == "https://test2.com" }.state == Allowed(Reason(AllowedReasons.PROTECTIONS_DISABLED.value)))
-        assertTrue(viewState.requests.first { it.url == "https://test3.com" }.state == Allowed(Reason(AllowedReasons.AD_CLICK_ATTRIBUTION.value)))
-        assertTrue(viewState.requests.first { it.url == "https://test4.com" }.state == Allowed(Reason(AllowedReasons.RULE_EXCEPTION.value)))
-        assertTrue(viewState.requests.first { it.url == "https://test5.com" }.state == Allowed(Reason(AllowedReasons.OWNED_BY_FIRST_PARTY.value)))
-        assertTrue(viewState.requests.first { it.url == "https://test6.com" }.state == Allowed(Reason(AllowedReasons.OTHER_THIRD_PARTY_REQUEST.value)))
+        assertTrue(viewState.requests.first { it.url == "http://test1.com" }.state is Blocked)
+        assertTrue(viewState.requests.first { it.url == "http://test2.com" }.state == Allowed(Reason(AllowedReasons.PROTECTIONS_DISABLED.value)))
+        assertTrue(viewState.requests.first { it.url == "http://test3.com" }.state == Allowed(Reason(AllowedReasons.AD_CLICK_ATTRIBUTION.value)))
+        assertTrue(viewState.requests.first { it.url == "http://test4.com" }.state == Allowed(Reason(AllowedReasons.RULE_EXCEPTION.value)))
+        assertTrue(viewState.requests.first { it.url == "http://test5.com" }.state == Allowed(Reason(AllowedReasons.OWNED_BY_FIRST_PARTY.value)))
+        assertTrue(viewState.requests.first { it.url == "http://test6.com" }.state == Allowed(Reason(AllowedReasons.OTHER_THIRD_PARTY_REQUEST.value)))
     }
 
     @Test
@@ -142,7 +142,7 @@ class AppSiteRequestDataViewStateMapperTest {
         val viewState = testee.mapFromSite(site)
 
         assertTrue(viewState.requests.count() == 1)
-        assertEquals("https://test.co.uk", viewState.requests.first().url)
+        assertEquals("http://test.co.uk", viewState.requests.first().url)
         assertEquals("test.co.uk", viewState.requests.first().eTLDplus1)
         assertEquals("test.com", viewState.requests.first().pageUrl)
         assertEquals(MAJOR_ENTITY_A.displayName, viewState.requests.first().entityName)
@@ -163,7 +163,7 @@ class AppSiteRequestDataViewStateMapperTest {
         val viewState = testee.mapFromSite(site)
 
         assertTrue(viewState.requests.count() == 1)
-        assertNotNull(viewState.requests.find { it.url == "https://test.com/a.js" })
+        assertNotNull(viewState.requests.find { it.url == "http://test.com/a.js" })
     }
 
     @Test
@@ -178,8 +178,8 @@ class AppSiteRequestDataViewStateMapperTest {
         val viewState = testee.mapFromSite(site)
 
         assertTrue(viewState.requests.count() == 2)
-        assertNotNull(viewState.requests.find { it.url == "https://test.com/a.js" })
-        assertNotNull(viewState.requests.find { it.url == "https://test.com/b.js" })
+        assertNotNull(viewState.requests.find { it.url == "http://test.com/a.js" })
+        assertNotNull(viewState.requests.find { it.url == "http://test.com/b.js" })
     }
 
     @Test
@@ -194,8 +194,8 @@ class AppSiteRequestDataViewStateMapperTest {
         val viewState = testee.mapFromSite(site)
 
         assertTrue(viewState.requests.count() == 2)
-        assertTrue(viewState.requests.find { it.url == "https://test.com/a.js" }!!.state is Blocked)
-        assertTrue(viewState.requests.find { it.url == "https://test.com/b.js" }!!.state is Allowed)
+        assertTrue(viewState.requests.find { it.url == "http://test.com/a.js" }!!.state is Blocked)
+        assertTrue(viewState.requests.find { it.url == "http://test.com/b.js" }!!.state is Allowed)
     }
 
     private fun site(
