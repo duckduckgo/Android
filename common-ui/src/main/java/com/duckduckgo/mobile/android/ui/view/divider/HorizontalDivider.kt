@@ -18,12 +18,9 @@ package com.duckduckgo.mobile.android.ui.view.divider
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewHorizontalDividerBinding
-import com.duckduckgo.mobile.android.ui.view.toDp
-import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class HorizontalDivider @JvmOverloads constructor(
@@ -44,14 +41,17 @@ class HorizontalDivider @JvmOverloads constructor(
             )
 
         val isFullWidth = typedArray.getBoolean(R.styleable.HorizontalDivider_fullWidth, true)
+        val defaultPadding = typedArray.getBoolean(R.styleable.HorizontalDivider_defaultPadding, true)
 
-        if (!isFullWidth){
+        if (!isFullWidth) {
             (binding.root.layoutParams as MarginLayoutParams).leftMargin = resources.getDimension(R.dimen.horizontalDividerSidePadding).toInt()
             (binding.root.layoutParams as MarginLayoutParams).rightMargin = resources.getDimension(R.dimen.horizontalDividerSidePadding).toInt()
         }
 
-        // (binding.root.layoutParams as MarginLayoutParams).topMargin = resources.getDimension(R.dimen.horizontalDividerTopPadding).toInt()
-        // (binding.root.layoutParams as MarginLayoutParams).bottomMargin = resources.getDimension(R.dimen.horizontalDividerBottomPadding).toInt()
+        if (defaultPadding) {
+            (binding.root.layoutParams as MarginLayoutParams).topMargin = resources.getDimension(R.dimen.horizontalDividerTopPadding).toInt()
+            (binding.root.layoutParams as MarginLayoutParams).bottomMargin = resources.getDimension(R.dimen.horizontalDividerBottomPadding).toInt()
+        }
 
         typedArray.recycle()
     }

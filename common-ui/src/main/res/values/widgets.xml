@@ -302,8 +302,6 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/horizontalDividerHeight</item>
         <item name="android:background">?attr/sectionDividerColor</item>
-        <item name="android:layout_marginTop">@dimen/horizontalDividerTopPadding</item>
-        <item name="android:layout_marginBottom">@dimen/horizontalDividerBottomPadding</item>
     </style>
 
     <style name="Widget.DuckDuckGo.VerticalDivider">

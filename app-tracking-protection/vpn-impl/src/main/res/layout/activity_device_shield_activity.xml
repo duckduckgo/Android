@@ -104,7 +104,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/atp_ActivityRecentActivity"
-                android:paddingTop="@dimen/keyline_4"
                 android:paddingStart="@dimen/keyline_4"
                 android:paddingBottom="@dimen/keyline_2"/>
 
@@ -130,7 +129,6 @@
             <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="@dimen/keyline_4"
                 android:paddingBottom="@dimen/keyline_2"
                 android:paddingStart="@dimen/keyline_4"
                 android:text="@string/atp_ActivityAbout" />

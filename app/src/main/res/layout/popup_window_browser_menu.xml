@@ -66,6 +66,7 @@
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        app:defaultPadding="false"
         android:paddingTop="8dp"
         android:paddingBottom="0dp"/>
 
@@ -99,6 +100,7 @@
                 android:id="@+id/siteOptionsMenuDivider"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
+                app:defaultPadding="false"
                 android:layout_marginTop="@dimen/keyline_empty"
                 android:layout_marginBottom="@dimen/keyline_empty"
                 android:layout_marginStart="@dimen/keyline_5"
@@ -138,6 +140,7 @@
                 android:layout_width="match_parent"
                 android:paddingTop="3dp"
                 android:paddingBottom="3dp"
+                app:defaultPadding="false"
                 android:layout_marginStart="@dimen/keyline_5"
                 android:layout_marginEnd="@dimen/keyline_5"/>
 
@@ -211,6 +214,7 @@
                 android:layout_width="match_parent"
                 android:paddingTop="3dp"
                 android:paddingBottom="3dp"
+                app:defaultPadding="false"
                 android:layout_marginStart="@dimen/keyline_5"
                 android:layout_marginEnd="@dimen/keyline_5"/>
 
