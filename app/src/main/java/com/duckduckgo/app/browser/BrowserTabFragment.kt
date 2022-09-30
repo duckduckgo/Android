@@ -1187,9 +1187,6 @@ class BrowserTabFragment :
             try {
                 startActivity(appLink.appIntent)
             } catch (e: SecurityException) {
-                e.message?.let { message ->
-                    pixel.fire(AppPixelName.APP_LINKS_SECURITY_EXCEPTION, mapOf(Pixel.PixelParameter.APP_LINKS_SECURITY_EXCEPTION to message))
-                }
                 showToast(R.string.unableToOpenLink)
             }
         } else if (appLink.excludedComponents != null && appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
