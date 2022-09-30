@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s quiere acceder a la cámara y al micrófono</string>
+    <string name="sitePermissionsMicDialogTitle">%1$s quiere acceder al micrófono</string>
+    <string name="sitePermissionsCameraDialogTitle">%1$s quiere acceder a la cámara</string>
+    <string name="sitePermissionsDialogContent">Administrar permisos concedidos en la configuración</string>
+    <string name="sitePermissionsDialogDenyButton">Rechazar</string>
+    <string name="sitePermissionsDialogAllowButton">Permitir</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Permitir que DuckDuckGo solicite acceso a la cámara y al micrófono</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Permitir que DuckDuckGo solicite acceso a la cámara</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Permitir que DuckDuckGo solicite acceso al micrófono</string>
+    <string name="sitePermissionsDeniedSnackBarAction">Permitir</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Permitir que DuckDuckGo solicite acceso a la cámara en este dispositivo</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Los sitios solo pueden usar tu cámara si permites que DuckDuckGo solicite acceso.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Permitir que DuckDuckGo solicite acceso al micrófono en este dispositivo</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Los sitios solo pueden usar tu micrófono si permites que DuckDuckGo solicite acceso.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Permitir que DuckDuckGo solicite acceso a la cámara y al micrófono en este dispositivo</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Los sitios solo pueden usar tu cámara y tu micrófono si permites que DuckDuckGo solicite acceso.</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Abrir configuración</string>
+    <string name="systemPermissionsDeniedDialogNegativeButton">Cancelar</string>
+</resources>

@@ -594,7 +594,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Tikai šai sesijai</string>
     <string name="preciseLocationSiteDialogDenyAlways">Vienmēr aizliegt</string>
     <string name="preciseLocationSiteDialogDenyOnce">Aizliegt šai sesijai</string>
-    <string name="settingsPreciseLocation">Atrašanās vieta</string>
     <string name="preciseLocationFeatureDescription">Apmeklētās vietnes var prasīt atklāt tavas ierīces atrašanās vietu. Tās nevarēs tai piekļūt, ja tu skaidri nepiešķirsi atļauju. DuckDuckGo izmanto tavu atrašanās vietu tikai anonīmi, lai nodrošinātu lokālās meklēšanas rezultātus.</string>
     <string name="preciseLocationToggleText">Vietnes var pieprasīt manu atrašanās vietu</string>
     <string name="preciseLocationEmptyListHint">Nevienai vietnei nav piešķirta atļauja piekļūt atrašanās vietai</string>
@@ -719,12 +718,27 @@
 
     <!-- Autoconsent -->
     <string name="autoconsentDialogTitle">Izskatās, ka šajā vietnē ir sīkfailu piekrišanas uznirstošais logs👇</string>
-    <string name="autoconsentDialogDescription">Vai vēlies, lai es tos apstrādāju tavā vietā? Es varu mēģināt samazināt sīkfailus, maksimāli palielināt konfidencialitāti un paslēpt šādus uznirstošos logus.</string>
+    <string name="autoconsentDialogDescription">Vai vēlies, lai es tos apstrādāju tavā vietā? Es varu mēģināt samazināt sīkfailus, maksimāli pastiprināt privātumu un paslēpt šādus uznirstošos logus.</string>
     <string name="autoconsentPrimaryCta">Pārvaldīt sīkfailu uznirstošos logus</string>
     <string name="autoconsentSecondaryCta">Nē, paldies</string>
 
     <string name="autoconsentSetting">Pārvaldīt sīkfailu uznirstošos logus</string>
     <string name="autoconsentAnimationText">Pārvaldītie sīkfaili</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Vietnes atļaujas</string>
+    <string name="sitePermissionsSettingsDescription">Apmeklētās vietnes var prasīt piekļuvi tavas ierīces atrašanās vietai, kamerai vai mikrofonam. Tās nevarēs tiem piekļūt, ja vien īpaši nedosi attiecīgo atļauju.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Ļaut visām vietnēm prasīt:</string>
+    <string name="sitePermissionsSettingsLocation">Atrašanās vieta</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofons</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Pārvaldīt vietnes</string>
+    <string name="sitePermissionsSettingsEmptyText">Vēl nav nevienas vietnes</string>
+    <string name="permissionPerWebsiteText">Atļaujas vietnei \"%1$s\" </string>
+    <string name="permissionsPerWebsiteAskSetting">Jautāt</string>
+    <string name="permissionsPerWebsiteDenySetting">Liegt</string>
+    <string name="permissionsPerWebsiteAllowSetting">Atļaut</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s – atļauja vietnei %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automātiska aizpilde</string>

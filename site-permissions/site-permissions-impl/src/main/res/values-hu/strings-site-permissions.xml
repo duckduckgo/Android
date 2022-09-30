@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s hozzá akar férni a kamerához és a mikrofonhoz</string>
+    <string name="sitePermissionsMicDialogTitle">%1$s hozzá akar férni a mikrofonhoz</string>
+    <string name="sitePermissionsCameraDialogTitle">%1$s hozzá akar férni a kamerához</string>
+    <string name="sitePermissionsDialogContent">A megadott engedélyek a beállításokban kezelhetők</string>
+    <string name="sitePermissionsDialogDenyButton">Megtagadás</string>
+    <string name="sitePermissionsDialogAllowButton">Engedélyezés</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Engedélyezés, hogy a DuckDuckGo hozzáférést kérjen a kamerához és a mikrofonhoz</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Engedélyezés, hogy a DuckDuckGo hozzáférést kérjen a kamerához</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Engedélyezés, hogy a DuckDuckGo hozzáférést kérjen a mikrofonhoz</string>
+    <string name="sitePermissionsDeniedSnackBarAction">Engedélyezés</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Engedélyezés, hogy a DuckDuckGo hozzáférést kérjen a kamerához ezen az eszközön</string>
+    <string name="systemPermissionDialogCameraDeniedContent">A webhelyek csak akkor használhatják a kamerát, ha engedélyezed, hogy a DuckDuckGo hozzáférést kérjen.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Engedélyezés, hogy a DuckDuckGo hozzáférést kérjen a mikrofonhoz ezen az eszközön</string>
+    <string name="systemPermissionDialogAudioDeniedContent">A webhelyek csak akkor használhatják a mikrofont, ha engedélyezed, hogy a DuckDuckGo hozzáférést kérjen.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Engedélyezés, hogy a DuckDuckGo hozzáférést kérjen a kamerához és a mikrofonhoz ezen az eszközön</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">A webhelyek csak akkor használhatják a kamerát és a mikrofont, ha engedélyezed, hogy a DuckDuckGo hozzáférést kérjen.</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Beállítások megnyitása</string>
+    <string name="systemPermissionsDeniedDialogNegativeButton">Mégsem</string>
+</resources>
