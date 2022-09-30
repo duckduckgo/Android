@@ -16,7 +16,10 @@
 
 <resources>
 
-    <attr name="horizontalDividerStyle" format="reference"/>
-    <attr name="verticalDividerStyle" format="reference"/>
+    <!--Chip view-->
+    <declare-styleable name="HorizontalDivider">
+        <attr name="chipBackground" format="reference" />
+        <attr name="android:text"/>
+    </declare-styleable>
 
 </resources>
