@@ -100,9 +100,15 @@
   "resourceSets": [
     {
       "type": "android",
-      "pathRegex": ".*.\\/values\\/strings.*\\.xml",
+      "pathRegex": ".*.\\/values\\/strings-autoconsent.xml",
       "translationPathExpression": "${originalFile.fullName.replaceAll('values', locale)}",
-      "translationCommitMessage": "Translate ${originalFile.baseName} to ${locale}"
+      "translationCommitMessage": "Translate ${originalFile.baseName} to ${locale}",
+      "locales": [
+        {
+          "smartling": "es-ES",
+          "application": "values-es"
+        }
+      ]
     }
   ]
 }
