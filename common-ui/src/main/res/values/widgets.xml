@@ -128,7 +128,7 @@
 
     <!-- Section Header -->
     <style name="Widget.DuckDuckGo.SectionHeader">
-        <item name="android:paddingTop">32dp</item>
+        <item name="android:paddingTop">@dimen/keyline_4</item>
         <item name="android:paddingBottom">14dp</item>
         <item name="android:paddingStart">@dimen/keyline_4</item>
         <item name="android:paddingEnd">@dimen/keyline_4</item>

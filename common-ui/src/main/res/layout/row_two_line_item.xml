@@ -23,5 +23,4 @@
     app:primaryText="tesdfsdfsdfsasdasdadasdadfsd"
     app:secondaryText="asdasdas as"
     app:trailingIcon="@drawable/ic_overflow"
-    app:showBetaPill="true"
     app:leadingIconBackground="circular"/>
