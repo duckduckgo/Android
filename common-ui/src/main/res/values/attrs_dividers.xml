@@ -15,9 +15,18 @@
   -->
 
 <resources>
+
+    <attr name="defaultPadding" format="boolean" />
+
     <!--Horizontal Divider-->
     <declare-styleable name="HorizontalDivider">
         <attr name="fullWidth" format="boolean" />
+        <attr name="defaultPadding" />
+    </declare-styleable>
+
+    <!--Vertical Divider-->
+    <declare-styleable name="VerticalDivider">
+        <attr name="defaultPadding"/>
     </declare-styleable>
 
 </resources>

@@ -26,10 +26,4 @@
         android:gravity="center_vertical"
         android:text="@string/autofillSettingsDisplayName" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp" />
-
 </LinearLayout>
