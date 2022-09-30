@@ -31,7 +31,11 @@
 
     <com.duckduckgo.mobile.android.ui.view.SwitchView
         android:id="@+id/sitePermissionsToggle"
+        android:layout_gravity="end"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:padding="@dimen/keyline_4"
+        android:textColor="?attr/normalTextColor"
         tools:text="@string/preciseLocationToggleText" />
 
 </LinearLayout>
