@@ -47,6 +47,7 @@ import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.privacy.config.api.AmpLinks
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -86,7 +87,6 @@ class BrowserWebViewClientTest {
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
     private val dosDetector: DosDetector = DosDetector()
     private val accessibilitySettings: AccessibilityManager = mock()
-    private val gpc: Gpc = mock()
     private val trustedCertificateStore: TrustedCertificateStore = mock()
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
@@ -97,6 +97,7 @@ class BrowserWebViewClientTest {
     private val internalTestUserChecker: InternalTestUserChecker = mock()
     private val adClickManager: AdClickManager = mock()
     private val autoconsent: Autoconsent = mock()
+    private val contentScopeScripts: ContentScopeScripts = mock()
 
     @UiThreadTest
     @Before
@@ -113,7 +114,6 @@ class BrowserWebViewClientTest {
             cookieManagerProvider,
             loginDetector,
             dosDetector,
-            gpc,
             thirdPartyCookieManager,
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
@@ -124,6 +124,7 @@ class BrowserWebViewClientTest {
             internalTestUserChecker,
             adClickManager,
             autoconsent,
+            contentScopeScripts
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -158,33 +159,6 @@ class BrowserWebViewClientTest {
     fun whenOnPageStartedCalledThenEventSentToLoginDetector() = runTest {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(loginDetector).onEvent(WebNavigationEvent.OnPageStarted(webView))
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageStartedCalledIfUrlIsNullThenDoNotInjectGpcToDom() = runTest {
-        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(true)
-
-        testee.onPageStarted(webView, null, null)
-        verify(gpc, never()).getGpcJs()
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageStartedCalledIfUrlIsValidThenInjectGpcToDom() = runTest {
-        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(true)
-
-        testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(gpc).getGpcJs()
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageStartedCalledIfUrlIsNotAndValidThenDoNotInjectGpcToDom() = runTest {
-        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(false)
-
-        testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(gpc, never()).getGpcJs()
     }
 
     @UiThreadTest
