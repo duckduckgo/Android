@@ -16,8 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.duckduckgo.app.CoroutineTestRule
@@ -38,12 +36,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
-import org.junit.runner.RunWith
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verifyNoInteractions
 
-@ExperimentalCoroutinesApi
-@RunWith(AndroidJUnit4::class)
 class AppTPCPUMonitorTest {
     private lateinit var cpuMonitor: AppTPCPUMonitor
 
@@ -53,18 +48,14 @@ class AppTPCPUMonitorTest {
     private lateinit var config: AppTpFeatureConfigImpl
     private lateinit var toggleDao: VpnConfigTogglesDao
 
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
-
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVpnRemoteConfigDatabase: VpnRemoteConfigDatabase = mock()
     private val mockWorkManager: WorkManager = mock()
-    private val mockCPUPerformanceLogger: CPUPerformanceLogger = mock()
 
     @Before
     fun setup() {
         toggleDao = FakeToggleConfigDao()
         whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
-        whenever(mockAppBuildConfig.isPerformanceTest).thenReturn(false)
         whenever(mockVpnRemoteConfigDatabase.vpnConfigTogglesDao()).thenReturn(toggleDao)
 
         config = AppTpFeatureConfigImpl(
@@ -74,7 +65,7 @@ class AppTPCPUMonitorTest {
             coroutineRule.testDispatcherProvider
         )
 
-        cpuMonitor = AppTPCPUMonitor(mockWorkManager, config, mockAppBuildConfig, context, mockCPUPerformanceLogger)
+        cpuMonitor = AppTPCPUMonitor(mockWorkManager, config)
     }
 
     @Test
@@ -87,9 +78,6 @@ class AppTPCPUMonitorTest {
             eq(ExistingPeriodicWorkPolicy.KEEP),
             any()
         )
-
-        // Never interact with performance logger in regular builds
-        verifyNoInteractions(mockCPUPerformanceLogger)
     }
 
     @Test
@@ -98,9 +86,6 @@ class AppTPCPUMonitorTest {
         cpuMonitor.onVpnStarted(coroutineRule.testScope)
 
         verifyNoInteractions(mockWorkManager)
-
-        // Never interact with performance logger in regular builds
-        verifyNoInteractions(mockCPUPerformanceLogger)
     }
 
     @Test
@@ -108,19 +93,5 @@ class AppTPCPUMonitorTest {
         cpuMonitor.onVpnStopped(coroutineRule.testScope, SELF_STOP)
 
         verify(mockWorkManager).cancelUniqueWork(AppTPCPUMonitor.APP_TRACKER_CPU_MONITOR_WORKER_TAG)
-
-        // Never interact with performance logger in regular builds
-        verifyNoInteractions(mockCPUPerformanceLogger)
-    }
-
-    @Test
-    fun whenPerformanceTestStartAndStopLogger() {
-        whenever(mockAppBuildConfig.isPerformanceTest).thenReturn(true)
-
-        cpuMonitor.onVpnStarted(coroutineRule.testScope)
-        verify(mockCPUPerformanceLogger).startLogging(coroutineRule.testScope)
-
-        cpuMonitor.onVpnStopped(coroutineRule.testScope, SELF_STOP)
-        verify(mockCPUPerformanceLogger).stopLogging(any())
     }
 }
