@@ -17,11 +17,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:clipToPadding="false"
-    android:paddingStart="@dimen/keyline_4"
-    android:paddingTop="@dimen/keyline_5"
-    android:paddingEnd="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_5">
+    android:clipToPadding="false">
 
     <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
         android:id="@+id/label"
