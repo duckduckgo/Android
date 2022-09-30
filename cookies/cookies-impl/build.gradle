@@ -28,12 +28,17 @@ dependencies {
 
     implementation project(':di')
     implementation project(':common')
+    implementation project(':app-build-config-api')
+    implementation project(':privacy-config-api')
+    implementation project(':feature-toggles-api')
     implementation project(':cookies-api')
+    implementation project(':cookies-store')
     implementation project(':browser-api')
     implementation project(':statistics')
 
     implementation Kotlin.stdlib.jdk7
     implementation JakeWharton.timber
+    implementation Square.retrofit2.converter.moshi
 
     implementation KotlinX.coroutines.core
 
@@ -46,6 +51,8 @@ dependencies {
     implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation AndroidX.work.runtimeKtx
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.ktx
 
     // Testing dependencies
     testImplementation project(path: ':common-test')
