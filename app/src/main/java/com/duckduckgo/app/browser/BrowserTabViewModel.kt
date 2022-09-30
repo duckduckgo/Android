@@ -25,6 +25,7 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
 import android.webkit.GeolocationPermissions
+import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -122,6 +123,8 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
@@ -179,7 +182,8 @@ class BrowserTabViewModel @Inject constructor(
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore,
     private val autofillStore: AutofillStore,
-    private val adClickManager: AdClickManager
+    private val adClickManager: AdClickManager,
+    private val sitePermissionsManager: SitePermissionsManager
 ) : WebViewClientListener,
     EditSavedSiteListener,
     HttpAuthenticationListener,
@@ -435,6 +439,14 @@ class BrowserTabViewModel @Inject constructor(
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
         class NavigateToHistory(val historyStackIndex: Int) : Command()
         object EmailSignEvent : Command()
+        class ShowSitePermissionsDialog(
+            val permissionsToRequest: Array<String>,
+            val request: PermissionRequest
+        ) : Command()
+        class GrantSitePermissionRequest(
+            val sitePermissionsToGrant: Array<String>,
+            val request: PermissionRequest
+        ) : Command()
     }
 
     sealed class NavigationCommand : Command() {
@@ -1398,6 +1410,20 @@ class BrowserTabViewModel @Inject constructor(
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
+        }
+    }
+
+    override fun onSitePermissionRequested(request: PermissionRequest, sitePermissionsAllowedToAsk: Array<String>) {
+        viewModelScope.launch(dispatchers.io()) {
+            val url = request.origin.toString()
+            val sitePermissionsGranted = sitePermissionsManager.getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
+            val sitePermissionsToAsk = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }.toTypedArray()
+            if (sitePermissionsGranted.isNotEmpty()) {
+                command.postValue(GrantSitePermissionRequest(sitePermissionsGranted, request))
+            }
+            if (sitePermissionsToAsk.isNotEmpty()) {
+                command.postValue(ShowSitePermissionsDialog(sitePermissionsToAsk, request))
+            }
         }
     }
 
