@@ -29,6 +29,7 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Drm
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -39,7 +40,8 @@ class BrowserChromeClient @Inject constructor(
     private val drm: Drm,
     private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider()
+    private val coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
+    private val sitePermissionsManager: SitePermissionsManager
 ) : WebChromeClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -169,9 +171,15 @@ class BrowserChromeClient @Inject constructor(
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
-        val permissions = drm.getDrmPermissionsForRequest(request.origin.toString(), request.resources)
-        if (permissions.isNotEmpty()) {
-            request.grant(permissions)
+        val drmPermissions = drm.getDrmPermissionsForRequest(request.origin.toString(), request.resources)
+        if (drmPermissions.isNotEmpty()) {
+            request.grant(drmPermissions)
+        }
+        appCoroutineScope.launch(coroutineDispatcher.io()) {
+            val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissionsAllowedToAsk(request.origin.toString(), request.resources)
+            if (permissionsAllowedToAsk.isNotEmpty()) {
+                webViewClientListener?.onSitePermissionRequested(request, permissionsAllowedToAsk)
+            }
         }
     }
 

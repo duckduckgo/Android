@@ -596,7 +596,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Только для этой сессии</string>
     <string name="preciseLocationSiteDialogDenyAlways">Всегда отказывать</string>
     <string name="preciseLocationSiteDialogDenyOnce">Отказать для этой сессии</string>
-    <string name="settingsPreciseLocation">Местоположение</string>
     <string name="preciseLocationFeatureDescription">Сайты, которые вы посещаете, могут запрашивать информацию о местоположении вашего устройства. Они не смогут получить к нему доступ, пока вы не предоставите разрешение. DuckDuckGo использует ваше местоположение только анонимно для предоставления результатов местного поиска.</string>
     <string name="preciseLocationToggleText">Сайты могут запрашивать моё местоположение</string>
     <string name="preciseLocationEmptyListHint">Ни одному сайту не предоставлено разрешение на доступ к местоположению</string>
@@ -722,13 +721,28 @@
     <string name="atp_SettingsDeviceShieldDisabled">Отключено</string>
 
     <!-- Autoconsent -->
-    <string name="autoconsentDialogTitle">Похоже, на этом сайте есть всплывающее окно выбора куки-файлов👇</string>
-    <string name="autoconsentDialogDescription">Мы можем попытаться минимизировать выбор куки-файлов для большей безопасности ваших данных и автоматически закрывать такие окна.</string>
-    <string name="autoconsentPrimaryCta">Разрешить управление окнами выбора куки-файлов</string>
+    <string name="autoconsentDialogTitle">Похоже, на этом сайте есть всплывающее окно выбора куки-файлов 👇</string>
+    <string name="autoconsentDialogDescription">Хотите, чтобы такие окна закрывались автоматически? Мы можем попытаться минимизировать выбор куки-файлов для большей безопасности ваших данных и автоматически закрывать такие окна.</string>
+    <string name="autoconsentPrimaryCta">Управление окнами выбора куки-файлов</string>
     <string name="autoconsentSecondaryCta">Нет, спасибо</string>
 
     <string name="autoconsentSetting">Управление окнами выбора куки-файлов</string>
     <string name="autoconsentAnimationText">Kуки-файлы выбраны</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Разрешения для сайтов</string>
+    <string name="sitePermissionsSettingsDescription">Сайты, которые вы посещаете, могут запрашивать доступ к геопозиции, камере или микрофону вашего устройства. Доступ предоставляется только с вашего разрешения.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Разрешить всем сайтам запрашивать:</string>
+    <string name="sitePermissionsSettingsLocation">Геопозиция</string>
+    <string name="sitePermissionsSettingsCamera">Камера</string>
+    <string name="sitePermissionsSettingsMicrophone">Микрофон</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Управление сайтами</string>
+    <string name="sitePermissionsSettingsEmptyText">Пока нет сайтов</string>
+    <string name="permissionPerWebsiteText">Разрешения для «%1$s» </string>
+    <string name="permissionsPerWebsiteAskSetting">Запрашивать</string>
+    <string name="permissionsPerWebsiteDenySetting">Отказать</string>
+    <string name="permissionsPerWebsiteAllowSetting">Разрешить</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">Разрешение на доступ %2$s к %1$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Автозаполнение</string>

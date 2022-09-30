@@ -101,7 +101,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
 
         val removeCookiesStrategy = RemoveCookies(CookieManagerRemover(cookieManagerProvider), sqlCookieRemover)
 
-        testee = WebViewCookieManager(cookieManagerProvider, "duckduckgo.com", removeCookiesStrategy, DefaultDispatcherProvider())
+        testee = WebViewCookieManager(cookieManagerProvider, removeCookiesStrategy, DefaultDispatcherProvider())
 
         fireproofedSites.map { url ->
             fireproofWebsiteDao.insert(FireproofWebsiteEntity(url.toUri().domain().orEmpty()))

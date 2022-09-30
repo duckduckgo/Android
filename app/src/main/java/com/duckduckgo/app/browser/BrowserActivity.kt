@@ -56,7 +56,6 @@ import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
@@ -65,6 +64,7 @@ import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -456,8 +456,8 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         startActivity(SettingsActivity.intent(this))
     }
 
-    fun launchLocationSettings() {
-        startActivity(LocationPermissionsActivity.intent(this))
+    fun launchSitePermissionsSettings() {
+        startActivity(SitePermissionsActivity.intent(this))
     }
 
     fun launchBookmarks() {
@@ -575,7 +575,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         get() = (flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY
 
     private fun showAppEnjoymentPrompt(prompt: DialogFragment) {
-        (supportFragmentManager.findFragmentByTag(APP_ENJOYMENT_DIALOG_TAG) as? DialogFragment)?.dismiss()
+        (supportFragmentManager.findFragmentByTag(APP_ENJOYMENT_DIALOG_TAG) as? DialogFragment)?.dismissNow()
         prompt.show(supportFragmentManager, APP_ENJOYMENT_DIALOG_TAG)
     }
 

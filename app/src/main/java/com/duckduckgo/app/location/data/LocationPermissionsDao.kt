@@ -22,6 +22,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LocationPermissionsDao {
@@ -31,6 +32,9 @@ interface LocationPermissionsDao {
 
     @Query("select * from locationPermissions")
     fun allPermissionsEntities(): LiveData<List<LocationPermissionEntity>>
+
+    @Query("select * from locationPermissions")
+    fun allPermissionsAsFlow(): Flow<List<LocationPermissionEntity>>
 
     @Query("select * from locationPermissions WHERE domain = :domain")
     fun getPermission(domain: String): LocationPermissionEntity?

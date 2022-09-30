@@ -52,8 +52,7 @@
                 android:orientation="vertical"
                 tools:ignore="Overdraw">
 
-                <TextView
-                    style="@style/SettingsSectionTitle"
+                <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/keyline_4"
