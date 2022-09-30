@@ -158,14 +158,14 @@ class OneLineListItem @JvmOverloads constructor(
     }
 
     /** Sets the Switch Visible */
-    fun showSwitch(){
+    fun showSwitch() {
         binding.trailingContainer.show()
         binding.trailingSwitch.show()
         binding.trailingIcon.gone()
     }
 
     /** Sets the Trailing Icon Visible */
-    fun showTrailingIcon(){
+    fun showTrailingIcon() {
         binding.trailingContainer.show()
         binding.trailingIcon.show()
         binding.trailingSwitch.gone()
