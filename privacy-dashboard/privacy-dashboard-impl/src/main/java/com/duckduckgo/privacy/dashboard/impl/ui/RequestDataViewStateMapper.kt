@@ -17,7 +17,9 @@
 package com.duckduckgo.privacy.dashboard.impl.ui
 
 import com.duckduckgo.app.global.UriString
+import com.duckduckgo.app.global.addScheme
 import com.duckduckgo.app.global.extractDomain
+import com.duckduckgo.app.global.extractSchemeAndDomain
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
@@ -60,23 +62,24 @@ class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewS
 
         val uniqueEntityDomainState = mutableMapOf<String, List<TrackerStatus>>()
         val requests: List<DetectedRequest> = site.trackingEvents.map {
-            val entity: Entity = if (it.entity == null) return@map null else it.entity!!
+            val trackerEvent = it.copy(trackerUrl = it.trackerUrl.addScheme())
+            val entity: Entity = if (trackerEvent.entity == null) return@map null else trackerEvent.entity!!
 
-            if (it.surrogateId?.isNotEmpty() == true) {
-                installedSurrogates.add(it.trackerUrl)
+            if (trackerEvent.surrogateId?.isNotEmpty() == true) {
+                installedSurrogates.add(trackerEvent.trackerUrl)
             }
 
-            if (uniqueEntityDomainState.shouldSkipEvent(entity, it)) return@map null
+            if (uniqueEntityDomainState.shouldSkipEvent(entity, trackerEvent)) return@map null
 
             DetectedRequest(
-                category = it.categories?.firstOrNull { category -> allowedCategories.contains(category) },
-                url = it.trackerUrl,
-                eTLDplus1 = toTldPlusOne(it.trackerUrl),
-                pageUrl = it.documentUrl,
+                category = trackerEvent.categories?.firstOrNull { category -> allowedCategories.contains(category) },
+                url = trackerEvent.trackerUrl,
+                eTLDplus1 = toTldPlusOne(trackerEvent.trackerUrl),
+                pageUrl = trackerEvent.documentUrl,
                 entityName = entity.displayName,
                 ownerName = entity.name,
                 prevalence = entity.prevalence,
-                state = it.status.mapToViewState()
+                state = trackerEvent.status.mapToViewState()
             )
         }.filterNotNull()
 

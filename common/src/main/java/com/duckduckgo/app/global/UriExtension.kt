@@ -189,6 +189,12 @@ fun String.extractSchemeAndDomain(): String? {
     return "$scheme://$domain"
 }
 
+fun String.addScheme(): String {
+    val uri = this.toUri()
+    uri.scheme ?: return "https://$this"
+    return this
+}
+
 fun String.extractDomain(): String? {
     return if (this.startsWith("http")) {
         this.toUri().domain()
