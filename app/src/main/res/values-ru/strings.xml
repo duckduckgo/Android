@@ -743,8 +743,16 @@
     <string name="permissionsPerWebsiteDenySetting">Отказать</string>
     <string name="permissionsPerWebsiteAllowSetting">Разрешить</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle">Разрешение на доступ %2$s к %1$s</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Разрешения Удалены для Всех Сайтов</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Автозаполнение</string>
+    <string name="autofillDisableAutofillPromptTitle">Вы хотите и дальше использовать Автозаполнение?</string>
+    <string name="autofillDisableAutofillPromptMessage">Вы можете отключить Автозаполнение в настройках в любое время.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Использовать</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Запретить</string>
+    <string name="autofillLoginSavedSnackbarMessage">Логин сохранён</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Логин обновлен</string>
+    <string name="autofillSnackbarAction">Показать</string>
 
 </resources>
