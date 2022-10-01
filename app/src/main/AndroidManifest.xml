@@ -16,6 +16,8 @@
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <queries>
         <intent>
@@ -360,10 +362,14 @@
             android:label="@string/fireproofWebsitesActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
-            android:name="com.duckduckgo.app.location.ui.LocationPermissionsActivity"
+            android:name="com.duckduckgo.app.sitepermissions.SitePermissionsActivity"
             android:exported="false"
-            android:label="@string/preciseLocationActivityTitle"
+            android:label="@string/settingsSitePermissions"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteActivity"
+            android:exported="false"
+            android:parentActivityName="com.duckduckgo.app.sitepermissions.SitePermissionsActivity" />
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
             android:exported="false"

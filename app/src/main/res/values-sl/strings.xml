@@ -596,7 +596,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Samo za to sejo</string>
     <string name="preciseLocationSiteDialogDenyAlways">Vedno zavrni</string>
     <string name="preciseLocationSiteDialogDenyOnce">Zavrni za to sejo</string>
-    <string name="settingsPreciseLocation">Lokacija</string>
     <string name="preciseLocationFeatureDescription">Obiskana spletna mesta bodo morda želela vedeti lokacijo vaše naprave. Do nje ne bodo mogli dostopati, dokler ne podelite izrecnega dovoljenja. DuckDuckGo uporablja vašo lokacijo samo anonimno za prikaz rezultatov lokalnega iskanja.</string>
     <string name="preciseLocationToggleText">Spletna mesta lahko zahtevajo mojo lokacijo</string>
     <string name="preciseLocationEmptyListHint">Nobeno spletno mesto nima dovoljenja za dostop do lokacije</string>
@@ -729,6 +728,21 @@
 
     <string name="autoconsentSetting">Upravljanje pojavnih oken za piškotke</string>
     <string name="autoconsentAnimationText">Upravljani piškotki</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Dovoljenja za spletno mesto</string>
+    <string name="sitePermissionsSettingsDescription">Spletna mesta, ki jih obiščete, lahko zahtevajo dostop do lokacije, kamere ali mikrofona vaše naprave. Do njih ne bodo mogli dostopati, razen če jim to izrecno dovolite.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Dovoli vsem mestom, da zahtevajo:</string>
+    <string name="sitePermissionsSettingsLocation">Lokacija</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Upravljanje spletnih mest</string>
+    <string name="sitePermissionsSettingsEmptyText">Spletnih mest še ni</string>
+    <string name="permissionPerWebsiteText">Dovoljenja za »%1$s« </string>
+    <string name="permissionsPerWebsiteAskSetting">Vprašaj</string>
+    <string name="permissionsPerWebsiteDenySetting">Zavrni</string>
+    <string name="permissionsPerWebsiteAllowSetting">Dovoli</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s dovoljenje za %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Samodejno izpolnjevanje</string>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s soovib juurdepääsu kaamerale ja mikrofonile</string>
+    <string name="sitePermissionsMicDialogTitle">%1$s soovib juurdepääsu mikrofonile</string>
+    <string name="sitePermissionsCameraDialogTitle">%1$s soovib juurdepääsu kaamerale</string>
+    <string name="sitePermissionsDialogContent">Halda antud lube seadetes</string>
+    <string name="sitePermissionsDialogDenyButton">Keela</string>
+    <string name="sitePermissionsDialogAllowButton">Luba</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Luba DuckDuckGo’l küsida juurdepääsu kaamerale ja mikrofonile</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Luba DuckDuckGo’l küsida juurdepääsu kaamerale</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Luba DuckDuckGo’l küsida juurdepääsu mikrofonile</string>
+    <string name="sitePermissionsDeniedSnackBarAction">Luba</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Luba DuckDuckGo’l küsida juurdepääsu selle seadme kaamerale</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Saidid saavad sinu kaamerat kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Luba DuckDuckGo’l küsida juurdepääsu selle seadme mikrofonile</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Saidid saavad sinu mikrofoni kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Luba DuckDuckGo’l küsida juurdepääsu selle seadme kaamerale ja mikrofonile</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Saidid saavad sinu kaamerat ja mikrofoni kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Ava seaded</string>
+    <string name="systemPermissionsDeniedDialogNegativeButton">Tühista</string>
+</resources>

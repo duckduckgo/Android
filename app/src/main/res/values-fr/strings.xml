@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Seulement pour cette session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Toujours refuser</string>
     <string name="preciseLocationSiteDialogDenyOnce">Refuser pour cette session</string>
-    <string name="settingsPreciseLocation">Localisation</string>
     <string name="preciseLocationFeatureDescription">Les sites que vous avez visités peuvent demander l\'accès à la localisation de votre appareil. Ils n\'y auront accès que si vous leur accordez expressément l\'autorisation. DuckDuckGo utilise votre localisation de manière anonyme pour fournir des résultats de recherche locaux.</string>
     <string name="preciseLocationToggleText">Les sites peuvent demander ma localisation</string>
     <string name="preciseLocationEmptyListHint">L\'autorisation d\'accès à la localisation n\'a été accordée à aucun site Web</string>
@@ -721,6 +720,21 @@
 
     <string name="autoconsentSetting">Gérer les fenêtres contextuelles de cookies</string>
     <string name="autoconsentAnimationText">Cookies gérés</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Autorisations du site</string>
+    <string name="sitePermissionsSettingsDescription">Les sites que vous visitez peuvent demander l\'accès à la localisation, à l\'appareil photo ou au micro de votre appareil. Ils ne pourront y accéder que si vous leur en donnez explicitement la permission.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Autoriser tous les sites à demander :</string>
+    <string name="sitePermissionsSettingsLocation">Localisation</string>
+    <string name="sitePermissionsSettingsCamera">Appareil photo</string>
+    <string name="sitePermissionsSettingsMicrophone">Micro</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Gérer les sites</string>
+    <string name="sitePermissionsSettingsEmptyText">Pas encore de sites</string>
+    <string name="permissionPerWebsiteText">Autorisations pour « %1$s » </string>
+    <string name="permissionsPerWebsiteAskSetting">Demander</string>
+    <string name="permissionsPerWebsiteDenySetting">Refuser</string>
+    <string name="permissionsPerWebsiteAllowSetting">Autoriser</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">Autorisation de %1$s pour %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Saisie automatique</string>
