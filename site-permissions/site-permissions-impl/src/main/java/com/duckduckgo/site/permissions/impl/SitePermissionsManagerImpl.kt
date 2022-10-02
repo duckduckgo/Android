@@ -35,12 +35,12 @@ class SitePermissionsManagerImpl @Inject constructor(
             .filter { sitePermissionsRepository.isDomainAllowedToAsk(url, it) }
             .toTypedArray()
 
-    override suspend fun clearAllButFireproof(fireproofWebsites: List<String>) {
+    override suspend fun clearAllButFireproof(fireproofDomains: List<String>) {
         sitePermissionsRepository.askCameraEnabled = true
         sitePermissionsRepository.askMicEnabled = true
 
         sitePermissionsRepository.sitePermissionsForAllWebsites().forEach { permission ->
-            if (!fireproofWebsites.contains(permission.domain)) {
+            if (!fireproofDomains.contains(permission.domain)) {
                 sitePermissionsRepository.deletePermissionsForSite(permission.domain)
             }
         }
