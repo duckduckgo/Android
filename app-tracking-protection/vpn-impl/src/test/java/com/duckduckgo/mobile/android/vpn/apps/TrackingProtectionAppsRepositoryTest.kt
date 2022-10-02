@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.apps
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.NameNotFoundException
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
@@ -122,6 +123,16 @@ class TrackingProtectionAppsRepositoryTest {
     fun whenIsProtectionEnabledCalledOnUnknownPackageThenReturnTrue() = runTest {
         whenever(packageManager.getApplicationInfo("com.example.unknown", 0))
             .thenReturn(ApplicationInfo().apply { packageName = "com.example.unknown" })
+
+        val isEnabled = trackingProtectionAppsRepository.isAppProtectionEnabled("com.example.unknown")
+
+        assertTrue(isEnabled)
+    }
+
+    @Test
+    fun whenIsProtectionEnabledCalledAndNameNotFoundExceptionIsThrownThenReturnTrue() = runTest {
+        whenever(packageManager.getApplicationInfo("com.example.unknown", 0))
+            .thenThrow(NameNotFoundException())
 
         val isEnabled = trackingProtectionAppsRepository.isAppProtectionEnabled("com.example.unknown")
 
