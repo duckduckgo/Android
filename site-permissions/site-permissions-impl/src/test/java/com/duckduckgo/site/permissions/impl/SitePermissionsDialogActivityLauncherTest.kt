@@ -16,13 +16,20 @@
 
 package com.duckduckgo.site.permissions.impl
 
-import junit.framework.TestCase
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.nhaarman.mockitokotlin2.mock
+import org.junit.Before
 
-class SitePermissionsRepositoryImplTest : TestCase() {
+class SitePermissionsDialogActivityLauncherTest {
 
-    fun testIsDomainAllowedToAsk() {}
+    private lateinit var testee: SitePermissionsDialogActivityLauncher
 
-    fun testIsDomainGranted() {}
+    private val mockSystemPermissionsHelper: SystemPermissionsHelper = mock()
+    private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
+    private val mockPixel: Pixel = mock()
 
-    fun testSitePermissionGranted() {}
+    @Before
+    fun before() {
+        testee = SitePermissionsDialogActivityLauncher(mockSystemPermissionsHelper, mockSitePermissionsRepository, mockPixel)
+    }
 }

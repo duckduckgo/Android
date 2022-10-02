@@ -21,7 +21,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import javax.inject.Inject
 
 class SitePermissionsManagerImpl @Inject constructor(
-    private val sitePermissionsRepository: SitePermissionsRepositoryImpl
+    private val sitePermissionsRepository: SitePermissionsRepository
 ) : SitePermissionsManager {
 
     override suspend fun getSitePermissionsGranted(url: String, tabId: String, resources: Array<String>): Array<String> =
