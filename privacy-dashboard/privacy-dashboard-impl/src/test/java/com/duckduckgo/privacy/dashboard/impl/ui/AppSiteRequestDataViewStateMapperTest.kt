@@ -31,6 +31,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus.USER_ALLOWED
 import com.duckduckgo.app.trackerdetection.model.TrackerType.AD
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.dashboard.impl.ui.AppSiteRequestDataViewStateMapperTest.EntityMO.MAJOR_ENTITY_A
+import com.duckduckgo.privacy.dashboard.impl.ui.AppSiteRequestDataViewStateMapperTest.EntityMO.MINOR_ENTITY_A
 import com.duckduckgo.privacy.dashboard.impl.ui.AppSiteViewStateMapperTest.TestCertificateInfo
 import com.duckduckgo.privacy.dashboard.impl.ui.AppSiteViewStateMapperTest.TestEntity
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons
@@ -63,8 +64,8 @@ class AppSiteRequestDataViewStateMapperTest {
         val viewState = testee.mapFromSite(site)
 
         assertTrue(viewState.requests.count() == 2)
-        assertNotNull(viewState.requests.find { it.url == "test.com" })
-        assertNotNull(viewState.requests.find { it.url == "test2.com" })
+        assertNotNull(viewState.requests.find { it.url == "http://test.com" })
+        assertNotNull(viewState.requests.find { it.url == "http://test2.com" })
     }
 
     @Test
@@ -83,12 +84,12 @@ class AppSiteRequestDataViewStateMapperTest {
         val viewState = testee.mapFromSite(site)
 
         assertTrue(viewState.requests.count() == 6)
-        assertTrue(viewState.requests.first { it.url == "test1.com" }.state is Blocked)
-        assertTrue(viewState.requests.first { it.url == "test2.com" }.state == Allowed(Reason(AllowedReasons.PROTECTIONS_DISABLED.value)))
-        assertTrue(viewState.requests.first { it.url == "test3.com" }.state == Allowed(Reason(AllowedReasons.AD_CLICK_ATTRIBUTION.value)))
-        assertTrue(viewState.requests.first { it.url == "test4.com" }.state == Allowed(Reason(AllowedReasons.RULE_EXCEPTION.value)))
-        assertTrue(viewState.requests.first { it.url == "test5.com" }.state == Allowed(Reason(AllowedReasons.OWNED_BY_FIRST_PARTY.value)))
-        assertTrue(viewState.requests.first { it.url == "test6.com" }.state == Allowed(Reason(AllowedReasons.OTHER_THIRD_PARTY_REQUEST.value)))
+        assertTrue(viewState.requests.first { it.url == "http://test1.com" }.state is Blocked)
+        assertTrue(viewState.requests.first { it.url == "http://test2.com" }.state == Allowed(Reason(AllowedReasons.PROTECTIONS_DISABLED.value)))
+        assertTrue(viewState.requests.first { it.url == "http://test3.com" }.state == Allowed(Reason(AllowedReasons.AD_CLICK_ATTRIBUTION.value)))
+        assertTrue(viewState.requests.first { it.url == "http://test4.com" }.state == Allowed(Reason(AllowedReasons.RULE_EXCEPTION.value)))
+        assertTrue(viewState.requests.first { it.url == "http://test5.com" }.state == Allowed(Reason(AllowedReasons.OWNED_BY_FIRST_PARTY.value)))
+        assertTrue(viewState.requests.first { it.url == "http://test6.com" }.state == Allowed(Reason(AllowedReasons.OTHER_THIRD_PARTY_REQUEST.value)))
     }
 
     @Test
@@ -141,13 +142,60 @@ class AppSiteRequestDataViewStateMapperTest {
         val viewState = testee.mapFromSite(site)
 
         assertTrue(viewState.requests.count() == 1)
-        assertEquals("test.co.uk", viewState.requests.first().url)
+        assertEquals("http://test.co.uk", viewState.requests.first().url)
         assertEquals("test.co.uk", viewState.requests.first().eTLDplus1)
         assertEquals("test.com", viewState.requests.first().pageUrl)
         assertEquals(MAJOR_ENTITY_A.displayName, viewState.requests.first().entityName)
         assertEquals(MAJOR_ENTITY_A.name, viewState.requests.first().ownerName)
         assertEquals(MAJOR_ENTITY_A.prevalence, viewState.requests.first().prevalence, 0.0)
         assertTrue(viewState.requests.first().state is Blocked)
+    }
+
+    @Test
+    fun whenSiteHasTrackersFromSameDomainAndSameStateThenRequestDataViewStateContainsFirstEvent() {
+        val site = site(
+            events = listOf(
+                TrackingEvent("test.com", "test.com/a.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
+                TrackingEvent("test.com", "test.com/b.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD)
+            )
+        )
+
+        val viewState = testee.mapFromSite(site)
+
+        assertTrue(viewState.requests.count() == 1)
+        assertNotNull(viewState.requests.find { it.url == "http://test.com/a.js" })
+    }
+
+    @Test
+    fun whenSiteHasTrackersFromSameDomainAndSameStateButDifferentEntityThenRequestDataViewStateContainsBothEvent() {
+        val site = site(
+            events = listOf(
+                TrackingEvent("test.com", "test.com/a.js", null, MINOR_ENTITY_A, null, BLOCKED, AD),
+                TrackingEvent("test.com", "test.com/b.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD)
+            )
+        )
+
+        val viewState = testee.mapFromSite(site)
+
+        assertTrue(viewState.requests.count() == 2)
+        assertNotNull(viewState.requests.find { it.url == "http://test.com/a.js" })
+        assertNotNull(viewState.requests.find { it.url == "http://test.com/b.js" })
+    }
+
+    @Test
+    fun whenSiteHasTrackersFromSameDomainButDifferentStateThenRequestDataViewStateContainsBothEvent() {
+        val site = site(
+            events = listOf(
+                TrackingEvent("test.com", "test.com/a.js", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
+                TrackingEvent("test.com", "test.com/b.js", null, MAJOR_ENTITY_A, null, SAME_ENTITY_ALLOWED, AD)
+            )
+        )
+
+        val viewState = testee.mapFromSite(site)
+
+        assertTrue(viewState.requests.count() == 2)
+        assertTrue(viewState.requests.find { it.url == "http://test.com/a.js" }!!.state is Blocked)
+        assertTrue(viewState.requests.find { it.url == "http://test.com/b.js" }!!.state is Allowed)
     }
 
     private fun site(
