@@ -29,6 +29,7 @@ import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.recursiveEnable
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -177,8 +178,9 @@ class OneLineListItem @JvmOverloads constructor(
     }
 
     /** Sets the switch as enabled or not */
-    fun setIsEnabled(isEnabled: Boolean) {
-        binding.trailingSwitch.isEnabled = isEnabled
+    override fun setEnabled(enabled: Boolean) {
+        recursiveEnable(enabled)
+        super.setEnabled(enabled)
     }
 
     /** Allows to set a new value to the switch, without triggering the onChangeListener */

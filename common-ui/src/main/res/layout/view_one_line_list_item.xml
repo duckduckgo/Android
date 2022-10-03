@@ -54,7 +54,7 @@
             android:layout_marginEnd="@dimen/keyline_2"
             android:paddingTop="@dimen/oneLineItemPadding"
             android:paddingBottom="@dimen/oneLineItemPadding"
-            android:textColor="?attr/listItemTitleColor"
+            android:textColor="@color/primary_text_color_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/trailingContainer"
             app:layout_constraintStart_toEndOf="@id/leadingIconBackground"
