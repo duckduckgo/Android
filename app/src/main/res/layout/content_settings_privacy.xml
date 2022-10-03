@@ -22,11 +22,11 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:id="@+id/settingsPrivacyTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settingsHeadingPrivacy" />
+        android:text="@string/settingsHeadingPrivacy"/>
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/globalPrivacyControlSetting"
