@@ -111,14 +111,6 @@
                 app:showSwitch="true"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                android:id="@+id/vpn_new_networking_layer_toggle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="VPN new networking layer"
-                app:showSwitch="true"
-            />
-
             <!-- Section Trackers -->
             <com.duckduckgo.mobile.android.ui.view.SectionDivider
                 android:layout_width="match_parent"
