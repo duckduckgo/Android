@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s želi dostop do kamere in mikrofona</string>
+    <string name="sitePermissionsMicDialogTitle">%1$s želi dostop do mikrofona</string>
+    <string name="sitePermissionsCameraDialogTitle">%1$s želi dostop do kamere</string>
+    <string name="sitePermissionsDialogContent">Upravljanje podeljenih dovoljenj v nastavitvah</string>
+    <string name="sitePermissionsDialogDenyButton">Zavrni</string>
+    <string name="sitePermissionsDialogAllowButton">Dovoli</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Dovolite, da lahko spletno mesto DuckDuckGo zahteva dostop do kamere in mikrofona</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Dovolite, da lahko spletno mesto DuckDuckGo zahteva dostop do kamere</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Dovolite, da lahko spletno mesto DuckDuckGo zahteva dostop do mikrofona</string>
+    <string name="sitePermissionsDeniedSnackBarAction">Dovoli</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Dovolite, da lahko spletno mesto DuckDuckGo zahteva dostop do kamere v tej napravi</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Spletna mesta lahko uporabljajo vašo kamero le, če dovolite, da DuckDuckGo zaprosi za dostop.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Dovolite, da lahko spletno mesto DuckDuckGo zahteva dostop do mikrofona v tej napravi</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Spletna mesta lahko uporabljajo vaš mikrofon le, če dovolite, da DuckDuckGo zaprosi za dostop.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Dovolite, da lahko spletno mesto DuckDuckGo zahteva dostop do kamere in mikrofona v tej napravi</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Spletna mesta lahko uporabljajo vašo kamero in mikrofon le, če dovolite, da DuckDuckGo zaprosi za dostop.</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Odpri nastavitve</string>
+    <string name="systemPermissionsDeniedDialogNegativeButton">Preklic</string>
+</resources>

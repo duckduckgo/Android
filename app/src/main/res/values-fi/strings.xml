@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Vain tässä istunnossa</string>
     <string name="preciseLocationSiteDialogDenyAlways">Kiellä aina</string>
     <string name="preciseLocationSiteDialogDenyOnce">Kiellä tässä istunnossa</string>
-    <string name="settingsPreciseLocation">Sijainti</string>
     <string name="preciseLocationFeatureDescription">Sivustot, joilla käyt, voivat pyytää saada tietää sijaintisi. Ne eivät saa tietää sijaintiasi ennen kuin annat siihen erikseen luvan. DuckDuckGo käyttää sijaintiasi pelkästään anonyymisti antaakseen sinulle paikallisia hakutuloksia.</string>
     <string name="preciseLocationToggleText">Sivustot voivat pyytää nähdä sijaintini</string>
     <string name="preciseLocationEmptyListHint">Millekään sivustolle ei ole annettu lupaa käyttää sijaintiasi</string>
@@ -721,6 +720,21 @@
 
     <string name="autoconsentSetting">Evästeiden hallinnan ponnahdusikkunat</string>
     <string name="autoconsentAnimationText">Hallitut evästeet</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Sivuston käyttöoikeudet</string>
+    <string name="sitePermissionsSettingsDescription">Käyttämäsi sivustot saattavat pyytää laitteesi sijainnin, kameran tai mikrofonin käyttöoikeutta. Ne eivät voi käyttää niitä, ellet myönnä tällaista käyttöoikeutta.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Salli kaikkien sivustojen pyytää:</string>
+    <string name="sitePermissionsSettingsLocation">Sijainti</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofoni</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Hallitse sivustoja</string>
+    <string name="sitePermissionsSettingsEmptyText">Ei vielä yhtään sivustoa</string>
+    <string name="permissionPerWebsiteText">Oikeudet: %1$s </string>
+    <string name="permissionsPerWebsiteAskSetting">Kysy</string>
+    <string name="permissionsPerWebsiteDenySetting">Estä</string>
+    <string name="permissionsPerWebsiteAllowSetting">Salli</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s: käyttöoikeus – lupa %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automaattinen täyttö</string>

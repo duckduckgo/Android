@@ -48,7 +48,6 @@ class WebViewCookieManagerTest {
     private val externalHostCookie = Cookie("example.com", "dz=zyx")
     private val testee: WebViewCookieManager = WebViewCookieManager(
         cookieManagerProvider,
-        DDG_HOST,
         removeCookieStrategy,
         coroutineRule.testDispatcherProvider
     )
@@ -123,6 +122,6 @@ class WebViewCookieManagerTest {
     }
 
     companion object {
-        private const val DDG_HOST = "duckduckgo.com"
+        private const val DDG_HOST = "https://duckduckgo.com"
     }
 }

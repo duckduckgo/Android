@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Yalnızca Bu Oturum için</string>
     <string name="preciseLocationSiteDialogDenyAlways">Her Zaman Reddet</string>
     <string name="preciseLocationSiteDialogDenyOnce">Bu Oturum için Reddet</string>
-    <string name="settingsPreciseLocation">Konum</string>
     <string name="preciseLocationFeatureDescription">Ziyaret ettiğiniz siteler cihazınızın konumunu öğrenmek isteyebilir. Ancak siz açıkça izin vermediğiniz takdirde konumunuza erişemezler. DuckDuckGo, konumunuzu yalnızca yerel arama sonuçları sunmak için anonim olarak kullanır.</string>
     <string name="preciseLocationToggleText">Siteler Konumumu Sorabilir</string>
     <string name="preciseLocationEmptyListHint">Hiçbir web sitesine konuma erişim izni verilmedi</string>
@@ -714,13 +713,28 @@
     <string name="atp_SettingsDeviceShieldDisabled">Devre Dışı</string>
 
     <!-- Autoconsent -->
-    <string name="autoconsentDialogTitle">Görünüşe göre bu sitede çerez izni için açılır pencere var👇</string>
+    <string name="autoconsentDialogTitle">Görünüşe göre bu sitede çerez izni için açılır pencere var 👇</string>
     <string name="autoconsentDialogDescription">Bunları sizin yerinize halletmemizi ister misiniz? Çerezleri en aza indirmeyi, gizliliği en üst düzeye çıkarmayı ve bunun gibi açılır pencereleri gizlemeyi deneyebiliriz.</string>
     <string name="autoconsentPrimaryCta">Çerez Açılır Pencerelerini Yönetin</string>
     <string name="autoconsentSecondaryCta">Hayır Teşekkürler</string>
 
     <string name="autoconsentSetting">Çerez Açılır Pencerelerini Yönetin</string>
     <string name="autoconsentAnimationText">Yönetilen Çerezler</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Site İzinleri</string>
+    <string name="sitePermissionsSettingsDescription">Ziyaret ettiğiniz siteler cihazınızın konumuna, kamerasına veya mikrofonuna erişim isteyebilir. Siz açıkça izin vermediğiniz sürece bunlara erişemezler.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Tüm sitelerin şunları istemesine izin ver:</string>
+    <string name="sitePermissionsSettingsLocation">Konum</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Siteleri Yönet</string>
+    <string name="sitePermissionsSettingsEmptyText">Henüz site yok</string>
+    <string name="permissionPerWebsiteText">\"%1$s\" için izinler </string>
+    <string name="permissionsPerWebsiteAskSetting">Sor</string>
+    <string name="permissionsPerWebsiteDenySetting">Reddet</string>
+    <string name="permissionsPerWebsiteAllowSetting">İzin ver</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%2$s için %1$s izni</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Otomatik Doldurma</string>

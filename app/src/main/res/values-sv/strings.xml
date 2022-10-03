@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Endast för denna session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Neka alltid</string>
     <string name="preciseLocationSiteDialogDenyOnce">Neka för denna session</string>
-    <string name="settingsPreciseLocation">Position</string>
     <string name="preciseLocationFeatureDescription">Webbplatser du besöker kan begära åtkomst till din enhetsplats. De får inte åtkomst till din enhetsplats innan du uttryckligen beviljat detta. DuckDuckGo använder bara din enhetsplats anonymt för att tillhandahålla lokala sökresultat.</string>
     <string name="preciseLocationToggleText">Webbplatser kan be om åtkomst till min platsinf\bormation</string>
     <string name="preciseLocationEmptyListHint">Inga webbplatser har fått åtkomst till enhetsplats</string>
@@ -721,6 +720,21 @@
 
     <string name="autoconsentSetting">Hantera popup-fönster för cookies</string>
     <string name="autoconsentAnimationText">Cookies hanteras</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Webbplatsbehörigheter</string>
+    <string name="sitePermissionsSettingsDescription">Webbplatser som du besöker kan begära åtkomst till din enhets plats, kamera eller mikrofon. De kan inte komma åt dessa om du inte uttryckligen tillåter det.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Tillåt alla webbplatser att be om:</string>
+    <string name="sitePermissionsSettingsLocation">Plats</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Hantera webbplatser</string>
+    <string name="sitePermissionsSettingsEmptyText">Inga webbplatser ännu</string>
+    <string name="permissionPerWebsiteText">Behörigheter för %1$s </string>
+    <string name="permissionsPerWebsiteAskSetting">Fråga</string>
+    <string name="permissionsPerWebsiteDenySetting">Neka</string>
+    <string name="permissionsPerWebsiteAllowSetting">Tillåt</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$s-behörighet för %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatisk ifyllning</string>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s haluaa käyttää kameraa ja mikrofonia</string>
+    <string name="sitePermissionsMicDialogTitle">%1$s haluaa käyttää mikrofonia</string>
+    <string name="sitePermissionsCameraDialogTitle">%1$s haluaa käyttää kameraa</string>
+    <string name="sitePermissionsDialogContent">Hallitse myönnettyjä käyttöoikeuksia asetuksissa</string>
+    <string name="sitePermissionsDialogDenyButton">Estä</string>
+    <string name="sitePermissionsDialogAllowButton">Salli</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Salli DuckDuckGon pyytää kameran ja mikrofonin käyttöoikeutta</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Salli DuckDuckGon pyytää kameran käyttöoikeutta</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Salli DuckDuckGon pyytää mikrofonin käyttöoikeutta</string>
+    <string name="sitePermissionsDeniedSnackBarAction">Salli</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Salli DuckDuckGon pyytää kameran käyttöoikeutta tällä laitteella</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Sivustot voivat käyttää kameraa vain, jos sallit DuckDuckGon pyytää sen käyttöoikeutta.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Salli DuckDuckGon pyytää mikrofonin käyttöoikeutta tällä laitteella</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Sivustot voivat käyttää mikrofoniasi vain, jos sallit DuckDuckGon pyytää sen käyttöoikeutta.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Salli DuckDuckGon pyytää kameran ja mikrofonin käyttöoikeutta tällä laitteella</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Sivustot voivat käyttää kameraa ja mikrofonia vain, jos annat DuckDuckGon pyytää niiden käyttöoikeutta.</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Avaa asetukset</string>
+    <string name="systemPermissionsDeniedDialogNegativeButton">Peruuta</string>
+</resources>
