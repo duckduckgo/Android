@@ -77,13 +77,6 @@
         <item name="textAppearanceH3">@style/Typography.DuckDuckGo.H3</item>
         <item name="textAppearanceH4">@style/Typography.DuckDuckGo.H4</item>
         <item name="textAppearanceH5">@style/Typography.DuckDuckGo.H5</item>
-
-        <!--Design System Legacy Typography (to be removed when the migration happens)
-        <item name="textAppearanceBody1">@style/Typography.DuckDuckGo.Body1</item>
-        <item name="textAppearanceBody2">@style/Typography.DuckDuckGo.Body2</item>
-        <item name="textAppearanceButton">@style/Typography.DuckDuckGo.Button</item>
-        <item name="textAppearanceCaption">@style/Typography.DuckDuckGo.Caption</item> -->
-
     </style>
 
     <style name="AppTheme.BaseDark">

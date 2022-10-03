@@ -41,12 +41,4 @@
     <attr name="textAppearanceH4" format="reference"/>
     <attr name="textAppearanceH5" format="reference"/>
 
-    <!-- We use Material Components, therefore the following attributes
-     are already deigned there and we don't need to create them
-    <attr  name="textAppearanceBody1" format="reference"/>
-    <attr  name="textAppearanceBody2 format="reference"/>
-    <attr  name="textAppearanceButton" format="reference"/>
-    <attr  name="textAppearanceCaption" format="reference"/>
-    -->
-
 </resources>
