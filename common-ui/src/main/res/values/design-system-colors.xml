@@ -16,6 +16,49 @@
 
 <resources>
 
+    <!-- Design System References Colors -->
+    <attr name="daxColorBackgroundPrimary" format="color" />
+    <attr name="daxColorBackgroundSecondary" format="color" />
+    <attr name="daxColorContainer" format="color" />
+    <attr name="daxColorPrimaryText" format="color" />
+    <attr name="daxColorSecondaryText" format="color" />
+    <attr name="daxColorDestructive" format="color" />
+    <attr name="daxColorAccentBlue" format="color" />
+    <attr name="daxColorAccentYellow" format="color" />
+
+    <!-- Design System Raw Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <color name="gray0">#FAFAFA</color>
+    <color name="gray100">#111111</color>
+
+
+    <!-- Backgrounds
+Background primary - Light (Gray 0) // the base background
+Background secondary - Light (White) // second layer background (alerts, dax dialogues)
+Container - Light (Shade 6%) // gray circles in bookmarks
+Text
+Text primary - Light (Shade 84%)
+Text secondary - Light (Shade 60%)
+Destructive - Light (Alert Red - on Light) // Text and icons
+Other
+Lines - Light (shade 12%) // dividers, lines in text fields
+Lines - Light (shade 12%) // dividers, lines in text fields
+Accent - Blue 50 // Primary blue
+
+Dark theme
+Background - Dark (Gray 100)
+Surface - Dark (Gray 90)
+Container - Dark (Tint 12%)
+Text primary - Dark (Tint 84%)
+Text secondary - Dark (Tint 60%)
+Destructive - Dark (Alert Red - on Dark)
+Lines - Dark (Tint 18%)
+Accent - Blue 30 // Primary blue
+-->
+
+    <!-- Design System Raw Colors -->
     <color name="disabledColor">#59000000</color>
 
     <color name="red50">#DE5833</color>
