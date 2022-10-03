@@ -23,6 +23,4 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation Kotlin.stdlib.jdk7
-    implementation project(path: ':browser-api')
-    implementation "com.airbnb.android:lottie:_"
 }
