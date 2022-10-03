@@ -129,6 +129,20 @@
         <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
+            android:text="Typography Set Manually"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/typographyTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:text="Text Appearance Body 1 set manually"
+            tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
             android:text="Legacy Typography"/>
 
         <TextView
