@@ -321,7 +321,7 @@ class SettingsActivity :
         viewsPrivacy.automaticallyClearWhenSetting.setSecondaryText(clearWhenSubtitle)
 
         val whenOptionEnabled = automaticallyClearData.clearWhenOptionEnabled
-        viewsPrivacy.automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
+        viewsPrivacy.automaticallyClearWhenSetting.setIsEnabled(whenOptionEnabled)
     }
 
     private fun launchAutomaticallyClearWhatDialog(option: ClearWhatOption) {
