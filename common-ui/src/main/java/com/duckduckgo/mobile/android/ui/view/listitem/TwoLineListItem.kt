@@ -198,12 +198,6 @@ class TwoLineListItem @JvmOverloads constructor(
         binding.trailingSwitch.isChecked = isChecked
     }
 
-    /** Sets the switch as enabled or not */
-    fun setIsEnabled(isEnabled: Boolean) {
-        recursiveEnable(isEnabled)
-        super.setEnabled(isEnabled)
-    }
-
     /** Allows to set a new value to the switch, without triggering the onChangeListener */
     fun quietlySetIsChecked(
         newCheckedState: Boolean,
