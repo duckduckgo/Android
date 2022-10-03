@@ -22,13 +22,13 @@ import dagger.SingleInstanceIn
 import java.io.BufferedReader
 import javax.inject.Inject
 
-interface ContentScopeJS {
+interface ContentScopeJSReader {
     fun getContentScopeJS(): String
 }
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealContentScopeJS @Inject constructor() : ContentScopeJS {
+class RealContentScopeJSReader @Inject constructor() : ContentScopeJSReader {
     private lateinit var contentScopeJS: String
 
     override fun getContentScopeJS(): String {

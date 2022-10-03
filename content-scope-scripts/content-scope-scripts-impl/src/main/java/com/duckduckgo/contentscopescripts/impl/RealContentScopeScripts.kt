@@ -36,7 +36,7 @@ class RealContentScopeScripts @Inject constructor(
     private val pluginPoint: PluginPoint<ContentScopeConfigPlugin>,
     private val allowList: UserWhiteListRepository,
     private val gpc: Gpc,
-    private val contentScopeJS: ContentScopeJS
+    private val contentScopeJSReader: ContentScopeJSReader
 ) : ContentScopeScripts {
 
     private var cachedConfig: String = ""
@@ -78,10 +78,13 @@ class RealContentScopeScripts @Inject constructor(
 
     private fun getConfig(): String {
         var config = ""
-        for (plugin in pluginPoint.getPlugins()) {
+        val plugins = pluginPoint.getPlugins()
+        plugins.forEach { plugin ->
             plugin.config()?.let { pluginConfig ->
+                if (config.isNotEmpty()) {
+                    config += ","
+                }
                 config += pluginConfig
-                config += ",\n"
             }
         }
         return config
@@ -108,7 +111,7 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun cacheContentScopeJS() {
-        val contentScopeJS = contentScopeJS.getContentScopeJS()
+        val contentScopeJS = contentScopeJSReader.getContentScopeJS()
 
         cachedContentScopeJS = contentScopeJS
             .replace(contentScope, cachedContentScopeJson)
@@ -130,7 +133,7 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun getContentScopeJson(config: String): String = (
-        "{\"features\":{$config\"unprotectedTemporary\":[]}}"
+        "{\"features\":{$config},\"unprotectedTemporary\":[]}"
         )
 
     private fun getUserPreferences() = UserPreferences(
