@@ -21,8 +21,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/twoLineItemHeight"
+        android:paddingEnd="@dimen/keyline_0"
         xmlns:tools="http://schemas.android.com/tools"
-        android:paddingEnd="@dimen/keyline_4"
         android:id="@+id/item_container">
 
     <FrameLayout
@@ -50,7 +50,6 @@
             android:orientation="horizontal"
             android:layout_marginStart="16dp"
             android:layout_marginTop="14dp"
-            android:layout_marginEnd="16dp"
             app:layout_constraintStart_toEndOf="@+id/leadingIconBackground"
             app:layout_constraintEnd_toStartOf="@id/trailingContainer"
             app:layout_constraintTop_toTopOf="parent">
