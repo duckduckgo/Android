@@ -19,11 +19,85 @@ package com.duckduckgo.mobile.android.ui.view.text
 import android.content.Context
 import android.util.AttributeSet
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Type.Body1
 import com.google.android.material.textview.MaterialTextView
+import java.lang.reflect.Array.getInt
 
 class DaxTextView @JvmOverloads
 constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.style.Widget_DuckDuckGo_IconButton
-) : MaterialTextView(context, attrs, defStyleAttr)
+    defStyleAttr: Int = 0
+) : MaterialTextView(context, attrs, defStyleAttr) {
+
+    init {
+        val typedArray =
+            context.obtainStyledAttributes(
+                attrs,
+                R.styleable.DaxTextView,
+                0,
+                0
+            )
+
+        val typographyType = if (typedArray.hasValue(R.styleable.DaxTextView_typography)) {
+            Type.from(typedArray.getInt(R.styleable.DaxTextView_typography, 0))
+        } else {
+            Body1
+        }
+
+        setTypography(typographyType)
+
+        typedArray.recycle()
+    }
+
+    fun setTypography(type: Type) {
+        setTextAppearance(Type.getTextAppearanceStyle(type))
+    }
+
+    enum class Type {
+        Title,
+        H1,
+        H2,
+        H3,
+        H4,
+        H5,
+        Body1,
+        Body2,
+        Button,
+        Caption;
+
+        companion object {
+            fun from(type: Int): Type {
+                // same order as attrs-typography.xml
+                return when (type) {
+                    0 -> Title
+                    1 -> H1
+                    2 -> H2
+                    3 -> H3
+                    4 -> H4
+                    5 -> H5
+                    6 -> Body1
+                    7 -> Body2
+                    8 -> Button
+                    9 -> Caption
+                    else -> Body1
+                }
+            }
+
+            fun getTextAppearanceStyle(type: Type): Int {
+                return when (type) {
+                    Title -> R.style.Typography_DuckDuckGo_Title
+                    H1 -> R.style.Typography_DuckDuckGo_H1
+                    H2 -> R.style.Typography_DuckDuckGo_H2
+                    H3 -> R.style.Typography_DuckDuckGo_H3
+                    H4 -> R.style.Typography_DuckDuckGo_H4
+                    H5 -> R.style.Typography_DuckDuckGo_H5
+                    Body1 -> R.style.Typography_DuckDuckGo_Body1
+                    Body2 -> R.style.Typography_DuckDuckGo_Body2
+                    Button -> R.style.Typography_DuckDuckGo_Button
+                    Caption -> R.style.Typography_DuckDuckGo_Caption
+                }
+            }
+        }
+    }
+}
