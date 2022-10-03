@@ -84,7 +84,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="@dimen/oneLineItemPadding"
-            android:textColor="@color/secondary_text_color"
+            android:textColor="@color/secondary_text_color_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/trailingContainer"
             app:layout_constraintStart_toStartOf="@id/primaryTextContainer"
