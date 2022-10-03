@@ -20,6 +20,7 @@ import java.util.*
 
 interface AppBuildConfig {
     val isTest: Boolean
+    val isPerformanceTest: Boolean
     val isDebug: Boolean
     val applicationId: String
     val buildType: String
