@@ -16,8 +16,6 @@
 
 package com.duckduckgo.privacy.config.impl.referencetests.gpc
 
-import android.content.Context
-import android.content.res.Resources
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
@@ -72,13 +70,9 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
 
     @Before
     fun setup() {
-        val context: Context = mock()
-        val resources: Resources = mock()
-        whenever(context.resources).thenReturn(resources)
-        whenever(resources.openRawResource(any())).thenReturn("".byteInputStream())
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(testCase.gpcUserSettingOn)
         mockGpcPrivacyConfig()
-        gpc = RealGpc(context, mockFeatureToggle, mockGpcRepository, RealUnprotectedTemporary(mockUnprotectedTemporaryRepository))
+        gpc = RealGpc(mockFeatureToggle, mockGpcRepository, RealUnprotectedTemporary(mockUnprotectedTemporaryRepository))
     }
 
     @Test
