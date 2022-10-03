@@ -19,6 +19,7 @@
     <!--Common lists attributes-->
     <attr name="listItemTitleColor" format="color"/>
     <attr name="listItemSubtitleColor" format="color"/>
+    <attr name="listItemDisabledColor" format="color"/>
 
     <attr name="oneLineListItemStyle" format="reference"/>
     <attr name="twoLineListItemStyle" format="reference"/>

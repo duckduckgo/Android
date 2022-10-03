@@ -76,6 +76,7 @@
         <item name="chipBackgroundColor">@color/gray90</item>
         <item name="listItemTitleColor">@color/white</item>
         <item name="listItemSubtitleColor">@color/grayishTwo</item>
+        <item name="listItemDisabledColor">@color/warGreyTwo</item>
         <item name="subtitleTextColor">@color/grayishTwo</item>
         <item name="toolbarIconColor">@color/white</item>
         <item name="toolbarTextColor">@color/white</item>
@@ -266,6 +267,7 @@
 
         <item name="listItemTitleColor">@color/almostBlackDark</item>
         <item name="listItemSubtitleColor">@color/warmerGray</item>
+        <item name="listItemDisabledColor">@color/pinkish_grey_two</item>
         <item name="listItemBackgroundColor">@color/whiteFive</item>
         <item name="listItemSeparatorColor">@color/whiteSix</item>
         <item name="textInputOutlinedBoxColor">@color/grayishThree</item>
