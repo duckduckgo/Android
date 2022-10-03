@@ -17,14 +17,15 @@
 <resources>
 
     <!-- Design System References Colors -->
-    <attr name="daxColorBackgroundPrimary" format="color" />
-    <attr name="daxColorBackgroundSecondary" format="color" />
+    <attr name="daxColorBackground" format="color" />
+    <attr name="daxColorSurface" format="color" />
     <attr name="daxColorContainer" format="color" />
     <attr name="daxColorPrimaryText" format="color" />
     <attr name="daxColorSecondaryText" format="color" />
     <attr name="daxColorDestructive" format="color" />
     <attr name="daxColorAccentBlue" format="color" />
     <attr name="daxColorAccentYellow" format="color" />
+    <attr name="daxColorLines" format="color" />
 
     <!-- Design System Raw Colors -->
     <color name="white">#FFFFFF</color>
