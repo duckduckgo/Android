@@ -177,6 +177,7 @@ class SettingsActivity :
             autoconsentSetting.setOnClickListener { viewModel.onAutoconsentClicked() }
             fireproofWebsites.setClickListener { viewModel.onFireproofWebsitesClicked() }
             automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
+            automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
             whitelist.setClickListener { viewModel.onManageWhitelistSelected() }
         }
 
