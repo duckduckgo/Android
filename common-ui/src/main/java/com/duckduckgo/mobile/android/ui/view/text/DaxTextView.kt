@@ -67,7 +67,7 @@ constructor(
         Caption;
 
         companion object {
-            private fun from(type: Int): Type {
+            fun from(type: Int): Type {
                 // same order as attrs-typography.xml
                 return when (type) {
                     0 -> Title
@@ -84,7 +84,7 @@ constructor(
                 }
             }
 
-            private fun getTextAppearanceStyle(type: Type): Int {
+            fun getTextAppearanceStyle(type: Type): Int {
                 return when (type) {
                     Title -> R.style.Typography_DuckDuckGo_Title
                     H1 -> R.style.Typography_DuckDuckGo_H1
