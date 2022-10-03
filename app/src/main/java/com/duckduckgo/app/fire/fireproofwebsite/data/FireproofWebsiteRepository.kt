@@ -25,6 +25,7 @@ import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -38,7 +39,15 @@ interface FireproofWebsiteRepositoryAPI {
     suspend fun removeAllFireproofWebsites()
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = FireproofRepository::class
+)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = FireproofWebsiteRepositoryAPI::class
+)
+@SingleInstanceIn(AppScope::class)
 class FireproofWebsiteRepository @Inject constructor(
     private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val dispatchers: DispatcherProvider,

@@ -53,7 +53,6 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -290,10 +289,6 @@ class BrowserModule {
             adClickManager,
             cloakedCnameDetector
         )
-
-    @Provides
-    @Named("cookiesUrl")
-    fun cookiesUrl(): String = AppUrl.Url.COOKIES
 
     @Provides
     @Named("webViewDbLocator")

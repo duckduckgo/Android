@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.*
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
 import com.duckduckgo.app.global.DispatcherProvider
@@ -135,16 +134,6 @@ object PrivacyModule {
         dispatcherProvider: DispatcherProvider
     ): GeoLocationPermissions {
         return GeoLocationPermissionsManager(context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun fireproofWebsiteRepository(
-        fireproofWebsiteDao: FireproofWebsiteDao,
-        dispatchers: DispatcherProvider,
-        faviconManager: Lazy<FaviconManager>
-    ): FireproofWebsiteRepositoryAPI {
-        return FireproofWebsiteRepository(fireproofWebsiteDao, dispatchers, faviconManager)
     }
 
     @Provides

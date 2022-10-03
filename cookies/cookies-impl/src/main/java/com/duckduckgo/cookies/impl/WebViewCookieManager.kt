@@ -26,14 +26,12 @@ import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Named
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 @ContributesBinding(AppScope::class)
 class WebViewCookieManager @Inject constructor(
     private val cookieManager: CookieManagerProvider,
-    @Named("cookiesUrl") private val host: String,
     private val removeCookies: RemoveCookiesStrategy,
     private val dispatcher: DispatcherProvider
 ) : DuckDuckGoCookieManager {
