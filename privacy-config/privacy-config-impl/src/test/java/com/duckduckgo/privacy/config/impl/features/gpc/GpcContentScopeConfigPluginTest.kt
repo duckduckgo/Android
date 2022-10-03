@@ -49,12 +49,14 @@ class GpcContentScopeConfigPluginTest {
     @Test
     fun whenGetConfigThenReturnCorrectlyFormattedJsonWhenGpcIsEnabled() {
         val config = testee.config()
-        assertEquals("\"gpc\":{" +
-            "\"exceptions\":[{\"domain\":\"example.com\"}]," +
-            "\"minSupportedVersion\":123," +
-            "\"settings\":{\"gpcHeaderEnabledSites\":[\"foo.com\"]}," +
-            "\"state\":\"enabled\"}",
-            config)
+        assertEquals(
+            "\"gpc\":{" +
+                "\"exceptions\":[{\"domain\":\"example.com\"}]," +
+                "\"minSupportedVersion\":123," +
+                "\"settings\":{\"gpcHeaderEnabledSites\":[\"foo.com\"]}," +
+                "\"state\":\"enabled\"}",
+            config
+        )
     }
 
     @Test
@@ -62,11 +64,13 @@ class GpcContentScopeConfigPluginTest {
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(false)
 
         val config = testee.config()
-        assertEquals("\"gpc\":{" +
-            "\"exceptions\":[{\"domain\":\"example.com\"}]," +
-            "\"minSupportedVersion\":123," +
-            "\"settings\":{\"gpcHeaderEnabledSites\":[\"foo.com\"]}," +
-            "\"state\":\"disabled\"}",
-            config)
+        assertEquals(
+            "\"gpc\":{" +
+                "\"exceptions\":[{\"domain\":\"example.com\"}]," +
+                "\"minSupportedVersion\":123," +
+                "\"settings\":{\"gpcHeaderEnabledSites\":[\"foo.com\"]}," +
+                "\"state\":\"disabled\"}",
+            config
+        )
     }
 }
