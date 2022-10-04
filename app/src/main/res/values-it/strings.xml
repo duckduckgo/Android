@@ -143,6 +143,7 @@
     <string name="trackersContentDescription">Richieste di tracciamento bloccate</string>
     <string name="trackersOverview">Il caricamento delle richieste da parte dei seguenti domini di terze parti è stato bloccato perché si trattava di richieste di tracciamento. Il caricamento delle richieste da parte delle aziende può consentire loro di tracciare un profilo dell\'utente.</string>
     <string name="trackersOverviewProtectionsOff">Il caricamento delle richieste di tracciamento non è stato bloccato perché le protezioni per questo sito sono disattivate. Il caricamento delle richieste da parte delle aziende può consentire loro di tracciare un profilo dell\'utente.</string>
+    <string name="trackersOverviewEmpty">Nessun caricamento di richiesta di tracciamento è stato bloccato su questa pagina. Se le richieste di un\'azienda vengono caricate, possono consentirgli di creare un profilo dell\'utente.</string>
 
     <string name="domainsLoadedActivityTitle">Richieste di terze parti caricate</string>
     <string name="domainsLoadedContentDescription">Richieste di terze parti caricate</string>
@@ -730,6 +731,7 @@
     <string name="sitePermissionsSettingsMicrophone">Microfono</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Gestisci siti</string>
     <string name="sitePermissionsSettingsEmptyText">Non esistono ancora siti</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permessi rimossi per tutti i siti</string>
     <string name="permissionPerWebsiteText">Autorizzazioni per \"%1$s\" </string>
     <string name="permissionsPerWebsiteAskSetting">Chiedi</string>
     <string name="permissionsPerWebsiteDenySetting">Rifiuta</string>
@@ -738,5 +740,12 @@
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Compilazione automatica</string>
+    <string name="autofillSnackbarAction">Mostra</string>
+    <string name="autofillLoginSavedSnackbarMessage">Dati di accesso salvati</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Dati di accesso aggiornati</string>
+    <string name="autofillDisableAutofillPromptTitle">Vuoi continuare a usare il riempimento automatico?</string>
+    <string name="autofillDisableAutofillPromptMessage">Puoi disabilitare il riempimento automatico in qualsiasi momento nelle impostazioni</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Continua a usare</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Disabilita</string>
 
 </resources>
