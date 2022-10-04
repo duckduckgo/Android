@@ -14,5 +14,13 @@
   ~ limitations under the License.
   -->
 
-<View xmlns:android="http://schemas.android.com/apk/res/android"
-      style="@style/Widget.DuckDuckGo.HorizontalDivider"/>
+<merge
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <View
+            android:id="@+id/horizontalDivider"
+            style="@style/Widget.DuckDuckGo.HorizontalDivider"/>
+
+</merge>
