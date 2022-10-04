@@ -28,7 +28,6 @@
         android:id="@+id/sitePermissionsSectionTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/keyline_4"
         android:text="@string/permissionPerWebsiteText" />
 
     <androidx.recyclerview.widget.RecyclerView
