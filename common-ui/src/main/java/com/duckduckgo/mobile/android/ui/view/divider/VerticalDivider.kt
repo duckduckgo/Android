@@ -26,7 +26,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 class VerticalDivider @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.verticalDividerStyle
+    defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewVerticalDividerBinding by viewBinding()
@@ -42,12 +42,14 @@ class VerticalDivider @JvmOverloads constructor(
 
         val defaultPadding = typedArray.getBoolean(R.styleable.VerticalDivider_defaultPadding, false)
 
-        if (defaultPadding) {
-            (binding.root.layoutParams as MarginLayoutParams).leftMargin = resources.getDimension(R.dimen.verticalDividerSidePadding).toInt()
-            (binding.root.layoutParams as MarginLayoutParams).rightMargin = resources.getDimension(R.dimen.verticalDividerSidePadding).toInt()
+        val sidePadding = if (defaultPadding) {
+            resources.getDimensionPixelOffset(R.dimen.verticalDividerSidePadding)
+        } else {
+            0
         }
+
+        binding.root.setPadding(sidePadding, 0, sidePadding, 0)
 
         typedArray.recycle()
     }
-
 }
