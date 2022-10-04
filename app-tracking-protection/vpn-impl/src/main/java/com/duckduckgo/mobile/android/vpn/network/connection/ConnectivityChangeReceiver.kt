@@ -66,7 +66,7 @@ class ConnectivityChangeReceiver @Inject constructor(
     }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        if (vpnConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)) {
+        if (vpnConfig.isEnabled(AppTpSetting.InterceptDnsTraffic)) {
             val intentFilter = IntentFilter().apply {
                 addAction(ConnectivityManager.CONNECTIVITY_ACTION)
             }
