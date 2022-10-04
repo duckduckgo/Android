@@ -218,7 +218,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             allowFamily(AF_INET6)
 
             // TODO: eventually routes will be set by remote config
-            if (appBuildConfig.isPerformanceTest) {
+            if (appBuildConfig.isPerformanceTest && appBuildConfig.isInternalBuild()) {
                 // Currently allowing host PC address 10.0.2.2 when running performance test on an emulator (normally we don't route local traffic)
                 // The address is also isolated to minimize network interference during performance tests
                 VpnRoutes.includedTestRoutes.forEach { addRoute(it.address, it.maskWidth) }
