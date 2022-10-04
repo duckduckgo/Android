@@ -21,7 +21,6 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewHorizontalDividerBinding
-import com.duckduckgo.mobile.android.ui.view.toDp
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class HorizontalDivider @JvmOverloads constructor(
