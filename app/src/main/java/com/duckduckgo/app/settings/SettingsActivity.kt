@@ -69,7 +69,6 @@ import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
@@ -166,18 +165,18 @@ class SettingsActivity :
         }
 
         with(viewsAppearance) {
-            selectedThemeSetting.setOnClickListener { viewModel.userRequestedToChangeTheme() }
+            selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
             changeAppIconLabel.setClickListener { viewModel.userRequestedToChangeIcon() }
-            selectedFireAnimationSetting.setOnClickListener { viewModel.userRequestedToChangeFireAnimation() }
+            selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
         }
 
         with(viewsPrivacy) {
-            globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
-            autoconsentSetting.setOnClickListener { viewModel.onAutoconsentClicked() }
+            globalPrivacyControlSetting.setClickListener { viewModel.onGlobalPrivacyControlClicked() }
+            autoconsentSetting.setClickListener { viewModel.onAutoconsentClicked() }
             fireproofWebsites.setClickListener { viewModel.onFireproofWebsitesClicked() }
-            automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
-            automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
+            automaticallyClearWhatSetting.setClickListener { viewModel.onAutomaticallyClearWhatClicked() }
+            automaticallyClearWhenSetting.setClickListener { viewModel.onAutomaticallyClearWhenClicked() }
             whitelist.setClickListener { viewModel.onManageWhitelistSelected() }
         }
 
@@ -202,9 +201,9 @@ class SettingsActivity :
         }
 
         with(viewsMore) {
-            emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
-            macOsSetting.setOnClickListener { viewModel.onMacOsSettingClicked() }
-            vpnSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
+            emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
+            macOsSetting.setClickListener { viewModel.onMacOsSettingClicked() }
+            vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
         }
     }
 
@@ -217,7 +216,7 @@ class SettingsActivity :
                 setSecondaryText(feature.internalFeatureSubtitle())
             }
             viewsInternal.settingsInternalFeaturesContainer.addView(view)
-            view.setOnClickListener { feature.onInternalFeatureClicked(this) }
+            view.setClickListener { feature.onInternalFeatureClicked(this) }
         }
     }
 

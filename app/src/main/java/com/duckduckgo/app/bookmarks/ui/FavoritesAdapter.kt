@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.databinding.ViewSavedSiteEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -227,7 +228,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
                 showOverFlowMenu(anchor, favorite)
             }
 
-            listItem.setOnClickListener {
+            listItem.setClickListener {
                 viewModel.onSelected(favorite)
             }
         }

@@ -210,7 +210,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
                 showOverFlowMenu(anchor, bookmark)
             }
 
-            twoListItem.setOnClickListener {
+            twoListItem.setClickListener {
                 viewModel.onSelected(bookmark)
             }
         }
