@@ -27,14 +27,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.blocklist.AppTrackerListUpdateWorker
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
-import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackVariantManager
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding

@@ -31,8 +31,6 @@
     <attr name="trailingIcon" format="integer"/>
     <attr name="showBetaPill" format="boolean"/>
     <attr name="showSwitch" format="boolean"/>
-    <attr name="primaryTextColor" format="color"/>
-    <attr name="secondaryTextColor" format="color"/>
     <attr name="leadingIconBackground">
         <!-- No background. -->
         <enum name="none" value="0" />
@@ -45,7 +43,7 @@
     <!--One Line Item view-->
     <declare-styleable name="OneLineListItem">
         <attr name="primaryText"/>
-        <attr name="primaryTextColor"/>
+        <attr name="listItemTitleColor"/>
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
         <attr name="trailingIcon"/>
@@ -55,9 +53,7 @@
     <!--Two Line Item view-->
     <declare-styleable name="TwoLineListItem">
         <attr name="primaryText"/>
-        <attr name="primaryTextColor"/>
         <attr name="secondaryText"/>
-        <attr name="secondaryTextColor"/>
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
         <attr name="trailingIcon"/>

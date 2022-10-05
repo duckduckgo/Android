@@ -27,7 +27,6 @@ import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
-import androidx.core.view.isVisible
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
@@ -53,24 +52,7 @@ class TwoLineListItem @JvmOverloads constructor(
         ).apply {
 
             binding.primaryText.text = getString(R.styleable.TwoLineListItem_primaryText)
-            if (hasValue(R.styleable.TwoLineListItem_primaryTextColor)) {
-                binding.primaryText.setTextColor(
-                    getColor(
-                        R.styleable.TwoLineListItem_primaryTextColor,
-                        context.getColorFromAttr(R.attr.normalTextColor)
-                    )
-                )
-            }
-
             binding.secondaryText.text = getString(R.styleable.TwoLineListItem_secondaryText)
-            if (hasValue(R.styleable.TwoLineListItem_secondaryTextColor)) {
-                binding.secondaryText.setTextColor(
-                    getColor(
-                        R.styleable.TwoLineListItem_secondaryTextColor,
-                        context.getColorFromAttr(R.attr.normalTextColor)
-                    )
-                )
-            }
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIcon)) {
                 setLeadingIconDrawable(getDrawable(R.styleable.TwoLineListItem_leadingIcon)!!)
@@ -124,7 +106,7 @@ class TwoLineListItem @JvmOverloads constructor(
     }
 
     /** Sets the item click listener */
-    fun setOnClickListener(onClick: () -> Unit) {
+    fun setClickListener(onClick: () -> Unit) {
         binding.itemContainer.setOnClickListener { onClick() }
     }
 
