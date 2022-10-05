@@ -19,8 +19,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <View xmlns:android="http://schemas.android.com/apk/res/android"
-          style="@style/Widget.DuckDuckGo.VerticalDivider"/>
+    <View
+            android:id="@+id/verticalDivider"
+            style="@style/Widget.DuckDuckGo.VerticalDivider"/>
 
 </merge>
 
