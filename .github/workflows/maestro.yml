@@ -10,7 +10,7 @@ on:
 
 jobs:
   instrumentation_tests:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     name: Instrumentation tests
 
     steps:
@@ -34,6 +34,11 @@ jobs:
         if: always()
         run: mkdir apk
 
+      - name: Install maestro
+        run: |
+          brew tap mobile-dev-inc/tap
+          brew install maestro
+
       - name: Decode keys
         uses: davidSchuppa/base64Secret-toFile-action@v2
         with:
@@ -50,18 +55,18 @@ jobs:
 
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
-        with:
-          arguments: assemblePlayRelease
 
-      - name: Move APK to new folder
-        if: always()
-        run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
-
-      - uses: mobile-dev-inc/action-upload@v2.3.0
+      - name: Android checks
+        uses: reactiveCircus/android-emulator-runner@v2
         with:
-          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
-          name: ${{ github.sha }}
-          app-file: apk/release.apk
+          api-level: 30
+          ndk: 21.0.6113669
+          arch: x86_64
+          profile: Nexus 5
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew installPlayRelease && cd .mobiledev && maestro test test.yaml;
 
       - name: Bundle the Android CI checks report
         if: always()
