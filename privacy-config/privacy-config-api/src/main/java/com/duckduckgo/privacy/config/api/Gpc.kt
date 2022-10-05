@@ -45,13 +45,6 @@ interface Gpc {
     ): Boolean
 
     /**
-     * This method takes a [url] and returns `true` or `false` depending if the given [url] can use
-     * the GPC feature
-     * @return a `true` if the given [url] can use the GPC feature.
-     */
-    fun canGpcBeUsedByUrl(url: String): Boolean
-
-    /**
      * This method is used to enable GPC. Note: The remote configuration will take precedence over
      * this value.
      */

@@ -66,7 +66,7 @@ class RealGpc @Inject constructor(
         gpcRepository.disableGpc()
     }
 
-    override fun canGpcBeUsedByUrl(url: String): Boolean {
+    private fun canGpcBeUsedByUrl(url: String): Boolean {
         return isFeatureEnabled() && isEnabled() && !isAnException(url)
     }
 
