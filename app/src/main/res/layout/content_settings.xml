@@ -37,8 +37,7 @@
 
         <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:defaultPadding="true"/>
+            android:layout_height="wrap_content"/>
 
         <include
             android:id="@+id/contentSettingsAutofill"
@@ -96,11 +95,6 @@
             layout="@layout/content_settings_about"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-
-        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-            android:id="@+id/settingsInternalSectionBottomDivider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
 
         <include
             android:id="@+id/contentSettingsInternal"
