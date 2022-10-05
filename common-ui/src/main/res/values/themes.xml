@@ -137,8 +137,6 @@
         <item name="quickAccessItemTitleTextColor">@color/white</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
-        <item name="android:textColorPrimary">?attr/normalTextColor</item>
-        <item name="android:textColorSecondary">?attr/secondaryTextColor</item>
         <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
         <item name="lightContainerBackground">@color/almostBlack</item>
 
@@ -200,7 +198,6 @@
         <item name="colorPrimaryDark">@color/lightThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/almostBlackDark</item>
         <item name="normalTextColor">@color/almostBlackDark</item>
-        <item name="secondaryTextColor">@color/warmerGray</item>
         <item name="accentTextColor">@color/gray70</item>
         <item name="primaryIconColor">@color/gray95</item>
         <item name="primaryIconDisabledColor">@color/gray50</item>

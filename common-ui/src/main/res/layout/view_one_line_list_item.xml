@@ -42,7 +42,7 @@
 
     </FrameLayout>
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
             android:id="@+id/primaryText"
             style="@style/TextAppearance.DuckDuckGo.Body1"
             android:ellipsize="end"
