@@ -275,7 +275,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         searchBar.onAction {
             when (it) {
                 is SearchBar.Action.PerformUpAction -> hideSearchBar()
-                is SearchBar.Action.PerformSearch -> searchListener.onQueryTextChange(it.searchText)
+                is SearchBar.Action.PerformSearch -> if (this::searchListener.isInitialized) { searchListener.onQueryTextChange(it.searchText) }
             }
         }
     }
@@ -375,7 +375,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     override fun onDestroy() {
         deleteDialog?.dismiss()
-        searchListener.cancelSearch()
+        if (this::searchListener.isInitialized) {
+            searchListener.cancelSearch()
+        }
         super.onDestroy()
     }
 
