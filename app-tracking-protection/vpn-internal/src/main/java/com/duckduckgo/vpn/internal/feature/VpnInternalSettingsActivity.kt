@@ -247,13 +247,11 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         // we use the same receiver as it makes IPC much easier
         transparencyModeDebugReceiver = TransparencyModeDebugReceiver(this) {
             // avoid duplicating broadcast intent when toggle changes state
-            binding.transparencyModeToggle.setOnCheckedChangeListener(null)
             if (TransparencyModeDebugReceiver.isTurnOnIntent(it)) {
                 binding.transparencyModeToggle.quietlySetIsChecked(true, transparencyToggleListener)
             } else if (TransparencyModeDebugReceiver.isTurnOffIntent(it)) {
                 binding.transparencyModeToggle.quietlySetIsChecked(false, transparencyToggleListener)
             }
-            binding.transparencyModeToggle.setOnCheckedChangeListener(transparencyToggleListener)
         }.apply { register() }
 
         binding.transparencyModeToggle.setOnCheckedChangeListener(transparencyToggleListener)
@@ -337,13 +335,11 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     private fun setupDebugLogging() {
         debugLoggingReceiver = DebugLoggingReceiver(this) { intent ->
-            binding.debugLoggingToggle.setOnCheckedChangeListener(null)
             if (DebugLoggingReceiver.isLoggingOnIntent(intent)) {
                 binding.debugLoggingToggle.quietlySetIsChecked(true, debugLoggingToggleListener)
             } else if (DebugLoggingReceiver.isLoggingOffIntent(intent)) {
                 binding.debugLoggingToggle.quietlySetIsChecked(false, debugLoggingToggleListener)
             }
-            binding.debugLoggingToggle.setOnCheckedChangeListener(debugLoggingToggleListener)
         }.apply { register() }
 
         // initial state
