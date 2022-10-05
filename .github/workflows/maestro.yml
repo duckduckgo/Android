@@ -32,7 +32,7 @@ jobs:
           arch: x86_64
           profile: Nexus 5
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-snapshot-save -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: cd .mobiledev && maestro test test.yaml || adb shell /system/bin/screencap -p /data/local/tmp/screenshot.png && adb pull /data/local/tmp/screenshot.png screenshot.png;
 
