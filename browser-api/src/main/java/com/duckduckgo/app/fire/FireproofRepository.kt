@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,10 @@
 
 package com.duckduckgo.app.fire
 
-import android.content.Context
-
-class WebViewDatabaseLocator(context: Context) : DatabaseLocator(context) {
-    override val knownLocations = listOf("/app_webview/Default/Cookies", "/app_webview/Cookies")
-}
-
-class AuthDatabaseLocator(context: Context) : DatabaseLocator(context) {
-    override val knownLocations = listOf("/databases/http_auth.db")
+/** Public interface for FireproofRepository */
+interface FireproofRepository {
+    /**
+     * This method returns a list of strings containing the domains that are fireproofed
+     */
+    fun fireproofWebsites(): List<String>
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.cookies.api
 
-import android.content.Context
-
-class WebViewDatabaseLocator(context: Context) : DatabaseLocator(context) {
-    override val knownLocations = listOf("/app_webview/Default/Cookies", "/app_webview/Cookies")
-}
-
-class AuthDatabaseLocator(context: Context) : DatabaseLocator(context) {
-    override val knownLocations = listOf("/databases/http_auth.db")
+/** Public interface for RemoveCookiesStrategy */
+interface RemoveCookiesStrategy {
+    /**
+     * This method deletes all the cookies for the specific cookies strategy
+     */
+    suspend fun removeCookies()
 }

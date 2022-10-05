@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.cookies.impl
 
-import android.content.Context
+import com.duckduckgo.app.statistics.pixels.Pixel
 
-class WebViewDatabaseLocator(context: Context) : DatabaseLocator(context) {
-    override val knownLocations = listOf("/app_webview/Default/Cookies", "/app_webview/Cookies")
-}
-
-class AuthDatabaseLocator(context: Context) : DatabaseLocator(context) {
-    override val knownLocations = listOf("/databases/http_auth.db")
+enum class CookiesPixelName(override val pixelName: String) : Pixel.PixelName {
+    COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
+    COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de"),
 }
