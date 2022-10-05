@@ -168,22 +168,22 @@ class BrowserModule {
         trustedCertificateStore: TrustedCertificateStore,
         requestInterceptor: RequestInterceptor,
         cookieManagerProvider: CookieManagerProvider,
-        gpc: Gpc,
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         urlExtractor: DOMUrlExtractor,
+        contentScopeScripts: ContentScopeScripts
     ): UrlExtractingWebViewClient {
         return UrlExtractingWebViewClient(
             webViewHttpAuthStore,
             trustedCertificateStore,
             requestInterceptor,
             cookieManagerProvider,
-            gpc,
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
             urlExtractor,
+            contentScopeScripts
         )
     }
 
