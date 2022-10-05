@@ -49,7 +49,10 @@ import org.mockito.kotlin.whenever
 import kotlinx.coroutines.test.TestScope
 import org.junit.After
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -126,6 +129,16 @@ class AppTPCPUMonitorTest {
 
         cpuMonitor.onVpnStopped(coroutineRule.testScope, SELF_STOP)
         assertWorkerNotRunning()
+    }
+
+    @Test
+    fun whenCPUAboveThresholdSendAlert() {
+        whenever(mockCPUUsageReader.readCPUUsage()).thenReturn(42.0)
+
+        assertStartWorker()
+
+        verify(mockDeviceShieldPixels).sendCPUUsageAlert(eq(30))
+        verifyNoMoreInteractions(mockDeviceShieldPixels)
     }
 
     private fun testWorkerFactory(): WorkerFactory {

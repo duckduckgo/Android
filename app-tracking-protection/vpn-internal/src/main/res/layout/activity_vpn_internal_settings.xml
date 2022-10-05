@@ -253,15 +253,6 @@
             />
 
             <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/cpuMonitorToggle"
-                style="@style/SettingsSwitch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="CPU monitoring"
-                android:theme="@style/SettingsSwitchTheme"
-            />
-
-            <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/badHealthMonitorToggle"
                     style="@style/SettingsSwitch"
                     android:layout_width="match_parent"

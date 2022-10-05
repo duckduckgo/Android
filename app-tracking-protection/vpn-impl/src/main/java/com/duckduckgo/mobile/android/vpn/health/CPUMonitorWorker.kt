@@ -49,13 +49,13 @@ class CPUMonitorWorker(
                 val avgCPUUsagePercent = cpuUsageReader.readCPUUsage()
 
                 if (avgCPUUsagePercent > 30)
-                    deviceShieldPixels.sendCPUUsage(30)
+                    deviceShieldPixels.sendCPUUsageAlert(30)
                 else if (avgCPUUsagePercent > 20)
-                    deviceShieldPixels.sendCPUUsage(20)
+                    deviceShieldPixels.sendCPUUsageAlert(20)
                 else if (avgCPUUsagePercent > 10)
-                    deviceShieldPixels.sendCPUUsage(10)
+                    deviceShieldPixels.sendCPUUsageAlert(10)
                 else if (avgCPUUsagePercent > 5)
-                    deviceShieldPixels.sendCPUUsage(5)
+                    deviceShieldPixels.sendCPUUsageAlert(5)
             } catch (e: Exception) {
                 Timber.e("Could not read CPU usage", e)
                 return@withContext Result.failure()
