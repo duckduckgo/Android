@@ -183,12 +183,11 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <View
-                android:layout_width="1dp"
+            <com.duckduckgo.mobile.android.ui.view.divider.VerticalDivider
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:background="@color/grayish" />
+                android:layout_marginBottom="4dp" />
 
             <TextView
                 android:id="@+id/brokenSiteButton"

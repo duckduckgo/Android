@@ -78,13 +78,12 @@
                     android:layout_weight="1"
                     android:text="@string/atp_ActivityPastWeekBlocked" />
 
-                <View
+                <com.duckduckgo.mobile.android.ui.view.divider.VerticalDivider
                     android:id="@+id/vertical_divider"
-                    android:layout_width="1dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:background="?splitterColor" />
+                    android:layout_marginBottom="4dp" />
 
                 <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.PastWeekTrackerActivityContentView
                     android:id="@+id/tracking_apps_count"
@@ -95,19 +94,16 @@
 
             </LinearLayout>
 
-            <View
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:id="@+id/horizontal_divider"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="23dp"
-                android:background="?splitterColor" />
+                android:layout_height="wrap_content"/>
 
             <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/most_recent_activity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/atp_ActivityRecentActivity"
-                android:paddingTop="@dimen/keyline_4"
                 android:paddingStart="@dimen/keyline_4"
                 android:paddingBottom="@dimen/keyline_2"/>
 
@@ -126,15 +122,13 @@
                 android:text="@string/atp_ActivityCtaShowAll"
                 android:visibility="gone"/>
 
-            <View
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="?splitterColor" />
+                android:layout_height="wrap_content" />
 
             <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="@dimen/keyline_4"
                 android:paddingBottom="@dimen/keyline_2"
                 android:paddingStart="@dimen/keyline_4"
                 android:text="@string/atp_ActivityAbout" />
