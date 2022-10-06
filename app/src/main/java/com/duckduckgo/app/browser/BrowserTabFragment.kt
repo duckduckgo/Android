@@ -463,7 +463,7 @@ class BrowserTabFragment :
 
         override fun onPopUpHandled() {
             launch {
-                context?.let { animatorHelper.createCookiesAnimation(omnibarViews(), cookieDummyView, cookieAnimation, scene_root) }
+                context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation, scene_root) }
             }
         }
 
@@ -2633,6 +2633,7 @@ class BrowserTabFragment :
 
                     activity?.let { activity ->
                         animatorHelper.startTrackersAnimation(
+                            context = activity,
                             shouldRunPartialAnimation = lastSeenCtaViewState?.cta is DaxTrackersBlockedCta,
                             shieldAnimationView = shieldIcon,
                             trackersAnimationView = trackerAnimationView,
