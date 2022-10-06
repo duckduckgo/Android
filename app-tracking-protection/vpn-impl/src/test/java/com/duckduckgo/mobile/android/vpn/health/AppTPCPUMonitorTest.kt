@@ -132,13 +132,32 @@ class AppTPCPUMonitorTest {
     }
 
     @Test
-    fun whenCPUAboveThresholdSendAlert() {
-        whenever(mockCPUUsageReader.readCPUUsage()).thenReturn(42.0)
+    fun whenCPUAbove30ThresholdSendAlert() {
+        assertAlertSent(42.0, 30)
+    }
+
+    @Test
+    fun whenCPUAbove20ThresholdSendAlert() {
+        assertAlertSent(30.0, 20)
+    }
+
+    @Test
+    fun whenCPUAbove10ThresholdSendAlert() {
+        assertAlertSent(10.1, 10)
+    }
+
+    @Test
+    fun whenCPUAbove5ThresholdSendAlert() {
+        assertAlertSent(5.5, 5)
+    }
+
+    @Test
+    fun whenCPUBelow5NoAlert() {
+        whenever(mockCPUUsageReader.readCPUUsage()).thenReturn(2.0)
 
         assertStartWorker()
 
-        verify(mockDeviceShieldPixels).sendCPUUsageAlert(eq(30))
-        verifyNoMoreInteractions(mockDeviceShieldPixels)
+        verifyNoInteractions(mockDeviceShieldPixels)
     }
 
     private fun testWorkerFactory(): WorkerFactory {
@@ -155,6 +174,15 @@ class AppTPCPUMonitorTest {
                 }
             }
         }
+    }
+
+    private fun assertAlertSent(cpuValue: Double, expectedAlert: Int) {
+        whenever(mockCPUUsageReader.readCPUUsage()).thenReturn(cpuValue)
+
+        assertStartWorker()
+
+        verify(mockDeviceShieldPixels).sendCPUUsageAlert(eq(expectedAlert))
+        verifyNoMoreInteractions(mockDeviceShieldPixels)
     }
 
     private fun assertStartWorker() {
