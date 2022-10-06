@@ -76,7 +76,7 @@
         android:layout_height="wrap_content"
         android:text="Button Ghost Small"/>
 
-    <com.duckduckgo.mobile.android.ui.view.IconButton
+    <com.duckduckgo.mobile.android.ui.view.button.IconButton
         android:layout_gravity="center"
         android:id="@+id/getIconButton"
         android:layout_width="wrap_content"

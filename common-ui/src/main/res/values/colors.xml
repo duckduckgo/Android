@@ -29,8 +29,6 @@
     <color name="lightThemePrimary">@color/whiteFive</color>
 
     <!-- Widget colors -->
-    <color name="divider">@color/subtleGrayTwo</color>
-    <color name="slightlyTransparentDivider">#1A000000</color>
     <color name="webViewScrollbarTrackColor">#ff333333</color>
     <color name="webViewScrollbarThumbColor">#ffababab</color>
 

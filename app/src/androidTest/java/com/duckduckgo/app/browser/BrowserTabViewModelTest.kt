@@ -24,8 +24,10 @@ import android.view.MenuItem
 import android.view.View
 import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
+import android.webkit.PermissionRequest
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
@@ -136,6 +138,7 @@ import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import org.mockito.kotlin.*
@@ -322,6 +325,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockAdClickManager: AdClickManager
 
+    @Mock
+    private lateinit var mockSitePermissionsManager: SitePermissionsManager
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -473,7 +479,8 @@ class BrowserTabViewModelTest {
             voiceSearchPixelLogger = voiceSearchPixelLogger,
             settingsDataStore = mockSettingsDataStore,
             autofillStore = mockAutofillStore,
-            adClickManager = mockAdClickManager
+            adClickManager = mockAdClickManager,
+            sitePermissionsManager = mockSitePermissionsManager
         )
 
         testee.loadData("abc", null, false, false)
@@ -4114,6 +4121,54 @@ class BrowserTabViewModelTest {
         assertTrue(testee.siteLiveData.value?.consentSelfTestFailed!!)
     }
 
+    @Test
+    fun givenPermissionsAlreadyGrantedWhenWebsiteRequestsSitePermissionThenGrantItAutomatically() = runTest {
+        val request: PermissionRequest = mock()
+        val permissionsGranted = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+        whenever(mockSitePermissionsManager.getSitePermissionsGranted(any(), any(), any())).thenReturn(permissionsGranted)
+
+        givenSitePermissionsRequestFromDomain(request)
+
+        assertCommandIssued<Command.GrantSitePermissionRequest> {
+            assertEquals(this.request, request)
+            assertArrayEquals(this.sitePermissionsToGrant, permissionsGranted)
+        }
+    }
+
+    @Test
+    fun givenPermissionNeverGrantedWhenWebsiteRequestsSitePermissionThenGrantItAutomatically() = runTest {
+        val request: PermissionRequest = mock()
+        val permissionsGranted = arrayOf<String>()
+        val permissionsToAsk = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+        whenever(mockSitePermissionsManager.getSitePermissionsGranted(any(), any(), any())).thenReturn(permissionsGranted)
+
+        givenSitePermissionsRequestFromDomain(request)
+
+        assertCommandIssued<Command.ShowSitePermissionsDialog> {
+            assertEquals(this.request, request)
+            assertArrayEquals(this.permissionsToRequest, permissionsToAsk)
+        }
+    }
+
+    @Test
+    fun whenOnePermissionIsGrantedAndOtherNeedsToBeRequestedThenBothCommandsAreCalled() = runTest {
+        val request: PermissionRequest = mock()
+        val permissionsGranted = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        val permissionsToAsk = arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+        whenever(mockSitePermissionsManager.getSitePermissionsGranted(any(), any(), any())).thenReturn(permissionsGranted)
+
+        givenSitePermissionsRequestFromDomain(request)
+
+        assertCommandIssued<Command.GrantSitePermissionRequest> {
+            assertEquals(this.request, request)
+            assertArrayEquals(this.sitePermissionsToGrant, permissionsGranted)
+        }
+        assertCommandIssued<Command.ShowSitePermissionsDialog> {
+            assertEquals(this.request, request)
+            assertArrayEquals(this.permissionsToRequest, permissionsToAsk)
+        }
+    }
+
     private fun assertShowHistoryCommandSent(expectedStackSize: Int) {
         assertCommandIssued<ShowBackNavigationHistory> {
             assertEquals(expectedStackSize, history.size)
@@ -4169,6 +4224,11 @@ class BrowserTabViewModelTest {
         permission: LocationPermissionType
     ) {
         locationPermissionsDao.insert(LocationPermissionEntity(domain, permission))
+    }
+
+    private fun givenSitePermissionsRequestFromDomain(request: PermissionRequest) {
+        whenever(request.origin).thenReturn("https://example.com".toUri())
+        testee.onSitePermissionRequested(request, arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE))
     }
 
     class StubPermissionCallback : GeolocationPermissions.Callback {

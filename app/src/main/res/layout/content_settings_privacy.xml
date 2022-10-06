@@ -22,50 +22,53 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
         android:id="@+id/settingsPrivacyTitle"
-        style="@style/SettingsSectionTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/settingsHeadingPrivacy" />
 
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/globalPrivacyControlSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/globalPrivacyControlSetting"
-        tools:subtitle="test test test" />
+        app:primaryText="@string/globalPrivacyControlSetting"
+        tools:secondaryText="test test test" />
 
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/autoconsentSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/autoconsentSetting" />
+        app:primaryText="@string/autoconsentSetting" />
 
-
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/whitelist"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsPrivacyProtectionWhitelist" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsPrivacyProtectionWhitelist"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/fireproofWebsites"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsFireproofWebsites" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsFireproofWebsites"/>
 
-
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/automaticallyClearWhatSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/settingsAutomaticallyClearWhat"
-        tools:subtitle="test test test" />
+        app:primaryText="@string/settingsAutomaticallyClearWhat"
+        tools:secondaryText="test test test" />
 
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/automaticallyClearWhenSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/settingsAutomaticallyClearWhen"
-        tools:subtitle="test test test" />
+        app:primaryText="@string/settingsAutomaticallyClearWhen"
+        tools:secondaryText="test test test" />
 
 </LinearLayout>

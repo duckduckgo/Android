@@ -51,6 +51,7 @@ class RealAppBuildConfig @Inject constructor() : AppBuildConfig {
             false
         }
     }
+    override val isPerformanceTest: Boolean = BuildConfig.IS_PERFORMANCE_TEST
     override val deviceLocale: Locale
         get() = Locale.getDefault()
 }

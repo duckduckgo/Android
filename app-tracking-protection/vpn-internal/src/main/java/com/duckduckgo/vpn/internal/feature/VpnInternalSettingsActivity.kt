@@ -214,14 +214,11 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupBugReport() {
-        binding.apptpBugreport.setTitle("Generate AppTP bug report")
-        binding.apptpBugreport.setIsLoading(false)
         binding.apptpBugreport.setOnClickListener {
+            Snackbar.make(binding.root, "Generating AppTP Bug Report", Snackbar.LENGTH_LONG).show()
             lifecycleScope.launch {
-                binding.apptpBugreport.setIsLoading(true)
                 val bugreport = vpnBugReporter.generateBugReport()
                 shareBugReport(bugreport)
-                binding.apptpBugreport.setIsLoading(false)
             }
         }
     }
@@ -248,29 +245,27 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         // we use the same receiver as it makes IPC much easier
         transparencyModeDebugReceiver = TransparencyModeDebugReceiver(this) {
             // avoid duplicating broadcast intent when toggle changes state
-            binding.transparencyModeToggle.setOnCheckedChangeListener(null)
             if (TransparencyModeDebugReceiver.isTurnOnIntent(it)) {
-                binding.transparencyModeToggle.isChecked = true
+                binding.transparencyModeToggle.quietlySetIsChecked(true, transparencyToggleListener)
             } else if (TransparencyModeDebugReceiver.isTurnOffIntent(it)) {
-                binding.transparencyModeToggle.isChecked = false
+                binding.transparencyModeToggle.quietlySetIsChecked(false, transparencyToggleListener)
             }
-            binding.transparencyModeToggle.setOnCheckedChangeListener(transparencyToggleListener)
         }.apply { register() }
 
         binding.transparencyModeToggle.setOnCheckedChangeListener(transparencyToggleListener)
     }
 
     private fun setupHealthMonitoring() {
-        binding.badHealthMonitorToggle.isChecked = appHealthMonitor.isMonitoringStarted()
+        binding.badHealthMonitorToggle.setIsChecked(appHealthMonitor.isMonitoringStarted())
         binding.badHealthMonitorToggle.setOnCheckedChangeListener(badHealthMonitoringToggleListener)
 
-        binding.badHealthMitigationToggle.isChecked = appTpConfig.isEnabled(AppTpSetting.BadHealthMitigation)
+        binding.badHealthMitigationToggle.setIsChecked(appTpConfig.isEnabled(AppTpSetting.BadHealthMitigation))
         binding.badHealthMitigationToggle.setOnCheckedChangeListener(badHealthMitigationFeatureToggle)
     }
 
     private fun setupConfigSection() {
         with(AppTpSetting.CPUMonitoring) {
-            binding.cpuMonitorToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.cpuMonitorToggle.setIsChecked(appTpConfig.isEnabled(this))
             binding.cpuMonitorToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
@@ -281,7 +276,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         with(AppTpSetting.Ipv6Support) {
-            binding.ipv6SupportToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.ipv6SupportToggle.setIsChecked(appTpConfig.isEnabled(this))
             binding.ipv6SupportToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
@@ -292,7 +287,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         with(AppTpSetting.PrivateDnsSupport) {
-            binding.privateDnsToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.privateDnsToggle.setIsChecked(appTpConfig.isEnabled(this))
             binding.privateDnsToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
@@ -303,7 +298,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         with(AppTpSetting.NetworkSwitchHandling) {
-            binding.vpnUnderlyingNetworksToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.vpnUnderlyingNetworksToggle.setIsChecked(appTpConfig.isEnabled(this))
             binding.vpnUnderlyingNetworksToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
@@ -314,7 +309,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         with(AppTpSetting.AlwaysSetDNS) {
-            binding.vpnAlwaysSetDNSToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.vpnAlwaysSetDNSToggle.setIsChecked(appTpConfig.isEnabled(this))
             binding.vpnAlwaysSetDNSToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
@@ -325,7 +320,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         with(AppTpSetting.ConnectivityChecks) {
-            binding.vpnConnectivityChecksToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.vpnConnectivityChecksToggle.setIsChecked(appTpConfig.isEnabled(this))
             binding.vpnConnectivityChecksToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
@@ -338,17 +333,15 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     private fun setupDebugLogging() {
         debugLoggingReceiver = DebugLoggingReceiver(this) { intent ->
-            binding.debugLoggingToggle.setOnCheckedChangeListener(null)
             if (DebugLoggingReceiver.isLoggingOnIntent(intent)) {
-                binding.debugLoggingToggle.isChecked = true
+                binding.debugLoggingToggle.quietlySetIsChecked(true, debugLoggingToggleListener)
             } else if (DebugLoggingReceiver.isLoggingOffIntent(intent)) {
-                binding.debugLoggingToggle.isChecked = false
+                binding.debugLoggingToggle.quietlySetIsChecked(false, debugLoggingToggleListener)
             }
-            binding.debugLoggingToggle.setOnCheckedChangeListener(debugLoggingToggleListener)
         }.apply { register() }
 
         // initial state
-        binding.debugLoggingToggle.isChecked = TimberExtensions.isLoggingEnabled()
+        binding.debugLoggingToggle.setIsChecked(TimberExtensions.isLoggingEnabled())
 
         // listener
         binding.debugLoggingToggle.setOnCheckedChangeListener(debugLoggingToggleListener)

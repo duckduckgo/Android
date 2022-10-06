@@ -63,9 +63,20 @@ class NoStyleAppliedToDesignSystemComponentDetector : LayoutDetector() {
         private const val BUTTON_SECONDARY_SMALL = "com.duckduckgo.mobile.android.ui.view.button.ButtonSecondarySmall"
         private const val BUTTON_GHOST_LARGE = "com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge"
         private const val BUTTON_GHOST_SMALL = "com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall"
+        private const val ONE_LINE_LIST_ITEM = "com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem"
+        private const val SWITCH = "com.duckduckgo.mobile.android.ui.view.SwitchView"
 
         val DESIGN_COMPONENTS =
-            listOf(BUTTON_PRIMARY_LARGE, BUTTON_PRIMARY_SMALL, BUTTON_SECONDARY_LARGE, BUTTON_SECONDARY_SMALL, BUTTON_GHOST_LARGE, BUTTON_GHOST_SMALL)
+            listOf(
+                BUTTON_PRIMARY_LARGE,
+                BUTTON_PRIMARY_SMALL,
+                BUTTON_SECONDARY_LARGE,
+                BUTTON_SECONDARY_SMALL,
+                BUTTON_GHOST_LARGE,
+                BUTTON_GHOST_SMALL,
+                ONE_LINE_LIST_ITEM,
+                SWITCH
+            )
 
         val STYLE_IN_DESIGN_SYSTEM_COMPONENT = Issue
             .create(

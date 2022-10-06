@@ -29,7 +29,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewBookmarkFolderEntryBinding
-import com.duckduckgo.app.browser.databinding.ViewSavedSiteSectionTitleBinding
+import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import timber.log.Timber
 
 class BookmarkFoldersAdapter(
@@ -73,7 +73,7 @@ class BookmarkFoldersAdapter(
                 BookmarkFolderScreenViewHolders.BookmarkFoldersViewHolder(layoutInflater, binding, viewModel)
             }
             BOOKMARK_FOLDERS_SECTION_TITLE_TYPE -> {
-                val binding = ViewSavedSiteSectionTitleBinding.inflate(inflater, parent, false)
+                val binding = ViewSectionHeaderBinding.inflate(inflater, parent, false)
                 BookmarkFolderScreenViewHolders.SectionTitle(binding)
             }
             else -> throw IllegalArgumentException("viewType not found")
@@ -105,9 +105,9 @@ class BookmarkFoldersAdapter(
 
 sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class SectionTitle(private val binding: ViewSavedSiteSectionTitleBinding) : BookmarkFolderScreenViewHolders(binding.root) {
+    class SectionTitle(private val binding: ViewSectionHeaderBinding) : BookmarkFolderScreenViewHolders(binding.root) {
         fun bind() {
-            binding.savedSiteSectionTitle.setText(R.string.bookmarksSectionTitle)
+            binding.sectionHeader.setText(R.string.bookmarksSectionTitle)
         }
     }
 

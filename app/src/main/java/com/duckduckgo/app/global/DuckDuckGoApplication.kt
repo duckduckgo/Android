@@ -16,18 +16,13 @@
 
 package com.duckduckgo.app.global
 
-import android.app.Application
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.process.ProcessDetector
-import com.duckduckgo.app.process.ProcessDetector.DuckDuckGoProcess
-import com.duckduckgo.app.process.ProcessDetector.DuckDuckGoProcess.VpnProcess
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.mobile.android.vpn.service.VpnUncaughtExceptionHandler
@@ -42,7 +37,9 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
-open class DuckDuckGoApplication : HasDaggerInjector, Application() {
+private const val VPN_PROCESS_NAME = "vpn"
+
+open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() {
 
     @Inject
     lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
@@ -66,31 +63,18 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
     @Inject
     lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*, *>>
 
-    private val processDetector = ProcessDetector()
-
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
 
     open lateinit var daggerAppComponent: AppComponent
 
-    override fun onCreate() {
-        super.onCreate()
-
+    override fun onMainProcessCreate() {
         configureLogging()
-
-        val currentProcess = processDetector.detectProcess(this)
-        Timber.i("Creating DuckDuckGoApplication. Process %s", currentProcess)
-
-        if (appIsRestarting()) return
+        Timber.d("onMainProcessCreate $currentProcessName")
 
         configureDependencyInjection()
         setupActivityLifecycleCallbacks()
-        configureUncaughtExceptionHandler(currentProcess)
+        configureUncaughtExceptionHandlerBrowser()
         initializeDateLibrary()
-
-        if (currentProcess is VpnProcess) {
-            Timber.i("VPN process, no further logic executed in application onCreate()")
-            return
-        }
 
         // Deprecated, we need to move all these into AppLifecycleEventObserver
         ProcessLifecycleOwner.get().lifecycle.apply {
@@ -105,17 +89,19 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
         }
     }
 
-    private fun setupActivityLifecycleCallbacks() {
-        activityLifecycleCallbacks.getPlugins().forEach { registerActivityLifecycleCallbacks(it) }
+    override fun onSecondaryProcessCreate(shortProcessName: String) {
+        configureLogging()
+        Timber.d("onSecondaryProcessCreate $shortProcessName")
+        runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
+            Timber.d("Init for secondary process $shortProcessName")
+            configureDependencyInjection()
+            configureUncaughtExceptionHandlerVpn()
+            initializeDateLibrary()
+        }
     }
 
-    private fun configureUncaughtExceptionHandler(currentProcess: DuckDuckGoProcess) {
-        when (currentProcess) {
-            is VpnProcess -> configureUncaughtExceptionHandlerVpn()
-            is DuckDuckGoProcess.BrowserProcess -> configureUncaughtExceptionHandlerBrowser()
-            else -> Timber.w("Unknown process: Not configuring uncaught exception handler for %s", currentProcess)
-
-        }
+    private fun setupActivityLifecycleCallbacks() {
+        activityLifecycleCallbacks.getPlugins().forEach { registerActivityLifecycleCallbacks(it) }
     }
 
     private fun configureUncaughtExceptionHandlerBrowser() {
@@ -133,19 +119,11 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
         Thread.setDefaultUncaughtExceptionHandler(vpnUncaughtExceptionHandler)
     }
 
-    private fun appIsRestarting(): Boolean {
-        if (FireActivity.appRestarting(this)) {
-            Timber.i("App restarting")
-            return true
-        }
-        return false
-    }
-
     private fun configureLogging() {
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
     }
 
-    protected open fun configureDependencyInjection() {
+    private fun configureDependencyInjection() {
         daggerAppComponent = DaggerAppComponent.builder()
             .application(this)
             .applicationCoroutineScope(applicationCoroutineScope)
@@ -171,11 +149,13 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
         mode: Int
     ): File {
         val dir = super.getDir(name, mode)
-        if (name == "webview" && processDetector.detectProcess(this) is VpnProcess) {
-            return File("${dir.absolutePath}/vpn").apply {
-                Timber.d(":vpn process getDir = $absolutePath")
-                if (!exists()) {
-                    mkdirs()
+        runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
+            if (name == "webview") {
+                return File("${dir.absolutePath}/vpn").apply {
+                    Timber.d(":vpn process getDir = $absolutePath")
+                    if (!exists()) {
+                        mkdirs()
+                    }
                 }
             }
         }
@@ -184,7 +164,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
 
     override fun getCacheDir(): File {
         val dir = super.getCacheDir()
-        if (processDetector.detectProcess(this) is VpnProcess) {
+        runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
             return File("${dir.absolutePath}/vpn").apply {
                 Timber.d(":vpn process getCacheDir = $absolutePath")
                 if (!exists()) {

@@ -22,33 +22,40 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        android:id="@+id/settingsSectionMoreBottomDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
         android:id="@+id/settingsAboutTitle"
-        style="@style/SettingsSectionTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/settingsHeadingAbout" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/about"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsAboutDuckduckgo" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsAboutDuckduckgo"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/privacyPolicy"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsPrivacyPolicyDuckduckgo" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsPrivacyPolicyDuckduckgo"/>
 
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/version"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/settingsVersion"
-        tools:subtitle="123.43.5456" />
+        app:primaryText="@string/settingsVersion"
+        tools:secondaryText="123.43.5456" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/provideFeedback"
-        style="@style/SettingsItemClickable"
-        android:text="@string/leaveFeedback" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/leaveFeedback"/>
 
 </LinearLayout>

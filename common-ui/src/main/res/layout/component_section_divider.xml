@@ -15,22 +15,73 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingStart="@dimen/keyline_4"
-    android:paddingTop="@dimen/keyline_5"
-    android:paddingEnd="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_5">
-
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:paddingTop="@dimen/keyline_5"
+              android:paddingEnd="@dimen/keyline_4">
 
     <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:text="Section divider"/>
+        android:paddingStart="@dimen/keyline_4"
+        android:text="Horizontal divider (Full Width)"/>
 
-    <com.duckduckgo.mobile.android.ui.view.SectionDivider
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_height="wrap_content"
         android:layout_width="match_parent"/>
+
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingStart="@dimen/keyline_4"
+        android:text="Horizontal divider (Not Full Width)"/>
+
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        app:fullWidth="false"/>
+
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingStart="@dimen/keyline_4"
+        android:text="Horizontal divider (Custom margins)"/>
+
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_margin="@dimen/keyline_6"
+        app:defaultPadding="false"/>
+
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingTop="@dimen/keyline_5"
+        android:paddingStart="@dimen/keyline_4"
+        android:text="Vertical divider"/>
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <com.duckduckgo.mobile.android.ui.view.button.IconButton
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:srcCompat="@drawable/ic_union"/>
+
+        <com.duckduckgo.mobile.android.ui.view.divider.VerticalDivider
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.button.IconButton
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:srcCompat="@drawable/ic_union"/>
+
+    </LinearLayout>
 
 </LinearLayout>

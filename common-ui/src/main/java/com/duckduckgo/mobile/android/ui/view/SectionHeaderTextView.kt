@@ -47,6 +47,13 @@ constructor(
             )
         setTextAppearance(context, textAppearanceId)
 
+        val paddingTop = typedArray.getDimensionPixelOffset(R.styleable.SectionHeaderTextView_android_paddingTop, 24)
+        val paddingStart = typedArray.getDimensionPixelOffset(R.styleable.SectionHeaderTextView_android_paddingStart, 20)
+        val paddingBottom = typedArray.getDimensionPixelOffset(R.styleable.SectionHeaderTextView_android_paddingBottom, 16)
+        val paddingEnd = typedArray.getDimensionPixelOffset(R.styleable.SectionHeaderTextView_android_paddingEnd, 20)
+
+        setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom)
+
         typedArray.recycle()
     }
 }

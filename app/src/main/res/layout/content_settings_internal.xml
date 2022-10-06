@@ -20,25 +20,22 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.duckduckgo.mobile.android.ui.view.SectionDivider
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:id="@+id/settingsInternalSectionBottomDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
         android:id="@+id/settingsInternalTitle"
-        style="@style/SettingsSectionTitle"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settingsInternalSectionBottomDivider"
-        android:text="Internal Features" />
+        android:text="Internal Features"/>
 
     <LinearLayout
         android:id="@+id/settingsInternalFeaturesContainer"

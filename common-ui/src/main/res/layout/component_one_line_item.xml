@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content"
+                                                   android:clipToPadding="false"
+                                                   android:paddingTop="@dimen/keyline_5"
+                                                   android:paddingBottom="@dimen/keyline_5">
+
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+        android:id="@+id/label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Single Line Items"
+        android:paddingStart="@dimen/keyline_4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label"
+        app:primaryText="This is a One Line List Item"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItem"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:primaryText="This is a One Line List Item with Leading Image"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithTrailingIcon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithImage"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:primaryText="This is a One Line List Item With Trailing Icon"
+        app:trailingIcon="@drawable/ic_overflow"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithLeadingAndTrailingIcons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithTrailingIcon"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:primaryText="This is a One Line List Item With Leading and Trailing Icons"
+        app:trailingIcon="@drawable/ic_overflow"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLeadingAndTrailingIcons"
+        app:primaryText="This is a One Line List Switch Item"
+        app:showSwitch="true"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListSwitchItemWithLeadingIcon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemSwitch"
+        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:primaryText="This is a One Line List Item Switch With Leading Icon"
+        app:showSwitch="true"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
