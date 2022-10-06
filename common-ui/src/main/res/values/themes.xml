@@ -270,6 +270,7 @@
 
         <item name="listItemTitleColor">@color/almostBlackDark</item>
         <item name="listItemSubtitleColor">@color/warmerGray</item>
+        <item name="listItemDisabledColor">@color/warGreyTwo</item>
         <item name="listItemBackgroundColor">@color/whiteFive</item>
         <item name="listItemSeparatorColor">@color/whiteSix</item>
         <item name="textInputOutlinedBoxColor">@color/grayishThree</item>
