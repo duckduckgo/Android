@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.omnibar.animations
 
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
@@ -36,6 +37,7 @@ interface BrowserTrackersAnimatorHelper {
      * @param entities are the tracker entities detected on the current site
      */
     fun startTrackersAnimation(
+        context: Context,
         shouldRunPartialAnimation: Boolean,
         shieldAnimationView: LottieAnimationView,
         trackersAnimationView: LottieAnimationView,
@@ -52,6 +54,7 @@ interface BrowserTrackersAnimatorHelper {
      * @param cookieScene holder of cookie consent text animation.
      */
     fun createCookiesAnimation(
+        context: Context,
         omnibarViews: List<View>,
         cookieBackground: View,
         cookieAnimationView: LottieAnimationView,

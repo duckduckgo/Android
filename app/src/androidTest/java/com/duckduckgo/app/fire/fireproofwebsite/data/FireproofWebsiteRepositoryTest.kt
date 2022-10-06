@@ -31,6 +31,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -132,6 +133,53 @@ class FireproofWebsiteRepositoryTest {
         val count = fireproofWebsiteRepository.fireproofWebsitesCountByDomain("example.com")
 
         assertEquals(1, count)
+    }
+
+    @Test
+    fun whenSubDomainFireproofWebsiteThenExpectedListReturned() {
+        givenFireproofWebsitesStored(FireproofWebsiteEntity("mobile.twitter.com"))
+        val expectedList = listOf(
+            ".mobile.twitter.com",
+            "mobile.twitter.com",
+            ".twitter.com",
+            ".com"
+        )
+
+        val hostsToPreserve = fireproofWebsiteRepository.fireproofWebsites()
+
+        assertTrue(expectedList.all { hostsToPreserve.contains(it) })
+    }
+
+    @Test
+    fun whenFireproofWebsiteThenExpectedListReturned() {
+        givenFireproofWebsitesStored(FireproofWebsiteEntity("twitter.com"))
+        val expectedList = listOf("twitter.com", ".twitter.com", ".com")
+
+        val hostsToPreserve = fireproofWebsiteRepository.fireproofWebsites()
+
+        assertTrue(expectedList.all { hostsToPreserve.contains(it) })
+    }
+
+    @Test
+    fun whenMultipleFireproofWebsiteWithSameTopLevelThenExpectedListReturned() {
+        givenFireproofWebsitesStored(FireproofWebsiteEntity("twitter.com"))
+        givenFireproofWebsitesStored(FireproofWebsiteEntity("example.com"))
+        val expectedList = listOf(
+            ".example.com",
+            "example.com",
+            "twitter.com",
+            ".twitter.com",
+            ".com"
+        )
+
+        val hostsToPreserve = fireproofWebsiteRepository.fireproofWebsites()
+
+        assertEquals(expectedList.size, hostsToPreserve.size)
+        assertTrue(expectedList.all { hostsToPreserve.contains(it) })
+    }
+
+    private fun givenFireproofWebsitesStored(fireproofWebsiteEntity: FireproofWebsiteEntity) {
+        fireproofWebsiteDao.insert(fireproofWebsiteEntity)
     }
 
     private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {

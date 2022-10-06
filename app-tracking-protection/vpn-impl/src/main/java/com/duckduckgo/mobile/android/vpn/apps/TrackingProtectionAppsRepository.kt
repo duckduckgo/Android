@@ -195,7 +195,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
 
     override suspend fun isAppProtectionEnabled(packageName: String): Boolean {
         Timber.d("TrackingProtectionAppsRepository: Checking $packageName protection status")
-        val appInfo = packageManager.getApplicationInfo(packageName, 0)
+        val appInfo = runCatching { packageManager.getApplicationInfo(packageName, 0) }.getOrElse { return true }
         val appExclusionList = appTrackerRepository.getAppExclusionList()
         val manualAppExclusionList = appTrackerRepository.getManualAppExclusionList()
 

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s traži pristup kameri i mikrofonu</string>
+    <string name="sitePermissionsMicDialogTitle">%1$s traži pristup mikrofonu</string>
+    <string name="sitePermissionsCameraDialogTitle">%1$s traži pristup kameri</string>
+    <string name="sitePermissionsDialogContent">Upravljajte odobrenim dopuštenjima u postavkama</string>
+    <string name="sitePermissionsDialogDenyButton">Odbij</string>
+    <string name="sitePermissionsDialogAllowButton">Dopusti</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Dopusti DuckDuckGou da zatraži pristup kameri i mikrofonu</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Dopusti DuckDuckGou da zatraži pristup kameri</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Dopusti DuckDuckGou da zatraži pristup mikrofonu</string>
+    <string name="sitePermissionsDeniedSnackBarAction">Dopusti</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Dopusti DuckDuckGou da zatraži pristup kameri na ovom uređaju</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Stranice mogu koristiti tvoju kameru samo ako dopustiš DuckDuckGou da zatraži pristup.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Dopusti DuckDuckGou da zatraži pristup mikrofonu na ovom uređaju</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Stranice mogu koristiti tvoj mikrofon samo ako dopustiš DuckDuckGou da zatraži pristup.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Dopusti DuckDuckGou da zatraži pristup kameri i mikrofonu na ovom uređaju</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Stranice mogu koristiti tvoju kameru i mikrofon samo ako dopustiš DuckDuckGou da zatraži pristup.</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Otvorite postavke</string>
+    <string name="systemPermissionsDeniedDialogNegativeButton">Otkaži</string>
+</resources>

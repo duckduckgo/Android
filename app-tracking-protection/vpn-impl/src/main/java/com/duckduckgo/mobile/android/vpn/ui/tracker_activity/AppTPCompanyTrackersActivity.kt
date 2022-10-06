@@ -33,6 +33,7 @@ import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.view.InfoPanel
+import com.duckduckgo.mobile.android.ui.view.SwitchView
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
@@ -192,7 +193,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         menuInflater.inflate(R.menu.menu_company_trackers_activity, menu)
 
         val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
-        appEnabledSwitch = switchMenuItem?.actionView as SwitchCompat
+        appEnabledSwitch = switchMenuItem?.actionView as SwitchView
         appEnabledSwitch.setOnCheckedChangeListener(toggleAppSwitchListener)
         return true
     }

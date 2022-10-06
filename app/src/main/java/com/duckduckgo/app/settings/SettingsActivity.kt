@@ -47,7 +47,6 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
-import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.WhitelistActivity
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
@@ -56,6 +55,7 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
+import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -68,7 +68,7 @@ import com.duckduckgo.macos_api.MacWaitlistState.*
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
@@ -157,39 +157,39 @@ class SettingsActivity :
     private fun configureUiEventHandlers() {
         with(viewsGeneral) {
             setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
-            homeScreenWidgetSetting.setOnClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
+            homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
         }
 
         with(viewsAutofill) {
-            autofill.setOnClickListener { viewModel.onAutofillSettingsClick() }
+            autofill.setClickListener { viewModel.onAutofillSettingsClick() }
         }
 
         with(viewsAppearance) {
-            selectedThemeSetting.setOnClickListener { viewModel.userRequestedToChangeTheme() }
-            changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
-            selectedFireAnimationSetting.setOnClickListener { viewModel.userRequestedToChangeFireAnimation() }
-            accessibilitySetting.setOnClickListener { viewModel.onAccessibilitySettingClicked() }
+            selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
+            changeAppIconLabel.setClickListener { viewModel.userRequestedToChangeIcon() }
+            selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
+            accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
         }
 
         with(viewsPrivacy) {
-            globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
-            autoconsentSetting.setOnClickListener { viewModel.onAutoconsentClicked() }
-            fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
-            automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
-            automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
-            whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
+            globalPrivacyControlSetting.setClickListener { viewModel.onGlobalPrivacyControlClicked() }
+            autoconsentSetting.setClickListener { viewModel.onAutoconsentClicked() }
+            fireproofWebsites.setClickListener { viewModel.onFireproofWebsitesClicked() }
+            automaticallyClearWhatSetting.setClickListener { viewModel.onAutomaticallyClearWhatClicked() }
+            automaticallyClearWhenSetting.setClickListener { viewModel.onAutomaticallyClearWhenClicked() }
+            whitelist.setClickListener { viewModel.onManageWhitelistSelected() }
         }
 
         with(viewsCustomize) {
             autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
-            locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
-            appLinksSetting.setOnClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
+            sitePermissions.setClickListener { viewModel.onSitePermissionsClicked() }
+            appLinksSetting.setClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
         }
 
         with(viewsOther) {
-            provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
-            about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
-            privacyPolicy.setOnClickListener {
+            provideFeedback.setClickListener { viewModel.userRequestedToSendFeedback() }
+            about.setClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
+            privacyPolicy.setClickListener {
                 startActivity(
                     WebViewActivity.intent(
                         this@SettingsActivity,
@@ -201,9 +201,9 @@ class SettingsActivity :
         }
 
         with(viewsMore) {
-            emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
-            macOsSetting.setOnClickListener { viewModel.onMacOsSettingClicked() }
-            vpnSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
+            emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
+            macOsSetting.setClickListener { viewModel.onMacOsSettingClicked() }
+            vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
         }
     }
 
@@ -211,12 +211,12 @@ class SettingsActivity :
         viewsInternal.settingsSectionInternal.visibility = if (internalFeaturePlugins.getPlugins().isEmpty()) View.GONE else View.VISIBLE
         internalFeaturePlugins.getPlugins().forEach { feature ->
             Timber.v("Adding internal feature ${feature.internalFeatureTitle()}")
-            val view = SettingsOptionWithSubtitle(this).apply {
-                setTitle(feature.internalFeatureTitle())
-                this.setSubtitle(feature.internalFeatureSubtitle())
+            val view = TwoLineListItem(this).apply {
+                setPrimaryText(feature.internalFeatureTitle())
+                setSecondaryText(feature.internalFeatureSubtitle())
             }
             viewsInternal.settingsInternalFeaturesContainer.addView(view)
-            view.setOnClickListener { feature.onInternalFeatureClicked(this) }
+            view.setClickListener { feature.onInternalFeatureClicked(this) }
         }
     }
 
@@ -231,7 +231,7 @@ class SettingsActivity :
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState.let {
-                    viewsOther.version.setSubtitle(it.version)
+                    viewsOther.version.setSecondaryText(it.version)
                     updateSelectedTheme(it.theme)
                     viewsCustomize.autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                     updateDefaultBrowserViewVisibility(it)
@@ -264,7 +264,7 @@ class SettingsActivity :
 
     private fun updateEmailSubtitle(emailAddress: String?) {
         val subtitle = emailAddress ?: getString(R.string.settingsEmailProtectionSubtitle)
-        viewsMore.emailSetting.setSubtitle(subtitle)
+        viewsMore.emailSetting.setSecondaryText(subtitle)
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {
@@ -273,7 +273,7 @@ class SettingsActivity :
         } else {
             getString(R.string.disabled)
         }
-        viewsPrivacy.globalPrivacyControlSetting.setSubtitle(stateText)
+        viewsPrivacy.globalPrivacyControlSetting.setSecondaryText(stateText)
     }
 
     private fun setAutoconsentSetting(enabled: Boolean) {
@@ -282,12 +282,12 @@ class SettingsActivity :
         } else {
             getString(R.string.disabled)
         }
-        viewsPrivacy.autoconsentSetting.setSubtitle(stateText)
+        viewsPrivacy.autoconsentSetting.setSecondaryText(stateText)
     }
 
     private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
         val subtitle = getString(fireAnimation.nameResId)
-        viewsAppearance.selectedFireAnimationSetting.setSubtitle(subtitle)
+        viewsAppearance.selectedFireAnimationSetting.setSecondaryText(subtitle)
     }
 
     private fun updateSelectedTheme(selectedTheme: DuckDuckGoTheme) {
@@ -298,7 +298,7 @@ class SettingsActivity :
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> R.string.settingsSystemTheme
             }
         )
-        viewsAppearance.selectedThemeSetting.setSubtitle(subtitle)
+        viewsAppearance.selectedThemeSetting.setSecondaryText(subtitle)
     }
 
     private fun updateAppLinkBehavior(appLinkSettingType: AppLinkSettingType) {
@@ -309,15 +309,15 @@ class SettingsActivity :
                 AppLinkSettingType.NEVER -> R.string.settingsAppLinksNever
             }
         )
-        viewsCustomize.appLinksSetting.setSubtitle(subtitle)
+        viewsCustomize.appLinksSetting.setSecondaryText(subtitle)
     }
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
         val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringResourceId())
-        viewsPrivacy.automaticallyClearWhatSetting.setSubtitle(clearWhatSubtitle)
+        viewsPrivacy.automaticallyClearWhatSetting.setSecondaryText(clearWhatSubtitle)
 
         val clearWhenSubtitle = getString(automaticallyClearData.clearWhenOption.nameStringResourceId())
-        viewsPrivacy.automaticallyClearWhenSetting.setSubtitle(clearWhenSubtitle)
+        viewsPrivacy.automaticallyClearWhenSetting.setSecondaryText(clearWhenSubtitle)
 
         val whenOptionEnabled = automaticallyClearData.clearWhenOptionEnabled
         viewsPrivacy.automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
@@ -381,12 +381,12 @@ class SettingsActivity :
     ) {
         with(viewsMore) {
             if (waitlistState != WaitlistState.InBeta) {
-                vpnSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
+                vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
             } else {
                 if (appTPEnabled) {
-                    vpnSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldEnabled))
+                    vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldEnabled))
                 } else {
-                    vpnSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldDisabled))
+                    vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
                 }
             }
         }
@@ -395,9 +395,9 @@ class SettingsActivity :
     private fun updateMacOsSettings(waitlistState: MacWaitlistState) {
         with(viewsMore) {
             when (waitlistState) {
-                InBeta -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description_ready))
-                JoinedWaitlist -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description_list))
-                NotJoinedQueue -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description))
+                InBeta -> macOsSetting.setSecondaryText(getString(R.string.macos_settings_description_ready))
+                JoinedWaitlist -> macOsSetting.setSecondaryText(getString(R.string.macos_settings_description_list))
+                NotJoinedQueue -> macOsSetting.setSecondaryText(getString(R.string.macos_settings_description))
             }
         }
     }
@@ -433,7 +433,7 @@ class SettingsActivity :
 
     private fun launchLocation() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(LocationPermissionsActivity.intent(this), options)
+        startActivity(SitePermissionsActivity.intent(this), options)
     }
 
     private fun launchWhitelist() {
