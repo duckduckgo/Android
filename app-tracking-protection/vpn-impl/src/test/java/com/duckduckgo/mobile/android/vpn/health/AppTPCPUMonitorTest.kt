@@ -27,6 +27,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.impl.utils.SynchronousExecutor
+import androidx.work.testing.TestDriver
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -67,6 +68,7 @@ class AppTPCPUMonitorTest {
     private lateinit var config: AppTpFeatureConfigImpl
     private lateinit var toggleDao: VpnConfigTogglesDao
     private lateinit var workManager: WorkManager
+    private lateinit var testDriver: TestDriver
 
     private val mockDeviceShieldPixels: DeviceShieldPixels = mock()
     private val mockCPUUsageReader: CPUUsageReader = mock()
@@ -94,6 +96,7 @@ class AppTPCPUMonitorTest {
 
         WorkManagerTestInitHelper.initializeTestWorkManager(context, workManagerConfig)
         workManager = WorkManager.getInstance(context)
+        testDriver = WorkManagerTestInitHelper.getTestDriver(context)!!
 
         cpuMonitor = AppTPCPUMonitor(workManager, config)
     }
@@ -106,8 +109,6 @@ class AppTPCPUMonitorTest {
     @Test
     fun whenConfigEnabledStartWorker() {
         assertStartWorker()
-
-        verify(mockCPUUsageReader).readCPUUsage()
     }
 
     @Test
@@ -118,8 +119,6 @@ class AppTPCPUMonitorTest {
         cpuMonitor.onVpnStarted(TestScope())
 
         assertWorkerNotRunning()
-
-        verifyNoInteractions(mockCPUUsageReader)
     }
 
     @Test
@@ -194,7 +193,10 @@ class AppTPCPUMonitorTest {
     private fun assertWorkerRunning() {
         val scheduledWorkers = getScheduledWorkers()
         assertEquals(1, scheduledWorkers.size)
-        assertEquals(WorkInfo.State.RUNNING, scheduledWorkers[0].state)
+        assertEquals(WorkInfo.State.ENQUEUED, scheduledWorkers[0].state)
+
+        // Skip initial delay so we don't have to wait
+        testDriver.setInitialDelayMet(scheduledWorkers[0].id)
     }
 
     private fun assertWorkerNotRunning() {
