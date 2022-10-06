@@ -103,5 +103,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: device-screenshot
+          name: device-screenshot-${{ matrix.api-level }}
           path: ./*Screenshot.png
