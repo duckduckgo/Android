@@ -148,6 +148,7 @@ import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import android.content.pm.ResolveInfo
 import android.print.PrintAttributes
 import android.print.PrintManager
+import android.webkit.PermissionRequest
 import android.webkit.URLUtil
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
@@ -203,6 +204,8 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
+import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
@@ -218,7 +221,8 @@ class BrowserTabFragment :
     TrackersAnimatorListener,
     DownloadConfirmationDialogListener,
     SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
-    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener {
+    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener,
+    SitePermissionsGrantedListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -357,6 +361,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
 
+    @Inject
+    lateinit var sitePermissionsDialogLauncher: SitePermissionsDialogLauncher
+
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
@@ -456,7 +463,7 @@ class BrowserTabFragment :
 
         override fun onPopUpHandled() {
             launch {
-                context?.let { animatorHelper.createCookiesAnimation(omnibarViews(), cookieDummyView, cookieAnimation, scene_root) }
+                context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation, scene_root) }
             }
         }
 
@@ -528,6 +535,7 @@ class BrowserTabFragment :
                 else -> resumeWebView()
             }
         }
+        sitePermissionsDialogLauncher.registerPermissionLauncher(this)
     }
 
     private fun resumeWebView() {
@@ -986,6 +994,8 @@ class BrowserTabFragment :
                 notifyEmailSignEvent()
             }
             is Command.PrintLink -> launchPrint(it.url)
+            is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest, it.request)
+            is Command.GrantSitePermissionRequest -> grantSitePermissionRequest(it.sitePermissionsToGrant, it.request)
             else -> {
                 // NO OP
             }
@@ -1106,7 +1116,7 @@ class BrowserTabFragment :
                 Snackbar.LENGTH_SHORT
             )
         snackbar.view.setOnClickListener {
-            browserActivity?.launchLocationSettings()
+            browserActivity?.launchSitePermissionsSettings()
         }
         snackbar.show()
     }
@@ -1194,7 +1204,11 @@ class BrowserTabFragment :
     private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
         if (appLink.appIntent != null) {
             appLink.appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(appLink.appIntent)
+            try {
+                startActivity(appLink.appIntent)
+            } catch (e: SecurityException) {
+                showToast(R.string.unableToOpenLink)
+            }
         } else if (appLink.excludedComponents != null && appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             val title = getString(R.string.appLinkIntentChooserTitle)
             val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents)
@@ -2619,6 +2633,7 @@ class BrowserTabFragment :
 
                     activity?.let { activity ->
                         animatorHelper.startTrackersAnimation(
+                            context = activity,
                             shouldRunPartialAnimation = lastSeenCtaViewState?.cta is DaxTrackersBlockedCta,
                             shieldAnimationView = shieldIcon,
                             trackersAnimationView = trackerAnimationView,
@@ -3008,6 +3023,16 @@ class BrowserTabFragment :
         }
     }
 
+    private fun showSitePermissionsDialog(permissionsToRequest: Array<String>, request: PermissionRequest) {
+        activity?.let {
+            sitePermissionsDialogLauncher.askForSitePermission(it, webView?.url.orEmpty(), tabId, permissionsToRequest, request, this)
+        }
+    }
+
+    private fun grantSitePermissionRequest(sitePermissionsToGrant: Array<String>, request: PermissionRequest) {
+        request.grant(sitePermissionsToGrant)
+    }
+
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {
         Timber.i("Continuing to download %s", pendingFileDownload)
         viewModel.download(pendingFileDownload)
@@ -3042,5 +3067,10 @@ class BrowserTabFragment :
 
     override fun onSystemLocationPermissionNeverAllowed() {
         viewModel.onSystemLocationPermissionNeverAllowed()
+    }
+
+    override fun permissionsGrantedOnWhereby() {
+        val roomParameters = "?skipMediaPermissionPrompt"
+        webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
     }
 }

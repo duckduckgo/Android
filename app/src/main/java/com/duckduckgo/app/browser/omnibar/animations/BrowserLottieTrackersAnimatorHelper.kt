@@ -46,8 +46,7 @@ import javax.inject.Inject
 
 @ContributesBinding(FragmentScope::class)
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
-    val context: Context,
-    val theme: AppTheme
+    private val theme: AppTheme
 ) : BrowserTrackersAnimatorHelper {
 
     private var listener: TrackersAnimatorListener? = null
@@ -68,6 +67,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     lateinit var secondScene: Scene
 
     override fun startTrackersAnimation(
+        context: Context,
         shouldRunPartialAnimation: Boolean,
         shieldAnimationView: LottieAnimationView,
         trackersAnimationView: LottieAnimationView,
@@ -82,13 +82,13 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         this.shieldAnimation = shieldAnimationView
 
         if (entities.isNullOrEmpty()) { // no badge nor tracker animations
-            tryToStartCookiesAnimation(omnibarViews)
+            tryToStartCookiesAnimation(context, omnibarViews)
             return
         }
 
         val logos = getLogos(context, entities)
         if (logos.isEmpty()) {
-            tryToStartCookiesAnimation(omnibarViews)
+            tryToStartCookiesAnimation(context, omnibarViews)
             return
         }
 
@@ -109,7 +109,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                     if (!runPartialAnimation) {
                         animateOmnibarIn(omnibarViews).start()
                         completePartialAnimation = false
-                        tryToStartCookiesAnimation(omnibarViews)
+                        tryToStartCookiesAnimation(context, omnibarViews)
                         listener?.onAnimationFinished()
                     }
                 }
@@ -134,6 +134,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     }
 
     override fun createCookiesAnimation(
+        context: Context,
         omnibarViews: List<View>,
         cookieBackground: View,
         cookieAnimationView: LottieAnimationView,
@@ -179,7 +180,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         shieldAnimation.playAnimation()
     }
 
-    private fun tryToStartCookiesAnimation(omnibarViews: List<View>) {
+    private fun tryToStartCookiesAnimation(context: Context, omnibarViews: List<View>) {
         if (enqueueCookiesAnimation) {
             startCookiesAnimation(context, omnibarViews)
             enqueueCookiesAnimation = false

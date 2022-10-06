@@ -22,8 +22,8 @@ import android.webkit.WebView
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.httpauth.db.clearFormDataCompat
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.global.file.FileDeleter
+import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import java.io.File
 import javax.inject.Inject
 

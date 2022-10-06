@@ -30,10 +30,10 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEntryBinding
-import com.duckduckgo.app.browser.databinding.ViewSavedSiteSectionTitleBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -113,7 +113,7 @@ class FavoritesAdapter(
                 )
             }
             FAVORITE_SECTION_TITLE_TYPE -> {
-                val binding = ViewSavedSiteSectionTitleBinding.inflate(inflater, parent, false)
+                val binding = ViewSectionHeaderBinding.inflate(inflater, parent, false)
                 return FavoritesScreenViewHolders.SectionTitle(binding)
             }
             EMPTY_STATE_TYPE -> {
@@ -184,9 +184,9 @@ class FavoritesAdapter(
 
 sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class SectionTitle(private val binding: ViewSavedSiteSectionTitleBinding) : FavoritesScreenViewHolders(binding.root) {
+    class SectionTitle(private val binding: ViewSectionHeaderBinding) : FavoritesScreenViewHolders(binding.root) {
         fun bind() {
-            binding.savedSiteSectionTitle.setText(R.string.favoritesSectionTitle)
+            binding.sectionHeader.setText(R.string.favoritesSectionTitle)
         }
     }
 
@@ -211,18 +211,20 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
             val listItem = binding.root
             this.favorite = favorite
 
-            listItem.setContentDescription(
+            listItem.setLeadingIconContentDescription(
                 context.getString(
                     R.string.bookmarkOverflowContentDescription,
                     favorite.title
                 )
             )
 
-            listItem.setTitle(favorite.title)
-            listItem.setSubtitle(parseDisplayUrl(favorite.url))
-            loadFavicon(favorite.url, listItem.imageView())
+            listItem.setPrimaryText(favorite.title)
+            listItem.setSecondaryText(parseDisplayUrl(favorite.url))
 
-            listItem.setOverflowClickListener { anchor ->
+            loadFavicon(favorite.url, listItem.leadingIcon())
+
+            listItem.setTrailingIcon(R.drawable.ic_overflow)
+            listItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, favorite)
             }
 

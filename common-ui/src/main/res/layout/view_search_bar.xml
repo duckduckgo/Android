@@ -29,13 +29,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.duckduckgo.mobile.android.ui.view.IconButton
+        <com.duckduckgo.mobile.android.ui.view.button.IconButton
             android:id="@+id/upAction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="@dimen/keyline_2"
-            app:srcCompat="@drawable/ic_back_24" />
+            app:srcCompat="@drawable/ic_back_24"/>
 
     </FrameLayout>
 
@@ -62,7 +62,7 @@
         app:layout_goneMarginEnd="@dimen/keyline_2"
         tools:text="https://duckduckgo.com/?q=areallylongexampleexample" />
 
-    <com.duckduckgo.mobile.android.ui.view.IconButton
+    <com.duckduckgo.mobile.android.ui.view.button.IconButton
         android:id="@+id/clearTextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -72,6 +72,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_close_24dp"
-        tools:visibility="visible" />
+        tools:visibility="visible"/>
 
 </merge>
