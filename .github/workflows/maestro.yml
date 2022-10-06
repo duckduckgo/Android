@@ -1,4 +1,4 @@
-name: Instrumentation tests
+name: Maestro tests
 
 on:
   push:
@@ -12,6 +12,10 @@ jobs:
   instrumentation_tests:
     runs-on: macos-latest
     name: Instrumentation tests
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [ 23, 29, 31 ]
 
     steps:
       - name: Cancel previous
@@ -29,10 +33,6 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-
-      - name: Create folder
-        if: always()
-        run: mkdir apk
 
       - name: Install maestro
         run: |
@@ -56,21 +56,52 @@ jobs:
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
 
+      - name: Build
+        run: ./gradlew assemblePlayRelease
+
+      - name: AVD cache
+        uses: actions/cache@v3
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}-maestro
+
       - name: Android checks
+        if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactiveCircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
           arch: x86_64
           profile: Nexus 5
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Android checks
+        uses: reactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          ndk: 21.0.6113669
+          arch: x86_64
+          profile: Nexus 5
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot-save
           disable-animations: true
-          script: ./gradlew installPlayRelease && cd .mobiledev && maestro test test.yaml || adb shell /system/bin/screencap -p /data/local/tmp/screenshot.png && adb pull /data/local/tmp/screenshot.png screenshot.png;
+          script:  |
+            sleep 5; adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS;
+            ./gradlew installPlayRelease || touch sorry_but_tests_are_failing
+            sleep 5; 
+            maestro --platform android test .mobiledev/test.yaml || touch sorry_but_tests_are_failing
+            adb shell screencap -p /data/local/tmp/Screenshot.png; adb pull /data/local/tmp/Screenshot.png Screenshot.png;
+            test ! -f sorry_but_tests_are_failing
 
       - name: Upload screenshot
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: device-screenshot
-          path: screenshot.png
+          path: ./*Screenshot.png

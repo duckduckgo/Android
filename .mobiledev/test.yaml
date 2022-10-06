@@ -2,8 +2,10 @@ appId: com.duckduckgo.mobile.android
 ---
 - launchApp:
     clearState: true
+- takeScreenshot: LaunchScreenshot
 - assertVisible:
     text: ".*Not to worry! Searching and browsing privately.*"
+- takeScreenshot: Launch2Screenshot
 - tapOn: "let's do it!"
 - tapOn: "cancel"
 - assertVisible:
