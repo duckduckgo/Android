@@ -16,7 +16,6 @@
 
 package com.duckduckgo.privacy.config.impl.features.gpc
 
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -67,8 +66,7 @@ class RealGpc @Inject constructor(
         gpcRepository.disableGpc()
     }
 
-    @VisibleForTesting
-    fun canGpcBeUsedByUrl(url: String): Boolean {
+    private fun canGpcBeUsedByUrl(url: String): Boolean {
         return isFeatureEnabled() && isEnabled() && !isAnException(url)
     }
 
