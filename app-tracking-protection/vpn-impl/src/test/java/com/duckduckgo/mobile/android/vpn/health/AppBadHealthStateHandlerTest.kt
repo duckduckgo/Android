@@ -54,10 +54,14 @@ import org.threeten.bp.ZoneOffset
 @RunWith(AndroidJUnit4::class)
 class AppBadHealthStateHandlerTest {
 
-    @get:Rule @Suppress("unused") val coroutineRule = CoroutineTestRule()
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     @Mock private lateinit var deviceShieldPixels: DeviceShieldPixels
+
     @Mock private lateinit var appBuildConfig: AppBuildConfig
+
     @Mock private lateinit var appTpConfig: AppTpFeatureConfig
     private val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
 
@@ -78,7 +82,13 @@ class AppBadHealthStateHandlerTest {
         whenever(appTpConfig.isEnabled(AppTpSetting.BadHealthMitigation)).thenReturn(true)
 
         appBadHealthStateHandler = AppBadHealthStateHandler(
-            context, appBuildConfig, db, appTpConfig, deviceShieldPixels, coroutineRule.testDispatcherProvider, coroutineRule.testScope
+            context,
+            appBuildConfig,
+            db,
+            appTpConfig,
+            deviceShieldPixels,
+            coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope
         )
     }
 

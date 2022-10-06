@@ -22,16 +22,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.downloads.impl.FilenameExtractor
-import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.downloads.impl.isDataUrl
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.impl.FilenameExtractor
+import com.duckduckgo.downloads.impl.isDataUrl
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.download_confirmation.view.*
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.download_confirmation.view.*
+import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class DownloadConfirmationFragment : BottomSheetDialogFragment() {

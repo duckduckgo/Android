@@ -30,9 +30,9 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class FireproofWebsitesViewModel @Inject constructor(
@@ -125,7 +125,6 @@ class FireproofWebsitesViewModel @Inject constructor(
 
     fun removeAllWebsites() {
         viewModelScope.launch(dispatcherProvider.io()) {
-
             fireproofWebsiteRepository.removeAllFireproofWebsites()
             pixel.fire(FIREPROOF_WEBSITE_ALL_DELETED)
         }

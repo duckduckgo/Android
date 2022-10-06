@@ -47,7 +47,9 @@ object Theming {
     ): Drawable? {
         val themeId: Int = THEME_MAP[Pair(R.style.AppTheme, theme)] ?: R.style.AppTheme_Light
         return ResourcesCompat.getDrawable(
-            context.resources, drawableId, ContextThemeWrapper(context, themeId).theme
+            context.resources,
+            drawableId,
+            ContextThemeWrapper(context, themeId).theme
         )
     }
 

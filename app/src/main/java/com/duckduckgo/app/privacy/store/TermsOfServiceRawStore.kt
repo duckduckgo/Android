@@ -23,11 +23,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 /**
  * This raw file store is temporary. Once we move to an api call to retrieve the json

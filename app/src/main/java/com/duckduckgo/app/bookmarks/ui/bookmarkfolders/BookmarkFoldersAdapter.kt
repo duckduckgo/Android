@@ -26,10 +26,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewBookmarkFolderEntryBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import timber.log.Timber
 
 class BookmarkFoldersAdapter(

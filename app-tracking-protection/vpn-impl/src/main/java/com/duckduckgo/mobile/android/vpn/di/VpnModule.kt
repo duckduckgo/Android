@@ -34,9 +34,9 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
 import java.nio.channels.Selector
 import javax.inject.Named
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(VpnScope::class)
@@ -119,7 +119,7 @@ object VpnModule {
         payloadBytesExtractor: PayloadBytesExtractor,
         vpnDatabase: VpnDatabase,
         tlsContentTypeExtractor: ContentTypeExtractor,
-        requestInterceptors: PluginPoint<VpnTrackerDetectorInterceptor>,
+        requestInterceptors: PluginPoint<VpnTrackerDetectorInterceptor>
     ): VpnTrackerDetector {
         return DomainBasedTrackerDetector(
             hostnameExtractor,

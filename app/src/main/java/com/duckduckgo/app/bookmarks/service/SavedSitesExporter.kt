@@ -24,10 +24,10 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.TreeNode
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import kotlinx.coroutines.withContext
 
 interface SavedSitesExporter {
     suspend fun export(uri: Uri): ExportSavedSitesResult
@@ -95,7 +95,6 @@ class RealSavedSitesExporter(
         parentId: Long,
         currentDepth: Int
     ) {
-
         val bookmarkFolders = bookmarksRepository.getBookmarkFoldersByParentId(parentId)
 
         bookmarkFolders.forEach { bookmarkFolder ->

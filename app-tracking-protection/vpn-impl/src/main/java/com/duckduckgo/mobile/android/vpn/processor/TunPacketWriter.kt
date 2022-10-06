@@ -23,12 +23,12 @@ import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import okio.ByteString.Companion.toByteString
-import timber.log.Timber
-import xyz.hexene.localvpn.ByteBufferPool
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.channels.FileChannel
+import okio.ByteString.Companion.toByteString
+import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
 
 class TunPacketWriter @AssistedInject constructor(
     @Assisted private val tunInterface: ParcelFileDescriptor,

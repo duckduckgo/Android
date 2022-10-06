@@ -36,7 +36,6 @@ import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
@@ -47,14 +46,15 @@ import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.extensions.html
-import com.duckduckgo.mobile.android.ui.view.*
+import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -223,7 +223,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         val layoutManager = GridLayoutManager(this, numOfColumns)
         quickAccessRecyclerView.layoutManager = layoutManager
         quickAccessAdapter = FavoritesQuickAccessAdapter(
-            this, faviconManager,
+            this,
+            faviconManager,
             { viewHolder -> itemTouchHelper.startDrag(viewHolder) },
             { viewModel.onQuickAccessItemClicked(it) },
             { viewModel.onEditQuickAccessItemRequested(it) },

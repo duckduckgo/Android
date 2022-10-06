@@ -41,6 +41,8 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_MEMORY_EXCEPTION
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,8 +51,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.minutes
 
 /**
  * Health monitor will periodically obtain the current health metrics across AppTP, and raise an
@@ -76,7 +76,7 @@ class AppTPHealthMonitor @Inject constructor(
     private val healthMetricCounter: HealthMetricCounter,
     private val healthClassifier: HealthClassifier,
     private val callbacks: PluginPoint<AppHealthCallback>,
-    private val appBuildConfig: AppBuildConfig,
+    private val appBuildConfig: AppBuildConfig
 ) : AppHealthMonitor {
 
     companion object {
@@ -113,11 +113,13 @@ class AppTPHealthMonitor @Inject constructor(
     private val socketConnectExceptionAlerts = object : HealthRule("socketConnectExceptionAlerts") {}.also { healthRules.add(it) }
     private val tunWriteExceptionAlerts = object : HealthRule("tunWriteIOExceptions") {}.also { healthRules.add(it) }
     private val tunReadExceptionAlerts = object : HealthRule(
-        "tunReadIOExceptions", samplesToWaitBeforeAlerting = TUN_READ_IO_SAMPLES
+        "tunReadIOExceptions",
+        samplesToWaitBeforeAlerting = TUN_READ_IO_SAMPLES
     ) {}.also { healthRules.add(it) }
     private val tunWriteIOMemoryExceptionsAlerts = object : HealthRule("tunWriteIOMemoryExceptions") {}.also { healthRules.add(it) }
     private val noNetworkConnectivityAlert = object : HealthRule(
-        "noNetworkConnectivityAlert", samplesToWaitBeforeAlerting = NO_NETWORK_CONNECTIVITY_SAMPLES
+        "noNetworkConnectivityAlert",
+        samplesToWaitBeforeAlerting = NO_NETWORK_CONNECTIVITY_SAMPLES
     ) {}.also { healthRules.add(it) }
 
     // these alerts below will never trigger and are informational

@@ -34,7 +34,6 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val currentOption: ClearWhatOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhatOption? ?: CLEAR_NONE
 
         val rootView = View.inflate(activity, R.layout.settings_automatically_clear_what_fragment, null)
@@ -86,7 +85,6 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
 
             fragment.arguments = Bundle().also {
                 it.putSerializable(DEFAULT_OPTION_EXTRA, clearWhatSetting)
-
             }
             return fragment
         }

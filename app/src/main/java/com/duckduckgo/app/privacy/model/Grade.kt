@@ -83,7 +83,6 @@ class Grade(
     }
 
     fun calculateScore(): Scores {
-
         if (!fullSiteDetailsAvailable) {
             Timber.d("Full site details are not available")
             return scoresUnavailable()

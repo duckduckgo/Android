@@ -122,8 +122,4 @@ fladle {
     }
 }
 
-tasks.named('check') {
-    dependsOn 'installKotlinterPrePushHook'
-}
-
 apply plugin: 'android-reporting'

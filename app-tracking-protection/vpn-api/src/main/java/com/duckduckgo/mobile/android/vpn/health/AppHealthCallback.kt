@@ -38,7 +38,7 @@ data class RawMetricsSubmission(
     val name: String,
     val metrics: Map<String, Metric> = emptyMap(),
     val redacted: Boolean = false,
-    val informational: Boolean = false,
+    val informational: Boolean = false
 )
 
 /**
@@ -49,7 +49,7 @@ data class RawMetricsSubmission(
 data class Metric(
     val value: String,
     val isBadState: Boolean? = null,
-    val isCritical: Boolean = false,
+    val isCritical: Boolean = false
 ) {
 
     override fun toString(): String {

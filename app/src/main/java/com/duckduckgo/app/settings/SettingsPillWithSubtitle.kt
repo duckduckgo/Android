@@ -23,9 +23,9 @@ import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.SettingsPillWithSubtitleBinding
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.recursiveEnable
-import com.duckduckgo.app.browser.databinding.SettingsPillWithSubtitleBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SettingsPillWithSubtitle : LinearLayout {

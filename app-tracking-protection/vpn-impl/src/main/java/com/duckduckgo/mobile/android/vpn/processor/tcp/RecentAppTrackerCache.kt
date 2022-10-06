@@ -17,9 +17,9 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import androidx.annotation.VisibleForTesting
+import javax.inject.Inject
 import timber.log.Timber
 import xyz.hexene.localvpn.TCB
-import javax.inject.Inject
 
 class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser) {
 

@@ -80,7 +80,6 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
                 is TrackerCompanyBadge.Company -> displayTrackerCompany(trackerInfo)
                 is TrackerCompanyBadge.Extra -> displayExtraBadge(trackerInfo)
             }
-
         }
 
         private fun displayTrackerCompany(trackerInfo: TrackerCompanyBadge.Company) {

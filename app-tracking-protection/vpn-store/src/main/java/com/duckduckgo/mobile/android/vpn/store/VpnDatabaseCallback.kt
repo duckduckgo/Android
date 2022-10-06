@@ -25,17 +25,17 @@ import com.duckduckgo.mobile.android.vpn.model.VpnState
 import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.util.*
+import javax.inject.Provider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
 import timber.log.Timber
-import java.util.*
-import javax.inject.Provider
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class VpnDatabaseCallback(
     private val context: Context,
     private val vpnDatabase: Provider<VpnDatabase>,
-    private val dispatcherProvider: DispatcherProvider,
+    private val dispatcherProvider: DispatcherProvider
 ) : RoomDatabase.Callback() {
 
     override fun onCreate(db: SupportSQLiteDatabase) {

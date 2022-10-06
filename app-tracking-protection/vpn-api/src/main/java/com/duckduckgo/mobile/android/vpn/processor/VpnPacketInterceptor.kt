@@ -70,7 +70,7 @@ fun interface VpnPacketInterceptor {
 data class PacketRequest(
     val packetInfo: PacketInfo,
     val byteBuffer: ByteBuffer,
-    val byteChannel: ByteChannel,
+    val byteChannel: ByteChannel
 )
 
 data class PacketInfo(
@@ -79,5 +79,5 @@ data class PacketInfo(
     val destinationAddress: InetAddress,
     val destinationPort: Int,
     val sourceAddress: InetAddress,
-    val sourcePort: Int,
+    val sourcePort: Int
 )

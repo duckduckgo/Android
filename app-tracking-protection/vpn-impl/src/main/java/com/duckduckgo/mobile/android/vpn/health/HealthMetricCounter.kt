@@ -38,11 +38,11 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_U
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_MEMORY_EXCEPTION
 import dagger.SingleInstanceIn
+import java.util.concurrent.Executors
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
-import java.util.concurrent.Executors
-import javax.inject.Inject
 
 /**
  * HealthMetricCounter is used to temporarily store raw health metrics
@@ -54,7 +54,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class HealthMetricCounter @Inject constructor(
     val context: Context,
-    @VpnCoroutineScope val coroutineScope: CoroutineScope,
+    @VpnCoroutineScope val coroutineScope: CoroutineScope
 ) {
 
     private val db = Room.inMemoryDatabaseBuilder(context, HealthStatsDatabase::class.java).build()

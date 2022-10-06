@@ -82,7 +82,6 @@ class WebViewRequestInterceptor(
         documentUrl: String?,
         webViewClientListener: WebViewClientListener?
     ): WebResourceResponse? {
-
         val url = request.url
 
         adClickManager.detectAdClick(url?.toString(), request.isForMainFrame)
@@ -134,7 +133,6 @@ class WebViewRequestInterceptor(
         request: WebResourceRequest?,
         documentUrl: String?
     ): WebResourceResponse? {
-
         if (documentUrl == null) return null
         if (request == null) return null
 
@@ -239,7 +237,6 @@ class WebViewRequestInterceptor(
         checkFirstParty: Boolean = true,
         url: String = request.url.toString()
     ): TrackingEvent? {
-
         if (request.isForMainFrame || documentUrl == null) {
             return null
         }

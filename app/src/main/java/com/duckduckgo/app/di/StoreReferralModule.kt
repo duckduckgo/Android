@@ -22,8 +22,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.IntoSet
 import dagger.SingleInstanceIn
+import dagger.multibindings.IntoSet
 
 @Module
 @ContributesTo(AppScope::class)

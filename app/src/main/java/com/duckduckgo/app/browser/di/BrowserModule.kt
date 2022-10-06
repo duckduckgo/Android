@@ -45,10 +45,10 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.browser.useragent.UserAgentInterceptor
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
+import com.duckduckgo.app.browser.useragent.UserAgentInterceptor
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.*
@@ -86,18 +86,18 @@ import com.duckduckgo.downloads.impl.DataUriDownloader
 import com.duckduckgo.downloads.impl.DownloadFileService
 import com.duckduckgo.downloads.impl.FileDownloadCallback
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.api.UserAgent
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import kotlinx.coroutines.CoroutineScope
-import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Provider
+import kotlinx.coroutines.CoroutineScope
+import retrofit2.Retrofit
 
 @Module
 class BrowserModule {
@@ -134,7 +134,7 @@ class BrowserModule {
         printInjector: PrintInjector,
         internalTestUserChecker: InternalTestUserChecker,
         adClickManager: AdClickManager,
-        autoconsent: Autoconsent,
+        autoconsent: Autoconsent
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -157,7 +157,7 @@ class BrowserModule {
             printInjector,
             internalTestUserChecker,
             adClickManager,
-            autoconsent,
+            autoconsent
         )
     }
 
@@ -171,7 +171,7 @@ class BrowserModule {
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        urlExtractor: DOMUrlExtractor,
+        urlExtractor: DOMUrlExtractor
     ): UrlExtractingWebViewClient {
         return UrlExtractingWebViewClient(
             webViewHttpAuthStore,
@@ -182,7 +182,7 @@ class BrowserModule {
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
-            urlExtractor,
+            urlExtractor
         )
     }
 
@@ -243,7 +243,7 @@ class BrowserModule {
         packageManager: PackageManager,
         ampLinks: AmpLinks,
         trackingParameters: TrackingParameters,
-        appBuildConfig: AppBuildConfig,
+        appBuildConfig: AppBuildConfig
     ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, appBuildConfig)
 
     @Provides
@@ -255,7 +255,7 @@ class BrowserModule {
         userAgent: UserAgent,
         toggle: FeatureToggle,
         userAllowListRepository: UserAllowListRepository,
-        dispatcher: DispatcherProvider,
+        dispatcher: DispatcherProvider
     ): UserAgentProvider {
         return UserAgentProvider(
             defaultUserAgent,
@@ -365,7 +365,7 @@ class BrowserModule {
         callback: FileDownloadCallback,
         workManager: WorkManager,
         @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
+        dispatcherProvider: DispatcherProvider
     ): FileDownloader {
         return AndroidFileDownloader(dataUriDownloader, callback, workManager, coroutineScope, dispatcherProvider)
     }

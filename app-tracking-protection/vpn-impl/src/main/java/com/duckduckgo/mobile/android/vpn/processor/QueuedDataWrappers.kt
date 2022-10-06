@@ -16,8 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.processor
 
-import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
+import xyz.hexene.localvpn.Packet
 
 data class QueuedBuffer(
     val buffer: ByteBuffer,

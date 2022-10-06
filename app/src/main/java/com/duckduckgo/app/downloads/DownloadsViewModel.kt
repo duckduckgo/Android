@@ -35,6 +35,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
+import java.io.File
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -43,14 +45,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDateTime
-import java.io.File
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
-    private val dispatcher: DispatcherProvider,
+    private val dispatcher: DispatcherProvider
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
@@ -130,7 +130,6 @@ class DownloadsViewModel @Inject constructor(
     fun onQueryTextChange(newText: String) {
         val filtered = LinkedHashMap<Header, List<Item>>()
         viewModelScope.launch(dispatcher.io()) {
-
             currentViewState().downloadItems.forEach { item ->
                 if (item is Header) {
                     filtered[item] = mutableListOf()

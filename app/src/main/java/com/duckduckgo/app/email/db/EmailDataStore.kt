@@ -37,7 +37,7 @@ interface EmailDataStore {
 
 class EmailEncryptedSharedPreferences(
     private val context: Context,
-    private val pixel: Pixel,
+    private val pixel: Pixel
 ) : EmailDataStore {
 
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
@@ -66,8 +66,11 @@ class EmailEncryptedSharedPreferences(
         get() = encryptedPreferences?.getString(KEY_EMAIL_TOKEN, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_EMAIL_TOKEN)
-                else putString(KEY_EMAIL_TOKEN, value)
+                if (value == null) {
+                    remove(KEY_EMAIL_TOKEN)
+                } else {
+                    putString(KEY_EMAIL_TOKEN, value)
+                }
             }
         }
 
@@ -75,8 +78,11 @@ class EmailEncryptedSharedPreferences(
         get() = encryptedPreferences?.getString(KEY_NEXT_ALIAS, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_NEXT_ALIAS)
-                else putString(KEY_NEXT_ALIAS, value)
+                if (value == null) {
+                    remove(KEY_NEXT_ALIAS)
+                } else {
+                    putString(KEY_NEXT_ALIAS, value)
+                }
             }
         }
 
@@ -84,8 +90,11 @@ class EmailEncryptedSharedPreferences(
         get() = encryptedPreferences?.getString(KEY_EMAIL_USERNAME, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_EMAIL_USERNAME)
-                else putString(KEY_EMAIL_USERNAME, value)
+                if (value == null) {
+                    remove(KEY_EMAIL_USERNAME)
+                } else {
+                    putString(KEY_EMAIL_USERNAME, value)
+                }
             }
         }
 
@@ -93,8 +102,11 @@ class EmailEncryptedSharedPreferences(
         get() = encryptedPreferences?.getString(KEY_COHORT, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_COHORT)
-                else putString(KEY_COHORT, value)
+                if (value == null) {
+                    remove(KEY_COHORT)
+                } else {
+                    putString(KEY_COHORT, value)
+                }
             }
         }
 
@@ -102,8 +114,11 @@ class EmailEncryptedSharedPreferences(
         get() = encryptedPreferences?.getString(KEY_LAST_USED_DATE, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_LAST_USED_DATE)
-                else putString(KEY_LAST_USED_DATE, value)
+                if (value == null) {
+                    remove(KEY_LAST_USED_DATE)
+                } else {
+                    putString(KEY_LAST_USED_DATE, value)
+                }
             }
         }
 

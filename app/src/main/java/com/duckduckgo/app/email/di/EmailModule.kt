@@ -34,8 +34,8 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Autofill
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 class EmailModule {
@@ -66,7 +66,7 @@ class EmailModule {
     @Provides
     fun providesEmailDataStore(
         context: Context,
-        pixel: Pixel,
+        pixel: Pixel
     ): EmailDataStore {
         return EmailEncryptedSharedPreferences(context, pixel)
     }

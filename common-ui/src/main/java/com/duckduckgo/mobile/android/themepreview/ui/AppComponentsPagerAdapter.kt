@@ -44,7 +44,6 @@ class AppComponentsPagerAdapter(
         MESSAGING(R.string.tab_title_component_messaging),
         LIST_ITEMS(R.string.tab_title_component_list_items),
         OTHERS(R.string.tab_title_component_others)
-
     }
 
     override fun getCount(): Int = MainFragments.values().size

@@ -30,7 +30,7 @@ import javax.inject.Provider
 class InternalUAInterceptor @Inject constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
     device: DeviceInfo,
-    @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>,
+    @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>
 ) : UserAgentInterceptor {
 
     private val applicationComponent = "DuckDuckGo/${device.majorAppVersion}"

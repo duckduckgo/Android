@@ -19,7 +19,6 @@ package com.duckduckgo.app.settings
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
@@ -49,15 +48,16 @@ import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateReposito
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistStateRepository
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import org.mockito.kotlin.*
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import kotlin.time.ExperimentalTime
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 @ExperimentalTime
@@ -154,7 +154,7 @@ class SettingsViewModelTest {
             mockMacOsWaitlist,
             autofillStore,
             vpnFeaturesRegistry,
-            autoconsent,
+            autoconsent
         )
     }
 
@@ -533,7 +533,6 @@ class SettingsViewModelTest {
 
             cancelAndConsumeRemainingEvents()
         }
-
     }
 
     @Test
@@ -723,5 +722,4 @@ private class FakeAppTrackingProtectionWaitlistDataStore : AppTrackingProtection
     override fun canUseEncryption(): Boolean {
         return false
     }
-
 }

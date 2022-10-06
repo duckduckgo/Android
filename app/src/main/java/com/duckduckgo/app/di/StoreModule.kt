@@ -35,9 +35,9 @@ import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.widget.FavoritesObserver
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.ui.store.ThemingSharedPreferences
-import com.duckduckgo.app.widget.FavoritesObserver
 import com.duckduckgo.widget.AppWidgetThemePreferences
 import com.duckduckgo.widget.WidgetPreferences
 import dagger.Binds

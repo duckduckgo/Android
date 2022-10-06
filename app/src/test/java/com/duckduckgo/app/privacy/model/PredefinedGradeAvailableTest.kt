@@ -31,7 +31,6 @@ class PredefinedGradeAvailableTest(private val testCase: GradeTestCase) {
 
     @Test
     fun predefinedGradeTests() {
-
         val grade = Grade(testCase.input.https, testCase.input.httpsAutoUpgrade)
         grade.updateData(testCase.input.privacyScore, testCase.input.parentEntity)
 

@@ -29,7 +29,7 @@ data class BrokenSiteData(
     val urlParametersRemoved: Boolean,
     val consentManaged: Boolean,
     val consentOptOutFailed: Boolean,
-    val consentSelfTestFailed: Boolean,
+    val consentSelfTestFailed: Boolean
 ) {
 
     companion object {
@@ -53,7 +53,7 @@ data class BrokenSiteData(
                 urlParametersRemoved = urlParametersRemoved,
                 consentManaged = consentManaged,
                 consentOptOutFailed = consentOptOutFailed,
-                consentSelfTestFailed = consentSelfTestFailed,
+                consentSelfTestFailed = consentSelfTestFailed
             )
         }
     }

@@ -121,7 +121,8 @@ class AppIconModifier @Inject constructor(
     ) {
         context.packageManager.setComponentEnabledSetting(
             ComponentName(appBuildConfig.applicationId, componentName),
-            componentState, PackageManager.DONT_KILL_APP
+            componentState,
+            PackageManager.DONT_KILL_APP
         )
     }
 }

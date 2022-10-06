@@ -49,7 +49,8 @@ class SingleLineListItem : LinearLayout {
         )
         setImageResource(
             attributes.getResourceId(
-                R.styleable.SingleLineListItem_singleLineItemDrawable, R.drawable.ic_overflow
+                R.styleable.SingleLineListItem_singleLineItemDrawable,
+                R.drawable.ic_overflow
             )
         )
         attributes.recycle()

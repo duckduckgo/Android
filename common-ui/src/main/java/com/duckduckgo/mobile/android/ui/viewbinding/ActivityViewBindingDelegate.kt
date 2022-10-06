@@ -53,4 +53,5 @@ class ActivityViewBindingDelegate<T : ViewBinding>(
     }
 }
 
-@Suppress("UNCHECKED_CAST") private fun <T> Any.cast(): T = this as T
+@Suppress("UNCHECKED_CAST")
+private fun <T> Any.cast(): T = this as T

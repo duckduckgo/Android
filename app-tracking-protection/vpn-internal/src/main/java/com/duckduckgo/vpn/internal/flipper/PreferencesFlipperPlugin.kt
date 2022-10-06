@@ -138,7 +138,6 @@ class PreferencesFlipperPlugin @Inject constructor(context: Context) : FlipperPl
                 responder.success(getFlipperObjectFor(sharedPreferencesName))
             }
         )
-
     }
 
     override fun onDisconnect() {

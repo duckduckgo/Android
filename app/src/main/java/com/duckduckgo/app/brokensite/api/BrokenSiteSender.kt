@@ -70,7 +70,7 @@ class BrokenSiteSubmitter(
                 URL_PARAMETERS_REMOVED to brokenSite.urlParametersRemoved.toBinaryString(),
                 CONSENT_MANAGED to brokenSite.consentManaged.toBinaryString(),
                 CONSENT_OPT_OUT_FAILED to brokenSite.consentOptOutFailed.toBinaryString(),
-                CONSENT_SELF_TEST_FAILED to brokenSite.consentSelfTestFailed.toBinaryString(),
+                CONSENT_SELF_TEST_FAILED to brokenSite.consentSelfTestFailed.toBinaryString()
             )
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,

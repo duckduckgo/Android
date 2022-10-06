@@ -18,21 +18,21 @@ package com.duckduckgo.mobile.android.vpn.breakage
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.mobile.android.vpn.apps.AppCategory
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.ExperimentalTime
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
@@ -48,7 +48,6 @@ class ReportBreakageAppListViewModelTest {
 
     @Before
     fun setup() {
-
         viewModel = ReportBreakageAppListViewModel(trackingProtectionAppsRepository)
     }
 
@@ -105,7 +104,7 @@ class ReportBreakageAppListViewModelTest {
             protectedAppsChannel.send(listOf(appWithoutIssues, appWithIssues))
             val expected = listOf(
                 InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name),
-                InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name, isSelected = true),
+                InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name, isSelected = true)
             )
             assertEquals(
                 ReportBreakageAppListView.State(expected, true),
@@ -122,7 +121,7 @@ class ReportBreakageAppListViewModelTest {
             protectedAppsChannel.send(listOf(appWithoutIssues, appWithIssues))
             val expected = listOf(
                 InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name),
-                InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name),
+                InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name)
             )
             assertEquals(
                 ReportBreakageAppListView.State(expected, false),

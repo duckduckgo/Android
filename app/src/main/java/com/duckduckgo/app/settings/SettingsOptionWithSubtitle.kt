@@ -24,8 +24,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.SettingsOptionWithSubtitleBinding
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SettingsOptionWithSubtitle : ConstraintLayout {

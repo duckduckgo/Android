@@ -38,12 +38,12 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import com.duckduckgo.mobile.android.vpn.R as VpnR
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -58,7 +58,7 @@ class NotificationRegistrar @Inject constructor(
     private val pixel: Pixel,
     private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>,
     private val notificationPluginPoint: PluginPoint<NotificationPlugin>,
-    private val appBuildConfig: AppBuildConfig,
+    private val appBuildConfig: AppBuildConfig
 ) : DefaultLifecycleObserver {
 
     object NotificationId {

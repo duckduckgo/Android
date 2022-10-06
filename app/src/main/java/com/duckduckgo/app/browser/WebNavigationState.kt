@@ -52,8 +52,9 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
         return WebNavigationStateChange.Unchanged
     }
 
-    if (this is EmptyNavigationState)
+    if (this is EmptyNavigationState) {
         return WebNavigationStateChange.PageNavigationCleared
+    }
 
     if (originalUrl == null && previous?.originalUrl != null) {
         return WebNavigationStateChange.PageCleared
@@ -69,7 +70,6 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
     // The most up-to-date record of the url is the current one, this may change many times during a page load
     // If the host changes too, we class it as a new page load
     if (currentUrl != previous?.currentUrl) {
-
         if (currentUrl?.toUri()?.host != previous?.currentUrl?.toUri()?.host) {
             return WebNavigationStateChange.NewPage(latestUrl, title)
         }
@@ -145,7 +145,6 @@ data class WebViewNavigationState(
         }
         return entryList
     }
-
 }
 
 @Suppress("DataClassPrivateConstructor")

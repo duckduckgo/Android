@@ -28,8 +28,8 @@ import androidx.room.RoomDatabase
     version = 1,
     entities =
     [
-        SimpleEvent::class,
-    ],
+        SimpleEvent::class
+    ]
 )
 abstract class HealthStatsDatabase : RoomDatabase() {
     abstract fun healthStatDao(): HealthStatDao
@@ -85,7 +85,7 @@ interface HealthStatDao {
     ): Long
 
     @Query(
-        "DELETE FROM SimpleEvent WHERE id IN (SELECT id FROM SimpleEvent ORDER BY timestamp DESC LIMIT -1 OFFSET :maxNumberToKeep)",
+        "DELETE FROM SimpleEvent WHERE id IN (SELECT id FROM SimpleEvent ORDER BY timestamp DESC LIMIT -1 OFFSET :maxNumberToKeep)"
     )
     fun purgeOldMetrics(maxNumberToKeep: Int = MAX_NUMBER_HEALTH_METRICS_TO_RETAIN)
 }

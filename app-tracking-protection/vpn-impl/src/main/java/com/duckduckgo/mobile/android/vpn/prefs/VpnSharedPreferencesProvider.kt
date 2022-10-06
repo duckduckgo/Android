@@ -23,8 +23,8 @@ import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 private const val MIGRATED_TO_HARMONY = "migrated_to_harmony"
 

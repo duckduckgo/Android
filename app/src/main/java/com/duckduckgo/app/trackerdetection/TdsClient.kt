@@ -70,7 +70,6 @@ class TdsClient(
         exceptions: RuleExceptions?,
         documentUrl: String
     ): Boolean {
-
         if (exceptions == null) return false
 
         val domains = exceptions.domains

@@ -50,5 +50,4 @@ class TransparencyTrackerDetectorInterceptorTest {
         private const val HOSTNAME = "hostname"
         private const val SOME_PACKAGE_ID = "some.package.name"
     }
-
 }

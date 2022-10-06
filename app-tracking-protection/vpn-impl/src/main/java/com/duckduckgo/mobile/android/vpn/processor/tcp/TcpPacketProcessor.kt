@@ -70,7 +70,7 @@ constructor(
     tcpSocketWriter: TcpSocketWriter,
     recentAppTrackerCache: RecentAppTrackerCache,
     @Assisted private val vpnCoroutineScope: CoroutineScope,
-    healthMetricCounter: HealthMetricCounter,
+    healthMetricCounter: HealthMetricCounter
 ) : Runnable {
 
     @AssistedFactory
@@ -207,7 +207,11 @@ constructor(
                 }
 
                 this.referencePacket.updateTcpBuffer(
-                    buffer, (FIN or ACK).toByte(), responseSeq, responseAck, 0
+                    buffer,
+                    (FIN or ACK).toByte(),
+                    responseSeq,
+                    responseAck,
+                    0
                 )
 
                 if (triggeredByServerEndOfStream) {

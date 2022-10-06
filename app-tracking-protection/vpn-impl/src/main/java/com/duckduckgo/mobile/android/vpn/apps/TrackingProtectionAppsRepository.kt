@@ -26,11 +26,11 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import dagger.SingleInstanceIn
-import kotlinx.coroutines.flow.*
 
 interface TrackingProtectionAppsRepository {
 
@@ -61,7 +61,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
+    private val appTpFeatureConfig: AppTpFeatureConfig
 ) : TrackingProtectionAppsRepository {
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()

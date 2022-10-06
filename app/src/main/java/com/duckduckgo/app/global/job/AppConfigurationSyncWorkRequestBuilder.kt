@@ -22,9 +22,9 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.di.scopes.AppScope
 import io.reactivex.Single
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import timber.log.Timber
 
 class AppConfigurationSyncWorkRequestBuilder @Inject constructor() {
 

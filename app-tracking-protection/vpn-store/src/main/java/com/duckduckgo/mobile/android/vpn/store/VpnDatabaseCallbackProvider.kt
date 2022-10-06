@@ -23,7 +23,7 @@ import javax.inject.Provider
 
 class VpnDatabaseCallbackProvider constructor(
     private val context: Context,
-    private val vpnDatabaseProvider: Provider<VpnDatabase>,
+    private val vpnDatabaseProvider: Provider<VpnDatabase>
 ) {
     fun provideCallbacks(): RoomDatabase.Callback {
         return VpnDatabaseCallback(context, vpnDatabaseProvider, DefaultDispatcherProvider())

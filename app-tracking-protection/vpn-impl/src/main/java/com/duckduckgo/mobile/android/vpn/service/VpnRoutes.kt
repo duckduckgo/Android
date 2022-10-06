@@ -193,7 +193,7 @@ class VpnRoutes {
             Route(address = "255.255.255.240", maskWidth = 29, lowAddress = "255.255.255.240", highAddress = "255.255.255.247"),
             Route(address = "255.255.255.248", maskWidth = 30, lowAddress = "255.255.255.248", highAddress = "255.255.255.251"),
             Route(address = "255.255.255.252", maskWidth = 31, lowAddress = "255.255.255.252", highAddress = "255.255.255.253"),
-            Route(address = "255.255.255.254", maskWidth = 32, lowAddress = "255.255.255.254", highAddress = "255.255.255.254"),
+            Route(address = "255.255.255.254", maskWidth = 32, lowAddress = "255.255.255.254", highAddress = "255.255.255.254")
             // Excluded range: 255.255.255.255 -> 255.255.255.255
         )
 
@@ -201,7 +201,7 @@ class VpnRoutes {
          * Routes used when testing to limit interference with the test and allow emulator to contact host
          */
         val includedTestRoutes: List<Route> = listOf(
-            Route(address = "10.0.2.2", maskWidth = 32, lowAddress = "10.0.2.2", highAddress = "10.0.2.2"),
+            Route(address = "10.0.2.2", maskWidth = 32, lowAddress = "10.0.2.2", highAddress = "10.0.2.2")
         )
     }
 }

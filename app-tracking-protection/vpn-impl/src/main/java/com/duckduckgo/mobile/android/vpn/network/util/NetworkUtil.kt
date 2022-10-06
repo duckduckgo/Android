@@ -45,5 +45,4 @@ fun InetAddress.isLocal(): Boolean {
 
 fun Context.getActiveNetwork(): Network? {
     return (getSystemService(VpnService.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetwork
-
 }

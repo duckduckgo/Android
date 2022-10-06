@@ -26,13 +26,13 @@ import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
-import org.mockito.kotlin.*
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.*
 import retrofit2.Call
 import retrofit2.Response
 
@@ -226,7 +226,8 @@ class SurveyDownloaderTest {
                 1.0,
                 true,
                 null,
-                null, listOf(SurveyUrlParameter.EmailCohortParam.parameter)
+                null,
+                listOf(SurveyUrlParameter.EmailCohortParam.parameter)
             )
         )
         return SurveyGroup(id, surveyOptions)
@@ -236,7 +237,8 @@ class SurveyDownloaderTest {
         val surveyOptions = listOf(
             SurveyGroup.SurveyOption(
                 SURVEY_URL,
-                -1, 1.0,
+                -1,
+                1.0,
                 null,
                 true,
                 null,

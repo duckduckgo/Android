@@ -114,28 +114,28 @@ class TextAlertDialog(val builder: Builder) : DialogFragment() {
         }
 
         fun setTitle(
-            @StringRes textId: Int,
+            @StringRes textId: Int
         ): Builder {
             titleText = context.getText(textId)
             return this
         }
 
         fun setMessage(
-            @StringRes textId: Int,
+            @StringRes textId: Int
         ): Builder {
             messageText = context.getText(textId)
             return this
         }
 
         fun setTitle(
-            text: CharSequence,
+            text: CharSequence
         ): Builder {
             titleText = text
             return this
         }
 
         fun setMessage(
-            text: CharSequence,
+            text: CharSequence
         ): Builder {
             messageText = text
             return this

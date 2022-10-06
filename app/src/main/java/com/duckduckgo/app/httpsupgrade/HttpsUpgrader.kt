@@ -31,11 +31,11 @@ import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
+import dagger.SingleInstanceIn
 import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 import kotlin.concurrent.thread
+import timber.log.Timber
 
 interface HttpsUpgrader {
 

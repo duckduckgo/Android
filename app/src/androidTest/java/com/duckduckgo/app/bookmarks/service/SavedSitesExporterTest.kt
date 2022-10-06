@@ -28,13 +28,13 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
-import org.mockito.kotlin.mock
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.Assert.assertTrue
-import java.io.File
 import dagger.Lazy
+import java.io.File
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.*
+import org.junit.Assert.assertTrue
+import org.mockito.kotlin.mock
 
 @ExperimentalCoroutinesApi
 class SavedSitesExporterTest {

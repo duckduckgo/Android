@@ -68,7 +68,7 @@ data class IssueReport(
     val appPackageId: String? = null,
     val description: String? = null,
     val category: String? = null,
-    val customMetadata: String? = null,
+    val customMetadata: String? = null
 ) : Parcelable {
 
     fun toMap(): Map<String, String> {

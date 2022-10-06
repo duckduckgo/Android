@@ -45,7 +45,6 @@ class StackedAlertDialog(val builder: Builder) : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val binding: DialogStackedAlertBinding = DialogStackedAlertBinding.inflate(layoutInflater)
 
         if (builder.headerImageDrawableId > 0) {
@@ -117,28 +116,28 @@ class StackedAlertDialog(val builder: Builder) : DialogFragment() {
         }
 
         fun setTitle(
-            @StringRes textId: Int,
+            @StringRes textId: Int
         ): Builder {
             titleText = context.getText(textId)
             return this
         }
 
         fun setTitle(
-            text: CharSequence,
+            text: CharSequence
         ): Builder {
             titleText = text
             return this
         }
 
         fun setMessage(
-            @StringRes textId: Int,
+            @StringRes textId: Int
         ): Builder {
             messageText = context.getText(textId)
             return this
         }
 
         fun setMessage(
-            text: CharSequence,
+            text: CharSequence
         ): Builder {
             messageText = text
             return this

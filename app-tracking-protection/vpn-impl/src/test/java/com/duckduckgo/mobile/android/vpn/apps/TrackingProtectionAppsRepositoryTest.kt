@@ -60,7 +60,10 @@ class TrackingProtectionAppsRepositoryTest {
 
         trackingProtectionAppsRepository =
             RealTrackingProtectionAppsRepository(
-                packageManager, appTrackerRepository, coroutineRule.testDispatcherProvider, appTpFeatureConfig
+                packageManager,
+                appTrackerRepository,
+                coroutineRule.testDispatcherProvider,
+                appTpFeatureConfig
             )
     }
 
@@ -203,7 +206,7 @@ class TrackingProtectionAppsRepositoryTest {
                     "com.example.app5" to true,
                     "com.example.app6" to false,
                     "com.example.game" to true,
-                    "com.example.system.overriden" to false,
+                    "com.example.system.overriden" to false
                 ),
                 this.awaitItem().map { it.packageName to it.isExcluded }
             )
@@ -234,7 +237,7 @@ class TrackingProtectionAppsRepositoryTest {
                     "com.example.app5" to true,
                     "com.example.app6" to false,
                     "com.example.game" to false,
-                    "com.example.system.overriden" to false,
+                    "com.example.system.overriden" to false
                 ),
                 this.awaitItem().map { it.packageName to it.isExcluded }
             )
@@ -264,20 +267,20 @@ class TrackingProtectionAppsRepositoryTest {
             "com.example.game", // should be automatically be added to exclusion list
             "com.example.system", // should be automatically be added to exclusion list
             "com.example.system.overriden",
-            "com.duckduckgo.mobile", // should be automatically be added to exclusion list
+            "com.duckduckgo.mobile" // should be automatically be added to exclusion list
         )
         private val EXCLUSION_LIST = listOf(
             "com.example.app1",
             "com.example.app3",
-            "com.example.app5",
+            "com.example.app5"
         )
         private val MANUAL_EXCLUSION_LIST = mapOf(
             "com.example.app1" to true,
             "com.example.app2" to false,
-            "com.example.app3" to false,
+            "com.example.app3" to false
         )
         private val SYSTEM_OVERRIDE_LIST = listOf(
-            "com.example.system.overriden",
+            "com.example.system.overriden"
         )
     }
 }

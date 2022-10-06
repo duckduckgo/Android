@@ -21,8 +21,8 @@ import com.duckduckgo.app.job.JobCleaner.Companion.allDeprecatedNotificationWork
 import com.duckduckgo.app.job.JobCleaner.Companion.allDeprecatedWorkerTags
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 interface JobCleaner {
     fun cleanDeprecatedJobs()

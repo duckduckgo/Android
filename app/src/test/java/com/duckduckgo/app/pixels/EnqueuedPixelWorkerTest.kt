@@ -23,9 +23,9 @@ import androidx.work.WorkManager
 import com.duckduckgo.app.browser.WebViewVersionProvider
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import org.mockito.kotlin.*
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.*
 
 class EnqueuedPixelWorkerTest {
     private val workManager: WorkManager = mock()

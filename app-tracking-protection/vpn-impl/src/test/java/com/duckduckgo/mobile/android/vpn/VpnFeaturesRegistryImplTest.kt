@@ -155,7 +155,7 @@ class VpnFeaturesRegistryImplTest {
 
     private enum class TestVpnFeatures(override val featureName: String) : VpnFeature {
         FOO("FOO"),
-        BAR("BAR"),
+        BAR("BAR")
     }
 
     private class TestVpnServiceWrapper : VpnServiceWrapper(InstrumentationRegistry.getInstrumentation().context) {

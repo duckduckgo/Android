@@ -97,7 +97,9 @@ class TrackersRendererTest {
     @Test
     fun whenToggleDisabledAndTrackersCountMoreThanZeroThenNetworksIconIsBad() {
         val resource = testee.networksIcon(
-            trackersBlockedCount = 1, specialDomainsLoadedCount = 0, toggleEnabled = false
+            trackersBlockedCount = 1,
+            specialDomainsLoadedCount = 0,
+            toggleEnabled = false
         )
         assertEquals(R.drawable.networks_icon_bad, resource)
     }
@@ -105,7 +107,9 @@ class TrackersRendererTest {
     @Test
     fun whenToggleDisabledAndSpecialDomainsCountMoreThanZeroThenNetworksIconIsBad() {
         val resource = testee.networksIcon(
-            trackersBlockedCount = 0, specialDomainsLoadedCount = 1, toggleEnabled = false
+            trackersBlockedCount = 0,
+            specialDomainsLoadedCount = 1,
+            toggleEnabled = false
         )
         assertEquals(R.drawable.networks_icon_bad, resource)
     }
@@ -113,7 +117,9 @@ class TrackersRendererTest {
     @Test
     fun whenToggleDisabledAndTrackersAndSpecialDomainsCountIsZeroThenNetworksIconIsGood() {
         val resource = testee.networksIcon(
-            trackersBlockedCount = 0, specialDomainsLoadedCount = 0, toggleEnabled = false
+            trackersBlockedCount = 0,
+            specialDomainsLoadedCount = 0,
+            toggleEnabled = false
         )
         assertEquals(R.drawable.networks_icon_good, resource)
     }
@@ -121,7 +127,9 @@ class TrackersRendererTest {
     @Test
     fun whenToggleEnabledAndTrackersCountZeroAndDomainsCountMoreThanZeroThenNetworksIconIsNeutral() {
         val resource = testee.networksIcon(
-            trackersBlockedCount = 0, specialDomainsLoadedCount = 1, toggleEnabled = true
+            trackersBlockedCount = 0,
+            specialDomainsLoadedCount = 1,
+            toggleEnabled = true
         )
         assertEquals(R.drawable.networks_icon_neutral, resource)
     }
@@ -129,7 +137,9 @@ class TrackersRendererTest {
     @Test
     fun whenToggleEnabledAndTrackersCountZeroAndDomainsCountIsZeroThenNetworksIconIsGood() {
         val resource = testee.networksIcon(
-            trackersBlockedCount = 0, specialDomainsLoadedCount = 0, toggleEnabled = true
+            trackersBlockedCount = 0,
+            specialDomainsLoadedCount = 0,
+            toggleEnabled = true
         )
         assertEquals(R.drawable.networks_icon_good, resource)
     }
@@ -137,7 +147,9 @@ class TrackersRendererTest {
     @Test
     fun whenToggleEnabledAndTrackersCountMoreThanZeroAndDomainsCountIsZeroThenNetworksIconIsGood() {
         val resource = testee.networksIcon(
-            trackersBlockedCount = 1, specialDomainsLoadedCount = 0, toggleEnabled = true
+            trackersBlockedCount = 1,
+            specialDomainsLoadedCount = 0,
+            toggleEnabled = true
         )
         assertEquals(R.drawable.networks_icon_good, resource)
     }
@@ -145,7 +157,9 @@ class TrackersRendererTest {
     @Test
     fun whenToggleEnabledAndTrackersCountMoreThanZeroAndDomainsCountMoreThanZeroThenNetworksIconIsGood() {
         val resource = testee.networksIcon(
-            trackersBlockedCount = 1, specialDomainsLoadedCount = 1, toggleEnabled = true
+            trackersBlockedCount = 1,
+            specialDomainsLoadedCount = 1,
+            toggleEnabled = true
         )
         assertEquals(R.drawable.networks_icon_good, resource)
     }
@@ -153,7 +167,10 @@ class TrackersRendererTest {
     @Test
     fun whenToggleEnabledAndTrackersCountMoreThanZeroAndDomainsCountMoreThanZeroAndLargeIconNeededThenNetworksIconIsGoodAndLarge() {
         val resource = testee.networksIcon(
-            trackersBlockedCount = 1, specialDomainsLoadedCount = 1, toggleEnabled = true, largeIcon = true
+            trackersBlockedCount = 1,
+            specialDomainsLoadedCount = 1,
+            toggleEnabled = true,
+            largeIcon = true
         )
         assertEquals(R.drawable.networks_icon_good_large, resource)
     }

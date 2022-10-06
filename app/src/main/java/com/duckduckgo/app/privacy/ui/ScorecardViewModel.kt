@@ -31,9 +31,9 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class ScorecardViewModel @Inject constructor(

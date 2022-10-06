@@ -22,12 +22,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import java.util.*
+import javax.inject.Inject
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
-import java.util.*
-import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
@@ -414,7 +414,7 @@ interface DeviceShieldPixels {
 @SingleInstanceIn(AppScope::class)
 class RealDeviceShieldPixels @Inject constructor(
     private val pixel: Pixel,
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider
 ) : DeviceShieldPixels {
 
     private val preferences: SharedPreferences
@@ -908,7 +908,7 @@ class RealDeviceShieldPixels @Inject constructor(
     private fun firePixel(
         pixelName: String,
         payload: Map<String, String> = emptyMap(),
-        enqueue: Boolean = false,
+        enqueue: Boolean = false
     ) {
         if (enqueue) {
             pixel.enqueueFire(pixelName, payload)
@@ -927,7 +927,7 @@ class RealDeviceShieldPixels @Inject constructor(
     private fun tryToFireDailyPixel(
         pixelName: String,
         payload: Map<String, String> = emptyMap(),
-        enqueue: Boolean = false,
+        enqueue: Boolean = false
     ) {
         val now = getUtcIsoLocalDate()
         val timestamp = preferences.getString(pixelName.appendTimestampSuffix(), null)

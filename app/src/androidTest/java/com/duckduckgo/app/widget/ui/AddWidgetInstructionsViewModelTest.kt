@@ -22,8 +22,6 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowHome
-import org.mockito.kotlin.lastValue
-import org.mockito.kotlin.verify
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -33,6 +31,8 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.lastValue
+import org.mockito.kotlin.verify
 
 class AddWidgetInstructionsViewModelTest {
 

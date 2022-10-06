@@ -23,7 +23,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealAtpCohortManager @Inject constructor(
     private val cohortStore: CohortStore,
-    private val cohortCalculator: CohortCalculator,
+    private val cohortCalculator: CohortCalculator
 ) : AtpCohortManager {
     override fun getCohort(): String? {
         return cohortStore.getCohortStoredLocalDate()?.let {

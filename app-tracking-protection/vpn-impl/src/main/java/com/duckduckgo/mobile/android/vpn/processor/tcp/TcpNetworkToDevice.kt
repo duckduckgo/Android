@@ -31,6 +31,14 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.SendRe
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_TCP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
+import java.io.IOException
+import java.nio.ByteBuffer
+import java.nio.channels.CancelledKeyException
+import java.nio.channels.SelectionKey
+import java.nio.channels.SelectionKey.OP_CONNECT
+import java.nio.channels.Selector
+import java.nio.channels.SocketChannel
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -44,14 +52,6 @@ import xyz.hexene.localvpn.Packet.TCPHeader.SYN
 import xyz.hexene.localvpn.TCB
 import xyz.hexene.localvpn.TCB.TCBStatus.SYN_RECEIVED
 import xyz.hexene.localvpn.TCB.TCBStatus.SYN_SENT
-import java.io.IOException
-import java.nio.ByteBuffer
-import java.nio.channels.CancelledKeyException
-import java.nio.channels.SelectionKey
-import java.nio.channels.SelectionKey.OP_CONNECT
-import java.nio.channels.Selector
-import java.nio.channels.SocketChannel
-import java.util.concurrent.TimeUnit
 
 class TcpNetworkToDevice(
     private val queues: VpnQueues,

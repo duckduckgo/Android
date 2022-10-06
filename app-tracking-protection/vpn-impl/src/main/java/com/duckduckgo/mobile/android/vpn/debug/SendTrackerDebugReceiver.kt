@@ -20,23 +20,23 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * This receiver allows sending fake trackers, to do so, in the command line:
@@ -54,7 +54,7 @@ import javax.inject.Inject
 class SendTrackerDebugReceiver @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
-    private val vpnDatabase: VpnDatabase,
+    private val vpnDatabase: VpnDatabase
 ) : BroadcastReceiver(), VpnServiceCallbacks {
 
     private fun register() {
@@ -187,5 +187,5 @@ private val dummyTrackers = listOf(
             packageId = "puppy.package.id",
             appDisplayName = "PUPPY"
         )
-    ),
+    )
 )

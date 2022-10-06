@@ -27,10 +27,6 @@ import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import timber.log.Timber
-import xyz.hexene.localvpn.ByteBufferPool
-import xyz.hexene.localvpn.Packet
-import xyz.hexene.localvpn.TCB
 import java.nio.ByteBuffer
 import java.nio.channels.ByteChannel
 import java.nio.channels.SelectionKey.OP_READ
@@ -39,6 +35,10 @@ import java.nio.channels.Selector
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
+import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
+import xyz.hexene.localvpn.Packet
+import xyz.hexene.localvpn.TCB
 
 interface TcpSocketWriter {
     fun writeToSocket(tcb: TCB)
@@ -62,7 +62,7 @@ interface TcpSocketWriter {
 class RealTcpSocketWriter @Inject constructor(
     @TcpNetworkSelector private val selector: Selector,
     private val queues: VpnQueues,
-    interceptorPlugins: PluginPoint<VpnPacketInterceptor>,
+    interceptorPlugins: PluginPoint<VpnPacketInterceptor>
 ) : TcpSocketWriter, VpnMemoryCollectorPlugin {
 
     // added an initial capacity based on what I observed from the low memory pixels we send
@@ -102,7 +102,6 @@ class RealTcpSocketWriter @Inject constructor(
         return writeQueue.getOrPut(this) {
             LinkedList()
         }
-
     }
 
     @Synchronized
@@ -225,7 +224,7 @@ class RealTcpSocketWriter @Inject constructor(
             destinationAddress = ipHeader.sourceAddress,
             destinationPort = tcpHeader.sourcePort,
             sourceAddress = ipHeader.destinationAddress,
-            sourcePort = tcpHeader.destinationPort,
+            sourcePort = tcpHeader.destinationPort
         )
     }
 

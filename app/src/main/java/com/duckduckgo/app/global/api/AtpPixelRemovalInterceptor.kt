@@ -20,10 +20,10 @@ import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

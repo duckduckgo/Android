@@ -29,13 +29,13 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.IotCate
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.MessagesCategory
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.OtherCategory
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategory.UploadsCategory
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @ContributesViewModel(VpnScope::class)
 class ReportBreakageCategorySingleChoiceViewModel @Inject constructor() : ViewModel() {
@@ -43,7 +43,7 @@ class ReportBreakageCategorySingleChoiceViewModel @Inject constructor() : ViewMo
     data class ViewState(
         val indexSelected: Int = -1,
         val categorySelected: ReportBreakageCategory? = null,
-        val submitAllowed: Boolean = false,
+        val submitAllowed: Boolean = false
     )
 
     sealed class Command {

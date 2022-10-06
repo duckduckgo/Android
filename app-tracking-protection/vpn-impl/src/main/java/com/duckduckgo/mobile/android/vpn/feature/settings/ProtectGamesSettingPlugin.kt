@@ -20,15 +20,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = AppTpSettingPlugin::class
 )
 class ProtectGamesSettingPlugin @Inject constructor(
-    private val appTpFeatureConfig: AppTpFeatureConfig,
+    private val appTpFeatureConfig: AppTpFeatureConfig
 ) : AppTpSettingPlugin {
     private val jsonAdapter = Moshi.Builder().build().adapter(JsonConfigModel::class.java)
 

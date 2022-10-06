@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = LifecycleObserver::class
 )
 @SingleInstanceIn(AppScope::class)
 class WidgetAddedReceiver @Inject constructor(

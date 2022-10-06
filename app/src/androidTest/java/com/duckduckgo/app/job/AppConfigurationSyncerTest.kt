@@ -25,13 +25,13 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder.Companion.APP_CONFIG_SYNC_WORK_TAG
 import com.duckduckgo.app.global.job.AppConfigurationWorker
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import io.reactivex.Completable
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class AppConfigurationSyncerTest {
 

@@ -23,9 +23,10 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(
-    exportSchema = true, version = 1,
+    exportSchema = true,
+    version = 1,
     entities = [
-        VpnConfigToggle::class,
+        VpnConfigToggle::class
     ]
 )
 @TypeConverters()

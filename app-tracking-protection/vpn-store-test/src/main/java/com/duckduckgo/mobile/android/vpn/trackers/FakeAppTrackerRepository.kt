@@ -26,14 +26,17 @@ class FakeAppTrackerRepository : AppTrackerRepository {
             field = value
             exclusionListFlow.value = getAppExclusionList()
         }
+
     // list of app IDs
     var systemAppOverrides: Set<String> = setOf()
+
     // appID -> isProtected
     var manualExclusionList: MutableMap<String, Boolean> = mutableMapOf()
         set(value) {
             field = value
             manualExclusionListFlow.value = getManualAppExclusionList()
         }
+
     // tracker -> app IDs
     var blocklist: MutableMap<String, Set<String>> = mutableMapOf()
     private val exclusionListFlow = MutableStateFlow(listOf<AppTrackerExcludedPackage>())
@@ -87,11 +90,10 @@ class FakeAppTrackerRepository : AppTrackerRepository {
                 isCdn = false,
                 owner = TrackerOwner(
                     name = this,
-                    displayName = this,
+                    displayName = this
                 ),
                 app = TrackerApp(1, 1.0)
             )
         )
     }
-
 }

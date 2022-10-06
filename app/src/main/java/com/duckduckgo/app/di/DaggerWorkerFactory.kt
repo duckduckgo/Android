@@ -25,7 +25,7 @@ import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import timber.log.Timber
 
 class DaggerWorkerFactory(
-    private val workerInjectorPluginPoint: PluginPoint<WorkerInjectorPlugin>,
+    private val workerInjectorPluginPoint: PluginPoint<WorkerInjectorPlugin>
 ) : WorkerFactory() {
 
     override fun createWorker(
@@ -33,7 +33,6 @@ class DaggerWorkerFactory(
         workerClassName: String,
         workerParameters: WorkerParameters
     ): ListenableWorker? {
-
         try {
             val workerClass = Class.forName(workerClassName).asSubclass(ListenableWorker::class.java)
             val constructor = workerClass.getDeclaredConstructor(Context::class.java, WorkerParameters::class.java)

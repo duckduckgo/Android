@@ -17,5 +17,5 @@
 package com.duckduckgo.mobile.android.vpn.feature
 
 enum class AppTpFeatureName(val value: String) {
-    AppTrackerProtection("appTrackerProtection"),
+    AppTrackerProtection("appTrackerProtection")
 }

@@ -25,11 +25,11 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * This receiver allows to add exclusion rules to appTP
@@ -75,7 +75,7 @@ class ExceptionRulesDebugReceiver(
 @ContributesMultibinding(VpnScope::class)
 class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val context: Context,
-    private val exclusionRulesRepository: ExclusionRulesRepository,
+    private val exclusionRulesRepository: ExclusionRulesRepository
 ) : VpnServiceCallbacks {
 
     private val exceptionRulesSavedState = mutableListOf<AppTrackerExceptionRule>()

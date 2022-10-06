@@ -19,14 +19,14 @@ package com.duckduckgo.mobile.android.vpn.processor.requestingapp
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageLegacy.NetworkFileSearchResult
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageLegacy.NetworkFileSearchResult.Found
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageLegacy.NetworkFileSearchResult.NotFound
-import kotlinx.coroutines.ensureActive
-import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.coroutines.coroutineContext
+import kotlinx.coroutines.ensureActive
+import timber.log.Timber
 
 interface NetworkFileConnectionMatcher {
     suspend fun searchNetworkFile(

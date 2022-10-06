@@ -37,7 +37,6 @@ class AppTPDisableConfirmationDialog private constructor(private val listener: L
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_confirm_disable, null)
 
         val disableOneApp = rootView.findViewById<Button>(R.id.disableConfirmationDialogOneApp)

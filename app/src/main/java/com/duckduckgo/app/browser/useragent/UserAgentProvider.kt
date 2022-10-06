@@ -33,9 +33,9 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.runBlocking
 import javax.inject.Named
 import javax.inject.Provider
+import kotlinx.coroutines.runBlocking
 
 /**
  * Example Default User Agent (From Chrome):
@@ -51,7 +51,7 @@ class UserAgentProvider constructor(
     private val userAgent: UserAgent,
     private val toggle: FeatureToggle,
     private val userAllowListRepository: UserAllowListRepository,
-    private val dispatcher: DispatcherProvider,
+    private val dispatcher: DispatcherProvider
 ) {
 
     private val baseAgent: String by lazy { concatWithSpaces(mobilePrefix, getWebKitVersionOnwards(false)) }

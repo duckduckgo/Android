@@ -27,7 +27,7 @@ import org.mockito.kotlin.whenever
 class MajorWebViewVersionProviderTest {
     private val webViewVersionSource: WebViewVersionSource = mock()
     private val testee = DefaultWebViewVersionProvider(
-        webViewVersionSource,
+        webViewVersionSource
     )
 
     @Test

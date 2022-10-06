@@ -37,10 +37,6 @@ import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_UDP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.*
-import timber.log.Timber
-import xyz.hexene.localvpn.ByteBufferPool
-import xyz.hexene.localvpn.Packet
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
@@ -51,6 +47,10 @@ import java.nio.channels.Selector
 import java.util.concurrent.Executors.newSingleThreadExecutor
 import java.util.concurrent.TimeUnit
 import javax.inject.Provider
+import kotlinx.coroutines.*
+import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
+import xyz.hexene.localvpn.Packet
 
 class UdpPacketProcessor @AssistedInject constructor(
     private val queues: VpnQueues,
@@ -61,7 +61,7 @@ class UdpPacketProcessor @AssistedInject constructor(
     private val channelCache: UdpChannelCache,
     private val healthMetricCounter: HealthMetricCounter,
     private val appBuildConfig: AppBuildConfig,
-    interceptorPlugins: PluginPoint<VpnPacketInterceptor>,
+    interceptorPlugins: PluginPoint<VpnPacketInterceptor>
 ) : Runnable {
 
     @AssistedFactory
@@ -174,7 +174,7 @@ class UdpPacketProcessor @AssistedInject constructor(
                         destinationAddress = connectionInfo.destinationAddress,
                         destinationPort = connectionInfo.destinationPort,
                         sourceAddress = connectionInfo.sourceAddress,
-                        sourcePort = connectionInfo.sourcePort,
+                        sourcePort = connectionInfo.sourcePort
                     ),
                     byteBuffer = payloadBuffer,
                     byteChannel = channelDetails.datagramChannel

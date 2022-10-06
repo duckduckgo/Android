@@ -72,13 +72,13 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import javax.inject.Inject
+import kotlin.collections.ArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
@@ -273,7 +273,6 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     }
 
     private fun launchNewSearchOrQuery(intent: Intent?) {
-
         Timber.i("launchNewSearchOrQuery: $intent")
 
         if (intent == null) {
@@ -287,7 +286,6 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         }
 
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
-
             Timber.i("Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
             appCoroutineScope.launch {
                 clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)

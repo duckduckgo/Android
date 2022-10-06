@@ -22,9 +22,9 @@ import com.duckduckgo.mobile.android.vpn.model.HealthTriggerEntity
 import com.duckduckgo.mobile.android.vpn.store.AppHealthTriggersRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 import org.json.JSONObject
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -77,7 +77,7 @@ class BadHealthMitigationSettingPlugin @Inject constructor(
 
     private data class JsonHealthTrigger(
         val state: String,
-        val threshold: Int?,
+        val threshold: Int?
     ) {
         fun toHealthTrigger(name: String): HealthTrigger {
             return HealthTrigger(name, state, threshold)
@@ -87,7 +87,7 @@ class BadHealthMitigationSettingPlugin @Inject constructor(
     private data class HealthTrigger(
         val name: String,
         val state: String,
-        val threshold: Int?,
+        val threshold: Int?
     ) {
         fun toEntity(): HealthTriggerEntity {
             return HealthTriggerEntity(name, state.lowercase() == "enabled", threshold)

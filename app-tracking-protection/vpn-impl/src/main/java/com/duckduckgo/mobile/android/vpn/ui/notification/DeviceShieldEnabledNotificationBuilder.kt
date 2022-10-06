@@ -55,7 +55,6 @@ class DeviceShieldEnabledNotificationBuilder {
             deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
             notificationPressHandler: OngoingNotificationPressedHandler
         ): Notification {
-
             registerOngoingNotificationChannel(context)
 
             val privacyReportIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
@@ -84,7 +83,6 @@ class DeviceShieldEnabledNotificationBuilder {
             deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
             notificationPressHandler: OngoingNotificationPressedHandler
         ): Notification {
-
             registerOngoingNotificationChannel(context)
 
             val privacyReportIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = notificationPressHandler)

@@ -36,7 +36,6 @@ class VpnRemoveFeatureConfirmationDialog private constructor(private val listene
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_remove_feature_confirm_disable, null)
 
         val cancelCta = rootView.findViewById<Button>(R.id.vpnFeatureRemoveDialogCancel)

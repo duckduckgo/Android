@@ -21,16 +21,16 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import java.util.UUID
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
-import java.util.UUID
 
 private const val PREFS_FILENAME = "com.duckduckgo.mobile.android.vpn.feature.registry.v1"
 private const val IS_INITIALIZED = "IS_INITIALIZED"
 
 internal class VpnFeaturesRegistryImpl(
     private val vpnServiceWrapper: VpnServiceWrapper,
-    private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: VpnSharedPreferencesProvider
 ) : VpnFeaturesRegistry, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val preferences: SharedPreferences

@@ -23,8 +23,8 @@ import com.facebook.flipper.core.FlipperPlugin
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.Multibinds
 import dagger.SingleInstanceIn
+import dagger.multibindings.Multibinds
 
 private class FlipperPluginPluginPoint(
     private val plugins: DaggerSet<FlipperPlugin>

@@ -39,8 +39,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @Module
 @ContributesTo(AppScope::class)

@@ -22,8 +22,8 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.AppScope
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class SiteFactory @Inject constructor(

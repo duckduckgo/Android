@@ -22,7 +22,7 @@ import android.content.Context
 interface AppTpFeatureToggleRepository : VpnFeatureToggleStore {
     companion object {
         fun create(
-            context: Context,
+            context: Context
         ): AppTpFeatureToggleRepository {
             val store = RealVpnFeatureToggleStore(context)
             return RealAppTpFeatureToggleRepository(store)
@@ -31,5 +31,5 @@ interface AppTpFeatureToggleRepository : VpnFeatureToggleStore {
 }
 
 internal class RealAppTpFeatureToggleRepository constructor(
-    private val vpnFeatureToggleStore: VpnFeatureToggleStore,
+    private val vpnFeatureToggleStore: VpnFeatureToggleStore
 ) : AppTpFeatureToggleRepository, VpnFeatureToggleStore by vpnFeatureToggleStore

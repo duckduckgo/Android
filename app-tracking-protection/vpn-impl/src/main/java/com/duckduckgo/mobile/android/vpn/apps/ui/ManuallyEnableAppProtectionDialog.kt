@@ -49,7 +49,6 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_manually_enable_app, null)
 
         val appIcon = rootView.findViewById<ImageView>(R.id.trackingProtectionAppIcon)

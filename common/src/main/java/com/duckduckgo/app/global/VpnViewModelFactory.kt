@@ -31,7 +31,6 @@ class VpnViewModelFactory @Inject constructor(
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-
         return viewModelFactoryPluginPoint.getPlugins().mapNotNull { it.create(modelClass) }
             .first()
     }

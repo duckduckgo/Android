@@ -31,10 +31,8 @@ class PredefinedGradeUnavailableTest(private val testCase: GradeTestCase) {
 
     @Test
     fun predefinedGradeTests() {
-
         val grade = Grade(testCase.input.https, testCase.input.httpsAutoUpgrade)
         for (tracker in testCase.input.trackers) {
-
             if (tracker.blocked) {
                 grade.addEntityBlocked(tracker.parentEntity)
             } else {

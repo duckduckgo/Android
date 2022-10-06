@@ -26,15 +26,15 @@ import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import timber.log.Timber
 
 @ContributesMultibinding(VpnScope::class)
 class AppTPCPUMonitor @Inject constructor(
     private val workManager: WorkManager,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
+    private val appTpFeatureConfig: AppTpFeatureConfig
 ) : VpnServiceCallbacks {
 
     companion object {

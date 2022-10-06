@@ -28,8 +28,8 @@ import com.duckduckgo.mobile.android.vpn.prefs.PREFS_FILENAME
 import com.duckduckgo.mobile.android.vpn.prefs.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldAlertNotificationBuilder
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface VpnReminderReceiverManager {
     fun showReminderNotificationIfVpnDisabled(context: Context)
@@ -40,7 +40,7 @@ class AndroidVpnReminderReceiverManager @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val notificationManager: NotificationManagerCompat,
     private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry
 ) : VpnReminderReceiverManager {
 
     override fun showReminderNotificationIfVpnDisabled(context: Context) {

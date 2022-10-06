@@ -16,11 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.processor
 
+import java.net.InetAddress
+import java.nio.ByteBuffer
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
-import java.net.InetAddress
-import java.nio.ByteBuffer
 
 class RealPacketInterceptorChainTest {
 
@@ -55,14 +55,13 @@ class RealPacketInterceptorChainTest {
                 VpnPacketInterceptor { chain -> return@VpnPacketInterceptor chain.proceed(chain.request()) },
                 VpnPacketInterceptor { chain -> return@VpnPacketInterceptor chain.proceed(chain.request()) },
                 VpnPacketInterceptor { chain -> return@VpnPacketInterceptor chain.proceed(chain.request()) },
-                VpnPacketInterceptor { return@VpnPacketInterceptor 1 },
+                VpnPacketInterceptor { return@VpnPacketInterceptor 1 }
             ),
             0,
             testRequest
         ).proceed(testRequest)
 
         assertEquals(1, result)
-
     }
 
     @Test
@@ -72,13 +71,12 @@ class RealPacketInterceptorChainTest {
                 VpnPacketInterceptor { chain -> return@VpnPacketInterceptor chain.proceed(chain.request()) },
                 VpnPacketInterceptor { return@VpnPacketInterceptor 2 },
                 VpnPacketInterceptor { chain -> return@VpnPacketInterceptor chain.proceed(chain.request()) },
-                VpnPacketInterceptor { return@VpnPacketInterceptor 1 },
+                VpnPacketInterceptor { return@VpnPacketInterceptor 1 }
             ),
             0,
             testRequest
         ).proceed(testRequest)
 
         assertEquals(2, result)
-
     }
 }

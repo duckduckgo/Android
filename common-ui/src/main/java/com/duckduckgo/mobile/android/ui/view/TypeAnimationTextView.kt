@@ -21,10 +21,10 @@ import android.text.Spanned
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.app.global.extensions.html
-import kotlinx.coroutines.*
 import java.text.BreakIterator
 import java.text.StringCharacterIterator
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.*
 
 class TypeAnimationTextView @JvmOverloads constructor(
     context: Context,

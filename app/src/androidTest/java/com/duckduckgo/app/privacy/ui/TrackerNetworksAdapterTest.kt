@@ -20,13 +20,13 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.trackerdetection.model.TrackerType
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import java.util.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
-import java.util.*
 
 class TrackerNetworksAdapterTest {
 
@@ -106,7 +106,7 @@ class TrackerNetworksAdapterTest {
 
         val section = TrackerNetworksSection(descriptionRes, 2, null, TrackerStatus.ALLOWED)
         val entitiesMap = mapOf(
-            TestEntity("A", "A", 0.0) as Entity to listOf(trackingEvent),
+            TestEntity("A", "A", 0.0) as Entity to listOf(trackingEvent)
         ).toSortedMap(compareBy { it.displayName })
 
         return mapOf(section to entitiesMap).toSortedMap(compareBy { it.trackerStatus })
@@ -126,10 +126,10 @@ class TrackerNetworksAdapterTest {
         val firstSection = TrackerNetworksSection(R.string.domainsLoadedSectionDescription, 2, null, TrackerStatus.ALLOWED)
         val secondSection = TrackerNetworksSection(R.string.domainsLoadedBreakageSectionDescription, 2, null, TrackerStatus.SITE_BREAKAGE_ALLOWED)
         val firstEntitiesMap = mapOf(
-            TestEntity("A", "A", 0.0) as Entity to listOf(trackingEvent),
+            TestEntity("A", "A", 0.0) as Entity to listOf(trackingEvent)
         ).toSortedMap(compareBy { it.displayName })
         val secondEntitiesMap = mapOf(
-            TestEntity("B", "B", 0.0) as Entity to listOf(trackingEvent),
+            TestEntity("B", "B", 0.0) as Entity to listOf(trackingEvent)
         ).toSortedMap(compareBy { it.displayName })
 
         return mapOf(firstSection to firstEntitiesMap, secondSection to secondEntitiesMap).toSortedMap(compareBy { it.trackerStatus })

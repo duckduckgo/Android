@@ -32,10 +32,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 data class WebViewHttpAuthCredentials(
     val username: String,
@@ -83,7 +83,7 @@ class RealWebViewHttpAuthStore @Inject constructor(
     @Named("authDbLocator") private val authDatabaseLocator: DatabaseLocator,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val appBuildConfig: AppBuildConfig,
+    private val appBuildConfig: AppBuildConfig
 ) : WebViewHttpAuthStore, DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {

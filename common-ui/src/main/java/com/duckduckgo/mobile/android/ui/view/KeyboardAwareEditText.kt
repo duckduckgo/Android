@@ -84,7 +84,6 @@ class KeyboardAwareEditText : AppCompatEditText {
         keyCode: Int,
         event: KeyEvent
     ): Boolean {
-
         if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
             return onBackKeyListener?.onBackKey() ?: false
         }

@@ -42,7 +42,6 @@ class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
         oldItem: TabEntity,
         newItem: TabEntity
     ): Bundle {
-
         val diffBundle = Bundle()
 
         if (oldItem.title != newItem.title) {

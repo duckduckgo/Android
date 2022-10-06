@@ -32,7 +32,8 @@ import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.cookies.impl.CookiesPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR
-import org.mockito.kotlin.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -41,8 +42,7 @@ import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class SQLCookieRemoverTest {

@@ -35,10 +35,10 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import kotlinx.coroutines.*
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.*
+import timber.log.Timber
 
 @Module
 @ContributesTo(AppScope::class)
@@ -139,16 +139,22 @@ class DeviceShieldDailyNotificationWorker(
 ) : CoroutineWorker(context, params) {
     @Inject
     lateinit var notificationPressedHandler: DailyNotificationPressedHandler
+
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
+
     @Inject
     lateinit var repository: AppTrackerBlockingStatsRepository
+
     @Inject
     lateinit var notificationManager: NotificationManagerCompat
+
     @Inject
     lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
+
     @Inject
     lateinit var vpnNotificationsDao: VpnNotificationsDao
+
     @Inject
     lateinit var deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
 
@@ -200,12 +206,16 @@ class DeviceShieldWeeklyNotificationWorker(
 ) : CoroutineWorker(context, params) {
     @Inject
     lateinit var notificationPressedHandler: WeeklyNotificationPressedHandler
+
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
+
     @Inject
     lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
+
     @Inject
     lateinit var notificationManager: NotificationManagerCompat
+
     @Inject
     lateinit var deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
 
@@ -219,7 +229,9 @@ class DeviceShieldWeeklyNotificationWorker(
         if (!deviceShieldNotification.hidden) {
             Timber.v("Vpn Daily notification won't be shown because there is no data to show")
             val notification = deviceShieldAlertNotificationBuilder.buildStatusNotification(
-                context, deviceShieldNotification, notificationPressedHandler
+                context,
+                deviceShieldNotification,
+                notificationPressedHandler
             )
             deviceShieldPixels.didShowWeeklyNotification(deviceShieldNotification.notificationVariant)
             notificationManager.notify(Companion.VPN_WEEKLY_NOTIFICATION_ID, notification)

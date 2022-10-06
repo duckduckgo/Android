@@ -17,8 +17,8 @@
 package com.duckduckgo.app.onboarding.store
 
 import com.duckduckgo.app.global.DispatcherProvider
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface UserStageStore {
     suspend fun getUserAppStage(): AppStage

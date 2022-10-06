@@ -22,8 +22,8 @@ import android.app.job.JobService
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ActivityScope
 import dagger.android.AndroidInjection
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @Deprecated(
     "This is the old sync service which uses JobScheduler. " +

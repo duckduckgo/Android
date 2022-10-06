@@ -16,14 +16,13 @@
 
 package com.duckduckgo.widget
 
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_LOCALE_CHANGED
-import android.content.ComponentName
-
-import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
 
 class VoiceSearchWidgetUpdater : BroadcastReceiver() {
     override fun onReceive(

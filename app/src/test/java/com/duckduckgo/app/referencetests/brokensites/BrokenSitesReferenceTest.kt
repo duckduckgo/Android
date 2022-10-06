@@ -32,11 +32,9 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.net.URLEncoder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.After
@@ -46,11 +44,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
-import java.net.URLEncoder
 
 @ExperimentalCoroutinesApi
 @RunWith(ParameterizedRobolectricTestRunner::class)
@@ -129,7 +129,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             urlParametersRemoved = testCase.urlParametersRemoved.toBoolean(),
             consentManaged = testCase.consentManaged.toBoolean(),
             consentOptOutFailed = testCase.consentOptOutFailed.toBoolean(),
-            consentSelfTestFailed = testCase.consentSelfTestFailed.toBoolean(),
+            consentSelfTestFailed = testCase.consentSelfTestFailed.toBoolean()
         )
 
         testee.submitBrokenSiteFeedback(brokenSite)
@@ -176,7 +176,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val urlParametersRemoved: String,
         val consentManaged: String,
         val consentOptOutFailed: String,
-        val consentSelfTestFailed: String,
+        val consentSelfTestFailed: String
     )
 
     data class UrlParam(

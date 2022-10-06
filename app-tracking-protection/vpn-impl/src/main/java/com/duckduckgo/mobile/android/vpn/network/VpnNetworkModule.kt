@@ -21,8 +21,8 @@ import com.duckduckgo.mobile.android.vpn.blocklist.AppTrackerListService
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import retrofit2.Retrofit
 import javax.inject.Named
+import retrofit2.Retrofit
 
 @Module
 @ContributesTo(AppScope::class)

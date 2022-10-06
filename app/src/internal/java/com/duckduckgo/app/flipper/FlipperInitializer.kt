@@ -27,8 +27,8 @@ import com.facebook.flipper.core.FlipperPlugin
 import com.facebook.flipper.plugins.databases.DatabasesFlipperPlugin
 import com.facebook.soloader.SoLoader
 import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,

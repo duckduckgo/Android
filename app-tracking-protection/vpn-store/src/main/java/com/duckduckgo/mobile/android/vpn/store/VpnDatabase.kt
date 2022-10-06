@@ -29,7 +29,8 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 @Database(
-    exportSchema = true, version = 24,
+    exportSchema = true,
+    version = 24,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -50,7 +51,7 @@ import org.threeten.bp.format.DateTimeFormatter
         AppTrackerSystemAppOverridePackage::class,
         AppTrackerSystemAppOverrideListMetadata::class,
         AppTrackerEntity::class,
-        VpnFeatureRemoverState::class,
+        VpnFeatureRemoverState::class
     ]
 )
 
@@ -132,7 +133,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_20_TO_21,
                 MIGRATION_21_TO_22,
                 MIGRATION_22_TO_23,
-                MIGRATION_23_TO_24,
+                MIGRATION_23_TO_24
             )
     }
 }

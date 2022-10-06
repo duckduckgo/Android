@@ -26,7 +26,6 @@ class DosDetector @Inject constructor() {
     var dosCount = 0
 
     fun isUrlGeneratingDos(url: Uri?): Boolean {
-
         val currentUrlLoadTime = System.currentTimeMillis()
 
         if (url != lastUrl) {

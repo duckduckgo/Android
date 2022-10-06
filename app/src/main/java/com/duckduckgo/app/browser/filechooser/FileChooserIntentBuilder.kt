@@ -18,9 +18,9 @@ package com.duckduckgo.app.browser.filechooser
 
 import android.content.Intent
 import android.net.Uri
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
+import timber.log.Timber
 
 class FileChooserIntentBuilder @Inject constructor() {
 
@@ -50,7 +50,6 @@ class FileChooserIntentBuilder @Inject constructor() {
      *     failing that, we bail.
      */
     fun extractSelectedFileUris(intent: Intent): Array<Uri>? {
-
         // first try to determine if multiple files were selected
         val clipData = intent.clipData
         if (clipData != null && clipData.itemCount > 0) {

@@ -32,7 +32,6 @@ class ResourceSurrogatesImpl : ResourceSurrogates {
     }
 
     override fun get(scriptId: String): SurrogateResponse {
-
         return surrogates.find { it.scriptId == scriptId }
             ?: return SurrogateResponse(responseAvailable = false)
     }

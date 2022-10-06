@@ -19,21 +19,21 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
-import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import kotlin.coroutines.coroutineContext
 
 @ContributesViewModel(FragmentScope::class)
 class DeviceShieldActivityFeedViewModel @Inject constructor(
@@ -164,5 +164,4 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         val timestamp: String,
         val companyPrevalence: Int
     )
-
 }

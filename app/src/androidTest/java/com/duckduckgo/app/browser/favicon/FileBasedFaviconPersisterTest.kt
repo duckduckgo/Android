@@ -22,14 +22,12 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.sha256
-import org.mockito.kotlin.any
-import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
+import java.io.File
+import java.io.FileOutputStream
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -38,8 +36,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.io.File
-import java.io.FileOutputStream
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
 class FileBasedFaviconPersisterTest {
@@ -93,7 +93,6 @@ class FileBasedFaviconPersisterTest {
 
         val newFile = testee.faviconFile(secondaryTestDirectory, subFolder, filename)
         verifyDirectoryUse(newFile!!.absolutePath, secondaryTestDirectory)
-
     }
 
     @Test
@@ -143,7 +142,6 @@ class FileBasedFaviconPersisterTest {
 
     @Test
     fun whenDeletePersistedFaviconThenDeleteTheFile() = runTest {
-
         val captor = argumentCaptor<List<String>>()
 
         testee.deletePersistedFavicon("domain")

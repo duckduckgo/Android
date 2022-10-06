@@ -45,8 +45,11 @@ class AddWidgetCompatLauncher @Inject constructor(
 ) : AddWidgetLauncher {
 
     override fun launchAddWidget(activity: Activity?) {
-        if (widgetCapabilities.supportsAutomaticWidgetAdd)
-            defaultAddWidgetLauncher.launchAddWidget(activity) else legacyAddWidgetLauncher.launchAddWidget(activity)
+        if (widgetCapabilities.supportsAutomaticWidgetAdd) {
+            defaultAddWidgetLauncher.launchAddWidget(activity)
+        } else {
+            legacyAddWidgetLauncher.launchAddWidget(activity)
+        }
     }
 }
 

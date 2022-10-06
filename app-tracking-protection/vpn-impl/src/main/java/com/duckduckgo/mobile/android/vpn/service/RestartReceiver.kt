@@ -27,10 +27,10 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = VpnScope::class,
@@ -40,7 +40,7 @@ import javax.inject.Inject
 class RestartReceiver @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val context: Context,
-    private val appBuildConfig: AppBuildConfig,
+    private val appBuildConfig: AppBuildConfig
 ) : BroadcastReceiver(), VpnServiceCallbacks {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.getStringExtra("action")?.lowercase() == "restart") {

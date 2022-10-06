@@ -40,6 +40,6 @@ class WelcomePageModule {
     @Provides
     fun defaultRoleBrowserDialog(
         appInstallStore: AppInstallStore,
-        appBuildConfig: AppBuildConfig,
+        appBuildConfig: AppBuildConfig
     ): DefaultRoleBrowserDialog = RealDefaultRoleBrowserDialog(appInstallStore, appBuildConfig)
 }

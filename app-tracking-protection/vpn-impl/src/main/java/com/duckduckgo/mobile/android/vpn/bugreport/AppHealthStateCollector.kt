@@ -16,17 +16,17 @@
 
 package com.duckduckgo.mobile.android.vpn.bugreport
 
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.AppHealthState
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.BAD_HEALTH
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.GOOD_HEALTH
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import org.json.JSONObject
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(VpnScope::class)
 class AppHealthStateCollector @Inject constructor(

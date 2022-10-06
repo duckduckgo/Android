@@ -16,12 +16,12 @@
 
 package com.duckduckgo.app.fire.fireproofwebsite.ui
 
-import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R

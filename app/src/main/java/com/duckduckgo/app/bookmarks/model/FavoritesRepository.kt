@@ -21,10 +21,10 @@ import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import dagger.Lazy
 import io.reactivex.Single
+import java.io.Serializable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import java.io.Serializable
 
 interface FavoritesRepository {
     fun favoritesCountByDomain(domain: String): Int
@@ -68,7 +68,7 @@ sealed class SavedSite(
 
 class FavoritesDataRepository(
     private val favoritesDao: FavoritesDao,
-    private val faviconManager: Lazy<FaviconManager>,
+    private val faviconManager: Lazy<FaviconManager>
 ) : FavoritesRepository {
     override fun favoritesCountByDomain(domain: String): Int {
         return favoritesDao.favoritesCountByUrl(domain)

@@ -32,8 +32,6 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.store.PlayHttpsEmbeddedDataPersister
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import com.squareup.moshi.Moshi
 import org.junit.After
 import org.junit.Assert.assertFalse
@@ -41,6 +39,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class HttpsEmbeddedDataIntegrationTest {
 

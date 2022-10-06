@@ -68,14 +68,12 @@ class UncaughtExceptionRepositoryDb(
 
     @VisibleForTesting
     fun isNotDuplicate(incomingException: UncaughtExceptionEntity): Boolean {
-
         val lastRecordedException = uncaughtExceptionDao.getLatestException() ?: return true
 
         if (incomingException.message == lastRecordedException.message &&
             incomingException.exceptionSource == lastRecordedException.exceptionSource &&
             incomingException.version == lastRecordedException.version
         ) {
-
             val timeDiff = incomingException.timestamp - lastRecordedException.timestamp
 
             return if (timeDiff > TIME_THRESHOLD_MILLIS) {

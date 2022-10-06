@@ -23,9 +23,9 @@ import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
-import kotlinx.coroutines.CoroutineScope
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlinx.coroutines.CoroutineScope
 
 // TODO we'll hopefully remove ths class once the VPN new networking stack is validated
 private class LegacyVpnNetworkStack constructor(
@@ -34,7 +34,7 @@ private class LegacyVpnNetworkStack constructor(
     private val tunPacketReaderFactory: TunPacketReader.Factory,
     private val tunPacketWriterFactory: TunPacketWriter.Factory,
     private val queues: VpnQueues,
-    private val coroutineScope: CoroutineScope,
+    private val coroutineScope: CoroutineScope
 ) : VpnNetworkStack {
     private lateinit var udpPacketProcessor: UdpPacketProcessor
     private lateinit var tcpPacketProcessor: TcpPacketProcessor

@@ -18,10 +18,10 @@ package com.duckduckgo.app.email
 
 import android.webkit.WebView
 import androidx.annotation.UiThread
+import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.email.EmailJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Autofill
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -51,7 +51,7 @@ class EmailInjectorJs(
     private val dispatcherProvider: DispatcherProvider,
     private val featureToggle: FeatureToggle,
     private val javaScriptInjector: JavascriptInjector,
-    private val autofill: Autofill,
+    private val autofill: Autofill
 ) : EmailInjector {
 
     override fun addJsInterface(
@@ -93,5 +93,4 @@ class EmailInjectorJs(
     private fun isFeatureEnabled() = featureToggle.isFeatureEnabled(PrivacyFeatureName.AutofillFeatureName.value, defaultValue = true)
 
     private fun isDuckDuckGoUrl(url: String?): Boolean = (url != null && urlDetector.isDuckDuckGoEmailUrl(url))
-
 }

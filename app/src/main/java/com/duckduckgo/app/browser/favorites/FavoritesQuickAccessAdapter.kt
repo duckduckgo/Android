@@ -36,9 +36,9 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAcc
 import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_URL
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import kotlin.math.absoluteValue
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.math.absoluteValue
 
 class FavoritesQuickAccessAdapter(
     private val lifecycleOwner: LifecycleOwner,

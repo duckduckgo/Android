@@ -21,8 +21,8 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Process
 import androidx.annotation.RequiresApi
-import timber.log.Timber
 import java.net.InetSocketAddress
+import timber.log.Timber
 
 @RequiresApi(Build.VERSION_CODES.Q)
 class DetectOriginatingAppPackageModern(

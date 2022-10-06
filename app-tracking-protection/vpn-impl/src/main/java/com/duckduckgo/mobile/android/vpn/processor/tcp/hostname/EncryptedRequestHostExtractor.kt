@@ -16,8 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
-import timber.log.Timber
 import kotlin.text.Charsets.US_ASCII
+import timber.log.Timber
 
 interface EncryptedRequestHostExtractor {
     fun extract(packet: ByteArray): String?
@@ -27,7 +27,6 @@ interface EncryptedRequestHostExtractor {
 class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: TlsMessageDetector) : EncryptedRequestHostExtractor {
 
     override fun extract(packet: ByteArray): String? {
-
         try {
             if (!isClientHelloProtocol(packet)) {
                 Timber.v("Not a Client Hello packet")

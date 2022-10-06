@@ -169,16 +169,25 @@ class SitePermissionsAdapter(
             binding.sitePermissionsToggle.quietlySetIsChecked(item.enable, listener)
             val iconRes = when (item.text) {
                 R.string.sitePermissionsSettingsLocation -> {
-                    if (item.enable) R.drawable.ic_location
-                    else R.drawable.ic_location_disabled
+                    if (item.enable) {
+                        R.drawable.ic_location
+                    } else {
+                        R.drawable.ic_location_disabled
+                    }
                 }
                 R.string.sitePermissionsSettingsCamera -> {
-                    if (item.enable) R.drawable.ic_camera
-                    else R.drawable.ic_camera_disabled
+                    if (item.enable) {
+                        R.drawable.ic_camera
+                    } else {
+                        R.drawable.ic_camera_disabled
+                    }
                 }
                 R.string.sitePermissionsSettingsMicrophone -> {
-                    if (item.enable) R.drawable.ic_microphone
-                    else R.drawable.ic_microphone_disabled
+                    if (item.enable) {
+                        R.drawable.ic_microphone
+                    } else {
+                        R.drawable.ic_microphone_disabled
+                    }
                 }
                 else -> null
             }

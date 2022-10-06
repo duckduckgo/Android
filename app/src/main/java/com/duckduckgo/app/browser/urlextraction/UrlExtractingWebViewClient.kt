@@ -43,7 +43,7 @@ class UrlExtractingWebViewClient(
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val urlExtractor: DOMUrlExtractor,
+    private val urlExtractor: DOMUrlExtractor
 ) : WebViewClient() {
 
     var urlExtractionListener: UrlExtractionListener? = null
@@ -90,7 +90,10 @@ class UrlExtractingWebViewClient(
                 "Intercepting resource ${request.url} type:${request.method} on page $documentUrl"
             )
             requestInterceptor.shouldIntercept(
-                request, webView, documentUrl, null
+                request,
+                webView,
+                documentUrl,
+                null
             )
         }
     }
@@ -111,7 +114,9 @@ class UrlExtractingWebViewClient(
                 val credentials =
                     view?.let {
                         webViewHttpAuthStore.getHttpAuthUsernamePassword(
-                            it, host.orEmpty(), realm.orEmpty()
+                            it,
+                            host.orEmpty(),
+                            realm.orEmpty()
                         )
                     }
 
@@ -137,8 +142,11 @@ class UrlExtractingWebViewClient(
         }
 
         Timber.d("The certificate authority validation result is $trusted")
-        if (trusted is CertificateValidationState.TrustedChain) handler.proceed()
-        else super.onReceivedSslError(view, handler, error)
+        if (trusted is CertificateValidationState.TrustedChain) {
+            handler.proceed()
+        } else {
+            super.onReceivedSslError(view, handler, error)
+        }
     }
 
     override fun onReceivedError(

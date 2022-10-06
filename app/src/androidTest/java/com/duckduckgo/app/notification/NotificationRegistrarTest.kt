@@ -29,11 +29,11 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class NotificationRegistrarTest {
@@ -64,7 +64,7 @@ class NotificationRegistrarTest {
             mockPixel,
             mockSchedulableNotificationPluginPoint,
             mockNotificationPluginPoint,
-            appBuildConfig,
+            appBuildConfig
         )
     }
 

@@ -38,7 +38,7 @@ import com.duckduckgo.mobile.android.ui.view.show
 import javax.inject.Inject
 
 class DownloadsAdapter @Inject constructor(
-    private val dataSizeFormatter: DataSizeFormatter,
+    private val dataSizeFormatter: DataSizeFormatter
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val items = mutableListOf<DownloadViewItem>()

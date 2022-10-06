@@ -29,7 +29,6 @@ class TrackersRenderer {
         trackersBlockedCount: Int,
         specialDomainsLoadedCount: Int
     ): String {
-
         val resource = if (trackersBlockedCount > 0) {
             R.string.trackersBlockedText
         } else if (trackersBlockedCount == 0 && specialDomainsLoadedCount > 0) {
@@ -42,9 +41,8 @@ class TrackersRenderer {
 
     fun domainsLoadedText(
         context: Context,
-        domainsLoadedCount: Int,
+        domainsLoadedCount: Int
     ): String {
-
         val resource = if (domainsLoadedCount > 0) {
             R.string.domainsLoadedText
         } else {

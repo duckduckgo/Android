@@ -50,7 +50,8 @@ class TwoLineListItem : LinearLayout {
         )
         setImageResource(
             attributes.getResourceId(
-                R.styleable.TwoLineListItem_twoLineItemDrawable, R.drawable.ic_overflow
+                R.styleable.TwoLineListItem_twoLineItemDrawable,
+                R.drawable.ic_overflow
             )
         )
         attributes.recycle()

@@ -25,8 +25,8 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
 import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
+import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
 import com.duckduckgo.mobile.android.ui.view.SingleLineListItem
 import com.duckduckgo.mobile.android.ui.view.TwoLineListItem
 import com.google.android.material.snackbar.Snackbar

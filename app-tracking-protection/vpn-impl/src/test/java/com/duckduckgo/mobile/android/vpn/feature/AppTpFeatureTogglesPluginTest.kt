@@ -123,7 +123,8 @@ class AppTpFeatureTogglesPluginTest {
     private fun givenAppTpFeatureIsEnabled() {
         whenever(
             appTpFeatureToggleRepository.get(
-                AppTpFeatureName.AppTrackerProtection, true
+                AppTpFeatureName.AppTrackerProtection,
+                true
             )
         ).thenReturn(true)
     }
@@ -131,7 +132,8 @@ class AppTpFeatureTogglesPluginTest {
     private fun givenAppTpFeatureIsDisabled() {
         whenever(
             appTpFeatureToggleRepository.get(
-                AppTpFeatureName.AppTrackerProtection, true
+                AppTpFeatureName.AppTrackerProtection,
+                true
             )
         ).thenReturn(false)
     }
@@ -139,7 +141,8 @@ class AppTpFeatureTogglesPluginTest {
     private fun givenAppTpFeatureReturnsDefaultValue(defaultValue: Boolean) {
         whenever(
             appTpFeatureToggleRepository.get(
-                AppTpFeatureName.AppTrackerProtection, defaultValue
+                AppTpFeatureName.AppTrackerProtection,
+                defaultValue
             )
         ).thenReturn(defaultValue)
     }

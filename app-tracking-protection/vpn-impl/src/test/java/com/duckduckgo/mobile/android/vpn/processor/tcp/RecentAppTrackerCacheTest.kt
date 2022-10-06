@@ -16,11 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
-import org.mockito.kotlin.mock
+import java.util.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import java.util.*
+import org.mockito.kotlin.mock
 
 class RecentAppTrackerCacheTest {
 

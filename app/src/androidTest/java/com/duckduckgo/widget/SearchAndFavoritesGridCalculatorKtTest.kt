@@ -17,9 +17,8 @@
 package com.duckduckgo.widget
 
 import androidx.test.platform.app.InstrumentationRegistry
-import org.junit.Test
-
 import org.junit.Assert.*
+import org.junit.Test
 import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized

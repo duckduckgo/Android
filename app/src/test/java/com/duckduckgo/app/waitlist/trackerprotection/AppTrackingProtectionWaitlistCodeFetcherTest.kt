@@ -18,22 +18,22 @@ package com.duckduckgo.app.waitlist.trackerprotection
 
 import androidx.work.WorkManager
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder.Companion.APP_TP_WAITLIST_SYNC_WORK_TAG
-import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class AppTrackingProtectionWaitlistCodeFetcherTest {

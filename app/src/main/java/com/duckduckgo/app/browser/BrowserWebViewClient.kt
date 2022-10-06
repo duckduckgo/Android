@@ -41,15 +41,15 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
-import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.cookies.api.CookieManagerProvider
-import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.Gpc
+import java.net.URI
 import kotlinx.coroutines.*
 import timber.log.Timber
-import java.net.URI
 
 class BrowserWebViewClient(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -72,7 +72,7 @@ class BrowserWebViewClient(
     private val printInjector: PrintInjector,
     private val internalTestUserChecker: InternalTestUserChecker,
     private val adClickManager: AdClickManager,
-    private val autoconsent: Autoconsent,
+    private val autoconsent: Autoconsent
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -110,7 +110,6 @@ class BrowserWebViewClient(
         url: Uri,
         isForMainFrame: Boolean
     ): Boolean {
-
         Timber.v("shouldOverride $url")
         try {
             if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {

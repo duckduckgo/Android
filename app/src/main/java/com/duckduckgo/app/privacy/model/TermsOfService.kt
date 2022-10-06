@@ -35,7 +35,6 @@ data class TermsOfService(
                 "B" -> return MIXED
                 "C" -> return POOR
                 "D" -> return POOR
-
             }
 
             if (goodPrivacyTerms.isNotEmpty() && badPrivacyTerms.isNotEmpty()) {

@@ -31,15 +31,16 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
 @Database(
-    exportSchema = true, version = 6,
+    exportSchema = true,
+    version = 6,
     entities = [
         AppHealthState::class,
-        HealthTriggerEntity::class,
+        HealthTriggerEntity::class
     ]
 )
 @TypeConverters(
     AppHealthDatabaseConverters::class,
-    AppHealthState.HealthEventTypeConverter::class,
+    AppHealthState.HealthEventTypeConverter::class
 )
 abstract class AppHealthDatabase : RoomDatabase() {
 

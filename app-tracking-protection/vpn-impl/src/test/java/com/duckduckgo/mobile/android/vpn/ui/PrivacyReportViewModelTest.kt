@@ -24,22 +24,22 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
+import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.prefs.PREFS_FILENAME
 import com.duckduckgo.mobile.android.vpn.prefs.RealVpnPreferences
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.jakewharton.threetenabp.AndroidThreeTen
-import org.mockito.kotlin.mock
-import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
+import com.jakewharton.threetenabp.AndroidThreeTen
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -48,8 +48,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 import org.threeten.bp.LocalDateTime
-import kotlin.time.ExperimentalTime
 
 @ExperimentalCoroutinesApi
 @ExperimentalTime
@@ -104,7 +104,6 @@ class PrivacyReportViewModelTest {
 
     @Test
     fun whenTrackersBlockedThenReportHasTrackers() = runBlocking {
-
         trackerFound("dax.com")
         trackerFound("dax.com")
         trackerFound("dax.com")
@@ -118,7 +117,6 @@ class PrivacyReportViewModelTest {
 
     @Test
     fun whenTrackersBlockedOutsideTimeWindowThenReturnEmpty() = runBlocking {
-
         trackerFoundYesterday("dax.com")
         trackerFoundYesterday("dax.com")
         trackerFoundYesterday("dax.com")

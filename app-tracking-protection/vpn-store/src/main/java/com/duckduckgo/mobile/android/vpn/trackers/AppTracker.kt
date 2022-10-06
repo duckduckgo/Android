@@ -96,7 +96,7 @@ data class JsonAppBlockingList(
     val version: String,
     val trackers: Map<String, JsonAppTracker>,
     val packageNames: Map<String, String>,
-    val entities: Map<String, JsonTrackingSignal>,
+    val entities: Map<String, JsonTrackingSignal>
 )
 
 class JsonAppTracker(

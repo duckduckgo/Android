@@ -17,8 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.dao
 
 import androidx.room.*
-import com.duckduckgo.mobile.android.vpn.model.VpnRunningStats
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.mobile.android.vpn.model.VpnRunningStats
 import kotlinx.coroutines.flow.Flow
 
 @Dao

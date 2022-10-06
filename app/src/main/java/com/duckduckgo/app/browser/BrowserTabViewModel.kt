@@ -87,11 +87,11 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.extensions.asLocationPermissionOrigin
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.global.extensions.asLocationPermissionOrigin
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -122,8 +122,8 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.privacy.config.api.*
-import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -131,13 +131,13 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 @ContributesViewModel(FragmentScope::class)
 class BrowserTabViewModel @Inject constructor(
@@ -698,7 +698,6 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String? = null
     ) {
-
         if (buildingSiteFactoryJob?.isCompleted == false) {
             Timber.i("Cancelling existing work to build SiteMonitor for $url")
             buildingSiteFactoryJob?.cancel()
@@ -856,7 +855,6 @@ class BrowserTabViewModel @Inject constructor(
                 handleCloakedAmpLink(type.ampUrl)
             }
             else -> {
-
                 if (type is SpecialUrlDetector.UrlType.ExtractedAmpLink) {
                     Timber.d("AMP link detection: Using extracted URL: ${type.extractedUrl}")
                     urlToNavigate = type.extractedUrl
@@ -1541,7 +1539,6 @@ class BrowserTabViewModel @Inject constructor(
                     command.postValue(AskDomainPermission(locationPermission.origin))
                 }
             }
-
         }
     }
 
@@ -1672,7 +1669,6 @@ class BrowserTabViewModel @Inject constructor(
     private fun onSiteChanged() {
         httpsUpgraded = false
         viewModelScope.launch {
-
             val improvedGrade = withContext(dispatchers.io()) {
                 site?.calculateGrades()?.improvedGrade
             }
@@ -1719,7 +1715,6 @@ class BrowserTabViewModel @Inject constructor(
         hasFocus: Boolean,
         hasQueryChanged: Boolean
     ) {
-
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank() || !hasFocus) {
             AutoCompleteResult(query, emptyList())
@@ -1854,7 +1849,9 @@ class BrowserTabViewModel @Inject constructor(
                 if (url.isNotBlank()) {
                     faviconManager.persistCachedFavicon(tabId, url)
                     favoritesRepository.insert(title = title, url = url)
-                } else null
+                } else {
+                    null
+                }
             }
             favorite?.let {
                 withContext(dispatchers.main()) {
@@ -1968,8 +1965,11 @@ class BrowserTabViewModel @Inject constructor(
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
         viewModelScope.launch(dispatchers.io()) {
             val bookmarkFolder =
-                if (savedSite is SavedSite.Bookmark) getBookmarkFolder(savedSite)
-                else null
+                if (savedSite is SavedSite.Bookmark) {
+                    getBookmarkFolder(savedSite)
+                } else {
+                    null
+                }
 
             withContext(dispatchers.main()) {
                 command.value = ShowEditSavedSiteDialog(
@@ -2072,7 +2072,6 @@ class BrowserTabViewModel @Inject constructor(
         longPressTarget: LongPressTarget,
         item: MenuItem
     ): Boolean {
-
         val requiredAction = longPressHandler.userSelectedMenuItem(longPressTarget, item)
         Timber.d("Required action from long press is $requiredAction")
 
@@ -2155,8 +2154,11 @@ class BrowserTabViewModel @Inject constructor(
         val uri = site?.uri ?: return
 
         pixel.fire(
-            if (desktopSiteRequested) AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED
-            else AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED
+            if (desktopSiteRequested) {
+                AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED
+            } else {
+                AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED
+            }
         )
 
         if (desktopSiteRequested && uri.isMobileSite) {
@@ -2226,7 +2228,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun removeAtbAndSourceParamsFromSearch(url: String): String {
-
         if (!duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             return url
         }

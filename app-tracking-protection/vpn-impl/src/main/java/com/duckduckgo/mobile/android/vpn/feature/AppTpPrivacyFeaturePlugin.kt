@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class AppTpPrivacyFeaturePlugin @Inject constructor(
-    plugins: DaggerSet<AppTpSettingPlugin>,
+    plugins: DaggerSet<AppTpSettingPlugin>
 ) : PrivacyFeaturePlugin {
 
     private val settings = plugins.sortedBy { it.settingName.value }

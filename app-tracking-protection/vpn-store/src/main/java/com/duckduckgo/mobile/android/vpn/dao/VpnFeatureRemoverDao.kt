@@ -26,7 +26,6 @@ interface VpnFeatureRemoverDao {
 
     @Query("select * from vpn_feature_remover")
     fun getState(): VpnFeatureRemoverState?
-
 }
 
 @Entity(tableName = "vpn_feature_remover")

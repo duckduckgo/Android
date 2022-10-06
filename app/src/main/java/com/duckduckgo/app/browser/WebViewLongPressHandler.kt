@@ -24,10 +24,10 @@ import android.webkit.WebView
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
 import com.duckduckgo.app.browser.model.LongPressTarget
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
-import timber.log.Timber
+import com.duckduckgo.app.statistics.pixels.Pixel
 import javax.inject.Inject
+import timber.log.Timber
 
 interface LongPressHandler {
     fun handleLongPress(

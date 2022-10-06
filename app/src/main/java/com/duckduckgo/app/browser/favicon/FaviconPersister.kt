@@ -22,11 +22,11 @@ import android.graphics.BitmapFactory
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.sha256
+import java.io.File
+import java.io.FileOutputStream
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.io.FileOutputStream
 
 interface FaviconPersister {
     fun faviconFile(

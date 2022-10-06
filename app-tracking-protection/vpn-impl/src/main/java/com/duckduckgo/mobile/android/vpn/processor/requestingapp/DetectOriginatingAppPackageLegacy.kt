@@ -21,11 +21,11 @@ import com.duckduckgo.mobile.android.vpn.ProtocolVersion.TCP
 import com.duckduckgo.mobile.android.vpn.ProtocolVersion.UDP
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageLegacy.NetworkFileSearchResult.Found
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageLegacy.NetworkFileSearchResult.NotFound
-import kotlinx.coroutines.*
-import timber.log.Timber
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.regex.Pattern
+import kotlinx.coroutines.*
+import timber.log.Timber
 
 /**
  * Parses networking level proc/net files to match connection details to an open connection
@@ -48,12 +48,12 @@ class DetectOriginatingAppPackageLegacy(
 
     private val tcpSearchOrder = listOf(
         SearchFile(fileNameTcpV6, ipv6RegexPattern()),
-        SearchFile(fileNameTcpV4, ipv4RegexPattern()),
+        SearchFile(fileNameTcpV4, ipv4RegexPattern())
     )
 
     private val udpSearchOrder = listOf(
         SearchFile(fileNameUdpV6, ipv6RegexPattern()),
-        SearchFile(fileNameUdpV4, ipv4RegexPattern()),
+        SearchFile(fileNameUdpV4, ipv4RegexPattern())
     )
 
     override fun resolvePackageId(connectionInfo: ConnectionInfo): String {

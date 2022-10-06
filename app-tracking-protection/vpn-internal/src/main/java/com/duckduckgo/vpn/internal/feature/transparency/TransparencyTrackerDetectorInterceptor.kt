@@ -21,9 +21,9 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerTyp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetectorInterceptor
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

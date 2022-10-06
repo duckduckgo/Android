@@ -106,7 +106,6 @@ class SiteMonitor(
     }
 
     private fun httpsStatus(): HttpsStatus {
-
         val uri = uri ?: return HttpsStatus.NONE
 
         if (uri.isHttps) {

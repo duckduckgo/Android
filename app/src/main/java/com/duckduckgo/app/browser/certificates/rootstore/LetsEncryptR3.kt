@@ -18,9 +18,9 @@ package com.duckduckgo.app.browser.certificates.rootstore
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.certificates.LetsEncryptCertificate
 import com.duckduckgo.app.browser.certificates.CertificateType
 import com.duckduckgo.app.browser.certificates.CertificateTypes
+import com.duckduckgo.app.browser.certificates.LetsEncryptCertificate
 import java.security.cert.Certificate
 import java.security.cert.CertificateFactory
 

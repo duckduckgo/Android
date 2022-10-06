@@ -32,14 +32,14 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.duckduckgo.vpn.internal.databinding.ActivityExceptionRulesDebugBinding
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTrackerListener {
@@ -95,7 +95,6 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
                 }
                 binding.appRule.isVisible = true
                 binding.progress.isVisible = false
-
             }
             .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
@@ -172,7 +171,7 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
 
 private data class InstalledApp(
     val packageName: String,
-    val name: String? = null,
+    val name: String? = null
 )
 
 private data class InstalledAppTrackers(

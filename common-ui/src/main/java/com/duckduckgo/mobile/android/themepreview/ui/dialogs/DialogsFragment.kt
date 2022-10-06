@@ -26,9 +26,9 @@ import androidx.fragment.app.Fragment
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialog
+import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog.EventListener
-import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog
 import com.google.android.material.snackbar.Snackbar
 
 /** Fragment to display a list of dialogs. */
@@ -185,7 +185,7 @@ class DialogsFragment : Fragment() {
                                 primaryButtonText = "Primary CTA",
                                 secondaryButtonText = "Secondary CTA",
                                 hideButtonText = "Hide",
-                                toolbarDimmed = false,
+                                toolbarDimmed = false
                             ).show(fragmentManager, "dialog")
                         }
                     }
@@ -215,7 +215,7 @@ class DialogsFragment : Fragment() {
                                 secondaryButtonText = "Secondary CTA",
                                 hideButtonText = "Hide",
                                 toolbarDimmed = true,
-                                showHideButton = false,
+                                showHideButton = false
                             ).show(fragmentManager, "dialog")
                         }
                     }

@@ -30,10 +30,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Provider
+import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -115,6 +115,7 @@ class RealEnqueuedPixelWorker(
 ) : CoroutineWorker(context, parameters) {
     @Inject
     lateinit var pixel: Pixel
+
     @Inject
     lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 

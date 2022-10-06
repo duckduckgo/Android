@@ -38,14 +38,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 interface DataClearer {
     val dataClearerState: LiveData<ApplicationClearDataState>
@@ -97,7 +97,6 @@ class AutomaticDataClearer @Inject constructor(
         workManager.cancelAllWorkByTag(DataClearingWorker.WORK_REQUEST_TAG)
 
         withContext(dispatchers.io()) {
-
             val appUsedSinceLastClear = settingsDataStore.appUsedSinceLastClear
             settingsDataStore.appUsedSinceLastClear = true
 
@@ -181,12 +180,10 @@ class AutomaticDataClearer @Inject constructor(
     @Suppress("NON_EXHAUSTIVE_WHEN")
     private suspend fun clearDataWhenAppInForeground(clearWhat: ClearWhatOption) {
         withContext(dispatchers.main()) {
-
             Timber.i("Clearing data when app is in the foreground: $clearWhat")
 
             when (clearWhat) {
                 ClearWhatOption.CLEAR_TABS_ONLY -> {
-
                     clearDataAction.clearTabsAsync(true)
 
                     Timber.i("Notifying listener that clearing has finished")

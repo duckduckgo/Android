@@ -28,11 +28,11 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class PrivacyReportViewModel @Inject constructor(
@@ -59,7 +59,6 @@ class PrivacyReportViewModel @Inject constructor(
 
                 PrivacyReportView.TrackersBlocked(latestApp, otherAppsSize, trackers.size)
             }
-
         }
     }
 

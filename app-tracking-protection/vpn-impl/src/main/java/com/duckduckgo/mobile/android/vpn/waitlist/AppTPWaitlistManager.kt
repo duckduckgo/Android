@@ -25,10 +25,10 @@ import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
-import javax.inject.Inject
 
 interface AppTPWaitlistManager {
     suspend fun fetchInviteCode(): FetchCodeResult
@@ -90,7 +90,6 @@ class AndroidAppTPWaitlistManager @Inject constructor(
 
     override suspend fun redeemCode(inviteCode: String): RedeemCodeResult {
         return withContext(dispatcherProvider.io()) {
-
             val result = try {
                 service.redeemCode(inviteCode)
                 storeInviteCode(inviteCode)

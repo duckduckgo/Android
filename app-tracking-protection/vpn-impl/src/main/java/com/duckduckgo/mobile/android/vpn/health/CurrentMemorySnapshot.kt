@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.health
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Debug
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 class CurrentMemorySnapshot @Inject constructor(val applicationContext: Context) {
 
@@ -134,7 +134,7 @@ class CurrentMemorySnapshot @Inject constructor(val applicationContext: Context)
             totalMemoryConsumed, totalMemoryBrowserProcess, totalMemoryVpnProcess,
             percentageHeapUsed, heapAllocated, heapMax, heapRemaining,
             percentageNativeUsed, nativeAllocated, nativeMax, nativeRemaining,
-            percentageDeviceUsed, deviceAllocated, deviceMax, deviceRemaining,
+            percentageDeviceUsed, deviceAllocated, deviceMax, deviceRemaining
         )
     }
 

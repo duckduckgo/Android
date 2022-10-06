@@ -26,14 +26,14 @@ import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
+import java.util.concurrent.TimeUnit.DAYS
+import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit.DAYS
-import javax.inject.Inject
-import kotlin.coroutines.coroutineContext
 
 @ContributesViewModel(ActivityScope::class)
 class ManageAppsProtectionViewModel @Inject constructor(

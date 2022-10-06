@@ -25,7 +25,7 @@ data class InstalledApp(
 object ReportBreakageAppListView {
     data class State(
         val installedApps: List<InstalledApp>,
-        val canSubmit: Boolean,
+        val canSubmit: Boolean
     )
 
     sealed class Command {

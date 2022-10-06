@@ -44,10 +44,10 @@ import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.duckduckgo.vpn.internal.feature.trackers.DeleteTrackersDebugReceiver
 import com.duckduckgo.vpn.internal.feature.transparency.TransparencyModeDebugReceiver
 import com.google.android.material.snackbar.Snackbar
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
@@ -244,7 +244,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupTransparencyMode() {
-
         // we use the same receiver as it makes IPC much easier
         transparencyModeDebugReceiver = TransparencyModeDebugReceiver(this) {
             // avoid duplicating broadcast intent when toggle changes state

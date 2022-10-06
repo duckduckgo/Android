@@ -86,7 +86,7 @@ class BrokenSiteViewModel @Inject constructor(
         urlParametersRemoved: Boolean,
         consentManaged: Boolean,
         consentOptOutFailed: Boolean,
-        consentSelfTestFailed: Boolean,
+        consentSelfTestFailed: Boolean
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
@@ -116,7 +116,6 @@ class BrokenSiteViewModel @Inject constructor(
 
     fun onSubmitPressed(webViewVersion: String) {
         if (url.isNotEmpty()) {
-
             val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
 
             val brokenSite = if (lastAmpLinkInfo?.destinationUrl == url) {
@@ -151,7 +150,7 @@ class BrokenSiteViewModel @Inject constructor(
             urlParametersRemoved = urlParametersRemoved,
             consentManaged = consentManaged,
             consentOptOutFailed = consentOptOutFailed,
-            consentSelfTestFailed = consentSelfTestFailed,
+            consentSelfTestFailed = consentSelfTestFailed
         )
     }
 

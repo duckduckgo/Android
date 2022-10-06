@@ -140,7 +140,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
             val encodedData =
                 Base64.encodeToString(
                     json.toByteArray(),
-                    Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
+                    Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE
                 )
             deviceShieldPixels.sendHealthMonitorReport(mapOf("data" to encodedData))
         }
@@ -208,7 +208,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
 
         binding.sendBadHealthReportButton.setOnClickListener {
             userHealthReportActivityResult.launch(
-                VpnDiagnosticsGetUserHealthReportActivity.intent(this),
+                VpnDiagnosticsGetUserHealthReportActivity.intent(this)
             )
         }
     }
@@ -233,7 +233,8 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
                     getString(R.string.atp_ConnectionStatus, networkInfo.vpn.toString())
                 binding.networkAvailable.text =
                     getString(
-                        R.string.atp_NetworkAvailable, networkInfo.connectedToInternet.toString()
+                        R.string.atp_NetworkAvailable,
+                        networkInfo.connectedToInternet.toString()
                     )
                 binding.runningTime.text = runningTimeFormatted
                 binding.appTrackersBlockedText.text =
@@ -266,39 +267,39 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
                 healthMetricsInfo.tunPacketReceived,
                 calculatePercentage(
                     healthMetricsInfo.writtenToDeviceToNetworkQueue,
-                    healthMetricsInfo.tunPacketReceived,
+                    healthMetricsInfo.tunPacketReceived
                 ),
                 healthMetricsInfo.tunIpv4PacketReceived,
                 calculatePercentage(
                     healthMetricsInfo.tunIpv4PacketReceived,
-                    healthMetricsInfo.tunPacketReceived,
+                    healthMetricsInfo.tunPacketReceived
                 ),
                 healthMetricsInfo.tunUnknownPacketReceived,
                 calculatePercentage(
                     healthMetricsInfo.tunUnknownPacketReceived,
-                    healthMetricsInfo.tunPacketReceived,
+                    healthMetricsInfo.tunPacketReceived
                 ),
                 healthMetricsInfo.tunIpv6PacketReceived,
                 calculatePercentage(
                     healthMetricsInfo.tunIpv6PacketReceived,
-                    healthMetricsInfo.tunPacketReceived,
+                    healthMetricsInfo.tunPacketReceived
                 ),
                 healthMetricsInfo.removeFromDeviceToNetworkQueue,
                 calculatePercentage(
                     healthMetricsInfo.writtenToDeviceToNetworkQueue,
-                    healthMetricsInfo.removeFromDeviceToNetworkQueue,
+                    healthMetricsInfo.removeFromDeviceToNetworkQueue
                 ),
                 healthMetricsInfo.removeFromTCPDeviceToNetworkQueue,
                 calculatePercentage(
                     healthMetricsInfo.writtenToTCPDeviceToNetworkQueue,
-                    healthMetricsInfo.removeFromTCPDeviceToNetworkQueue,
+                    healthMetricsInfo.removeFromTCPDeviceToNetworkQueue
                 ),
                 healthMetricsInfo.removeFromUDPDeviceToNetworkQueue,
                 calculatePercentage(
                     healthMetricsInfo.writtenToUDPDeviceToNetworkQueue,
-                    healthMetricsInfo.removeFromUDPDeviceToNetworkQueue,
-                ),
-            ),
+                    healthMetricsInfo.removeFromUDPDeviceToNetworkQueue
+                )
+            )
         )
 
         healthMetricsStrings.add(
@@ -306,29 +307,29 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
                 "\n\nSocket exceptions:\nRead: %d, Write: %d, Connect: %d",
                 healthMetricsInfo.socketReadExceptions,
                 healthMetricsInfo.socketWriteExceptions,
-                healthMetricsInfo.socketConnectException,
-            ),
+                healthMetricsInfo.socketConnectException
+            )
         )
 
         healthMetricsStrings.add(
             String.format(
                 "\n\nTun write exceptions: %d",
-                healthMetricsInfo.tunWriteIOExceptions,
-            ),
+                healthMetricsInfo.tunWriteIOExceptions
+            )
         )
 
         healthMetricsStrings.add(
             String.format(
                 "\n\nTun write memory exceptions: %d",
-                healthMetricsInfo.tunWriteIOMemoryExceptions,
-            ),
+                healthMetricsInfo.tunWriteIOMemoryExceptions
+            )
         )
 
         healthMetricsStrings.add(
             String.format(
                 "\n\nBuffer allocations: %d",
-                healthMetricsInfo.bufferAllocations,
-            ),
+                healthMetricsInfo.bufferAllocations
+            )
         )
 
         val sb = StringBuilder()
@@ -344,7 +345,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         if (denominator == 0L) return "0%"
         return String.format(
             "%s%%",
-            numberFormatter.format(numerator.toDouble() / denominator * 100),
+            numberFormatter.format(numerator.toDouble() / denominator * 100)
         )
     }
 
@@ -406,7 +407,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         val exitReasons =
             applicationContext.historicalExitReasonsByProcessName(
                 "com.duckduckgo.mobile.android.vpn:vpn",
-                10,
+                10
             )
         return AppExitHistory(exitReasons)
     }
@@ -429,7 +430,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
 
     private suspend fun retrieveRunningTimeInfo() =
         generateTimeRunningMessage(
-            repository.getRunningTimeMillis({ repository.noStartDate() }).firstOrNull() ?: 0L,
+            repository.getRunningTimeMillis({ repository.noStartDate() }).firstOrNull() ?: 0L
         )
 
     private suspend fun retrieveAppTrackersBlockedInfo() =
@@ -441,7 +442,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         } else {
             networkInfo.networks.joinToString(
                 "\n\n",
-                transform = { "${it.type.type} (${it.iface}):\n${it.address}" },
+                transform = { "${it.type.type} (${it.iface}):\n${it.address}" }
             )
         }
     }
@@ -452,7 +453,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         } else {
             return getString(
                 R.string.vpnTimeRunning,
-                TimePassed.fromMilliseconds(timeRunningMillis).format(resources = resources),
+                TimePassed.fromMilliseconds(timeRunningMillis).format(resources = resources)
             )
         }
     }
@@ -475,18 +476,20 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
             networks,
             metered = metered,
             vpn = vpn,
-            connectedToInternet = connectedToInternet,
+            connectedToInternet = connectedToInternet
         )
     }
 
     private fun retrieveDnsInfo(): String {
         val dnsServerAddresses = this.getSystemActiveNetworkDefaultDns()
 
-        return if (dnsServerAddresses.isEmpty()) return "none"
-        else
+        return if (dnsServerAddresses.isEmpty()) {
+            return "none"
+        } else {
             dnsServerAddresses.joinToString(
-                ", ",
+                ", "
             ) { it }
+        }
     }
 
     private fun isConnectedToInternet(): Boolean {
@@ -507,8 +510,8 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
                         Network(
                             iface = networkInterface.name,
                             address = networkAddress.hostAddress,
-                            type = addressType(address = networkAddress),
-                        ),
+                            type = addressType(address = networkAddress)
+                        )
                     )
                 }
             }
@@ -639,7 +642,7 @@ data class HealthMetricsInfo(
     val socketConnectException: Long,
     val tunWriteIOExceptions: Long,
     val tunWriteIOMemoryExceptions: Long,
-    val bufferAllocations: Long,
+    val bufferAllocations: Long
 )
 
 data class NetworkInfo(

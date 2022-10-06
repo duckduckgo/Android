@@ -102,10 +102,11 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
 
     private fun configureToolbar() {
         toolbar.title = getString(
-            if (intent.getBooleanExtra(EXTRA_DOMAINS_LOADED, true))
+            if (intent.getBooleanExtra(EXTRA_DOMAINS_LOADED, true)) {
                 R.string.domainsLoadedActivityTitle
-            else
+            } else {
                 R.string.trackersActivityTitle
+            }
         )
         setupToolbar(toolbar)
     }

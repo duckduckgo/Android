@@ -21,8 +21,8 @@ import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface CloakedCnameDetector {
     fun detectCnameCloakedHost(url: Uri): String?

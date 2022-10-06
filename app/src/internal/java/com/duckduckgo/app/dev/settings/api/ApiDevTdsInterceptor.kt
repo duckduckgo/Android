@@ -20,9 +20,9 @@ import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

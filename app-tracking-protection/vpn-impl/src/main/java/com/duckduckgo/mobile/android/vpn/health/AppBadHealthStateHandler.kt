@@ -38,6 +38,7 @@ import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -46,7 +47,6 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -60,7 +60,7 @@ class AppBadHealthStateHandler @Inject constructor(
     private val appTpConfig: AppTpFeatureConfig,
     private val deviceShieldPixels: DeviceShieldPixels,
     private val dispatcherProvider: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : AppHealthCallback {
 
     private var debounceJob = ConflatedJob()
@@ -229,7 +229,8 @@ class AppBadHealthStateHandler @Inject constructor(
         // Debounced it to deduplicate pixels as if the VPN is restarted, we'll get immediately a call to onAppHealthUpdate() with same bad-health
         debounceJob += appCoroutineScope.launch(dispatcherProvider.io()) {
             val encodedData = Base64.encodeToString(
-                badHealthJsonString.toByteArray(), Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
+                badHealthJsonString.toByteArray(),
+                Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE
             )
             deviceShieldPixels.sendHealthMonitorReport(
                 mapOf(
@@ -237,7 +238,7 @@ class AppBadHealthStateHandler @Inject constructor(
                     MODEL_KEY to if (appBuildConfig.flavor.isInternal()) appBuildConfig.model else "redacted",
                     OS_KEY to appBuildConfig.sdkInt.toString(),
                     RESTARTED_KEY to restarted.toString(),
-                    BAD_HEALTH_DATA_KEY to encodedData,
+                    BAD_HEALTH_DATA_KEY to encodedData
                 )
             )
             delay(1000)
@@ -253,7 +254,8 @@ class AppBadHealthStateHandler @Inject constructor(
         val resolvedByRestart = (nowEpochSeconds - restartedWhenEpochSeconds) < RESTART_BAKE_TIME_SECONDS
 
         val encodedData = Base64.encodeToString(
-            lastState.healthDataJsonString.toByteArray(), Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
+            lastState.healthDataJsonString.toByteArray(),
+            Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE
         )
 
         if (resolvedByRestart) {
@@ -263,7 +265,7 @@ class AppBadHealthStateHandler @Inject constructor(
                     MODEL_KEY to if (appBuildConfig.flavor.isInternal()) appBuildConfig.model else "redacted",
                     OS_KEY to appBuildConfig.sdkInt.toString(),
                     BAD_HEALTH_DURATION_SECONDS to lastState.badHealthSustainDurationSeconds().toString(),
-                    RESOLVED_BAD_HEALTH_DATA_KEY to encodedData,
+                    RESOLVED_BAD_HEALTH_DATA_KEY to encodedData
                 )
             )
         } else {
@@ -273,7 +275,7 @@ class AppBadHealthStateHandler @Inject constructor(
                     MODEL_KEY to if (appBuildConfig.flavor.isInternal()) appBuildConfig.model else "redacted",
                     OS_KEY to appBuildConfig.sdkInt.toString(),
                     BAD_HEALTH_DURATION_SECONDS to lastState.badHealthSustainDurationSeconds().toString(),
-                    RESOLVED_BAD_HEALTH_DATA_KEY to encodedData,
+                    RESOLVED_BAD_HEALTH_DATA_KEY to encodedData
                 )
             )
         }

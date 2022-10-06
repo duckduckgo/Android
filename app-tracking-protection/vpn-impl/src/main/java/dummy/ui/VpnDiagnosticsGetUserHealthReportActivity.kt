@@ -41,7 +41,6 @@ class VpnDiagnosticsGetUserHealthReportActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.doneButton.setOnClickListener {
-
             val healthStatusValue = when (binding.userHealthSelection.checkedRadioButtonId) {
                 binding.goodHealth.id -> "good"
                 binding.badHealth.id -> "bad"

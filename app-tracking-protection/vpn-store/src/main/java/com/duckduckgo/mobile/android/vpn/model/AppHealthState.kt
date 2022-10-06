@@ -29,7 +29,7 @@ data class AppHealthState(
     val alerts: List<String>,
     val healthDataJsonString: String,
     val restartedAtEpochSeconds: Long?,
-    val badHealthStartEpochSeconds: Long? = null,
+    val badHealthStartEpochSeconds: Long? = null
 ) {
     object HealthEventTypeConverter {
         @TypeConverter
@@ -50,7 +50,7 @@ data class AppHealthState(
 data class HealthTriggerEntity(
     @PrimaryKey val name: String,
     val enabled: Boolean = false,
-    val threshold: Int? = null,
+    val threshold: Int? = null
 )
 
 enum class HealthEventType {

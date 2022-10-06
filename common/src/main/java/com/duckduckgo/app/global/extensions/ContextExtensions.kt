@@ -22,8 +22,8 @@ import android.content.Context.ACTIVITY_SERVICE
 import android.os.Build.VERSION_CODES.R
 import android.provider.Settings
 import androidx.annotation.RequiresApi
-import timber.log.Timber
 import java.util.*
+import timber.log.Timber
 
 @RequiresApi(R)
 fun Context.historicalExitReasonsByProcessName(

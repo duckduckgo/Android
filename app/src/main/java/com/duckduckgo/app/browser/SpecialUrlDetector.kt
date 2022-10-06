@@ -26,11 +26,11 @@ import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.AmpLinkType
+import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
-import timber.log.Timber
 import java.net.URISyntaxException
+import timber.log.Timber
 
 interface SpecialUrlDetector {
     fun determineType(initiatingUrl: String?, uri: Uri): UrlType

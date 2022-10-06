@@ -83,7 +83,10 @@ constructor(
 
         val a =
             context.theme.obtainStyledAttributes(
-                attrs, R.styleable.LabelLinkView, defStyleAttr, defStyleRes
+                attrs,
+                R.styleable.LabelLinkView,
+                defStyleAttr,
+                defStyleRes
             )
         leadingIcon = a.getDrawable(R.styleable.LabelLinkView_leadingIcon)
         label = a.getString(R.styleable.LabelLinkView_android_text) ?: label

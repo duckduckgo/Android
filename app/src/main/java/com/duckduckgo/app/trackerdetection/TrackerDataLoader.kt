@@ -34,10 +34,10 @@ import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @WorkerThread
 @ContributesMultibinding(

@@ -17,17 +17,17 @@
 package com.duckduckgo.mobile.android.vpn.stats
 
 import androidx.annotation.WorkerThread
-import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
-import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
+import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.LocalDateTime
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 interface AppTrackerBlockingStatsRepository {
 
@@ -211,7 +211,6 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
     }
 
     private fun calculateDataTotals(dataStats: List<VpnDataStats>): DataStats {
-
         var dataSent = 0L
         var packetsSent = 0L
         var dataReceived = 0L

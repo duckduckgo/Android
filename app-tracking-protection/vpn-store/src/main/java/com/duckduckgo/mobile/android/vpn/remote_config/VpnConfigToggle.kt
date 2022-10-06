@@ -25,5 +25,5 @@ data class VpnConfigToggle(
     @PrimaryKey(autoGenerate = false) val name: String,
     val enabled: Boolean,
     val isManualOverride: Boolean = false,
-    val localtime: String = DatabaseDateFormatter.timestamp(),
+    val localtime: String = DatabaseDateFormatter.timestamp()
 )

@@ -75,7 +75,5 @@ class AppTrackerJsonParser {
                 .map { it.value }
                 .sortedBy { it.score }
         }
-
     }
-
 }

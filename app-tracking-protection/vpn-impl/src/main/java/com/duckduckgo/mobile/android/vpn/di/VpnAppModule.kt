@@ -106,7 +106,7 @@ object VpnAppModule {
     @SingleInstanceIn(AppScope::class)
     fun provideVpnFeaturesRegistry(
         context: Context,
-        sharedPreferencesProvider: VpnSharedPreferencesProvider,
+        sharedPreferencesProvider: VpnSharedPreferencesProvider
     ): VpnFeaturesRegistry {
         return VpnFeaturesRegistryImpl(VpnServiceWrapper(context), sharedPreferencesProvider)
     }

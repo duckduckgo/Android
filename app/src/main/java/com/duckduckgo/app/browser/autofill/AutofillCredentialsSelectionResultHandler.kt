@@ -34,11 +34,11 @@ import com.duckduckgo.autofill.ui.credential.saving.declines.AutofillDeclineCoun
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 class AutofillCredentialsSelectionResultHandler @Inject constructor(
     private val deviceAuthenticator: DeviceAuthenticator,

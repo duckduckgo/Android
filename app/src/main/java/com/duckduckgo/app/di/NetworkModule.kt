@@ -48,6 +48,8 @@ import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import java.io.File
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -57,8 +59,6 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import timber.log.Timber
-import java.io.File
-import javax.inject.Named
 
 @Module
 class NetworkModule {
@@ -89,7 +89,7 @@ class NetworkModule {
     fun pixelOkHttpClient(
         apiRequestInterceptor: ApiRequestInterceptor,
         pixelReQueryInterceptor: PixelReQueryInterceptor,
-        pixelInterceptorPlugins: PluginPoint<PixelInterceptorPlugin>,
+        pixelInterceptorPlugins: PluginPoint<PixelInterceptorPlugin>
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)

@@ -53,8 +53,11 @@ import timber.log.Timber
 class DeviceShieldTileService : TileService() {
 
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
+
     @Inject lateinit var repository: AtpWaitlistStateRepository
+
     @Inject lateinit var vpnStore: VpnStore
+
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     private var deviceShieldStatePollingJob = ConflatedJob()

@@ -32,8 +32,9 @@ fun ByteArray.indexOf(sequence: ByteArray, offset: Int = 0): Int {
     for (i in offset until this.size) {
         if (this[i] == sequence[matchIdx]) {
             matchIdx++
-            if (matchIdx == sequence.size)
+            if (matchIdx == sequence.size) {
                 return i + 1
+            }
         } else {
             matchIdx = 0
         }

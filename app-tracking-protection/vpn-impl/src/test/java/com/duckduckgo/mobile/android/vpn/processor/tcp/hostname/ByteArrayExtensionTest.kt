@@ -16,9 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
+import java.nio.charset.StandardCharsets
 import org.junit.Assert
 import org.junit.Test
-import java.nio.charset.StandardCharsets
 
 class ByteArrayExtensionTest {
     private val testee = "test_string".toByteArray(StandardCharsets.US_ASCII)

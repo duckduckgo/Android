@@ -52,6 +52,7 @@ import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.SitePermissionsPixelName
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -63,7 +64,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SettingsViewModel @Inject constructor(
@@ -82,7 +82,7 @@ class SettingsViewModel @Inject constructor(
     private val macOsWaitlist: MacOsWaitlist,
     private val autofillStore: AutofillStore,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val autoconsent: Autoconsent,
+    private val autoconsent: Autoconsent
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -104,7 +104,7 @@ class SettingsViewModel @Inject constructor(
         val emailAddress: String? = null,
         val macOsWaitlistState: MacWaitlistState = MacWaitlistState.NotJoinedQueue,
         val showAutofill: Boolean = false,
-        val autoconsentEnabled: Boolean = false,
+        val autoconsentEnabled: Boolean = false
     )
 
     data class AutomaticallyClearData(
@@ -174,7 +174,7 @@ class SettingsViewModel @Inject constructor(
                     emailAddress = emailManager.getEmailAddress(),
                     macOsWaitlistState = macOsWaitlist.getWaitlistState(),
                     showAutofill = autofillStore.autofillAvailable,
-                    autoconsentEnabled = autoconsent.isSettingEnabled(),
+                    autoconsentEnabled = autoconsent.isSettingEnabled()
                 )
             )
         }

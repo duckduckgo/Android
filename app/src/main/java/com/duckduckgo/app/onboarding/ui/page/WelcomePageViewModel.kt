@@ -96,7 +96,10 @@ class WelcomePageViewModelFactory(
         return with(modelClass) {
             when {
                 isAssignableFrom(WelcomePageViewModel::class.java) -> WelcomePageViewModel(
-                    appInstallStore, context, pixel, defaultRoleBrowserDialog
+                    appInstallStore,
+                    context,
+                    pixel,
+                    defaultRoleBrowserDialog
                 )
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }

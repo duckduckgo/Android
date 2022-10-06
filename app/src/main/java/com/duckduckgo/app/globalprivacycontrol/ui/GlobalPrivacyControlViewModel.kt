@@ -38,7 +38,7 @@ class GlobalPrivacyControlViewModel @Inject constructor(
 
     data class ViewState(
         val globalPrivacyControlEnabled: Boolean = false,
-        val globalPrivacyControlFeatureEnabled: Boolean = false,
+        val globalPrivacyControlFeatureEnabled: Boolean = false
     )
 
     sealed class Command {

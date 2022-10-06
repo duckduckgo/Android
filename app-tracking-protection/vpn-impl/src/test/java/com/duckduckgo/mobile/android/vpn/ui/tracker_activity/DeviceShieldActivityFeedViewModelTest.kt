@@ -21,17 +21,19 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.model.TrackingApp
-import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.model.TrackingApp
+import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.jakewharton.threetenabp.AndroidThreeTen
+import java.util.concurrent.TimeUnit.DAYS
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -39,8 +41,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.TimeUnit.DAYS
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
@@ -103,7 +103,7 @@ class DeviceShieldActivityFeedViewModelTest {
                         trackingApp = dummyTrackers[0].trackingApp,
                         trackingCompanyBadges = listOf(
                             TrackerCompanyBadge.Company(dummyTrackers[0].company, dummyTrackers[0].companyDisplayName),
-                            TrackerCompanyBadge.Company(dummyTrackers[1].company, dummyTrackers[1].companyDisplayName),
+                            TrackerCompanyBadge.Company(dummyTrackers[1].company, dummyTrackers[1].companyDisplayName)
                         ),
                         timestamp = TEST_TIMESTAMP,
                         displayTimestamp = "Just Now",
@@ -114,12 +114,12 @@ class DeviceShieldActivityFeedViewModelTest {
                         bucket = dummyTrackers[2].bucket(),
                         trackingApp = dummyTrackers[2].trackingApp,
                         trackingCompanyBadges = listOf(
-                            TrackerCompanyBadge.Company(dummyTrackers[2].company, dummyTrackers[2].companyDisplayName),
+                            TrackerCompanyBadge.Company(dummyTrackers[2].company, dummyTrackers[2].companyDisplayName)
                         ),
                         timestamp = TEST_TIMESTAMP,
                         displayTimestamp = "Just Now",
                         trackersTotalCount = 1
-                    ),
+                    )
                 ),
                 awaitItem()
             )

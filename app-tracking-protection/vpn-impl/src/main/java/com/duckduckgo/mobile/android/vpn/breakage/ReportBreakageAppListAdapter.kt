@@ -65,7 +65,7 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
 
     private class DiffCallback(
         private val oldList: List<InstalledApp>,
-        private val newList: List<InstalledApp>,
+        private val newList: List<InstalledApp>
     ) : DiffUtil.Callback() {
         override fun getOldListSize(): Int {
             return oldList.size

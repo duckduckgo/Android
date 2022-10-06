@@ -44,7 +44,6 @@ class RestoreDefaultProtectionDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_restore_defaults, null)
 
         val restoreCTA = rootView.findViewById<Button>(R.id.trackingProtectionRestoreDefaultsRestore)

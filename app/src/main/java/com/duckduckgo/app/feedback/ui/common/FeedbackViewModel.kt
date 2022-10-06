@@ -36,11 +36,11 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class FeedbackViewModel @Inject constructor(
@@ -48,7 +48,7 @@ class FeedbackViewModel @Inject constructor(
     private val feedbackSubmitter: FeedbackSubmitter,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
-    private val dispatchers: DispatcherProvider,
+    private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()

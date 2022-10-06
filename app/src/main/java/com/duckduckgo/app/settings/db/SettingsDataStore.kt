@@ -41,6 +41,7 @@ interface SettingsDataStore {
     var selectedFireAnimation: FireAnimation
     val fireAnimationEnabled: Boolean
     var appIconChanged: Boolean
+
     @Deprecated(message = "Not used anymore after adding automatic fireproof", replaceWith = ReplaceWith(expression = "automaticFireproofSetting"))
     var appLoginDetection: Boolean
     var automaticFireproofSetting: AutomaticFireproofSetting
@@ -82,8 +83,11 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getString(KEY_BACKGROUND_JOB_ID, null)
         set(value) {
             preferences.edit(commit = true) {
-                if (value == null) remove(KEY_BACKGROUND_JOB_ID)
-                else putString(KEY_BACKGROUND_JOB_ID, value)
+                if (value == null) {
+                    remove(KEY_BACKGROUND_JOB_ID)
+                } else {
+                    putString(KEY_BACKGROUND_JOB_ID, value)
+                }
             }
         }
 

@@ -32,7 +32,7 @@ interface DefaultRoleBrowserDialog {
 
 class RealDefaultRoleBrowserDialog(
     private val appInstallStore: AppInstallStore,
-    private val appBuildConfig: AppBuildConfig,
+    private val appBuildConfig: AppBuildConfig
 ) : DefaultRoleBrowserDialog {
 
     /**

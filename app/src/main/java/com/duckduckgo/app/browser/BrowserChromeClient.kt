@@ -30,10 +30,10 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Drm
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class BrowserChromeClient @Inject constructor(
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,

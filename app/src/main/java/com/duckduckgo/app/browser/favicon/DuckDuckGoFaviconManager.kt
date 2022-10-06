@@ -33,8 +33,8 @@ import com.duckduckgo.app.global.touchFaviconLocation
 import com.duckduckgo.app.global.view.loadFavicon
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.autofill.store.AutofillStore
-import kotlinx.coroutines.withContext
 import java.io.File
+import kotlinx.coroutines.withContext
 
 class DuckDuckGoFaviconManager constructor(
     private val faviconPersister: FaviconPersister,
@@ -118,7 +118,9 @@ class DuckDuckGoFaviconManager constructor(
 
             return@withContext if (cachedFavicon != null) {
                 faviconDownloader.getFaviconFromDisk(cachedFavicon)
-            } else null
+            } else {
+                null
+            }
         }
     }
 
@@ -142,7 +144,9 @@ class DuckDuckGoFaviconManager constructor(
 
             return@withContext if (cachedFavicon != null) {
                 faviconDownloader.getFaviconFromDisk(cachedFavicon, cornerRadius, width, height)
-            } else null
+            } else {
+                null
+            }
         }
     }
 
@@ -237,7 +241,9 @@ class DuckDuckGoFaviconManager constructor(
     ): File? {
         return if (persistedFaviconsForDomain(domain) > 0) {
             faviconPersister.store(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, icon, domain)
-        } else null
+        } else {
+            null
+        }
     }
 
     private suspend fun tryRemoteFallbackFavicon(

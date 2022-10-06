@@ -27,12 +27,12 @@ import com.bumptech.glide.module.AppGlideModule
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX1
 import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX2
+import java.io.InputStream
+import java.security.cert.X509Certificate
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.tls.HandshakeCertificates
 import timber.log.Timber
-import java.io.InputStream
-import java.security.cert.X509Certificate
 
 @GlideModule
 class GlobalGlideModule : AppGlideModule() {

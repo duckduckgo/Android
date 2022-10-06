@@ -28,10 +28,10 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesTo
@@ -39,9 +39,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.android.AndroidInjection
 import dagger.multibindings.IntoSet
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import timber.log.Timber
 
 @Module
 @ContributesTo(AppScope::class)
@@ -93,8 +93,10 @@ class VpnServiceHeartbeatMonitorWorker(
 ) : CoroutineWorker(context, params) {
     @Inject
     lateinit var vpnPhoenixDao: VpnPhoenixDao
+
     @Inject
     lateinit var vpnHeartBeatDao: VpnHeartBeatDao
+
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 

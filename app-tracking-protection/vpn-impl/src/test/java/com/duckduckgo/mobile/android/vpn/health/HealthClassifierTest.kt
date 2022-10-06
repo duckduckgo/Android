@@ -153,7 +153,6 @@ class HealthClassifierTest {
 
     @Test
     fun whenLotsOfTunInputsButNoQueueReadsThenReportsBadHealth() {
-
         // success rate: 0%
         val tunInputs: Long = 100
         val queueReads = QueueReads(0, 0, 0, 0)
@@ -163,7 +162,6 @@ class HealthClassifierTest {
 
     @Test
     fun whenLotsOfTunInputsAndLowNumberOfQueueReadsThenReportsBadHealth() {
-
         // success rate: 10%
         val tunInputs: Long = 900
         val queueReads = QueueReads(100, 100, 0, 0)
@@ -186,7 +184,6 @@ class HealthClassifierTest {
 
     @Test
     fun whenLotsOfTunInputsAndQueueReadsThenReportsGoodHealth() {
-
         // success rate: 100%
         val tunInputs: Long = 900
         val queueReads = QueueReads(900, 900, 0, 0)
@@ -196,7 +193,6 @@ class HealthClassifierTest {
 
     @Test
     fun whenLotsOfTunInputsAndQueueReadsAndRemoteThresholdThenReportsGoodHealth() {
-
         whenever(thresholds.triggers()).thenReturn(
             listOf(HealthTriggerEntity("tunInputsQueueReadRate", true))
         )
@@ -210,7 +206,6 @@ class HealthClassifierTest {
 
     @Test
     fun whenTunInputsToQueueReadRateIsOver100PercentThenIsStillGoodHealth() {
-
         // success rate: 900%
         val tunInputs: Long = 100
         val queueReads = QueueReads(900, 900, 0, 0)

@@ -20,11 +20,11 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import java.io.InterruptedIOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.InterruptedIOException
 
 class AlertingUncaughtExceptionHandler(
     private val originalHandler: Thread.UncaughtExceptionHandler,
@@ -39,7 +39,6 @@ class AlertingUncaughtExceptionHandler(
         thread: Thread?,
         originalException: Throwable?
     ) {
-
         if (shouldRecordExceptionAndCrashApp(originalException)) {
             recordExceptionAndAllowCrash(thread, originalException)
             return

@@ -64,7 +64,6 @@ class AutoCompleteApi @Inject constructor(
 ) : AutoComplete {
 
     override fun autoComplete(query: String): Observable<AutoCompleteResult> {
-
         if (query.isBlank()) {
             return Observable.just(AutoCompleteResult(query = query, suggestions = emptyList()))
         }

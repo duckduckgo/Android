@@ -19,11 +19,11 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
+import kotlin.math.absoluteValue
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
 import xyz.hexene.localvpn.TCB.TCBStatus.*
-import kotlin.math.absoluteValue
 
 class TcpStateFlow {
 
@@ -34,7 +34,6 @@ class TcpStateFlow {
             packetType: PacketType,
             sequenceNumberToClientInitial: Long
         ): TcpStateAction {
-
             val newActions = when (currentState.serverState) {
                 LISTEN -> handlePacketInStateListen(connectionKey, currentState, packetType)
                 SYN_RECEIVED -> handlePacketInSynReceived(connectionKey, currentState, packetType, sequenceNumberToClientInitial)
@@ -115,12 +114,22 @@ class TcpStateFlow {
             if (!match) {
                 Timber.w(
                     "%s - %s, received [fin=%s, ack=%s] but mismatching numbers. Expected=%d, actual=%d",
-                    connectionKey, currentState, packetType.isFin, packetType.isAck, packetType.finSequenceNumberToClient, packetType.ackNum
+                    connectionKey,
+                    currentState,
+                    packetType.isFin,
+                    packetType.isAck,
+                    packetType.finSequenceNumberToClient,
+                    packetType.ackNum
                 )
             } else {
                 Timber.v(
                     "%s - %s, received [fin=%s, ack=%s] with matching numbers. Expected=%d, actual=%d",
-                    connectionKey, currentState, packetType.isFin, packetType.isAck, packetType.finSequenceNumberToClient, packetType.ackNum
+                    connectionKey,
+                    currentState,
+                    packetType.isFin,
+                    packetType.isAck,
+                    packetType.finSequenceNumberToClient,
+                    packetType.ackNum
                 )
             }
             return match
@@ -229,7 +238,7 @@ class TcpStateFlow {
         ): List<Event> {
             val events = when {
                 packetType.isRst -> {
-                    Timber.d("Received RESET while in $currentState. Nothing to do. $connectionKey",)
+                    Timber.d("Received RESET while in $currentState. Nothing to do. $connectionKey")
                     listOf(CloseConnection)
                 }
                 packetType.isSyn -> {
@@ -259,7 +268,6 @@ class TcpStateFlow {
             packetType: PacketType,
             initialSequenceNumberToClient: Long
         ): List<Event> {
-
             val events = when {
                 packetType.isRst -> {
                     Timber.w("Received RESET while in $currentState. Closing connection $connectionKey")

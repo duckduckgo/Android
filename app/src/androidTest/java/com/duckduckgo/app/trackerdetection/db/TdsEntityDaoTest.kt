@@ -51,7 +51,6 @@ class TdsEntityDaoTest {
 
     @Test
     fun whenListIsUpdatedThenEntitiesAreUpdated() {
-
         val list = listOf(
             TdsEntity("Entity 1 Ltd", "Entity 1", 1.0),
             TdsEntity("Entity 2 Ltd", "Entity 2", 2.0),
@@ -75,7 +74,6 @@ class TdsEntityDaoTest {
 
     @Test
     fun whenEntitiesWithSameNameAddedThenOnlySingleEntryForDomainExists() {
-
         val list = listOf(
             TdsEntity("Entity 1 Ltd", "Entity A", 0.0),
             TdsEntity("Entity 1 Ltd", "Entity B", 0.0),
@@ -89,7 +87,6 @@ class TdsEntityDaoTest {
 
     @Test
     fun whenAllEntitiesDeletedThenGetAllIsEmpty() {
-
         val list = listOf(
             TdsEntity("Entity 1 Ltd", "Entity 1", 1.0),
             TdsEntity("Entity 2 Ltd", "Entity 2", 2.0),

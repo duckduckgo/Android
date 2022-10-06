@@ -28,16 +28,16 @@ import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.nio.channels.SocketChannel
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 private const val WWW_DUCKDUCKGO_COM = "www.duckduckgo.com"
 
@@ -47,7 +47,7 @@ class NetworkConnectivityHealthHandler @Inject constructor(
     private val pixel: DeviceShieldPixels,
     private val healthMetricCounter: HealthMetricCounter,
     private val appTpFeatureConfig: AppTpFeatureConfig,
-    private val trackerBlockingVpnService: Provider<TrackerBlockingVpnService>,
+    private val trackerBlockingVpnService: Provider<TrackerBlockingVpnService>
 ) : VpnServiceCallbacks {
     private val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val job = ConflatedJob()

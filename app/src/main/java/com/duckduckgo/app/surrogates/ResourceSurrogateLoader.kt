@@ -25,11 +25,11 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.io.ByteArrayInputStream
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.ByteArrayInputStream
-import javax.inject.Inject
 
 @WorkerThread
 @ContributesMultibinding(
@@ -76,13 +76,11 @@ class ResourceSurrogateLoader @Inject constructor(
         val functionBuilder = StringBuilder()
 
         existingLines.forEach {
-
             if (it.startsWith("#")) {
                 return@forEach
             }
 
             if (nextLineIsNewRule) {
-
                 with(it.split(" ")) {
                     ruleName = this[0]
                     mimeType = this[1]

@@ -26,11 +26,11 @@ import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
 class DataClearingWorker(
@@ -40,12 +40,12 @@ class DataClearingWorker(
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
+
     @Inject
     lateinit var clearDataAction: ClearDataAction
 
     @WorkerThread
     override suspend fun doWork(): Result {
-
         if (jobAlreadyExecuted()) {
             Timber.i("This job has run before; no more work needed")
             return success()

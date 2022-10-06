@@ -22,10 +22,10 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
+import dagger.SingleInstanceIn
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
-import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)

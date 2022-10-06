@@ -33,7 +33,7 @@ interface WidgetCapabilities {
 
 class AppWidgetCapabilities @Inject constructor(
     private val context: Context,
-    private val appBuildConfig: AppBuildConfig,
+    private val appBuildConfig: AppBuildConfig
 ) : WidgetCapabilities {
 
     override val supportsAutomaticWidgetAdd: Boolean

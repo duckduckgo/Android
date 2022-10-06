@@ -23,16 +23,16 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.model.PixelEntity
-import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_DASHBOARD_OPENED
-import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import org.mockito.kotlin.*
 import io.reactivex.Completable
+import java.util.concurrent.TimeoutException
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -40,7 +40,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import java.util.concurrent.TimeoutException
+import org.mockito.kotlin.*
 
 class RxPixelSenderTest {
 
@@ -77,7 +77,11 @@ class RxPixelSenderTest {
         pendingPixelDao = db.pixelDao()
 
         testee = RxPixelSender(
-            api, pendingPixelDao, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo,
+            api,
+            pendingPixelDao,
+            mockStatisticsDataStore,
+            mockVariantManager,
+            mockDeviceInfo,
             object : StatisticsLibraryConfig {
                 override fun shouldFirePixelsAsDev() = true
             }
@@ -212,7 +216,11 @@ class RxPixelSenderTest {
         testee.onStart(mockLifecycleOwner)
 
         verify(api).fire(
-            pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams
+            pixelEntity.pixelName,
+            "phone",
+            pixelEntity.atb,
+            pixelEntity.additionalQueryParams,
+            pixelEntity.encodedQueryParams
         )
     }
 
@@ -268,7 +276,11 @@ class RxPixelSenderTest {
         testee.onStart(mockLifecycleOwner)
 
         verify(api, times(5)).fire(
-            pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams
+            pixelEntity.pixelName,
+            "phone",
+            pixelEntity.atb,
+            pixelEntity.additionalQueryParams,
+            pixelEntity.encodedQueryParams
         )
     }
 

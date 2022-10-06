@@ -50,7 +50,9 @@ class NavigationHistorySheet(
 
         findViewById<RecyclerView>(com.duckduckgo.app.browser.R.id.historyRecycler)?.also { recycler ->
             NavigationHistoryAdapter(
-                viewLifecycleOwner, faviconManager, tabId,
+                viewLifecycleOwner,
+                faviconManager,
+                tabId,
                 object : NavigationHistoryListener {
                     override fun historicalPageSelected(stackIndex: Int) {
                         dismiss()

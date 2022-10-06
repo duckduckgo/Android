@@ -43,7 +43,6 @@ class RealSavedSitesParser : SavedSitesParser {
         folderTree: FolderTree,
         favorites: List<SavedSite.Favorite>
     ): String {
-
         if (folderTree.isEmpty() && favorites.isEmpty()) {
             return ""
         }
@@ -142,7 +141,6 @@ class RealSavedSitesParser : SavedSitesParser {
         savedSites: MutableList<SavedSite>,
         inFavorite: Boolean
     ): List<SavedSite> {
-
         var favorites = 0
 
         documentElement.select("DL").first()?.let { itemBlock ->

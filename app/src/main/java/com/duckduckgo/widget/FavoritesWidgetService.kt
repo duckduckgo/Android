@@ -28,13 +28,13 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.view.generateDefaultDrawable
-import kotlinx.coroutines.runBlocking
+import com.duckduckgo.mobile.android.R as CommonR
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 
 class FavoritesWidgetService : RemoteViewsService() {
 

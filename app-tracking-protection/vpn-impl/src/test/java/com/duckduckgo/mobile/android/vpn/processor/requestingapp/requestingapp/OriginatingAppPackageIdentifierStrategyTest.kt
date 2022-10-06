@@ -20,11 +20,11 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.ConnectionInfo
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifier
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
+import java.net.InetAddress
+import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.junit.Test
 import xyz.hexene.localvpn.TransportProtocol
-import java.net.InetAddress
 
 class OriginatingAppPackageIdentifierStrategyTest {
 
@@ -32,7 +32,9 @@ class OriginatingAppPackageIdentifierStrategyTest {
     private val mockResolverLegacy: OriginatingAppPackageIdentifier = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val testee = OriginatingAppPackageIdentifierStrategy(
-        modern = mockResolverModern, legacy = mockResolverLegacy, appBuildConfig = mockAppBuildConfig
+        modern = mockResolverModern,
+        legacy = mockResolverLegacy,
+        appBuildConfig = mockAppBuildConfig
     )
 
     @Test

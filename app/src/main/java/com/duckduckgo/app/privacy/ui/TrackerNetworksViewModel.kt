@@ -32,6 +32,9 @@ import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import java.util.*
+import javax.inject.Inject
+import kotlin.Comparator
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -42,9 +45,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
-import java.util.*
-import javax.inject.Inject
-import kotlin.Comparator
 
 @ContributesViewModel(ActivityScope::class)
 class TrackerNetworksViewModel @Inject constructor(
@@ -170,38 +170,50 @@ class TrackerNetworksViewModel @Inject constructor(
     private fun sectionsComparator(): Comparator<TrackerNetworksSection> = compareBy { it.trackerStatus }
 
     private fun sectionInfo(status: TrackerStatus, domain: String?): TrackerNetworksSection? {
-        if (status == TrackerStatus.BLOCKED) return TrackerNetworksSection(
-            trackerStatus = status
-        )
+        if (status == TrackerStatus.BLOCKED) {
+            return TrackerNetworksSection(
+                trackerStatus = status
+            )
+        }
 
-        if (status == TrackerStatus.AD_ALLOWED) return TrackerNetworksSection(
-            descriptionRes = R.string.adLoadedSectionDescription,
-            linkTextRes = R.string.adLoadedSectionLinkText,
-            linkUrlRes = R.string.adLoadedSectionUrl,
-            domain = domain,
-            trackerStatus = status
-        )
+        if (status == TrackerStatus.AD_ALLOWED) {
+            return TrackerNetworksSection(
+                descriptionRes = R.string.adLoadedSectionDescription,
+                linkTextRes = R.string.adLoadedSectionLinkText,
+                linkUrlRes = R.string.adLoadedSectionUrl,
+                domain = domain,
+                trackerStatus = status
+            )
+        }
 
-        if (status == TrackerStatus.SITE_BREAKAGE_ALLOWED) return TrackerNetworksSection(
-            descriptionRes = R.string.domainsLoadedBreakageSectionDescription,
-            trackerStatus = status
-        )
+        if (status == TrackerStatus.SITE_BREAKAGE_ALLOWED) {
+            return TrackerNetworksSection(
+                descriptionRes = R.string.domainsLoadedBreakageSectionDescription,
+                trackerStatus = status
+            )
+        }
 
-        if (status == TrackerStatus.ALLOWED) return TrackerNetworksSection(
-            descriptionRes = R.string.domainsLoadedSectionDescription,
-            trackerStatus = status
-        )
+        if (status == TrackerStatus.ALLOWED) {
+            return TrackerNetworksSection(
+                descriptionRes = R.string.domainsLoadedSectionDescription,
+                trackerStatus = status
+            )
+        }
 
-        if (status == TrackerStatus.USER_ALLOWED) return TrackerNetworksSection(
-            descriptionRes = R.string.trackersBlockedNoSectionDescription,
-            trackerStatus = status
-        )
+        if (status == TrackerStatus.USER_ALLOWED) {
+            return TrackerNetworksSection(
+                descriptionRes = R.string.trackersBlockedNoSectionDescription,
+                trackerStatus = status
+            )
+        }
 
-        if (status == TrackerStatus.SAME_ENTITY_ALLOWED) return TrackerNetworksSection(
-            descriptionRes = R.string.domainsLoadedAssociatedSectionDescription,
-            trackerStatus = status,
-            domain = domain
-        )
+        if (status == TrackerStatus.SAME_ENTITY_ALLOWED) {
+            return TrackerNetworksSection(
+                descriptionRes = R.string.domainsLoadedAssociatedSectionDescription,
+                trackerStatus = status,
+                domain = domain
+            )
+        }
 
         return null
     }

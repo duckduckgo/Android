@@ -25,11 +25,11 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @ContributesMultibinding(
     scope = AppScope::class,

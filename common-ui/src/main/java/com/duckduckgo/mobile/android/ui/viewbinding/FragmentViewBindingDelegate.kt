@@ -50,7 +50,8 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
                         nullifyBindingHandler.post { binding = null }
                         super.onDestroy(owner)
                     }
-                })
+                }
+            )
         }
     }
 
@@ -58,7 +59,6 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
         thisRef: Fragment,
         property: KProperty<*>
     ): T {
-
         // onCreateView maybe be called between the onDestroyView and the next Main thread run-loop.
         // Because nullifyBindingHandler has to post to null the binding, it may happen that
         // [binding]
@@ -84,4 +84,5 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
     }
 }
 
-@Suppress("UNCHECKED_CAST") private fun <T> Any.cast(): T = this as T
+@Suppress("UNCHECKED_CAST")
+private fun <T> Any.cast(): T = this as T

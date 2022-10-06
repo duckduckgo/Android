@@ -41,11 +41,11 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 private const val REMOTE_FEATURE = "remote-feature"
 private const val ON = "on"
@@ -93,7 +93,7 @@ class VpnRemoteFeatureReceiver(
 class VpnRemoteFeatureReceiverRegister @Inject constructor(
     private val context: Context,
     private val appTpFeatureConfig: AppTpFeatureConfig,
-    private val dispatcherProvider: DispatcherProvider,
+    private val dispatcherProvider: DispatcherProvider
 ) : VpnServiceCallbacks {
 
     private var receiver: VpnRemoteFeatureReceiver? = null

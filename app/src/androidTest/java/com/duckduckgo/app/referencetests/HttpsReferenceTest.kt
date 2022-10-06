@@ -55,11 +55,10 @@ import com.duckduckgo.privacy.config.store.toHttpsException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -67,8 +66,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import timber.log.Timber
-import java.util.concurrent.CopyOnWriteArrayList
 
 @ExperimentalCoroutinesApi
 @RunWith(Parameterized::class)
@@ -202,7 +202,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
             embeddedDataPersister,
             httpsDataPersister,
             mockPixel,
-            InstrumentationRegistry.getInstrumentation().targetContext,
+            InstrumentationRegistry.getInstrumentation().targetContext
         )
     }
 

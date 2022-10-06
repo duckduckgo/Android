@@ -25,14 +25,14 @@ import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
-import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.app.global.formatters.data.DataSizeFormatter
 import com.duckduckgo.app.global.formatters.time.model.TimePassed
-import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
 import com.duckduckgo.app.global.formatters.time.model.dateOfPreviousMidnight
+import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.DataTransfer
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.google.android.material.snackbar.Snackbar
@@ -92,7 +92,6 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
     }
 
     private fun subscribeForViewUpdates() {
-
         viewModel.getRunningTimeUpdates { dateOfPreviousMidnight() }.observe(this) {
             renderTimeRunning(it.runningTimeMillis)
         }
@@ -175,7 +174,9 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
             val clipData: ClipData = ClipData.newPlainText("VPN UUID", uuidTextView.text)
             manager.setPrimaryClip(clipData)
             Snackbar.make(
-                uuidTextView, "UUID is now copied to the Clipboard", Snackbar.LENGTH_SHORT
+                uuidTextView,
+                "UUID is now copied to the Clipboard",
+                Snackbar.LENGTH_SHORT
             )
                 .show()
         }
@@ -246,7 +247,8 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
             getString(R.string.vpnNotRunYet)
         } else {
             return getString(
-                R.string.vpnTimeRunning, TimePassed.fromMilliseconds(timeRunningMillis).format(resources = resources)
+                R.string.vpnTimeRunning,
+                TimePassed.fromMilliseconds(timeRunningMillis).format(resources = resources)
             )
         }
     }
@@ -279,11 +281,13 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
         } else {
             return if (displayWeek) {
                 applicationContext.getString(
-                    R.string.vpnTrackerCompaniesBlockedThisWeek, totalTrackerCompanies
+                    R.string.vpnTrackerCompaniesBlockedThisWeek,
+                    totalTrackerCompanies
                 )
             } else {
                 applicationContext.getString(
-                    R.string.vpnTrackerCompaniesBlockedToday, totalTrackerCompanies
+                    R.string.vpnTrackerCompaniesBlockedToday,
+                    totalTrackerCompanies
                 )
             }
         }

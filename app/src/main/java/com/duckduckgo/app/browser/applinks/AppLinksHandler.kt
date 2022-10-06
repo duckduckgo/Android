@@ -39,7 +39,7 @@ interface AppLinksHandler {
 
 @ContributesBinding(AppScope::class)
 class DuckDuckGoAppLinksHandler @Inject constructor(
-    private val appBuildConfig: AppBuildConfig,
+    private val appBuildConfig: AppBuildConfig
 ) : AppLinksHandler {
 
     var previousUrl: String? = null
@@ -52,7 +52,6 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
         shouldHaltWebNavigation: Boolean,
         launchAppLink: () -> Unit
     ): Boolean {
-
         if (!appLinksEnabled || appBuildConfig.sdkInt < Build.VERSION_CODES.N || !isForMainFrame) {
             return false
         }

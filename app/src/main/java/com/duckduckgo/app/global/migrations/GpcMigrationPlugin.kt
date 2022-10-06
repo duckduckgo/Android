@@ -21,9 +21,9 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

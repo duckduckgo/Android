@@ -26,8 +26,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface FireproofWebsiteRepositoryAPI {
     suspend fun fireproofWebsite(domain: String): FireproofWebsiteEntity?

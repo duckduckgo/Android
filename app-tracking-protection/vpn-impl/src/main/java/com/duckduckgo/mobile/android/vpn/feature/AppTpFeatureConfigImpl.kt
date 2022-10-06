@@ -24,11 +24,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.remote_config.*
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.ConcurrentHashMap
-import javax.inject.Inject
 
 @ContributesBinding(
     scope = AppScope::class,
@@ -39,7 +39,7 @@ class AppTpFeatureConfigImpl @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
     vpnRemoteConfigDatabase: VpnRemoteConfigDatabase,
-    dispatcherProvider: DispatcherProvider,
+    dispatcherProvider: DispatcherProvider
 ) : AppTpFeatureConfig, AppTpFeatureConfig.Editor {
 
     private val togglesDao = vpnRemoteConfigDatabase.vpnConfigTogglesDao()

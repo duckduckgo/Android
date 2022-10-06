@@ -20,9 +20,9 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollector
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 interface VpnBugReporter {
     suspend fun generateBugReport(): String
@@ -31,7 +31,7 @@ interface VpnBugReporter {
 @ContributesBinding(VpnScope::class)
 class RealVpnBugReporter @Inject constructor(
     private val vpnStateCollector: VpnStateCollector,
-    private val dispatcherProvider: DispatcherProvider,
+    private val dispatcherProvider: DispatcherProvider
 ) : VpnBugReporter {
     override suspend fun generateBugReport(): String {
         return withContext(dispatcherProvider.io()) {

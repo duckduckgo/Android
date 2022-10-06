@@ -25,19 +25,19 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
+import java.lang.Thread.UncaughtExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.lang.Thread.UncaughtExceptionHandler
-import dagger.SingleInstanceIn
-import kotlinx.coroutines.NonCancellable
 
 class VpnUncaughtExceptionHandler(
     private val originalHandler: UncaughtExceptionHandler?,
     private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository
 ) : UncaughtExceptionHandler {
 
     override fun uncaughtException(
@@ -75,7 +75,7 @@ object VpnExceptionModule {
         @AppCoroutineScope vpnCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
-        uncaughtExceptionRepository: UncaughtExceptionRepository,
+        uncaughtExceptionRepository: UncaughtExceptionRepository
     ): VpnUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
         return VpnUncaughtExceptionHandler(

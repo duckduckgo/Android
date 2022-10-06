@@ -21,11 +21,11 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class TabsDbSanitizer @Inject constructor(

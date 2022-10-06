@@ -29,8 +29,8 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class BookmarkFoldersViewModel @Inject constructor(

@@ -23,7 +23,6 @@ import javax.inject.Named
 class DataSizeFormatter @Inject constructor(@Named("numberFormatterWithSeparator") val numberFormatter: NumberFormat) {
 
     fun format(bytes: Long): String {
-
         return when {
             (bytes >= BYTES_PER_GIGABYTE) -> {
                 val formatted = (bytes.toDouble() / BYTES_PER_GIGABYTE)

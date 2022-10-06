@@ -41,7 +41,6 @@ class InitialPromptTypeDecider(
 
     override suspend fun determineInitialPromptType(): AppEnjoymentPromptOptions {
         return withContext(Dispatchers.IO) {
-
             if (!isPlayStoreInstalled()) return@withContext ShowNothing
             if (!wasInstalledThroughPlayStore()) return@withContext ShowNothing
             if (!enoughSearchesMade()) return@withContext ShowNothing

@@ -18,9 +18,9 @@ package com.duckduckgo.app.autocomplete.api
 
 import com.duckduckgo.app.global.AppUrl
 import io.reactivex.Observable
+import java.util.*
 import retrofit2.http.GET
 import retrofit2.http.Query
-import java.util.*
 
 interface AutoCompleteService {
 

@@ -26,9 +26,9 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class FavoritesObserver @Inject constructor(

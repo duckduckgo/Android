@@ -34,7 +34,7 @@ class OnboardingModule {
     fun onboardingPageManger(
         defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
         onboardingPageBuilder: OnboardingPageBuilder,
-        defaultBrowserDetector: DefaultBrowserDetector,
+        defaultBrowserDetector: DefaultBrowserDetector
     ): OnboardingPageManager {
         return OnboardingPageManagerWithTrackerBlocking(defaultRoleBrowserDialog, onboardingPageBuilder, defaultBrowserDetector)
     }

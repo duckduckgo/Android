@@ -36,13 +36,12 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.trackerdetection.model.TrackerType
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
-import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -50,6 +49,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class WebViewRequestInterceptorTest {
@@ -733,7 +733,6 @@ class WebViewRequestInterceptorTest {
         whenever(mockGpc.isEnabled()).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
         whenever(mockRequest.requestHeaders).thenReturn(mapOf(GPC_HEADER to "test"))
-
     }
 
     private fun configureShouldAddGpcHeader() = runTest {

@@ -37,6 +37,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityBrokenSiteBinding by viewBinding()
     private val viewModel: BrokenSiteViewModel by bindViewModel()
+
     @Inject lateinit var webViewVersionProvider: WebViewVersionProvider
 
     private val toolbar
@@ -73,7 +74,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             urlParametersRemoved = urlParametersRemoved,
             consentManaged = consentManaged,
             consentOptOutFailed = consentOptOutFailed,
-            consentSelfTestFailed = consentSelfTestFailed,
+            consentSelfTestFailed = consentSelfTestFailed
         )
     }
 

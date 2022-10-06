@@ -37,13 +37,13 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleCh
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageCategorySingleChoiceBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import dagger.WrongScope
+import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @WrongScope(
     comment = "To use the right scope we first need to enable dagger component nesting",
-    correctScope = ActivityScope::class,
+    correctScope = ActivityScope::class
 )
 @InjectWith(VpnScope::class)
 class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
@@ -153,7 +153,6 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         binding.categoriesSelection.setText(category)
         binding.otherCategoryDescription.visibility = if (viewState.indexSelected == 8) View.VISIBLE else View.GONE
         binding.ctaNextFormSubmit.isEnabled = viewState.submitAllowed
-
     }
 
     companion object {
@@ -161,7 +160,6 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         private const val APP_PACKAGE_ID_EXTRA = "APP_PACKAGE_ID_EXTRA"
 
         fun intent(context: Context, brokenApp: BrokenApp): Intent {
-
             return Intent(context, ReportBreakageCategorySingleChoiceActivity::class.java).apply {
                 putExtra(APP_PACKAGE_ID_EXTRA, brokenApp)
             }

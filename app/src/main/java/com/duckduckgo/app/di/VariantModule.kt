@@ -35,7 +35,7 @@ object VariantModule {
     fun variantManager(
         statisticsDataStore: StatisticsDataStore,
         weightedRandomizer: IndexRandomizer,
-        appBuildConfig: AppBuildConfig,
+        appBuildConfig: AppBuildConfig
     ): VariantManager =
         ExperimentationVariantManager(statisticsDataStore, weightedRandomizer, appBuildConfig)
 

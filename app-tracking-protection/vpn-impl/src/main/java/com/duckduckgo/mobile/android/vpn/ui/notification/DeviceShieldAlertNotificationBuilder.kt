@@ -68,7 +68,7 @@ interface DeviceShieldAlertNotificationBuilder {
 }
 
 class AndroidDeviceShieldAlertNotificationBuilder constructor(
-    private val appBuildConfig: AppBuildConfig,
+    private val appBuildConfig: AppBuildConfig
 ) : DeviceShieldAlertNotificationBuilder {
 
     @Suppress("NewApi") // we use appBuildConfig

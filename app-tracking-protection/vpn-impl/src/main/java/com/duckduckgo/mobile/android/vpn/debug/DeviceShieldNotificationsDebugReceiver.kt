@@ -29,11 +29,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.ui.notification.*
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * This receiver allows to trigger appTP notifications, to do so, in the command line:
@@ -106,7 +106,9 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
                     val deviceShieldNotification = deviceShieldNotificationFactory.dailyNotificationFactory.createDailyDeviceShieldNotification(daily)
 
                     deviceShieldAlertNotificationBuilder.buildStatusNotification(
-                        context, deviceShieldNotification, dailyNotificationPressedHandler
+                        context,
+                        deviceShieldNotification,
+                        dailyNotificationPressedHandler
                     )
                 } else {
                     Timber.v("Debug - invalid notification type")

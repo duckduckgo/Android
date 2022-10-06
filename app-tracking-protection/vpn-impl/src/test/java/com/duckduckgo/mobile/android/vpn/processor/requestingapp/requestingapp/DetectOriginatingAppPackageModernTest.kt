@@ -19,11 +19,11 @@ package com.duckduckgo.mobile.android.vpn.processor.requestingapp.requestingapp
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageModern
-import org.mockito.kotlin.*
-import org.junit.Assert.assertEquals
-import org.junit.Test
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import org.junit.Assert.assertEquals
+import org.junit.Test
+import org.mockito.kotlin.*
 
 class DetectOriginatingAppPackageModernTest {
 

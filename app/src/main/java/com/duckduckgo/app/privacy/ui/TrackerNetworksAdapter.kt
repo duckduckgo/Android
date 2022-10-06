@@ -29,9 +29,9 @@ import com.duckduckgo.app.browser.databinding.ItemTrackerNetworkHeaderBinding
 import com.duckduckgo.app.browser.databinding.ItemTrackerNetworkSectionTitleBinding
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
-import com.duckduckgo.app.privacy.ui.TrackerNetworksAdapter.ViewData.SectionTitle
 import com.duckduckgo.app.privacy.ui.TrackerNetworksAdapter.ViewData.Header
 import com.duckduckgo.app.privacy.ui.TrackerNetworksAdapter.ViewData.Row
+import com.duckduckgo.app.privacy.ui.TrackerNetworksAdapter.ViewData.SectionTitle
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
@@ -64,7 +64,7 @@ class TrackerNetworksAdapter(
             @StringRes val descriptionRes: Int? = null,
             @StringRes val linkTextRes: Int? = null,
             @StringRes val linkUrlRes: Int? = null,
-            val domain: String? = null,
+            val domain: String? = null
         ) : ViewData()
     }
 

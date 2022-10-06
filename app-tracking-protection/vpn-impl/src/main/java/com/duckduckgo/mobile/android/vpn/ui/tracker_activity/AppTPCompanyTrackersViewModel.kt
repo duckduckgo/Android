@@ -20,12 +20,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -81,7 +81,8 @@ constructor(
         val lastTrackerBlockedAgo =
             if (trackerData.isNotEmpty()) {
                 timeDiffFormatter.formatTimePassed(
-                    LocalDateTime.now(), LocalDateTime.parse(trackerData[0].tracker.timestamp)
+                    LocalDateTime.now(),
+                    LocalDateTime.parse(trackerData[0].tracker.timestamp)
                 )
             } else {
                 ""

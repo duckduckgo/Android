@@ -51,8 +51,8 @@ import com.duckduckgo.site.permissions.impl.SitePermissionsRepositoryImpl
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.IntoSet
 import dagger.SingleInstanceIn
+import dagger.multibindings.IntoSet
 
 @Module
 object PrivacyModule {

@@ -25,7 +25,6 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import org.mockito.kotlin.whenever
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Assert.*
@@ -34,6 +33,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class AutoCompleteApiTest {
@@ -108,7 +108,7 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com"),
-                AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title", "https://foo.com"),
+                AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title", "https://foo.com")
             ),
             value.suggestions
         )
@@ -144,7 +144,7 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "favexample.com", "title", "https://favexample.com"),
-                AutoCompleteBookmarkSuggestion(phrase = "favfoo.com", "title", "https://favfoo.com"),
+                AutoCompleteBookmarkSuggestion(phrase = "favfoo.com", "title", "https://favfoo.com")
             ),
             value.suggestions
         )
@@ -271,7 +271,7 @@ class AutoCompleteApiTest {
                     BookmarkEntity(0, "the title example", "https://example.com", 0),
                     BookmarkEntity(0, "the title foo", "https://foo.com/path/to/foo", 0),
                     BookmarkEntity(0, "title bar", "https://bar.com", 0),
-                    BookmarkEntity(0, "the title foo", "https://foo.com", 0),
+                    BookmarkEntity(0, "the title foo", "https://foo.com", 0)
                 )
             )
         )
@@ -287,7 +287,7 @@ class AutoCompleteApiTest {
                     phrase = "example.com",
                     "the title example",
                     "https://example.com"
-                ),
+                )
             ),
             value.suggestions
         )
@@ -302,7 +302,7 @@ class AutoCompleteApiTest {
                     BookmarkEntity(0, "title example", "https://example.com", 0),
                     BookmarkEntity(0, "title bar", "https://bar.com", 0),
                     BookmarkEntity(0, "title foo", "https://foo.com", 0),
-                    BookmarkEntity(0, "title baz", "https://baz.com", 0),
+                    BookmarkEntity(0, "title baz", "https://baz.com", 0)
                 )
             )
         )
@@ -313,7 +313,7 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
+                AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com")
             ),
             value.suggestions
         )
@@ -327,7 +327,7 @@ class AutoCompleteApiTest {
                 listOf(
                     BookmarkEntity(0, "CNN international", "https://cnn.com", 0),
                     BookmarkEntity(0, "CNN international", "https://cnn.com", 0),
-                    BookmarkEntity(0, "CNN international - world", "https://cnn.com/world", 0),
+                    BookmarkEntity(0, "CNN international - world", "https://cnn.com/world", 0)
                 )
             )
         )
@@ -343,7 +343,7 @@ class AutoCompleteApiTest {
                     phrase = "cnn.com/world",
                     "CNN international - world",
                     "https://cnn.com/world"
-                ),
+                )
             ),
             value.suggestions
         )
@@ -356,7 +356,7 @@ class AutoCompleteApiTest {
             Single.just(
                 listOf(
                     BookmarkEntity(0, "Reddit", "https://reddit.com", 0),
-                    BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0),
+                    BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0)
                 )
             )
         )
@@ -372,7 +372,7 @@ class AutoCompleteApiTest {
                     phrase = "reddit.com/r/duckduckgo",
                     "Reddit - duckduckgo",
                     "https://reddit.com/r/duckduckgo"
-                ),
+                )
             ),
             value.suggestions
         )
@@ -385,7 +385,7 @@ class AutoCompleteApiTest {
             Single.just(
                 listOf(
                     BookmarkEntity(0, "Reddit", "https://reddit.com", 0),
-                    BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0),
+                    BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0)
                 )
             )
         )
@@ -401,7 +401,7 @@ class AutoCompleteApiTest {
                     phrase = "reddit.com/r/duckduckgo",
                     "Reddit - duckduckgo",
                     "https://reddit.com/r/duckduckgo"
-                ),
+                )
             ),
             value.suggestions
         )
@@ -414,7 +414,7 @@ class AutoCompleteApiTest {
             Single.just(
                 listOf(
                     BookmarkEntity(0, "Reddit", "https://reddit.com", 0),
-                    BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0),
+                    BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0)
                 )
             )
         )
@@ -429,7 +429,7 @@ class AutoCompleteApiTest {
                     phrase = "reddit.com/r/duckduckgo",
                     "Reddit - duckduckgo",
                     "https://reddit.com/r/duckduckgo"
-                ),
+                )
             ),
             value.suggestions
         )
@@ -442,7 +442,7 @@ class AutoCompleteApiTest {
             Single.just(
                 listOf(
                     BookmarkEntity(0, "Reddit", "https://www.reddit.com", 0),
-                    BookmarkEntity(0, "duckduckgo", "https://www.reddit.com/r/duckduckgo", 0),
+                    BookmarkEntity(0, "duckduckgo", "https://www.reddit.com/r/duckduckgo", 0)
                 )
             )
         )
@@ -458,7 +458,7 @@ class AutoCompleteApiTest {
                     phrase = "www.reddit.com/r/duckduckgo",
                     "duckduckgo",
                     "https://www.reddit.com/r/duckduckgo"
-                ),
+                )
             ),
             value.suggestions
         )
@@ -474,7 +474,7 @@ class AutoCompleteApiTest {
                     BookmarkEntity(0, "title example", "https://example.com", 0),
                     BookmarkEntity(0, "title bar", "https://bar.com", 0),
                     BookmarkEntity(0, "the title foo", "https://foo.com", 0),
-                    BookmarkEntity(0, "title baz", "https://baz.com", 0),
+                    BookmarkEntity(0, "title baz", "https://baz.com", 0)
                 )
             )
         )
@@ -496,7 +496,7 @@ class AutoCompleteApiTest {
                     BookmarkEntity(0, "title example", "https://example.com", 0),
                     BookmarkEntity(0, "title bar", "https://bar.com", 0),
                     BookmarkEntity(0, "the title foo", "https://foo.com", 0),
-                    BookmarkEntity(0, "title foo baz", "https://baz.com", 0),
+                    BookmarkEntity(0, "title foo baz", "https://baz.com", 0)
                 )
             )
         )
@@ -508,7 +508,7 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title foo baz", "https://baz.com"),
-                AutoCompleteBookmarkSuggestion(phrase = "foo.com", "the title foo", "https://foo.com"),
+                AutoCompleteBookmarkSuggestion(phrase = "foo.com", "the title foo", "https://foo.com")
             ),
             value.suggestions
         )

@@ -21,5 +21,5 @@ import org.json.JSONObject
 data class JsonAppTpFeatureConfig(
     val state: String,
     val minSupportedVersion: Int?,
-    val settings: Map<String, JSONObject?>,
+    val settings: Map<String, JSONObject?>
 )

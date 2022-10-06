@@ -20,9 +20,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.CompoundButton
 import android.widget.FrameLayout
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.SettingsToggleOptionWithSubtitleBinding
 import com.duckduckgo.app.global.view.childrenRecursiveSequence
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 

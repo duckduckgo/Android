@@ -17,11 +17,11 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import javax.inject.Inject
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
-import javax.inject.Inject
 
 class TCBCloser @Inject constructor(private val socketWriter: TcpSocketWriter) {
 
@@ -39,7 +39,7 @@ class TCBCloser @Inject constructor(private val socketWriter: TcpSocketWriter) {
         connectionParams: ConnectionInitializer.TcpConnectionParams,
         queues: VpnQueues,
         payloadSize: Int,
-        isFIN: Boolean,
+        isFIN: Boolean
     ) {
         val buffer = ByteBufferPool.acquire()
         val tcb = connectionParams.tcbOrClose() ?: return

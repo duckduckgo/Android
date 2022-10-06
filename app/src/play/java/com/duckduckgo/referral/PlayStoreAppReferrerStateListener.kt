@@ -32,10 +32,10 @@ import com.duckduckgo.app.referral.ParsedReferrerResult.*
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.di.scopes.AppScope
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import timber.log.Timber
-import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @SingleInstanceIn(AppScope::class)
 class PlayStoreAppReferrerStateListener @Inject constructor(
@@ -59,7 +59,6 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
             initialisationStartTime = System.currentTimeMillis()
 
             if (appReferrerDataStore.referrerCheckedPreviously) {
-
                 referralResult = if (appReferrerDataStore.installedFromEuAuction) {
                     EuAuctionReferrerFound(fromCache = true)
                 } else {
@@ -114,7 +113,6 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
                 DEVELOPER_ERROR -> referralResultFailed(DeveloperError)
                 SERVICE_DISCONNECTED -> referralResultFailed(ServiceDisconnected)
                 else -> referralResultFailed(UnknownError)
-
             }
 
             referralClient.endConnection()

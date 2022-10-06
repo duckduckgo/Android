@@ -119,7 +119,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
         ) = with(binding) {
-
             title.text = item.title
             url.text = item.url
 

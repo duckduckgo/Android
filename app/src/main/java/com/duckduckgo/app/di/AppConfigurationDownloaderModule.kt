@@ -35,7 +35,6 @@ open class AppConfigurationDownloaderModule {
         resourceSurrogateDownloader: ResourceSurrogateListDownloader,
         surveyDownloader: SurveyDownloader
     ): ConfigurationDownloader {
-
         return AppConfigurationDownloader(
             trackerDataDownloader,
             httpsUpgradeDataDownloader,

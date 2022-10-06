@@ -25,9 +25,9 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

@@ -86,7 +86,6 @@ class InstalledDeviceAppListProvider(private val packageManager: PackageManager)
 
     @WorkerThread
     override fun get(): List<DeviceApp> {
-
         val appsInfo = packageManager.getInstalledApplications(GET_META_DATA)
 
         return appsInfo.map {

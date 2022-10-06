@@ -29,11 +29,11 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExclusionListMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverrideListMetadata
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
 class AppTrackerExclusionListUpdateWorker(
@@ -42,8 +42,10 @@ class AppTrackerExclusionListUpdateWorker(
 ) : CoroutineWorker(context, workerParameters) {
     @Inject
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
+
     @Inject
     lateinit var vpnDatabase: VpnDatabase
+
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     override suspend fun doWork(): Result {
@@ -78,7 +80,8 @@ class AppTrackerExclusionListUpdateWorker(
 
                 Timber.d("Updating the app tracker system app overrides, eTag: ${sysAppsOverrides.etag.value}")
                 vpnDatabase.vpnSystemAppsOverridesDao().upsertSystemAppOverrides(
-                    sysAppsOverrides.overridePackages, AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag)
+                    sysAppsOverrides.overridePackages,
+                    AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag)
                 )
 
                 vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)

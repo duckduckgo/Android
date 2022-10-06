@@ -31,11 +31,11 @@ import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
+import java.io.File
+import javax.inject.Inject
 import kotlinx.coroutines.*
 import org.threeten.bp.zone.ZoneRulesProvider
 import timber.log.Timber
-import java.io.File
-import javax.inject.Inject
 
 private const val VPN_PROCESS_NAME = "vpn"
 

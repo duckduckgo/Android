@@ -28,25 +28,25 @@ import com.duckduckgo.app.global.extensions.isPrivateDnsActive
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
-import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.frybits.harmony.getHarmonySharedPreferences
+import java.net.InetAddress
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
-import java.net.InetAddress
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = VpnScope::class,
@@ -61,7 +61,7 @@ class NetworkTypeCollector @Inject constructor(
     private val context: Context,
     private val vpnPreferences: VpnPreferences,
     private val appTpFeatureConfig: AppTpFeatureConfig,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope
 ) : VpnStateCollectorPlugin, VpnServiceCallbacks {
 
     private val databaseDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
@@ -262,19 +262,19 @@ class NetworkTypeCollector @Inject constructor(
         val currentNetwork: Connection,
         val previousNetwork: Connection? = null,
         val lastSwitchTimestampMillis: Long,
-        val secondsSinceLastSwitch: Long,
+        val secondsSinceLastSwitch: Long
     )
 
     internal data class Connection(val netId: Long, val type: NetworkType, val state: NetworkState, val mnc: Int? = null)
 
     internal enum class NetworkType {
         WIFI,
-        CELLULAR,
+        CELLULAR
     }
 
     internal enum class NetworkState {
         AVAILABLE,
-        LOST,
+        LOST
     }
 
     companion object {

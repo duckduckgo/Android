@@ -46,7 +46,7 @@ object WorkerModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun workerFactory(
-        workerInjectorPluginPoint: PluginPoint<WorkerInjectorPlugin>,
+        workerInjectorPluginPoint: PluginPoint<WorkerInjectorPlugin>
     ): WorkerFactory {
         return DaggerWorkerFactory(workerInjectorPluginPoint)
     }

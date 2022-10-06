@@ -32,9 +32,9 @@ import com.duckduckgo.mobile.android.ui.view.Chip
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
+import java.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.*
 
 class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapter.CompanyDetailsViewHolder>() {
 
@@ -147,7 +147,8 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
             companyName.text = companyDetails.companyDisplayName
             trackingAttempts.text = view.context.resources.getQuantityString(
                 R.plurals.atp_CompanyDetailsTrackingAttempts,
-                companyDetails.trackingAttempts, companyDetails.trackingAttempts
+                companyDetails.trackingAttempts,
+                companyDetails.trackingAttempts
             )
 
             val inflater = LayoutInflater.from(view.context)

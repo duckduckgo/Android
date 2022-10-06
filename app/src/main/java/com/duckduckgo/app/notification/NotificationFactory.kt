@@ -35,7 +35,6 @@ class NotificationFactory @Inject constructor(
         launchIntent: PendingIntent,
         cancelIntent: PendingIntent
     ): Notification {
-
         val builder = NotificationCompat.Builder(context, specification.channel.id)
             .setPriority(specification.channel.priority)
             .setSmallIcon(specification.icon)

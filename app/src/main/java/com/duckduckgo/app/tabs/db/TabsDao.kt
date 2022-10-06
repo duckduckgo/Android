@@ -21,8 +21,8 @@ import androidx.room.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.di.scopes.AppScope
-import kotlinx.coroutines.flow.Flow
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 @SingleInstanceIn(AppScope::class)

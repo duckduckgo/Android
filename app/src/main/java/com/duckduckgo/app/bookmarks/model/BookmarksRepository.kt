@@ -186,7 +186,6 @@ class BookmarksDataRepository(
         currentFolder: BookmarkFolder?,
         rootFolderName: String
     ): List<BookmarkFolderItem> {
-
         val bookmarkFolders = removeCurrentFolderBranch(currentFolder, getBookmarkFolders())
 
         val parentGroupings = bookmarkFolders
@@ -219,7 +218,6 @@ class BookmarksDataRepository(
         depth: Int,
         selectedFolderId: Long
     ): List<BookmarkFolderItem> {
-
         val bookmarkFolders = parentGroupings[bookmarkFolder.id] ?: emptyList()
         val isSelected = bookmarkFolder.id == selectedFolderId
 
@@ -246,7 +244,6 @@ class BookmarksDataRepository(
         bookmarksFlow: Flow<List<BookmarkEntity>>,
         bookmarkFoldersFlow: Flow<List<BookmarkFolder>>
     ): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
-
         return bookmarksFlow.combine(bookmarkFoldersFlow) { bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolder> ->
 
             val mappedBookmarks = bookmarks.map {

@@ -17,10 +17,10 @@
 package com.duckduckgo.mobile.android.vpn.dao
 
 import androidx.room.*
+import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
-import com.duckduckgo.mobile.android.vpn.trackers.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -148,5 +148,4 @@ interface VpnAppTrackerBlockingDao {
 
     @Query("DELETE from vpn_app_tracker_manual_exclusion_list")
     fun deleteManualAppExclusionList()
-
 }

@@ -43,6 +43,7 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
     CoroutineWorker(context, workerParameters) {
     @Inject
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
+
     @Inject
     lateinit var vpnDatabase: VpnDatabase
 
@@ -144,7 +145,9 @@ class AppTrackerListUpdateWorkerScheduler @Inject constructor(
                 .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
                 .build()
         workManager.enqueueUniquePeriodicWork(
-            APP_TRACKER_LIST_UPDATE_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, workerRequest
+            APP_TRACKER_LIST_UPDATE_WORKER_TAG,
+            ExistingPeriodicWorkPolicy.KEEP,
+            workerRequest
         )
     }
 

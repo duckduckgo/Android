@@ -22,9 +22,9 @@ import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -67,12 +67,12 @@ class PixelAdClickAttributionRemovalInterceptor @Inject constructor() : Intercep
         @VisibleForTesting
         internal val PIXELS_SET_NO_ATB = setOf(
             AdClickPixelName.AD_CLICK_DETECTED.pixelName,
-            AdClickPixelName.AD_CLICK_ACTIVE.pixelName,
+            AdClickPixelName.AD_CLICK_ACTIVE.pixelName
         )
 
         @VisibleForTesting
         internal val PIXELS_SET_NO_ATB_AND_VERSION = setOf(
-            AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION.pixelName,
+            AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION.pixelName
         )
     }
 }

@@ -31,7 +31,7 @@ interface VpnPreferences {
 
 @ContributesBinding(VpnScope::class)
 class RealVpnPreferences @Inject constructor(
-    private val applicationContext: Context,
+    private val applicationContext: Context
 ) : VpnPreferences {
 
     override var isPrivateDnsEnabled: Boolean

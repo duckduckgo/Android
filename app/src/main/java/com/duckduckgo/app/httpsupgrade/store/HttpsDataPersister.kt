@@ -20,9 +20,9 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
-import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
+import timber.log.Timber
 
 class HttpsDataPersister @Inject constructor(
     private val binaryDataStore: BinaryDataStore,

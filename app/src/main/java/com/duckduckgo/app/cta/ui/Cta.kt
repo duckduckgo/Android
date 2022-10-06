@@ -28,10 +28,9 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
-import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
-import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -40,6 +39,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
 import com.duckduckgo.mobile.android.ui.view.LottieDaxDialog
+import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
@@ -91,7 +91,7 @@ sealed class DaxDialogCta(
         TypewriterDaxDialog.newInstance(
             daxText = "",
             primaryButtonText = "",
-            hideButtonText = "",
+            hideButtonText = ""
         )
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
@@ -117,7 +117,7 @@ sealed class DaxDialogCta(
                 daxText = context.getString(R.string.daxSerpCtaText),
                 primaryButtonText = context.getString(R.string.daxDialogPhew),
                 toolbarDimmed = false,
-                hideButtonText = context.getString(R.string.daxDialogHideButton),
+                hideButtonText = context.getString(R.string.daxDialogHideButton)
             )
             dialog.setDaxDialogListener(daxDialogListener)
             return dialog
@@ -144,7 +144,7 @@ sealed class DaxDialogCta(
                 daxText = getDaxText(context),
                 primaryButtonText = context.getString(R.string.daxDialogHighFive),
                 toolbarDimmed = false,
-                hideButtonText = context.getString(R.string.daxDialogHideButton),
+                hideButtonText = context.getString(R.string.daxDialogHideButton)
             )
             dialog.setDaxDialogListener(daxDialogListener)
             return dialog
@@ -188,7 +188,7 @@ sealed class DaxDialogCta(
             val dialog = TypewriterDaxDialog.newInstance(
                 daxText = getDaxText(context),
                 primaryButtonText = context.getString(R.string.daxDialogGotIt),
-                hideButtonText = context.getString(R.string.daxDialogHideButton),
+                hideButtonText = context.getString(R.string.daxDialogHideButton)
             )
             dialog.setDaxDialogListener(daxDialogListener)
             return dialog
@@ -232,7 +232,7 @@ sealed class DaxDialogCta(
             val dialog = TypewriterDaxDialog.newInstance(
                 daxText = context.getString(R.string.daxNonSerpCtaText),
                 primaryButtonText = context.getString(R.string.daxDialogGotIt),
-                hideButtonText = context.getString(R.string.daxDialogHideButton),
+                hideButtonText = context.getString(R.string.daxDialogHideButton)
             )
             dialog.setDaxDialogListener(daxDialogListener)
             return dialog
@@ -242,7 +242,7 @@ sealed class DaxDialogCta(
     class DaxAutoconsentCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        private val appTheme: AppTheme,
+        private val appTheme: AppTheme
     ) : DaxDialogCta(
         CtaId.DAX_DIALOG_AUTOCONSENT,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
@@ -261,7 +261,7 @@ sealed class DaxDialogCta(
                 primaryButtonText = context.getString(R.string.autoconsentPrimaryCta),
                 secondaryButtonText = context.getString(R.string.autoconsentSecondaryCta),
                 hideButtonText = context.getString(R.string.daxDialogHideButton),
-                showHideButton = false,
+                showHideButton = false
             )
             dialog.setDaxDialogListener(daxDialogListener)
             return dialog
@@ -336,7 +336,7 @@ sealed class BubbleCta(
     @StringRes open val description: Int,
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
-    override val cancelPixel: Pixel.PixelName?,
+    override val cancelPixel: Pixel.PixelName?
 ) : Cta, ViewCta {
 
     override fun showCta(view: View) {

@@ -32,8 +32,9 @@ class PlaintextHostHeaderExtractor : HostnameHeaderExtractor {
             if (hostEndIdx > hostIdx) {
                 val hostLen = hostEndIdx - hostIdx - CARRIAGE_RETURN.size
                 val hostname = String(payload, hostIdx, hostLen, StandardCharsets.US_ASCII)
-                if (hostname.isNotEmpty())
+                if (hostname.isNotEmpty()) {
                     return hostname
+                }
             }
         }
 

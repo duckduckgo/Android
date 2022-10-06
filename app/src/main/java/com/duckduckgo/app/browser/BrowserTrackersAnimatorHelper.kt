@@ -45,11 +45,11 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.view.toPx
-import com.duckduckgo.mobile.android.R as CommonR
 
 interface TrackersAnimatorListener {
     fun onAnimationFinished()
@@ -62,7 +62,7 @@ class BrowserTrackersAnimatorHelper(
     private val cookieScene: ViewGroup,
     private val dummyCookieView: View,
     private val container: ConstraintLayout,
-    private val appTheme: AppTheme,
+    private val appTheme: AppTheme
 ) {
     private var trackersAnimation: AnimatorSet = AnimatorSet()
     private var pulseAnimation: AnimatorSet = AnimatorSet()
@@ -197,7 +197,7 @@ class BrowserTrackersAnimatorHelper(
     fun startTrackersAnimation(
         context: Context,
         cta: Cta?,
-        entities: List<Entity>?,
+        entities: List<Entity>?
     ) {
         if (entities.isNullOrEmpty()) {
             listener?.onAnimationFinished()

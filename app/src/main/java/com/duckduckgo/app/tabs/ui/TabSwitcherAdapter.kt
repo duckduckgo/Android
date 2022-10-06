@@ -37,12 +37,12 @@ import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIF
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.image.GlideRequests
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
+import com.duckduckgo.mobile.android.ui.view.show
+import java.io.File
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
 
 class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,

@@ -29,10 +29,10 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType.FirstParty
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType.ThirdParty
+import java.nio.ByteBuffer
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
-import java.nio.ByteBuffer
 
 interface VpnTrackerDetector {
 
@@ -53,7 +53,7 @@ class DomainBasedTrackerDetector(
     private val payloadBytesExtractor: PayloadBytesExtractor,
     private val tlsContentTypeExtractor: ContentTypeExtractor,
     private val vpnDatabase: VpnDatabase,
-    private val requestInterceptors: PluginPoint<VpnTrackerDetectorInterceptor>,
+    private val requestInterceptors: PluginPoint<VpnTrackerDetectorInterceptor>
 ) : VpnTrackerDetector {
 
     override fun determinePacketType(
@@ -64,7 +64,6 @@ class DomainBasedTrackerDetector(
         requestingApp: OriginatingApp,
         hostname: String?
     ): RequestTrackerType {
-
         if (isLocalAddress) {
             Timber.v("%s is a local address; not looking for trackers", packet.ipHeader.destinationAddress)
             tcb.trackerTypeDetermined = true

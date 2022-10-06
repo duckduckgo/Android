@@ -39,9 +39,10 @@ import com.duckduckgo.cookies.impl.RemoveCookies
 import com.duckduckgo.cookies.impl.SQLCookieRemover
 import com.duckduckgo.cookies.impl.WebViewCookieManager
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
-import org.mockito.kotlin.mock
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -52,8 +53,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import org.mockito.kotlin.mock
 
 @ExperimentalCoroutinesApi
 @RunWith(Parameterized::class)

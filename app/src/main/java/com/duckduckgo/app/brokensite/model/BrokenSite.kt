@@ -30,7 +30,7 @@ data class BrokenSite(
     val urlParametersRemoved: Boolean,
     val consentManaged: Boolean,
     val consentOptOutFailed: Boolean,
-    val consentSelfTestFailed: Boolean,
+    val consentSelfTestFailed: Boolean
 )
 
 sealed class BrokenSiteCategory(

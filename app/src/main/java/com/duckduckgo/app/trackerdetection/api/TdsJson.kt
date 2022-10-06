@@ -35,8 +35,11 @@ class TdsJson {
 
     fun jsonToDomainEntities(): List<TdsDomainEntity> {
         return domains.mapNotNull { (key, value) ->
-            if (value == null) null
-            else TdsDomainEntity(key, value)
+            if (value == null) {
+                null
+            } else {
+                TdsDomainEntity(key, value)
+            }
         }
     }
 
@@ -51,8 +54,11 @@ class TdsJson {
 
     fun jsonToCnameEntities(): List<TdsCnameEntity> {
         return cnames.mapNotNull { (key, value) ->
-            if (value == null) null
-            else TdsCnameEntity(key, value)
+            if (value == null) {
+                null
+            } else {
+                TdsCnameEntity(key, value)
+            }
         }
     }
 }

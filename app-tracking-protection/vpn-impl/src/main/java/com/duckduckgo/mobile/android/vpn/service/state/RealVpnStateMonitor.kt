@@ -32,10 +32,10 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealVpnStateMonitor @Inject constructor(
@@ -61,9 +61,13 @@ class RealVpnStateMonitor @Inject constructor(
                 val isFeatureEnabled = feature.second
                 val isVpnEnabled = vpnState.state == VpnRunningState.ENABLED
 
-                if (!isVpnEnabled) vpnState
-                else if (isFeatureEnabled) VpnState(VpnRunningState.ENABLED)
-                else VpnState(VpnRunningState.DISABLED)
+                if (!isVpnEnabled) {
+                    vpnState
+                } else if (isFeatureEnabled) {
+                    VpnState(VpnRunningState.ENABLED)
+                } else {
+                    VpnState(VpnRunningState.DISABLED)
+                }
             }.flowOn(dispatcherProvider.io())
             .onStart {
                 if (vpnFeaturesRegistry.isFeatureRegistered(vpnFeature)) {

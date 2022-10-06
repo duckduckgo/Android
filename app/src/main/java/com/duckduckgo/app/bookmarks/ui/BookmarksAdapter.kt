@@ -186,7 +186,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private val binding: ViewSavedSiteEntryBinding,
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
-        private val faviconManager: FaviconManager,
+        private val faviconManager: FaviconManager
     ) : BookmarkScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context

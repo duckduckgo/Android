@@ -37,10 +37,10 @@ import com.duckduckgo.vpn.network.api.*
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesBinding(
     scope = VpnScope::class,
@@ -59,7 +59,7 @@ class NgVpnNetworkStack @Inject constructor(
     private val appNameResolver: AppNameResolver,
     private val appTrackerRecorder: AppTrackerRecorder,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    vpnDatabase: VpnDatabase,
+    vpnDatabase: VpnDatabase
 ) : VpnNetworkStack, VpnNetworkCallback {
 
     private val packageManager = context.packageManager
@@ -69,6 +69,7 @@ class NgVpnNetworkStack @Inject constructor(
     private var jniContext = 0L
     private val jniLock = Any()
     private val dnsResourceCache = LruCache<String, String>(1000)
+
     // cache packageId -> app name
     private val appNamesCache = LruCache<String, AppNameResolver.OriginatingApp>(100)
 
@@ -85,7 +86,6 @@ class NgVpnNetworkStack @Inject constructor(
                 vpnNetwork.destroy(jniContext)
                 jniContext = 0
             }
-
         }
         jniContext = vpnNetwork.create()
 

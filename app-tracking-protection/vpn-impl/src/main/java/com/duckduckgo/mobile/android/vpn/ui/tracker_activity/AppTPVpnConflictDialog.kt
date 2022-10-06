@@ -38,7 +38,6 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_vpn_conflict, null)
 
         val endCta = rootView.findViewById<Button>(R.id.vpnConflictDialogEndCta)

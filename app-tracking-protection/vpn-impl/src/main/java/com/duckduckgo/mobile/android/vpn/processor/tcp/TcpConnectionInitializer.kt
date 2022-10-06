@@ -21,17 +21,17 @@ import com.duckduckgo.mobile.android.vpn.network.channels.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
-import xyz.hexene.localvpn.ByteBufferPool
-import xyz.hexene.localvpn.Packet
-import xyz.hexene.localvpn.Packet.TCPHeader
-import xyz.hexene.localvpn.TCB
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.random.Random
+import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
+import xyz.hexene.localvpn.Packet
+import xyz.hexene.localvpn.Packet.TCPHeader
+import xyz.hexene.localvpn.TCB
 
 interface ConnectionInitializer {
     fun initializeConnection(params: TcpConnectionParams): Pair<TCB, SocketChannel>?

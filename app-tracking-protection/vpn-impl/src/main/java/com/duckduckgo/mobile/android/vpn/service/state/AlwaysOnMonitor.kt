@@ -25,11 +25,11 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Provider
 
 @ContributesMultibinding(
     scope = VpnScope::class,
@@ -39,7 +39,7 @@ class AlwaysOnMonitor @Inject constructor(
     private val vpnStore: VpnStore,
     private val appBuildConfig: AppBuildConfig,
     private val vpnService: Provider<TrackerBlockingVpnService>,
-    private val deviceShieldPixels: DeviceShieldPixels,
+    private val deviceShieldPixels: DeviceShieldPixels
 ) : VpnServiceCallbacks {
 
     @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig

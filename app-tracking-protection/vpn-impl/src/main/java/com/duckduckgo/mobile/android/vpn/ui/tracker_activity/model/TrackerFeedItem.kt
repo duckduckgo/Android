@@ -39,7 +39,7 @@ sealed class TrackerFeedItem(open val id: Int) {
 sealed class TrackerCompanyBadge {
     data class Company(
         val companyName: String,
-        val companyDisplayName: String,
+        val companyDisplayName: String
     ) : TrackerCompanyBadge()
     data class Extra(
         val amount: Int

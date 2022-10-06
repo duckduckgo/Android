@@ -30,6 +30,8 @@ import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
+import java.util.*
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -40,8 +42,6 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.*
-import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class TabDataRepository @Inject constructor(
@@ -130,7 +130,6 @@ class TabDataRepository @Inject constructor(
     ) {
         siteData[tabId] = data
         databaseExecutor().scheduleDirect {
-
             Timber.i("Trying to add tab, is default? $isDefaultTab, current tabs count: ${tabsDao.tabs().size}")
 
             if (isDefaultTab && tabsDao.tabs().isNotEmpty()) {
@@ -161,7 +160,6 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun selectByUrlOrNewTab(url: String) {
-
         val tabId = tabsDao.selectTabByUrl(url)
         if (tabId != null) {
             select(tabId)

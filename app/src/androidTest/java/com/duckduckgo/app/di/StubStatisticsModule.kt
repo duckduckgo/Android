@@ -32,11 +32,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import io.reactivex.Completable
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
-import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(

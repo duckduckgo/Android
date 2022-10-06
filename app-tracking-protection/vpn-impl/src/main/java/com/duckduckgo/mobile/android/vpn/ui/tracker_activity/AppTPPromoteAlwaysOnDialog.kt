@@ -37,7 +37,6 @@ class AppTPPromoteAlwaysOnDialog private constructor(private val listener: Liste
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_promote_always_on, null)
 
         val goToSettings = rootView.findViewById<Button>(R.id.promoteAlwaysOnDialogSettings)

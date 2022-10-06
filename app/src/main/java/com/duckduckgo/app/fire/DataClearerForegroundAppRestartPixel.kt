@@ -30,8 +30,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 /**
  * Stores information about unsent automatic data clearer restart Pixels, detecting if user started the app from an external Intent.

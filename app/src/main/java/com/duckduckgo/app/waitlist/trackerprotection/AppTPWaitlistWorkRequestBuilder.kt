@@ -23,8 +23,8 @@ import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder.Companion.APP_TP_WAITLIST_SYNC_WORK_TAG
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

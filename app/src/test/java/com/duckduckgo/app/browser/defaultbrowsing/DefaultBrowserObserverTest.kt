@@ -20,11 +20,11 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import org.mockito.kotlin.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.*
 
 class DefaultBrowserObserverTest {
 

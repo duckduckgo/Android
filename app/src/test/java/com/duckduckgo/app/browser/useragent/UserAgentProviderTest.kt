@@ -31,6 +31,7 @@ import com.duckduckgo.privacy.config.impl.features.useragent.RealUserAgent
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -39,7 +40,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.util.concurrent.CopyOnWriteArrayList
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)

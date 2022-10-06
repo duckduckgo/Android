@@ -20,16 +20,16 @@ import android.os.SystemClock
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpSelectorOp
 import com.squareup.anvil.annotations.ContributesBinding
-import xyz.hexene.localvpn.Packet
+import dagger.SingleInstanceIn
 import java.nio.ByteBuffer
+import java.util.*
 import java.util.concurrent.BlockingDeque
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import dagger.SingleInstanceIn
-import java.util.*
 import kotlin.math.min
+import xyz.hexene.localvpn.Packet
 
 interface VpnQueuesTimeLogger {
     /**
@@ -75,7 +75,7 @@ class VpnQueues @Inject constructor() : VpnQueuesTimeLogger {
         return minOf(
             (tcpDeviceToNetwork as LoggingLinkedBlockingDeque).millisSinceLastTake(),
             (udpDeviceToNetwork as LoggingLinkedBlockingDeque).millisSinceLastTake(),
-            (networkToDevice as LoggingLinkedBlockingDeque).millisSinceLastTake(),
+            (networkToDevice as LoggingLinkedBlockingDeque).millisSinceLastTake()
         )
     }
 

@@ -39,10 +39,10 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchTra
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class PrivacyDashboardViewModel @Inject constructor(

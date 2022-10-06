@@ -26,18 +26,18 @@ import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.feature.FakeToggleConfigDao
 import com.duckduckgo.mobile.android.vpn.remote_config.VpnConfigTogglesDao
 import com.duckduckgo.mobile.android.vpn.remote_config.VpnRemoteConfigDatabase
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 class AppTPCPUMonitorTest {
     private lateinit var cpuMonitor: AppTPCPUMonitor
