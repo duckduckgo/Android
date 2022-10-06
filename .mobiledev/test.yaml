@@ -3,6 +3,9 @@ appId: com.duckduckgo.mobile.android
 - launchApp:
     clearState: true
 - takeScreenshot: LaunchScreenshot
+- extendedWaitUntil:
+    visible: ".*Not to worry! Searching and browsing privately.*"
+    timeout: 60000
 - assertVisible:
     text: ".*Not to worry! Searching and browsing privately.*"
 - takeScreenshot: Launch2Screenshot
