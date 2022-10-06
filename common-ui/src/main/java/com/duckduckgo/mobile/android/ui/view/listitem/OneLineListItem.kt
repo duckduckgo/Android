@@ -52,7 +52,7 @@ class OneLineListItem @JvmOverloads constructor(
             binding.primaryText.text = getString(R.styleable.OneLineListItem_primaryText)
 
             if (hasValue(R.styleable.OneLineListItem_primaryTextColorOverlay)) {
-                 binding.primaryText.setTextColor(getColorStateList(R.styleable.OneLineListItem_primaryTextColorOverlay))
+                binding.primaryText.setTextColor(getColorStateList(R.styleable.OneLineListItem_primaryTextColorOverlay))
             }
 
             if (hasValue(R.styleable.OneLineListItem_leadingIcon)) {
