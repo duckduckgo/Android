@@ -36,9 +36,11 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     text: "About our Web Tracking Protections"
 - assertVisible:
-    text: "www.ad-company.site"
+    text: ".*Ad Company"
 - assertVisible:
     text: "convert.ad-company.site"
+- assertVisible:
+      text: "www.ad-company.site"
 - action: back
 - assertVisible:
     text: "No Third-Party Requests Found"
