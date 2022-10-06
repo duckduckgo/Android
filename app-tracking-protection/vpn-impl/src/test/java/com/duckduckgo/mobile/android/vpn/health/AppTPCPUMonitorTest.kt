@@ -49,7 +49,6 @@ import org.mockito.kotlin.whenever
 import kotlinx.coroutines.test.TestScope
 import org.junit.After
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -64,7 +63,7 @@ class AppTPCPUMonitorTest {
     var coroutineRule = CoroutineTestRule()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    
+
     private lateinit var config: AppTpFeatureConfigImpl
     private lateinit var toggleDao: VpnConfigTogglesDao
     private lateinit var workManager: WorkManager
