@@ -60,6 +60,8 @@
         <item name="primaryButtonLowercaseStyle">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
         <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
+        <item name="horizontalDividerStyle">@style/Widget.DuckDuckGo.HorizontalDivider</item>
+        <item name="verticalDividerStyle">@style/Widget.DuckDuckGo.VerticalDivider</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -268,7 +270,6 @@
 
         <item name="listItemTitleColor">@color/almostBlackDark</item>
         <item name="listItemSubtitleColor">@color/warmerGray</item>
-        <item name="listItemDisabledColor">@color/pinkish_grey_two</item>
         <item name="listItemBackgroundColor">@color/whiteFive</item>
         <item name="listItemSeparatorColor">@color/whiteSix</item>
         <item name="textInputOutlinedBoxColor">@color/grayishThree</item>

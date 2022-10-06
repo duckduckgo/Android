@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.cookies.impl
 
-import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.cookies.api.RemoveCookiesStrategy
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-interface DuckDuckGoCookieManager {
-    suspend fun removeExternalCookies()
-    fun flush()
-}
-
-class WebViewCookieManager(
+@ContributesBinding(AppScope::class)
+class WebViewCookieManager @Inject constructor(
     private val cookieManager: CookieManagerProvider,
     private val removeCookies: RemoveCookiesStrategy,
     private val dispatcher: DispatcherProvider

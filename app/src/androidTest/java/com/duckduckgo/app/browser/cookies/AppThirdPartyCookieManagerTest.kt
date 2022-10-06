@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager.Companion.U
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext

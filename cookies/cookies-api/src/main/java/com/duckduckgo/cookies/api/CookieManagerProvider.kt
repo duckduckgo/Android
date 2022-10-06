@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.cookies
+package com.duckduckgo.cookies.api
 
 import android.webkit.CookieManager
 
+/** Public interface for CookieManagerProvider */
 interface CookieManagerProvider {
+    /**
+     * This method returns the [CookieManager] instance. This is a singleton instance.
+     */
     fun get(): CookieManager
-}
-
-class DefaultCookieManagerProvider : CookieManagerProvider {
-
-    @Volatile
-    private var instance: CookieManager? = null
-
-    override fun get(): CookieManager =
-        instance ?: synchronized(this) {
-            instance ?: CookieManager.getInstance().also { instance = it }
-        }
 }
