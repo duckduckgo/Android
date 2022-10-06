@@ -24,9 +24,14 @@
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
-        android:clipToPadding="false"
+        app:fastScrollEnabled="true"
+        app:fastScrollHorizontalThumbDrawable="@drawable/scrollbar_thumb_drawable"
+        app:fastScrollHorizontalTrackDrawable="@drawable/scrollbar_line_drawable"
+        app:fastScrollVerticalThumbDrawable="@drawable/scrollbar_thumb_drawable"
+        app:fastScrollVerticalTrackDrawable="@drawable/scrollbar_line_drawable"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listItem="@layout/view_bookmark_entry" />
 
