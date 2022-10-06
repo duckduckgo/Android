@@ -1,7 +1,7 @@
 {
     "ampFormats": {
         "name": "A URL is able to be extracted from a google formatted URL.",
-        "desc": "Those tests use config_reference.json where the trackingLinks feature contains regexes",
+        "desc": "Those tests use config_reference.json where the ampLinks feature contains regexes",
         "referenceConfig": "config_reference.json",
         "tests": [
             {
@@ -44,7 +44,7 @@
     },
     "ampKeywords": {
         "name": "A URL is able to be detected as a potential AMP link",
-        "desc": "Those tests use config_reference.json where the trackingLinks feature contains regexes and AMP keywords",
+        "desc": "Those tests use config_reference.json where the ampLinks feature contains regexes and AMP keywords",
         "referenceConfig": "config_reference.json",
         "tests": [
             {
@@ -57,13 +57,7 @@
                 "name": "A URL is able to be detected using .amp patterns",
                 "ampURL": "https://www.bbc.com/news/world-asia-china-19432800.amp",
                 "expectAmpDetected": true,
-                "exceptPlatforms": [
-                    "web-extension",
-                    "safari-extension",
-                    "android-browser",
-                    "macos-browser",
-                    "windows-browser"
-                ]
+                "exceptPlatforms": []
             },
             {
                 "name": "A URL is able to be detected using amp. patterns",
