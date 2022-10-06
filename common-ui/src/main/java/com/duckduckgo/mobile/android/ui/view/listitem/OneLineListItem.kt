@@ -50,13 +50,9 @@ class OneLineListItem @JvmOverloads constructor(
         ).apply {
 
             binding.primaryText.text = getString(R.styleable.OneLineListItem_primaryText)
-            if (hasValue(R.styleable.OneLineListItem_listItemTitleColor)) {
-                binding.primaryText.setTextColor(
-                    getColor(
-                        R.styleable.OneLineListItem_listItemTitleColor,
-                        context.getColorFromAttr(R.attr.listItemTitleColor)
-                    )
-                )
+
+            if (hasValue(R.styleable.OneLineListItem_primaryTextColorOverlay)) {
+                 binding.primaryText.setTextColor(getColorStateList(R.styleable.OneLineListItem_primaryTextColorOverlay))
             }
 
             if (hasValue(R.styleable.OneLineListItem_leadingIcon)) {
