@@ -57,26 +57,13 @@
                     app:drawableStartCompat="@drawable/ic_dax_icon"
                     android:drawablePadding="@dimen/keyline_2"/>
 
-                <FrameLayout
+                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                    android:id="@+id/dark_theme_switch"
+                    android:layout_marginTop="@dimen/keyline_5"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_5">
-
-                    <TextView
-                        android:id="@+id/dark_theme_title_text_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start|center_vertical"
-                        android:text="Enable Dark Theme"
-                        android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"/>
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/dark_theme_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end|center_vertical"/>
-
-                </FrameLayout>
+                    app:primaryText="Enable Dark Theme"
+                    app:showSwitch="true"/>
 
             </LinearLayout>
 

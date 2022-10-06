@@ -27,7 +27,6 @@ import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.CompoundButton
-import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -37,6 +36,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.APPTP_SETTINGS_ANNOTATION
 import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.REPORT_ISSUES_ANNOTATION
+import com.duckduckgo.mobile.android.ui.view.SwitchView
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
@@ -86,7 +86,7 @@ class DeviceShieldTrackerActivity :
 
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
-    private lateinit var deviceShieldSwitch: SwitchCompat
+    private lateinit var deviceShieldSwitch: SwitchView
 
     // we might get an update before options menu has been populated; temporarily cache value to use when menu populated
     private var vpnCachedState: VpnState? = null
@@ -124,27 +124,27 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun bindViews() {
-        binding.ctaTrackerFaq.setOnClickListener {
+        binding.ctaTrackerFaq.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
         }
 
-        binding.ctaBetaInstructions.setOnClickListener {
+        binding.ctaBetaInstructions.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchBetaInstructions)
         }
 
-        binding.ctaWhatAreAppTrackers.setOnClickListener {
+        binding.ctaWhatAreAppTrackers.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchAppTrackersFAQ)
         }
 
-        binding.ctaManageProtection.setOnClickListener {
+        binding.ctaManageProtection.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
         }
 
-        binding.ctaRemoveFeature.setOnClickListener {
+        binding.ctaRemoveFeature.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.AskToRemoveFeature)
         }
 
-        binding.ctaShowAll.setOnClickListener {
+        binding.ctaShowAll.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
         }
     }
@@ -450,7 +450,7 @@ class DeviceShieldTrackerActivity :
         menuInflater.inflate(R.menu.menu_device_tracker_activity, menu)
 
         val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
-        deviceShieldSwitch = switchMenuItem?.actionView as SwitchCompat
+        deviceShieldSwitch = switchMenuItem?.actionView as SwitchView
         deviceShieldSwitch.setOnCheckedChangeListener(enableAppTPSwitchListener)
         return true
     }

@@ -54,6 +54,7 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtimeKtx
     implementation AndroidX.room.runtime
+    implementation AndroidX.constraintLayout
 
     // Testing dependencies
     testImplementation project(path: ':common-test')

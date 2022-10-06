@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,6 +14,10 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.mobile.android.ui.view.TwoLineListItem xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" />
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="?attr/listItemImageBackground" />
+    <size
+        android:width="@dimen/listItemImageContainerSize"
+        android:height="@dimen/listItemImageContainerSize"/>
+</shape>

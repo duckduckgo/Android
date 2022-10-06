@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,29 +14,13 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
+
+<com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingBottom="10dp">
-
-    <TextView
-        android:id="@+id/title"
-        style="@style/SettingsItemClickable"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        tools:text="Title goes here" />
-
-    <ProgressBar
-        android:id="@+id/loading_state"
-        android:padding="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-    />
-
-
-</LinearLayout>
+    app:primaryText="tesdfsdfsdfsasdasdadasdadfsd"
+    app:secondaryText="asdasdas as"
+    app:trailingIcon="@drawable/ic_overflow"
+    app:leadingIconBackground="circular"/>

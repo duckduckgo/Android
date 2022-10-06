@@ -68,7 +68,7 @@
         android:orientation="horizontal"
         android:gravity="center">
 
-        <com.duckduckgo.mobile.android.ui.view.IconButton
+        <com.duckduckgo.mobile.android.ui.view.button.IconButton
             android:layout_width="48dp"
             android:layout_height="48dp"
             app:srcCompat="@drawable/ic_union"/>
@@ -77,11 +77,10 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"/>
 
-        <com.duckduckgo.mobile.android.ui.view.IconButton
+        <com.duckduckgo.mobile.android.ui.view.button.IconButton
             android:layout_width="48dp"
             android:layout_height="48dp"
             app:srcCompat="@drawable/ic_union"/>
-
 
     </LinearLayout>
 
