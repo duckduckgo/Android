@@ -18,10 +18,10 @@ package com.duckduckgo.contentscopescripts.impl
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi.Builder
@@ -35,27 +35,27 @@ import javax.inject.Inject
 class RealContentScopeScripts @Inject constructor(
     private val pluginPoint: PluginPoint<ContentScopeConfigPlugin>,
     private val allowList: UserWhiteListRepository,
-    private val gpc: Gpc,
-    private val contentScopeJSReader: ContentScopeJSReader
+    private val contentScopeJSReader: ContentScopeJSReader,
+    private val appBuildConfig: AppBuildConfig
 ) : ContentScopeScripts {
 
-    private var cachedConfig: String = ""
-    private lateinit var cachedContentScopeJson: String
+    private var cachedContentScopeJson: String = getContentScopeJson("")
 
     private var cachedUserUnprotectedDomains = CopyOnWriteArrayList<String>()
     private var cachedUserUnprotectedDomainsJson: String = emptyJsonList
 
-    private var cachedUserPreferences = getUserPreferences()
-    private lateinit var cachedUserPreferencesJson: String
+    private var cachedUserPreferencesJson: String = emptyJson
 
     private lateinit var cachedContentScopeJS: String
 
     override fun getScript(): String {
         var updateJS = false
 
-        val config = getConfig()
-        if (!this::cachedContentScopeJson.isInitialized || cachedConfig != config) {
-            cacheContentScope(config)
+        val pluginParameters = getPluginParameters()
+
+        val contentScopeJson = getContentScopeJson(pluginParameters.config)
+        if (cachedContentScopeJson != contentScopeJson) {
+            cachedContentScopeJson = contentScopeJson
             updateJS = true
         }
 
@@ -64,35 +64,36 @@ class RealContentScopeScripts @Inject constructor(
             updateJS = true
         }
 
-        if (!this::cachedUserPreferencesJson.isInitialized || cachedUserPreferences.globalPrivacyControlValue != gpc.isEnabled()) {
-            cacheUserPreferences(getUserPreferences())
+        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences)
+        if (cachedUserPreferencesJson != userPreferencesJson) {
+            cachedUserPreferencesJson = userPreferencesJson
             updateJS = true
         }
 
         if (!this::cachedContentScopeJS.isInitialized || updateJS) {
             cacheContentScopeJS()
         }
-
         return cachedContentScopeJS
     }
 
-    private fun getConfig(): String {
+    private fun getPluginParameters(): PluginParameters {
         var config = ""
+        var preferences = ""
         val plugins = pluginPoint.getPlugins()
         plugins.forEach { plugin ->
-            plugin.config()?.let { pluginConfig ->
-                if (config.isNotEmpty()) {
-                    config += ","
+            if (config.isNotEmpty()) {
+                config += ","
+            }
+            config += plugin.config()
+
+            plugin.preferences()?.let { pluginPreferences ->
+                if (preferences.isNotEmpty()) {
+                    preferences += ","
                 }
-                config += pluginConfig
+                preferences += pluginPreferences
             }
         }
-        return config
-    }
-
-    private fun cacheContentScope(config: String) {
-        cachedConfig = config
-        cachedContentScopeJson = getContentScopeJson(config)
+        return PluginParameters(config, preferences)
     }
 
     private fun cacheUserUnprotectedDomains(userUnprotectedDomains: List<String>) {
@@ -103,11 +104,6 @@ class RealContentScopeScripts @Inject constructor(
             cachedUserUnprotectedDomainsJson = getUserUnprotectedDomainsJson(userUnprotectedDomains)
             cachedUserUnprotectedDomains.addAll(userUnprotectedDomains)
         }
-    }
-
-    private fun cacheUserPreferences(userPreferences: UserPreferences) {
-        cachedUserPreferences = userPreferences
-        cachedUserPreferencesJson = getUserPreferencesJson(userPreferences)
     }
 
     private fun cacheContentScopeJS() {
@@ -126,24 +122,29 @@ class RealContentScopeScripts @Inject constructor(
         return jsonAdapter.toJson(userUnprotectedDomains)
     }
 
-    private fun getUserPreferencesJson(userPreferences: UserPreferences): String {
-        val moshi = Builder().build()
-        val jsonAdapter: JsonAdapter<UserPreferences> = moshi.adapter(UserPreferences::class.java)
-        return jsonAdapter.toJson(userPreferences)
+    private fun getUserPreferencesJson(userPreferences: String): String {
+        if (userPreferences.isEmpty()) {
+            return "{${getVersionNumberKVP()}}"
+        }
+        return "{$userPreferences,${getVersionNumberKVP()}}"
     }
 
-    private fun getContentScopeJson(config: String): String = (
-        "{\"features\":{$config},\"unprotectedTemporary\":[]}"
-        )
+    private fun getVersionNumberKVP() = "\"versionNumber\":${appBuildConfig.versionCode}"
 
-    private fun getUserPreferences() = UserPreferences(
-        globalPrivacyControlValue = gpc.isEnabled()
-    )
+    private fun getContentScopeJson(config: String): String = (
+        "{\"features\":{$config},\"unprotectedTemporary\":$emptyJsonList}"
+        )
 
     companion object {
         const val emptyJsonList = "[]"
+        const val emptyJson = "{}"
         const val contentScope = "\$CONTENT_SCOPE$"
         const val userUnprotectedDomains = "\$USER_UNPROTECTED_DOMAINS$"
         const val userPreferences = "\$USER_PREFERENCES$"
     }
 }
+
+data class PluginParameters(
+    val config: String,
+    val preferences: String
+)

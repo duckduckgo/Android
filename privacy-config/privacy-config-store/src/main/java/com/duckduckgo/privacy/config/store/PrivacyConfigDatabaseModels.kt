@@ -107,6 +107,12 @@ fun GpcExceptionEntity.toGpcException(): GpcException {
     return GpcException(domain = this.domain)
 }
 
+@Entity(tableName = "gpc_content_scope_config")
+data class GpcContentScopeConfigEntity(
+    @PrimaryKey val id: Int = 1,
+    val config: String
+)
+
 @Entity(tableName = "content_blocking_exceptions")
 data class ContentBlockingExceptionEntity(
     @PrimaryKey val domain: String,

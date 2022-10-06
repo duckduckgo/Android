@@ -46,7 +46,6 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.cookies.api.CookieManagerProvider
-import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.privacy.config.api.AmpLinks
 import org.mockito.kotlin.any

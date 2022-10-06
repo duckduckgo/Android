@@ -46,12 +46,13 @@ package com.duckduckgo.contentscopescripts.api
  */
 interface ContentScopeConfigPlugin {
     /**
-     * @return a [String] containing the config to be used in content scope scripts
+     * @return a [String] containing the JSON config
      */
-    fun config(): String?
+    fun config(): String
 
     /**
-     * @return the [featureName] of this feature
+     * @return a [String] containing the user preferences.
+     * Provide `null` if the feature does not have preferences.
      */
-    val featureName: String
+    fun preferences(): String?
 }

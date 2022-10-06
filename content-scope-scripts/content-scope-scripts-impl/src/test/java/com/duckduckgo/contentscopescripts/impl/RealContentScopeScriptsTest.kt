@@ -18,9 +18,9 @@ package com.duckduckgo.contentscopescripts.impl
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
-import com.duckduckgo.privacy.config.api.Gpc
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -34,24 +34,22 @@ class RealContentScopeScriptsTest {
 
     private val mockPluginPoint: PluginPoint<ContentScopeConfigPlugin> = mock()
     private val mockAllowList: UserWhiteListRepository = mock()
-    private val mockGpc: Gpc = mock()
     private val mockContentScopeJsReader: ContentScopeJSReader = mock()
     private val mockPlugin1: ContentScopeConfigPlugin = mock()
     private val mockPlugin2: ContentScopeConfigPlugin = mock()
-    private val mockPlugin3: ContentScopeConfigPlugin = mock()
+    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     lateinit var testee: ContentScopeScripts
 
     @Before
     fun setup() {
-        testee = RealContentScopeScripts(mockPluginPoint, mockAllowList, mockGpc, mockContentScopeJsReader)
+        testee = RealContentScopeScripts(mockPluginPoint, mockAllowList, mockContentScopeJsReader, mockAppBuildConfig)
         whenever(mockPlugin1.config()).thenReturn(config1)
         whenever(mockPlugin2.config()).thenReturn(config2)
-        whenever(mockPlugin3.config()).thenReturn(null)
-        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1, mockPlugin2, mockPlugin3))
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1, mockPlugin2))
         whenever(mockAllowList.userWhiteList).thenReturn(listOf(exampleUrl))
-        whenever(mockGpc.isEnabled()).thenReturn(true)
         whenever(mockContentScopeJsReader.getContentScopeJS()).thenReturn(contentScopeJS)
+        whenever(mockAppBuildConfig.versionCode).thenReturn(versionCode)
     }
 
     @Test
@@ -64,7 +62,6 @@ class RealContentScopeScriptsTest {
         js = testee.getScript()
 
         assertEquals(defaultExpectedJs, js)
-        verify(mockGpc, times(3)).isEnabled()
         verify(mockAllowList, times(3)).userWhiteList
         verifyNoMoreInteractions(mockContentScopeJsReader)
     }
@@ -84,11 +81,10 @@ class RealContentScopeScriptsTest {
                 "{\"features\":{" +
                 "\"config1\":{\"state\":\"enabled\"}," +
                 "\"config2\":{\"state\":\"disabled\"}}," +
-                "\"unprotectedTemporary\":[]}, [\"foo.com\"], {\"globalPrivacyControlValue\":true})",
+                "\"unprotectedTemporary\":[]}, [\"foo.com\"], {\"versionNumber\":1234})",
             js
         )
 
-        verify(mockGpc, times(3)).isEnabled()
         verify(mockAllowList, times(4)).userWhiteList
         verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
     }
@@ -99,7 +95,7 @@ class RealContentScopeScriptsTest {
 
         assertEquals(defaultExpectedJs, js)
 
-        whenever(mockGpc.isEnabled()).thenReturn(false)
+        whenever(mockPlugin2.preferences()).thenReturn("\"globalPrivacyControlValue\":false")
 
         js = testee.getScript()
 
@@ -108,11 +104,10 @@ class RealContentScopeScriptsTest {
                 "{\"features\":{" +
                 "\"config1\":{\"state\":\"enabled\"}," +
                 "\"config2\":{\"state\":\"disabled\"}}," +
-                "\"unprotectedTemporary\":[]}, [\"example.com\"], {\"globalPrivacyControlValue\":false})",
+                "\"unprotectedTemporary\":[]}, [\"example.com\"], {\"globalPrivacyControlValue\":false,\"versionNumber\":1234})",
             js
         )
 
-        verify(mockGpc, times(4)).isEnabled()
         verify(mockAllowList, times(3)).userWhiteList
         verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
     }
@@ -123,7 +118,9 @@ class RealContentScopeScriptsTest {
 
         assertEquals(defaultExpectedJs, js)
 
-        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin3, mockPlugin1))
+        whenever(mockPlugin1.preferences()).thenReturn("\"globalPrivacyControlValue\":true")
+
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1))
 
         js = testee.getScript()
 
@@ -131,11 +128,10 @@ class RealContentScopeScriptsTest {
             "processConfig(" +
                 "{\"features\":{" +
                 "\"config1\":{\"state\":\"enabled\"}}," +
-                "\"unprotectedTemporary\":[]}, [\"example.com\"], {\"globalPrivacyControlValue\":true})",
+                "\"unprotectedTemporary\":[]}, [\"example.com\"], {\"globalPrivacyControlValue\":true,\"versionNumber\":1234})",
             js
         )
 
-        verify(mockGpc, times(3)).isEnabled()
         verify(mockAllowList, times(3)).userWhiteList
         verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
     }
@@ -150,6 +146,7 @@ class RealContentScopeScriptsTest {
             "{\"features\":{" +
             "\"config1\":{\"state\":\"enabled\"}," +
             "\"config2\":{\"state\":\"disabled\"}}," +
-            "\"unprotectedTemporary\":[]}, [\"example.com\"], {\"globalPrivacyControlValue\":true})"
+            "\"unprotectedTemporary\":[]}, [\"example.com\"], {\"versionNumber\":1234})"
+        const val versionCode = 1234
     }
 }

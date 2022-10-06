@@ -16,61 +16,45 @@
 
 package com.duckduckgo.privacy.config.impl.features.gpc
 
-import com.duckduckgo.privacy.config.api.GpcException
-import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName.GpcFeatureName
-import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.util.concurrent.CopyOnWriteArrayList
 
 class GpcContentScopeConfigPluginTest {
 
     lateinit var testee: GpcContentScopeConfigPlugin
 
-    private val mockFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
     private val mockGpcRepository: GpcRepository = mock()
 
     @Before
     fun before() {
-        testee = GpcContentScopeConfigPlugin(mockGpcRepository, mockFeatureTogglesRepository)
+        testee = GpcContentScopeConfigPlugin(mockGpcRepository)
+    }
+
+    @Test
+    fun whenGetConfigThenReturnCorrectlyFormattedJson() {
+        whenever(mockGpcRepository.gpcContentScopeConfig).thenReturn(config)
+        assertEquals("\"gpc\":$config", testee.config())
+    }
+
+    @Test
+    fun whenGetPreferencesThenReturnCorrectlyFormattedJsonWhenGpcIsEnabled() {
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
-        whenever(mockFeatureTogglesRepository.getMinSupportedVersion(GpcFeatureName)).thenReturn(123)
-        val gpcExceptions = listOf(GpcException("example.com"))
-        whenever(mockGpcRepository.exceptions).thenReturn(CopyOnWriteArrayList(gpcExceptions))
-        val headerEnabledSites = listOf(GpcHeaderEnabledSite("foo.com"))
-        whenever(mockGpcRepository.headerEnabledSites).thenReturn(CopyOnWriteArrayList(headerEnabledSites))
+        assertEquals(testee.preferences(), "\"globalPrivacyControlValue\":true")
     }
 
     @Test
-    fun whenGetConfigThenReturnCorrectlyFormattedJsonWhenGpcIsEnabled() {
-        val config = testee.config()
-        assertEquals(
-            "\"gpc\":{" +
-                "\"exceptions\":[{\"domain\":\"example.com\"}]," +
-                "\"minSupportedVersion\":123," +
-                "\"settings\":{\"gpcHeaderEnabledSites\":[\"foo.com\"]}," +
-                "\"state\":\"enabled\"}",
-            config
-        )
-    }
-
-    @Test
-    fun whenGetConfigThenReturnCorrectlyFormattedJsonWhenGpcIsDisabled() {
+    fun whenGetPreferencesThenReturnCorrectlyFormattedJsonWhenGpcIsDisabled() {
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(false)
+        assertEquals(testee.preferences(), "\"globalPrivacyControlValue\":false")
+    }
 
-        val config = testee.config()
-        assertEquals(
-            "\"gpc\":{" +
-                "\"exceptions\":[{\"domain\":\"example.com\"}]," +
-                "\"minSupportedVersion\":123," +
-                "\"settings\":{\"gpcHeaderEnabledSites\":[\"foo.com\"]}," +
-                "\"state\":\"disabled\"}",
-            config
-        )
+    companion object {
+        const val config = "{\"exceptions\":[{\"domain\":\"example.com\"}]," +
+            "\"settings\":{\"gpcHeaderEnabledSites\":[\"foo.com\"]}," +
+            "\"state\":\"enabled\"}"
     }
 }
