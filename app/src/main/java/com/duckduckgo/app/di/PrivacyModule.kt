@@ -26,23 +26,31 @@ import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.BackgroundTimeKeeper
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.fire.DataClearerTimeKeeper
-import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.GeoLocationPermissionsManager
+import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
+import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.impl.SitePermissionsManagerImpl
+import com.duckduckgo.site.permissions.impl.SitePermissionsRepositoryImpl
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -70,7 +78,9 @@ object PrivacyModule {
         appCacheClearer: AppCacheClearer,
         geoLocationPermissions: GeoLocationPermissions,
         thirdPartyCookieManager: ThirdPartyCookieManager,
-        adClickManager: AdClickManager
+        adClickManager: AdClickManager,
+        fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
+        sitePermissionsManager: SitePermissionsManager
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -82,7 +92,9 @@ object PrivacyModule {
             appCacheClearer,
             geoLocationPermissions,
             thirdPartyCookieManager,
-            adClickManager
+            adClickManager,
+            fireproofWebsiteRepository,
+            sitePermissionsManager
         )
     }
 
@@ -116,5 +128,19 @@ object PrivacyModule {
         dispatcherProvider: DispatcherProvider
     ): GeoLocationPermissions {
         return GeoLocationPermissionsManager(context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
+    }
+
+    @Provides
+    fun providesSitePermissionsManager(sitePermissionsRepository: SitePermissionsRepositoryImpl): SitePermissionsManager {
+        return SitePermissionsManagerImpl(sitePermissionsRepository)
+    }
+
+    @Provides
+    fun providesLocationPermissionsRepository(
+        locationPermissionsDao: LocationPermissionsDao,
+        faviconManager: Lazy<FaviconManager>,
+        dispatchers: DispatcherProvider
+    ): LocationPermissionsRepositoryAPI {
+        return LocationPermissionsRepository(locationPermissionsDao, faviconManager, dispatchers)
     }
 }

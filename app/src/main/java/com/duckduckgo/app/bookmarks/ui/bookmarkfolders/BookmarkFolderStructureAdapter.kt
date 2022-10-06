@@ -23,9 +23,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ItemBookmarkFolderBinding
 import com.duckduckgo.mobile.android.ui.view.toPx
+import com.duckduckgo.mobile.android.R as CommonR
 
 class BookmarkFolderStructureAdapter(
     private val viewModel: BookmarkFoldersViewModel,
@@ -77,7 +77,7 @@ class FolderViewHolder(
             binding.iconContainer.setBackgroundResource(R.drawable.selected_icon_background)
         } else {
             binding.icon.setImageResource(R.drawable.ic_folder)
-            binding.iconContainer.setBackgroundResource(CommonR.drawable.list_item_image_background)
+            binding.iconContainer.setBackgroundResource(CommonR.drawable.list_item_image_circular_background)
         }
 
         itemView.setOnClickListener {

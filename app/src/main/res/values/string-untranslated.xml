@@ -16,6 +16,9 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
+    <!-- Site Permissions Settings -->
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Permissions Removed for All Sites</string>
+
     <!-- Autofill -->
     <string name="autofillSnackbarAction">View</string>
     <string name="autofillLoginSavedSnackbarMessage">Login saved</string>

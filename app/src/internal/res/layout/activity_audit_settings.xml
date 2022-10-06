@@ -36,117 +36,116 @@
             android:orientation="vertical"
             android:layout_height="wrap_content">
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/privacyAuditTitle"
-                style="@style/SettingsSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/auditSettingsScreenPrivacyAuditSection" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/step1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/auditStep1Title"
-                app:subtitle="@string/auditStep1Subtitle" />
+                app:primaryText="@string/auditStep1Title"
+                app:secondaryText="@string/auditStep1Subtitle" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/step2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/auditStep2Title"
-                app:subtitle="@string/auditStep2Subtitle" />
+                app:primaryText="@string/auditStep2Title"
+                app:secondaryText="@string/auditStep2Subtitle" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/step3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/auditStep3Title"
-                app:subtitle="@string/auditStep3Subtitle" />
+                app:primaryText="@string/auditStep3Title"
+                app:secondaryText="@string/auditStep3Subtitle" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/refTestsTitle"
-                style="@style/SettingsSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/auditSettingsScreenRefTestsSection" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/requestBlocking"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/requestBlockingTitle"
-                app:subtitle="@string/requestBlockingSubtitle" />
+                app:primaryText="@string/requestBlockingTitle"
+                app:secondaryText="@string/requestBlockingSubtitle" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/requestBlockingDisabled"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/requestBlockingDisabledTitle"
-                app:subtitle="@string/requestBlockingDisabledSubtitle" />
+                app:primaryText="@string/requestBlockingDisabledTitle"
+                app:secondaryText="@string/requestBlockingDisabledSubtitle" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/httpsUpgrades"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/httpsUpgradesTitle"
-                app:subtitle="@string/httpsUpgradesSubtitle" />
+                app:primaryText="@string/httpsUpgradesTitle"
+                app:secondaryText="@string/httpsUpgradesSubtitle" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/fireButtonStore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/fireButtonStoreTitle"
-                app:subtitle="@string/fireButtonStoreSubtitle" />
+                app:primaryText="@string/fireButtonStoreTitle"
+                app:secondaryText="@string/fireButtonStoreSubtitle" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/fireButtonRetrieve"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/fireButtonRetrieveTitle"
-                app:subtitle="@string/fireButtonRetrieveSubtitle" />
+                app:primaryText="@string/fireButtonRetrieveTitle"
+                app:secondaryText="@string/fireButtonRetrieveSubtitle" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/cookies3pStore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/cookies3pStoreTitle"
-                app:subtitle="@string/cookies3pStoreSubtitle" />
+                app:primaryText="@string/cookies3pStoreTitle"
+                app:secondaryText="@string/cookies3pStoreSubtitle" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/cookies3pRetrieve"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/cookies3pRetrieveTitle"
-                app:subtitle="@string/cookies3pRetrieveSubtitle" />
+                app:primaryText="@string/cookies3pRetrieveTitle"
+                app:secondaryText="@string/cookies3pRetrieveSubtitle" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/gpc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/gpcTitle"
-                app:subtitle="@string/gpcSubtitle" />
+                app:primaryText="@string/gpcTitle"
+                app:secondaryText="@string/gpcSubtitle" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/gpcOther"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/gpcOtherTitle"
-                app:subtitle="@string/gpcOtherSubtitle" />
+                app:primaryText="@string/gpcOtherTitle"
+                app:secondaryText="@string/gpcOtherSubtitle" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/surrogates"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/surrogatesTitle"
-                app:subtitle="@string/surrogatesSubtitle" />
+                app:primaryText="@string/surrogatesTitle"
+                app:secondaryText="@string/surrogatesSubtitle" />
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/surrogatesDisabled"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/surrogatesDisabledTitle"
-                app:subtitle="@string/surrogatesDisabledSubtitle" />
+                app:primaryText="@string/surrogatesDisabledTitle"
+                app:secondaryText="@string/surrogatesDisabledSubtitle" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

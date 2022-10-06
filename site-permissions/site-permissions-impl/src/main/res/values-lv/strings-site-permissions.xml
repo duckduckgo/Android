@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s vēlas piekļūt kamerai un mikrofonam</string>
+    <string name="sitePermissionsMicDialogTitle">%1$s vēlas piekļūt mikrofonam</string>
+    <string name="sitePermissionsCameraDialogTitle">%1$s vēlas piekļūt kamerai</string>
+    <string name="sitePermissionsDialogContent">Pārvaldiet piešķirtās atļaujas iestatījumos</string>
+    <string name="sitePermissionsDialogDenyButton">Liegt</string>
+    <string name="sitePermissionsDialogAllowButton">Atļaut</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Atļaut DuckDuckGo prasīt piekļuvi kamerai un mikrofonam</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Atļaut DuckDuckGo prasīt piekļuvi kamerai</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Atļaut DuckDuckGo prasīt piekļuvi mikrofonam</string>
+    <string name="sitePermissionsDeniedSnackBarAction">Atļaut</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Atļaut DuckDuckGo pieprasīt piekļuvi kamerai šajā ierīcē</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Vietnes var izmantot tavu kameru tikai tad, ja tu atļauj DuckDuckGo prasīt piekļuvi.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Atļaut DuckDuckGo prasīt piekļuvi mikrofonam šajā ierīcē</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Vietnes var izmantot tavu mikrofonu tikai tad, ja tu atļauj DuckDuckGo prasīt piekļuvi.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Atļaut DuckDuckGo prasīt piekļuvi kamerai un mikrofonam šajā ierīcē</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Vietnes var izmantot tavu kameru un mikrofonu tikai tad, ja tu atļauj DuckDuckGo prasīt piekļuvi.</string>
+    <string name="systemPermissionsDeniedDialogPositiveButton">Atvērt iestatījumus</string>
+    <string name="systemPermissionsDeniedDialogNegativeButton">Atcelt</string>
+</resources>

@@ -19,44 +19,45 @@ package com.duckduckgo.app.browser.tabpreview
 import android.graphics.Bitmap
 import android.webkit.WebView
 import androidx.core.view.drawToBitmap
-import kotlinx.coroutines.Dispatchers
+import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 interface WebViewPreviewGenerator {
     suspend fun generatePreview(webView: WebView): Bitmap
 }
 
-class FileBasedWebViewPreviewGenerator : WebViewPreviewGenerator {
+class FileBasedWebViewPreviewGenerator(private val dispatchers: DispatcherProvider) : WebViewPreviewGenerator {
 
     override suspend fun generatePreview(webView: WebView): Bitmap {
-        val fullSizeBitmap = convertWebViewToBitmap(webView)
+        disableScrollbars(webView)
+        val fullSizeBitmap = createBitmap(webView)
         val scaledBitmap = scaleBitmap(fullSizeBitmap)
-        Timber.d("Full size bitmap: ${fullSizeBitmap.byteCount}, reduced size: ${scaledBitmap.byteCount}")
+        enableScrollbars(webView)
         return scaledBitmap
     }
 
-    private suspend fun convertWebViewToBitmap(webView: WebView): Bitmap {
-        return withContext(Dispatchers.Main) {
-            disableScrollbars(webView)
-            val bm = webView.drawToBitmap()
-            enableScrollbars(webView)
-            return@withContext bm
+    private suspend fun createBitmap(webView: WebView): Bitmap {
+        return withContext(dispatchers.default()) {
+            webView.drawToBitmap()
         }
     }
 
-    private fun enableScrollbars(webView: WebView) {
-        webView.isVerticalScrollBarEnabled = true
-        webView.isHorizontalScrollBarEnabled = true
+    private suspend fun enableScrollbars(webView: WebView) {
+        withContext(dispatchers.main()) {
+            webView.isVerticalScrollBarEnabled = true
+            webView.isHorizontalScrollBarEnabled = true
+        }
     }
 
-    private fun disableScrollbars(webView: WebView) {
-        webView.isVerticalScrollBarEnabled = false
-        webView.isHorizontalScrollBarEnabled = false
+    private suspend fun disableScrollbars(webView: WebView) {
+        withContext(dispatchers.main()) {
+            webView.isVerticalScrollBarEnabled = false
+            webView.isHorizontalScrollBarEnabled = false
+        }
     }
 
     private suspend fun scaleBitmap(bitmap: Bitmap): Bitmap {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatchers.default()) {
             return@withContext Bitmap.createScaledBitmap(
                 bitmap,
                 (bitmap.width * COMPRESSION_RATIO).toInt(),

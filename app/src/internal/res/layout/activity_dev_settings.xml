@@ -15,92 +15,93 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.duckduckgo.app.dev.settings.DevSettingsActivity">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context="com.duckduckgo.app.dev.settings.DevSettingsActivity">
 
     <include
-        android:id="@+id/includeToolbar"
-        layout="@layout/include_default_toolbar" />
+            android:id="@+id/includeToolbar"
+            layout="@layout/include_default_toolbar"/>
 
     <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <TextView
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/generalTitle"
-                style="@style/SettingsSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/devSettingsScreenGeneralSection" />
 
-            <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
-                android:id="@+id/enableAppStartupTrace"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:toggleSubTitle="@string/devStartupTracingByline"
-                app:toggleTitle="@string/devStartupTracing" />
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/enableAppStartupTrace"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:secondaryText="@string/devStartupTracingByline"
+                    app:primaryText="@string/devStartupTracing"
+                    app:showSwitch="true"/>
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-                android:id="@+id/triggerAnr"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:subtitle="@string/devSettingsTriggerAnrSubtitle"
-                app:title="@string/devSettingsTriggerAnr" />
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/triggerAnr"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:secondaryText="@string/devSettingsTriggerAnrSubtitle"
+                    app:primaryText="@string/devSettingsTriggerAnr"/>
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-                android:id="@+id/clearSavedSites"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:subtitle="@string/devSettingsClearSavedSitesSubtitle"
-                app:title="@string/devSettingsClearSavedSites" />
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/clearSavedSites"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:secondaryText="@string/devSettingsClearSavedSitesSubtitle"
+                    app:primaryText="@string/devSettingsClearSavedSites"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/privacyTitle"
-                style="@style/SettingsSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/devSettingsScreenPrivacySection" />
 
-            <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
-                android:id="@+id/nextTdsEnabled"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:toggleSubTitle="@string/devSettingsScreenTdsVersion"
-                app:toggleTitle="@string/devSettingsScreenTdsVersionSubtitle" />
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/nextTdsEnabled"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:secondaryText="@string/devSettingsScreenTdsVersion"
+                    app:primaryText="@string/devSettingsScreenTdsVersionSubtitle"
+                    app:showSwitch="true"/>
 
-            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/userAgentTitle"
-                style="@style/SettingsSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/devSettingsScreenUserAgentSection" />
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/overrideUserAgentToggle"
-                style="@style/SettingsSwitch"
-                android:text="@string/devSettingsScreenUserAgentOverride"
-                android:theme="@style/SettingsSwitchTheme" />
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                    android:id="@+id/overrideUserAgentToggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/devSettingsScreenUserAgentOverride"
+                    app:showSwitch="true"/>
 
-            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-                android:id="@+id/overrideUserAgentSelector"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/devSettingsScreenUserAgentSelectorTitle" />
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/overrideUserAgentSelector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/devSettingsScreenUserAgentSelectorTitle"/>
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

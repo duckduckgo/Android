@@ -25,7 +25,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
-
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -44,6 +43,12 @@ android {
                     srcDirs += files("$projectDir/../node_modules/@duckduckgo/privacy_dashboard/build/android".toString())
                 }
             }
+        }
+
+        if (project.hasProperty('perf-test')) {
+            buildConfigField "boolean", "IS_PERFORMANCE_TEST", "true"
+        } else {
+            buildConfigField "boolean", "IS_PERFORMANCE_TEST", "false"
         }
     }
     buildFeatures {
@@ -100,9 +105,9 @@ android {
             path "CMakeLists.txt"
         }
     }
-    lintOptions {
-        disable 'ObsoleteLintCustomCheck'
+    lint {
         abortOnError true
+        ignoreTestSources true
         baseline file("lint-baseline.xml")
     }
     testOptions {
@@ -207,6 +212,9 @@ dependencies {
     internalImplementation project(':traces-api')
     internalImplementation project(':traces-impl')
 
+    implementation project(':site-permissions-api')
+    implementation project(':site-permissions-impl')
+
     implementation project(':bandwidth-impl')
     implementation project(':bandwidth-store')
 
@@ -224,6 +232,9 @@ dependencies {
     implementation project(':autoconsent-api')
     implementation project(':autoconsent-impl')
     implementation project(':autoconsent-store')
+
+    implementation project(':cookies-api')
+    implementation project(':cookies-impl')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
