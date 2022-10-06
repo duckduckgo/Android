@@ -17,15 +17,12 @@
 package com.duckduckgo.app.fire
 
 import android.app.Activity
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Process
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.fadeTransitionConfig
 import com.duckduckgo.di.scopes.ActivityScope
 
@@ -91,17 +88,6 @@ class FireActivity : AppCompatActivity() {
 
         private fun killProcess() {
             Runtime.getRuntime().exit(0)
-        }
-
-        fun appRestarting(context: Context): Boolean {
-            val currentProcessId = Process.myPid()
-            val activityManager: ActivityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            activityManager.runningAppProcesses?.forEach {
-                if (it.pid == currentProcessId && it.processName.endsWith(context.getString(R.string.fireProcessName))) {
-                    return true
-                }
-            }
-            return false
         }
     }
 }

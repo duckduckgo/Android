@@ -17,9 +17,10 @@
 <resources>
     <declare-styleable name="SectionHeaderTextView">
         <attr name="android:textColor"/>
-        <attr name="android:textSize"/>
-        <attr name="android:fontFamily"/>
-        <attr name="android:textAllCaps"/>
         <attr name="android:textAppearance"/>
+        <attr name="android:paddingStart"/>
+        <attr name="android:paddingTop"/>
+        <attr name="android:paddingBottom"/>
+        <attr name="android:paddingEnd"/>
     </declare-styleable>
 </resources>

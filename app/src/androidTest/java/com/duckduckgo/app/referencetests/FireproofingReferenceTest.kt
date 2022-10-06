@@ -23,14 +23,9 @@ import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.browser.cookies.DefaultCookieManagerProvider
-import com.duckduckgo.app.fire.CookieManagerRemover
-import com.duckduckgo.app.fire.GetCookieHostsToPreserve
-import com.duckduckgo.app.fire.RemoveCookies
-import com.duckduckgo.app.fire.SQLCookieRemover
-import com.duckduckgo.app.fire.WebViewCookieManager
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.domain
@@ -38,6 +33,11 @@ import com.duckduckgo.app.global.exception.RootExceptionFinder
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.cookies.impl.CookieManagerRemover
+import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
+import com.duckduckgo.cookies.impl.RemoveCookies
+import com.duckduckgo.cookies.impl.SQLCookieRemover
+import com.duckduckgo.cookies.impl.WebViewCookieManager
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import org.mockito.kotlin.mock
 import com.squareup.moshi.JsonAdapter
@@ -67,7 +67,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
     private val mockPixel = mock<Pixel>()
     private val mockOfflinePixelCountDataStore = mock<OfflinePixelCountDataStore>()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
-    private val getHostsToPreserve = GetCookieHostsToPreserve(fireproofWebsiteDao)
+    private val fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, DefaultDispatcherProvider(), mock())
     private lateinit var testee: WebViewCookieManager
 
     companion object {
@@ -93,7 +93,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
     fun before() {
         val sqlCookieRemover = SQLCookieRemover(
             webViewDatabaseLocator,
-            getHostsToPreserve,
+            fireproofWebsiteRepository,
             mockOfflinePixelCountDataStore,
             ExceptionPixel(mockPixel, RootExceptionFinder()),
             DefaultDispatcherProvider()
@@ -101,7 +101,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
 
         val removeCookiesStrategy = RemoveCookies(CookieManagerRemover(cookieManagerProvider), sqlCookieRemover)
 
-        testee = WebViewCookieManager(cookieManagerProvider, "duckduckgo.com", removeCookiesStrategy, DefaultDispatcherProvider())
+        testee = WebViewCookieManager(cookieManagerProvider, removeCookiesStrategy, DefaultDispatcherProvider())
 
         fireproofedSites.map { url ->
             fireproofWebsiteDao.insert(FireproofWebsiteEntity(url.toUri().domain().orEmpty()))

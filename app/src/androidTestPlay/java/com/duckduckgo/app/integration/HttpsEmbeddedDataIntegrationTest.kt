@@ -39,6 +39,7 @@ import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 
 class HttpsEmbeddedDataIntegrationTest {
@@ -85,7 +86,7 @@ class HttpsEmbeddedDataIntegrationTest {
         db.close()
     }
 
-    @Test
+    @Ignore("This test is ignored because it has been flaky lately, see https://app.asana.com/0/1202552961248957/1203035277827863/f")
     fun whenUpgraderLoadedWithEmbeddedDataAndItemInBloomListThenUpdgraded() {
         assertTrue(httpsUpgrader.shouldUpgrade(Uri.parse("http://facebook.com")))
     }

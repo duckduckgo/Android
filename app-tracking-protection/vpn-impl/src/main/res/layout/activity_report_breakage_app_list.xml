@@ -48,12 +48,10 @@
                 android:text="@string/atp_ReportBreakageAppFeature"
                 android:textColor="?attr/settingsMinorTextColor"/>
 
-            <View
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:id="@+id/appBreakageReportSplitter"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/keyline_4"
-                android:background="?splitterColor"/>
+                android:layout_height="wrap_content"/>
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/deviceShieldReportBreakageAppListSkeleton"
@@ -97,7 +95,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
-                android:paddingTop="@dimen/keyline_2"
                 android:paddingBottom="@dimen/keyline_2"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listItem="@layout/view_device_shield_report_app_breakage_entry"/>
@@ -106,16 +103,17 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <View
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?splitterColor"/>
+        android:layout_height="wrap_content"/>
 
     <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
         android:id="@+id/ctaSubmitAppBreakage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_4"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginBottom="@dimen/keyline_4"
         android:enabled="false"
         android:text="@string/atp_ReportBreakageAppSubmitCta"/>
 

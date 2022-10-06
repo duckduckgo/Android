@@ -16,14 +16,14 @@
 -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:clipToPadding="false"
-  android:paddingTop="@dimen/keyline_5"
-  android:paddingBottom="@dimen/keyline_5"
-  android:paddingStart="@dimen/keyline_4"
-  android:paddingEnd="@dimen/keyline_4">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content"
+                                                   android:clipToPadding="false"
+                                                   android:paddingTop="@dimen/keyline_5"
+                                                   android:paddingBottom="@dimen/keyline_5"
+                                                   android:paddingStart="@dimen/keyline_4"
+                                                   android:paddingEnd="@dimen/keyline_4">
 
     <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
         android:id="@+id/label"
@@ -33,29 +33,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-      android:id="@+id/switch_one"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/keyline_4"
-      android:layout_marginEnd="@dimen/keyline_2"
-      android:checked="false"
-      app:layout_constraintEnd_toStartOf="@+id/switch_two"
-      app:layout_constraintHorizontal_bias="0.0"
-      app:layout_constraintHorizontal_chainStyle="packed"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/label" />
+    <com.duckduckgo.mobile.android.ui.view.SwitchView
+        android:id="@+id/switch_one"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:checked="false"
+        app:layout_constraintEnd_toStartOf="@+id/switch_two"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/label"/>
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-      android:id="@+id/switch_two"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="@dimen/keyline_2"
-      android:checked="true"
-      app:layout_constraintBottom_toBottomOf="@+id/switch_one"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.5"
-      app:layout_constraintStart_toEndOf="@+id/switch_one"
-      app:layout_constraintTop_toTopOf="@+id/switch_one" />
+    <com.duckduckgo.mobile.android.ui.view.SwitchView
+        android:id="@+id/switch_two"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:checked="true"
+        app:layout_constraintBottom_toBottomOf="@+id/switch_one"
+        app:layout_constraintStart_toEndOf="@+id/switch_one"
+        app:layout_constraintTop_toTopOf="@+id/switch_one"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
