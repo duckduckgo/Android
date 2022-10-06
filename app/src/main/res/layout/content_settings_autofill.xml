@@ -25,10 +25,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/autofill"
-        style="@style/SettingsItemClickable"
-        android:gravity="center_vertical"
-        android:text="@string/autofillSettingsDisplayName" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/autofillSettingsDisplayName"/>
 
 </LinearLayout>

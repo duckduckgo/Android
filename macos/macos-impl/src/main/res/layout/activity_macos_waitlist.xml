@@ -156,7 +156,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <com.duckduckgo.mobile.android.ui.view.IconButton
+            <com.duckduckgo.mobile.android.ui.view.button.IconButton
                 android:id="@+id/shareImage"
                 android:visibility="gone"
                 android:layout_width="40dp"

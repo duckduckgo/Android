@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,8 +14,12 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:color="?attr/settingsItemTextColorDisabled" />
-    <item android:state_enabled="true" android:color="?attr/settingsItemTextColor"/>
-</selector>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/list_item_image_circular_background"/>
+    <item
+            android:bottom="10dp"
+            android:drawable="@drawable/ic_file"
+            android:left="@dimen/keyline_3"
+            android:right="@dimen/keyline_3"
+            android:top="10dp"/>
+</layer-list>

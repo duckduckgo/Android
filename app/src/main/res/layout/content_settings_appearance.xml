@@ -32,32 +32,25 @@
         android:layout_height="wrap_content"
         android:text="@string/settingsHeadingAppearance" />
 
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/selectedThemeSetting"
-        style="@style/SettingsItemClickable"
-        android:paddingTop="0dp"
-        android:paddingBottom="0dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="0dp"
-        android:paddingEnd="0dp"
-        app:subtitle="@string/settingsSystemTheme"
-        app:title="@string/settingsTheme" />
+        app:secondaryText="@string/settingsSystemTheme"
+        app:primaryText="@string/settingsTheme" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
             android:id="@+id/changeAppIconLabel"
-            style="@style/SettingsItemClickable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:text="@string/changeIconCtaLabel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:primaryText="@string/changeIconCtaLabel"/>
 
         <ImageView
             android:id="@+id/changeAppIcon"
@@ -72,21 +65,17 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/selectedFireAnimationSetting"
-        style="@style/SettingsItemClickable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="0dp"
-        android:paddingBottom="0dp"
-        android:paddingStart="0dp"
-        android:paddingEnd="0dp"
-        app:subtitle="@string/settingsHeroFireAnimation"
-        app:title="@string/settingsFireAnimation" />
+        app:secondaryText="@string/settingsHeroFireAnimation"
+        app:primaryText="@string/settingsFireAnimation" />
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/accessibilitySetting"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsAccessibility" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsAccessibility"/>
 
 </LinearLayout>
