@@ -42,6 +42,12 @@ android {
                 }
             }
         }
+
+        if (project.hasProperty('perf-test')) {
+            buildConfigField "boolean", "IS_PERFORMANCE_TEST", "true"
+        } else {
+            buildConfigField "boolean", "IS_PERFORMANCE_TEST", "false"
+        }
     }
     buildFeatures {
         viewBinding = true
@@ -221,6 +227,9 @@ dependencies {
     implementation project(':autoconsent-api')
     implementation project(':autoconsent-impl')
     implementation project(':autoconsent-store')
+
+    implementation project(':cookies-api')
+    implementation project(':cookies-impl')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

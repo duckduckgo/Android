@@ -105,14 +105,13 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/practicesBannerContainer" />
 
-            <View
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:id="@+id/topDivider"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="22dp"
                 android:layout_marginEnd="20dp"
-                android:background="@color/divider"
                 app:layout_constraintTop_toBottomOf="@id/practicesOverview" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -127,14 +126,13 @@
 
     </ScrollView>
 
-    <View
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:id="@+id/bottomDivider"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="wrap_content"
         android:layout_above="@id/tosdrLink"
         android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:background="@color/divider" />
+        android:layout_marginEnd="20dp" />
 
     <TextView
         android:id="@+id/tosdrLink"

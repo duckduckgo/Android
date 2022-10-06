@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.cookies.api
 
+/** Public interface for RemoveCookiesStrategy */
 interface RemoveCookiesStrategy {
+    /**
+     * This method deletes all the cookies for the specific cookies strategy
+     */
     suspend fun removeCookies()
-}
-
-class RemoveCookies(
-    private val cookieManagerRemover: CookieRemover,
-    private val selectiveCookieRemover: CookieRemover
-) : RemoveCookiesStrategy {
-    override suspend fun removeCookies() {
-        val removeSuccess = selectiveCookieRemover.removeCookies()
-        if (!removeSuccess) {
-            cookieManagerRemover.removeCookies()
-        }
-    }
 }

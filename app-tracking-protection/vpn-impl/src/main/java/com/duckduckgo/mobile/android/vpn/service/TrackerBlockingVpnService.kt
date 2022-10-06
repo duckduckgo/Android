@@ -217,7 +217,15 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             // See https://developer.android.com/reference/android/net/VpnService.Builder#allowFamily(int) for more info as to why
             allowFamily(AF_INET6)
 
-            VpnRoutes.includedRoutes.forEach { addRoute(it.address, it.maskWidth) }
+            // TODO: eventually routes will be set by remote config
+            if (appBuildConfig.isPerformanceTest && appBuildConfig.isInternalBuild()) {
+                // Currently allowing host PC address 10.0.2.2 when running performance test on an emulator (normally we don't route local traffic)
+                // The address is also isolated to minimize network interference during performance tests
+                VpnRoutes.includedTestRoutes.forEach { addRoute(it.address, it.maskWidth) }
+            } else {
+                VpnRoutes.includedRoutes.forEach { addRoute(it.address, it.maskWidth) }
+            }
+
             // Add the route for all Global Unicast Addresses. This is the IPv6 equivalent to
             // IPv4 public IP addresses. They are addresses that routable in the internet
             addRoute("2000::", 3)

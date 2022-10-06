@@ -117,7 +117,7 @@
             />
 
             <!-- Section Trackers -->
-            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
@@ -163,7 +163,7 @@
             />
 
             <!-- Section Protection -->
-            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
@@ -190,7 +190,7 @@
                     android:text="Restore default protections"/>
 
             <!-- Section Logging -->
-            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
@@ -212,7 +212,7 @@
             />
 
             <!-- Section Diagnostics -->
-            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
@@ -240,7 +240,7 @@
 
 
             <!-- Section Health -->
-            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>

@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.ui.view
+package com.duckduckgo.app.fire
 
 import android.content.Context
-import android.util.AttributeSet
-import android.widget.FrameLayout
-import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.databinding.ViewSectionDividerBinding
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import java.io.File
 
-class SectionDivider @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = R.style.SectionDivider
-) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
-    init {
-        viewBinding<ViewSectionDividerBinding>()
+abstract class DatabaseLocator(private val context: Context) {
+
+    abstract val knownLocations: List<String>
+
+    open fun getDatabasePath(): String {
+        val dataDir = context.applicationInfo.dataDir
+        val detectedPath = knownLocations.find { knownPath ->
+            val file = File(dataDir, knownPath)
+            file.exists()
+        }
+
+        return detectedPath
+            .takeUnless { it.isNullOrEmpty() }
+            ?.let { nonEmptyPath ->
+                "$dataDir$nonEmptyPath"
+            }.orEmpty()
     }
 }

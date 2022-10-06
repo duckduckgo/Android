@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.cookies.impl
 
 import android.webkit.CookieManager
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.fire.DatabaseLocator
+import com.duckduckgo.app.fire.FireproofRepository
+import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.exception.RootExceptionFinder
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.cookies.impl.CookiesPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR
 import org.mockito.kotlin.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -50,7 +54,6 @@ class SQLCookieRemoverTest {
     private val mockPixel = mock<Pixel>()
     private val mockOfflinePixelCountDataStore = mock<OfflinePixelCountDataStore>()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
-    private val getHostsToPreserve = GetCookieHostsToPreserve(fireproofWebsiteDao)
 
     @After
     fun after() = runBlocking {
@@ -110,7 +113,7 @@ class SQLCookieRemoverTest {
         sqlCookieRemover.removeCookies()
 
         verify(mockOfflinePixelCountDataStore).cookieDatabaseOpenErrorCount = 1
-        verify(mockPixel).fire(eq(AppPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR), any(), any())
+        verify(mockPixel).fire(eq(COOKIE_DATABASE_EXCEPTION_OPEN_ERROR), any(), any())
     }
 
     private fun givenFireproofWebsitesStored() {
@@ -132,14 +135,14 @@ class SQLCookieRemoverTest {
 
     private fun givenSQLCookieRemover(
         databaseLocator: DatabaseLocator = webViewDatabaseLocator,
-        cookieHostsToPreserve: GetCookieHostsToPreserve = getHostsToPreserve,
+        repository: FireproofRepository = FireproofWebsiteRepository(fireproofWebsiteDao, DefaultDispatcherProvider(), mock()),
         offlinePixelCountDataStore: OfflinePixelCountDataStore = mockOfflinePixelCountDataStore,
         exceptionPixel: ExceptionPixel = ExceptionPixel(mockPixel, RootExceptionFinder()),
         dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
     ): SQLCookieRemover {
         return SQLCookieRemover(
             databaseLocator,
-            cookieHostsToPreserve,
+            repository,
             offlinePixelCountDataStore,
             exceptionPixel,
             dispatcherProvider

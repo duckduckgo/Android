@@ -47,7 +47,7 @@ import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.SITE_ALLOW
 import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.TOGGLE
 import com.duckduckgo.mobile.android.databinding.ViewSingleLineListItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.SectionDivider
+import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
@@ -96,7 +96,7 @@ class SitePermissionsAdapter(
                 SitePermissionToggleViewHolder(binding)
             }
             DIVIDER -> {
-                val view = SectionDivider(parent.context)
+                val view = HorizontalDivider(parent.context)
                 SitePermissionsDividerViewHolder(view)
             }
             SITES_EMPTY -> {
