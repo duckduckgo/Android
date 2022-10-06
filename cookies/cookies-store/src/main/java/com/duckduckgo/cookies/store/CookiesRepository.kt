@@ -17,24 +17,27 @@
 package com.duckduckgo.cookies.store
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.cookies.api.TrackingCookie1pException
+import com.duckduckgo.cookies.api.CookieException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
 
 interface CookiesRepository {
-    fun updateAll(exceptions: List<TrackingCookie1pExceptionEntity>, firstPartyTrackerCookiePolicy: FirstPartyTrackerCookiePolicyEntity)
-    var firstPartyCookieTrackerPolicy: FirstPartyTrackerCookiePolicyEntity
-    val exceptions: List<TrackingCookie1pException>
+    fun updateAll(exceptions: List<CookieExceptionEntity>, firstPartyTrackerCookiePolicy: FirstPartyCookiePolicyEntity)
+    var firstPartyCookiePolicy: FirstPartyCookiePolicyEntity
+    val exceptions: List<CookieException>
 }
 
 class RealCookieRepository constructor(
-    database: CookiesDatabase,
+    val database: CookiesDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider
 ) : CookiesRepository {
 
     private val cookiesDao: CookiesDao = database.cookiesDao()
+
+    override val exceptions = CopyOnWriteArrayList<CookieException>()
+    override var firstPartyCookiePolicy = FirstPartyCookiePolicyEntity(threshold = DEFAULT_THRESHOLD, maxAge = DEFAULT_MAX_AGE)
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -42,12 +45,9 @@ class RealCookieRepository constructor(
         }
     }
 
-    override val exceptions = CopyOnWriteArrayList<TrackingCookie1pException>()
-    override var firstPartyCookieTrackerPolicy = FirstPartyTrackerCookiePolicyEntity(threshold = DEFAULT_THRESHOLD, maxAge = DEFAULT_MAX_AGE)
-
     override fun updateAll(
-        exceptions: List<TrackingCookie1pExceptionEntity>,
-        firstPartyTrackerCookiePolicy: FirstPartyTrackerCookiePolicyEntity
+        exceptions: List<CookieExceptionEntity>,
+        firstPartyTrackerCookiePolicy: FirstPartyCookiePolicyEntity
     ) {
         cookiesDao.updateAll(exceptions, firstPartyTrackerCookiePolicy)
         loadToMemory()
@@ -55,16 +55,16 @@ class RealCookieRepository constructor(
 
     private fun loadToMemory() {
         exceptions.clear()
-        cookiesDao.getAllTrackingCookie1pExceptions().map {
-            exceptions.add(it.toTrackingCookie1p())
+        cookiesDao.getAllCookieExceptions().map {
+            exceptions.add(it.toCookieException())
         }
-        firstPartyCookieTrackerPolicy =
-            cookiesDao.getFirstPartyCookieTrackersPolicy()
-                ?: FirstPartyTrackerCookiePolicyEntity(threshold = DEFAULT_THRESHOLD, maxAge = DEFAULT_MAX_AGE)
+        firstPartyCookiePolicy =
+            cookiesDao.getFirstPartyCookiePolicy()
+                ?: FirstPartyCookiePolicyEntity(threshold = DEFAULT_THRESHOLD, maxAge = DEFAULT_MAX_AGE)
     }
 
     companion object {
-        const val DEFAULT_THRESHOLD = 1
-        const val DEFAULT_MAX_AGE = 1
+        const val DEFAULT_THRESHOLD = 86400
+        const val DEFAULT_MAX_AGE = 86400
     }
 }

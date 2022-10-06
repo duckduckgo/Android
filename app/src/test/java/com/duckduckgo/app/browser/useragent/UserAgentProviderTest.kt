@@ -240,6 +240,8 @@ class UserAgentProviderTest {
 
     internal class FakeUserAllowListRepo : UserAllowListRepository {
         override fun isDomainInUserAllowList(domain: String): Boolean = (domain == ALLOWED_HOST)
+
+        override fun domainsInUserAllowList(): List<String> = emptyList()
     }
 
     companion object {

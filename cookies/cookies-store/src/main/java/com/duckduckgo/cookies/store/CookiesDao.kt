@@ -26,28 +26,28 @@ import androidx.room.Transaction
 abstract class CookiesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertFirstPartyCookiesTrackersPolicy(firstPartyTrackerCookiePolicy: FirstPartyTrackerCookiePolicyEntity)
+    abstract fun insertFirstPartyCookiePolicy(firstPartyTrackerCookiePolicy: FirstPartyCookiePolicyEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertAllTrackingCookie1pExceptions(exceptions: List<TrackingCookie1pExceptionEntity>)
+    abstract fun insertAllCookieExceptions(exceptions: List<CookieExceptionEntity>)
 
     @Transaction
-    open fun updateAll(exceptions: List<TrackingCookie1pExceptionEntity>, firstPartyTrackerCookiePolicy: FirstPartyTrackerCookiePolicyEntity) {
-        deleteFirstPartyCookiesTrackersPolicy()
-        deleteAllTrackingCookie1pExceptions()
-        insertAllTrackingCookie1pExceptions(exceptions)
-        insertFirstPartyCookiesTrackersPolicy(firstPartyTrackerCookiePolicy)
+    open fun updateAll(exceptions: List<CookieExceptionEntity>, firstPartyTrackerCookiePolicy: FirstPartyCookiePolicyEntity) {
+        deleteFirstPartyCookiePolicy()
+        deleteAllExceptions()
+        insertAllCookieExceptions(exceptions)
+        insertFirstPartyCookiePolicy(firstPartyTrackerCookiePolicy)
     }
 
-    @Query("select * from first_party_cookie_tracker_policy")
-    abstract fun getFirstPartyCookieTrackersPolicy(): FirstPartyTrackerCookiePolicyEntity?
+    @Query("select * from first_party_cookie_policy")
+    abstract fun getFirstPartyCookiePolicy(): FirstPartyCookiePolicyEntity?
 
-    @Query("select * from tracking_cookies_1p_exceptions")
-    abstract fun getAllTrackingCookie1pExceptions(): List<TrackingCookie1pExceptionEntity>
+    @Query("select * from cookie_exceptions")
+    abstract fun getAllCookieExceptions(): List<CookieExceptionEntity>
 
-    @Query("delete from first_party_cookie_tracker_policy")
-    abstract fun deleteFirstPartyCookiesTrackersPolicy()
+    @Query("delete from first_party_cookie_policy")
+    abstract fun deleteFirstPartyCookiePolicy()
 
-    @Query("delete from tracking_cookies_1p_exceptions")
-    abstract fun deleteAllTrackingCookie1pExceptions()
+    @Query("delete from cookie_exceptions")
+    abstract fun deleteAllExceptions()
 }

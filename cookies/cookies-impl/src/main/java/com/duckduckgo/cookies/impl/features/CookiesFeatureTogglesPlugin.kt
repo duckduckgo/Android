@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.cookies.impl.trackingcookies1p
+package com.duckduckgo.cookies.impl.features
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.cookies.impl.cookiesFeatureValueOf
@@ -25,7 +25,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class TrackingCookies1pFeatureTogglesPlugin @Inject constructor(
+class CookiesFeatureTogglesPlugin @Inject constructor(
     private val cookiesFeatureToggleRepository: CookiesFeatureToggleRepository,
     private val appBuildConfig: AppBuildConfig
 ) : FeatureTogglesPlugin {

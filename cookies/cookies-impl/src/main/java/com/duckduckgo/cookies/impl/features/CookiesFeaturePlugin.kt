@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.cookies.impl.trackingcookies1p
+package com.duckduckgo.cookies.impl.features
 
 import com.duckduckgo.cookies.api.CookiesFeatureName
 import com.duckduckgo.cookies.impl.cookiesFeatureValueOf
 import com.duckduckgo.cookies.store.CookiesFeatureToggleRepository
 import com.duckduckgo.cookies.store.CookiesFeatureToggles
 import com.duckduckgo.cookies.store.CookiesRepository
-import com.duckduckgo.cookies.store.FirstPartyTrackerCookiePolicyEntity
+import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
 import com.duckduckgo.cookies.store.RealCookieRepository.Companion.DEFAULT_MAX_AGE
 import com.duckduckgo.cookies.store.RealCookieRepository.Companion.DEFAULT_THRESHOLD
-import com.duckduckgo.cookies.store.TrackingCookie1pExceptionEntity
+import com.duckduckgo.cookies.store.CookieExceptionEntity
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -33,7 +33,7 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class TrackingCookies1pFeaturePlugin @Inject constructor(
+class CookiesFeaturePlugin @Inject constructor(
     private val cookiesRepository: CookiesRepository,
     private val cookiesFeatureToggleRepository: CookiesFeatureToggleRepository
 ) : PrivacyFeaturePlugin {
@@ -42,28 +42,28 @@ class TrackingCookies1pFeaturePlugin @Inject constructor(
         val cookiesFeatureName = cookiesFeatureValueOf(featureName) ?: return false
         if (cookiesFeatureName.value == this.featureName) {
             val moshi = Moshi.Builder().build()
-            val jsonAdapter: JsonAdapter<TrackingCookies1pFeature> =
-                moshi.adapter(TrackingCookies1pFeature::class.java)
+            val jsonAdapter: JsonAdapter<CookiesFeature> =
+                moshi.adapter(CookiesFeature::class.java)
 
-            val trackingCookies1pFeature: TrackingCookies1pFeature? = jsonAdapter.fromJson(jsonString)
+            val cookiesFeature: CookiesFeature? = jsonAdapter.fromJson(jsonString)
 
-            val exceptions = trackingCookies1pFeature?.exceptions?.map {
-                TrackingCookie1pExceptionEntity(domain = it.domain, reason = it.reason)
+            val exceptions = cookiesFeature?.exceptions?.map {
+                CookieExceptionEntity(domain = it.domain, reason = it.reason)
             }.orEmpty()
 
-            val maxAge = trackingCookies1pFeature?.settings?.firstPartyTrackerCookiePolicy?.maxAge ?: DEFAULT_MAX_AGE
-            val threshold = trackingCookies1pFeature?.settings?.firstPartyTrackerCookiePolicy?.threshold ?: DEFAULT_THRESHOLD
-            val policy = FirstPartyTrackerCookiePolicyEntity(threshold = threshold, maxAge = maxAge)
+            val maxAge = cookiesFeature?.settings?.firstPartyCookiePolicy?.maxAge ?: DEFAULT_MAX_AGE
+            val threshold = cookiesFeature?.settings?.firstPartyCookiePolicy?.threshold ?: DEFAULT_THRESHOLD
+            val policy = FirstPartyCookiePolicyEntity(threshold = threshold, maxAge = maxAge)
 
             cookiesRepository.updateAll(exceptions, policy)
-            val isEnabled = trackingCookies1pFeature?.state == "enabled"
+            val isEnabled = cookiesFeature?.state == "enabled"
             cookiesFeatureToggleRepository.insert(
-                CookiesFeatureToggles(cookiesFeatureName, isEnabled, trackingCookies1pFeature?.minSupportedVersion)
+                CookiesFeatureToggles(cookiesFeatureName, isEnabled, cookiesFeature?.minSupportedVersion)
             )
             return true
         }
         return false
     }
 
-    override val featureName: String = CookiesFeatureName.TrackingCookies1p.value
+    override val featureName: String = CookiesFeatureName.Cookie.value
 }

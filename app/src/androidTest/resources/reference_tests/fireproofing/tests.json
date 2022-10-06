@@ -8,7 +8,7 @@
         ],
         "tests": [
             {
-                "name": "example cookie - cookie should be cleared",
+                "name": "unfireproofed domain - cookie should be cleared",
                 "cookieDomain": ".example.com",
                 "cookieName": "test",
                 "expectCookieRemoved": true,
@@ -22,37 +22,51 @@
                 "exceptPlatforms": []
             },
             {
-                "name": "cookie is set on a non-fireproofed subdomain - cookie should be cleared",
-                "cookieDomain": "sub.fireproofed.test",
+                "name": "only subdomain is fireproofed, but cookie is using dot notation - it should not be cleared",
+                "cookieDomain": ".no-fire.test",
                 "cookieName": "test",
-                "expectCookieRemoved": true,
-                "exceptPlatforms": []
-            },
-            {
-                "name": "cookie is set on a non-fireproofed subdomain - cookie should be cleared",
-                "cookieDomain": "sub.fireproofed.test",
-                "cookieName": "test",
-                "expectCookieRemoved": true,
-                "exceptPlatforms": []
-            },
-            {
-                "name": "duckduckgo.com settings cookie - cookie should not be cleared",
-                "cookieDomain": "duckduckgo.com",
-                "cookieName": "setting",
                 "expectCookieRemoved": false,
                 "exceptPlatforms": []
             },
             {
-                "name": "fireproofing match #1 - cookie should not be cleared",
+                "name": "fireproofed subdomain match - cookie should not be cleared",
+                "cookieDomain": "sub.no-fire.test",
+                "cookieName": "test",
+                "expectCookieRemoved": false,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "fireproofed subdomain match, cookie is using dot notation - cookie should not be cleared",
+                "cookieDomain": ".sub.no-fire.test",
+                "cookieName": "test",
+                "expectCookieRemoved": false,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "subdomain for the fireproofed hostname - cookie should be cleared",
+                "cookieDomain": "sub.sub.no-fire.test",
+                "cookieName": "test",
+                "expectCookieRemoved": true,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "cookie is set on a non-fireproofed subdomain - cookie should be cleared",
+                "cookieDomain": "sub.fireproofed.test",
+                "cookieName": "test",
+                "expectCookieRemoved": true,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "fireproofing match, cookie is using dot notation - cookie should not be cleared",
                 "cookieDomain": ".fireproofed.test",
                 "cookieName": "test",
                 "expectCookieRemoved": false,
                 "exceptPlatforms": []
             },
             {
-                "name": "fireproofing match #2 - cookie should not be cleared",
-                "cookieDomain": "sub.no-fire.test",
-                "cookieName": "test",
+                "name": "duckduckgo.com settings cookie - cookie should not be cleared",
+                "cookieDomain": "duckduckgo.com",
+                "cookieName": "setting",
                 "expectCookieRemoved": false,
                 "exceptPlatforms": []
             }

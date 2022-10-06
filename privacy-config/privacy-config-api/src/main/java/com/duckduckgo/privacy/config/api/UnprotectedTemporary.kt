@@ -28,11 +28,6 @@ interface UnprotectedTemporary {
 
     /** The unprotected temporary exceptions list */
     val unprotectedTemporaryExceptions: List<UnprotectedTemporaryException>
-
-    /**
-     * This method returns a list of Strings containing the domains in the unprotected temporary exceptions list.
-     */
-    fun allExceptions(): List<String>
 }
 
 /** Public data class for Unprotected Temporary Exceptions. */

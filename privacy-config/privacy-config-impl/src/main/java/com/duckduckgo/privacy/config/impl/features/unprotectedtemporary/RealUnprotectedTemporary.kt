@@ -29,8 +29,6 @@ import dagger.SingleInstanceIn
 @SingleInstanceIn(AppScope::class)
 class RealUnprotectedTemporary @Inject constructor(private val repository: UnprotectedTemporaryRepository) : UnprotectedTemporary {
 
-    override fun allExceptions(): List<String> = repository.exceptions.map { it.domain }
-
     override fun isAnException(url: String): Boolean {
         return matches(url)
     }

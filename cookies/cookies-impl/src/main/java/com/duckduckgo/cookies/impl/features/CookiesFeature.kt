@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.cookies.impl.trackingcookies1p
+package com.duckduckgo.cookies.impl.features
 
-import com.duckduckgo.cookies.api.TrackingCookie1pException
+import com.duckduckgo.cookies.api.CookieException
 
-data class TrackingCookies1pFeature(
+data class CookiesFeature(
     val state: String,
     val minSupportedVersion: Int?,
-    val exceptions: List<TrackingCookie1pException>,
+    val exceptions: List<CookieException>,
     val settings: Settings,
 )
 
 data class Settings(
-    val firstPartyTrackerCookiePolicy: FirstPartyTrackerCookiePolicy,
+    val firstPartyCookiePolicy: FirstPartyCookiePolicy,
 )
 
-data class FirstPartyTrackerCookiePolicy(
+data class FirstPartyCookiePolicy(
     val threshold: Int,
     val maxAge: Int
 )

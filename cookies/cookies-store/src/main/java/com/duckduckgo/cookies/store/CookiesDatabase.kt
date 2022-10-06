@@ -24,8 +24,8 @@ import androidx.room.migration.Migration
     exportSchema = true,
     version = 1,
     entities = [
-        FirstPartyTrackerCookiePolicyEntity::class,
-        TrackingCookie1pExceptionEntity::class
+        FirstPartyCookiePolicyEntity::class,
+        CookieExceptionEntity::class
     ]
 )
 abstract class CookiesDatabase : RoomDatabase() {

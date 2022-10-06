@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.cookies.impl.trackingcookies1p
+package com.duckduckgo.cookies.impl.features.firstparty
 
 import android.content.Context
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -87,7 +87,7 @@ class FirstPartyCookiesModifierWorkerScheduler @Inject constructor(
         }
     }
 
-    private fun isFeatureEnabled(): Boolean = toggle.isFeatureEnabled(CookiesFeatureName.TrackingCookies1p.value)
+    private fun isFeatureEnabled(): Boolean = toggle.isFeatureEnabled(CookiesFeatureName.Cookie.value)
 
     companion object {
         private const val FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG = "FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG"
