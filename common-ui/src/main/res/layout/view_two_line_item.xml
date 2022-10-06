@@ -99,6 +99,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent">
 
+
         <ImageView
                 android:id="@+id/trailingIcon"
                 android:layout_width="@dimen/listItemImageContainerSize"
@@ -109,9 +110,12 @@
                 tools:ignore="ContentDescription"/>
 
         <com.duckduckgo.mobile.android.ui.view.SwitchView
-                android:id="@+id/trailingSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+            android:id="@+id/trailingSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/keyline_2"
+        />
+
 
     </FrameLayout>
 
