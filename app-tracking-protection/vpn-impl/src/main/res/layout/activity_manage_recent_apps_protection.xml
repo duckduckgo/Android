@@ -101,13 +101,12 @@
                 android:visibility="gone"
                 android:text="@string/atp_ManageRecentAppsProtectionEmpty" />
 
-            <com.duckduckgo.mobile.android.ui.view.SettingsOption
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/manageRecentAppsShowAll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="56dp"
-                android:text="@string/atp_ManageRecentAppsProtectionShowAll"
-                android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"/>
+                app:primaryText="@string/atp_ManageRecentAppsProtectionShowAll"/>
 
         </LinearLayout>
 

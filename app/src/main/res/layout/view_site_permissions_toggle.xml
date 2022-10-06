@@ -29,10 +29,13 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp" />
 
-    <androidx.appcompat.widget.SwitchCompat
+    <com.duckduckgo.mobile.android.ui.view.SwitchView
         android:id="@+id/sitePermissionsToggle"
-        style="@style/SitePermissionsSwitch"
+        android:layout_gravity="end"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:padding="@dimen/keyline_4"
-        android:theme="@style/SettingsSwitchTheme"
+        android:textColor="?attr/normalTextColor"
         tools:text="@string/preciseLocationToggleText" />
+
 </LinearLayout>

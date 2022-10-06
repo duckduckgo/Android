@@ -95,7 +95,7 @@
 
                     </androidx.appcompat.widget.AppCompatEditText>
 
-                    <com.duckduckgo.mobile.android.ui.view.IconButton
+                    <com.duckduckgo.mobile.android.ui.view.button.IconButton
                         android:id="@+id/voiceSearchButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
