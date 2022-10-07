@@ -40,4 +40,3 @@ import io.reactivex.Completable
 interface OfflinePixel {
     fun send(): Completable
 }
-

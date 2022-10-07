@@ -20,7 +20,6 @@ import com.duckduckgo.app.global.exception.RootExceptionFinder
 import com.duckduckgo.app.global.exception.extractExceptionCause
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesTo
 import javax.inject.Inject
 
 /**
@@ -32,7 +31,7 @@ import javax.inject.Inject
 class ExceptionPixelImpl @Inject constructor(
     private val pixel: Pixel,
     private val rootExceptionFinder: RootExceptionFinder
-): ExceptionPixel {
+) : ExceptionPixel {
 
     override fun sendExceptionPixel(
         pixelName: Pixel.PixelName,

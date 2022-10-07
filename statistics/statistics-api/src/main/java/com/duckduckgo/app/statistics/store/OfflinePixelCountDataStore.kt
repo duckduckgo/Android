@@ -24,7 +24,8 @@ package com.duckduckgo.app.statistics.store
  * */
 @Deprecated(
     message = "We will no longer evolve this class. Instead please create your own datastore to persist pixels locally," +
-        "and provide your own implementation of {@link OfflinePixel}. You can also use {@link Pixel.enqueuePixel} which is less flexible but simpler.",
+        "and provide your own implementation of {@link OfflinePixel}." +
+        "You can also use {@link Pixel.enqueuePixel} which is less flexible but simpler.",
     level = DeprecationLevel.WARNING
 )
 interface OfflinePixelCountDataStore {
