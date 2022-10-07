@@ -27,7 +27,7 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = AppTpSettingPlugin::class
 )
-class NetworkSwitchingSettingPlugin @Inject constructor(
+class InterceptDnsTrafficSettingPlugin @Inject constructor(
     private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : AppTpSettingPlugin {
     private val jsonAdapter = Moshi.Builder().build().adapter(JsonConfigModel::class.java)
@@ -46,7 +46,7 @@ class NetworkSwitchingSettingPlugin @Inject constructor(
         return false
     }
 
-    override val settingName: SettingName = AppTpSetting.NetworkSwitchHandling
+    override val settingName: SettingName = AppTpSetting.InterceptDnsTraffic
 
     private data class JsonConfigModel(val state: String?)
 }
