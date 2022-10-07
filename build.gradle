@@ -7,6 +7,8 @@ buildscript {
         anvil_version = "2.4.1"
         gradle_plugin = "7.2.2" // When updating, also update lint_version
         lint_version = "30.2.2" // This value must always be gradle_plugin + 23
+        ktlint_version = "0.47.1"
+        android_library_version = "7.2.2"
         min_sdk = 23
         target_sdk = 30
         compile_sdk = 33
@@ -33,6 +35,8 @@ buildscript {
 plugins {
     id 'com.osacky.fulladle' version "$fladle_version"
     id 'org.jmailen.kotlinter' version "$kotlinter_version" apply false
+    id 'com.android.library' apply false
+    id 'org.jetbrains.kotlin.android' version '1.7.10' apply false
 }
 
 allprojects {

@@ -1,0 +1,25 @@
+plugins {
+    id "java-library"
+    id "kotlin"
+}
+dependencies {
+
+    compileOnly Kotlin.stdlib.jdk7
+    compileOnly "com.pinterest.ktlint:ktlint-core:$ktlint_version"
+
+    testImplementation Testing.junit4
+    testImplementation "com.pinterest.ktlint:ktlint-core:$ktlint_version"
+    testImplementation "com.pinterest.ktlint:ktlint-test:$ktlint_version"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}

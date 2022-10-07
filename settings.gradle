@@ -70,3 +70,4 @@ buildCache {
         removeUnusedEntriesAfterDays = 7
     }
 }
+include ':ktlint-rules'
