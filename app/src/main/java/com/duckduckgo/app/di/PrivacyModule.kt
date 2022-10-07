@@ -135,16 +135,6 @@ object PrivacyModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun fireproofWebsiteRepository(
-        fireproofWebsiteDao: FireproofWebsiteDao,
-        dispatchers: DispatcherProvider,
-        faviconManager: Lazy<FaviconManager>
-    ): FireproofWebsiteRepositoryAPI {
-        return FireproofWebsiteRepository(fireproofWebsiteDao, dispatchers, faviconManager)
-    }
-
-    @Provides
     fun providesLocationPermissionsRepository(
         locationPermissionsDao: LocationPermissionsDao,
         faviconManager: Lazy<FaviconManager>,

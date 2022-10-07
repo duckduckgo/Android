@@ -36,7 +36,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -51,29 +50,25 @@ class PermissionsPerWebsiteViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private lateinit var viewModel: PermissionsPerWebsiteViewModel
-
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
     private val mockLocationPermissionsRepository: LocationPermissionsRepositoryAPI = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockPixel: Pixel = mock()
 
-    private val domain = "domain.com"
+    private val viewModel = PermissionsPerWebsiteViewModel(
+        sitePermissionsRepository = mockSitePermissionsRepository,
+        locationPermissionsRepository = mockLocationPermissionsRepository,
+        settingsDataStore = mockSettingsDataStore,
+        pixel = mockPixel
+    )
 
-    @Before
-    fun before() {
-        viewModel = PermissionsPerWebsiteViewModel(
-            sitePermissionsRepository = mockSitePermissionsRepository,
-            locationPermissionsRepository = mockLocationPermissionsRepository,
-            settingsDataStore = mockSettingsDataStore,
-            pixel = mockPixel
-        )
-        loadAskForPermissionsPrefs()
-        loadWebsitePermissionsSettings()
-    }
+    private val domain = "domain.com"
 
     @Test
     fun whenPermissionsSettingsAreLoadedThenViewStateEmittedSettings() = runTest {
+        loadAskForPermissionsPrefs()
+        loadWebsitePermissionsSettings()
+
         viewModel.websitePermissionSettings(domain)
 
         viewModel.viewState.test {
@@ -84,7 +79,9 @@ class PermissionsPerWebsiteViewModelTest {
 
     @Test
     fun whenSitePermissionIsAllowAlwaysThenShowSettingAsAllow() = runTest {
+        loadAskForPermissionsPrefs()
         loadWebsitePermissionsSettings(cameraSetting = SitePermissionAskSettingType.ALLOW_ALWAYS.name)
+
         viewModel.websitePermissionSettings(domain)
 
         viewModel.viewState.test {
@@ -95,7 +92,9 @@ class PermissionsPerWebsiteViewModelTest {
 
     @Test
     fun whenSitePermissionIsAskEveryTimeThenShowSettingAsAsk() = runTest {
+        loadAskForPermissionsPrefs()
         loadWebsitePermissionsSettings(cameraSetting = SitePermissionAskSettingType.ASK_EVERY_TIME.name)
+
         viewModel.websitePermissionSettings(domain)
 
         viewModel.viewState.test {
@@ -106,7 +105,9 @@ class PermissionsPerWebsiteViewModelTest {
 
     @Test
     fun whenSitePermissionIsDenyAlwaysTimeThenShowSettingAsDeny() = runTest {
+        loadAskForPermissionsPrefs()
         loadWebsitePermissionsSettings(cameraSetting = SitePermissionAskSettingType.DENY_ALWAYS.name)
+
         viewModel.websitePermissionSettings(domain)
 
         viewModel.viewState.test {
@@ -118,6 +119,8 @@ class PermissionsPerWebsiteViewModelTest {
     @Test
     fun whenAskForSitePermissionPrefsIsDisabledThenShowSettingAsDeny() = runTest {
         loadAskForPermissionsPrefs(cameraEnabled = false)
+        loadWebsitePermissionsSettings()
+
         viewModel.websitePermissionSettings(domain)
 
         viewModel.viewState.test {
@@ -128,6 +131,9 @@ class PermissionsPerWebsiteViewModelTest {
 
     @Test
     fun whenPermissionIsTappedThenShowSettingsSelectionDialog() = runTest {
+        loadAskForPermissionsPrefs()
+        loadWebsitePermissionsSettings()
+
         viewModel.websitePermissionSettings(domain)
         val websitePermissionSetting =
             WebsitePermissionSetting(R.drawable.ic_camera, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingType.ASK)
@@ -140,6 +146,9 @@ class PermissionsPerWebsiteViewModelTest {
 
     @Test
     fun whenPermissionSettingIsChangedThenSave() = runTest {
+        loadAskForPermissionsPrefs()
+        loadWebsitePermissionsSettings()
+
         viewModel.websitePermissionSettings(domain)
         val websitePermissionSetting =
             WebsitePermissionSetting(R.drawable.ic_camera, R.string.sitePermissionsSettingsCamera, WebsitePermissionSettingType.ASK)
@@ -156,6 +165,9 @@ class PermissionsPerWebsiteViewModelTest {
 
     @Test
     fun whenWebsitePermissionsAreRemovedThenDeleteFromDB() = runTest {
+        loadAskForPermissionsPrefs()
+        loadWebsitePermissionsSettings()
+
         viewModel.websitePermissionSettings(domain)
         viewModel.removeWebsitePermissionsSettings(domain)
 
@@ -164,6 +176,9 @@ class PermissionsPerWebsiteViewModelTest {
 
     @Test
     fun whenWebsitePermissionsAreRemovedThenNavigateBackToSitePermissionsScreen() = runTest {
+        loadAskForPermissionsPrefs()
+        loadWebsitePermissionsSettings()
+
         viewModel.websitePermissionSettings(domain)
         viewModel.removeWebsitePermissionsSettings(domain)
 

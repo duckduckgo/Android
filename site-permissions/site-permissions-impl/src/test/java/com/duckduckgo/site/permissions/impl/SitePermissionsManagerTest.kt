@@ -18,7 +18,6 @@ package com.duckduckgo.site.permissions.impl
 
 import android.webkit.PermissionRequest
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
@@ -27,27 +26,21 @@ import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class SitePermissionsManageTest {
+class SitePermissionsManagerTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private lateinit var testee: SitePermissionsManager
-
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
 
-    private val url = "https://domain.com/whatever"
+    private val testee = SitePermissionsManagerImpl(mockSitePermissionsRepository)
 
-    @Before
-    fun before() {
-        testee = SitePermissionsManagerImpl(mockSitePermissionsRepository)
-    }
+    private val url = "https://domain.com/whatever"
 
     @Test
     fun givenListOfPermissionsThenFilterGranted() = runTest {
@@ -58,6 +51,7 @@ class SitePermissionsManageTest {
 
         val permissionsGranted = testee.getSitePermissionsGranted(url, tabId, resources)
         assertEquals(1, permissionsGranted.size)
+        assertEquals(PermissionRequest.RESOURCE_AUDIO_CAPTURE, permissionsGranted.first())
     }
 
     @Test
@@ -69,6 +63,7 @@ class SitePermissionsManageTest {
 
         val permissionsAllowedToAsk = testee.getSitePermissionsAllowedToAsk(url, resources)
         assertEquals(1, permissionsAllowedToAsk.size)
+        assertEquals(PermissionRequest.RESOURCE_VIDEO_CAPTURE, permissionsAllowedToAsk.first())
     }
 
     @Test

@@ -49,24 +49,23 @@ class SitePermissionsViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private lateinit var viewModel: SitePermissionsViewModel
-
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
     private val mockLocationPermissionsRepository: LocationPermissionsRepositoryAPI = mock()
     private val mockGeoLocationPermissions: GeoLocationPermissions = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockPixel: Pixel = mock()
 
+    private val viewModel = SitePermissionsViewModel(
+        sitePermissionsRepository = mockSitePermissionsRepository,
+        locationPermissionsRepository = mockLocationPermissionsRepository,
+        geolocationPermissions = mockGeoLocationPermissions,
+        settingsDataStore = mockSettingsDataStore,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
+        pixel = mockPixel
+    )
+
     @Before
     fun before() {
-        viewModel = SitePermissionsViewModel(
-            sitePermissionsRepository = mockSitePermissionsRepository,
-            locationPermissionsRepository = mockLocationPermissionsRepository,
-            geolocationPermissions = mockGeoLocationPermissions,
-            settingsDataStore = mockSettingsDataStore,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            pixel = mockPixel
-        )
         loadPermissionsSettings()
         loadWebsites()
         viewModel.allowedSites()

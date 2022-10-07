@@ -33,7 +33,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,25 +47,20 @@ class SitePermissionsRepositoryTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private lateinit var repository: SitePermissionsRepository
-
     private val mockSitePermissionsDao: SitePermissionsDao = mock()
     private val mockSitePermissionsAllowedDao: SitePermissionsAllowedDao = mock()
     private val mockSitePermissionsPreferences: SitePermissionsPreferences = mock()
 
+    private val repository = SitePermissionsRepositoryImpl(
+        mockSitePermissionsDao,
+        mockSitePermissionsAllowedDao,
+        mockSitePermissionsPreferences,
+        coroutineRule.testScope,
+        coroutineRule.testDispatcherProvider
+    )
+
     private val url = "https://domain.com/whatever"
     private val domain = "domain.com"
-
-    @Before
-    fun before() {
-        repository = SitePermissionsRepositoryImpl(
-            mockSitePermissionsDao,
-            mockSitePermissionsAllowedDao,
-            mockSitePermissionsPreferences,
-            coroutineRule.testScope,
-            coroutineRule.testDispatcherProvider
-        )
-    }
 
     @Test
     fun givenPermissionNotSupportedThenDomainIsNotAllowedToAsk() {
@@ -122,7 +116,7 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
-    fun whenSitePermissionsWasGrantedWithin24hThenReturnPermissionNotGranted() {
+    fun whenSitePermissionsWasMoreThen24hAgoThenReturnPermissionNotGranted() {
         setInitialSettings()
         val permission = PermissionRequest.RESOURCE_VIDEO_CAPTURE
         val tabId = "tabId"
