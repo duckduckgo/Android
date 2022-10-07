@@ -27,7 +27,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.exception.RootExceptionFinder
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
@@ -53,6 +52,7 @@ class SQLCookieRemoverTest {
     private val fireproofWebsiteDao = db.fireproofWebsiteDao()
     private val mockPixel = mock<Pixel>()
     private val mockOfflinePixelCountDataStore = mock<OfflinePixelCountDataStore>()
+    private val mockExceptionPixel = mock<ExceptionPixel>()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
 
     @After
@@ -113,7 +113,7 @@ class SQLCookieRemoverTest {
         sqlCookieRemover.removeCookies()
 
         verify(mockOfflinePixelCountDataStore).cookieDatabaseOpenErrorCount = 1
-        verify(mockPixel).fire(eq(COOKIE_DATABASE_EXCEPTION_OPEN_ERROR), any(), any())
+        verify(mockExceptionPixel).sendExceptionPixel(eq(COOKIE_DATABASE_EXCEPTION_OPEN_ERROR), any())
     }
 
     private fun givenFireproofWebsitesStored() {
@@ -137,7 +137,7 @@ class SQLCookieRemoverTest {
         databaseLocator: DatabaseLocator = webViewDatabaseLocator,
         repository: FireproofRepository = FireproofWebsiteRepository(fireproofWebsiteDao, DefaultDispatcherProvider(), mock()),
         offlinePixelCountDataStore: OfflinePixelCountDataStore = mockOfflinePixelCountDataStore,
-        exceptionPixel: ExceptionPixel = ExceptionPixel(mockPixel, RootExceptionFinder()),
+        exceptionPixel: ExceptionPixel = mockExceptionPixel,
         dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
     ): SQLCookieRemover {
         return SQLCookieRemover(

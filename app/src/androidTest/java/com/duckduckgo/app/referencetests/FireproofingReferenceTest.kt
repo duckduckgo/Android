@@ -29,7 +29,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.domain
-import com.duckduckgo.app.global.exception.RootExceptionFinder
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
@@ -66,6 +65,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
     private val fireproofWebsiteDao = db.fireproofWebsiteDao()
     private val mockPixel = mock<Pixel>()
     private val mockOfflinePixelCountDataStore = mock<OfflinePixelCountDataStore>()
+    private val mockExceptionPixel = mock<ExceptionPixel>()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
     private val fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, DefaultDispatcherProvider(), mock())
     private lateinit var testee: WebViewCookieManager
@@ -95,7 +95,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
             webViewDatabaseLocator,
             fireproofWebsiteRepository,
             mockOfflinePixelCountDataStore,
-            ExceptionPixel(mockPixel, RootExceptionFinder()),
+            mockExceptionPixel,
             DefaultDispatcherProvider()
         )
 
