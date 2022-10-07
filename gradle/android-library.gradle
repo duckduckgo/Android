@@ -30,6 +30,12 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
+    lint {
+        abortOnError true
+        ignoreTestSources true
+        ignoreTestSources true
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -42,10 +48,6 @@ android {
     }
     buildFeatures {
         viewBinding = true
-    }
-    lintOptions {
-        disable 'ObsoleteLintCustomCheck'
-        abortOnError true
     }
 }
 dependencies {

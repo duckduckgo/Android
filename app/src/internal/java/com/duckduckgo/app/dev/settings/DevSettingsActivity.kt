@@ -98,7 +98,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
                     binding.enableAppStartupTrace.quietlySetIsChecked(it.startupTraceEnabled, startupTraceToggleListener)
                     binding.overrideUserAgentToggle.quietlySetIsChecked(it.overrideUA, overrideUAListener)
                     binding.overrideUserAgentSelector.isEnabled = it.overrideUA
-                    binding.overrideUserAgentSelector.setSubtitle(it.userAgent)
+                    binding.overrideUserAgentSelector.setSecondaryText(it.userAgent)
                 }
             }.launchIn(lifecycleScope)
 

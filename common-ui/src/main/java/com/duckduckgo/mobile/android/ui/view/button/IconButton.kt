@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.ui.view
+package com.duckduckgo.mobile.android.ui.view.button
 
 import android.content.Context
 import android.util.AttributeSet

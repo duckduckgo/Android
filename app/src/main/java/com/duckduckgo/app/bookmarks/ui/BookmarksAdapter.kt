@@ -194,17 +194,19 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         fun update(bookmark: SavedSite.Bookmark) {
             val twoListItem = binding.root
 
-            twoListItem.setContentDescription(
+            twoListItem.setLeadingIconContentDescription(
                 context.getString(
                     R.string.bookmarkOverflowContentDescription,
                     bookmark.title
                 )
             )
-            twoListItem.setTitle(bookmark.title)
-            twoListItem.setSubtitle(parseDisplayUrl(bookmark.url))
-            loadFavicon(bookmark.url, twoListItem.imageView())
+            twoListItem.setPrimaryText(bookmark.title)
+            twoListItem.setSecondaryText(parseDisplayUrl(bookmark.url))
 
-            twoListItem.setOverflowClickListener { anchor ->
+            loadFavicon(bookmark.url, twoListItem.leadingIcon())
+
+            twoListItem.setTrailingIcon(R.drawable.ic_overflow)
+            twoListItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, bookmark)
             }
 

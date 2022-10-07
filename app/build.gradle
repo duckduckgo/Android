@@ -28,7 +28,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
-
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -106,9 +105,9 @@ android {
             path "CMakeLists.txt"
         }
     }
-    lintOptions {
-        disable 'ObsoleteLintCustomCheck'
+    lint {
         abortOnError true
+        ignoreTestSources true
         baseline file("lint-baseline.xml")
     }
     testOptions {

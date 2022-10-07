@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -13,10 +14,13 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<resources>
-    <declare-styleable name="SettingsOptionWithSubtitle">
-        <attr name="title" format="string" />
-        <attr name="subtitle" format="string" />
-    </declare-styleable>
-</resources>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/list_item_image_circular_background"/>
+    <item
+        android:bottom="@dimen/keyline_2"
+        android:drawable="@drawable/ic_globe_gray_16dp"
+        android:left="@dimen/keyline_2"
+        android:right="@dimen/keyline_2"
+        android:top="@dimen/keyline_2"/>
+</layer-list>

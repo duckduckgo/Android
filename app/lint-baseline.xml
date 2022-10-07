@@ -4081,7 +4081,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.layout.view_whitelist_entry` appears to be unused"
-        errorLine1="&lt;com.duckduckgo.mobile.android.ui.view.SingleLineListItem xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine1="&lt;com.duckduckgo.mobile.android.ui.view.listitem.SingleLineListItem xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
         <location
             file="src/main/res/layout/view_whitelist_entry.xml"
