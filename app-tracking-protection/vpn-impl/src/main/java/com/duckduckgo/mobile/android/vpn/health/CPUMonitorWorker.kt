@@ -17,24 +17,15 @@
 package com.duckduckgo.mobile.android.vpn.health
 
 import android.content.Context
-import android.os.SystemClock
-import android.system.Os
-import android.system.OsConstants
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileReader
-import java.io.IOException
 import javax.inject.Inject
-import kotlin.math.roundToInt
-import kotlin.time.Duration.Companion.seconds
 
 @ContributesWorker(AppScope::class)
 class CPUMonitorWorker(
@@ -44,45 +35,31 @@ class CPUMonitorWorker(
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
-    companion object {
-        private val CLOCK_SPEED_HZ = Os.sysconf(OsConstants._SC_CLK_TCK)
-        private val NUM_CORES = Os.sysconf(OsConstants._SC_NPROCESSORS_CONF)
+    @Inject
+    lateinit var cpuUsageReader: CPUUsageReader
 
-        private val WHITE_SPACE = "\\s".toRegex()
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
 
-        // Indices in /proc/[pid]/stat (https://linux.die.net/man/5/proc)
-        private val UTIME_IDX = 13
-        private val STIME_IDX = 14
-        private val STARTTIME_IDX = 21
-        private val PROC_SIZE = 44
-    }
+    // TODO: move thresholds to remote config
+    private val alertThresholds = listOf(30, 20, 10, 5).sortedDescending()
 
     override suspend fun doWork(): Result {
-        return withContext(Dispatchers.IO) {
-            val pid = android.os.Process.myPid()
+        return withContext(dispatcherProvider.io()) {
             try {
-                val procFile = File("/proc/$pid/stat")
-                val statsText = (FileReader(procFile)).buffered().use(BufferedReader::readText)
-
-                val procArray = statsText.split(WHITE_SPACE)
-                if (procArray.size < PROC_SIZE) {
-                    Timber.e("Unexpected /proc file size: " + procArray.size)
-                    return@withContext Result.failure()
+                val avgCPUUsagePercent = cpuUsageReader.readCPUUsage()
+                alertThresholds.forEach {
+                    if (avgCPUUsagePercent > it) {
+                        deviceShieldPixels.sendCPUUsageAlert(it)
+                        return@withContext Result.success()
+                    }
                 }
-
-                val procCPUTimeSec = (procArray[UTIME_IDX].toLong() + procArray[STIME_IDX].toLong()) / CLOCK_SPEED_HZ.toDouble()
-                val systemUptimeSec = SystemClock.elapsedRealtime() / 1.seconds.inWholeMilliseconds.toDouble()
-                val procTimeSec = systemUptimeSec - (procArray[STARTTIME_IDX].toLong() / CLOCK_SPEED_HZ.toDouble())
-
-                val avgCPUUsagePercent = (100 * (procCPUTimeSec / procTimeSec)) / NUM_CORES
-                deviceShieldPixels.sendCPUUsage(avgCPUUsagePercent.roundToInt())
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 Timber.e("Could not read CPU usage", e)
                 return@withContext Result.failure()
             }
 
             return@withContext Result.success()
         }
-
     }
 }

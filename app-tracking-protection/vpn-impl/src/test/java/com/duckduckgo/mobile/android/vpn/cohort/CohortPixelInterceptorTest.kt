@@ -76,7 +76,7 @@ class CohortPixelInterceptorTest {
         val date = LocalDate.now().plusDays(3)
         cohortStore.setCohortLocalDate(date)
 
-        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_atp_ev_cpu_usage_10")
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_atp_ev_cpu_usage_above_10")
         val result = cohortPixelInterceptor.intercept(FakeChain(pixelUrl))
         val resultUrl = result.request.url
 
