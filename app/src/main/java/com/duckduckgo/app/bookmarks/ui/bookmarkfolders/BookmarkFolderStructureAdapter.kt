@@ -26,7 +26,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemBookmarkFolderBinding
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.toPx
-import com.duckduckgo.mobile.android.R as CommonR
 
 class BookmarkFolderStructureAdapter(
     private val viewModel: BookmarkFoldersViewModel,

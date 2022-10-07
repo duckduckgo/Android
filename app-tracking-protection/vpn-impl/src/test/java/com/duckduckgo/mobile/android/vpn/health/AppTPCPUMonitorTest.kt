@@ -40,19 +40,19 @@ import com.duckduckgo.mobile.android.vpn.remote_config.VpnConfigTogglesDao
 import com.duckduckgo.mobile.android.vpn.remote_config.VpnRemoteConfigDatabase
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
-import kotlinx.coroutines.test.TestScope
-import org.junit.After
 import org.junit.runner.RunWith
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)

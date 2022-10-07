@@ -23,9 +23,9 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
 class CPUMonitorWorker(

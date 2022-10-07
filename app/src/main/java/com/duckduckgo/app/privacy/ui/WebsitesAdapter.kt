@@ -55,7 +55,7 @@ class WebsitesAdapter(
     private val sortedHeaderElements = listOf(
         DESCRIPTION_TYPE,
         DIVIDER_TYPE,
-        SECTION_TITLE_TYPE,
+        SECTION_TITLE_TYPE
     )
 
     private fun itemsOnTopOfList() = sortedHeaderElements.size
