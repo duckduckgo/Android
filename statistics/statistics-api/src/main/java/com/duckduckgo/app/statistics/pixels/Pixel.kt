@@ -17,7 +17,6 @@
 package com.duckduckgo.app.statistics.pixels
 
 interface Pixel {
-
     interface PixelName {
         val pixelName: String
     }

@@ -25,14 +25,14 @@ import javax.inject.Inject
  * or illegal states to be stored and send as offline pixels
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class ExceptionPixel
+class ExceptionPixelImpl
 @Inject
 constructor(
     private val pixel: Pixel,
     private val rootExceptionFinder: RootExceptionFinder
-) {
+): ExceptionPixel {
 
-    fun sendExceptionPixel(
+    override fun sendExceptionPixel(
         pixelName: Pixel.PixelName,
         throwable: Throwable
     ) {
@@ -40,7 +40,7 @@ constructor(
         pixel.fire(pixelName, params)
     }
 
-    fun sendExceptionPixel(
+    override fun sendExceptionPixel(
         pixelName: String,
         throwable: Throwable
     ) {
