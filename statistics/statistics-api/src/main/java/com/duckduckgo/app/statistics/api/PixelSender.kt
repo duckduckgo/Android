@@ -18,13 +18,26 @@ package com.duckduckgo.app.statistics.api
 
 import io.reactivex.Completable
 
+/**
+ * Public interface for Pixel sender.
+ *
+ * This interface offers a way to send or enqueue a Pixel with more control than using {@link Pixel}.
+ * Use this api if you want to have visibility on the action result. For example: to ensure if action succeed or failed.
+ */
 interface PixelSender {
+
+    /**
+     * Fires a pixel.
+     */
     fun sendPixel(
         pixelName: String,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>
     ): Completable
 
+    /**
+     * Enqueues a pixel.
+     */
     fun enqueuePixel(
         pixelName: String,
         parameters: Map<String, String>,

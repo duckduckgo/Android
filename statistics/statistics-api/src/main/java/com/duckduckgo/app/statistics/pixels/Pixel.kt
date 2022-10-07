@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.pixels
 
+/** Public interface for Pixel */
 interface Pixel {
     interface PixelName {
         val pixelName: String
@@ -90,24 +91,44 @@ interface Pixel {
         const val FIRE_ANIMATION_NONE = "fann"
     }
 
+    /**
+     * Tries to fire a pixel when method is called.
+     */
     fun fire(
         pixel: PixelName,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap()
     )
 
+    /**
+     * Tries to fire a pixel when method is called.
+     */
     fun fire(
         pixelName: String,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap()
     )
 
+    /**
+     * Enqueues a Pixel event.
+     *
+     * The timing to send the pixel will depend on the actual implementation.
+     * This method was introduced to cover cases where we want to be sure pixel is sent.
+     * For example: close to application destroyed event (fire button).
+     */
     fun enqueueFire(
         pixel: PixelName,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap()
     )
 
+    /**
+     * Enqueues a Pixel event.
+     *
+     * The timing to send the pixel will depend on the actual implementation.
+     * This method was introduced to cover cases where we want to be sure pixel is sent.
+     * For example: close to application destroyed event (fire button).
+     */
     fun enqueueFire(
         pixelName: String,
         parameters: Map<String, String> = emptyMap(),

@@ -16,8 +16,23 @@
 
 package com.duckduckgo.app.statistics.api
 
+/**
+ * Public interface to initialize/refresh atb for statistics.
+ */
 interface StatisticsUpdater {
+
+    /**
+     * Initializes installation Atb
+     * */
     fun initializeAtb()
+
+    /**
+     * Refreshes search Atb.
+     * */
     fun refreshSearchRetentionAtb()
+
+    /**
+     * Refreshes app retention Atb.
+     * */
     fun refreshAppRetentionAtb()
 }

@@ -16,6 +16,17 @@
 
 package com.duckduckgo.app.statistics.store
 
+/** Public interface for Offline Pixel Counter data store.
+ *
+ * This class was previously used to ensure we were able to send pixels when the application is about to be destroyed/closed.
+ * We now have a preferred way to handle that usecase. See deprecation notes.
+ *
+ * */
+@Deprecated(
+    message = "We will no longer evolve this class. Instead please create your own datastore to persist pixels locally," +
+        "and provide your own implementation of {@link OfflinePixel}. You can also use {@link Pixel.enqueuePixel} which is less flexible but simpler.",
+    level = DeprecationLevel.WARNING
+)
 interface OfflinePixelCountDataStore {
     var applicationCrashCount: Int
     var webRendererGoneCrashCount: Int
