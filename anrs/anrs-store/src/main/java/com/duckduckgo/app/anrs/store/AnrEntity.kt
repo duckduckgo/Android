@@ -27,5 +27,5 @@ data class AnrEntity(
     val file: String?,
     val lineNumber: Int,
     val stackTrace: List<String>,
-    val timestamp: String,
+    val timestamp: String
 )

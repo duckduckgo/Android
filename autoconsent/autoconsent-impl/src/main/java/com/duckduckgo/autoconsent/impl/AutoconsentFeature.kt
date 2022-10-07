@@ -22,9 +22,9 @@ data class AutoconsentFeature(
     val state: String,
     val minSupportedVersion: Int?,
     val exceptions: List<AutoconsentExceptionEntity>,
-    val settings: Settings,
+    val settings: Settings
 )
 
 data class Settings(
-    val disabledCMPs: List<String>,
+    val disabledCMPs: List<String>
 )

@@ -44,6 +44,7 @@ class PrivacyConfigDownloadWorker(
 ) : CoroutineWorker(context, workerParameters) {
     @Inject
     lateinit var privacyConfigDownloader: PrivacyConfigDownloader
+
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 

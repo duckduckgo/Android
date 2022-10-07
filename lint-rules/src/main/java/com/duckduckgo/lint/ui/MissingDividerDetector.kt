@@ -38,9 +38,9 @@ class MissingDividerDetector : LayoutDetector() {
         context: XmlContext,
         element: Element
     ) {
-        if (element.hasAttributeNS(ANDROID_URI, ATTR_LAYOUT_HEIGHT)){
+        if (element.hasAttributeNS(ANDROID_URI, ATTR_LAYOUT_HEIGHT)) {
             val heightNode = element.getAttributeNodeNS(ANDROID_URI, ATTR_LAYOUT_HEIGHT)
-            if (heightNode.value == "1dp"){
+            if (heightNode.value == "1dp") {
                 context.report(
                     issue = MISSING_HORIZONTAL_DIVIDER,
                     location = context.getNameLocation(element),
@@ -49,9 +49,9 @@ class MissingDividerDetector : LayoutDetector() {
             }
         }
 
-        if (element.hasAttributeNS(ANDROID_URI, ATTR_LAYOUT_WIDTH)){
+        if (element.hasAttributeNS(ANDROID_URI, ATTR_LAYOUT_WIDTH)) {
             val widthNode = element.getAttributeNodeNS(ANDROID_URI, ATTR_LAYOUT_WIDTH)
-            if (widthNode.value == "1dp"){
+            if (widthNode.value == "1dp") {
                 context.report(
                     issue = MISSING_VERTICAL_DIVIDER,
                     location = context.getNameLocation(element),
@@ -96,4 +96,3 @@ class MissingDividerDetector : LayoutDetector() {
             )
     }
 }
-

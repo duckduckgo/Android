@@ -27,5 +27,5 @@ data class AutoconsentExceptionEntity(
 
 @Entity(tableName = "autoconsent_disabled_cmps")
 data class DisabledCmpsEntity(
-    @PrimaryKey val name: String,
+    @PrimaryKey val name: String
 )

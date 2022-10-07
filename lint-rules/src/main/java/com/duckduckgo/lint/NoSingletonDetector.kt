@@ -26,10 +26,8 @@ import com.android.tools.lint.detector.api.Scope.JAVA_FILE
 import com.android.tools.lint.detector.api.Scope.TEST_SOURCES
 import com.android.tools.lint.detector.api.Severity.ERROR
 import com.android.tools.lint.detector.api.SourceCodeScanner
-import org.jetbrains.uast.UAnnotation
-import org.jetbrains.uast.UClass
-import org.jetbrains.uast.UFile
 import java.util.*
+import org.jetbrains.uast.UAnnotation
 
 @Suppress("UnstableApiUsage")
 class NoSingletonDetector : Detector(), SourceCodeScanner {
@@ -46,14 +44,17 @@ class NoSingletonDetector : Detector(), SourceCodeScanner {
     }
 
     companion object {
-        val NO_SINGLETON_ISSUE = Issue.create("NoSingletonAnnotation",
+        val NO_SINGLETON_ISSUE = Issue.create(
+            "NoSingletonAnnotation",
             "The Singleton annotation must not be used",
             """
                 The @Singleton annotation must not be used to contribute dependencies
                 to the App dagger component.
                 Use @SingleInstanceIn(SomeScope::class) instead.
             """.trimIndent(),
-            Category.CORRECTNESS, 10, ERROR,
+            Category.CORRECTNESS,
+            10,
+            ERROR,
             Implementation(NoSingletonDetector::class.java, EnumSet.of(JAVA_FILE, TEST_SOURCES))
         )
     }

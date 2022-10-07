@@ -31,7 +31,7 @@ sealed class DownloadCommand(@StringRes val messageId: Int) {
         val mimeType: String? = null
     ) : DownloadCommand(messageId)
     class ShowDownloadFailedMessage(
-        @StringRes messageId: Int,
+        @StringRes messageId: Int
     ) : DownloadCommand(messageId)
 }
 

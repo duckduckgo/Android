@@ -22,8 +22,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

@@ -65,7 +65,7 @@ class DeprecatedAndroidButtonUsedInXmlDetectorTest {
                   <Button
                    ~~~~~~
                 1 errors, 0 warnings        
-            """.trimMargin()
+                """.trimMargin()
             )
     }
 

@@ -121,7 +121,8 @@ class AdClickFeatureTogglesPluginTest {
     private fun givenAdCLickFeatureIsEnabled() {
         whenever(
             adClickFeatureToggleRepository.get(
-                AdClickFeatureName.AdClickAttributionFeatureName, true
+                AdClickFeatureName.AdClickAttributionFeatureName,
+                true
             )
         ).thenReturn(true)
     }
@@ -129,7 +130,8 @@ class AdClickFeatureTogglesPluginTest {
     private fun givenAdCLickFeatureIsDisabled() {
         whenever(
             adClickFeatureToggleRepository.get(
-                AdClickFeatureName.AdClickAttributionFeatureName, true
+                AdClickFeatureName.AdClickAttributionFeatureName,
+                true
             )
         ).thenReturn(false)
     }
@@ -137,7 +139,8 @@ class AdClickFeatureTogglesPluginTest {
     private fun givenAdCLickFeatureReturnsDefaultValue(defaultValue: Boolean) {
         whenever(
             adClickFeatureToggleRepository.get(
-                AdClickFeatureName.AdClickAttributionFeatureName, defaultValue
+                AdClickFeatureName.AdClickAttributionFeatureName,
+                defaultValue
             )
         ).thenReturn(defaultValue)
     }

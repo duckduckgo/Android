@@ -34,8 +34,8 @@ import com.duckduckgo.macos_impl.R
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 class MacOsWaitlistCodeNotification @Inject constructor(
@@ -48,7 +48,6 @@ class MacOsWaitlistCodeNotification @Inject constructor(
     override val cancelIntent: String = "com.duckduckgo.notification.macos.waitlist.code.cancel"
 
     override suspend fun canShow(): Boolean {
-
         if (notificationRepository.exists(id)) {
             Timber.v("Notification already seen")
             return false

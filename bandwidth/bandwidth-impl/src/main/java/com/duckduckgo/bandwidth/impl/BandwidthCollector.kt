@@ -35,7 +35,6 @@ class RealBandwidthCollector @Inject constructor(
     val pixel: Pixel
 ) : BandwidthCollector {
     override fun collect() {
-
         val lastBandwidthData = bandwidthRepository.getStoredBandwidthData()
         val currentBandwidthData = bandwidthRepository.getCurrentBandwidthData().also { bandwidthRepository.persistBandwidthData(it) }
 

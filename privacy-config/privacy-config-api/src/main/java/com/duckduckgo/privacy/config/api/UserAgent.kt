@@ -25,6 +25,7 @@ interface UserAgent {
      * otherwise.
      */
     fun isAnApplicationException(url: String): Boolean
+
     /**
      * This method takes a [url] and returns `true` or `false` depending if the [url] is in the
      * version exceptions list
@@ -32,6 +33,7 @@ interface UserAgent {
      * otherwise.
      */
     fun isAVersionException(url: String): Boolean
+
     /**
      * This method takes a [url] and returns `true` or `false` depending if the [url] is in the
      * default exceptions list

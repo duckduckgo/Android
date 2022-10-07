@@ -24,11 +24,11 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.annotation.RequiresApi
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion
+import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface OnDeviceSpeechRecognizer {
     companion object {

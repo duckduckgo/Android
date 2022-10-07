@@ -24,12 +24,12 @@ import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.*
 import com.duckduckgo.di.scopes.ActivityScope
+import java.util.*
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.*
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class AutofillSettingsViewModel @Inject constructor(
@@ -71,7 +71,7 @@ class AutofillSettingsViewModel @Inject constructor(
             addCommand(
                 ShowCredentialMode(
                     credentials = credentials,
-                    isLaunchedDirectly = false,
+                    isLaunchedDirectly = false
                 )
             )
             _viewState.value = viewState.value.copy(

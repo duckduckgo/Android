@@ -19,6 +19,7 @@ package com.duckduckgo.downloads.impl
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
+import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
@@ -30,7 +31,6 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 import retrofit2.Call
 import retrofit2.Response
-import java.io.File
 
 @ExperimentalCoroutinesApi
 class UrlFileDownloaderTest {
@@ -46,12 +46,13 @@ class UrlFileDownloaderTest {
 
     @Before
     fun setup() {
-
         realFileDownloadManager = RealUrlFileDownloadCallManager()
         whenever(downloadFileService.downloadFile(anyString(), anyString())).thenReturn(call)
 
         urlFileDownloader = UrlFileDownloader(
-            downloadFileService, realFileDownloadManager, FakeCookieManagerWrapper()
+            downloadFileService,
+            realFileDownloadManager,
+            FakeCookieManagerWrapper()
         )
     }
 
@@ -175,14 +176,14 @@ class UrlFileDownloaderTest {
     private fun buildPendingDownload(
         url: String,
         contentDisposition: String? = null,
-        mimeType: String? = null,
+        mimeType: String? = null
     ): FileDownloader.PendingFileDownload {
         return FileDownloader.PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,
             subfolder = "folder",
-            directory = File("directory"),
+            directory = File("directory")
         )
     }
 

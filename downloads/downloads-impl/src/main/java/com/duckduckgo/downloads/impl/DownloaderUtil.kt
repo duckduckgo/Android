@@ -18,11 +18,11 @@ package com.duckduckgo.downloads.impl
 
 import android.net.Uri
 import android.webkit.MimeTypeMap
-import timber.log.Timber
 import java.lang.IllegalStateException
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import timber.log.Timber
 
 object DownloaderUtil {
 
@@ -30,14 +30,14 @@ object DownloaderUtil {
     private val CONTENT_DISPOSITION_PATTERN =
         Pattern.compile(
             "(inline|attachment)\\s*;\\s*filename\\s*=\\s*(\"((?:\\\\.|[^\"\\\\])*)\"|[^;]*)\\s*",
-            Pattern.CASE_INSENSITIVE,
+            Pattern.CASE_INSENSITIVE
         )
 
     // Generic values for the Content-Type header used to enforce the decision to take the file extension from the URL if possible.
     private val GENERIC_CONTENT_TYPES = setOf(
         "application/octet-stream",
         "application/unknown",
-        "binary/octet-stream",
+        "binary/octet-stream"
     )
 
     // Inspired from UrlUtil.guessFileName and adapted to fix some scenarios highlighted in tests.
@@ -145,7 +145,9 @@ object DownloaderUtil {
 
         return if (!filename.endsWith("/")) {
             filename.substringAfterLast('/')
-        } else null
+        } else {
+            null
+        }
     }
 
     fun parseContentDisposition(contentDisposition: String): String? {

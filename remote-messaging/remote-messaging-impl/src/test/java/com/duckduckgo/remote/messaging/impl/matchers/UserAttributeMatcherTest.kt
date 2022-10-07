@@ -20,13 +20,13 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Favorites
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import java.util.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.util.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class UserAttributeMatcherTest {
 
@@ -502,5 +502,4 @@ class UserAttributeMatcherTest {
         whenever(userBrowserProperties.searchCount()).thenReturn(searchCount)
         whenever(userBrowserProperties.widgetAdded()).thenReturn(widgetAdded)
     }
-
 }

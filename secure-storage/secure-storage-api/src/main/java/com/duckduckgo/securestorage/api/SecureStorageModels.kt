@@ -26,7 +26,7 @@ package com.duckduckgo.securestorage.api
 data class WebsiteLoginDetailsWithCredentials(
     val details: WebsiteLoginDetails,
     val password: String?,
-    val notes: String? = null,
+    val notes: String? = null
 )
 
 /**

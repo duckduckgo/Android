@@ -34,7 +34,7 @@ class StatisticsRequester(
     private val store: StatisticsDataStore,
     private val service: StatisticsService,
     private val variantManager: VariantManager,
-    private val plugins: PluginPoint<RefreshRetentionAtbPlugin>,
+    private val plugins: PluginPoint<RefreshRetentionAtbPlugin>
 ) : StatisticsUpdater {
 
     /**
@@ -85,7 +85,6 @@ class StatisticsRequester(
 
     @SuppressLint("CheckResult")
     override fun refreshSearchRetentionAtb() {
-
         val atb = store.atb
 
         if (atb == null) {

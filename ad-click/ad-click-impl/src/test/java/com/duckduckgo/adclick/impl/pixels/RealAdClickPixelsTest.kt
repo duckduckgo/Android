@@ -22,6 +22,7 @@ import androidx.core.content.edit
 import com.duckduckgo.adclick.impl.Exemption
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -37,7 +38,6 @@ import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.threeten.bp.Instant
-import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)

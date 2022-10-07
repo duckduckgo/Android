@@ -22,33 +22,33 @@ import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
-import okhttp3.ResponseBody
-import okio.Buffer
-import okio.sink
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.math.exp
 import kotlin.math.floor
 import kotlin.random.Random
+import okhttp3.ResponseBody
+import okio.Buffer
+import okio.sink
+import timber.log.Timber
 
 class UrlFileDownloader @Inject constructor(
     private val downloadFileService: DownloadFileService,
     private val urlFileDownloadCallManager: UrlFileDownloadCallManager,
-    private val cookieManagerWrapper: CookieManagerWrapper,
+    private val cookieManagerWrapper: CookieManagerWrapper
 ) {
 
     @WorkerThread
     fun downloadFile(
         pendingFileDownload: FileDownloader.PendingFileDownload,
         fileName: String,
-        downloadCallback: DownloadCallback,
+        downloadCallback: DownloadCallback
     ) {
         val url = pendingFileDownload.url
         val directory = pendingFileDownload.directory
         val call = downloadFileService.downloadFile(
             urlString = url,
-            cookie = cookieManagerWrapper.getCookie(url).orEmpty(),
+            cookie = cookieManagerWrapper.getCookie(url).orEmpty()
         )
         val downloadId = Random.nextLong()
         urlFileDownloadCallManager.add(downloadId, call)
@@ -109,7 +109,7 @@ class UrlFileDownloader @Inject constructor(
         fileName: String,
         directory: File,
         body: ResponseBody,
-        downloadCallback: DownloadCallback,
+        downloadCallback: DownloadCallback
     ): Boolean {
         Timber.d("Writing streaming response body to disk $fileName")
 

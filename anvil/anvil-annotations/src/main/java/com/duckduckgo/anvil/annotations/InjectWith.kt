@@ -36,5 +36,5 @@ annotation class InjectWith(
     val scope: KClass<*>,
 
     /** (optional) The binding class key to bind the dagger component */
-    val bindingKey: KClass<*> = Unit::class,
+    val bindingKey: KClass<*> = Unit::class
 )

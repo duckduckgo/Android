@@ -48,5 +48,4 @@ class SitePermissionsManagerImpl @Inject constructor(
 
     private fun isPermissionSupported(permission: String): Boolean =
         permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE || permission == PermissionRequest.RESOURCE_VIDEO_CAPTURE
-
 }

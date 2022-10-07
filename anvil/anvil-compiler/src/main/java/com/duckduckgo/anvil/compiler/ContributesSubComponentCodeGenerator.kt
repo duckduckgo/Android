@@ -35,10 +35,10 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
+import java.io.File
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
-import java.io.File
 
 /**
  * This Anvil code generator allows inject ViewModel without manually creating the ViewModel factory
@@ -56,7 +56,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
             .flatMap {
                 listOf(
                     generateSubcomponentFactory(it, codeGenDir, module),
-                    generateSubcomponentFactoryBindingModule(it, codeGenDir, module),
+                    generateSubcomponentFactoryBindingModule(it, codeGenDir, module)
                 )
             }
             .toList()
@@ -126,7 +126,6 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                     .build()
             )
             .build()
-
     }
 
     private fun generateSubcomponentFactoryBindingModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
@@ -165,7 +164,6 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
         }
 
         return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content)
-
     }
 
     private fun FqName.subComponentAnnotation(module: ModuleDescriptor): AnnotationSpec {
@@ -203,7 +201,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
     }
 
     private fun ClassReference.Psi.bindingKey(
-        fqName: FqName,
+        fqName: FqName
     ): FqName? {
         return annotations
             .first { it.fqName == fqName }

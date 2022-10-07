@@ -26,8 +26,8 @@ import com.android.tools.lint.detector.api.Scope.JAVA_FILE
 import com.android.tools.lint.detector.api.Scope.TEST_SOURCES
 import com.android.tools.lint.detector.api.Severity.ERROR
 import com.android.tools.lint.detector.api.SourceCodeScanner
-import org.jetbrains.uast.UClass
 import java.util.*
+import org.jetbrains.uast.UClass
 
 @Suppress("UnstableApiUsage")
 class NoLifecycleObserverDetector : Detector(), SourceCodeScanner {
@@ -44,13 +44,16 @@ class NoLifecycleObserverDetector : Detector(), SourceCodeScanner {
     }
 
     companion object {
-        val NO_LIFECYCLE_OBSERVER_ISSUE = Issue.create("NoLifecycleObserver",
+        val NO_LIFECYCLE_OBSERVER_ISSUE = Issue.create(
+            "NoLifecycleObserver",
             "The LifecycleObserver type should not be extended.",
             """
                 The LifecycleObserver should not be used.
                 Use DefaultLifecycleObserver instead.
             """.trimIndent(),
-            Category.CORRECTNESS, 10, ERROR,
+            Category.CORRECTNESS,
+            10,
+            ERROR,
             Implementation(NoLifecycleObserverDetector::class.java, EnumSet.of(JAVA_FILE, TEST_SOURCES))
         )
     }

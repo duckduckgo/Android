@@ -92,5 +92,4 @@ interface CredentialAutofillDialogFactory {
         credentials: LoginCredentials,
         tabId: String
     ): DialogFragment
-
 }

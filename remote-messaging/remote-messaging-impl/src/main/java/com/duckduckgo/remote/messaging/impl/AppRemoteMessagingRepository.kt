@@ -77,7 +77,8 @@ class AppRemoteMessagingRepository(
             RemoteMessage(
                 id = it.id,
                 content = message.content,
-                emptyList(), emptyList()
+                emptyList(),
+                emptyList()
             )
         }
     }

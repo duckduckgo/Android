@@ -23,13 +23,13 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewPropertyAnimator
 import android.widget.FrameLayout
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.voice.impl.databinding.ViewVoiceRecognizingIndicatorBinding
+import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion.MAX_VOLUME
+import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion.MIN_VOLUME
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Action
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Action.INDICATOR_CLICKED
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Model
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion.MAX_VOLUME
-import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion.MIN_VOLUME
-import com.duckduckgo.voice.impl.databinding.ViewVoiceRecognizingIndicatorBinding
 import java.util.*
 
 interface VoiceRecognizingIndicator {
@@ -66,7 +66,7 @@ class VoiceRecognizingIndicatorView @JvmOverloads constructor(
     private val pulseAnimator = ObjectAnimator.ofPropertyValuesHolder(
         binding.pulse,
         PropertyValuesHolder.ofFloat("scaleX", PULSE_MIN_RADIUS, PULSE_MAX_RADIUS),
-        PropertyValuesHolder.ofFloat("scaleY", PULSE_MIN_RADIUS, PULSE_MAX_RADIUS),
+        PropertyValuesHolder.ofFloat("scaleY", PULSE_MIN_RADIUS, PULSE_MAX_RADIUS)
     ).apply {
         duration = PULSE_DURATION
         repeatCount = ObjectAnimator.INFINITE
@@ -76,7 +76,7 @@ class VoiceRecognizingIndicatorView @JvmOverloads constructor(
     private val reversePulseAnimator = ObjectAnimator.ofPropertyValuesHolder(
         binding.pulse,
         PropertyValuesHolder.ofFloat("scaleX", PULSE_MAX_RADIUS, PULSE_MIN_RADIUS),
-        PropertyValuesHolder.ofFloat("scaleY", PULSE_MAX_RADIUS, PULSE_MIN_RADIUS),
+        PropertyValuesHolder.ofFloat("scaleY", PULSE_MAX_RADIUS, PULSE_MIN_RADIUS)
     ).apply {
         duration = PULSE_DURATION
         repeatCount = ObjectAnimator.INFINITE

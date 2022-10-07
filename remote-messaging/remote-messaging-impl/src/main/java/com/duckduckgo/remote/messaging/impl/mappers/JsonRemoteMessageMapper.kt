@@ -37,8 +37,8 @@ import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.MEDIUM
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
-import timber.log.Timber
 import java.util.*
+import timber.log.Timber
 
 private val smallMapper: (JsonContent) -> Content = { jsonContent ->
     Small(
@@ -152,7 +152,7 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
         is BigSingleAction -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
-            primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
+            primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText
         )
         is BigTwoActions -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
@@ -162,11 +162,11 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
         )
         is Medium -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
-            descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
+            descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText
         )
         is Small -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
-            descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
+            descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText
         )
     }
 }

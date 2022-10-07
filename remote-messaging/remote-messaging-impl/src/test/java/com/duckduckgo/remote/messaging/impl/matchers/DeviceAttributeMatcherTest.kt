@@ -20,13 +20,13 @@ import android.os.Build
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
-import java.util.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class DeviceAttributeMatcherTest {

@@ -18,13 +18,14 @@ package com.duckduckgo.privacy.config.impl.features.amplinks
 
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.AmpLinkException
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.util.concurrent.CopyOnWriteArrayList
 import junit.framework.TestCase.*
 import org.json.JSONObject
 import org.junit.Before
@@ -34,7 +35,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
-import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class AmpKeywordReferenceTest(private val testCase: TestCase) {

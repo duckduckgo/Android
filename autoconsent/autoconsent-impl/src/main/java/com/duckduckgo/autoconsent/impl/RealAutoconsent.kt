@@ -42,7 +42,7 @@ class RealAutoconsent @Inject constructor(
     private val autoconsentRepository: AutoconsentRepository,
     private val featureToggle: FeatureToggle,
     private val userAllowlistRepository: UserWhiteListRepository,
-    private val unprotectedTemporary: UnprotectedTemporary,
+    private val unprotectedTemporary: UnprotectedTemporary
 ) : Autoconsent {
 
     private lateinit var autoconsentJs: String

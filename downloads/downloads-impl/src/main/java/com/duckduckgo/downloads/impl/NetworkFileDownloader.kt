@@ -18,13 +18,13 @@ package com.duckduckgo.downloads.impl
 
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 class NetworkFileDownloader @Inject constructor(
     private val filenameExtractor: FilenameExtractor,
     private val fileService: DownloadFileService,
-    private val urlFileDownloader: UrlFileDownloader,
+    private val urlFileDownloader: UrlFileDownloader
 ) {
 
     fun download(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
@@ -94,7 +94,6 @@ class NetworkFileDownloader @Inject constructor(
         guessedFileName: String,
         callback: DownloadCallback
     ) {
-
         urlFileDownloader.downloadFile(pendingDownload, guessedFileName, callback)
     }
 }

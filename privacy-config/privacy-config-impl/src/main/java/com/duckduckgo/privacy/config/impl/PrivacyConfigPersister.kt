@@ -22,17 +22,17 @@ import androidx.annotation.WorkerThread
 import androidx.core.content.edit
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.di.ConfigPersisterPreferences
+import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 interface PrivacyConfigPersister {
     suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig)
@@ -49,7 +49,7 @@ class RealPrivacyConfigPersister @Inject constructor(
     private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository,
     private val privacyConfigRepository: PrivacyConfigRepository,
     private val database: PrivacyConfigDatabase,
-    @ConfigPersisterPreferences private val persisterPreferences: SharedPreferences,
+    @ConfigPersisterPreferences private val persisterPreferences: SharedPreferences
 ) : PrivacyConfigPersister {
 
     override suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig) {

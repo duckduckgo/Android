@@ -22,9 +22,9 @@ import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedBy
 import com.duckduckgo.securestorage.impl.encryption.RandomBytesGenerator
 import com.duckduckgo.securestorage.store.SecureStorageKeyRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import okio.ByteString.Companion.toByteString
 import java.security.Key
 import javax.inject.Inject
+import okio.ByteString.Companion.toByteString
 
 /**
  * This class provides the usable decrypted keys to be used in various levels on encryption

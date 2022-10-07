@@ -27,10 +27,10 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesWorker(AppScope::class)
 class RemoteMessagingConfigDownloadWorker(
@@ -39,6 +39,7 @@ class RemoteMessagingConfigDownloadWorker(
 ) : CoroutineWorker(context, workerParameters) {
     @Inject
     lateinit var downloader: RemoteMessagingConfigDownloader
+
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 

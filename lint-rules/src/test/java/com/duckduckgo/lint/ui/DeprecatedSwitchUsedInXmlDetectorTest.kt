@@ -67,7 +67,7 @@ class DeprecatedSwitchUsedInXmlDetectorTest {
                 <androidx.appcompat.widget.SwitchCompat
                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
-            """.trimMargin()
+                """.trimMargin()
             )
     }
 
@@ -117,7 +117,7 @@ class DeprecatedSwitchUsedInXmlDetectorTest {
                     <com.google.android.material.switchmaterial.SwitchMaterial
                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings      
-            """.trimMargin()
+                """.trimMargin()
             )
     }
 
@@ -165,7 +165,7 @@ class DeprecatedSwitchUsedInXmlDetectorTest {
                 <Switch
                  ~~~~~~
                 1 errors, 0 warnings
-            """.trimMargin()
+                """.trimMargin()
             )
     }
 

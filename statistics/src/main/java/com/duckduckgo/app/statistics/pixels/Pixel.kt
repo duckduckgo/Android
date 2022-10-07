@@ -47,7 +47,7 @@ interface Pixel {
         APPLICATION_CRASH_WEBVIEW_HIDE_CUSTOM_VIEW("m_d_ac_wch"),
         APPLICATION_CRASH_WEBVIEW_ON_PROGRESS_CHANGED("m_d_ac_wpc"),
         APPLICATION_CRASH_WEBVIEW_RECEIVED_PAGE_TITLE("m_d_ac_wpt"),
-        APPLICATION_CRASH_WEBVIEW_SHOW_FILE_CHOOSER("m_d_ac_wfc"),
+        APPLICATION_CRASH_WEBVIEW_SHOW_FILE_CHOOSER("m_d_ac_wfc")
     }
 
     object PixelParameter {
@@ -145,7 +145,8 @@ class RxBasedPixel @Inject constructor(private val pixelSender: PixelSender) : P
                 { Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters") },
                 {
                     Timber.w(
-                        it, "Pixel failed: $pixelName with params: $parameters $encodedParameters"
+                        it,
+                        "Pixel failed: $pixelName with params: $parameters $encodedParameters"
                     )
                 }
             )
@@ -182,7 +183,8 @@ class RxBasedPixel @Inject constructor(private val pixelSender: PixelSender) : P
                 },
                 {
                     Timber.w(
-                        it, "Pixel failed: $pixelName with params: $parameters $encodedParameters"
+                        it,
+                        "Pixel failed: $pixelName with params: $parameters $encodedParameters"
                     )
                 }
             )

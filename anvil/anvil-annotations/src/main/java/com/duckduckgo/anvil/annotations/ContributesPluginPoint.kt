@@ -48,5 +48,5 @@ annotation class ContributesPluginPoint(
      * interface MyPluginImpl : MyPlugin
      * ```
      */
-    val boundType: KClass<*> = Unit::class,
+    val boundType: KClass<*> = Unit::class
 )

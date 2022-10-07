@@ -20,8 +20,8 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface PrivacyConfigDownloader {
     suspend fun download(): Boolean

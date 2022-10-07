@@ -21,7 +21,7 @@ import android.content.Context
 interface AdClickFeatureToggleRepository : AdClickFeatureToggleStore {
     companion object {
         fun create(
-            context: Context,
+            context: Context
         ): AdClickFeatureToggleRepository {
             val store = RealAdClickFeatureToggleStore(context)
             return RealAdClickFeatureToggleRepository(store)
@@ -30,5 +30,5 @@ interface AdClickFeatureToggleRepository : AdClickFeatureToggleStore {
 }
 
 internal class RealAdClickFeatureToggleRepository constructor(
-    private val adClickFeatureToggleStore: AdClickFeatureToggleStore,
+    private val adClickFeatureToggleStore: AdClickFeatureToggleStore
 ) : AdClickFeatureToggleRepository, AdClickFeatureToggleStore by adClickFeatureToggleStore

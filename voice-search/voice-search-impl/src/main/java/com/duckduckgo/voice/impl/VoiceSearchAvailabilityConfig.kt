@@ -29,7 +29,7 @@ data class VoiceSearchAvailabilityConfig(
     val deviceModel: String,
     val sdkInt: Int,
     val languageTag: String,
-    val isOnDeviceSpeechRecognitionSupported: Boolean,
+    val isOnDeviceSpeechRecognitionSupported: Boolean
 )
 
 interface VoiceSearchAvailabilityConfigProvider {
@@ -49,6 +49,8 @@ class DefaultVoiceSearchAvailabilityConfigProvider @Inject constructor(
         languageTag = appBuildConfig.deviceLocale.toLanguageTag(),
         isOnDeviceSpeechRecognitionSupported = if (appBuildConfig.sdkInt >= VERSION_CODES.S) {
             SpeechRecognizer.isOnDeviceRecognitionAvailable(context)
-        } else false
+        } else {
+            false
+        }
     )
 }

@@ -21,8 +21,8 @@ import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface AutofillRuntimeConfigProvider {
     suspend fun getRuntimeConfiguration(

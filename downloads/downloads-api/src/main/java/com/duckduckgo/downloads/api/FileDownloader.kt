@@ -16,10 +16,10 @@
 
 package com.duckduckgo.downloads.api
 
-import java.io.File
-import java.io.Serializable
 import android.os.Environment
 import androidx.annotation.AnyThread
+import java.io.File
+import java.io.Serializable
 
 /** Interface for the starting point of a download. */
 interface FileDownloader {

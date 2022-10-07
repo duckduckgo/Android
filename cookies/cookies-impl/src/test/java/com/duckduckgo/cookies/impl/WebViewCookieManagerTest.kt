@@ -21,14 +21,14 @@ import android.webkit.ValueCallback
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.RemoveCookiesStrategy
-import kotlinx.coroutines.test.runTest
-import org.mockito.kotlin.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.*
 
 private data class Cookie(
     val url: String,

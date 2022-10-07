@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.global.api
 
-import okhttp3.*
 import java.util.concurrent.TimeUnit
+import okhttp3.*
 
 class FakeChain(private val url: String) : Interceptor.Chain {
     override fun call(): Call {

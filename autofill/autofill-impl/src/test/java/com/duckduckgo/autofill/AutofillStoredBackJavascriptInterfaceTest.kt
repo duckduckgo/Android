@@ -160,7 +160,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
                 loginCredential(username = "username1", password = "bar"),
                 loginCredential(username = null, password = "bar"),
                 loginCredential(username = null, password = "bar"),
-                loginCredential(username = "username2", password = null),
+                loginCredential(username = "username2", password = null)
             )
         )
         initiateGetAutofillDataRequest()
@@ -213,7 +213,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
                 loginCredential(username = "username2", password = null),
                 loginCredential(username = "username1", password = "password1"),
                 loginCredential(username = null, password = "password2"),
-                loginCredential(username = null, password = "password3"),
+                loginCredential(username = null, password = "password3")
 
             )
         )

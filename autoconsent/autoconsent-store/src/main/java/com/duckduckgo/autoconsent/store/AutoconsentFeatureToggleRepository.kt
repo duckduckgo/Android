@@ -21,7 +21,7 @@ import android.content.Context
 interface AutoconsentFeatureToggleRepository : AutoconsentFeatureToggleStore {
     companion object {
         fun create(
-            context: Context,
+            context: Context
         ): AutoconsentFeatureToggleRepository {
             val store = RealAutoconsentFeatureToggleStore(context)
             return RealAutoconsentFeatureToggleRepository(store)
@@ -30,5 +30,5 @@ interface AutoconsentFeatureToggleRepository : AutoconsentFeatureToggleStore {
 }
 
 internal class RealAutoconsentFeatureToggleRepository constructor(
-    private val autoconsentFeatureToggleStore: AutoconsentFeatureToggleStore,
+    private val autoconsentFeatureToggleStore: AutoconsentFeatureToggleStore
 ) : AutoconsentFeatureToggleRepository, AutoconsentFeatureToggleStore by autoconsentFeatureToggleStore

@@ -25,7 +25,9 @@ class NoSingletonDetectorTest {
     @Test
     fun whenSingletonAnnotationFoundThenFailWithError() {
         lint()
-            .files(kt("""
+            .files(
+                kt(
+                    """
               package com.duckduckgo.lint
     
                 annotation class Singleton
@@ -35,28 +37,36 @@ class NoSingletonDetectorTest {
                     fun quack() {                    
                     }
                 }
-            """).indented())
+            """
+                ).indented()
+            )
             .issues(NoSingletonDetector.NO_SINGLETON_ISSUE)
             .run()
-            .expect("""
+            .expect(
+                """
                src/com/duckduckgo/lint/Singleton.kt:5: Error: The Singleton annotation must not be used [NoSingletonAnnotation]
                  @Singleton
                  ~~~~~~~~~~
                1 errors, 0 warnings
-            """.trimMargin())
+                """.trimMargin()
+            )
     }
 
     @Test
     fun whenSingletonAnnotationNotFoundThenSucceed() {
         lint()
-            .files(kt("""
+            .files(
+                kt(
+                    """
               package com.duckduckgo.lint
     
                 class Duck {
                     fun quack() {                    
                     }
                 }
-            """).indented())
+            """
+                ).indented()
+            )
             .allowCompilationErrors()
             .issues(NoSingletonDetector.NO_SINGLETON_ISSUE)
             .run()

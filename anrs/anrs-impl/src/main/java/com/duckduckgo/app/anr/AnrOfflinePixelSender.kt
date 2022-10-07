@@ -31,7 +31,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class AnrOfflinePixelSender @Inject constructor(
     private val anrRepository: AnrRepository,
-    private val pixelSender: PixelSender,
+    private val pixelSender: PixelSender
 ) : OfflinePixel {
     override fun send(): Completable {
         return defer {

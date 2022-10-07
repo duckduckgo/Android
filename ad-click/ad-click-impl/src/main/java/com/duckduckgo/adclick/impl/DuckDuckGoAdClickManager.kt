@@ -23,9 +23,9 @@ import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
 import timber.log.Timber
-import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)

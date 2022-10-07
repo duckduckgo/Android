@@ -21,7 +21,7 @@ import android.content.Context
 interface AutoconsentSettingsRepository : AutoconsentSettingsDataStore {
     companion object {
         fun create(
-            context: Context,
+            context: Context
         ): AutoconsentSettingsRepository {
             val store = RealAutoconsentSettingsDataStore(context)
             return RealAutoconsentSettingsRepository(store)
@@ -30,5 +30,5 @@ interface AutoconsentSettingsRepository : AutoconsentSettingsDataStore {
 }
 
 internal class RealAutoconsentSettingsRepository constructor(
-    private val autoconsentSettingsDataStore: AutoconsentSettingsDataStore,
+    private val autoconsentSettingsDataStore: AutoconsentSettingsDataStore
 ) : AutoconsentSettingsRepository, AutoconsentSettingsDataStore by autoconsentSettingsDataStore

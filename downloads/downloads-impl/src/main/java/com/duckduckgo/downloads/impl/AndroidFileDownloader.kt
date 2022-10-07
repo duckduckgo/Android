@@ -32,11 +32,11 @@ class AndroidFileDownloader constructor(
     private val callback: FileDownloadCallback,
     private val workManager: WorkManager,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
+    private val dispatcherProvider: DispatcherProvider
 ) : FileDownloader {
 
     override fun enqueueDownload(
-        pending: PendingFileDownload,
+        pending: PendingFileDownload
     ) {
         when {
             pending.isNetworkUrl -> enqueueToWorker(pending)

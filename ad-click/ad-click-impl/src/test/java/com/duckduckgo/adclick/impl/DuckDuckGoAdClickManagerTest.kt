@@ -19,6 +19,7 @@ package com.duckduckgo.adclick.impl
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
 import com.duckduckgo.adclick.impl.pixels.AdClickPixels
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -32,7 +33,6 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)

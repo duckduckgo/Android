@@ -42,7 +42,7 @@ interface SecureStorageKeyGenerator {
 class RealSecureStorageKeyGenerator @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     @Named("DerivedKeySecretFactoryFor26Up") private val derivedKeySecretFactory: Provider<DerivedKeySecretFactory>,
-    @Named("DerivedKeySecretFactoryForLegacy") private val legacyDerivedKeySecretFactory: Provider<DerivedKeySecretFactory>,
+    @Named("DerivedKeySecretFactoryForLegacy") private val legacyDerivedKeySecretFactory: Provider<DerivedKeySecretFactory>
 ) : SecureStorageKeyGenerator {
     private val keyGenerator: KeyGenerator by lazy {
         KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES).also {

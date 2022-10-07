@@ -26,7 +26,9 @@ class NoFragmentDetectorTest {
     @Test
     fun whenFragmentExtendedThenFailWithError() {
         TestLintTask.lint()
-            .files(TestFiles.kt("""
+            .files(
+                TestFiles.kt(
+                    """
               package com.duckduckgo.lint
     
                 class Fragment
@@ -35,21 +37,27 @@ class NoFragmentDetectorTest {
                     fun quack() {                    
                     }
                 }
-            """).indented())
+            """
+                ).indented()
+            )
             .issues(NO_FRAGMENT_ISSUE)
             .run()
-            .expect("""
+            .expect(
+                """
                 src/com/duckduckgo/lint/Fragment.kt:5: Error: Fragment should not be directly extended [NoFragment]
                   class Duck : Fragment() {
                         ~~~~
                 1 errors, 0 warnings
-            """.trimMargin())
+                """.trimMargin()
+            )
     }
 
     @Test
     fun whenFragmentWithParamtExtendedThenFailWithError() {
         TestLintTask.lint()
-            .files(TestFiles.kt("""
+            .files(
+                TestFiles.kt(
+                    """
               package com.duckduckgo.lint
     
                 class Fragment(val param: String)
@@ -58,21 +66,27 @@ class NoFragmentDetectorTest {
                     fun quack() {                    
                     }
                 }
-            """).indented())
+            """
+                ).indented()
+            )
             .issues(NO_FRAGMENT_ISSUE)
             .run()
-            .expect("""
+            .expect(
+                """
                 src/com/duckduckgo/lint/Fragment.kt:5: Error: Fragment should not be directly extended [NoFragment]
                   class Duck(param: String) : Fragment(param) {
                         ~~~~
                 1 errors, 0 warnings
-            """.trimMargin())
+                """.trimMargin()
+            )
     }
 
     @Test
     fun whenAnyOtherFragmentTypeExtendedThenSuccess() {
         TestLintTask.lint()
-            .files(TestFiles.kt("""
+            .files(
+                TestFiles.kt(
+                    """
               package com.duckduckgo.lint
     
                 class DialogFragment(val param: String)
@@ -81,7 +95,9 @@ class NoFragmentDetectorTest {
                     fun quack() {                    
                     }
                 }
-            """).indented())
+            """
+                ).indented()
+            )
             .allowCompilationErrors()
             .issues(NoLifecycleObserverDetector.NO_LIFECYCLE_OBSERVER_ISSUE)
             .run()

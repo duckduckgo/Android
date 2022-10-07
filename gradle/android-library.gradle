@@ -63,7 +63,7 @@ tasks.register('android_checks') {
 }
 
 tasks.register('jvm_checks') {
-    dependsOn 'spotlessCheck', 'lint', 'testDebugUnitTest'
+    dependsOn 'spotlessCheck', 'lint', 'testDebugUnitTest', 'installKotlinterPrePushHook'
 }
 
 tasks.register('jvm_tests') {

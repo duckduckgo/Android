@@ -20,8 +20,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -31,6 +29,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class PrivacyFeatureTogglesPluginTest {
@@ -119,7 +119,8 @@ class PrivacyFeatureTogglesPluginTest {
     private fun givenPrivacyFeatureIsEnabled() {
         whenever(
             mockFeatureTogglesRepository.get(
-                PrivacyFeatureName.ContentBlockingFeatureName, true
+                PrivacyFeatureName.ContentBlockingFeatureName,
+                true
             )
         ).thenReturn(true)
     }
@@ -127,7 +128,8 @@ class PrivacyFeatureTogglesPluginTest {
     private fun givenPrivacyFeatureIsDisabled() {
         whenever(
             mockFeatureTogglesRepository.get(
-                PrivacyFeatureName.ContentBlockingFeatureName, true
+                PrivacyFeatureName.ContentBlockingFeatureName,
+                true
             )
         ).thenReturn(false)
     }
@@ -135,7 +137,8 @@ class PrivacyFeatureTogglesPluginTest {
     private fun givenPrivacyFeatureReturnsDefaultValue(defaultValue: Boolean) {
         whenever(
             mockFeatureTogglesRepository.get(
-                PrivacyFeatureName.ContentBlockingFeatureName, defaultValue
+                PrivacyFeatureName.ContentBlockingFeatureName,
+                defaultValue
             )
         ).thenReturn(defaultValue)
     }

@@ -26,7 +26,7 @@ import javax.inject.Named
 @ContributesBinding(AppScope::class)
 class RemoveCookies @Inject constructor(
     @Named("cookieManagerRemover") private val cookieManagerRemover: CookieRemover,
-    @Named("sqlCookieRemover") private val selectiveCookieRemover: CookieRemover,
+    @Named("sqlCookieRemover") private val selectiveCookieRemover: CookieRemover
 ) : RemoveCookiesStrategy {
     override suspend fun removeCookies() {
         val removeSuccess = selectiveCookieRemover.removeCookies()

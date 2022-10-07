@@ -18,9 +18,7 @@ package com.duckduckgo.lint
 
 import com.android.tools.lint.checks.infrastructure.TestFiles
 import com.android.tools.lint.checks.infrastructure.TestLintTask
-import com.duckduckgo.lint.NoFragmentDetector.Companion.NO_FRAGMENT_ISSUE
 import com.duckduckgo.lint.ui.NoAlertDialogDetector
-import com.duckduckgo.lint.ui.NoAlertDialogDetector.Companion
 import org.junit.Test
 
 class NoAlertDialogDetectorTest {
@@ -28,7 +26,9 @@ class NoAlertDialogDetectorTest {
     @Test
     fun whenMaterialAlertDialogThenFailWithError() {
         TestLintTask.lint()
-            .files(TestFiles.kt("""
+            .files(
+                TestFiles.kt(
+                    """
               package com.duckduckgo.lint
     
                 class Fragment
@@ -36,14 +36,18 @@ class NoAlertDialogDetectorTest {
                     fun createDialog() {                    
                         MaterialAlertDialogBuilder.create()
                     }
-            """).indented())
+            """
+                ).indented()
+            )
             .issues(NoAlertDialogDetector.NO_DESIGN_SYSTEM_DIALOG)
             .run()
-            .expect("""
+            .expect(
+                """
                 src/com/duckduckgo/lint/Fragment.kt:5: Error: Fragment should not be directly extended [NoFragment]
                   class Duck : Fragment() {
                         ~~~~
                 1 errors, 0 warnings
-            """.trimMargin())
+                """.trimMargin()
+            )
     }
 }

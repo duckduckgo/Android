@@ -65,7 +65,7 @@ style="@style/Widget.DuckDuckGo.Button.Primary"
                                   <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings 
-            """.trimMargin()
+                """.trimMargin()
             )
     }
 
@@ -150,7 +150,7 @@ style="@style/Widget.DuckDuckGo.Button.Primary"
                                   <com.duckduckgo.mobile.android.ui.view.SwitchView
                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
-            """.trimMargin()
+                """.trimMargin()
             )
     }
 }

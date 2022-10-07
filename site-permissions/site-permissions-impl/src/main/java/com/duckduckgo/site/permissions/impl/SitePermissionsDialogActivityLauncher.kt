@@ -81,7 +81,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         when {
             permissionsRequested.size == 2 -> {
                 showSitePermissionsRationaleDialog(
-                    R.string.sitePermissionsMicAndCameraDialogTitle, url, this::askForMicAndCameraPermissions, PixelValue.BOTH
+                    R.string.sitePermissionsMicAndCameraDialogTitle,
+                    url,
+                    this::askForMicAndCameraPermissions,
+                    PixelValue.BOTH
                 )
             }
             permissionsRequested.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) -> {

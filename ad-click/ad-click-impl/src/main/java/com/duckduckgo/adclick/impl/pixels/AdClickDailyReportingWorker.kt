@@ -29,11 +29,11 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
 class AdClickDailyReportingWorker(context: Context, workerParameters: WorkerParameters) :

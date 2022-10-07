@@ -180,7 +180,7 @@ class CredentialListSorterTest {
             creds(domain = "amazon.co.uk", title = "Smile Amazon"),
             creds(domain = "example.com", title = "c"),
             creds(domain = "aaa.com"),
-            creds(domain = "bar.com"),
+            creds(domain = "bar.com")
         )
 
         val sorted = testee.sort(credentials)
@@ -269,5 +269,4 @@ class CredentialListSorterTest {
     private fun credsWithDomain(domain: String?): LoginCredentials {
         return LoginCredentials(domain = domain, domainTitle = null, username = null, password = null)
     }
-
 }

@@ -44,8 +44,11 @@ class MacOsWaitlistDataStoreSharedPreferences constructor(private val context: C
         get() = preferences.getString(KEY_WAITLIST_TOKEN, null)
         set(value) {
             preferences.edit(commit = true) {
-                if (value == null) remove(KEY_WAITLIST_TOKEN)
-                else putString(KEY_WAITLIST_TOKEN, value)
+                if (value == null) {
+                    remove(KEY_WAITLIST_TOKEN)
+                } else {
+                    putString(KEY_WAITLIST_TOKEN, value)
+                }
             }
         }
 
@@ -53,8 +56,11 @@ class MacOsWaitlistDataStoreSharedPreferences constructor(private val context: C
         get() = preferences.getString(KEY_INVITE_CODE, null)
         set(value) {
             preferences.edit(commit = true) {
-                if (value == null) remove(KEY_INVITE_CODE)
-                else putString(KEY_INVITE_CODE, value)
+                if (value == null) {
+                    remove(KEY_INVITE_CODE)
+                } else {
+                    putString(KEY_INVITE_CODE, value)
+                }
             }
         }
 

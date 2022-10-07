@@ -25,7 +25,7 @@ data class ContainingCredentials(
 
     data class CredentialSuccessResponse(
         val credentials: JavascriptCredentials,
-        val action: String = "fill",
+        val action: String = "fill"
     )
 }
 

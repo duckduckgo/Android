@@ -20,8 +20,8 @@ import android.webkit.WebView
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesBinding(FragmentScope::class)
 class InlineBrowserAutofill @Inject constructor(

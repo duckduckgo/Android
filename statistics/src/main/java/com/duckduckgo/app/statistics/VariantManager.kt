@@ -21,8 +21,8 @@ import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import timber.log.Timber
 import java.util.*
+import timber.log.Timber
 
 @WorkerThread
 interface VariantManager {
@@ -41,7 +41,7 @@ interface VariantManager {
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() })
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -90,7 +90,7 @@ interface VariantManager {
 class ExperimentationVariantManager(
     private val store: StatisticsDataStore,
     private val indexRandomizer: IndexRandomizer,
-    private val appBuildConfig: AppBuildConfig,
+    private val appBuildConfig: AppBuildConfig
 ) : VariantManager {
 
     @Synchronized

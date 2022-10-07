@@ -95,7 +95,7 @@ class AmpLinksPluginTest {
         verify(mockAmpLinksRepository).updateAll(
             exceptionArgumentCaptor.capture(),
             ampLinkFormatArgumentCaptor.capture(),
-            ampKeywordArgumentCaptor.capture(),
+            ampKeywordArgumentCaptor.capture()
         )
 
         val ampLinkExceptionEntityList = exceptionArgumentCaptor.firstValue

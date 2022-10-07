@@ -33,7 +33,7 @@ interface MediaScanner {
 
 @ContributesBinding(AppScope::class)
 class MediaScannerImpl @Inject constructor(
-    private val context: Context,
+    private val context: Context
 ) : MediaScanner {
     override fun scan(file: File) {
         val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)

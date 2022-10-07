@@ -33,14 +33,14 @@ import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class,
+    boundType = LifecycleObserver::class
 )
 @SingleInstanceIn(AppScope::class)
 class FileDownloadNotificationActionReceiver @Inject constructor(
@@ -50,7 +50,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     private val downloadsRepository: DownloadsRepository,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val pixel: Pixel,
+    private val pixel: Pixel
 ) : BroadcastReceiver(), DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -92,7 +92,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
             val url = extractUrlFromRetryIntent(intent) ?: return
             FileDownloader.PendingFileDownload(
                 url = url,
-                subfolder = Environment.DIRECTORY_DOWNLOADS,
+                subfolder = Environment.DIRECTORY_DOWNLOADS
             ).run {
                 Timber.v("Retrying download for $url")
                 coroutineScope.launch(dispatcherProvider.io()) {

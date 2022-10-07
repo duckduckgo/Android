@@ -41,7 +41,7 @@ class OfflinePixelSender constructor(
     private val offlineCountCountDataStore: OfflinePixelCountDataStore,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val pixelSender: PixelSender,
-    private val offlinePixels: DaggerSet<OfflinePixel>,
+    private val offlinePixels: DaggerSet<OfflinePixel>
 ) {
 
     fun sendOfflinePixels(): Completable {
@@ -66,13 +66,15 @@ class OfflinePixelSender constructor(
 
     private fun sendWebRendererCrashedPixel(): Completable {
         return sendPixelCount(
-            offlineCountCountDataStore::webRendererGoneCrashCount, WEB_RENDERER_GONE_CRASH
+            offlineCountCountDataStore::webRendererGoneCrashCount,
+            WEB_RENDERER_GONE_CRASH
         )
     }
 
     private fun sendWebRendererKilledPixel(): Completable {
         return sendPixelCount(
-            offlineCountCountDataStore::webRendererGoneKilledCount, WEB_RENDERER_GONE_KILLED
+            offlineCountCountDataStore::webRendererGoneKilledCount,
+            WEB_RENDERER_GONE_KILLED
         )
     }
 
@@ -85,13 +87,15 @@ class OfflinePixelSender constructor(
 
     private fun sendCookieDatabaseOpenErrorPixel(): Completable {
         return sendPixelCount(
-            offlineCountCountDataStore::cookieDatabaseOpenErrorCount, COOKIE_DATABASE_OPEN_ERROR
+            offlineCountCountDataStore::cookieDatabaseOpenErrorCount,
+            COOKIE_DATABASE_OPEN_ERROR
         )
     }
 
     private fun sendCookieDatabaseNotFoundPixel(): Completable {
         return sendPixelCount(
-            offlineCountCountDataStore::cookieDatabaseNotFoundCount, COOKIE_DATABASE_NOT_FOUND
+            offlineCountCountDataStore::cookieDatabaseNotFoundCount,
+            COOKIE_DATABASE_NOT_FOUND
         )
     }
 

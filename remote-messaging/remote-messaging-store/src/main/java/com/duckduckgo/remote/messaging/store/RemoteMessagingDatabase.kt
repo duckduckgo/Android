@@ -21,7 +21,8 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 
 @Database(
-    exportSchema = true, version = 1,
+    exportSchema = true,
+    version = 1,
     entities = [
         RemoteMessagingConfig::class,
         RemoteMessageEntity::class

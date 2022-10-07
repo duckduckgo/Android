@@ -25,7 +25,9 @@ class NoLifecycleObserverTest {
     @Test
     fun whenLifecycleObserverExtendedThenFailWithError() {
         lint()
-            .files(kt("""
+            .files(
+                kt(
+                    """
               package com.duckduckgo.lint
     
                 class LifecycleObserver
@@ -34,21 +36,27 @@ class NoLifecycleObserverTest {
                     fun quack() {                    
                     }
                 }
-            """).indented())
+            """
+                ).indented()
+            )
             .issues(NoLifecycleObserverDetector.NO_LIFECYCLE_OBSERVER_ISSUE)
             .run()
-            .expect("""
+            .expect(
+                """
                 src/com/duckduckgo/lint/LifecycleObserver.kt:5: Error: LifecycleObserver should not be directly extended [NoLifecycleObserver]
                   class Duck : LifecycleObserver() {
                         ~~~~
                 1 errors, 0 warnings
-            """.trimMargin())
+                """.trimMargin()
+            )
     }
 
     @Test
     fun whenDefaultLifecycleObserverExtendedThenSucceed() {
         lint()
-            .files(kt("""
+            .files(
+                kt(
+                    """
               package com.duckduckgo.lint
     
                 class DefaultLifecycleObserver
@@ -57,7 +65,9 @@ class NoLifecycleObserverTest {
                     fun quack() {                    
                     }
                 }
-            """).indented())
+            """
+                ).indented()
+            )
             .allowCompilationErrors()
             .issues(NoLifecycleObserverDetector.NO_LIFECYCLE_OBSERVER_ISSUE)
             .run()
@@ -67,14 +77,18 @@ class NoLifecycleObserverTest {
     @Test
     fun whenLifecycleObserverNotFoundThenSucceed() {
         lint()
-            .files(kt("""
+            .files(
+                kt(
+                    """
               package com.duckduckgo.lint
     
                 class Duck {
                     fun quack() {                    
                     }
                 }
-            """).indented())
+            """
+                ).indented()
+            )
             .allowCompilationErrors()
             .issues(NoLifecycleObserverDetector.NO_LIFECYCLE_OBSERVER_ISSUE)
             .run()

@@ -28,6 +28,7 @@ import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.util.concurrent.CopyOnWriteArrayList
 import junit.framework.TestCase.assertEquals
 import org.json.JSONObject
 import org.junit.Before
@@ -36,7 +37,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
-import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class AdClickAttributionAllowlistReferenceTest(private val testCase: TestCase) {
@@ -99,7 +99,7 @@ class AdClickAttributionAllowlistReferenceTest(private val testCase: TestCase) {
     data class TestCase(
         val name: String,
         val url: String,
-        val isAllowed: Boolean,
+        val isAllowed: Boolean
     )
 
     data class AdClickAllowlistTest(

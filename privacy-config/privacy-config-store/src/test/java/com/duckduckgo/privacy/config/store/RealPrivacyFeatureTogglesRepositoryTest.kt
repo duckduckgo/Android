@@ -17,10 +17,10 @@
 package com.duckduckgo.privacy.config.store
 
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 class RealPrivacyFeatureTogglesRepositoryTest {
 

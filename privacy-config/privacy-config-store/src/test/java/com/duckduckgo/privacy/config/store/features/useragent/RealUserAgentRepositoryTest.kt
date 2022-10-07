@@ -48,7 +48,9 @@ class RealUserAgentRepositoryTest {
         whenever(mockDatabase.userAgentDao()).thenReturn(mockUserAgentDao)
         testee =
             RealUserAgentRepository(
-                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                mockDatabase,
+                TestScope(),
+                coroutineRule.testDispatcherProvider
             )
     }
 
@@ -58,7 +60,9 @@ class RealUserAgentRepositoryTest {
         val actual = userAgentException.toUserAgentException()
         testee =
             RealUserAgentRepository(
-                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                mockDatabase,
+                TestScope(),
+                coroutineRule.testDispatcherProvider
             )
 
         assertEquals(testee.omitApplicationExceptions.first(), actual)
@@ -71,7 +75,9 @@ class RealUserAgentRepositoryTest {
         runTest {
             testee =
                 RealUserAgentRepository(
-                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                    mockDatabase,
+                    TestScope(),
+                    coroutineRule.testDispatcherProvider
                 )
 
             testee.updateAll(listOf())
@@ -85,7 +91,9 @@ class RealUserAgentRepositoryTest {
             givenUserAgentDaoContainsExceptions()
             testee =
                 RealUserAgentRepository(
-                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                    mockDatabase,
+                    TestScope(),
+                    coroutineRule.testDispatcherProvider
                 )
             assertEquals(1, testee.defaultExceptions.size)
             assertEquals(1, testee.omitApplicationExceptions.size)

@@ -21,12 +21,12 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class AndroidAppAttributeMatcherTest {
@@ -297,5 +297,4 @@ class AndroidAppAttributeMatcherTest {
         whenever(appProperties.expVariant()).thenReturn(expVariant)
         whenever(appProperties.installedGPlay()).thenReturn(installedGPlay)
     }
-
 }

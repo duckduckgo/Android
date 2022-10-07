@@ -27,22 +27,33 @@ data class AutofillDataRequest(
     data class InputType(
         val title: String,
         val description: String,
-        val type: String,
+        val type: String
     )
 }
 
 enum class SupportedAutofillInputMainType {
-    @Json(name = "credentials") CREDENTIALS,
-    @Json(name = "identities") IDENTITIES,
-    @Json(name = "creditCards") CREDIT_CARDS,
+    @Json(name = "credentials")
+    CREDENTIALS,
+
+    @Json(name = "identities")
+    IDENTITIES,
+
+    @Json(name = "creditCards")
+    CREDIT_CARDS
 }
 
 enum class SupportedAutofillInputSubType {
-    @Json(name = "username") USERNAME,
-    @Json(name = "password") PASSWORD,
+    @Json(name = "username")
+    USERNAME,
+
+    @Json(name = "password")
+    PASSWORD
 }
 
 enum class SupportedAutofillTriggerType {
-    @Json(name = "userInitiated") USER_INITIATED,
-    @Json(name = "autoprompt") AUTOPROMPT,
+    @Json(name = "userInitiated")
+    USER_INITIATED,
+
+    @Json(name = "autoprompt")
+    AUTOPROMPT
 }

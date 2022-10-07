@@ -28,7 +28,7 @@ class DownloadNotificationChannels @Inject constructor() : NotificationPlugin {
     override fun getChannels(): List<Channel> {
         return listOf(
             FileDownloadNotificationChannelType.FILE_DOWNLOADING,
-            FileDownloadNotificationChannelType.FILE_DOWNLOADED,
+            FileDownloadNotificationChannelType.FILE_DOWNLOADED
         )
     }
 }

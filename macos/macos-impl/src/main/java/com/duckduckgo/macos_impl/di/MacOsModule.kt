@@ -29,10 +29,10 @@ import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import javax.inject.Named
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import javax.inject.Named
 
 @Module
 @ContributesTo(AppScope::class)

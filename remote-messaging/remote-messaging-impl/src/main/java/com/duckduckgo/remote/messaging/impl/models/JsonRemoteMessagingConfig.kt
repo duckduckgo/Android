@@ -46,7 +46,7 @@ data class JsonContentTranslations(
     val titleText: String = "",
     val descriptionText: String = "",
     val primaryActionText: String = "",
-    val secondaryActionText: String = "",
+    val secondaryActionText: String = ""
 )
 
 data class JsonMatchingRule(

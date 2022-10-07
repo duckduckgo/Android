@@ -26,9 +26,9 @@ import com.android.tools.lint.detector.api.Scope.JAVA_FILE
 import com.android.tools.lint.detector.api.Scope.TEST_SOURCES
 import com.android.tools.lint.detector.api.Severity.ERROR
 import com.android.tools.lint.detector.api.SourceCodeScanner
+import java.util.*
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.tryResolveNamed
-import java.util.*
 
 @Suppress("UnstableApiUsage")
 class NoSystemLoadLibraryDetector : Detector(), SourceCodeScanner {
@@ -45,13 +45,16 @@ class NoSystemLoadLibraryDetector : Detector(), SourceCodeScanner {
     }
 
     companion object {
-        val NO_SYSTEM_LOAD_LIBRARY = Issue.create("NoSystemLoadLibrary",
+        val NO_SYSTEM_LOAD_LIBRARY = Issue.create(
+            "NoSystemLoadLibrary",
             "Do not use System.loadLibrary().",
             """
                 System.loadLibrary() should not be used.
                 Use LibraryLoader.loadLibrary() instead.
             """.trimIndent(),
-            Category.CORRECTNESS, 10, ERROR,
+            Category.CORRECTNESS,
+            10,
+            ERROR,
             Implementation(NoSystemLoadLibraryDetector::class.java, EnumSet.of(JAVA_FILE, TEST_SOURCES))
         )
     }

@@ -28,13 +28,13 @@ import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.EmailEnable
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Locale
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Unknown
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class RemoteMessagingConfigMatcherTest {
 
@@ -183,7 +183,7 @@ class RemoteMessagingConfigMatcherTest {
                 messages = listOf(
                     aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2)),
                     aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2)),
-                    aMediumMessage(matchingRules = rules(1), exclusionRules = emptyList()),
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = emptyList())
                 ),
                 rules = mapOf(
                     rule(1, Api(max = 19)),
@@ -202,7 +202,7 @@ class RemoteMessagingConfigMatcherTest {
         val message = testee.evaluate(
             RemoteConfig(
                 messages = listOf(
-                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2)),
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2))
                 ),
                 rules = mapOf(
                     rule(1, Api(max = 19)),

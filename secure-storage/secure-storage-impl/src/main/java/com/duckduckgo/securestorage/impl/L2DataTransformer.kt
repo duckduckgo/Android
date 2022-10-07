@@ -24,9 +24,9 @@ import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedBy
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedString
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import okio.ByteString.Companion.decodeBase64
 import okio.ByteString.Companion.toByteString
-import javax.inject.Inject
 
 interface L2DataTransformer {
     fun canProcessData(): Boolean

@@ -18,17 +18,17 @@ package com.duckduckgo.downloads.impl
 
 import android.util.Base64
 import androidx.annotation.WorkerThread
-import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.impl.DataUriParser.GeneratedFilename
 import com.duckduckgo.downloads.impl.DataUriParser.ParseResult
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
-import timber.log.Timber
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
+import timber.log.Timber
 
 class DataUriDownloader @Inject constructor(
     private val dataUriParser: DataUriParser
@@ -39,7 +39,6 @@ class DataUriDownloader @Inject constructor(
         pending: PendingFileDownload,
         callback: DownloadCallback
     ) {
-
         try {
             when (val parsedDataUri = dataUriParser.generate(pending.url)) {
                 is ParseResult.Invalid -> {

@@ -45,9 +45,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class AutofillManagementActivity : DuckDuckGoActivity() {

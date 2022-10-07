@@ -22,5 +22,5 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.SOURCE)
 annotation class WrongScope(
     val comment: String,
-    val correctScope: KClass<*>,
+    val correctScope: KClass<*>
 )

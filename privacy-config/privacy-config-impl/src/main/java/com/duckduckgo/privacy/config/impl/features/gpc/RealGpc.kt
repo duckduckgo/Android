@@ -26,8 +26,8 @@ import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.R
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

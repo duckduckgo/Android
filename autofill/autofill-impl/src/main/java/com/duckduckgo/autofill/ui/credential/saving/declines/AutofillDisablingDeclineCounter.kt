@@ -24,11 +24,11 @@ import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -96,7 +96,6 @@ class AutofillDisablingDeclineCounter @Inject constructor(
         if (!isActive) return false
 
         return withContext(dispatchers.io()) {
-
             val shouldOffer = currentSessionDomainDeclineCount >= CURRENT_SESSION_DECLINE_COUNT_THRESHOLD &&
                 autofillStore.autofillDeclineCount >= GLOBAL_DECLINE_COUNT_THRESHOLD
 

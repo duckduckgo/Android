@@ -64,7 +64,7 @@ object JsonRemoteMessageOM {
         descriptionText = descriptionText,
         placeholder = placeholder,
         primaryActionText = primaryActionText,
-        primaryAction = primaryAction,
+        primaryAction = primaryAction
     )
 
     fun bigTwoActionJsonContent(

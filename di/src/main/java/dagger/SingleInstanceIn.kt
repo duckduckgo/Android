@@ -23,5 +23,5 @@ import kotlin.reflect.KClass
 @MustBeDocumented
 @Retention(AnnotationRetention.RUNTIME)
 annotation class SingleInstanceIn(
-    val scope: KClass<*>,
+    val scope: KClass<*>
 )

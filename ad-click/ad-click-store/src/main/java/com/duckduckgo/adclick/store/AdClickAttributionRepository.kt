@@ -17,16 +17,16 @@
 package com.duckduckgo.adclick.store
 
 import com.duckduckgo.app.global.DispatcherProvider
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface AdClickAttributionRepository {
     fun updateAll(
         linkFormats: List<AdClickAttributionLinkFormatEntity>,
         allowList: List<AdClickAttributionAllowlistEntity>,
         expirations: List<AdClickAttributionExpirationEntity>,
-        detections: List<AdClickAttributionDetectionEntity>,
+        detections: List<AdClickAttributionDetectionEntity>
     )
     val linkFormats: List<AdClickAttributionLinkFormatEntity>
     val allowList: List<AdClickAttributionAllowlistEntity>

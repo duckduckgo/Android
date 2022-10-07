@@ -49,4 +49,3 @@ class DuckDuckGoDesignSystemRegistry : IssueRegistry() {
         contact = "https://github.com/duckduckgo/android"
     )
 }
-

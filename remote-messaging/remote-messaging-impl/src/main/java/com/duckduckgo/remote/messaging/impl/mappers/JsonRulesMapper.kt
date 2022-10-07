@@ -24,8 +24,8 @@ import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.toIntOrDefault
 import com.duckduckgo.remote.messaging.impl.models.toStringList
 import com.duckduckgo.remote.messaging.impl.models.toStringOrDefault
-import timber.log.Timber
 import java.text.SimpleDateFormat
+import timber.log.Timber
 
 private val dateFormatter = SimpleDateFormat("yyyy-mm-dd")
 

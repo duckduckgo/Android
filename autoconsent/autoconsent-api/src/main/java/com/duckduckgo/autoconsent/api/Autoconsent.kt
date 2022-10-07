@@ -24,6 +24,7 @@ interface Autoconsent {
      * This method injects the JS code needed to run autoconsent. It requires a [WebView] instance and the URL where the code will be injected.
      */
     fun injectAutoconsent(webView: WebView, url: String)
+
     /**
      * This method adds the JS interface for autoconsent to create a bridge between JS and our client.
      * It requires a [WebView] instance and an [AutoconsentCallback].
@@ -79,5 +80,5 @@ interface AutoconsentCallback {
 
 /** List of [AutoconsentFeatureName] that belong to the Autoconsent feature */
 enum class AutoconsentFeatureName(val value: String) {
-    Autoconsent("autoconsent"),
+    Autoconsent("autoconsent")
 }

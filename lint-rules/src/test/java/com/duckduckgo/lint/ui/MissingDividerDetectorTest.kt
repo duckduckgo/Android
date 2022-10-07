@@ -54,7 +54,7 @@ class MissingDividerDetectorTest {
                   <View
                    ~~~~
                 1 errors, 0 warnings
-            """.trimMargin()
+                """.trimMargin()
             )
     }
 
@@ -90,7 +90,7 @@ class MissingDividerDetectorTest {
                   <View
                    ~~~~
                 1 errors, 0 warnings
-            """.trimMargin()
+                """.trimMargin()
             )
     }
 

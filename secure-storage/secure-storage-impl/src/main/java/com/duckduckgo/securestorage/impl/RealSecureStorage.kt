@@ -26,11 +26,11 @@ import com.duckduckgo.securestorage.store.SecureStorageRepository
 import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -64,7 +64,9 @@ class RealSecureStorage @Inject constructor(
                     }
                 }
             }
-        } else emptyFlow()
+        } else {
+            emptyFlow()
+        }
     }
 
     override suspend fun websiteLoginDetails(): Flow<List<WebsiteLoginDetails>> =
@@ -76,7 +78,9 @@ class RealSecureStorage @Inject constructor(
                     }
                 }
             }
-        } else emptyFlow()
+        } else {
+            emptyFlow()
+        }
 
     override suspend fun getWebsiteLoginDetailsWithCredentials(id: Long): WebsiteLoginDetailsWithCredentials? =
         withContext(dispatchers.io()) {
@@ -92,7 +96,9 @@ class RealSecureStorage @Inject constructor(
                     }
                 }
             }
-        } else emptyFlow()
+        } else {
+            emptyFlow()
+        }
 
     override suspend fun websiteLoginDetailsWithCredentials(): Flow<List<WebsiteLoginDetailsWithCredentials>> =
         if (secureStorageRepository != null) {
@@ -103,7 +109,9 @@ class RealSecureStorage @Inject constructor(
                     }
                 }
             }
-        } else emptyFlow()
+        } else {
+            emptyFlow()
+        }
 
     override suspend fun updateWebsiteLoginDetailsWithCredentials(
         websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials

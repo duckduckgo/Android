@@ -51,10 +51,10 @@ import com.duckduckgo.mobile.android.ui.view.addClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class MacOsWaitlistActivity : DuckDuckGoActivity() {
@@ -162,7 +162,8 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
         }
 
         val pi = PendingIntent.getBroadcast(
-            this, 0,
+            this,
+            0,
             Intent(this, MacOsInviteShareBroadcastReceiver::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

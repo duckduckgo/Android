@@ -47,6 +47,7 @@ allprojects {
 
 subprojects {
 
+    project.plugins.apply('org.jmailen.kotlinter')
     // Break build when using deprecated plugins
     String[] allowDeprecatedModuleIn = ["app", "vpn-impl"]
     project.plugins.withId('kotlin-android-extensions') {

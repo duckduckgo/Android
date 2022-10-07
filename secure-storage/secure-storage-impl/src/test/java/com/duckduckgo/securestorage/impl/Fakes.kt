@@ -19,8 +19,8 @@ package com.duckduckgo.securestorage.impl
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedBytes
 import com.duckduckgo.securestorage.store.SecureStorageKeyRepository
-import okio.ByteString.Companion.decodeBase64
 import java.security.Key
+import okio.ByteString.Companion.decodeBase64
 
 class FakeSecureStorageKeyRepository(private val canUseEncryption: Boolean) : SecureStorageKeyRepository {
     override var password: ByteArray? = null

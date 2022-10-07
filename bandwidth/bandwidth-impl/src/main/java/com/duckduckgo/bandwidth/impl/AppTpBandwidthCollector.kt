@@ -26,10 +26,10 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.*
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.*
+import timber.log.Timber
 
 @ContributesMultibinding(
     scope = VpnScope::class,

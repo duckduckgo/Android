@@ -30,8 +30,8 @@ import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface AuthLauncher {
     fun launch(

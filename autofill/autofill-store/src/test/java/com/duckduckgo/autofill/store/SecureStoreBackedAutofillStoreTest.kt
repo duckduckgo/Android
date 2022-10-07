@@ -185,7 +185,10 @@ class SecureStoreBackedAutofillStoreTest {
         storeCredentials(2, url, "username2", "password456")
         storeCredentials(3, url, "username3", "password789")
         val credentials = LoginCredentials(
-            domain = url, username = "username1", password = "newpassword", id = 1
+            domain = url,
+            username = "username1",
+            password = "newpassword",
+            id = 1
         )
 
         testee.updateCredentials(url, credentials)
@@ -205,7 +208,10 @@ class SecureStoreBackedAutofillStoreTest {
         storeCredentials(2, url, "username2", "password456")
         storeCredentials(3, url, "username3", "password789")
         val credentials = LoginCredentials(
-            domain = url, username = "username1", password = "newpassword", id = 1
+            domain = url,
+            username = "username1",
+            password = "newpassword",
+            id = 1
         )
 
         testee.updateCredentials(credentials)
@@ -222,7 +228,9 @@ class SecureStoreBackedAutofillStoreTest {
         setupTesteeWithAutofillAvailable()
         val url = "https://example.com"
         val credentials = LoginCredentials(
-            domain = url, username = "username1", password = "password"
+            domain = url,
+            username = "username1",
+            password = "password"
         )
         testee.saveCredentials(url, credentials)
 
@@ -234,7 +242,9 @@ class SecureStoreBackedAutofillStoreTest {
         setupTesteeWithAutofillAvailable()
         val url = "https://example.com"
         val credentials = LoginCredentials(
-            domain = url, username = "username1", password = "password"
+            domain = url,
+            username = "username1",
+            password = "password"
         )
         testee.saveCredentials(url, credentials)
         verify(autofillPrefsStore).showOnboardingWhenOfferingToSaveLogin = false

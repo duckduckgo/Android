@@ -16,7 +16,6 @@
 
 package com.duckduckgo.lint.ui
 
-import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
@@ -26,13 +25,9 @@ import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.android.tools.lint.detector.api.TextFormat
-import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Companion
 import com.intellij.psi.PsiMethod
-import org.jetbrains.uast.UCallExpression
-import org.jetbrains.uast.UClass
-import org.jetbrains.uast.UElement
-import org.jetbrains.uast.ULiteralExpression
 import java.util.*
+import org.jetbrains.uast.UCallExpression
 
 @Suppress("UnstableApiUsage")
 class NoAlertDialogDetector : Detector(), SourceCodeScanner {

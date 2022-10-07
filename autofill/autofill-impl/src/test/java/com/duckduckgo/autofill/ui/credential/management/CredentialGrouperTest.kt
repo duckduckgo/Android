@@ -66,7 +66,7 @@ class CredentialGrouperTest {
         val credentials = listOf(
             creds("example.com"),
             creds("energy.com"),
-            creds("elastic.com"),
+            creds("elastic.com")
         )
         val grouped = testee.group(credentials)
 
@@ -81,7 +81,7 @@ class CredentialGrouperTest {
             creds("example.com"),
             creds("foo.com"),
             creds("bar.com"),
-            creds("energy.com"),
+            creds("energy.com")
         )
         val grouped = testee.group(credentials)
 
@@ -99,7 +99,7 @@ class CredentialGrouperTest {
             creds(domain = "amazon.com", title = "Smile Amazon"),
             creds(domain = "example.com", title = "C"),
             creds(domain = "amazon.com"),
-            creds(domain = "bar.com"),
+            creds(domain = "bar.com")
         )
         val grouped = testee.group(credentials)
 
@@ -118,7 +118,7 @@ class CredentialGrouperTest {
             creds(domain = "amazon.com", title = "Smile Amazon"),
             creds(domain = "example.com"),
             creds(domain = null, title = null),
-            creds(domain = "null", title = "Title"),
+            creds(domain = "null", title = "Title")
         )
         val grouped = testee.group(credentials)
 
@@ -206,7 +206,7 @@ class CredentialGrouperTest {
             creds(title = "Ç"),
             creds(title = "Ça"),
             creds(title = "ça"),
-            creds(title = "D"),
+            creds(title = "D")
         )
         val grouped = testee.group(credentials)
 
@@ -258,5 +258,4 @@ class CredentialGrouperTest {
     private fun creds(domain: String? = null, title: String? = null): LoginCredentials {
         return LoginCredentials(domain = domain, domainTitle = title, username = null, password = null)
     }
-
 }

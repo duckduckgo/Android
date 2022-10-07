@@ -60,5 +60,4 @@ class TitleOrDomainExtractorTest {
         username = null,
         password = null
     )
-
 }

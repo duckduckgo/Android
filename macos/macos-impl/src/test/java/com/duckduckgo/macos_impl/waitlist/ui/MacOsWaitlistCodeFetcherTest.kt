@@ -40,6 +40,7 @@ import com.duckduckgo.macos_impl.waitlist.MacOsWaitlistManager
 import com.duckduckgo.macos_store.MacOsWaitlistState.InBeta
 import com.duckduckgo.macos_store.MacOsWaitlistState.JoinedWaitlist
 import com.duckduckgo.macos_store.MacOsWaitlistState.NotJoinedQueue
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -52,7 +53,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)

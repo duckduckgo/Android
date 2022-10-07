@@ -25,9 +25,9 @@ import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import java.net.URI
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

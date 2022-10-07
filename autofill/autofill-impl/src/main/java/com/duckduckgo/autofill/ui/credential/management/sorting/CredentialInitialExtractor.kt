@@ -20,10 +20,10 @@ import com.duckduckgo.autofill.AutofillDomainFormatter
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import java.lang.Character.*
 import java.text.Normalizer
 import javax.inject.Inject
+import timber.log.Timber
 
 interface InitialExtractor {
     fun extractInitial(loginCredentials: LoginCredentials): String
@@ -43,7 +43,7 @@ class CredentialInitialExtractor @Inject constructor(
         return when (val type = getCharacterType(rawInitial)) {
             LOWERCASE_LETTER,
             UPPERCASE_LETTER,
-            OTHER_LETTER,
+            OTHER_LETTER
             -> {
                 Normalizer.normalize(rawInitial, Normalizer.Form.NFKD).firstOrNull()?.toString() ?: INITIAL_CHAR_FOR_NON_LETTERS
             }

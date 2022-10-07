@@ -59,5 +59,4 @@ class CredentialGrouper @Inject constructor(
         }
         return groups
     }
-
 }

@@ -40,11 +40,11 @@ import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 interface AutofillJavascriptInterface {
 
@@ -139,7 +139,6 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         Timber.i("storeFormData called, credentials provided to be persisted")
 
         getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
-
             val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
             val title = autofillDomainFormatter.extractDomain(currentUrl)
 

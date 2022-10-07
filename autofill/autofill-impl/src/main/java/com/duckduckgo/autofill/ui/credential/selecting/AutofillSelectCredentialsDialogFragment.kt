@@ -41,8 +41,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @InjectWith(FragmentScope::class)
 class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialAutofillPickerDialog {
@@ -142,7 +142,6 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             triggerType: LoginTriggerType,
             tabId: String
         ): AutofillSelectCredentialsDialogFragment {
-
             val cr = ArrayList<LoginCredentials>(credentials)
 
             val fragment = AutofillSelectCredentialsDialogFragment()

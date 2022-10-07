@@ -42,10 +42,10 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewMode
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_edit_mode), MenuProvider {
@@ -259,7 +259,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                             url = it,
                             width = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIconSize),
                             height = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIconSize),
-                            cornerRadius = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_0),
+                            cornerRadius = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_0)
                         )
                     )
                 )

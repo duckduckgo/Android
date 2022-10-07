@@ -33,6 +33,8 @@ import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesSharedPreferences
 import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyFeatureTogglesRepository
+import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
+import com.duckduckgo.privacy.config.store.features.amplinks.RealAmpLinksRepository
 import com.duckduckgo.privacy.config.store.features.autofill.AutofillRepository
 import com.duckduckgo.privacy.config.store.features.autofill.RealAutofillRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
@@ -47,8 +49,6 @@ import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import com.duckduckgo.privacy.config.store.features.https.RealHttpsRepository
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.RealTrackerAllowlistRepository
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
-import com.duckduckgo.privacy.config.store.features.amplinks.RealAmpLinksRepository
-import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.duckduckgo.privacy.config.store.features.trackingparameters.RealTrackingParametersRepository
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
@@ -59,12 +59,12 @@ import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import javax.inject.Named
-import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)

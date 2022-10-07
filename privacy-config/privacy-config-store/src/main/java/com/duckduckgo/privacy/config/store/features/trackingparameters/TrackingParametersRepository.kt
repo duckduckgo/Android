@@ -19,9 +19,9 @@ package com.duckduckgo.privacy.config.store.features.trackingparameters
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.privacy.config.api.TrackingParameterException
 import com.duckduckgo.privacy.config.store.*
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface TrackingParametersRepository {
     fun updateAll(exceptions: List<TrackingParameterExceptionEntity>, parameters: List<TrackingParameterEntity>)

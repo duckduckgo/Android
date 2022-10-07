@@ -45,7 +45,7 @@ interface ActivityResultLauncherWrapper {
     sealed class Request {
         data class Permission(val onResult: (Boolean) -> Unit) : Request()
         data class ResultFromVoiceSearch(
-            val onResult: (Int, String) -> Unit,
+            val onResult: (Int, String) -> Unit
         ) : Request()
     }
 
@@ -75,7 +75,7 @@ class RealActivityResultLauncherWrapper @Inject constructor(
 
     private fun registerResultFromVoiceSearch(
         caller: ActivityResultCaller,
-        onResult: (Int, String) -> Unit,
+        onResult: (Int, String) -> Unit
     ) {
         voiceSearchActivityLaucher = caller.registerForActivityResult(StartActivityForResult()) {
             onResult(it.resultCode, it.data?.getStringExtra(VoiceSearchActivity.EXTRA_VOICE_RESULT) ?: "")

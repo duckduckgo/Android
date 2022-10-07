@@ -54,11 +54,12 @@ private const val SUMMARY_ID = 0
 class DefaultFileDownloadNotificationManager @Inject constructor(
     private val notificationManager: NotificationManager,
     private val applicationContext: Context,
-    private val appBuildConfig: AppBuildConfig,
+    private val appBuildConfig: AppBuildConfig
 ) : FileDownloadNotificationManager, BrowserLifecycleObserver {
 
     // Group notifications are not automatically cleared when the last notification in the group is removed. So we need to do this manually.
     private val groupNotificationsCounter = AtomicReference<Map<Long, String>>(mapOf())
+
     // This is not great but didn't find any other way to do it. When the user closes the app all the downloads are cancelled
     // but the in progress notifications are not dismissed however they should.
     // This will flag when the application is closing so that we don't post any more notifications.

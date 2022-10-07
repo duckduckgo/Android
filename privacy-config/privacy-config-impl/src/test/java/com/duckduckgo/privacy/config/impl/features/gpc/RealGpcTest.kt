@@ -28,16 +28,16 @@ import com.duckduckgo.privacy.config.impl.R
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import java.io.ByteArrayInputStream
 import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class RealGpcTest {

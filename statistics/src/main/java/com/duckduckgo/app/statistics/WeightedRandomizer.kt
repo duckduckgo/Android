@@ -29,7 +29,6 @@ interface Probabilistic {
 class WeightedRandomizer : IndexRandomizer {
 
     override fun random(items: List<Probabilistic>): Int {
-
         val indexArray = arrayPopulatedWithIndexes(items)
         val probabilitiesArray = arrayPopulatedWithProbabilities(items)
 

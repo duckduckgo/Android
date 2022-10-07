@@ -70,5 +70,4 @@ class SelfTestResultMessageHandlerPluginTest {
 
         verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false)
     }
-
 }

@@ -30,6 +30,8 @@ class RealSecureStorageRepositoryFactory @Inject constructor(
         val db = secureStorageDatabaseFactory.getDatabase()
         return if (db != null) {
             RealSecureStorageRepository(db.websiteLoginCredentialsDao())
-        } else null
+        } else {
+            null
+        }
     }
 }

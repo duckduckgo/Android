@@ -24,10 +24,10 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelName.AUTOCONSENT_DISABLED
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelName.AUTOCONSENT_ENABLED
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class AutoconsentSettingsViewModel @Inject constructor(private val autoconsent: Autoconsent, private val pixel: Pixel) : ViewModel() {
@@ -37,7 +37,7 @@ class AutoconsentSettingsViewModel @Inject constructor(private val autoconsent: 
     val viewState: StateFlow<ViewState> = viewStateFlow
 
     data class ViewState(
-        val autoconsentEnabled: Boolean,
+        val autoconsentEnabled: Boolean
     )
 
     fun onUserToggleAutoconsent(enabled: Boolean) {

@@ -30,11 +30,11 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import dagger.Binds
 import dagger.multibindings.Multibinds
+import java.io.File
+import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
-import java.io.File
-import javax.inject.Inject
 
 /**
  * This Anvil code generator allows inject ViewModel without manually creating the ViewModel factory
@@ -52,7 +52,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
             .flatMap {
                 listOf(
                     generatePluginPoint(it, codeGenDir, module),
-                    generateBindingModule(it, codeGenDir, module),
+                    generateBindingModule(it, codeGenDir, module)
                 )
             }
             .toList()
@@ -67,7 +67,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
         if (!vmClass.isInterface()) {
             throw AnvilCompilationException(
                 "${vmClass.fqName} must be an interface",
-                element = vmClass.clazz.identifyingElement,
+                element = vmClass.clazz.identifyingElement
             )
         }
         val content = FileSpec.buildFile(generatedPackage, pluginPointClassName) {
@@ -141,7 +141,6 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
         }
 
         return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content)
-
     }
 
     companion object {
@@ -164,7 +163,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
     }
 
     private fun ClassReference.Psi.pluginClassName(
-        fqName: FqName,
+        fqName: FqName
     ): ClassName? {
         return annotations
             .first { it.fqName == fqName }

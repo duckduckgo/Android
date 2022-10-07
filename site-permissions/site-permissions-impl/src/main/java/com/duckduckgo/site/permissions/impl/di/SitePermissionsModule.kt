@@ -19,9 +19,9 @@ package com.duckduckgo.site.permissions.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
-import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.SitePermissionsDatabase
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
+import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides

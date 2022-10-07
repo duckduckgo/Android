@@ -25,7 +25,9 @@ class NoSystemLoadLibraryDetectorTest {
     @Test
     fun whenSystemDotLibraryFoundThenFailWithError() {
         lint()
-            .files(kt("""
+            .files(
+                kt(
+                    """
               package com.duckduckgo.lint
     
                 class Duck {
@@ -33,21 +35,27 @@ class NoSystemLoadLibraryDetectorTest {
                         System.loadLibrary()
                     }
                 }
-            """).indented())
+            """
+                ).indented()
+            )
             .issues(NoSystemLoadLibraryDetector.NO_SYSTEM_LOAD_LIBRARY)
             .run()
-            .expect("""
+            .expect(
+                """
                src/com/duckduckgo/lint/Duck.kt:5: Error: System.loadLibrary() should not be used. [NoSystemLoadLibrary]
                          System.loadLibrary()
                                 ~~~~~~~~~~~
                1 errors, 0 warnings
-            """.trimMargin())
+                """.trimMargin()
+            )
     }
 
     @Test
     fun whenSystemDotLibraryNotFoundThenFailWithError() {
         lint()
-            .files(kt("""
+            .files(
+                kt(
+                    """
               package com.duckduckgo.lint
     
                 fun loadLibrary() {}
@@ -57,7 +65,9 @@ class NoSystemLoadLibraryDetectorTest {
                         loadLibrary()
                     }
                 }
-            """).indented())
+            """
+                ).indented()
+            )
             .allowCompilationErrors()
             .issues(NoSystemLoadLibraryDetector.NO_SYSTEM_LOAD_LIBRARY)
             .run()

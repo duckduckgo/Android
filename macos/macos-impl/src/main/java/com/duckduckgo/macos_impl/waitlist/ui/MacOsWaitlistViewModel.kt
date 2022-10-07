@@ -29,13 +29,13 @@ import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.Copy
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShareInviteCode
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowErrorMessage
 import com.duckduckgo.macos_store.MacOsWaitlistState
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @ContributesViewModel(AppScope::class)
 class MacOsWaitlistViewModel @Inject constructor(

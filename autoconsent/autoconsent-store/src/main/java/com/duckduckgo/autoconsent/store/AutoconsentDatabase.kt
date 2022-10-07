@@ -24,7 +24,7 @@ import androidx.room.RoomDatabase
     version = 1,
     entities = [
         AutoconsentExceptionEntity::class,
-        DisabledCmpsEntity::class,
+        DisabledCmpsEntity::class
     ]
 )
 abstract class AutoconsentDatabase : RoomDatabase() {

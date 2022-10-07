@@ -21,8 +21,8 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
 class ExistingCredentialStoreInterrogatingMatchDetector @Inject constructor(

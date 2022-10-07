@@ -19,16 +19,16 @@ package com.duckduckgo.remote.messaging.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.DaggerSet
-import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigDownloader
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.*
+import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigDownloader
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.AttributeMatcher
@@ -46,10 +46,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
+import javax.inject.Named
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import javax.inject.Named
 
 @Module
 @ContributesTo(AppScope::class)
@@ -131,7 +131,7 @@ object DataSourceModule {
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigMatcher(
         matchers: DaggerSet<AttributeMatcher>,
-        remoteMessagingRepository: RemoteMessagingRepository,
+        remoteMessagingRepository: RemoteMessagingRepository
     ): RemoteMessagingConfigMatcher {
         return RemoteMessagingConfigMatcher(matchers, remoteMessagingRepository)
     }

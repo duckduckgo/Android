@@ -33,7 +33,7 @@ class InMemorySharedPreferences : SharedPreferences, SharedPreferences.Editor {
         intMap,
         longMap,
         floatMap,
-        booleanMap,
+        booleanMap
     )
 
     override fun getAll(): MutableMap<String, *> {

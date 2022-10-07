@@ -23,6 +23,7 @@ import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode
+import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -33,7 +34,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.reflect.KClass
 
 @ExperimentalCoroutinesApi
 class AutofillSettingsViewModelTest {
@@ -189,7 +189,7 @@ class AutofillSettingsViewModelTest {
             assertEquals(
                 listOf(
                     ExitDisabledMode,
-                    ExitLockedMode,
+                    ExitLockedMode
                 ),
                 this.expectMostRecentItem().toList()
             )
@@ -378,6 +378,7 @@ class AutofillSettingsViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
     @Test
     fun whenAuthWasLaunchAndThenDeviceAuthDisabledThenEmitViewStateWithIsAuthenticatingFalse() = runTest {
         testee.launchDeviceAuth()

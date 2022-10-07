@@ -23,6 +23,7 @@ import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonRemoteM
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessagingConfigOM.aRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
+import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -35,7 +36,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
-import java.util.*
 
 @ExperimentalCoroutinesApi
 class RealRemoteMessagingConfigProcessorTest {
@@ -46,10 +46,13 @@ class RealRemoteMessagingConfigProcessorTest {
     private val remoteMessagingConfigJsonMapper = RemoteMessagingConfigJsonMapper(appBuildConfig)
     private val remoteMessagingConfigRepository = mock<RemoteMessagingConfigRepository>()
     private val remoteMessagingRepository = mock<RemoteMessagingRepository>()
-    private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(setOf(mock(), mock(), mock(),), mock(),)
+    private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(setOf(mock(), mock(), mock()), mock())
 
     private val testee = RealRemoteMessagingConfigProcessor(
-        remoteMessagingConfigJsonMapper, remoteMessagingConfigRepository, remoteMessagingRepository, remoteMessagingConfigMatcher
+        remoteMessagingConfigJsonMapper,
+        remoteMessagingConfigRepository,
+        remoteMessagingRepository,
+        remoteMessagingConfigMatcher
     )
 
     @Before

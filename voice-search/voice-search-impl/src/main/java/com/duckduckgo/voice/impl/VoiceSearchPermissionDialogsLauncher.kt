@@ -60,7 +60,6 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSear
         onRationaleAccepted: () -> Unit,
         onRationaleDeclined: () -> Unit
     ) {
-
         AlertDialog.Builder(context)
             .setTitle(R.string.voiceSearchPermissionRationaleTitle)
             .setMessage(R.string.voiceSearchPermissionRationaleDescription)

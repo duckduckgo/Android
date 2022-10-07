@@ -107,7 +107,6 @@ class RealMacOsWaitlistRepositoryTest {
         fakeDataStore.waitlistTimestamp = 1234
         fakeDataStore.waitlistToken = "token"
     }
-
 }
 
 class FakeMacOsWaitlistDataStore : MacOsWaitlistDataStore {

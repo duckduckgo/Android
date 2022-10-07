@@ -56,7 +56,6 @@ class CredentialsPickerRecyclerAdapter(
         credentials: LoginCredentials,
         fullCredentialListSize: Int
     ) {
-
         val buttonType = buttonTypeDecider.determineButtonType(position, fullCredentialListSize, showExpandedView)
 
         val button = when (buttonType) {
@@ -92,7 +91,6 @@ class CredentialsPickerRecyclerAdapter(
         hideableButtons
             .filterNot { it.id == buttonToKeep?.id }
             .forEach { it.gone() }
-
     }
 
     override fun getItemCount(): Int {

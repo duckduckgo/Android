@@ -19,9 +19,9 @@ package com.duckduckgo.privacy.config.store.features.amplinks
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.privacy.config.api.AmpLinkException
 import com.duckduckgo.privacy.config.store.*
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface AmpLinksRepository {
     fun updateAll(exceptions: List<AmpLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>)

@@ -93,7 +93,7 @@ class PendingFileDownloadCompressTest {
             url = url,
             mimeType = "image/png",
             subfolder = "folder",
-            directory = File("directory"),
+            directory = File("directory")
         )
     }
 }

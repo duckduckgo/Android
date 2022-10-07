@@ -22,13 +22,13 @@ import com.duckduckgo.remote.messaging.impl.matchers.AttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
 import com.duckduckgo.remote.messaging.impl.matchers.toResult
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Unknown
+import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import timber.log.Timber
 
 class RemoteMessagingConfigMatcher(
     private val matchers: Set<AttributeMatcher>,
-    private val remoteMessagingRepository: RemoteMessagingRepository,
+    private val remoteMessagingRepository: RemoteMessagingRepository
 ) {
 
     suspend fun evaluate(remoteConfig: RemoteConfig): RemoteMessage? {

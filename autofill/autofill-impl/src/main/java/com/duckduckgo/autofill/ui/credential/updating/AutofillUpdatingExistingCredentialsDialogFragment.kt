@@ -38,8 +38,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @InjectWith(FragmentScope::class)
 class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialUpdateExistingCredentialsDialog {
@@ -117,7 +117,6 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
     companion object {
 
         fun instance(url: String, credentials: LoginCredentials, tabId: String): AutofillUpdatingExistingCredentialsDialogFragment {
-
             val fragment = AutofillUpdatingExistingCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {

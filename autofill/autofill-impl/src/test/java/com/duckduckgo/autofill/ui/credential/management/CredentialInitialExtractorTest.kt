@@ -98,5 +98,4 @@ class CredentialInitialExtractorTest {
             password = ""
         )
     }
-
 }

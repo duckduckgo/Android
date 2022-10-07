@@ -291,7 +291,7 @@ class UriUtilsFilenameExtractorTest {
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,
-            subfolder = "aFolder",
+            subfolder = "aFolder"
         )
     }
 }

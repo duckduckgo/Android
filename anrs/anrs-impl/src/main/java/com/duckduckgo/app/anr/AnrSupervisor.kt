@@ -23,10 +23,10 @@ import com.duckduckgo.app.anrs.store.AnrsDatabase
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
 class AnrSupervisor @Inject constructor(

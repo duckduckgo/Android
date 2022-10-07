@@ -21,17 +21,17 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.BrowserAutofill.Configurator
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class InlineBrowserAutofillConfigurator @Inject constructor(
     private val autofillRuntimeConfigProvider: AutofillRuntimeConfigProvider,
     private val javascriptInjector: JavascriptInjector,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope
 ) : Configurator {
     override fun configureAutofillForCurrentPage(
         webView: WebView,

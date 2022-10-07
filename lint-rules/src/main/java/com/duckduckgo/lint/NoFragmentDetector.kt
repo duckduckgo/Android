@@ -26,8 +26,8 @@ import com.android.tools.lint.detector.api.Scope.JAVA_FILE
 import com.android.tools.lint.detector.api.Scope.TEST_SOURCES
 import com.android.tools.lint.detector.api.Severity.ERROR
 import com.android.tools.lint.detector.api.SourceCodeScanner
-import org.jetbrains.uast.UClass
 import java.util.*
+import org.jetbrains.uast.UClass
 
 @Suppress("UnstableApiUsage")
 class NoFragmentDetector : Detector(), SourceCodeScanner {
@@ -44,13 +44,16 @@ class NoFragmentDetector : Detector(), SourceCodeScanner {
     }
 
     companion object {
-        val NO_FRAGMENT_ISSUE = Issue.create("NoFragment",
+        val NO_FRAGMENT_ISSUE = Issue.create(
+            "NoFragment",
             "The Fragment type should not be extended. Use DuckDuckGoFragment instead.",
             """
                 The Fragment should not be used.
                 Use DuckDuckGoFragment instead.
             """.trimIndent(),
-            Category.CORRECTNESS, 10, ERROR,
+            Category.CORRECTNESS,
+            10,
+            ERROR,
             Implementation(NoFragmentDetector::class.java, EnumSet.of(JAVA_FILE, TEST_SOURCES))
         )
     }

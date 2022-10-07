@@ -21,12 +21,12 @@ import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistWorkRequestBuilder.Companion.MACOS_WAITLIST_SYNC_WORK_TAG
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.Code
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.CodeExisted
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.NoCode
 import com.duckduckgo.macos_impl.waitlist.MacOsWaitlistManager
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistWorkRequestBuilder.Companion.MACOS_WAITLIST_SYNC_WORK_TAG
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

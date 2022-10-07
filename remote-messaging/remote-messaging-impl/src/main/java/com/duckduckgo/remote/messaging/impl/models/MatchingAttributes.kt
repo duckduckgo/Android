@@ -18,8 +18,8 @@ package com.duckduckgo.remote.messaging.impl.models
 
 import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
 import com.duckduckgo.remote.messaging.impl.matchers.toResult
-import timber.log.Timber
 import java.util.*
+import timber.log.Timber
 
 sealed class MatchingAttribute {
     data class Locale(

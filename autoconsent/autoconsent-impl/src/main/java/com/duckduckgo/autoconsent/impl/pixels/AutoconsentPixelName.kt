@@ -20,5 +20,5 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class AutoconsentPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCONSENT_ENABLED("m_autoconsent_enabled"),
-    AUTOCONSENT_DISABLED("m_autoconsent_disabled"),
+    AUTOCONSENT_DISABLED("m_autoconsent_disabled")
 }

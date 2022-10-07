@@ -27,8 +27,8 @@ import com.duckduckgo.macos_store.MacOsWaitlistState
 import com.duckduckgo.macos_store.MacOsWaitlistState.InBeta
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface MacOsWaitlistManager {
     suspend fun fetchInviteCode(): FetchCodeResult

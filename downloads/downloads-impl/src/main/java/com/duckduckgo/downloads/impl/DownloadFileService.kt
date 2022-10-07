@@ -33,6 +33,6 @@ interface DownloadFileService {
     @GET
     fun downloadFile(
         @Header("Cookie") cookie: String,
-        @Url urlString: String,
+        @Url urlString: String
     ): Call<ResponseBody>
 }

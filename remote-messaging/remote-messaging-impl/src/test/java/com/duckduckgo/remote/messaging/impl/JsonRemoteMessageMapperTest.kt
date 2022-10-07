@@ -27,18 +27,18 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aBigSingleAction
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aBigTwoActionsMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
-import com.duckduckgo.remote.messaging.impl.mappers.mapToRemoteMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.bigSingleActionContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.bigTwoActionsContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.mediumContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.smallContent
+import com.duckduckgo.remote.messaging.impl.mappers.mapToRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
+import java.util.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import java.util.*
 
 @RunWith(Parameterized::class)
 class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
@@ -65,7 +65,7 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     aSmallMessage(id = "id1"),
                     aMediumMessage(id = "id2"),
                     aBigSingleActionMessage(id = "id3"),
-                    aBigTwoActionsMessage(id = "id4"),
+                    aBigTwoActionsMessage(id = "id4")
                 )
             ),
             TestCase(
@@ -74,7 +74,7 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     aJsonMessage(id = "id2", content = smallJsonContent()),
                     aJsonMessage(id = "id3", content = mediumJsonContent()),
                     aJsonMessage(id = "id4", content = bigSingleActionJsonContent()),
-                    aJsonMessage(id = "id5", content = bigTwoActionJsonContent()),
+                    aJsonMessage(id = "id5", content = bigTwoActionJsonContent())
                 ),
                 listOf(
                     aSmallMessage(id = "id2"),
@@ -102,19 +102,23 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
             TestCase(
                 listOf(
                     aJsonMessage(
-                        id = "id1", content = smallJsonContent(),
+                        id = "id1",
+                        content = smallJsonContent(),
                         translations = mapOf("fr" to frenchTranslations())
                     ),
                     aJsonMessage(
-                        id = "id2", content = mediumJsonContent(),
+                        id = "id2",
+                        content = mediumJsonContent(),
                         translations = mapOf("fr" to frenchTranslations())
                     ),
                     aJsonMessage(
-                        id = "id3", content = bigSingleActionJsonContent(),
+                        id = "id3",
+                        content = bigSingleActionJsonContent(),
                         translations = mapOf("fr" to frenchTranslations())
                     ),
                     aJsonMessage(
-                        id = "id4", content = bigTwoActionJsonContent(),
+                        id = "id4",
+                        content = bigTwoActionJsonContent(),
                         translations = mapOf("fr" to frenchTranslations())
                     )
                 ),
@@ -126,21 +130,25 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     aMediumMessage(
                         id = "id2",
                         mediumContent(
-                            titleText = frenchTranslations().titleText, descriptionText = frenchTranslations().descriptionText
+                            titleText = frenchTranslations().titleText,
+                            descriptionText = frenchTranslations().descriptionText
                         )
                     ),
                     aBigSingleActionMessage(
                         id = "id3",
                         bigSingleActionContent(
-                            titleText = frenchTranslations().titleText, descriptionText = frenchTranslations().descriptionText,
+                            titleText = frenchTranslations().titleText,
+                            descriptionText = frenchTranslations().descriptionText,
                             primaryActionText = frenchTranslations().primaryActionText
                         )
                     ),
                     aBigTwoActionsMessage(
                         id = "id4",
                         bigTwoActionsContent(
-                            titleText = frenchTranslations().titleText, descriptionText = frenchTranslations().descriptionText,
-                            primaryActionText = frenchTranslations().primaryActionText, secondaryActionText = frenchTranslations().secondaryActionText
+                            titleText = frenchTranslations().titleText,
+                            descriptionText = frenchTranslations().descriptionText,
+                            primaryActionText = frenchTranslations().primaryActionText,
+                            secondaryActionText = frenchTranslations().secondaryActionText
                         )
                     )
                 )
@@ -148,7 +156,8 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
         )
 
         private fun frenchTranslations() = JsonContentTranslations(
-            titleText = "Bonjour", descriptionText = "la description",
+            titleText = "Bonjour",
+            descriptionText = "la description",
             primaryActionText = "action principale",
             secondaryActionText = "action secondaire"
         )

@@ -38,5 +38,5 @@ enum class VpnNetworkLog {
     WARN,
     INFO,
     DEBUG,
-    VERBOSE,
+    VERBOSE
 }

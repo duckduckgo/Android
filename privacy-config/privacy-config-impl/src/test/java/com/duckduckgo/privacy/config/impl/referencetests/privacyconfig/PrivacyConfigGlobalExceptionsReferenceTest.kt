@@ -28,9 +28,6 @@ import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.RealUnpr
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,6 +38,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
 
 @ExperimentalCoroutinesApi

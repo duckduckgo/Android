@@ -33,9 +33,9 @@ import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistWorkRequestBuilder.Com
 import com.duckduckgo.macos_store.MacOsWaitlistState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

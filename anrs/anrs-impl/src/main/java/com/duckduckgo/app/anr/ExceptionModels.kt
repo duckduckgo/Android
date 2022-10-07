@@ -24,7 +24,7 @@ import org.threeten.bp.format.DateTimeFormatter
 internal data class ProcessThread(
     val name: String,
     val state: String,
-    val stackTrace: ArrayList<String>,
+    val stackTrace: ArrayList<String>
 )
 
 internal data class AnrData(
@@ -33,7 +33,7 @@ internal data class AnrData(
     val file: String?,
     val lineNumber: Int,
     val stackTrace: ArrayList<String>,
-    val timeStamp: String = FORMATTER_SECONDS.format(LocalDateTime.now()),
+    val timeStamp: String = FORMATTER_SECONDS.format(LocalDateTime.now())
 ) {
     companion object {
         private val FORMATTER_SECONDS: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
@@ -48,7 +48,7 @@ internal fun AnrData.asAnrEntity(): AnrEntity {
         file = file,
         lineNumber = lineNumber,
         stackTrace = stackTrace,
-        timestamp = timeStamp,
+        timestamp = timeStamp
     )
 }
 
@@ -58,7 +58,7 @@ internal fun Throwable.asExceptionData(): AnrData {
         message = message,
         stackTrace = stackTrace.asStringArray(),
         file = stackTrace.getOrNull(0)?.fileName,
-        lineNumber = stackTrace.getOrNull(0)?.lineNumber ?: Int.MIN_VALUE,
+        lineNumber = stackTrace.getOrNull(0)?.lineNumber ?: Int.MIN_VALUE
     )
 }
 

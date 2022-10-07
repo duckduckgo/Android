@@ -28,12 +28,12 @@ import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.CookieRemover
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @Named("cookieManagerRemover")

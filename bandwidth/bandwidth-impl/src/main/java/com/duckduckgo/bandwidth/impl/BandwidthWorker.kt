@@ -34,10 +34,10 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import kotlinx.coroutines.CoroutineScope
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import timber.log.Timber
 
 @Module
 @ContributesTo(AppScope::class)
@@ -80,7 +80,6 @@ class BandwidthWorker(
 
     @WorkerThread
     override suspend fun doWork(): Result {
-
         bandwidthCollector.collect()
 
         Timber.i("Bandwidth job finished; returning SUCCESS")

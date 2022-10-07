@@ -21,9 +21,9 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import java.lang.Exception
 import okio.ByteString.Companion.decodeBase64
 import okio.ByteString.Companion.toByteString
-import java.lang.Exception
 
 /**
  * This class provides a way to access and store key related data
@@ -73,8 +73,11 @@ class RealSecureStorageKeyStore constructor(
         keyValue: ByteArray?
     ) {
         encryptedPreferences?.edit(commit = true) {
-            if (keyValue == null) remove(keyName)
-            else putString(keyName, keyValue.toByteString().base64())
+            if (keyValue == null) {
+                remove(keyName)
+            } else {
+                putString(keyName, keyValue.toByteString().base64())
+            }
         }
     }
 

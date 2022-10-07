@@ -20,18 +20,18 @@ import android.webkit.PermissionRequest
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
-import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferencesImp
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 interface SitePermissionsRepository {
     var askCameraEnabled: Boolean
