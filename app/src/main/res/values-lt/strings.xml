@@ -692,8 +692,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Naršykite privačiai su mūsų „Mac“ skirta programa</string>
-    <string name="macos_settings_description_list">Jūs jau sąraše!</string>
-    <string name="macos_settings_description_ready">Galima atsisiųsti „Mac“</string>
     <string name="macos_settings_title">„DuckDuckGo“ darbalaukio programa</string>
 
     <!-- Downloads -->

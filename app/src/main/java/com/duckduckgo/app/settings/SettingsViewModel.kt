@@ -40,8 +40,6 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.macos_api.MacOsWaitlist
-import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
@@ -79,7 +77,6 @@ class SettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     private val appBuildConfig: AppBuildConfig,
     private val emailManager: EmailManager,
-    private val macOsWaitlist: MacOsWaitlist,
     private val autofillStore: AutofillStore,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val autoconsent: Autoconsent,
@@ -102,7 +99,6 @@ class SettingsViewModel @Inject constructor(
         val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
         val appTrackingProtectionEnabled: Boolean = false,
         val emailAddress: String? = null,
-        val macOsWaitlistState: MacWaitlistState = MacWaitlistState.NotJoinedQueue,
         val showAutofill: Boolean = false,
         val autoconsentEnabled: Boolean = false,
     )
@@ -172,7 +168,6 @@ class SettingsViewModel @Inject constructor(
                     appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN),
                     appTrackingProtectionWaitlistState = atpRepository.getState(),
                     emailAddress = emailManager.getEmailAddress(),
-                    macOsWaitlistState = macOsWaitlist.getWaitlistState(),
                     showAutofill = autofillStore.autofillAvailable,
                     autoconsentEnabled = autoconsent.isSettingEnabled(),
                 )

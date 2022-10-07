@@ -684,8 +684,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Navega de forma privada con nuestra aplicación para Mac</string>
-    <string name="macos_settings_description_list">¡Estás en la lista!</string>
-    <string name="macos_settings_description_ready">Disponible para descargar en Mac</string>
     <string name="macos_settings_title">Aplicación de escritorio DuckDuckGo</string>
 
     <!-- Downloads -->

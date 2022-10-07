@@ -684,8 +684,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Surf privat med vår app for Mac</string>
-    <string name="macos_settings_description_list">Du er satt på listen!</string>
-    <string name="macos_settings_description_ready">Tilgjengelig for nedlasting på Mac</string>
     <string name="macos_settings_title">DuckDuckGo skrivebordsapp</string>
 
     <!-- Downloads -->

@@ -688,8 +688,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Pārlūko privāti, izmantojot mūsu Mac lietotni</string>
-    <string name="macos_settings_description_list">Tu esi sarakstā!</string>
-    <string name="macos_settings_description_ready">Pieejams lejupielādei Mac datorā</string>
     <string name="macos_settings_title">DuckDuckGo darbvirsmas lietotne</string>
 
     <!-- Downloads -->

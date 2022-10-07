@@ -692,8 +692,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Brskajte zasebno z našo aplikacijo za računalnike Mac</string>
-    <string name="macos_settings_description_list">Ste na seznamu!</string>
-    <string name="macos_settings_description_ready">Na voljo za prenos za računalnike Mac</string>
     <string name="macos_settings_title">Namizna aplikacija DuckDuckGo</string>
 
     <!-- Downloads -->

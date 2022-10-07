@@ -189,7 +189,6 @@ dependencies {
     implementation project(':anrs-impl')
     implementation project(':macos-api')
     implementation project(':macos-impl')
-    implementation project(':macos-store')
 
     implementation project(':remote-messaging-api')
     implementation project(':remote-messaging-impl')
