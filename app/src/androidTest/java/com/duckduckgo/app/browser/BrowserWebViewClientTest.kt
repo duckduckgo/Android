@@ -162,6 +162,13 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
+    fun whenOnPageStartedCalledThenInjectContentScopeScriptsToDom() = runTest {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(contentScopeScripts).getScript()
+    }
+
+    @UiThreadTest
+    @Test
     fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() = runTest {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(thirdPartyCookieManager).processUriForThirdPartyCookies(webView, EXAMPLE_URL.toUri())

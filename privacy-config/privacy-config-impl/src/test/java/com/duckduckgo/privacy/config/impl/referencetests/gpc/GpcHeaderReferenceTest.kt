@@ -32,6 +32,7 @@ import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.toGpcException
+import com.duckduckgo.privacy.config.store.toUnprotectedTemporaryException
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -107,7 +108,9 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
         }
 
         val isEnabled = gpcFeature?.state == "enabled"
-        val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(config?.unprotectedTemporary ?: emptyList())
+        val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(
+            config?.unprotectedTemporary?.map { it.toUnprotectedTemporaryException() } ?: emptyList()
+        )
 
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value, isEnabled)).thenReturn(isEnabled)
         whenever(mockGpcRepository.exceptions).thenReturn(CopyOnWriteArrayList(gpcExceptions))

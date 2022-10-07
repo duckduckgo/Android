@@ -22,6 +22,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi.Builder
@@ -36,15 +38,19 @@ class RealContentScopeScripts @Inject constructor(
     private val pluginPoint: PluginPoint<ContentScopeConfigPlugin>,
     private val allowList: UserWhiteListRepository,
     private val contentScopeJSReader: ContentScopeJSReader,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
+    private val unprotectedTemporary: UnprotectedTemporary
 ) : ContentScopeScripts {
 
-    private var cachedContentScopeJson: String = getContentScopeJson("")
+    private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
 
     private var cachedUserUnprotectedDomains = CopyOnWriteArrayList<String>()
     private var cachedUserUnprotectedDomainsJson: String = emptyJsonList
 
     private var cachedUserPreferencesJson: String = emptyJson
+
+    private var cachedUnprotectTemporaryExceptions = CopyOnWriteArrayList<UnprotectedTemporaryException>()
+    private var cachedUnprotectTemporaryExceptionsJson: String = emptyJsonList
 
     private lateinit var cachedContentScopeJS: String
 
@@ -53,7 +59,12 @@ class RealContentScopeScripts @Inject constructor(
 
         val pluginParameters = getPluginParameters()
 
-        val contentScopeJson = getContentScopeJson(pluginParameters.config)
+        if (cachedUnprotectTemporaryExceptions != unprotectedTemporary.unprotectedTemporaryExceptions) {
+            cacheUserUnprotectedTemporaryExceptions(unprotectedTemporary.unprotectedTemporaryExceptions)
+            updateJS = true
+        }
+
+        val contentScopeJson = getContentScopeJson(pluginParameters.config, cachedUnprotectTemporaryExceptions)
         if (cachedContentScopeJson != contentScopeJson) {
             cachedContentScopeJson = contentScopeJson
             updateJS = true
@@ -106,6 +117,16 @@ class RealContentScopeScripts @Inject constructor(
         }
     }
 
+    private fun cacheUserUnprotectedTemporaryExceptions(unprotectedTemporaryExceptions: List<UnprotectedTemporaryException>) {
+        cachedUnprotectTemporaryExceptions.clear()
+        if (unprotectedTemporaryExceptions.isEmpty()) {
+            cachedUnprotectTemporaryExceptionsJson = emptyJsonList
+        } else {
+            cachedUnprotectTemporaryExceptionsJson = getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)
+            cachedUnprotectTemporaryExceptions.addAll(unprotectedTemporaryExceptions)
+        }
+    }
+
     private fun cacheContentScopeJS() {
         val contentScopeJS = contentScopeJSReader.getContentScopeJS()
 
@@ -122,17 +143,24 @@ class RealContentScopeScripts @Inject constructor(
         return jsonAdapter.toJson(userUnprotectedDomains)
     }
 
-    private fun getUserPreferencesJson(userPreferences: String): String {
-        if (userPreferences.isEmpty()) {
-            return "{${getVersionNumberKVP()}}"
-        }
-        return "{$userPreferences,${getVersionNumberKVP()}}"
+    private fun getUnprotectedTemporaryJson(unprotectedTemporaryExceptions: List<UnprotectedTemporaryException>): String {
+        val type = Types.newParameterizedType(MutableList::class.java, UnprotectedTemporaryException::class.java)
+        val moshi = Builder().build()
+        val jsonAdapter: JsonAdapter<List<UnprotectedTemporaryException>> = moshi.adapter(type)
+        return jsonAdapter.toJson(unprotectedTemporaryExceptions)
     }
 
-    private fun getVersionNumberKVP() = "\"versionNumber\":${appBuildConfig.versionCode}"
+    private fun getUserPreferencesJson(userPreferences: String): String {
+        if (userPreferences.isEmpty()) {
+            return "{${getVersionNumberKeyValuePair()}}"
+        }
+        return "{$userPreferences,${getVersionNumberKeyValuePair()}}"
+    }
 
-    private fun getContentScopeJson(config: String): String = (
-        "{\"features\":{$config},\"unprotectedTemporary\":$emptyJsonList}"
+    private fun getVersionNumberKeyValuePair() = "\"versionNumber\":${appBuildConfig.versionCode}"
+
+    private fun getContentScopeJson(config: String, unprotectedTemporaryExceptions: List<UnprotectedTemporaryException>): String = (
+        "{\"features\":{$config},\"unprotectedTemporary\":${getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)}}"
         )
 
     companion object {

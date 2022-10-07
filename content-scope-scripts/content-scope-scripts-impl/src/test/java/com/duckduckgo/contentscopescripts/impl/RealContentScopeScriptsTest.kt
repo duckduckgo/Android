@@ -21,6 +21,8 @@ import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -38,18 +40,21 @@ class RealContentScopeScriptsTest {
     private val mockPlugin1: ContentScopeConfigPlugin = mock()
     private val mockPlugin2: ContentScopeConfigPlugin = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
 
     lateinit var testee: ContentScopeScripts
 
     @Before
     fun setup() {
-        testee = RealContentScopeScripts(mockPluginPoint, mockAllowList, mockContentScopeJsReader, mockAppBuildConfig)
+        testee = RealContentScopeScripts(mockPluginPoint, mockAllowList, mockContentScopeJsReader, mockAppBuildConfig, mockUnprotectedTemporary)
         whenever(mockPlugin1.config()).thenReturn(config1)
         whenever(mockPlugin2.config()).thenReturn(config2)
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1, mockPlugin2))
         whenever(mockAllowList.userWhiteList).thenReturn(listOf(exampleUrl))
         whenever(mockContentScopeJsReader.getContentScopeJS()).thenReturn(contentScopeJS)
         whenever(mockAppBuildConfig.versionCode).thenReturn(versionCode)
+        whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions)
+            .thenReturn(listOf(unprotectedTemporaryException, unprotectedTemporaryException2))
     }
 
     @Test
@@ -62,6 +67,7 @@ class RealContentScopeScriptsTest {
         js = testee.getScript()
 
         assertEquals(defaultExpectedJs, js)
+        verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
         verify(mockAllowList, times(3)).userWhiteList
         verifyNoMoreInteractions(mockContentScopeJsReader)
     }
@@ -81,10 +87,12 @@ class RealContentScopeScriptsTest {
                 "{\"features\":{" +
                 "\"config1\":{\"state\":\"enabled\"}," +
                 "\"config2\":{\"state\":\"disabled\"}}," +
-                "\"unprotectedTemporary\":[]}, [\"foo.com\"], {\"versionNumber\":1234})",
+                "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
+                " [\"foo.com\"], {\"versionNumber\":1234})",
             js
         )
 
+        verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
         verify(mockAllowList, times(4)).userWhiteList
         verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
     }
@@ -104,10 +112,12 @@ class RealContentScopeScriptsTest {
                 "{\"features\":{" +
                 "\"config1\":{\"state\":\"enabled\"}," +
                 "\"config2\":{\"state\":\"disabled\"}}," +
-                "\"unprotectedTemporary\":[]}, [\"example.com\"], {\"globalPrivacyControlValue\":false,\"versionNumber\":1234})",
+                "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
+                " [\"example.com\"], {\"globalPrivacyControlValue\":false,\"versionNumber\":1234})",
             js
         )
 
+        verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
         verify(mockAllowList, times(3)).userWhiteList
         verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
     }
@@ -128,10 +138,37 @@ class RealContentScopeScriptsTest {
             "processConfig(" +
                 "{\"features\":{" +
                 "\"config1\":{\"state\":\"enabled\"}}," +
-                "\"unprotectedTemporary\":[]}, [\"example.com\"], {\"globalPrivacyControlValue\":true,\"versionNumber\":1234})",
+                "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
+                " [\"example.com\"], {\"globalPrivacyControlValue\":true,\"versionNumber\":1234})",
             js
         )
 
+        verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
+        verify(mockAllowList, times(3)).userWhiteList
+        verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
+    }
+
+    @Test
+    fun whenGetScriptAndVariablesAreCachedAndUnprotectedTemporaryChangedThenUseNewUnprotectedTemporaryValue() {
+        var js = testee.getScript()
+
+        assertEquals(defaultExpectedJs, js)
+
+        whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(listOf(unprotectedTemporaryException))
+
+        js = testee.getScript()
+
+        assertEquals(
+            "processConfig(" +
+                "{\"features\":{" +
+                "\"config1\":{\"state\":\"enabled\"}," +
+                "\"config2\":{\"state\":\"disabled\"}}," +
+                "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"}]}," +
+                " [\"example.com\"], {\"versionNumber\":1234})",
+            js
+        )
+
+        verify(mockUnprotectedTemporary, times(4)).unprotectedTemporaryExceptions
         verify(mockAllowList, times(3)).userWhiteList
         verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
     }
@@ -146,7 +183,10 @@ class RealContentScopeScriptsTest {
             "{\"features\":{" +
             "\"config1\":{\"state\":\"enabled\"}," +
             "\"config2\":{\"state\":\"disabled\"}}," +
-            "\"unprotectedTemporary\":[]}, [\"example.com\"], {\"versionNumber\":1234})"
+            "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}, " +
+            "[\"example.com\"], {\"versionNumber\":1234})"
         const val versionCode = 1234
+        val unprotectedTemporaryException = UnprotectedTemporaryException(domain = "example.com", reason = "reason")
+        val unprotectedTemporaryException2 = UnprotectedTemporaryException(domain = "foo.com", reason = "reason2")
     }
 }
