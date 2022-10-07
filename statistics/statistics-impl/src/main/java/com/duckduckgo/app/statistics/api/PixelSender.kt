@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics.api
 
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
@@ -25,33 +26,28 @@ import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import javax.inject.Inject
 
-interface PixelSender : DefaultLifecycleObserver {
-    fun sendPixel(
-        pixelName: String,
-        parameters: Map<String, String>,
-        encodedParameters: Map<String, String>
-    ): Completable
-
-    fun enqueuePixel(
-        pixelName: String,
-        parameters: Map<String, String>,
-        encodedParameters: Map<String, String>
-    ): Completable
-}
-
-class RxPixelSender constructor(
+@SingleInstanceIn(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
+class RxPixelSender @Inject constructor(
     private val api: PixelService,
     private val pendingPixelDao: PendingPixelDao,
     private val statisticsDataStore: StatisticsDataStore,
     private val variantManager: VariantManager,
     private val deviceInfo: DeviceInfo,
     private val statisticsLibraryConfig: StatisticsLibraryConfig?
-) : PixelSender {
+) : PixelSender, DefaultLifecycleObserver {
 
     private val compositeDisposable = CompositeDisposable()
 

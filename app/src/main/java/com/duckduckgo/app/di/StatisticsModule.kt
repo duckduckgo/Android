@@ -88,11 +88,6 @@ object StatisticsModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
-    @IntoSet
-    fun pixelSenderObserver(pixelSender: PixelSender): LifecycleObserver = pixelSender
-
-    @Provides
     fun offlinePixelSender(
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
