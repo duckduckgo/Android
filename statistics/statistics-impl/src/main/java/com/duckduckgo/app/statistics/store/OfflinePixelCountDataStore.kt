@@ -21,16 +21,6 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import javax.inject.Inject
 
-interface OfflinePixelCountDataStore {
-    var applicationCrashCount: Int
-    var webRendererGoneCrashCount: Int
-    var webRendererGoneKilledCount: Int
-    var cookieDatabaseNotFoundCount: Int
-    var cookieDatabaseOpenErrorCount: Int
-    var cookieDatabaseCorruptedCount: Int
-    var cookieDatabaseDeleteErrorCount: Int
-}
-
 class OfflinePixelCountSharedPreferences @Inject constructor(private val context: Context) :
     OfflinePixelCountDataStore {
 
