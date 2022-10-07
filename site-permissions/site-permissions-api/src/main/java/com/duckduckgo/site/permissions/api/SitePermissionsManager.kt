@@ -41,7 +41,7 @@ interface SitePermissionsManager {
     /**
      * Deletes all site permissions but the ones that are fireproof
      *
-     * @param fireproofWebsites list of urls that are fireproof
+     * @param fireproofDomains list of domains that are fireproof
      */
-    suspend fun clearAllButFireproof(fireproofWebsites: List<String>)
+    suspend fun clearAllButFireproof(fireproofDomains: List<String>)
 }

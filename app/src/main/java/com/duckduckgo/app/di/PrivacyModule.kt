@@ -46,8 +46,6 @@ import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
-import com.duckduckgo.site.permissions.impl.SitePermissionsManagerImpl
-import com.duckduckgo.site.permissions.impl.SitePermissionsRepositoryImpl
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -134,11 +132,6 @@ object PrivacyModule {
         dispatcherProvider: DispatcherProvider
     ): GeoLocationPermissions {
         return GeoLocationPermissionsManager(context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
-    }
-
-    @Provides
-    fun providesSitePermissionsManager(sitePermissionsRepository: SitePermissionsRepositoryImpl): SitePermissionsManager {
-        return SitePermissionsManagerImpl(sitePermissionsRepository)
     }
 
     @Provides
