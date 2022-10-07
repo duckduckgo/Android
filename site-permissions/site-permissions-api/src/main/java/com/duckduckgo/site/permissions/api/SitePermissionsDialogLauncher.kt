@@ -1,8 +1,8 @@
 package com.duckduckgo.site.permissions.api
 
+import android.app.Activity
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
-import androidx.fragment.app.FragmentActivity
 
 /** Public interface for requesting microphone and/or camera permissions when website requests it */
 interface SitePermissionsDialogLauncher {
@@ -28,7 +28,7 @@ interface SitePermissionsDialogLauncher {
      * @param permissionsGrantedListener interface that fragment or activity needs to implement to handle special cases when granting permissions
      */
     fun askForSitePermission(
-        activity: FragmentActivity,
+        activity: Activity,
         url: String,
         tabId: String,
         permissionsRequested: Array<String>,
