@@ -21,7 +21,6 @@ enum class AppTpSetting(override val value: String, override val defaultValue: B
     Ipv6Support("ipv6Support"),
     PrivateDnsSupport("privateDnsSupport"),
     InterceptDnsTraffic("interceptDnsTraffic"),
-    VpnDdgBrowserTraffic("vpnDdgBrowserTraffic"),
     ConnectivityChecks("connectivityChecks"),
     AlwaysSetDNS("alwaysSetDNS"),
     CPUMonitoring("cpuMonitoring"),
