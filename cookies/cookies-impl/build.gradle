@@ -30,7 +30,7 @@ dependencies {
     implementation project(':common')
     implementation project(':cookies-api')
     implementation project(':browser-api')
-    implementation project(':statistics')
+    implementation project(':statistics-api')
 
     implementation Kotlin.stdlib.jdk7
     implementation JakeWharton.timber

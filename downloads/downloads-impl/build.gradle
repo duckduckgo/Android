@@ -36,7 +36,7 @@ dependencies {
     implementation project(path: ':browser-api')
     implementation project(path: ':di')
     implementation project(path: ':common')
-    implementation project(path: ':statistics')
+    implementation project(path: ':statistics-api')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':downloads-store')
 
