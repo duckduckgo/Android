@@ -24,12 +24,6 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
-interface StatisticsUpdater {
-    fun initializeAtb()
-    fun refreshSearchRetentionAtb()
-    fun refreshAppRetentionAtb()
-}
-
 class StatisticsRequester(
     private val store: StatisticsDataStore,
     private val service: StatisticsService,
