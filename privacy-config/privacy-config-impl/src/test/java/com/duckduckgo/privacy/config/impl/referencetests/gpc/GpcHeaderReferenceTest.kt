@@ -31,7 +31,6 @@ import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.toGpcException
 import com.duckduckgo.privacy.config.store.toUnprotectedTemporaryException
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import com.squareup.moshi.JsonAdapter
