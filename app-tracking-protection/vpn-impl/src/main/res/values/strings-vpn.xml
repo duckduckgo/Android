@@ -203,10 +203,22 @@
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
     <string name="atp_ActivityManageProtection">Having Problems With An App?</string>
 
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d tracking attempt blocked from %2$d company in <b>%3$s</b> app]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d tracking attempt blocked from %2$d companies in <b>%3$s</b> app]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d tracking attempts blocked from %2$d company in <b>%3$s</b> app]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d tracking attempts blocked from %2$d companies in <b>%3$s</b> app]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"
+        instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
+        <![CDATA[1 tracking attempt blocked from 1 company in <b>%1$s</b> app]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"
+        instruction="Placeholder %1$d is the number of companies doing the tracking. Placeholder %2$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 5 companies in Venmo app.">
+        <![CDATA[1 tracking attempt blocked from %1$d companies in <b>%2$s</b> app]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"
+        instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$s is the name of the app doing the tracking. Example: 5 tracking attempts blocked from 1 company in Venmo app.">
+        <![CDATA[%1$d tracking attempts blocked from 1 company in <b>%2$s</b> app]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"
+        instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
+        <![CDATA[%1$d tracking attempts blocked from %2$d companies in <b>%3$s</b> app]]>
+    </string>
 
     <string name="atp_ActivityEmptyListTitle">No new activity</string>
     <string name="atp_ActivityEmptyListMessage">Keep using your device. Tracking attempts that App Tracking Protection blocks appear here.</string>
