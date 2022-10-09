@@ -15,6 +15,6 @@
   },
   "dependencies": {
     "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#5.0.1",
-    "@duckduckgo/autoconsent": "github:duckduckgo/autoconsent#2.2.0"
+    "@duckduckgo/autoconsent": "github:duckduckgo/autoconsent#v3.0.0"
   }
 }
