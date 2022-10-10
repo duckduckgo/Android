@@ -174,9 +174,6 @@
         <item name="daxColorPrimaryText">@color/gray80</item>
         <item name="daxColorSecondaryText">@color/gray80</item>
         <item name="daxColorDestructive">@color/gray80</item>
-        <item name="daxColorBackgroundPrimary">@color/gray80</item>
-        <item name="daxColorBackgroundPrimary">@color/gray80</item>
-        <item name="daxColorBackgroundPrimary">@color/gray80</item>
 
     </style>
 
