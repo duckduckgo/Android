@@ -107,4 +107,50 @@ style="@style/Widget.DuckDuckGo.Button.Primary"
             .run()
             .expectClean()
     }
+
+    @Test
+    fun whenSwitchViewFoundThenFailWithError() {
+        lint()
+            .files(
+                TestFiles.xml(
+                    "res/layout/buttons.xml",
+                    """
+                <android.support.design.widget.CoordinatorLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#eeeeee">
+
+                  <android.support.design.bottomappbar.BottomAppBar
+                      android:id="@+id/bottom_app_bar"
+                      style="@style/Widget.MaterialComponents.BottomAppBar"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="bottom"
+                      app:navigationIcon="@drawable/ic_menu_black_24dp"/>
+
+                  <com.duckduckgo.mobile.android.ui.view.SwitchView
+                      android:id="@+id/fab"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:tint="@android:color/white"
+style="@style/Widget.DuckDuckGo.Button.Primary"
+                      tools:ignore="RtlHardcoded"/>
+                </android.support.design.widget.CoordinatorLayout>
+            """
+                ).indented()
+            )
+            .issues(STYLE_IN_DESIGN_SYSTEM_COMPONENT)
+            .run()
+            .expect(
+                """
+                res/layout/buttons.xml:17: Error: Design System Components should not be styled. Consider creating a new Component or use one of the Components already created [StyleInDesignSystemComponent]
+                                  <com.duckduckgo.mobile.android.ui.view.SwitchView
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                1 errors, 0 warnings
+            """.trimMargin()
+            )
+    }
 }

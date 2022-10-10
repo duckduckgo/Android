@@ -58,17 +58,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.layout.settings_option_with_loading_state` appears to be unused"
-        errorLine1="&lt;LinearLayout"
-        errorLine2="^">
-        <location
-            file="src/main/res/layout/settings_option_with_loading_state.xml"
-            line="17"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.string.vpnExceptionRulesDebugActivityTitle` appears to be unused"
         errorLine1="    &lt;string name=&quot;vpnExceptionRulesDebugActivityTitle&quot;>AppTp Exception Rules&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">

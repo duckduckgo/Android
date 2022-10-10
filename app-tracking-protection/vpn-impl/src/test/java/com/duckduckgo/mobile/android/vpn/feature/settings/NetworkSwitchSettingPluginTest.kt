@@ -27,7 +27,7 @@ import org.mockito.kotlin.*
 
 class NetworkSwitchSettingPluginTest {
 
-    private lateinit var featureConfig: NetworkSwitchingSettingPlugin
+    private lateinit var featureConfig: InterceptDnsTrafficSettingPlugin
     private val appTpFeatureConfig: AppTpFeatureConfig = mock()
     private val appTpFeatureConfigEditor: AppTpFeatureConfig.Editor = mock()
     private val jsonEnabled = """
@@ -46,14 +46,14 @@ class NetworkSwitchSettingPluginTest {
     @Before
     fun setup() {
         whenever(appTpFeatureConfig.edit()).thenReturn(appTpFeatureConfigEditor)
-        featureConfig = NetworkSwitchingSettingPlugin(appTpFeatureConfig)
+        featureConfig = InterceptDnsTrafficSettingPlugin(appTpFeatureConfig)
     }
 
     @Test
     fun whenStoreWithCorrectSettingAndEnabledThenStoreAndReturnTrue() {
         val result = featureConfig.store(featureConfig.settingName, jsonEnabled)
 
-        verify(appTpFeatureConfigEditor).setEnabled(AppTpSetting.NetworkSwitchHandling, enabled = true, isManualOverride = false)
+        verify(appTpFeatureConfigEditor).setEnabled(AppTpSetting.InterceptDnsTraffic, enabled = true, isManualOverride = false)
         assertTrue(result)
     }
 
@@ -61,7 +61,7 @@ class NetworkSwitchSettingPluginTest {
     fun whenStoreWithCorrectSettingAndDisabledThenStoreAndReturnTrue() {
         val result = featureConfig.store(featureConfig.settingName, jsonDisabled)
 
-        verify(appTpFeatureConfigEditor).setEnabled(AppTpSetting.NetworkSwitchHandling, enabled = false, isManualOverride = false)
+        verify(appTpFeatureConfigEditor).setEnabled(AppTpSetting.InterceptDnsTraffic, enabled = false, isManualOverride = false)
         assertTrue(result)
     }
 

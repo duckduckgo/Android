@@ -45,7 +45,8 @@
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
-        <item name="sliderStyle">@style/Widget.App.Slider</item>
+        <item name="sliderStyle">@style/Widget.DuckDuckGo.Slider</item>
+        <item name="switchStyle">@style/Widget.DuckDuckGo.Switch</item>
 
         <!-- Design System Components -->
         <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
@@ -57,6 +58,10 @@
         <item name="primaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Rounded</item>
         <item name="secondaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Secondary.Rounded</item>
         <item name="primaryButtonLowercaseStyle">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
+        <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
+        <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
+        <item name="horizontalDividerStyle">@style/Widget.DuckDuckGo.HorizontalDivider</item>
+        <item name="verticalDividerStyle">@style/Widget.DuckDuckGo.VerticalDivider</item>
 
         <!--Design System Legacy Typography (to be removed when the migration happens) -->
         <item name="textAppearanceHeadline1">@style/TextAppearance.DuckDuckGo.Headline1</item>
@@ -93,6 +98,7 @@
         <item name="chipBackgroundColor">@color/gray90</item>
         <item name="listItemTitleColor">@color/white</item>
         <item name="listItemSubtitleColor">@color/grayishTwo</item>
+        <item name="listItemDisabledColor">@color/warGreyTwo</item>
         <item name="subtitleTextColor">@color/grayishTwo</item>
         <item name="toolbarIconColor">@color/white</item>
         <item name="toolbarTextColor">@color/white</item>
@@ -125,7 +131,6 @@
         <item name="settingsItemTextColor">@color/white</item>
         <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
-        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
         <item name="buttonOutlinedTextColor">@color/pinkishGrayThree</item>
         <item name="buttonOutlinedBorderColor">@color/brownishGrayTwo</item>
         <item name="callToActionTitleColor">@color/white</item>
@@ -154,8 +159,6 @@
         <item name="quickAccessItemTitleTextColor">@color/white</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
-        <item name="android:textColorPrimary">?attr/normalTextColor</item>
-        <item name="android:textColorSecondary">?attr/secondaryTextColor</item>
         <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
         <item name="lightContainerBackground">@color/almostBlack</item>
 
@@ -180,6 +183,9 @@
         <item name="autofillDialogTitleColor">@color/white</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
         <item name="autofillCredentialListSubtitleColor">@color/paleBrownishGray</item>
+
+        <!-- TODO: For Noelia to remove -->
+        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -252,7 +258,6 @@
         <item name="settingsItemTextColor">@color/almostBlackDark</item>
         <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="settingsMinorTextColor">@color/warmerGray</item>
-        <item name="settingsSwitchBackgroundColor">@color/brownishGrayTwo</item>
         <item name="buttonOutlinedTextColor">@color/cornflowerBlue</item>
         <item name="buttonOutlinedBorderColor">@color/grayishThree</item>
         <item name="callToActionTitleColor">@color/almostBlackDark</item>
@@ -285,6 +290,7 @@
 
         <item name="listItemTitleColor">@color/almostBlackDark</item>
         <item name="listItemSubtitleColor">@color/warmerGray</item>
+        <item name="listItemDisabledColor">@color/warGreyTwo</item>
         <item name="listItemBackgroundColor">@color/whiteFive</item>
         <item name="listItemSeparatorColor">@color/whiteSix</item>
         <item name="textInputOutlinedBoxColor">@color/grayishThree</item>
@@ -306,6 +312,9 @@
         <item name="autofillDialogOnboardingExplanationColor">@color/gray70</item>
         <item name="autofillCredentialListSubtitleColor">@color/brownishGrayTwo</item>
         <item name="appTPHeaderBackground">@color/light_blue</item>
+
+        <!-- TODO: For Noelia to remove -->
+        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
@@ -336,25 +345,8 @@
         <item name="colorControlHighlight">@color/subtleGrayTwo</item>
     </style>
 
-    <style name="ToolbarTheme.Green">
-        <item name="colorAccent">@color/cornflowerGreen</item>
-        <item name="colorControlActivated">@color/cornflowerGreen</item>
-        <item name="colorSwitchThumbNormal">@color/white</item>
-        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
-    </style>
-
     <style name="OmnibarToolbarTheme">
         <item name="colorControlHighlight">@color/subtleGrayTwo</item>
-    </style>
-
-    <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
-        <item name="colorControlActivated">@android:color/white</item>
-    </style>
-
-    <style name="SettingsSwitchTheme">
-        <item name="colorControlActivated">@color/cornflowerBlue</item>
-        <item name="colorSwitchThumbNormal">@color/white</item>
-        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
     </style>
 
     <style name="TextInputLayoutTheme" parent="Widget.Design.TextInputLayout">
@@ -385,7 +377,7 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="PopUpMenuSwitchTheme">
+    <style name="PopUpMenuCheckBoxTheme">
         <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
     </style>
@@ -419,6 +411,12 @@
 
     <style name="Theme.AndroidVpn.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
 
+    <style name="SettingsSwitchTheme">
+        <item name="colorControlActivated">@color/cornflowerBlue</item>
+        <item name="colorSwitchThumbNormal">@color/white</item>
+        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
+    </style>
+
     <style name="BottomSheetDialog" parent="Theme.Design.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
     </style>
@@ -450,17 +448,4 @@
         <item name="android:textColor">@color/cornflowerBlue</item>
     </style>
 
-    <style name="Widget.App.Slider" parent="Widget.MaterialComponents.Slider">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Slider</item>
-        <item name="trackHeight">6dp</item>
-        <item name="trackColorInactive">@color/slider_inactive_track</item>
-        <item name="trackColorActive">@color/accentBlue</item>
-        <item name="thumbColor">@color/accentBlue</item>
-    </style>
-
-    <style name="ThemeOverlay.App.Slider" parent="">
-        <item name="colorPrimary">@color/accentBlue</item>
-        <item name="colorOnPrimary">@color/accentBlue</item>
-        <item name="colorOnSurface">?attr/settingsSwitchBackgroundColor</item>
-    </style>
 </resources>

@@ -45,9 +45,9 @@ import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.HEADER
 import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.SITES_EMPTY
 import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.SITE_ALLOWED_ITEM
 import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.TOGGLE
-import com.duckduckgo.mobile.android.databinding.ViewSingleLineListItemBinding
+import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.SectionDivider
+import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
@@ -96,7 +96,7 @@ class SitePermissionsAdapter(
                 SitePermissionToggleViewHolder(binding)
             }
             DIVIDER -> {
-                val view = SectionDivider(parent.context)
+                val view = HorizontalDivider(parent.context)
                 SitePermissionsDividerViewHolder(view)
             }
             SITES_EMPTY -> {
@@ -104,7 +104,7 @@ class SitePermissionsAdapter(
                 SitePermissionsSimpleViewHolder(binding)
             }
             SITE_ALLOWED_ITEM -> {
-                val binding = ViewSingleLineListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                val binding = RowOneLineListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 SiteViewHolder(binding, viewModel, lifecycleOwner, faviconManager)
             }
         }
@@ -189,18 +189,18 @@ class SitePermissionsAdapter(
     }
 
     class SiteViewHolder(
-        private val binding: ViewSingleLineListItemBinding,
+        private val binding: RowOneLineListItemBinding,
         private val viewModel: SitePermissionsViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: SiteAllowedItem) {
-            binding.title.text = item.domain
+            val oneListItem = binding.root
+            oneListItem.setPrimaryText(item.domain)
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = item.domain, view = binding.image)
+                faviconManager.loadToViewFromLocalOrFallback(url = item.domain, view = oneListItem.leadingIcon())
             }
-            binding.overflowMenu.gone()
-            binding.root.setOnClickListener {
+            oneListItem.setClickListener {
                 viewModel.allowedSiteSelected(item.domain)
             }
         }

@@ -52,6 +52,19 @@
         <item name="autoCompleteTextViewStyle">@style/Widget.DuckDuckGo.AutoCompleteTextView</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialComponents.Dialog.Alert</item>
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Surface</item>
+
+        <!-- Design System Components -->
+        <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
+        <item name="primaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Primary.Small</item>
+        <item name="secondaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
+        <item name="secondaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
+        <item name="ghostButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Borderless</item>
+        <item name="ghostButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Borderless.Small</item>
+        <item name="primaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Rounded</item>
+        <item name="secondaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Secondary.Rounded</item>
+        <item name="primaryButtonLowercaseStyle">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
+        <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
+        <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->

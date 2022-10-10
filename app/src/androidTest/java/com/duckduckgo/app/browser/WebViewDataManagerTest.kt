@@ -22,8 +22,8 @@ import android.webkit.WebView
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
-import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.global.file.FileDeleter
+import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import kotlinx.coroutines.Dispatchers
