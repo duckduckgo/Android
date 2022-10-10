@@ -168,7 +168,7 @@
                 android:id="@+id/cta_remove_feature"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:listItemTitleColor="@color/red50"
+                app:primaryTextColorOverlay="@color/red_text_color_selector"
                 app:primaryText="@string/atp_ActivityRemoveFeature"/>
 
         </LinearLayout>

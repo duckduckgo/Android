@@ -32,7 +32,6 @@ class AppTpSettingTest {
                 AppTpSetting.InterceptDnsTraffic -> assertFalse(setting.defaultValue)
                 AppTpSetting.AlwaysSetDNS -> assertFalse(setting.defaultValue)
                 AppTpSetting.CPUMonitoring -> assertFalse(setting.defaultValue)
-                AppTpSetting.VpnDdgBrowserTraffic -> assertFalse(setting.defaultValue)
                 AppTpSetting.ConnectivityChecks -> assertFalse(setting.defaultValue)
                 AppTpSetting.ProtectGames -> assertFalse(setting.defaultValue)
                 else -> throw java.lang.IllegalStateException("Missing AppTpSetting default checks")

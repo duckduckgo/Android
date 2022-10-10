@@ -99,6 +99,16 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
                 setOnCheckedChangeListener { view, isChecked -> Snackbar.make(view, "Switch checked: $isChecked", Snackbar.LENGTH_SHORT).show() }
             }
+
+            view.findViewById<OneLineListItem>(R.id.oneLineListItemDisabled).apply {
+                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+                isEnabled = false
+            }
+
+            view.findViewById<OneLineListItem>(R.id.oneLineListItemCustomTextColor).apply {
+                setClickListener { Snackbar.make(this.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
+            }
+
         }
     }
 

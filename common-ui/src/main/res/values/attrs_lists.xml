@@ -16,17 +16,18 @@
 
 <resources>
 
-    <!--Common lists attributes-->
+    <!--Default lists attributes-->
     <attr name="listItemTitleColor" format="color"/>
     <attr name="listItemSubtitleColor" format="color"/>
     <attr name="listItemDisabledColor" format="color"/>
 
     <attr name="oneLineListItemStyle" format="reference"/>
     <attr name="twoLineListItemStyle" format="reference"/>
-    <attr name="twoLineRadioListIteWithStyle" format="reference"/>
 
     <attr name="primaryText" format="string"/>
+    <attr name="primaryTextColorOverlay" format="color"/>
     <attr name="secondaryText" format="string"/>
+    <attr name="secondaryTextColorOverlay" format="color"/>
     <attr name="leadingIcon" format="integer"/>
     <attr name="trailingIcon" format="integer"/>
     <attr name="showBetaPill" format="boolean"/>
@@ -39,11 +40,12 @@
         <!-- Rectangular shape, with optional rounded corners. -->
         <enum name="rounded" value="2" />
     </attr>
+    <attr name="textColorOverride" format="color"/>
 
     <!--One Line Item view-->
     <declare-styleable name="OneLineListItem">
         <attr name="primaryText"/>
-        <attr name="listItemTitleColor"/>
+        <attr name="primaryTextColorOverlay"/>
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
         <attr name="trailingIcon"/>
@@ -53,7 +55,9 @@
     <!--Two Line Item view-->
     <declare-styleable name="TwoLineListItem">
         <attr name="primaryText"/>
+        <attr name="primaryTextColorOverlay"/>
         <attr name="secondaryText"/>
+        <attr name="secondaryTextColorOverlay"/>
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
         <attr name="trailingIcon"/>
