@@ -96,8 +96,8 @@
         <item name="secondaryIconColor">@color/gray70</item>
         <item name="accentIconColor">@color/gray80</item>
         <item name="chipBackgroundColor">@color/gray90</item>
-        <item name="listItemTitleColor">@color/white</item>
-        <item name="listItemSubtitleColor">@color/grayishTwo</item>
+        <item name="listItemPrimaryTextColor">@color/white</item>
+        <item name="listItemSecondaryTextColor">@color/grayishTwo</item>
         <item name="listItemDisabledColor">@color/warGreyTwo</item>
         <item name="subtitleTextColor">@color/grayishTwo</item>
         <item name="toolbarIconColor">@color/white</item>
@@ -288,8 +288,8 @@
         <item name="savedSiteEditTextUnderlineColor">@color/dimmed</item>
         <item name="lightContainerBackground">@color/whiteThree</item>
 
-        <item name="listItemTitleColor">@color/almostBlackDark</item>
-        <item name="listItemSubtitleColor">@color/warmerGray</item>
+        <item name="listItemPrimaryTextColor">@color/almostBlackDark</item>
+        <item name="listItemSecondaryTextColor">@color/warmerGray</item>
         <item name="listItemDisabledColor">@color/warGreyTwo</item>
         <item name="listItemBackgroundColor">@color/whiteFive</item>
         <item name="listItemSeparatorColor">@color/whiteSix</item>
