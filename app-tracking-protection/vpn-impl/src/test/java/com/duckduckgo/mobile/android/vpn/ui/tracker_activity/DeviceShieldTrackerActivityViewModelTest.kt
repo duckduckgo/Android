@@ -43,6 +43,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -345,6 +346,32 @@ class DeviceShieldTrackerActivityViewModelTest {
 
         verify(deviceShieldPixels).didChooseToForgetPromoteAlwaysOnDialog()
         verify(vpnStore).onForgetPromoteAlwaysOn()
+    }
+
+    @Test
+    fun whenAppTpEnabledCtaNotAlreadyShownThenCommandIsSentAndFlagSetToTrue() = runBlocking {
+        whenever(vpnStore.didShowAppTpEnabledCta()).thenReturn(false)
+
+        viewModel.commands().test {
+            viewModel.showAppTpEnabledCtaIfNeeded()
+
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowAppTpEnabledCta, awaitItem())
+            verify(vpnStore).appTpEnabledCtaDidShow()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAppTpEnabledCtaAlreadyShownThenNoCommandSent() = runBlocking {
+        whenever(vpnStore.didShowAppTpEnabledCta()).thenReturn(true)
+
+        viewModel.commands().test {
+            viewModel.showAppTpEnabledCtaIfNeeded()
+
+            expectNoEvents()
+            verify(vpnStore, never()).appTpEnabledCtaDidShow()
+        }
     }
 
     private fun createInMemoryDb(): VpnDatabase {

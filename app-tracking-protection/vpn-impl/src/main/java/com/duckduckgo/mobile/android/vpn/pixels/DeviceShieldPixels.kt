@@ -408,6 +408,8 @@ interface DeviceShieldPixels {
     fun reportAlwaysOnLockdownEnabled()
 
     fun reportUnprotectedAppsBucket(bucketSize: Int)
+
+    fun didPressOnAppTpEnabledCtaButton()
 }
 
 @ContributesBinding(AppScope::class)
@@ -896,6 +898,10 @@ class RealDeviceShieldPixels @Inject constructor(
             String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY.pixelName, bucketSize)
         )
         firePixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET.pixelName, bucketSize))
+    }
+
+    override fun didPressOnAppTpEnabledCtaButton() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_APPTP_ENABLED_CTA_BUTTON)
     }
 
     private fun firePixel(

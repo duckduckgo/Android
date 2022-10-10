@@ -128,6 +128,13 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         }
     }
 
+    fun showAppTpEnabledCtaIfNeeded() {
+        if (!vpnStore.didShowAppTpEnabledCta()) {
+            vpnStore.appTpEnabledCtaDidShow()
+            sendCommand(Command.ShowAppTpEnabledCta)
+        }
+    }
+
     internal fun launchExcludedApps() {
         sendCommand(Command.LaunchManageAppsProtection)
     }
@@ -243,6 +250,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object ShowRemoveFeatureConfirmationDialog : Command()
         object CloseScreen : Command()
         object OpenVpnSettings : Command()
+        object ShowAppTpEnabledCta : Command()
     }
 }
 

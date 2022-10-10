@@ -37,6 +37,8 @@ interface VpnStore {
     fun userAllowsShowPromoteAlwaysOn(): Boolean
     suspend fun setAlwaysOn(enabled: Boolean)
     fun isAlwaysOnEnabled(): Boolean
+    fun didShowAppTpEnabledCta(): Boolean
+    fun appTpEnabledCtaDidShow()
 
     companion object {
         const val ALWAYS_ON_PROMOTION_DELTA = 3
@@ -93,13 +95,21 @@ class SharedPreferencesVpnStore @Inject constructor(
         return preferences.getBoolean(KEY_ALWAYS_ON_MODE_ENABLED, false)
     }
 
+    override fun didShowAppTpEnabledCta(): Boolean {
+        return preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN, false)
+    }
+
+    override fun appTpEnabledCtaDidShow() {
+        preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN, true) }
+    }
+
     companion object {
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
 
         private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
         private const val KEY_DEVICE_SHIELD_MANUALLY_ENABLED = "KEY_DEVICE_SHIELD_MANUALLY_ENABLED"
         private const val KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED = "KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED"
-
         private const val KEY_ALWAYS_ON_MODE_ENABLED = "KEY_ALWAYS_ON_MODE_ENABLED"
+        private const val KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN = "KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN"
     }
 }
