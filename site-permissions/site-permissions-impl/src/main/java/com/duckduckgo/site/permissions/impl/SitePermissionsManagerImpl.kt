@@ -21,7 +21,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import javax.inject.Inject
 
 class SitePermissionsManagerImpl @Inject constructor(
-    private val sitePermissionsRepository: SitePermissionsRepositoryImpl
+    private val sitePermissionsRepository: SitePermissionsRepository
 ) : SitePermissionsManager {
 
     override suspend fun getSitePermissionsGranted(url: String, tabId: String, resources: Array<String>): Array<String> =
@@ -35,12 +35,12 @@ class SitePermissionsManagerImpl @Inject constructor(
             .filter { sitePermissionsRepository.isDomainAllowedToAsk(url, it) }
             .toTypedArray()
 
-    override suspend fun clearAllButFireproof(fireproofWebsites: List<String>) {
+    override suspend fun clearAllButFireproof(fireproofDomains: List<String>) {
         sitePermissionsRepository.askCameraEnabled = true
         sitePermissionsRepository.askMicEnabled = true
 
         sitePermissionsRepository.sitePermissionsForAllWebsites().forEach { permission ->
-            if (!fireproofWebsites.contains(permission.domain)) {
+            if (!fireproofDomains.contains(permission.domain)) {
                 sitePermissionsRepository.deletePermissionsForSite(permission.domain)
             }
         }
