@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,25 +23,35 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    anvil project(path: ':anvil-compiler')
-    implementation project(path: ':anvil-annotations')
+    implementation project(':di')
+    implementation project(':common')
+    implementation project(':content-scope-scripts-api')
+    implementation project(':app-store')
+    implementation project(':privacy-config-api')
+    implementation project(':app-build-config-api')
 
-    implementation project(path: ':di')
-    implementation project(path: ':common')
-    implementation project(path: ':feature-toggles-api')
-    implementation project(path: ':privacy-config-api')
-    implementation project(path: ':app-store')
-    implementation project(path: ':app-build-config-api')
-    implementation project(path: ':privacy-config-store')
-    implementation project(path: ':content-scope-scripts-api')
+    anvil project(':anvil-compiler')
+    implementation project(':anvil-annotations')
 
-    implementation Kotlin.stdlib.jdk7
-    implementation AndroidX.appCompat
-    implementation Google.android.material
-    implementation AndroidX.constraintLayout
     implementation JakeWharton.timber
 
     implementation KotlinX.coroutines.core
+
+    implementation Square.retrofit2.converter.moshi
+    implementation Google.dagger
+    implementation AndroidX.core.ktx
+
+    // Testing dependencies
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation Testing.junit4
+    testImplementation AndroidX.core
+    testImplementation AndroidX.test.ext.junit
+    testImplementation "androidx.test:runner:_"
+    testImplementation Testing.robolectric
+    testImplementation CashApp.turbine
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
+
+    testImplementation project(path: ':common-test')
 
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
@@ -49,33 +59,18 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    implementation Square.retrofit2.converter.moshi
-    implementation Square.okHttp3.okHttp
-    implementation Google.dagger
-    implementation AndroidX.core.ktx
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
-    implementation AndroidX.work.runtimeKtx
-
-    // Testing dependencies
-    testImplementation project(path: ':common-test')
-    testImplementation AndroidX.work.testing
-    testImplementation AndroidX.room.testing
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.junit4
-    testImplementation AndroidX.archCore.testing
-    testImplementation AndroidX.core
-    testImplementation AndroidX.test.ext.junit
-    testImplementation "androidx.test:runner:_"
-    testImplementation Testing.robolectric
-    testImplementation CashApp.turbine
-
-    androidTestImplementation project(path: ':common-test')
-    testImplementation project(path: ':common-test')
 }
 
 android {
+    sourceSets {
+        main {
+            java {
+                resources {
+                    srcDirs += files("$projectDir/../../node_modules/@duckduckgo/content-scope-scripts/build/android/".toString())
+                }
+            }
+        }
+    }
     anvil {
         generateDaggerFactories = true // default is false
     }
@@ -84,6 +79,5 @@ android {
             includeAndroidResources = true
         }
     }
-  namespace 'com.duckduckgo.privacy.config.impl'
+    namespace 'com.duckduckgo.contentscopescripts.impl'
 }
-
