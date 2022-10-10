@@ -40,6 +40,10 @@
     <!-- List Items -->
     <dimen name="listItemImageContainerSize">40dp</dimen>
     <dimen name="listItemImageSize">22dp</dimen>
+    <dimen name="oneLineItemHeight">48dp</dimen>
+    <dimen name="oneLineItemPadding">14dp</dimen>
+    <dimen name="twoLineItemHeight">56dp</dimen>
+    <dimen name="twoLineItemPadding">14dp</dimen>
 
     <!-- PopupMenu -->
     <dimen name="popupMenuWidth">280dp</dimen>
@@ -51,4 +55,11 @@
     <dimen name="dialogButtonHeight">40dp</dimen>
     <dimen name="dialogImageSize">40dp</dimen>
 
+    <!-- Dividers -->
+    <dimen name="horizontalDividerHeight">1dp</dimen>
+    <dimen name="horizontalDividerSidePadding">@dimen/keyline_4</dimen>
+    <dimen name="horizontalDividerTopPadding">@dimen/keyline_4</dimen>
+    <dimen name="horizontalDividerBottomPadding">@dimen/keyline_4</dimen>
+    <dimen name="verticalDividerWidth">1dp</dimen>
+    <dimen name="verticalDividerSidePadding">@dimen/keyline_4</dimen>
 </resources>

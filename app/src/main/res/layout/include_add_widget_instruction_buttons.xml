@@ -24,11 +24,10 @@
     android:layout_height="wrap_content"
     tools:showIn="@layout/activity_add_widget_instructions">
 
-    <View
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/slightlyTransparentDivider"
-        app:layout_constraintBottom_toTopOf="@id/homeButton" />
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/homeButton"/>
 
     <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
         android:id="@+id/closeButton"

@@ -19,20 +19,46 @@
     <!--Common lists attributes-->
     <attr name="listItemTitleColor" format="color"/>
     <attr name="listItemSubtitleColor" format="color"/>
+    <attr name="listItemDisabledColor" format="color"/>
 
-    <!--Single Line Item view-->
-    <declare-styleable name="SingleLineListItem">
-        <attr name="singleLineItemTitle" format="string" />
-        <attr name="singleLineItemDrawable" format="reference" />
-        <attr name="singleLineItemImageVisible" format="boolean" />
+    <attr name="oneLineListItemStyle" format="reference"/>
+    <attr name="twoLineListItemStyle" format="reference"/>
+    <attr name="twoLineRadioListIteWithStyle" format="reference"/>
+
+    <attr name="primaryText" format="string"/>
+    <attr name="secondaryText" format="string"/>
+    <attr name="leadingIcon" format="integer"/>
+    <attr name="trailingIcon" format="integer"/>
+    <attr name="showBetaPill" format="boolean"/>
+    <attr name="showSwitch" format="boolean"/>
+    <attr name="leadingIconBackground">
+        <!-- No background. -->
+        <enum name="none" value="0"/>
+        <!-- Oval shape. -->
+        <enum name="circular" value="1"/>
+        <!-- Rectangular shape, with optional rounded corners. -->
+        <enum name="rounded" value="2"/>
+    </attr>
+
+    <!--One Line Item view-->
+    <declare-styleable name="OneLineListItem">
+        <attr name="primaryText"/>
+        <attr name="listItemTitleColor"/>
+        <attr name="leadingIcon"/>
+        <attr name="leadingIconBackground"/>
+        <attr name="trailingIcon"/>
+        <attr name="showSwitch"/>
     </declare-styleable>
 
     <!--Two Line Item view-->
     <declare-styleable name="TwoLineListItem">
-        <attr name="twoLineItemTitle" format="string" />
-        <attr name="twoLineItemSubtitle" format="string" />
-        <attr name="twoLineItemDrawable" format="reference" />
-        <attr name="twoLineItemImageVisible" format="boolean" />
+        <attr name="primaryText"/>
+        <attr name="secondaryText"/>
+        <attr name="leadingIcon"/>
+        <attr name="leadingIconBackground"/>
+        <attr name="trailingIcon"/>
+        <attr name="showBetaPill"/>
+        <attr name="showSwitch"/>
     </declare-styleable>
 
 </resources>

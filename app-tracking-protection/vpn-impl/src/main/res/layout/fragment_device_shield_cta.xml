@@ -18,17 +18,16 @@
 
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/deviceShieldCtaLayout"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:visibility="visible"
-    android:visibility="gone"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:id="@+id/deviceShieldCtaLayout"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content"
+                                                   android:visibility="gone"
+                                                   app:layout_constraintEnd_toEndOf="parent"
+                                                   app:layout_constraintStart_toStartOf="parent"
+                                                   app:layout_constraintTop_toTopOf="parent"
+                                                   tools:visibility="visible">
 
     <ImageView
         android:id="@+id/deviceShieldCtaImage"
@@ -59,13 +58,12 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="App Tracking Protection is enabled and blocking tracking attempts across your apps" />
 
-    <View
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:id="@+id/deviceShieldCtaSplitter"
         android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="?splitterColor"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

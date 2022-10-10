@@ -134,16 +134,17 @@
         android:layout_height="wrap_content"
         android:text="@string/atp_ReportBreakageFormCheckboxText" />
 
-    <View
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?splitterColor"/>
+        android:layout_height="wrap_content"/>
 
     <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
         android:id="@+id/ctaNextFormSubmit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_4"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginBottom="@dimen/keyline_4"
         android:text="@string/atp_ReportBreakageAppSubmitCta"/>
 
 </LinearLayout>

@@ -21,11 +21,12 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.browser.*
+import com.duckduckgo.app.browser.BrowserWebViewClientTest
+import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
-import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.Gpc
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope

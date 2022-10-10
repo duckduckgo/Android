@@ -22,12 +22,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
@@ -297,9 +297,9 @@ interface DeviceShieldPixels {
     fun didPressWaitlistDialogDismiss()
 
     /**
-     * Will send CPU usage info
+     * Will send CPU usage alert
      */
-    fun sendCPUUsage(cpuUsage: Int)
+    fun sendCPUUsageAlert(cpuThresholdPassed: Int)
 
     /**
      * Will fire when user submits a health monitor report
@@ -726,8 +726,8 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS)
     }
 
-    override fun sendCPUUsage(cpuUsage: Int) {
-        firePixel(String.format(DeviceShieldPixelNames.ATP_APP_CPU_MONITOR_REPORT.pixelName, cpuUsage))
+    override fun sendCPUUsageAlert(cpuThresholdPassed: Int) {
+        firePixel(String.format(DeviceShieldPixelNames.ATP_APP_CPU_MONITOR_REPORT.pixelName, cpuThresholdPassed))
     }
 
     override fun sendHealthMonitorReport(healthMetrics: Map<String, String>) {

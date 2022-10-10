@@ -19,10 +19,14 @@ package com.duckduckgo.mobile.android.vpn.feature
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
-import com.duckduckgo.mobile.android.vpn.remote_config.*
+import com.duckduckgo.mobile.android.vpn.remote_config.VpnConfigToggle
+import com.duckduckgo.mobile.android.vpn.remote_config.VpnConfigTogglesDao
+import com.duckduckgo.mobile.android.vpn.remote_config.VpnRemoteConfigDatabase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -61,8 +65,7 @@ class AppTpFeatureConfigImplTest {
                 AppTpSetting.BadHealthMitigation -> assertTrue(config.isEnabled(setting))
                 AppTpSetting.Ipv6Support -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.PrivateDnsSupport -> assertFalse(config.isEnabled(setting))
-                AppTpSetting.NetworkSwitchHandling -> assertFalse(config.isEnabled(setting))
-                AppTpSetting.SetActiveNetworkDns -> assertFalse(config.isEnabled(setting))
+                AppTpSetting.InterceptDnsTraffic -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.AlwaysSetDNS -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.CPUMonitoring -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.VpnDdgBrowserTraffic -> assertFalse(config.isEnabled(setting))
@@ -131,8 +134,8 @@ class AppTpFeatureConfigImplTest {
     fun whenInternalBuildThenProperlyHandleManualOverrides() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
 
-        config.setEnabled(AppTpSetting.NetworkSwitchHandling, true, isManualOverride = true)
-        config.setEnabled(AppTpSetting.NetworkSwitchHandling, false, isManualOverride = true)
+        config.setEnabled(AppTpSetting.InterceptDnsTraffic, true, isManualOverride = true)
+        config.setEnabled(AppTpSetting.InterceptDnsTraffic, false, isManualOverride = true)
 
         config.setEnabled(AppTpSetting.BadHealthMitigation, true, isManualOverride = true)
         config.setEnabled(AppTpSetting.BadHealthMitigation, false, isManualOverride = false)
@@ -143,7 +146,7 @@ class AppTpFeatureConfigImplTest {
         config.setEnabled(AppTpSetting.PrivateDnsSupport, true, isManualOverride = false)
         config.setEnabled(AppTpSetting.PrivateDnsSupport, false, isManualOverride = false)
 
-        assertFalse(config.isEnabled(AppTpSetting.NetworkSwitchHandling))
+        assertFalse(config.isEnabled(AppTpSetting.InterceptDnsTraffic))
         assertTrue(config.isEnabled(AppTpSetting.BadHealthMitigation))
         assertFalse(config.isEnabled(AppTpSetting.Ipv6Support))
         assertFalse(config.isEnabled(AppTpSetting.PrivateDnsSupport))
@@ -153,8 +156,8 @@ class AppTpFeatureConfigImplTest {
     fun whenNotInternalBuildThenAlwaysOverride() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
 
-        config.setEnabled(AppTpSetting.NetworkSwitchHandling, true, isManualOverride = true)
-        config.setEnabled(AppTpSetting.NetworkSwitchHandling, false, isManualOverride = true)
+        config.setEnabled(AppTpSetting.InterceptDnsTraffic, true, isManualOverride = true)
+        config.setEnabled(AppTpSetting.InterceptDnsTraffic, false, isManualOverride = true)
 
         config.setEnabled(AppTpSetting.BadHealthMitigation, true, isManualOverride = true)
         config.setEnabled(AppTpSetting.BadHealthMitigation, false, isManualOverride = false)
@@ -165,7 +168,7 @@ class AppTpFeatureConfigImplTest {
         config.setEnabled(AppTpSetting.PrivateDnsSupport, true, isManualOverride = false)
         config.setEnabled(AppTpSetting.PrivateDnsSupport, false, isManualOverride = false)
 
-        assertFalse(config.isEnabled(AppTpSetting.NetworkSwitchHandling))
+        assertFalse(config.isEnabled(AppTpSetting.InterceptDnsTraffic))
         assertFalse(config.isEnabled(AppTpSetting.BadHealthMitigation))
         assertFalse(config.isEnabled(AppTpSetting.Ipv6Support))
         assertFalse(config.isEnabled(AppTpSetting.PrivateDnsSupport))

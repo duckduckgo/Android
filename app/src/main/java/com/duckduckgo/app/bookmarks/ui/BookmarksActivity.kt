@@ -28,11 +28,11 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderBranch
 import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
 import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.DeleteBookmarkFolderConfirmationFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
@@ -42,18 +42,16 @@ import com.duckduckgo.app.browser.databinding.ContentBookmarksBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.DividerAdapter
 import com.duckduckgo.app.global.extensions.html
+import com.duckduckgo.app.global.view.DividerAdapter
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.SearchBar
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
+import java.util.*
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -275,7 +273,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
         searchBar.onAction {
             when (it) {
                 is SearchBar.Action.PerformUpAction -> hideSearchBar()
-                is SearchBar.Action.PerformSearch -> searchListener.onQueryTextChange(it.searchText)
+                is SearchBar.Action.PerformSearch -> if (this::searchListener.isInitialized) {
+                    searchListener.onQueryTextChange(it.searchText)
+                }
             }
         }
     }
@@ -375,7 +375,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     override fun onDestroy() {
         deleteDialog?.dismiss()
-        searchListener.cancelSearch()
+        if (this::searchListener.isInitialized) {
+            searchListener.cancelSearch()
+        }
         super.onDestroy()
     }
 

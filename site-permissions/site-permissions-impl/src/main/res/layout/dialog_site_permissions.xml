@@ -27,7 +27,7 @@
         android:layout_height="40dp"
         android:layout_gravity="center"
         android:layout_marginTop="24dp"
-        android:background="@drawable/list_item_image_background">
+        android:background="@drawable/list_item_image_circular_background">
 
         <ImageView
             android:id="@+id/sitePermissionDialogFavicon"
@@ -35,7 +35,7 @@
             android:layout_height="22dp"
             android:layout_gravity="center"
             android:importantForAccessibility="no"
-            android:src="@drawable/ic_globe_gray_16dp" />
+            android:src="@drawable/ic_globe_gray_16dp"/>
     </FrameLayout>
 
     <TextView

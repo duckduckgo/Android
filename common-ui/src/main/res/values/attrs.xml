@@ -46,7 +46,6 @@
     <attr name="settingsItemTextColor" format="color" />
     <attr name="settingsItemTextColorDisabled" format="color" />
     <attr name="settingsMinorTextColor" format="color" />
-    <attr name="settingsSwitchBackgroundColor" format="color" />
     <attr name="sectionDividerColor" format="color" />
     <attr name="buttonOutlinedBorderColor" format="color" />
     <attr name="buttonOutlinedTextColor" format="color" />
@@ -84,7 +83,7 @@
     <attr name="textInputOutlinedBoxColorHighlight" format="color" />
 
     <attr name="normalTextColor" format="color" />
-    <attr name="secondaryTextColor" format="color" />
+    <attr name="secondaryTextColor" format="color"/>
     <attr name="accentTextColor" format="color" />
     <attr name="primaryIconColor" format="color" />
     <attr name="primaryIconDisabledColor" format="color" />
@@ -92,13 +91,17 @@
     <attr name="accentIconColor" format="color" />
     <attr name="splitterColor" format="color" />
 
-    <attr name="secondaryButtonPressedColor" format="color" />
-    <attr name="primaryButtonDisabledColor" format="color" />
+    <attr name="secondaryButtonPressedColor" format="color"/>
+    <attr name="primaryButtonDisabledColor" format="color"/>
 
-    <attr name="dialogPrimaryButtonColor" format="color" />
-    <attr name="dialogSecondaryButtonColor" format="color" />
+    <attr name="dialogPrimaryButtonColor" format="color"/>
+    <attr name="dialogSecondaryButtonColor" format="color"/>
 
-    <attr name="overflowMenuDividerColor" format="color" />
-    <attr name="bottomShadowBackground" format="reference" />
-    <attr name="appTPHeaderBackground" format="color" />
+    <attr name="overflowMenuDividerColor" format="color"/>
+    <attr name="bottomShadowBackground" format="reference"/>
+    <attr name="appTPHeaderBackground" format="color"/>
+
+    <!-- TODO: For Noelia to remove -->
+    <attr name="settingsSwitchBackgroundColor" format="color"/>
+
 </resources>

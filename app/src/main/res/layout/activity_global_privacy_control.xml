@@ -17,15 +17,16 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context="com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity">
 
     <include
         android:id="@+id/includeToolbar"
-        layout="@layout/include_default_toolbar" />
+        layout="@layout/include_default_toolbar"/>
 
     <LinearLayout
         android:orientation="vertical"
@@ -45,13 +46,12 @@
             android:textSize="14sp"
             android:textStyle="normal" />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
             android:id="@+id/globalPrivacyControlToggle"
-            style="@style/SettingsSwitch"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:text="@string/globalPrivacyControlToggle"
-            android:theme="@style/SettingsSwitchTheme" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/globalPrivacyControlToggle"
+            app:showSwitch="true"/>
 
     </LinearLayout>
 

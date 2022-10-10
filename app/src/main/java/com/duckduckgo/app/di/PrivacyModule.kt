@@ -22,8 +22,12 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.fire.*
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.AndroidAppCacheClearer
+import com.duckduckgo.app.fire.AppCacheClearer
+import com.duckduckgo.app.fire.BackgroundTimeKeeper
+import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
+import com.duckduckgo.app.fire.DataClearerTimeKeeper
+import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
 import com.duckduckgo.app.global.DispatcherProvider
@@ -44,15 +48,14 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
+import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
-import com.duckduckgo.site.permissions.impl.SitePermissionsManagerImpl
-import com.duckduckgo.site.permissions.impl.SitePermissionsRepositoryImpl
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.IntoSet
 import dagger.SingleInstanceIn
+import dagger.multibindings.IntoSet
 
 @Module
 object PrivacyModule {
@@ -134,21 +137,6 @@ object PrivacyModule {
         dispatcherProvider: DispatcherProvider
     ): GeoLocationPermissions {
         return GeoLocationPermissionsManager(context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun fireproofWebsiteRepository(
-        fireproofWebsiteDao: FireproofWebsiteDao,
-        dispatchers: DispatcherProvider,
-        faviconManager: Lazy<FaviconManager>
-    ): FireproofWebsiteRepositoryAPI {
-        return FireproofWebsiteRepository(fireproofWebsiteDao, dispatchers, faviconManager)
-    }
-
-    @Provides
-    fun providesSitePermissionsManager(sitePermissionsRepository: SitePermissionsRepositoryImpl): SitePermissionsManager {
-        return SitePermissionsManagerImpl(sitePermissionsRepository)
     }
 
     @Provides

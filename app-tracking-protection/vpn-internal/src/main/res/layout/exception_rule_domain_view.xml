@@ -15,16 +15,15 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingStart="16dp"
-    android:paddingTop="8dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="8dp"
-    android:gravity="center">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center"
+              android:orientation="horizontal"
+              android:paddingStart="16dp"
+              android:paddingTop="8dp"
+              android:paddingEnd="16dp"
+              android:paddingBottom="8dp">
 
     <TextView
         android:id="@+id/tracker_domain"
@@ -49,6 +48,6 @@
         android:layout_gravity="center"
         android:button="@null"
         android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
-        android:theme="@style/PopUpMenuSwitchTheme" />
+        android:theme="@style/PopUpMenuCheckBoxTheme"/>
 
 </LinearLayout>

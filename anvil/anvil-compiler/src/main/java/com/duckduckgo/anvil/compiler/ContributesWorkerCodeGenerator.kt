@@ -44,7 +44,6 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
 import java.io.File
-import java.lang.StringBuilder
 import javax.inject.Inject
 
 /**
@@ -82,6 +81,22 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
                 PropertySpec
                     .builder(it.name, ClassName("javax.inject", "Provider").parameterizedBy(it.type().asTypeName()))
                     .addModifiers(KModifier.PRIVATE)
+                    .apply {
+                        // carry over the property annotations
+                        it.annotations.filter { ann -> ann.fqName != Inject::class.fqName }.forEach { annotation ->
+                            addAnnotation(
+                                AnnotationSpec.builder(annotation.fqName.asClassName(module))
+                                    .apply {
+                                        annotation.arguments.forEach { argument ->
+                                            argument.name?.let { name -> addMember("%N = %S", name, argument.value()) }
+                                                ?: addMember("%S", argument.value())
+
+                                        }
+                                    }
+                                    .build()
+                            )
+                        }
+                    }
                     .build()
             }.toTypedArray()
 

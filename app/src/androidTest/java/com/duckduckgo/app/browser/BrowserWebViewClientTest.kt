@@ -33,7 +33,6 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
-import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
@@ -46,14 +45,9 @@ import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
-import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import com.duckduckgo.privacy.config.api.Gpc
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -63,7 +57,13 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class BrowserWebViewClientTest {

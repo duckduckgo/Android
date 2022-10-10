@@ -47,6 +47,7 @@ dependencies {
     testImplementation CashApp.turbine
     testImplementation Testing.junit4
     testImplementation Testing.mockito.kotlin
+    testImplementation Testing.robolectric
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy

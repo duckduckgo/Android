@@ -19,9 +19,13 @@ package com.duckduckgo.app.fire.fireproofwebsite.data
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.UriString
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -35,11 +39,39 @@ interface FireproofWebsiteRepositoryAPI {
     suspend fun removeAllFireproofWebsites()
 }
 
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = FireproofRepository::class
+)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = FireproofWebsiteRepositoryAPI::class
+)
+@SingleInstanceIn(AppScope::class)
 class FireproofWebsiteRepository @Inject constructor(
     private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val dispatchers: DispatcherProvider,
     private val faviconManager: Lazy<FaviconManager>
-) : FireproofWebsiteRepositoryAPI {
+) : FireproofRepository, FireproofWebsiteRepositoryAPI {
+
+    override fun fireproofWebsites(): List<String> {
+        val fireproofWebsites = fireproofWebsiteDao.fireproofWebsitesSync()
+        return fireproofWebsites.flatMap { entity ->
+            val acceptedHosts = mutableSetOf<String>()
+            val host = entity.domain
+            acceptedHosts.add(host)
+            host.split(".")
+                .foldRight(
+                    ""
+                ) { next, acc ->
+                    val acceptedHost = ".$next$acc"
+                    acceptedHosts.add(acceptedHost)
+                    acceptedHost
+                }
+            acceptedHosts
+        }.distinct()
+    }
+
     override suspend fun fireproofWebsite(domain: String): FireproofWebsiteEntity? {
         if (!UriString.isValidDomain(domain)) return null
 

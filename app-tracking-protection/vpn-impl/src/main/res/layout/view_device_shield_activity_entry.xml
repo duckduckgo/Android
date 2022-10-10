@@ -88,12 +88,10 @@
 
     </LinearLayout>
 
-    <View
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:id="@+id/entry_splitter"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="70dp"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:background="?splitterColor"/>
+        android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"/>
 
 </LinearLayout>
