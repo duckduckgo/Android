@@ -114,4 +114,13 @@ class SharedPreferencesVpnStoreTest {
 
         assertFalse(sharedPreferencesVpnStore.isAlwaysOnEnabled())
     }
+
+    @Test
+    fun whenAppTpEnabledCtaDidShowThenSetPreferenceValueToTrue() {
+        assertFalse(sharedPreferencesVpnStore.didShowAppTpEnabledCta())
+
+        sharedPreferencesVpnStore.appTpEnabledCtaDidShow()
+
+        assertTrue(sharedPreferencesVpnStore.didShowAppTpEnabledCta())
+    }
 }

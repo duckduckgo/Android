@@ -196,7 +196,8 @@
     <string name="atp_ActivityPastWeek">Past 7 Days</string>
     <string name="atp_ActivityTitle">App Tracking Protection</string>
     <string name="atp_MostRecentActivityTitle">All Recent Activity</string>
-    <string name="atp_ActivityRecentActivity">Recent Activity</string>
+    <!-- TODO [ANA] Modified, double check if new key is needed -->
+    <string name="atp_ActivityRecentActivity">Activity</string>
     <string name="atp_ActivityCtaShowAll">View All Recent Activity</string>
     <string name="atp_ActivityAppTrackersFAQ">What Are App Trackers?</string>
     <string name="atp_ActivityReportProblem">Report a problem With an App</string>
@@ -220,7 +221,22 @@
         <![CDATA[%1$d tracking attempts blocked from %2$d companies in <b>%3$s</b> app]]>
     </string>
 
+    <!-- TODO [ANA] New strings added, need translation -->
+    <string name="atp_ActivityDescription" translatable="false">Blocked tracking attempts will appear here</string>
+    <string name="atp_ActivityProtectedApps" translatable="false">%s of your apps are protected from hidden trackers we find trying to access your personal info</string>
+    <string name="atp_ActivityUnprotectedApps" translatable="false">%s of your apps have protection automatically disabled</string>
+    <string name="atp_ActivityAppTpEnabledCtaText" translatable="false">Good news! App Tracking Protection is now enabled. \n 👌I’ll show you a real-time list of apps on your device that I catch trying to track you.</string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel" translatable="false">Got It!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" translatable="false">Protection Enabled (%s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" translatable="false">Protection Disabled (%s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel" translatable="false">All</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel" translatable="false">Protection Enabled</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel" translatable="false">Protection Disabled</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel" translatable="false">All</string>
+
+    <!-- TODO [ANA] Remove this -->
     <string name="atp_ActivityEmptyListTitle">No new activity</string>
+    <!-- TODO [ANA] Remove this -->
     <string name="atp_ActivityEmptyListMessage">Keep using your device. Tracking attempts that App Tracking Protection blocks appear here.</string>
     <string name="atp_ActivityPastWeekBlocked">Blocked</string>
     <string name="atp_ActivityPastWeekAcross">Across</string>

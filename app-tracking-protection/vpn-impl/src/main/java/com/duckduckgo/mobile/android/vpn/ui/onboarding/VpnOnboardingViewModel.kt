@@ -72,10 +72,6 @@ class VpnOnboardingViewModel @Inject constructor(
         OnboardingPage(
             appTPOnboardingAnimationHelper.getHeaderRes(VPN),
             R.string.atp_OnboardingLastPageThreeTitle, R.string.atp_OnboardingLastPageThreeSubTitle
-        ),
-        OnboardingPage(
-            appTPOnboardingAnimationHelper.getHeaderRes(TRACKING_APPS),
-            R.string.atp_EnabledTitle, R.string.atp_EnabledMessage
         )
     )
 
