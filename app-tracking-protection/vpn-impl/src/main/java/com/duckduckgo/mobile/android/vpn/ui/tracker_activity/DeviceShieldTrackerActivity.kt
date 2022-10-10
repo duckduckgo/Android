@@ -22,11 +22,15 @@ import android.content.Intent
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.ResultReceiver
 import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.CompoundButton
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.os.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -34,9 +38,11 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
 import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.APPTP_SETTINGS_ANNOTATION
 import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.REPORT_ISSUES_ANNOTATION
 import com.duckduckgo.mobile.android.ui.view.SwitchView
+import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
@@ -63,6 +69,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import nl.dionsegijn.konfetti.models.Shape
+import nl.dionsegijn.konfetti.models.Size
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -87,6 +95,8 @@ class DeviceShieldTrackerActivity :
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
     private lateinit var deviceShieldSwitch: SwitchView
+
+    private val handler = Handler(Looper.getMainLooper())
 
     // we might get an update before options menu has been populated; temporarily cache value to use when menu populated
     private var vpnCachedState: VpnState? = null
@@ -166,6 +176,13 @@ class DeviceShieldTrackerActivity :
         } else {
             binding.ctaShowAll.gone()
         }
+
+        viewModel.showAppTpEnabledCtaIfNeeded()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
     }
 
     private fun showDeviceShieldActivity() {
@@ -232,6 +249,7 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.ShowRemoveFeatureConfirmationDialog -> launchRemoveFeatureConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.CloseScreen -> finish()
             is DeviceShieldTrackerActivityViewModel.Command.OpenVpnSettings -> openVPNSettings()
+            is DeviceShieldTrackerActivityViewModel.Command.ShowAppTpEnabledCta -> showAppTpEnabledCta()
         }
     }
 
@@ -499,10 +517,69 @@ class DeviceShieldTrackerActivity :
         data class Denied(val intent: Intent) : VpnPermissionStatus()
     }
 
+    private fun showAppTpEnabledCta() {
+        supportFragmentManager.findFragmentByTag(TAG_APPTP_ENABLED_CTA_DIALOG)?.let {
+            return
+        }
+
+        val dialog = TypewriterDaxDialog.newInstance(
+            daxText = getString(R.string.atp_ActivityAppTpEnabledCtaText),
+            primaryButtonText = getString(R.string.atp_ActivityAppTpEnabledCtaButtonLabel),
+            hideButtonText = "",
+        )
+
+        dialog.setDaxDialogListener(object : DaxDialogListener {
+            override fun onDaxDialogDismiss() {
+                // NO OP
+            }
+
+            override fun onDaxDialogPrimaryCtaClick() {
+                dialog.dismiss()
+                launchKonfetti()
+                deviceShieldPixels.didPressOnAppTpEnabledCtaButton()
+            }
+
+            override fun onDaxDialogSecondaryCtaClick() {
+                // NO OP
+            }
+
+            override fun onDaxDialogHideClick() {
+                // NO OP
+            }
+        })
+
+        handler.postDelayed(delayInMillis = APPTP_ENABLED_CTA_DIALOG_DELAY_MS) {
+            dialog.show(supportFragmentManager, TAG_APPTP_ENABLED_CTA_DIALOG)
+        }
+    }
+
+    private fun launchKonfetti() {
+        val magenta = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.magenta, null)
+        val blue = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.accentBlue, null)
+        val purple = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.purple, null)
+        val green = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.green, null)
+        val yellow = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.yellow, null)
+
+        val displayWidth = resources.displayMetrics.widthPixels
+
+        binding.appTpEnabledKonfetti.build()
+            .addColors(magenta, blue, purple, green, yellow)
+            .setDirection(0.0, 359.0)
+            .setSpeed(1f, 5f)
+            .setFadeOutEnabled(true)
+            .setTimeToLive(2000L)
+            .addShapes(Shape.Rectangle(1f))
+            .addSizes(Size(8))
+            .setPosition(displayWidth / 2f, displayWidth / 2f, -50f, -50f)
+            .streamFor(50, 4000L)
+    }
+
     companion object {
         private const val RESULT_RECEIVER_EXTRA = "RESULT_RECEIVER_EXTRA"
         private const val ON_LAUNCHED_CALLED_SUCCESS = 0
-        private const val MIN_ROWS_FOR_ALL_ACTIVITY = 6
+        private const val MIN_ROWS_FOR_ALL_ACTIVITY = 5
+        private const val TAG_APPTP_ENABLED_CTA_DIALOG = "AppTpEnabledCta"
+        private const val APPTP_ENABLED_CTA_DIALOG_DELAY_MS = 1000L
 
         private const val REQUEST_ASK_VPN_PERMISSION = 101
 
