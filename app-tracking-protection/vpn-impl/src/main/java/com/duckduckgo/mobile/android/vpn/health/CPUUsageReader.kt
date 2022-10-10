@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.site.permissions.impl
+package com.duckduckgo.mobile.android.vpn.health
 
-import junit.framework.TestCase
-
-class SitePermissionsRepositoryImplTest : TestCase() {
-
-    fun testIsDomainAllowedToAsk() {}
-
-    fun testIsDomainGranted() {}
-
-    fun testSitePermissionGranted() {}
+interface CPUUsageReader {
+    fun readCPUUsage(): Double
 }

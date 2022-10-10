@@ -88,10 +88,10 @@
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                android:id="@+id/vpnUnderlyingNetworksToggle"
+                android:id="@+id/vpn_intercept_dns_traffic_toggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="Network Switching handling"
+                app:primaryText="Intercept DNS"
                 app:showSwitch="true"
             />
 
@@ -252,14 +252,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Health"
-            />
-
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/cpuMonitorToggle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="CPU monitoring"
-                    app:showSwitch="true"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem

@@ -27,7 +27,7 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = AppTpSettingPlugin::class
 )
-class NetworkSwitchingSettingPlugin @Inject constructor(
+class CPUMonitoringSettingPlugin @Inject constructor(
     private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : AppTpSettingPlugin {
     private val jsonAdapter = Moshi.Builder().build().adapter(JsonConfigModel::class.java)
@@ -37,8 +37,12 @@ class NetworkSwitchingSettingPlugin @Inject constructor(
         val name = appTpSettingValueOf(name.value)
         if (name == settingName) {
             Timber.d("Received configuration: $jsonString")
-            jsonAdapter.fromJson(jsonString)?.let { config ->
-                appTpFeatureConfig.edit { setEnabled(settingName, config.state == "enabled") }
+            runCatching {
+                jsonAdapter.fromJson(jsonString)?.state?.let { state ->
+                    appTpFeatureConfig.edit { setEnabled(settingName, state == "enabled") }
+                }
+            }.onFailure {
+                Timber.w(it, "Invalid JSON remote configuration for $settingName")
             }
             return true
         }
@@ -46,7 +50,7 @@ class NetworkSwitchingSettingPlugin @Inject constructor(
         return false
     }
 
-    override val settingName: SettingName = AppTpSetting.NetworkSwitchHandling
+    override val settingName: SettingName = AppTpSetting.CPUMonitoring
 
     private data class JsonConfigModel(val state: String?)
 }

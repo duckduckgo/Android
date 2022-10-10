@@ -85,10 +85,10 @@ class ClearPersonalDataAction(
         shouldFireDataClearPixel: Boolean
     ) {
         withContext(Dispatchers.IO) {
-            val fireproofWebsites = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
+            val fireproofDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
             cookieManager.flush()
             geoLocationPermissions.clearAllButFireproofed()
-            sitePermissionsManager.clearAllButFireproof(fireproofWebsites)
+            sitePermissionsManager.clearAllButFireproof(fireproofDomains)
             thirdPartyCookieManager.clearAllData()
             clearTabsAsync(appInForeground)
         }
