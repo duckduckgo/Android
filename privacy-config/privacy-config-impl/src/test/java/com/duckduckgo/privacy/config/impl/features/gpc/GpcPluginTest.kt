@@ -21,12 +21,14 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyList
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 class GpcPluginTest {
     lateinit var testee: GpcPlugin
@@ -79,12 +81,12 @@ class GpcPluginTest {
     }
 
     @Test
-    fun whenFeatureNameMatchesGpcThenUpdateAllExistingExceptionsAndHeaders() {
+    fun whenFeatureNameMatchesGpcThenUpdateAllExistingExceptionsAndHeadersAndConfig() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/gpc.json")
 
         testee.store(FEATURE_NAME_VALUE, jsonString)
 
-        verify(mockGpcRepository).updateAll(anyList(), anyList())
+        verify(mockGpcRepository).updateAll(anyList(), anyList(), any())
     }
 
     companion object {

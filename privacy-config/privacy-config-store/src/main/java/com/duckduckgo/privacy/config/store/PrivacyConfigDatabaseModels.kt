@@ -19,14 +19,15 @@ package com.duckduckgo.privacy.config.store
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import com.duckduckgo.privacy.config.api.AmpLinkException
 import com.duckduckgo.privacy.config.api.AutofillException
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.api.HttpsException
-import com.duckduckgo.privacy.config.api.AmpLinkException
 import com.duckduckgo.privacy.config.api.TrackingParameterException
+import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import com.duckduckgo.privacy.config.api.UserAgentException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -107,6 +108,12 @@ fun GpcExceptionEntity.toGpcException(): GpcException {
     return GpcException(domain = this.domain)
 }
 
+@Entity(tableName = "gpc_content_scope_config")
+data class GpcContentScopeConfigEntity(
+    @PrimaryKey val id: Int = 1,
+    val config: String
+)
+
 @Entity(tableName = "content_blocking_exceptions")
 data class ContentBlockingExceptionEntity(
     @PrimaryKey val domain: String,
@@ -169,6 +176,10 @@ fun AmpLinkExceptionEntity.toAmpLinkException(): AmpLinkException {
 
 fun TrackingParameterExceptionEntity.toTrackingParameterException(): TrackingParameterException {
     return TrackingParameterException(domain = this.domain, reason = this.reason)
+}
+
+fun UnprotectedTemporaryEntity.toUnprotectedTemporaryException(): UnprotectedTemporaryException {
+    return UnprotectedTemporaryException(domain = this.domain, reason = this.reason)
 }
 
 class Adapters {

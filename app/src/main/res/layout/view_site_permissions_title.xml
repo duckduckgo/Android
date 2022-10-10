@@ -20,15 +20,12 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
         android:id="@+id/sitePermissionsSectionTitle"
-        style="@style/SitePermissionsSectionTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        tools:text="Title" />
+        tools:text="Title"/>
 
     <ImageView
         android:id="@+id/overflowMenu"

@@ -68,7 +68,6 @@ class AppTpFeatureConfigImplTest {
                 AppTpSetting.InterceptDnsTraffic -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.AlwaysSetDNS -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.CPUMonitoring -> assertFalse(config.isEnabled(setting))
-                AppTpSetting.VpnDdgBrowserTraffic -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ConnectivityChecks -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ProtectGames -> assertFalse(config.isEnabled(setting))
             }

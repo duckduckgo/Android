@@ -19,10 +19,24 @@ package com.duckduckgo.autofill.ui.credential.management
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.store.AutofillStore
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.*
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitDisabledMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitLockedMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Editing
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.NotInCredentialMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,7 +48,8 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class AutofillSettingsViewModel @Inject constructor(
     private val autofillStore: AutofillStore,
-    private val clipboardInteractor: AutofillClipboardInteractor
+    private val clipboardInteractor: AutofillClipboardInteractor,
+    private val pixel: Pixel
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -208,11 +223,15 @@ class AutofillSettingsViewModel @Inject constructor(
     fun onEnableAutofill() {
         autofillStore.autofillEnabled = true
         _viewState.value = viewState.value.copy(autofillEnabled = true)
+
+        pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED)
     }
 
     fun onDisableAutofill() {
         autofillStore.autofillEnabled = false
         _viewState.value = viewState.value.copy(autofillEnabled = false)
+
+        pixel.fire(AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED)
     }
 
     fun onAuthenticationEnded() {

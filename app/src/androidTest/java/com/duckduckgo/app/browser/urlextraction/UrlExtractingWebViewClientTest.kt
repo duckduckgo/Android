@@ -26,17 +26,15 @@ import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.cookies.api.CookieManagerProvider
-import com.duckduckgo.privacy.config.api.Gpc
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -51,12 +49,12 @@ class UrlExtractingWebViewClientTest {
     private val requestInterceptor: RequestInterceptor = mock()
     private val cookieManagerProvider: CookieManagerProvider = mock()
     private val cookieManager: CookieManager = mock()
-    private val gpc: Gpc = mock()
     private val trustedCertificateStore: TrustedCertificateStore = mock()
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val urlExtractor: DOMUrlExtractor = mock()
     private val mockWebView: WebView = mock()
+    private val contentScopeScripts: ContentScopeScripts = mock()
 
     @UiThreadTest
     @Before
@@ -66,11 +64,11 @@ class UrlExtractingWebViewClientTest {
             trustedCertificateStore,
             requestInterceptor,
             cookieManagerProvider,
-            gpc,
             thirdPartyCookieManager,
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
             urlExtractor,
+            contentScopeScripts
         )
         whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
     }
@@ -84,29 +82,9 @@ class UrlExtractingWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledIfUrlIsNullThenDoNotInjectGpcToDom() = runTest {
-        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(true)
-
-        testee.onPageStarted(mockWebView, null, null)
-        verify(gpc, never()).getGpcJs()
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageStartedCalledIfUrlIsValidThenInjectGpcToDom() = runTest {
-        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(true)
-
+    fun whenOnPageStartedCalledThenInjectContentScopeScriptsToDom() = runTest {
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        verify(gpc).getGpcJs()
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageStartedCalledIfUrlIsNotAndValidThenDoNotInjectGpcToDom() = runTest {
-        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(false)
-
-        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        verify(gpc, never()).getGpcJs()
+        verify(contentScopeScripts).getScript()
     }
 
     @UiThreadTest

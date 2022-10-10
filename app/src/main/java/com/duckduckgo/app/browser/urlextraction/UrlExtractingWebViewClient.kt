@@ -18,14 +18,8 @@ package com.duckduckgo.app.browser.urlextraction
 
 import android.graphics.Bitmap
 import android.net.http.SslError
-import android.net.http.SslError.SSL_UNTRUSTED
-import android.webkit.HttpAuthHandler
-import android.webkit.SslErrorHandler
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.net.http.SslError.*
+import android.webkit.*
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
@@ -35,13 +29,9 @@ import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.cookies.api.CookieManagerProvider
-import com.duckduckgo.privacy.config.api.Gpc
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import timber.log.Timber
 
 class UrlExtractingWebViewClient(
@@ -49,11 +39,11 @@ class UrlExtractingWebViewClient(
     private val trustedCertificateStore: TrustedCertificateStore,
     private val requestInterceptor: RequestInterceptor,
     private val cookieManagerProvider: CookieManagerProvider,
-    private val gpc: Gpc,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val urlExtractor: DOMUrlExtractor,
+    private val contentScopeScripts: ContentScopeScripts
 ) : WebViewClient() {
 
     var urlExtractionListener: UrlExtractionListener? = null
@@ -66,7 +56,7 @@ class UrlExtractingWebViewClient(
                 thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
             }
         }
-        injectGpcToDom(webView, url)
+        webView.evaluateJavascript("javascript:${contentScopeScripts.getScript()}", null)
         Timber.d("AMP link detection: Injecting JS for URL extraction")
         urlExtractor.injectUrlExtractionJS(webView)
     }
@@ -75,14 +65,6 @@ class UrlExtractingWebViewClient(
     override fun onPageFinished(webView: WebView, url: String?) {
         Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
         flushCookies()
-    }
-
-    private fun injectGpcToDom(webView: WebView, url: String?) {
-        url?.let {
-            if (gpc.canGpcBeUsedByUrl(url)) {
-                webView.evaluateJavascript("javascript:${gpc.getGpcJs()}", null)
-            }
-        }
     }
 
     private fun flushCookies() {

@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl
+plugins {
+    id 'java-library'
+    id 'kotlin'
+}
 
-import com.duckduckgo.app.statistics.pixels.Pixel
+apply from: "$rootProject.projectDir/spotless.gradle"
 
-enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName {
-    AUTOFILL_LOGINS_AUTOPROMPT_DISMISSED("m_autofill_logins_autoprompt_dismissed")
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    implementation Kotlin.stdlib.jdk7
 }

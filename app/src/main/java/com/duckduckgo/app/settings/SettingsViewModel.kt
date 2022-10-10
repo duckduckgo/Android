@@ -25,7 +25,27 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.icon.api.AppIcon
-import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.pixels.AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE
+import com.duckduckgo.app.pixels.AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS
+import com.duckduckgo.app.pixels.AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS_AND_DATA
+import com.duckduckgo.app.pixels.AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_ONLY
+import com.duckduckgo.app.pixels.AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_15_MINS
+import com.duckduckgo.app.pixels.AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS
+import com.duckduckgo.app.pixels.AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_5_MINS
+import com.duckduckgo.app.pixels.AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_ANIMATION_NEW_SELECTED
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_ANIMATION_SETTINGS_OPENED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APP_LINKS_ALWAYS_SELECTED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_APP_LINKS_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_AUTOFILL_MANAGEMENT_OPENED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_MANAGE_WHITELIST
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_OPENED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_DARK
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -247,6 +267,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onAutofillSettingsClick() {
         viewModelScope.launch { command.send(Command.LaunchAutofillSettings) }
+        pixel.fire(SETTINGS_AUTOFILL_MANAGEMENT_OPENED)
     }
 
     fun onSitePermissionsClicked() {

@@ -99,6 +99,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
+import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.di.scopes.AppScope
@@ -146,7 +147,6 @@ class BrowserModule {
         cookieManagerProvider: CookieManagerProvider,
         loginDetector: DOMLoginDetector,
         dosDetector: DosDetector,
-        gpc: Gpc,
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
@@ -157,6 +157,7 @@ class BrowserModule {
         internalTestUserChecker: InternalTestUserChecker,
         adClickManager: AdClickManager,
         autoconsent: Autoconsent,
+        contentScopeScripts: ContentScopeScripts
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -169,7 +170,6 @@ class BrowserModule {
             cookieManagerProvider,
             loginDetector,
             dosDetector,
-            gpc,
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
@@ -180,6 +180,7 @@ class BrowserModule {
             internalTestUserChecker,
             adClickManager,
             autoconsent,
+            contentScopeScripts
         )
     }
 
@@ -189,22 +190,22 @@ class BrowserModule {
         trustedCertificateStore: TrustedCertificateStore,
         requestInterceptor: RequestInterceptor,
         cookieManagerProvider: CookieManagerProvider,
-        gpc: Gpc,
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         urlExtractor: DOMUrlExtractor,
+        contentScopeScripts: ContentScopeScripts
     ): UrlExtractingWebViewClient {
         return UrlExtractingWebViewClient(
             webViewHttpAuthStore,
             trustedCertificateStore,
             requestInterceptor,
             cookieManagerProvider,
-            gpc,
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
             urlExtractor,
+            contentScopeScripts
         )
     }
 

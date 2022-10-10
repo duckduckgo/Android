@@ -19,15 +19,9 @@ package com.duckduckgo.app.browser
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
-import android.net.http.SslError.SSL_UNTRUSTED
+import android.net.http.SslError.*
 import android.os.Build
-import android.webkit.HttpAuthHandler
-import android.webkit.RenderProcessGoneDetail
-import android.webkit.SslErrorHandler
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
@@ -45,23 +39,15 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource.ON_HTTP_AUTH_REQUEST
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource.ON_PAGE_FINISHED
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource.ON_PAGE_STARTED
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource.SHOULD_INTERCEPT_REQUEST
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource.SHOULD_OVERRIDE_REQUEST
+import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
+import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
-import com.duckduckgo.privacy.config.api.Gpc
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
 
@@ -76,7 +62,6 @@ class BrowserWebViewClient(
     private val cookieManagerProvider: CookieManagerProvider,
     private val loginDetector: DOMLoginDetector,
     private val dosDetector: DosDetector,
-    private val gpc: Gpc,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -87,6 +72,7 @@ class BrowserWebViewClient(
     private val internalTestUserChecker: InternalTestUserChecker,
     private val adClickManager: AdClickManager,
     private val autoconsent: Autoconsent,
+    private val contentScopeScripts: ContentScopeScripts
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -277,7 +263,7 @@ class BrowserWebViewClient(
             }
             lastPageStarted = url
             browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
-            injectGpcToDom(webView, url)
+            webView.evaluateJavascript("javascript:${contentScopeScripts.getScript()}", null)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {
             appCoroutineScope.launch(dispatcherProvider.default()) {
@@ -310,17 +296,6 @@ class BrowserWebViewClient(
             appCoroutineScope.launch(dispatcherProvider.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
                 throw e
-            }
-        }
-    }
-
-    private fun injectGpcToDom(
-        webView: WebView,
-        url: String?
-    ) {
-        url?.let {
-            if (gpc.canGpcBeUsedByUrl(url)) {
-                webView.evaluateJavascript("javascript:${gpc.getGpcJs()}", null)
             }
         }
     }

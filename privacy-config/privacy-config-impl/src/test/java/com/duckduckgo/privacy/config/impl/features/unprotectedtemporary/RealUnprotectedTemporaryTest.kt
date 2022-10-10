@@ -17,15 +17,16 @@
 package com.duckduckgo.privacy.config.impl.features.unprotectedtemporary
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
+import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
-import java.util.concurrent.CopyOnWriteArrayList
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(AndroidJUnit4::class)
 class RealUnprotectedTemporaryTest {
@@ -53,15 +54,15 @@ class RealUnprotectedTemporaryTest {
 
     @Test
     fun whenIsAnExceptionAndDomainIsNotListedInTheExceptionsListThenReturnFalse() {
-        val exceptions = CopyOnWriteArrayList<UnprotectedTemporaryEntity>()
+        val exceptions = CopyOnWriteArrayList<UnprotectedTemporaryException>()
         whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(exceptions)
 
         assertFalse(testee.isAnException("http://test.example.com"))
     }
 
     private fun givenThereAreExceptions() {
-        val exceptions = CopyOnWriteArrayList<UnprotectedTemporaryEntity>()
-        exceptions.add(UnprotectedTemporaryEntity("example.com", "my reason here"))
+        val exceptions = CopyOnWriteArrayList<UnprotectedTemporaryException>()
+        exceptions.add(UnprotectedTemporaryException("example.com", "my reason here"))
 
         whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(exceptions)
     }

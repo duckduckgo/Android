@@ -34,10 +34,9 @@ import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecycl
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Delete
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel
-import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.ui.credential.management.LoginCredentialTitleExtractor
+import com.duckduckgo.autofill.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -65,18 +64,19 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private val binding: FragmentAutofillManagementListModeBinding by viewBinding()
     private lateinit var adapter: AutofillManagementRecyclerAdapter
 
-    private val globalAutofillToggleListener = object : CompoundButton.OnCheckedChangeListener {
-
-        override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-            if (isChecked) viewModel.onEnableAutofill() else viewModel.onDisableAutofill()
-        }
+    private val globalAutofillToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@OnCheckedChangeListener
+        if (isChecked) viewModel.onEnableAutofill() else viewModel.onDisableAutofill()
     }
 
     private fun configureToggle() {
         binding.enabledToggle.setOnCheckedChangeListener(globalAutofillToggleListener)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
         super.onViewCreated(view, savedInstanceState)
         configureToggle()
         configureRecyclerView()

@@ -18,10 +18,20 @@ package com.duckduckgo.autofill.ui.credential.management
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitDisabledMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitLockedMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -43,7 +53,8 @@ class AutofillSettingsViewModelTest {
 
     private val mockStore: AutofillStore = mock()
     private val clipboardInteractor: AutofillClipboardInteractor = mock()
-    private val testee = AutofillSettingsViewModel(mockStore, clipboardInteractor)
+    private val pixel: Pixel = mock()
+    private val testee = AutofillSettingsViewModel(mockStore, clipboardInteractor, pixel)
 
     @Test
     fun whenUserEnablesAutofillThenViewStateUpdatedToReflectChange() = runTest {
@@ -378,6 +389,7 @@ class AutofillSettingsViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
     @Test
     fun whenAuthWasLaunchAndThenDeviceAuthDisabledThenEmitViewStateWithIsAuthenticatingFalse() = runTest {
         testee.launchDeviceAuth()
