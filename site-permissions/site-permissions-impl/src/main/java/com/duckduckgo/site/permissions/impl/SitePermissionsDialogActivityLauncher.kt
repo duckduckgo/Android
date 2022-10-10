@@ -254,6 +254,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedContent
             SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedContent
         }
+
         AlertDialog.Builder(activity).apply {
             setTitle(titleRes)
             setMessage(contentRes)
@@ -284,21 +285,5 @@ fun String.websiteFromGeoLocationsApiOrigin(): String {
 enum class SitePermissionsRequestedType {
     CAMERA,
     AUDIO,
-    CAMERA_AND_AUDIO;
-
-    companion object {
-        fun convertSystemPermissionToType(systemPermission: String): SitePermissionsRequestedType =
-            when (systemPermission) {
-                Manifest.permission.CAMERA -> CAMERA
-                Manifest.permission.RECORD_AUDIO -> AUDIO
-                else -> CAMERA_AND_AUDIO
-            }
-
-        fun SitePermissionsRequestedType.convertToPermissionRequest(): Array<String> =
-            when (this) {
-                CAMERA -> arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-                AUDIO -> arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
-                CAMERA_AND_AUDIO -> arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
-            }
-    }
+    CAMERA_AND_AUDIO
 }
