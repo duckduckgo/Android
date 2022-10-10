@@ -26,7 +26,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
-import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.recursiveEnable
@@ -50,13 +49,9 @@ class OneLineListItem @JvmOverloads constructor(
         ).apply {
 
             binding.primaryText.text = getString(R.styleable.OneLineListItem_primaryText)
-            if (hasValue(R.styleable.OneLineListItem_listItemTitleColor)) {
-                binding.primaryText.setTextColor(
-                    getColor(
-                        R.styleable.OneLineListItem_listItemTitleColor,
-                        context.getColorFromAttr(R.attr.listItemTitleColor)
-                    )
-                )
+
+            if (hasValue(R.styleable.OneLineListItem_primaryTextColorOverlay)) {
+                binding.primaryText.setTextColor(getColorStateList(R.styleable.OneLineListItem_primaryTextColorOverlay))
             }
 
             if (hasValue(R.styleable.OneLineListItem_leadingIcon)) {
