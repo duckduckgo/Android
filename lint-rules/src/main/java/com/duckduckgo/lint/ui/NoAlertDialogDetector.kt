@@ -73,7 +73,7 @@ class NoAlertDialogDetector : Detector(), SourceCodeScanner {
                 androidSpecific = true,
                 implementation = Implementation(
                     NoAlertDialogDetector::class.java,
-                    Scope.RESOURCE_FILE_SCOPE
+                    Scope.JAVA_FILE_SCOPE
                 )
             )
     }
