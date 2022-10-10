@@ -20,6 +20,4 @@
     <string name="autoconsentTitle">Administrar ventanas emergentes de cookies</string>
     <string name="autoconsentDescription">Cuando DuckDuckGo detecta ventanas emergentes de consentimiento de cookies en los sitios que visitas, podemos configurar automáticamente tus preferencias de cookies para minimizar las cookies y maximizar la privacidad y, a continuación, cerrar las ventanas emergentes.</string>
     <string name="autoconsentToggle">Deja que DuckDuckGo gestione las ventanas emergentes de consentimiento de cookies</string>
-
-    <string name="marcosTest">No, gracias</string>
 </resources>

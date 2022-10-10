@@ -14,6 +14,7 @@
   ~ limitations under the License.
   -->
 <!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- smartling.placeholder_format = NONE -->
     <string name="atp_name">App Tracking Protection</string>
