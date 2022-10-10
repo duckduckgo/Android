@@ -47,8 +47,8 @@ interface DeviceAuthenticator {
 
     sealed class AuthResult {
         object Success : AuthResult()
-        object Failed : AuthResult()
-        data class Error(private val reason: String) : AuthResult()
+        object UserCancelled : AuthResult()
+        data class Error(val reason: String) : AuthResult()
     }
 
     enum class Features {

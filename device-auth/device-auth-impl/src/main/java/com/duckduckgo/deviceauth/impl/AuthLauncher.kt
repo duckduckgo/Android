@@ -28,6 +28,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.UserCancelled
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
@@ -93,8 +94,13 @@ class RealAuthLauncher @Inject constructor(
             errString: CharSequence
         ) {
             super.onAuthenticationError(errorCode, errString)
-            Timber.d("onAuthenticationError: %s", errString)
-            onResult(Error(errString.toString()))
+            Timber.d("onAuthenticationError: (%d) %s", errorCode, errString)
+
+            if (errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
+                onResult(UserCancelled)
+            } else {
+                onResult(Error(String.format("(%d) %s", errorCode, errString)))
+            }
         }
 
         override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
