@@ -52,16 +52,21 @@ class AutofillDeviceCapabilityReporter @Inject constructor(
                 return@launch
             }
 
-            val secureStorageAvailable = secureStorage.canAccessSecureStorage()
-            val deviceAuthAvailable = deviceAuthenticator.hasValidDeviceAuthentication()
+            try {
+                val secureStorageAvailable = secureStorage.canAccessSecureStorage()
+                val deviceAuthAvailable = deviceAuthenticator.hasValidDeviceAuthentication()
 
-            Timber.d(
-                "Autofill device capabilities:" +
-                    "\nSecure storage available: $secureStorageAvailable" +
-                    "\nDevice auth available: $deviceAuthAvailable"
-            )
+                Timber.d(
+                    "Autofill device capabilities:" +
+                        "\nSecure storage available: $secureStorageAvailable" +
+                        "\nDevice auth available: $deviceAuthAvailable"
+                )
 
-            pixel.sendCapabilitiesPixel(secureStorageAvailable, deviceAuthAvailable)
+                pixel.sendCapabilitiesPixel(secureStorageAvailable, deviceAuthAvailable)
+            } catch (e: Error) {
+                Timber.w(e, "Failed to determine device autofill capabilities")
+                pixel.sendCapabilitiesUndeterminablePixel()
+            }
         }
     }
 }

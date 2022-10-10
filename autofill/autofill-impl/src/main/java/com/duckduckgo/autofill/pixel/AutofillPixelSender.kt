@@ -26,6 +26,7 @@ import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILI
 import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_CAPABLE
 import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE_AND_DEVICE_AUTH_DISABLED
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_UNKNOWN_ERROR
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -40,6 +41,8 @@ interface AutofillPixelSender {
         secureStorageAvailable: Boolean,
         deviceAuthAvailable: Boolean
     )
+
+    fun sendCapabilitiesUndeterminablePixel()
 }
 
 @ContributesBinding(AppScope::class)
@@ -66,6 +69,13 @@ class AutofillUniquePixelSender @Inject constructor(
             sendPixel(secureStorageAvailable, deviceAuthAvailable).let {
                 Timber.v("Autofill capability pixel fired: %s", it)
             }
+            preferences.edit { putBoolean(KEY_CAPABILITIES_DETERMINED, true) }
+        }
+    }
+
+    override fun sendCapabilitiesUndeterminablePixel() {
+        appCoroutineScope.launch(dispatchers.default()) {
+            pixel.fire(AUTOFILL_DEVICE_CAPABILITY_UNKNOWN_ERROR)
             preferences.edit { putBoolean(KEY_CAPABILITIES_DETERMINED, true) }
         }
     }
