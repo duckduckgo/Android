@@ -25,9 +25,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_CANCELLED
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_FAILURE
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_SHOWN
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_SUCCESSFUL
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.*
@@ -36,7 +41,9 @@ import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManageme
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementListMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementLockedMode
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Error
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.UserCancelled
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
@@ -57,6 +64,9 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var deviceAuthenticator: DeviceAuthenticator
+
+    @Inject
+    lateinit var pixel: Pixel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,17 +100,34 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun launchDeviceAuth() {
         if (deviceAuthenticator.hasValidDeviceAuthentication()) {
             viewModel.lock()
+
+            pixel.fire(AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_SHOWN)
             deviceAuthenticator.authenticate(AUTOFILL, this) {
-                if (it == AuthResult.Success) {
-                    viewModel.unlock()
-                } else {
-                    finish()
+                when (it) {
+                    Success -> onAuthenticationSuccessful()
+                    UserCancelled -> onAuthenticationCancelled()
+                    is Error -> onAuthenticationError()
                 }
                 viewModel.onAuthenticationEnded()
             }
         } else {
             viewModel.disabled()
         }
+    }
+
+    private fun onAuthenticationSuccessful() {
+        pixel.fire(AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_SUCCESSFUL)
+        viewModel.unlock()
+    }
+
+    private fun onAuthenticationCancelled() {
+        pixel.fire(AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_CANCELLED)
+        finish()
+    }
+
+    private fun onAuthenticationError() {
+        pixel.fire(AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_FAILURE)
+        finish()
     }
 
     private fun observeViewModel() {
@@ -200,6 +227,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             } else {
                 super.onBackPressed()
             }
+
             else -> super.onBackPressed()
         }
     }
@@ -216,7 +244,10 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
          * Optionally, can provide LoginCredentials to jump directly into viewing mode.
          * If no LoginCredentials provided, will show the list mode.
          */
-        fun intent(context: Context, loginCredentials: LoginCredentials? = null): Intent {
+        fun intent(
+            context: Context,
+            loginCredentials: LoginCredentials? = null
+        ): Intent {
             return Intent(context, AutofillManagementActivity::class.java).apply {
                 if (loginCredentials != null) {
                     putExtra(EXTRAS_CREDENTIALS_TO_VIEW, loginCredentials)
@@ -233,7 +264,10 @@ class AutofillSettingsModule {
     @Provides
     fun activityLauncher(): AutofillSettingsActivityLauncher {
         return object : AutofillSettingsActivityLauncher {
-            override fun intent(context: Context, loginCredentials: LoginCredentials?): Intent {
+            override fun intent(
+                context: Context,
+                loginCredentials: LoginCredentials?
+            ): Intent {
                 return AutofillManagementActivity.intent(context, loginCredentials)
             }
         }
