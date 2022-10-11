@@ -21,13 +21,14 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ActivityAppComponentsBinding
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK_V2
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT_V2
-import com.duckduckgo.mobile.android.ui.applyTheme
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class AppComponentsActivity : AppCompatActivity() {
@@ -37,7 +38,7 @@ class AppComponentsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val themePreferences = AppComponentsSharedPreferences(this)
         val selectedTheme = themePreferences.selectedTheme
-        applyTheme(selectedTheme)
+        applyLocalTheme(selectedTheme)
 
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -56,8 +57,16 @@ class AppComponentsActivity : AppCompatActivity() {
             startActivity(intent(this))
             finish()
         }
+    }
 
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+    private fun applyLocalTheme(theme: DuckDuckGoTheme) {
+        when (theme) {
+            LIGHT_V2 -> setTheme(R.style.Theme_DuckDuckGo_Light)
+            DARK_V2 -> setTheme(R.style.Theme_DuckDuckGo_Dark)
+            LIGHT -> setTheme(R.style.AppTheme_Light)
+            DARK -> setTheme(R.style.AppTheme_Light)
+            else -> setTheme(R.style.AppTheme_Light)
+        }
     }
 
     private fun getTheme(
@@ -66,15 +75,15 @@ class AppComponentsActivity : AppCompatActivity() {
     ): DuckDuckGoTheme {
         return if (darkThemeEnabled) {
             if (newDesignSystemEnabled) {
-                DuckDuckGoTheme.DARK_V2
+                DARK_V2
             } else {
-                DuckDuckGoTheme.DARK
+                DARK
             }
         } else {
             if (newDesignSystemEnabled) {
-                DuckDuckGoTheme.LIGHT_V2
+                LIGHT_V2
             } else {
-                DuckDuckGoTheme.LIGHT
+                LIGHT
             }
         }
     }
@@ -89,20 +98,17 @@ class AppComponentsActivity : AppCompatActivity() {
 class AppComponentsSharedPreferences(private val context: Context) {
     var selectedTheme: DuckDuckGoTheme
         get() {
-            return if (preferences.getBoolean(KEY_SELECTED_DARK_THEME, false)) {
-                DuckDuckGoTheme.DARK
-            } else {
-                DuckDuckGoTheme.LIGHT
-            }
+            val theme = preferences.getString(KEY_SELECTED_THEME, DARK_V2.name)
+            return DARK_V2
         }
         set(theme) =
-            preferences.edit { putBoolean(KEY_SELECTED_DARK_THEME, theme == DuckDuckGoTheme.DARK) }
+            preferences.edit { putString(KEY_SELECTED_THEME, theme.name) }
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.dev_settings_activity.theme_settings"
-        const val KEY_SELECTED_DARK_THEME = "KEY_SELECTED_DARK_THEME"
+        const val KEY_SELECTED_THEME = "KEY_SELECTED_THEME"
     }
 }
