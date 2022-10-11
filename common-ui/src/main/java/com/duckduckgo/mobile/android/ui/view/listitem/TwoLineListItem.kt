@@ -200,6 +200,11 @@ class TwoLineListItem @JvmOverloads constructor(
         super.setEnabled(enabled)
     }
 
+    /** Indicates if the switch is checked or not */
+    fun isSwitchChecked(): Boolean {
+        return binding.trailingSwitch.isChecked
+    }
+
     fun View.recursiveEnable(enabled: Boolean) {
         (this as? ViewGroup)?.children?.forEach {
             it.isEnabled = enabled

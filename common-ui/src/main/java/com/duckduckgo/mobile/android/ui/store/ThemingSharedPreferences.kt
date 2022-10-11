@@ -48,6 +48,8 @@ class ThemingSharedPreferences @Inject constructor(private val context: Context)
         companion object {
             private const val THEME_LIGHT = "LIGHT"
             private const val THEME_DARK = "DARK"
+            private const val THEME_LIGHT_v2 = "LIGHT_V2"
+            private const val THEME_DARK_V2 = "DARK_V2"
             private const val THEME_SYSTEM_DEFAULT = "SYSTEM_DEFAULT"
         }
 
@@ -56,6 +58,8 @@ class ThemingSharedPreferences @Inject constructor(private val context: Context)
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> THEME_SYSTEM_DEFAULT
                 DuckDuckGoTheme.LIGHT -> THEME_LIGHT
                 DuckDuckGoTheme.DARK -> THEME_DARK
+                DuckDuckGoTheme.DARK_V2 -> THEME_DARK_V2
+                DuckDuckGoTheme.LIGHT_V2 -> THEME_LIGHT_v2
             }
 
         fun themeFrom(

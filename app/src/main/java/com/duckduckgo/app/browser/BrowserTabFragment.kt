@@ -221,6 +221,8 @@ import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK_V2
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT_V2
 import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.ui.view.DaxDialog
@@ -1779,8 +1781,8 @@ class BrowserTabFragment :
 
     private fun configureDarkThemeSupport(webSettings: WebSettings) {
         when (themingDataStore.theme) {
-            DuckDuckGoTheme.LIGHT -> webSettings.enableLightMode()
-            DuckDuckGoTheme.DARK -> webSettings.enableDarkMode()
+            DuckDuckGoTheme.LIGHT, LIGHT_V2 -> webSettings.enableLightMode()
+            DuckDuckGoTheme.DARK, DARK_V2 -> webSettings.enableDarkMode()
             DuckDuckGoTheme.SYSTEM_DEFAULT -> {
                 val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
                 if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {

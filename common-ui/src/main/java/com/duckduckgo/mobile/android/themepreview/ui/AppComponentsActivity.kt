@@ -21,19 +21,16 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
-import androidx.viewpager.widget.ViewPager
-import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.databinding.ActivityAppComponentsBinding
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.applyTheme
-import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-import com.google.android.material.tabs.TabLayout
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class AppComponentsActivity : AppCompatActivity() {
 
-    private lateinit var viewPager: ViewPager
-    private lateinit var tabLayout: TabLayout
-    private lateinit var darkThemeSwitch: OneLineListItem
+    private val binding: ActivityAppComponentsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val themePreferences = AppComponentsSharedPreferences(this)
@@ -41,24 +38,42 @@ class AppComponentsActivity : AppCompatActivity() {
         applyTheme(selectedTheme)
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_app_components)
-        viewPager = findViewById(R.id.view_pager)
-        tabLayout = findViewById(R.id.tab_layout)
-        darkThemeSwitch = findViewById(R.id.dark_theme_switch)
+        setContentView(binding.root)
 
-        tabLayout.setupWithViewPager(viewPager)
-        val adapter = AppComponentsPagerAdapter(this, supportFragmentManager)
-        viewPager.adapter = adapter
+        binding.tabLayout.setupWithViewPager(binding.viewPager)
+        binding.viewPager.adapter = AppComponentsPagerAdapter(this, supportFragmentManager)
 
-        darkThemeSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK) { _, enabled ->
-            themePreferences.selectedTheme =
-                if (enabled) {
-                    DuckDuckGoTheme.DARK
-                } else {
-                    DuckDuckGoTheme.LIGHT
-                }
+        binding.darkThemeSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK) { _, enabled ->
+            themePreferences.selectedTheme = getTheme(enabled, binding.newDesignSystemSwitch.isSwitchChecked())
             startActivity(intent(this))
             finish()
+        }
+
+        binding.newDesignSystemSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK) { _, enabled ->
+            themePreferences.selectedTheme = getTheme(enabled, binding.newDesignSystemSwitch.isSwitchChecked())
+            startActivity(intent(this))
+            finish()
+        }
+
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+    }
+
+    private fun getTheme(
+        darkThemeEnabled: Boolean,
+        newDesignSystemEnabled: Boolean
+    ): DuckDuckGoTheme {
+        return if (darkThemeEnabled) {
+            if (newDesignSystemEnabled) {
+                DuckDuckGoTheme.DARK
+            } else {
+                DuckDuckGoTheme.LIGHT
+            }
+        } else {
+            if (newDesignSystemEnabled) {
+                DuckDuckGoTheme.DARK_V2
+            } else {
+                DuckDuckGoTheme.LIGHT_V2
+            }
         }
     }
 

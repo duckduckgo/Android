@@ -446,6 +446,8 @@ class SettingsViewModel @Inject constructor(
             when (selectedTheme) {
                 DuckDuckGoTheme.LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
                 DuckDuckGoTheme.DARK -> SETTINGS_THEME_TOGGLED_DARK
+                DuckDuckGoTheme.LIGHT_V2 -> SETTINGS_THEME_TOGGLED_LIGHT
+                DuckDuckGoTheme.DARK_V2 -> SETTINGS_THEME_TOGGLED_DARK
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
             }
         pixel.fire(pixelName)

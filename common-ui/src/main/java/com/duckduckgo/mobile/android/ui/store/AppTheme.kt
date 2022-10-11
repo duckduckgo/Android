@@ -44,9 +44,7 @@ class BrowserAppTheme @Inject constructor(
         return when (themeDataStore.theme) {
             DuckDuckGoTheme.LIGHT -> true
             DuckDuckGoTheme.DARK -> false
-            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
-                !isNightMode(context)
-            }
+            else -> !isNightMode(context)
         }
     }
 

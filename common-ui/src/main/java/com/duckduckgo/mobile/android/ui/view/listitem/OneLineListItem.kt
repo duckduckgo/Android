@@ -185,4 +185,9 @@ class OneLineListItem @JvmOverloads constructor(
     ) {
         binding.trailingSwitch.quietlySetIsChecked(newCheckedState, changeListener)
     }
+
+    /** Indicates if the switch is checked or not */
+    fun isSwitchChecked(): Boolean {
+        return binding.trailingSwitch.isChecked
+    }
 }

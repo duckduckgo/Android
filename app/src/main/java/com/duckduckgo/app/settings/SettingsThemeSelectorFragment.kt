@@ -26,7 +26,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.*
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK_V2
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT_V2
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 
 class SettingsThemeSelectorFragment : DialogFragment() {
 
@@ -82,6 +86,8 @@ class SettingsThemeSelectorFragment : DialogFragment() {
         return when (this) {
             LIGHT -> R.id.themeSelectorLight
             DARK -> R.id.themeSelectorDark
+            LIGHT_V2 -> R.id.themeSelectorLight
+            DARK_V2 -> R.id.themeSelectorDark
             SYSTEM_DEFAULT -> R.id.themeSelectorSystemDefault
         }
     }

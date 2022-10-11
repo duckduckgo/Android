@@ -21,7 +21,7 @@
                                                      android:layout_height="match_parent">
 
     <androidx.viewpager.widget.ViewPager
-        android:id="@+id/view_pager"
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
@@ -51,18 +51,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAlignment="viewStart"
-                    android:paddingTop="42dp"
+                    android:paddingTop="@dimen/keyline_3"
                     android:text="App Components"
                     android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline1"
                     app:drawableStartCompat="@drawable/ic_dax_icon"
                     android:drawablePadding="@dimen/keyline_2"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/dark_theme_switch"
-                    android:layout_marginTop="@dimen/keyline_5"
+                    android:id="@+id/darkThemeSwitch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="Enable Dark Theme"
+                    app:showSwitch="true"/>
+
+                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                    android:id="@+id/newDesignSystemSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="Try new Design System specs"
                     app:showSwitch="true"/>
 
             </LinearLayout>
