@@ -33,12 +33,13 @@
         <item name="android:colorForeground">@color/subtleGrayTwo</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.ToolbarThemev2" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:textColorPrimary">?attr/daxColorPrimaryText</item>
-    </style>
-
     <style name="Widget.DuckDuckGo.PopUpOverflowMenu" parent="@style/Widget.MaterialComponents.PopupMenu.Overflow">
         <item name="android:popupBackground">@drawable/popup_menu_bg</item>
+    </style>
+
+    <!-- Tabs -->
+    <style name="Widget.DuckDuckGo.TabLayout" parent="Widget.MaterialComponents.TabLayout">
+        <item name="tabTextAppearance">@style/TextAppearance.MaterialComponents.Button</item>
     </style>
 
     <!-- List Items -->
