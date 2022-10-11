@@ -65,7 +65,7 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
             val test = adapter.fromJson(
                 FileUtilities.loadText(
                     TrackingParameterReferenceTest::class.java.classLoader!!,
-                    "reference_tests/trackingparameters/tracking_parameters_matching_tests.json"
+                    "reference_tests/trackingparameters/tests.json"
                 )
             )
             return test?.trackingParameters?.tests ?: emptyList()
@@ -88,11 +88,13 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
         val trackingParameters = CopyOnWriteArrayList<Regex>()
         val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
             TrackingParameterReferenceTest::class.java.classLoader!!,
-            "reference_tests/trackingparameters/tracking_parameters_reference.json"
+            "reference_tests/trackingparameters/config_reference.json"
         )
 
-        jsonObject.keys().forEach { key ->
-            val trackingParametersFeature: TrackingParametersFeature? = jsonAdapter.fromJson(jsonObject.get(key).toString())
+        val features: JSONObject = jsonObject.getJSONObject("features")
+
+        features.keys().forEach { key ->
+            val trackingParametersFeature: TrackingParametersFeature? = jsonAdapter.fromJson(features.get(key).toString())
             exceptions.addAll(trackingParametersFeature!!.exceptions)
             trackingParameters.addAll(trackingParametersFeature.settings.parameters.map { it.toRegex() })
         }

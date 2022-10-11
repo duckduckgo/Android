@@ -21,6 +21,9 @@ build/
 #Autoconsent
 /node_modules/@duckduckgo/autoconsent/
 
+#Privacy reference tests
+/node_modules/@duckduckgo/privacy-reference-tests/
+
 # Local configuration file (sdk path, etc)
 local.properties
 
