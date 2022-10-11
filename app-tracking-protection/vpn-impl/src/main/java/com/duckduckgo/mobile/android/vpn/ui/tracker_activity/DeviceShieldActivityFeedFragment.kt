@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
+import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +31,8 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayoutManager
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -80,14 +83,22 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
                 .collect {
                     feedListener?.onTrackerListShowed(it.size)
                     trackerFeedAdapter.updateData(if (config.unboundedRows()) it else it.take(config.maxRows)) { trackerFeedData ->
-                        startActivity(
-                            AppTPCompanyTrackersActivity.intent(
-                                requireContext(),
-                                trackerFeedData.trackingApp.packageId,
-                                trackerFeedData.trackingApp.appDisplayName,
-                                trackerFeedData.bucket
+                        if (trackerFeedData.isAppInstalled()) {
+                            startActivity(
+                                AppTPCompanyTrackersActivity.intent(
+                                    requireContext(),
+                                    trackerFeedData.trackingApp.packageId,
+                                    trackerFeedData.trackingApp.appDisplayName,
+                                    trackerFeedData.bucket
+                                )
                             )
-                        )
+                        } else {
+                            Snackbar.make(
+                                requireView(),
+                                getString(R.string.atp_CompanyDetailsNotAvailableForUninstalledApps),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
         }
@@ -104,6 +115,15 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
     override fun onDetach() {
         super.onDetach()
         feedListener = null
+    }
+
+    private fun TrackerFeedItem.TrackerFeedData.isAppInstalled(): Boolean {
+        return try {
+            requireContext().packageManager.getPackageInfo(trackingApp.packageId, 0)
+            true
+        } catch (e: NameNotFoundException) {
+            false
+        }
     }
 
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }

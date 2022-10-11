@@ -295,6 +295,7 @@
     <string name="atp_CompanyDetailsTrackingLearnMore">Apps may include trackers from other companies for things like analytics and marketing. If we didn\'t block them, these trackers could create even more detailed digital profiles on you. <annotation type="learn_more_link">Learn more.</annotation></string>
     <string name="atp_CompanyDetailsTrackingShowLess">Show Less</string>
     <string name="atp_CompanyDetailsAppInfoPanel">Protection is currently disabled for this app. If App Tracking Protection caused a problem, please <annotation type="report_issues_link">report the issue</annotation></string>
+    <string name="atp_CompanyDetailsNotAvailableForUninstalledApps" instruction="Toast shown when users tap on item that corresponds to an already uninstalled application">Tracker details not available for uninstalled apps</string>
 
     <!--  App Tracking Company Signals -->
     <string name="atp_TrackingSignalAAID">Android Advertising ID</string>
