@@ -40,38 +40,42 @@
             android:background="?attr/toolbarBgColor"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/keyline_4"
-                android:layout_marginEnd="@dimen/keyline_4"
-                android:orientation="vertical">
+                android:layout_height="wrap_content">
 
-                <TextView
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAlignment="viewStart"
-                    android:paddingTop="@dimen/keyline_3"
-                    android:text="App Components"
-                    android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline1"
-                    app:drawableStartCompat="@drawable/ic_dax_icon"
-                    android:drawablePadding="@dimen/keyline_2"/>
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="32dp" android:src="@drawable/ic_dax_icon"
+                    android:text="App Components" app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                     android:id="@+id/darkThemeSwitch"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:primaryText="Enable Dark Theme"
-                    app:showSwitch="true"/>
+                    android:layout_marginStart="24dp"
+                    android:paddingTop="@dimen/keyline_1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageView"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:primaryText="Enable Dark Theme" app:showSwitch="true"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                     android:id="@+id/newDesignSystemSwitch"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageView"
+                    app:layout_constraintTop_toBottomOf="@+id/darkThemeSwitch"
                     app:primaryText="Try new Design System specs"
                     app:showSwitch="true"/>
 
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 

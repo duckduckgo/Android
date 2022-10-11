@@ -26,11 +26,11 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class ThemesPreviewInternalFeature @Inject constructor() : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {
-        return "App Components Design Preview"
+        return "Android Design System Components"
     }
 
     override fun internalFeatureSubtitle(): String {
-        return "Set of components designed following our Design System"
+        return "Preview of components based on the Design System"
     }
 
     override fun onInternalFeatureClicked(activityContext: Context) {

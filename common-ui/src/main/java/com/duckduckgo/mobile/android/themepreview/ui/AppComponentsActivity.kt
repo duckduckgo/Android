@@ -25,6 +25,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import com.duckduckgo.mobile.android.databinding.ActivityAppComponentsBinding
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK_V2
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT_V2
 import com.duckduckgo.mobile.android.ui.applyTheme
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -43,14 +45,14 @@ class AppComponentsActivity : AppCompatActivity() {
         binding.tabLayout.setupWithViewPager(binding.viewPager)
         binding.viewPager.adapter = AppComponentsPagerAdapter(this, supportFragmentManager)
 
-        binding.darkThemeSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK) { _, enabled ->
+        binding.darkThemeSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK || selectedTheme == DARK_V2) { _, enabled ->
             themePreferences.selectedTheme = getTheme(enabled, binding.newDesignSystemSwitch.isSwitchChecked())
             startActivity(intent(this))
             finish()
         }
 
-        binding.newDesignSystemSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK) { _, enabled ->
-            themePreferences.selectedTheme = getTheme(enabled, binding.newDesignSystemSwitch.isSwitchChecked())
+        binding.newDesignSystemSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK_V2 || selectedTheme == LIGHT_V2) { _, enabled ->
+            themePreferences.selectedTheme = getTheme(binding.darkThemeSwitch.isSwitchChecked(), enabled)
             startActivity(intent(this))
             finish()
         }
@@ -64,15 +66,15 @@ class AppComponentsActivity : AppCompatActivity() {
     ): DuckDuckGoTheme {
         return if (darkThemeEnabled) {
             if (newDesignSystemEnabled) {
-                DuckDuckGoTheme.DARK
+                DuckDuckGoTheme.DARK_V2
             } else {
-                DuckDuckGoTheme.LIGHT
+                DuckDuckGoTheme.DARK
             }
         } else {
             if (newDesignSystemEnabled) {
-                DuckDuckGoTheme.DARK_V2
-            } else {
                 DuckDuckGoTheme.LIGHT_V2
+            } else {
+                DuckDuckGoTheme.LIGHT
             }
         }
     }
