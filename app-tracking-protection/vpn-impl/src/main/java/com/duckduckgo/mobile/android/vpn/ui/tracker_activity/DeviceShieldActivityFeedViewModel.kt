@@ -25,10 +25,12 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import okhttp3.internal.toImmutableList
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -39,7 +41,8 @@ import kotlin.coroutines.coroutineContext
 class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
     private val dispatcherProvider: DispatcherProvider,
-    private val timeDiffFormatter: TimeDiffFormatter
+    private val timeDiffFormatter: TimeDiffFormatter,
+    private val excludedApps: TrackingProtectionAppsRepository
 ) : ViewModel() {
 
     private val MAX_BADGES_TO_DISPLAY = 5
@@ -67,12 +70,26 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
             .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
             .map { aggregateDataPerApp(it, showHeadings) }
             .flowOn(Dispatchers.Default)
-            .map { it.ifEmpty { listOf(TrackerFeedItem.TrackerEmptyFeed) } }
             .onStart {
                 startTickerRefresher()
                 emit(listOf(TrackerFeedItem.TrackerLoadingSkeleton))
                 delay(300)
             }
+    }
+
+    suspend fun getAppsData(): Flow<List<TrackerFeedItem>> = withContext(dispatcherProvider.io()) {
+        return@withContext excludedApps.getAppsAndProtectionInfo().map { list ->
+            val unprotectedCount = list.count { it.isExcluded }
+            val protectedCount = list.size - unprotectedCount
+            val items = mutableListOf<TrackerFeedItem.TrackerAppsData>()
+            if (protectedCount > 0) {
+                items.add(TrackerFeedItem.TrackerAppsData(appsCount = protectedCount, isProtected = true))
+            }
+            if (unprotectedCount > 0) {
+                items.add(TrackerFeedItem.TrackerAppsData(appsCount = unprotectedCount, isProtected = false))
+            }
+            items.toImmutableList()
+        }
     }
 
     private suspend fun aggregateDataPerApp(
