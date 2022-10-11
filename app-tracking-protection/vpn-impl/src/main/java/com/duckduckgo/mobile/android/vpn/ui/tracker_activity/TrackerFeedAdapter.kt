@@ -48,7 +48,7 @@ class TrackerFeedAdapter @Inject constructor(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), StickyHeaders {
 
     private val trackerFeedItems = mutableListOf<TrackerFeedItem>()
-    private lateinit var onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit
+    private lateinit var onAppClick: (TrackerFeedItem) -> Unit
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
@@ -62,6 +62,11 @@ class TrackerFeedAdapter @Inject constructor(
             )
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
+            is TrackerAppsDataViewHolder -> holder.bind(
+                trackerFeedItems[position] as TrackerFeedItem.TrackerAppsData,
+                onAppClick,
+                position == trackerFeedItems.size - 1
+            )
         }
     }
 
@@ -71,8 +76,9 @@ class TrackerFeedAdapter @Inject constructor(
     ): RecyclerView.ViewHolder {
         return when (viewType) {
             LOADING_STATE_TYPE -> TrackerSkeletonViewHolder.create(parent)
-            EMPTY_STATE_TYPE -> TrackerEmptyFeedViewHolder.create(parent)
             DATA_STATE_TYPE -> TrackerFeedViewHolder.create(parent)
+            DESCRIPTION_TYPE -> TrackerDescriptionViewHolder.create(parent)
+            APPS_STATE_TYPE -> TrackerAppsDataViewHolder.create(parent)
             else -> TrackerFeedHeaderViewHolder.create(parent, timeDiffFormatter)
         }
     }
@@ -82,9 +88,10 @@ class TrackerFeedAdapter @Inject constructor(
     override fun getItemViewType(position: Int): Int {
         return when (trackerFeedItems[position]) {
             is TrackerFeedItem.TrackerLoadingSkeleton -> LOADING_STATE_TYPE
-            is TrackerFeedItem.TrackerEmptyFeed -> EMPTY_STATE_TYPE
             is TrackerFeedItem.TrackerFeedData -> DATA_STATE_TYPE
             is TrackerFeedItem.TrackerFeedItemHeader -> HEADER_TYPE
+            is TrackerFeedItem.TrackerDescriptionFeed -> DESCRIPTION_TYPE
+            is TrackerFeedItem.TrackerAppsData -> APPS_STATE_TYPE
         }
     }
 
@@ -94,7 +101,7 @@ class TrackerFeedAdapter @Inject constructor(
 
     suspend fun updateData(
         data: List<TrackerFeedItem>,
-        onAppClickListener: (TrackerFeedItem.TrackerFeedData) -> Unit
+        onAppClickListener: (TrackerFeedItem) -> Unit
     ) {
         onAppClick = onAppClickListener
         val newData = data
@@ -106,16 +113,6 @@ class TrackerFeedAdapter @Inject constructor(
         trackerFeedItems.clear().also { trackerFeedItems.addAll(newData) }
 
         diffResult.dispatchUpdatesTo(this@TrackerFeedAdapter)
-    }
-
-    private class TrackerEmptyFeedViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        companion object {
-            fun create(parent: ViewGroup): TrackerEmptyFeedViewHolder {
-                val inflater = LayoutInflater.from(parent.context)
-                val view = inflater.inflate(R.layout.view_device_shield_activity_empty, parent, false)
-                return TrackerEmptyFeedViewHolder(view)
-            }
-        }
     }
 
     private class TrackerSkeletonViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -245,6 +242,51 @@ class TrackerFeedAdapter @Inject constructor(
         }
     }
 
+    private class TrackerDescriptionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        companion object {
+            fun create(parent: ViewGroup): TrackerDescriptionViewHolder {
+                val inflater = LayoutInflater.from(parent.context)
+                val view = inflater.inflate(R.layout.view_device_shield_activity_description, parent, false)
+                return TrackerDescriptionViewHolder(view)
+            }
+        }
+    }
+
+    private class TrackerAppsDataViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        companion object {
+            fun create(parent: ViewGroup): TrackerAppsDataViewHolder {
+                val inflater = LayoutInflater.from(parent.context)
+                val view = inflater.inflate(R.layout.view_device_shield_activity_apps, parent, false)
+                return TrackerAppsDataViewHolder(view)
+            }
+        }
+
+        val context: Context = view.context
+        val appsText: TextView = view.findViewById(R.id.activity_apps)
+        val splitter: View = view.findViewById(R.id.activity_apps_splitter)
+        val warningImage: View = view.findViewById(R.id.activity_apps_warning_image)
+
+        fun bind(item: TrackerFeedItem.TrackerAppsData, onItemClick: (TrackerFeedItem.TrackerAppsData) -> Unit, isLastPosition: Boolean) {
+            appsText.text = context.getString(
+                if (item.isProtected) R.string.atp_ActivityProtectedApps else R.string.atp_ActivityUnprotectedApps,
+                item.appsCount
+            )
+            if (item.isProtected) {
+                warningImage.hide()
+            } else {
+                warningImage.show()
+            }
+            itemView.setOnClickListener {
+                onItemClick(item)
+            }
+            if (isLastPosition) {
+                splitter.hide()
+            } else {
+                splitter.show()
+            }
+        }
+    }
+
     private class DiffCallback(
         private val old: List<TrackerFeedItem>,
         private val new: List<TrackerFeedItem>
@@ -271,8 +313,9 @@ class TrackerFeedAdapter @Inject constructor(
 
     companion object {
         private const val LOADING_STATE_TYPE = 0
-        private const val EMPTY_STATE_TYPE = 1
-        private const val DATA_STATE_TYPE = 2
-        private const val HEADER_TYPE = 3
+        private const val DATA_STATE_TYPE = 1
+        private const val HEADER_TYPE = 2
+        private const val DESCRIPTION_TYPE = 3
+        private const val APPS_STATE_TYPE = 4
     }
 }
