@@ -27,7 +27,6 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <com.google.android.material.appbar.AppBarLayout
-        style="@style/Widget.MaterialComponents.AppBarLayout.Surface"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:translationZ="@dimen/elevation_default_top_app_bar">
@@ -47,19 +46,19 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="32dp" android:src="@drawable/ic_dax_icon"
-                    android:text="App Components" app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/darkThemeSwitch"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:paddingTop="@dimen/keyline_1"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/imageView"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:primaryText="Enable Dark Theme" app:showSwitch="true"/>
+                        android:id="@+id/darkThemeSwitch"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:paddingTop="@dimen/keyline_1"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/imageView"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:primaryText="Enable Dark Theme" app:showSwitch="true" android:layout_marginTop="16dp"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                     android:id="@+id/newDesignSystemSwitch"
@@ -69,7 +68,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imageView"
                     app:layout_constraintTop_toBottomOf="@+id/darkThemeSwitch"
-                    app:primaryText="Try new Design System specs"
+                    app:primaryText="Design System v2"
                     app:showSwitch="true"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -78,13 +77,13 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
-            android:layout_width="match_parent"
-            android:layout_height="?actionBarSize"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
             android:layout_gravity="bottom"
-            app:tabIndicatorColor="?daxColorPrimaryText"
+            app:tabIndicatorColor="?attr/daxColorPrimaryText"
             app:tabMode="scrollable"
-            app:tabSelectedTextColor="?daxColorPrimaryText"
-            app:tabTextColor="?daxColorSecondaryText"/>
+            app:tabSelectedTextColor="?attr/daxColorPrimaryText"
+            app:tabTextColor="?attr/daxColorSecondaryText"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 

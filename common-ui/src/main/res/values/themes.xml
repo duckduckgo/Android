@@ -171,8 +171,8 @@
         <item name="daxColorBackground">@color/gray100</item>
         <item name="daxColorSurface">@color/gray90</item>
         <item name="daxColorContainer">@color/black12</item>
-        <item name="daxColorPrimaryText">@color/black84</item>
-        <item name="daxColorSecondaryText">@color/black60</item>
+        <item name="daxColorPrimaryText">@color/white84</item>
+        <item name="daxColorSecondaryText">@color/white60</item>
         <item name="daxColorDestructive">@color/destructiveRedDark</item>
         <item name="daxColorDisabled">@color/black35</item>
         <item name="daxColorLines">@color/black18</item>
@@ -312,8 +312,8 @@
         <item name="daxColorBackground">@color/gray0</item>
         <item name="daxColorSurface">@color/white</item>
         <item name="daxColorContainer">@color/black6</item>
-        <item name="daxColorPrimaryText">@color/white84</item>
-        <item name="daxColorSecondaryText">@color/white60</item>
+        <item name="daxColorPrimaryText">@color/black84</item>
+        <item name="daxColorSecondaryText">@color/black60</item>
         <item name="daxColorDestructive">@color/destructiveRedLight</item>
         <item name="daxColorDisabled">@color/black35</item>
         <item name="daxColorLines">@color/black12</item>
@@ -341,16 +341,6 @@
         <item name="android:windowAnimationStyle">@android:style/Animation</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="toolbarIconColor">@color/white</item>
-    </style>
-
-    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="colorControlNormal">?attr/toolbarIconColor</item>
-        <item name="android:textColorPrimary">?attr/toolbarTextColor</item>
-        <item name="colorControlHighlight">@color/subtleGrayTwo</item>
-    </style>
-
-    <style name="OmnibarToolbarTheme">
-        <item name="colorControlHighlight">@color/subtleGrayTwo</item>
     </style>
 
     <style name="TextInputLayoutTheme" parent="Widget.Design.TextInputLayout">

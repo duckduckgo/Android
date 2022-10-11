@@ -63,8 +63,7 @@ class AppComponentsActivity : AppCompatActivity() {
         when (theme) {
             LIGHT_V2 -> setTheme(R.style.Theme_DuckDuckGo_Light)
             DARK_V2 -> setTheme(R.style.Theme_DuckDuckGo_Dark)
-            LIGHT -> setTheme(R.style.AppTheme_Light)
-            DARK -> setTheme(R.style.AppTheme_Light)
+            DARK -> setTheme(R.style.AppTheme_Dark)
             else -> setTheme(R.style.AppTheme_Light)
         }
     }
@@ -98,7 +97,7 @@ class AppComponentsActivity : AppCompatActivity() {
 class AppComponentsSharedPreferences(private val context: Context) {
     var selectedTheme: DuckDuckGoTheme
         get() {
-            return when (preferences.getString(KEY_SELECTED_THEME, DARK_V2.name)) {
+            return when (preferences.getString(KEY_SELECTED_THEME, DARK.name)) {
                 DARK_V2.name -> DARK_V2
                 LIGHT_V2.name -> LIGHT_V2
                 DARK.name -> DARK

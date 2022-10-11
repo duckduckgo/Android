@@ -21,12 +21,11 @@
     The platform theme layer allows us to account for API specific attributes.
     Using resource qualifiers, we can specify a different platform theme for different versions of Android. -->
 
-    <style name="Platform.Theme.DuckDuckGo" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Platform.Theme.DuckDuckGo" parent="Theme.MaterialComponents.NoActionBar">
         <item name="android:statusBarColor" tools:ignore="NewApi">?attr/colorSurface</item>
         <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
         <item name="android:navigationBarColor" tools:ignore="NewApi">?android:attr/colorBackground</item>
         <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
-        <item name="android:navigationBarDividerColor" tools:ignore="NewApi">?attr/colorControlHighlight</item>
     </style>
 
     <!--  Our base theme, Base.Theme.DuckDuckGo,
@@ -97,8 +96,8 @@
         <item name="daxColorBackground">@color/gray100</item>
         <item name="daxColorSurface">@color/gray90</item>
         <item name="daxColorContainer">@color/black12</item>
-        <item name="daxColorPrimaryText">@color/black84</item>
-        <item name="daxColorSecondaryText">@color/black60</item>
+        <item name="daxColorPrimaryText">@color/white84</item>
+        <item name="daxColorSecondaryText">@color/white60</item>
         <item name="daxColorDestructive">@color/destructiveRedDark</item>
         <item name="daxColorDisabled">@color/black35</item>
         <item name="daxColorLines">@color/black18</item>
@@ -110,8 +109,8 @@
         <item name="daxColorBackground">@color/gray0</item>
         <item name="daxColorSurface">@color/white</item>
         <item name="daxColorContainer">@color/black6</item>
-        <item name="daxColorPrimaryText">@color/white84</item>
-        <item name="daxColorSecondaryText">@color/white60</item>
+        <item name="daxColorPrimaryText">@color/black84</item>
+        <item name="daxColorSecondaryText">@color/black60</item>
         <item name="daxColorDestructive">@color/destructiveRedLight</item>
         <item name="daxColorDisabled">@color/black35</item>
         <item name="daxColorLines">@color/black12</item>
