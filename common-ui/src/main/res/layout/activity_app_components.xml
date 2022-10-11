@@ -30,14 +30,11 @@
         style="@style/Widget.MaterialComponents.AppBarLayout.Surface"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ToolbarTheme"
         android:translationZ="@dimen/elevation_default_top_app_bar">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/ToolbarTheme"
-            android:background="?attr/toolbarBgColor"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -84,11 +81,10 @@
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:layout_gravity="bottom"
-            android:background="?attr/toolbarBgColor"
-            app:tabIndicatorColor="?normalTextColor"
+            app:tabIndicatorColor="?daxColorPrimaryText"
             app:tabMode="scrollable"
-            app:tabSelectedTextColor="?normalTextColor"
-            app:tabTextColor="?secondaryTextColor"/>
+            app:tabSelectedTextColor="?daxColorPrimaryText"
+            app:tabTextColor="?daxColorSecondaryText"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 

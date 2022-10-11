@@ -98,8 +98,12 @@ class AppComponentsActivity : AppCompatActivity() {
 class AppComponentsSharedPreferences(private val context: Context) {
     var selectedTheme: DuckDuckGoTheme
         get() {
-            val theme = preferences.getString(KEY_SELECTED_THEME, DARK_V2.name)
-            return DARK_V2
+            return when (preferences.getString(KEY_SELECTED_THEME, DARK_V2.name)) {
+                DARK_V2.name -> DARK_V2
+                LIGHT_V2.name -> LIGHT_V2
+                DARK.name -> DARK
+                else -> LIGHT
+            }
         }
         set(theme) =
             preferences.edit { putString(KEY_SELECTED_THEME, theme.name) }
