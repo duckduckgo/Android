@@ -59,7 +59,7 @@ class FakeUnprotected(private val exceptionList: List<String>) : UnprotectedTemp
     }
 
     override val unprotectedTemporaryExceptions: List<UnprotectedTemporaryException>
-        get() = emptyList()
+        get() = exceptionList.map { UnprotectedTemporaryException(domain = it, reason = "A reason") }
 }
 
 class FakeUserAllowlist(override val userWhiteList: List<String>) : UserWhiteListRepository

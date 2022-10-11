@@ -1,0 +1,103 @@
+{
+  "copyFiles": [
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/storage-clearing/tests.json",
+      "to": "app/src/androidTest/resources/reference_tests/fireproofing/tests.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/https-upgrades/tests.json",
+      "to": "app/src/androidTest/resources/reference_tests/https/tests.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/https-upgrades/config_reference.json",
+      "to": "app/src/androidTest/resources/reference_tests/https/config_reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/https-upgrades/https_allowlist_reference.json",
+      "to": "app/src/androidTest/resources/reference_tests/https/https_allowlist_reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/https-upgrades/https_bloomfilter_reference.bin",
+      "to": "app/src/androidTest/resources/reference_tests/https/https_bloomfilter_reference.bin"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/https-upgrades/https_bloomfilter_spec_reference.json",
+      "to": "app/src/androidTest/resources/reference_tests/https/https_bloomfilter_spec_reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/tracker-radar-tests/TR-domain-matching/domain_matching_tests.json",
+      "to": "app/src/androidTest/resources/reference_tests/domain_matching_tests.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/tracker-radar-tests/TR-domain-matching/surrogates.txt",
+      "to": "app/src/androidTest/resources/reference_tests/surrogates.txt"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/tracker-radar-tests/TR-domain-matching/tracker_radar_reference.json",
+      "to": "app/src/androidTest/resources/reference_tests/tracker_radar_reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/broken-site-reporting/tests.json",
+      "to": "app/src/android/resources/reference_tests/brokensites/tests.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/amp-protections/tests.json",
+      "to": "privacy-config/privacy-config-impl/src/test/resources/reference_tests/amplinks/tests.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/amp-protections/config_reference.json",
+      "to": "privacy-config/privacy-config-impl/src/test/resources/reference_tests/amplinks/config_reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/global-privacy-control/config_reference.json",
+      "to": "privacy-config/privacy-config-impl/src/test/resources/reference_tests/gpc/config_reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/global-privacy-control/tests.json",
+      "to": "privacy-config/privacy-config-impl/src/test/resources/reference_tests/gpc/tests.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/privacy-configuration/tests.json",
+      "to": "privacy-config/privacy-config-impl/src/test/resources/reference_tests/privacyconfig/tests.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/privacy-configuration/config1_reference.json",
+      "to": "privacy-config/privacy-config-impl/src/test/resources/reference_tests/privacyconfig/config1_reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/privacy-configuration/config2_reference.json",
+      "to": "privacy-config/privacy-config-impl/src/test/resources/reference_tests/privacyconfig/config2_reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/privacy-configuration/config3_reference.json",
+      "to": "privacy-config/privacy-config-impl/src/test/resources/reference_tests/privacyconfig/config3_reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/tracker-radar-tests/TR-domain-matching/tracker_allowlist_matching_tests.json",
+      "to": "privacy-config/privacy-config-impl/src/test/resources/reference_tests/trackerallowlist/tracker_allowlist_matching_tests.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/tracker-radar-tests/TR-domain-matching/tracker_allowlist_reference.json",
+      "to": "privacy-config/privacy-config-impl/src/test/resources/reference_tests/trackerallowlist/tracker_allowlist_reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/url-parameters/tests.json",
+      "to": "privacy-config/privacy-config-impl/src/test/resources/reference_tests/trackingparameters/tests.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/url-parameters/config_reference.json",
+      "to": "privacy-config/privacy-config-impl/src/test/resources/reference_tests/trackingparameters/config_reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/expire-first-party-js-cookies/config_reference.json",
+      "to": "app/src/androidTest/resources/reference_tests/firstpartycookies/config_reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/expire-first-party-js-cookies/tests.json",
+      "to": "app/src/androidTest/resources/reference_tests/firstpartycookies/tests.json"
+    }
+  ],
+  "copyFilesSettings": {
+    "whenFileExists": "overwrite"
+  }
+}
