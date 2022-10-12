@@ -24,13 +24,13 @@
     android:paddingEnd="@dimen/keyline_4"
     android:paddingBottom="@dimen/keyline_5">
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/keyline_5"
         android:text="Outlined Text Input"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
         android:id="@+id/outlinedinputtext1"

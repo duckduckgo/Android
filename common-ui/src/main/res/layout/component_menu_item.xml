@@ -19,7 +19,7 @@
                                                    android:layout_height="wrap_content"
                                                    android:clipToPadding="false">
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:id="@+id/label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

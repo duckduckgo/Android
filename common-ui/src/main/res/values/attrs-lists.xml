@@ -17,8 +17,8 @@
 <resources>
 
     <!--Default lists attributes-->
-    <attr name="listItemTitleColor" format="color"/>
-    <attr name="listItemSubtitleColor" format="color"/>
+    <attr name="listItemPrimaryTextColor" format="color"/>
+    <attr name="listItemSecondaryTextColor" format="color"/>
     <attr name="listItemDisabledColor" format="color"/>
 
     <attr name="oneLineListItemStyle" format="reference"/>

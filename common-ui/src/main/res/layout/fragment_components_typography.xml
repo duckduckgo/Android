@@ -15,7 +15,8 @@
 ~ limitations under the License.
 -->
 
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -25,15 +26,124 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingStart="@dimen/keyline_3"
+        android:paddingEnd="@dimen/keyline_3"
         android:paddingTop="@dimen/keyline_5"
-        android:paddingBottom="@dimen/keyline_5"
-        android:paddingStart="@dimen/keyline_4"
-        android:paddingEnd="@dimen/keyline_4">
+        android:paddingBottom="@dimen/keyline_5">
 
-        <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="Typography"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:text="Text Appearance Title"
+            app:typography="title"
+            tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:text="Text Appearance H1"
+            app:typography="h1"
+            tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:text="Text Appearance H2"
+            app:typography="h2"
+            tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:text="Text Appearance H3"
+            app:typography="h3"
+            tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:text="Text Appearance H4"
+            app:typography="h4"
+            tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:text="Text Appearance H5"
+            app:typography="h5"
+            tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:text="Text Appearance Body1"
+            app:typography="body1"
+            tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:text="Text Appearance Body2"
+            app:typography="body2"
+            tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:text="Text Appearance Button"
+            app:typography="button"
+            tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:text="Text Appearance Caption"
+            app:typography="caption"
+            tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Typography Set Manually"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/typographyTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:text="Text Appearance Body 1 set manually"
+            tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Legacy Typography"/>
 
         <TextView
             android:layout_width="match_parent"
