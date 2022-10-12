@@ -24,7 +24,7 @@ import com.duckduckgo.mobile.android.databinding.BottomSheetPromoBinding
 import com.duckduckgo.mobile.android.ui.view.show
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-class PromoBottomSheetDialog(context: Context) : BottomSheetDialog(context, R.style.Widget_DuckDuckGo_BottomSheetDialog) {
+class PromoBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.context, R.style.Widget_DuckDuckGo_BottomSheetDialog) {
 
     abstract class EventListener {
         open fun onBottomSheetShown() {}
@@ -33,39 +33,74 @@ class PromoBottomSheetDialog(context: Context) : BottomSheetDialog(context, R.st
         open fun onSecondaryButtonClicked() {}
     }
 
-    private val binding: BottomSheetPromoBinding
+    internal class DefaultEventListener : EventListener()
+
+    private val binding: BottomSheetPromoBinding = BottomSheetPromoBinding.inflate(LayoutInflater.from(context))
 
     init {
-        binding = BottomSheetPromoBinding.inflate(LayoutInflater.from(context))
         setContentView(binding.root)
+
+        setOnDismissListener { builder.listener.onBottomSheetDismissed() }
+        setOnShowListener { builder.listener.onBottomSheetShown() }
+        binding.bottomSheetPromoPrimaryButton.setOnClickListener { builder.listener.onPrimaryButtonClicked() }
+        binding.bottomSheetPromoSecondaryButton.setOnClickListener { builder.listener.onSecondaryButtonClicked() }
+
+        builder.icon?.let {
+            binding.bottomSheetPromoIcon.setImageResource(it)
+            binding.bottomSheetPromoIcon.show()
+        }
+
+        builder.titleText?.let {
+            binding.bottomSheetPromoTitle.text = it
+            binding.bottomSheetPromoTitle.show()
+        }
+
+        binding.bottomSheetPromoContent.text = builder.contentText
+        binding.bottomSheetPromoPrimaryButton.text = builder.primaryButtonText
+        binding.bottomSheetPromoSecondaryButton.text = builder.secondaryButtonText
     }
 
-    fun addEventListener(eventListener: EventListener) {
-        setOnDismissListener { eventListener.onBottomSheetDismissed() }
-        setOnShowListener { eventListener.onBottomSheetShown() }
-        binding.bottomSheetPromoPrimaryButton.setOnClickListener { eventListener.onPrimaryButtonClicked() }
-        binding.bottomSheetPromoSecondaryButton.setOnClickListener { eventListener.onSecondaryButtonClicked() }
-    }
+    class Builder(val context: Context) {
+        var listener: EventListener = DefaultEventListener()
+        var icon: Int? = null
+        var titleText: String? = null
+        var contentText: String = ""
+        var primaryButtonText: String = ""
+        var secondaryButtonText: String = ""
 
-    fun setIcon(@DrawableRes iconRes: Int) {
-        binding.bottomSheetPromoIcon.setImageResource(iconRes)
-        binding.bottomSheetPromoIcon.show()
-    }
+        fun addEventListener(eventListener: EventListener): Builder {
+            listener = eventListener
+            return this
+        }
 
-    fun setTitle(title: String) {
-        binding.bottomSheetPromoTitle.text = title
-        binding.bottomSheetPromoTitle.show()
-    }
+        fun setIcon(@DrawableRes iconRes: Int): Builder {
+            icon = iconRes
+            return this
+        }
 
-    fun setContent(text: String) {
-        binding.bottomSheetPromoContent.text = text
-    }
+        fun setTitle(text: String): Builder {
+            titleText = text
+            return this
+        }
 
-    fun setPrimaryButtonText(primaryText: String) {
-        binding.bottomSheetPromoPrimaryButton.text = primaryText
-    }
+        fun setContent(text: String): Builder {
+            contentText = text
+            return this
+        }
 
-    fun setSecondaryButtonText(secondaryText: String) {
-        binding.bottomSheetPromoSecondaryButton.text = secondaryText
+        fun setPrimaryButton(text: String): Builder {
+            primaryButtonText = text
+            return this
+        }
+
+        fun setSecondaryButton(text: String): Builder {
+            secondaryButtonText = text
+            return this
+        }
+
+        fun show() {
+            val dialog = PromoBottomSheetDialog(this)
+            dialog.show()
+        }
     }
 }

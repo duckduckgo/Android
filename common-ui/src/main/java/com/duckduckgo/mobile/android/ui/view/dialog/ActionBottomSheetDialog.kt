@@ -24,7 +24,7 @@ import com.duckduckgo.mobile.android.databinding.BottomSheetActionBinding
 import com.duckduckgo.mobile.android.ui.view.show
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-class ActionBottomSheetDialog(context: Context) : BottomSheetDialog(context, R.style.Widget_DuckDuckGo_BottomSheetDialog) {
+class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.context, R.style.Widget_DuckDuckGo_BottomSheetDialog) {
 
     abstract class EventListener {
         open fun onBottomSheetShown() {}
@@ -33,32 +33,63 @@ class ActionBottomSheetDialog(context: Context) : BottomSheetDialog(context, R.s
         open fun onSecondaryItemClicked() {}
     }
 
-    private val binding: BottomSheetActionBinding
+    internal class DefaultEventListener : EventListener()
+
+    private val binding: BottomSheetActionBinding = BottomSheetActionBinding.inflate(LayoutInflater.from(context))
 
     init {
-        binding = BottomSheetActionBinding.inflate(LayoutInflater.from(context))
         setContentView(binding.root)
+
+        setOnDismissListener { builder.listener.onBottomSheetDismissed() }
+        setOnShowListener { builder.listener.onBottomSheetShown() }
+        binding.actionBottomSheetDialogPrimaryItem.setOnClickListener { builder.listener.onPrimaryItemClicked() }
+        binding.actionBottomSheetDialogSecondaryItem.setOnClickListener { builder.listener.onSecondaryItemClicked() }
+
+        builder.titleText?.let {
+            binding.actionBottomSheetDialogTitle.text = it
+            binding.actionBottomSheetDialogTitle.show()
+        }
+
+        binding.actionBottomSheetDialogPrimaryItem.setPrimaryText(builder.primaryItemText)
+        builder.primaryItemIcon?.let { binding.actionBottomSheetDialogPrimaryItem.setLeadingIcon(it) }
+
+        binding.actionBottomSheetDialogSecondaryItem.setPrimaryText(builder.secondaryItemText)
+        builder.secondaryItemIcon?.let { binding.actionBottomSheetDialogSecondaryItem.setLeadingIcon(it) }
     }
 
-    fun addEventListener(eventListener: EventListener) {
-        setOnDismissListener { eventListener.onBottomSheetDismissed() }
-        setOnShowListener { eventListener.onBottomSheetShown() }
-        binding.actionBottomSheetDialogPrimaryItem.setOnClickListener { eventListener.onPrimaryItemClicked() }
-        binding.actionBottomSheetDialogSecondaryItem.setOnClickListener { eventListener.onSecondaryItemClicked() }
-    }
+    class Builder(val context: Context) {
+        var listener: EventListener = DefaultEventListener()
+        var titleText: String? = null
+        var primaryItemText: String = ""
+        var primaryItemIcon: Int? = null
+        var secondaryItemText: String = ""
+        var secondaryItemIcon: Int? = null
 
-    fun setTitle(title: String) {
-        binding.actionBottomSheetDialogTitle.text = title
-        binding.actionBottomSheetDialogTitle.show()
-    }
+        fun addEventListener(eventListener: EventListener): Builder {
+            listener = eventListener
+            return this
+        }
 
-    fun onPrimaryItem(primaryText: String, @DrawableRes primaryIcon: Int? = null) {
-        binding.actionBottomSheetDialogPrimaryItem.setPrimaryText(primaryText)
-        primaryIcon?.let { binding.actionBottomSheetDialogPrimaryItem.setLeadingIcon(it) }
-    }
+        fun setTitle(title: String): Builder {
+            titleText = title
+            return this
+        }
 
-    fun onSecondaryItem(secondaryText: String, @DrawableRes secondaryIcon: Int? = null) {
-        binding.actionBottomSheetDialogSecondaryItem.setPrimaryText(secondaryText)
-        secondaryIcon?.let { binding.actionBottomSheetDialogSecondaryItem.setLeadingIcon(it) }
+        fun onPrimaryItem(text: String, @DrawableRes icon: Int? = null): Builder {
+            primaryItemText = text
+            primaryItemIcon = icon
+            return this
+        }
+
+        fun onSecondaryItem(text: String, @DrawableRes icon: Int? = null): Builder {
+            secondaryItemText = text
+            secondaryItemIcon = icon
+            return this
+        }
+
+        fun show() {
+            val dialog = ActionBottomSheetDialog(this)
+            dialog.show()
+        }
     }
 }
