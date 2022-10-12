@@ -225,7 +225,7 @@
     <string name="atp_ActivityDescription" translatable="false">Blocked tracking attempts will appear here</string>
     <string name="atp_ActivityProtectedApps" translatable="false">%s of your apps are protected from hidden trackers we find trying to access your personal info</string>
     <string name="atp_ActivityUnprotectedApps" translatable="false">%s of your apps have protection automatically disabled</string>
-    <string name="atp_ActivityAppTpEnabledCtaText" translatable="false">Good news! App Tracking Protection is now enabled. \n 👌I’ll show you a real-time list of apps on your device that I catch trying to track you.</string>
+    <string name="atp_ActivityAppTpEnabledCtaText" translatable="false"><![CDATA[Good news! App Tracking Protection is now enabled.<br/><br/>👌I’ll show you a real-time list of apps on your device that I catch trying to track you.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel" translatable="false">Got It!</string>
     <string name="atp_ExcludedAppsFilterProtectedLabel" translatable="false">Protection Enabled (%s)</string>
     <string name="atp_ExcludedAppsFilterUnprotectedLabel" translatable="false">Protection Disabled (%s)</string>
