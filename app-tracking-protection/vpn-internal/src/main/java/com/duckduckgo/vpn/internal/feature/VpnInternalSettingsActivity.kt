@@ -132,7 +132,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     private fun setupAppProtectionSection() {
         appTrackerRepository.getAppExclusionListFlow()
             .combine(appTrackerRepository.getManualAppExclusionListFlow()) { exclusionList, manualList ->
-                val mappedExclusionList = exclusionList.map { it.packageId }
+                val mappedExclusionList = exclusionList.map { it.packageName }
                 val mappedManualExclusionList = manualList.map { it.packageId }
 
                 val canProtect = mappedManualExclusionList.isEmpty() ||
@@ -156,7 +156,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         binding.protectAllApps.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 for (excludedPackage in appTrackerRepository.getAppExclusionList()) {
-                    appTrackerRepository.manuallyEnabledApp(excludedPackage.packageId)
+                    appTrackerRepository.manuallyEnabledApp(excludedPackage.packageName)
                 }
                 vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             }

@@ -148,7 +148,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
             return true
         }
 
-        return ddgExclusionList.any { it.packageId == appInfo.packageName }
+        return ddgExclusionList.any { it.packageName == appInfo.packageName }
     }
 
     private fun hasKnownIssue(
@@ -158,7 +158,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         if (BROWSERS.contains(appInfo.packageName)) {
             return TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON
         }
-        if (ddgExclusionList.any { it.packageId == appInfo.packageName }) {
+        if (ddgExclusionList.any { it.packageName == appInfo.packageName }) {
             return TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON
         }
         if (appInfo.isGame() && !appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)) {

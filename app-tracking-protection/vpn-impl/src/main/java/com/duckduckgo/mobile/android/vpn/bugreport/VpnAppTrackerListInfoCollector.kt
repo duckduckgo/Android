@@ -50,7 +50,7 @@ class VpnAppTrackerListInfoCollector @Inject constructor(
 
     private fun isUnprotectedByDefault(appPackageId: String): Boolean {
         return appCategoryDetector.getAppCategory(appPackageId) is AppCategory.Game ||
-            appTrackerRepository.getAppExclusionList().any { it.packageId == appPackageId }
+            appTrackerRepository.getAppExclusionList().any { it.packageName == appPackageId }
     }
 
     private fun isProtectionOverriden(appPackageId: String): Boolean {

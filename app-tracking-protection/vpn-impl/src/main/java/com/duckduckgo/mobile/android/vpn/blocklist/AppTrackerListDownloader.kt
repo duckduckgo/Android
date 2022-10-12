@@ -135,7 +135,6 @@ class RealAppTrackerListDownloader @Inject constructor(
 
         val eTag = response.headers().extractETag()
         val exclusionList = response.body()?.rules.orEmpty()
-            .map { AppTrackerExcludedPackage(it) }
 
         Timber.d("Received the app tracker exclusion list, size: ${exclusionList.size}")
 
