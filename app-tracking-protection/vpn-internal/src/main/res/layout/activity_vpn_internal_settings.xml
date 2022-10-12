@@ -144,6 +144,7 @@
                 android:id="@+id/delete_tracking_history"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:primaryText="Delete Tracking History"
             />

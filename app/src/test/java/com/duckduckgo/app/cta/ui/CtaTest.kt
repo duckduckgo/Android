@@ -31,16 +31,18 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.trackerdetection.model.TrackerType
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
-import org.junit.Assert.*
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
 class CtaTest {
@@ -212,6 +214,13 @@ class CtaTest {
     @Test
     fun whenCanSendPixelAndCtaNotPartOfHistoryThenReturnTrue() {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
+        val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
+        assertTrue(testee.canSendShownPixel())
+    }
+
+    @Test
+    fun whenCanSendPixelAndCtaNotPartOfHistoryButIsASubstringThenReturnTrue() {
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0-te:0")
         val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
         assertTrue(testee.canSendShownPixel())
     }
