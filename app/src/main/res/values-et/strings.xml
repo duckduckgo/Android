@@ -494,7 +494,7 @@
         <item quantity="other"><![CDATA[ üritas sind siin jälitada. <br/><br/>Blokeerisin nad!<br/><br/> ☝️Võid vaadata URL-i riba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Kui puudutate ja kerite, siis mina blokeerin tüütud jälgijad. <br/><br/>Edasi — jätkake sirvimist!]]></string>
-    <string name="daxMainNetworkCtaText">Ettevaatust! Mul pole võimalik tagada, et %s ei näeks sinu tegevust kohas %s <br></br><br></br>Küll aga võid minuga sirvida ja ma saan piirata seda, mida %s sinust üldisemalt teab, blokeerides tema jälgurid paljudel saitidel.</string>
+    <string name="daxMainNetworkCtaText">Ettevaatust! Ma ei saa tagada, et %s ei näeks sinu tegevust veebisaidil %s <br></br><br></br>Küll aga võid minuga sirvida ja ma saan piirata seda, mida %s sinust üldisemalt teab, blokeerides tema jälgurid paljudel saitidel.</string>
     <string name="daxMainNetworkOwnedCtaText">Ettevaatust! Kuna %s on olemi %s omanik, ei saa ma teda siin takistada sinu tegevust jälgimast.<br></br><br></br>Küll aga võid minuga sirvida ja ma saan piirata seda, mida %s sinust üldisemalt teab, blokeerides tema jälgurid paljudel saitidel.</string>
 
     <!-- Download Confirmation -->
@@ -587,7 +587,7 @@
     <string name="preciseLocationSystemDialogAllow">Luba</string>
     <string name="preciseLocationSystemDialogDeny">Võib-olla hiljem</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ära küsi enam selle saidi jaoks</string>
-    <string name="preciseLocationSiteDialogTitle">Kas anda üksusele %s luba juurdepääsuks asukohaandmetele?</string>
+    <string name="preciseLocationSiteDialogTitle">Kas anda veebisaidile %s luba juurdepääsuks asukohaandmetele?</string>
     <string name="preciseLocationDDGDialogSubtitle">Kasutame sinu anonüümset asukohta ainult sulle paremate tulemuste pakkumiseks. Hiljem saad alati oma meelt muuta.</string>
     <string name="preciseLocationSiteDialogSubtitle">Saad hallata asukohale juurdepääsu luba, mille sa oled andnud üksikutele saitidele valikus Seaded.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Alati</string>
@@ -734,7 +734,7 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Saitide haldamine</string>
     <string name="sitePermissionsSettingsEmptyText">Saite pole veel</string>
-    <string name="permissionPerWebsiteText">%s: load </string>
+    <string name="permissionPerWebsiteText">Veebisaidi %s load </string>
     <string name="permissionsPerWebsiteAskSetting">Küsi</string>
     <string name="permissionsPerWebsiteDenySetting">Keela</string>
     <string name="permissionsPerWebsiteAllowSetting">Luba</string>
