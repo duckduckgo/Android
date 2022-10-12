@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s chce získať prístup k fotoaparátu a mikrofónu</string>
-    <string name="sitePermissionsMicDialogTitle">%1$s chce získať prístup k mikrofónu</string>
-    <string name="sitePermissionsCameraDialogTitle">%1$s chce získať prístup k fotoaparátu</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle">\"%1$s\" chce získať prístup k fotoaparátu a mikrofónu</string>
+    <string name="sitePermissionsMicDialogTitle">\"%1$s\"chce získať prístup k mikrofónu</string>
+    <string name="sitePermissionsCameraDialogTitle">\"%1$s\" chce mať prístup k fotoaparátu</string>
     <string name="sitePermissionsDialogContent">Spravujte udelené povolenia v nastaveniach</string>
     <string name="sitePermissionsDialogDenyButton">Odmietnuť</string>
     <string name="sitePermissionsDialogAllowButton">Povoliť</string>
