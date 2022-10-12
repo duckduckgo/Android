@@ -69,15 +69,6 @@
         <item name="android:textStyle">normal</item>
     </style>
 
-    <!-- Bottom Sheet -->
-    <style name="Widget.DuckDuckGo.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.Dialog">
-        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.BottomSheet.Model" parent="Widget.MaterialComponents.BottomSheet.Modal">
-        <item name="behavior_peekHeight">512dp</item>
-    </style>
-
     <style name="Widget.DuckDuckGo.AutoCompleteTextView" parent="Widget.AppCompat.AutoCompleteTextView">
         <item name="android:textCursorDrawable">@drawable/text_cursor</item>
         <item name="android:textColorHint">?attr/omnibarHintColor</item>
@@ -274,6 +265,22 @@
         <item name="endIconTint">?attr/normalTextColor</item>
         <item name="hintTextColor">@color/outlined_text_input_hint_color_selector</item>
         <item name="android:theme">@style/TextInputEditTextTheme</item>
+    </style>
+
+    <!-- Bottom Sheet -->
+    <style name="Widget.DuckDuckGo.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/ModalBottomSheetStyle</item>
+    </style>
+
+    <style name="ModalBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.BottomSheetDialogCorners</item>
+        <item name="android:backgroundTint">?attr/daxDialogBackgroundColor</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BottomSheetDialogCorners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeTopLeft">16dp</item>
     </style>
 
     <!-- Switches -->
