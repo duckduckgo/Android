@@ -94,6 +94,11 @@
 
         <!-- Legacy colors to remove-->
         <item name="normalTextColor">?attr/daxColorPrimaryText</item>
+        <item name="dialogBgColor">?attr/daxColorSurface</item>
+        <item name="daxDialogBackgroundColor">?attr/daxColorSurface</item>
+        <item name="toolbarBgColor">?attr/daxColorSurface</item>
+        <item name="omnibarTextColor">?attr/daxColorPrimaryText</item>
+        <item name="omnibarHintColor">?attr/daxColorSurface</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->

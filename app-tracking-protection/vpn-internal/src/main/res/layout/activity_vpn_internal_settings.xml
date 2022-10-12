@@ -64,8 +64,7 @@
                 app:panelText="Turn AppTP ON to be able to configure this settings"/>
 
             <!-- Section Config -->
-            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
-                android:id="@+id/sectionConfigTitle"
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Config"

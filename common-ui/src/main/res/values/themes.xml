@@ -82,6 +82,7 @@
         <item name="textAppearanceH3">@style/Typography.DuckDuckGo.H3</item>
         <item name="textAppearanceH4">@style/Typography.DuckDuckGo.H4</item>
         <item name="textAppearanceH5">@style/Typography.DuckDuckGo.H5</item>
+
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -183,9 +184,6 @@
         <item name="autofillDialogTitleColor">@color/white</item>
         <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
         <item name="autofillCredentialListSubtitleColor">@color/paleBrownishGray</item>
-
-        <!-- TODO: For Noelia to remove -->
-        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
 
         <!-- Design System Colors Dark -->
         <item name="daxColorBackground">@color/gray100</item>
@@ -325,9 +323,6 @@
         <item name="autofillCredentialListSubtitleColor">@color/brownishGrayTwo</item>
         <item name="appTPHeaderBackground">@color/light_blue</item>
 
-        <!-- TODO: For Noelia to remove -->
-        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
-
         <!-- Design System Colors Light-->
         <item name="daxColorBackground">@color/gray0</item>
         <item name="daxColorSurface">@color/white</item>
@@ -424,12 +419,6 @@
     <style name="Theme.AndroidVpn.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar"/>
 
     <style name="Theme.AndroidVpn.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark"/>
-
-    <style name="SettingsSwitchTheme">
-        <item name="colorControlActivated">@color/cornflowerBlue</item>
-        <item name="colorSwitchThumbNormal">@color/white</item>
-        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
-    </style>
 
     <style name="BottomSheetDialog" parent="Theme.Design.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/BottomSheetStyle</item>

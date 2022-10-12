@@ -101,7 +101,4 @@
     <attr name="bottomShadowBackground" format="reference"/>
     <attr name="appTPHeaderBackground" format="color"/>
 
-    <!-- TODO: For Noelia to remove -->
-    <attr name="settingsSwitchBackgroundColor" format="color"/>
-
 </resources>

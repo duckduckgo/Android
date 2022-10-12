@@ -47,7 +47,7 @@ class AppComponentsPagerAdapter(
 
     }
 
-    override fun getCount(): Int = 2
+    override fun getCount(): Int = MainFragments.values().size
 
     private fun getItemType(position: Int): MainFragments {
         return MainFragments.values()[position]
