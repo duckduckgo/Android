@@ -20,6 +20,13 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
+import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -31,12 +38,17 @@ interface VpnStore {
     fun onboardingDidNotShow()
     fun didShowOnboarding(): Boolean
     fun resetAppTPManuallyEnablesCounter()
+    // TODO remove
     fun onAppTPManuallyEnabled()
+    // TODO remove
     fun getAppTPManuallyEnables(): Int
+    // TODO remove
     fun onForgetPromoteAlwaysOn()
+    // TODO remove
     fun userAllowsShowPromoteAlwaysOn(): Boolean
     suspend fun setAlwaysOn(enabled: Boolean)
     fun isAlwaysOnEnabled(): Boolean
+    suspend fun vpnLastDisabledByAndroid(): Boolean
 
     companion object {
         const val ALWAYS_ON_PROMOTION_DELTA = 3
@@ -48,6 +60,9 @@ interface VpnStore {
 class SharedPreferencesVpnStore @Inject constructor(
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
     private val dispatcherProvider: DispatcherProvider,
+    private val vpnHeartBeatDao: VpnHeartBeatDao,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val vpnServiceStateDao: VpnServiceStateStatsDao,
 ) : VpnStore {
 
     private val preferences: SharedPreferences
@@ -91,6 +106,26 @@ class SharedPreferencesVpnStore @Inject constructor(
 
     override fun isAlwaysOnEnabled(): Boolean {
         return preferences.getBoolean(KEY_ALWAYS_ON_MODE_ENABLED, false)
+    }
+
+    override suspend fun vpnLastDisabledByAndroid(): Boolean {
+        fun vpnUnexpectedlyDisabled(): Boolean {
+            return vpnServiceStateDao.getLastStateStats()?.let {
+                (
+                    it.state == VpnServiceState.DISABLED &&
+                        it.stopReason != VpnStoppingReason.SELF_STOP &&
+                        it.stopReason != VpnStoppingReason.REVOKED
+                    )
+            } ?: false
+        }
+
+        fun vpnKilledBySystem(): Boolean {
+            val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
+            return lastHeartBeat?.type == VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE &&
+                !vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+        }
+
+        return vpnUnexpectedlyDisabled() || vpnKilledBySystem()
     }
 
     companion object {

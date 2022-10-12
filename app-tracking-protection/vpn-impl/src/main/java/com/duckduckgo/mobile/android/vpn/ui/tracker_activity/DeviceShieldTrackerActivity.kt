@@ -52,6 +52,8 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
+import com.duckduckgo.mobile.android.vpn.ui.alwayson.AlwaysOnAlertDialogFragment
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
@@ -125,27 +127,27 @@ class DeviceShieldTrackerActivity :
 
     private fun bindViews() {
         binding.ctaTrackerFaq.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
+            viewModel.onViewEvent(ViewEvent.LaunchDeviceShieldFAQ)
         }
 
         binding.ctaBetaInstructions.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchBetaInstructions)
+            viewModel.onViewEvent(ViewEvent.LaunchBetaInstructions)
         }
 
         binding.ctaWhatAreAppTrackers.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchAppTrackersFAQ)
+            viewModel.onViewEvent(ViewEvent.LaunchAppTrackersFAQ)
         }
 
         binding.ctaManageProtection.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
+            viewModel.onViewEvent(ViewEvent.LaunchExcludedApps)
         }
 
         binding.ctaRemoveFeature.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.AskToRemoveFeature)
+            viewModel.onViewEvent(ViewEvent.AskToRemoveFeature)
         }
 
         binding.ctaShowAll.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
+            viewModel.onViewEvent(ViewEvent.LaunchMostRecentActivity)
         }
     }
 
@@ -274,8 +276,7 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchAlwaysOnPromotionDialog() {
-        deviceShieldPixels.didShowDisableTrackingProtectionDialog()
-        val dialog = AppTPPromoteAlwaysOnDialog.instance(this)
+        val dialog = AlwaysOnAlertDialogFragment.newInstance { openVPNSettings() }
         dialog.show(
             supportFragmentManager,
             AppTPPromoteAlwaysOnDialog.TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG
@@ -284,7 +285,7 @@ class DeviceShieldTrackerActivity :
 
     override fun onOpenAppProtection() {
         deviceShieldPixels.didChooseToDisableOneAppFromDialog()
-        viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
+        viewModel.onViewEvent(ViewEvent.LaunchExcludedApps)
     }
 
     override fun onTurnAppTrackingProtectionOff() {
@@ -307,7 +308,7 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onPromoteAlwaysOnGoToVPNSettings() {
-        viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.PromoteAlwaysOnOpenSettings)
+        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings)
     }
 
     @SuppressLint("InlinedApi")
@@ -335,7 +336,7 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onPromoteAlwaysOnRemindLater() {
-        viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.PromoteAlwaysOnRemindLater)
+        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnRemindLater)
     }
 
     override fun onPromoteAlwaysOnForget() {
@@ -416,7 +417,6 @@ class DeviceShieldTrackerActivity :
 
     private fun updateRunningState(runningState: VpnState) {
         if (runningState.state == VpnRunningState.ENABLED) {
-            Timber.d("updateRunningState enabled")
             binding.deviceShieldTrackerLabelDisabled.gone()
 
             binding.deviceShieldTrackerLabelEnabled.apply {
@@ -430,17 +430,21 @@ class DeviceShieldTrackerActivity :
             binding.deviceShieldTrackerLabelEnabled.gone()
 
             val disabledLabel = if (runningState.stopReason == REVOKED) {
-                Timber.d("updateRunningState revoked")
                 R.string.atp_ActivityRevokedLabel
-            } else {
-                Timber.d("updateRunningState disabled")
+            } else if (runningState.stopReason == SELF_STOP) {
                 R.string.atp_ActivityDisabledLabel
+            } else {
+                R.string.atp_ActivityDisabledBySystemLabel
             }
             binding.deviceShieldTrackerLabelDisabled.apply {
                 setClickableLink(
                     REPORT_ISSUES_ANNOTATION,
                     getText(disabledLabel)
                 ) { launchFeedback() }
+                setClickableLink(
+                    RE_ENABLE_ANNOTATION,
+                    getText(disabledLabel)
+                ) { reEnableAppTrackingProtection() }
                 show()
             }
         }
@@ -489,9 +493,8 @@ class DeviceShieldTrackerActivity :
         reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps)
     }
 
-    private fun launchAppSettings() {
-        deviceShieldPixels.didSubmitReportIssuesFromTrackerActivity()
-        reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps)
+    private fun reEnableAppTrackingProtection() {
+        checkVPNPermission()
     }
 
     private sealed class VpnPermissionStatus {
@@ -501,6 +504,7 @@ class DeviceShieldTrackerActivity :
 
     companion object {
         private const val RESULT_RECEIVER_EXTRA = "RESULT_RECEIVER_EXTRA"
+        private const val RE_ENABLE_ANNOTATION = "re_enable_link"
         private const val ON_LAUNCHED_CALLED_SUCCESS = 0
         private const val MIN_ROWS_FOR_ALL_ACTIVITY = 6
 

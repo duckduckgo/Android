@@ -87,17 +87,8 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         }
     }
 
-    private fun shouldPromoteAlwaysOn(): Boolean {
-        val shouldPromoteAlwaysOn =
-            vpnStore.getAppTPManuallyEnables() >= VpnStore.ALWAYS_ON_PROMOTION_DELTA &&
-                vpnStore.userAllowsShowPromoteAlwaysOn() &&
-                !vpnStore.isAlwaysOnEnabled()
-
-        if (shouldPromoteAlwaysOn) {
-            vpnStore.resetAppTPManuallyEnablesCounter()
-        }
-
-        return shouldPromoteAlwaysOn
+    private suspend fun shouldPromoteAlwaysOn(): Boolean {
+        return !vpnStore.isAlwaysOnEnabled() && vpnStore.vpnLastDisabledByAndroid()
     }
 
     private fun sendCommand(newCommand: Command) {
@@ -161,13 +152,14 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     private fun launchVpn() {
         sendCommand(Command.LaunchVPN)
-        if (shouldPromoteAlwaysOn()) {
-            deviceShieldPixels.didShowPromoteAlwaysOnDialog()
-            sendCommand(Command.ShowAlwaysOnPromotionDialog)
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (shouldPromoteAlwaysOn()) {
+                deviceShieldPixels.didShowPromoteAlwaysOnDialog()
+                sendCommand(Command.ShowAlwaysOnPromotionDialog)
+            }
         }
 
         deviceShieldPixels.enableFromSummaryTrackerActivity()
-        vpnStore.onAppTPManuallyEnabled()
     }
 
     fun removeFeature() {
