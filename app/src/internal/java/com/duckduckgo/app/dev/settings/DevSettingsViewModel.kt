@@ -21,12 +21,13 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
-import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
+import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.traces.api.StartupTraces
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -44,6 +45,7 @@ class DevSettingsViewModel @Inject constructor(
     private val userAgentProvider: UserAgentProvider,
     private val bookmarksRepository: BookmarksRepository,
     private val favoritesRepository: FavoritesRepository,
+    private val themingDataStore: ThemingDataStore,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -51,7 +53,8 @@ class DevSettingsViewModel @Inject constructor(
         val nextTdsEnabled: Boolean = false,
         val startupTraceEnabled: Boolean = false,
         val overrideUA: Boolean = false,
-        val userAgent: String = ""
+        val userAgent: String = "",
+        val adsThemeEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -70,7 +73,8 @@ class DevSettingsViewModel @Inject constructor(
                     nextTdsEnabled = devSettingsDataStore.nextTdsEnabled,
                     startupTraceEnabled = startupTraces.isTraceEnabled,
                     overrideUA = devSettingsDataStore.overrideUA,
-                    userAgent = userAgentProvider.userAgent("", false)
+                    userAgent = userAgentProvider.userAgent("", false),
+                    adsThemeEnabled = themingDataStore.adsThemeEnabled
                 )
             )
         }
@@ -128,6 +132,13 @@ class DevSettingsViewModel @Inject constructor(
             favoritesRepository.deleteAll()
             bookmarksRepository.deleteAll()
             command.send(Command.ShowSavedSitesClearedConfirmation)
+        }
+    }
+
+    fun enableDesignSystemTheming(isEnabled: Boolean) {
+        themingDataStore.adsThemeEnabled = isEnabled
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(adsThemeEnabled = isEnabled))
         }
     }
 }

@@ -61,6 +61,10 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         viewModel.onOverrideUAToggled(isChecked)
     }
 
+    private val designSystemThemeListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.enableDesignSystemTheming(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -97,6 +101,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
                     binding.overrideUserAgentToggle.quietlySetIsChecked(it.overrideUA, overrideUAListener)
                     binding.overrideUserAgentSelector.isEnabled = it.overrideUA
                     binding.overrideUserAgentSelector.setSecondaryText(it.userAgent)
+                    binding.designSystemTheming.quietlySetIsChecked(it.adsThemeEnabled, designSystemThemeListener)
                 }
             }.launchIn(lifecycleScope)
 

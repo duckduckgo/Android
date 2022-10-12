@@ -64,6 +64,13 @@
                 app:primaryText="@string/devSettingsClearSavedSites"
                 app:secondaryText="@string/devSettingsClearSavedSitesSubtitle"/>
 
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/designSystemTheming"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenDesignSystemThemeTitle"
+                app:showSwitch="true"/>
+
             <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/privacyTitle"
                 android:layout_width="wrap_content"

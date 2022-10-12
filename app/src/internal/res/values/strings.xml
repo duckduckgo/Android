@@ -40,6 +40,7 @@
     <string name="devSettingsScreenUserAgentFirefox" translatable="false">Firefox</string>
     <string name="devSettingsScreenUserAgentDuckDuckGo" translatable="false">DDG Default</string>
     <string name="devSettingsScreenUserAgentWebView" translatable="false">UA WebView</string>
+    <string name="devSettingsScreenDesignSystemThemeTitle" translatable="false">Enable ADS Theming</string>
     <!-- Privacy Audit settings -->
     <string name="auditSettingsTitle" translatable="false">Audit Settings</string>
     <string name="auditSettingsSubtitle" translatable="false">Features useful for doing our privacy audit</string>

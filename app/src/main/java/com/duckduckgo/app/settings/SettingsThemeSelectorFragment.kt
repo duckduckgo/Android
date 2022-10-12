@@ -43,13 +43,19 @@ class SettingsThemeSelectorFragment : DialogFragment() {
         val currentOption: DuckDuckGoTheme =
             arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as DuckDuckGoTheme? ?: LIGHT
 
-        val rootView =
-            View.inflate(activity, R.layout.settings_theme_selector_fragment, null)
+        val rootView = View.inflate(activity, R.layout.settings_theme_selector_fragment, null)
+
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             rootView.findViewById<RadioButton>(R.id.themeSelectorSystemDefault).visibility =
                 View.VISIBLE
         }
+
+        if (arguments?.getBoolean(ADS_THEME_ENABLED, false)!!) {
+            rootView.findViewById<RadioButton>(R.id.themeSelectorAdsLight).visibility = View.VISIBLE
+            rootView.findViewById<RadioButton>(R.id.themeSelectorAdsDark).visibility = View.VISIBLE
+        }
+
         updateCurrentSelect(currentOption, rootView.findViewById(R.id.themeSelectorGroup))
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
@@ -62,6 +68,8 @@ class SettingsThemeSelectorFragment : DialogFragment() {
                         R.id.themeSelectorLight -> LIGHT
                         R.id.themeSelectorDark -> DARK
                         R.id.themeSelectorSystemDefault -> SYSTEM_DEFAULT
+                        R.id.themeSelectorAdsLight -> LIGHT_V2
+                        R.id.themeSelectorAdsDark -> DARK_V2
                         else -> LIGHT
                     }
                     val listener = activity as Listener?
@@ -86,8 +94,8 @@ class SettingsThemeSelectorFragment : DialogFragment() {
         return when (this) {
             LIGHT -> R.id.themeSelectorLight
             DARK -> R.id.themeSelectorDark
-            LIGHT_V2 -> R.id.themeSelectorLight
-            DARK_V2 -> R.id.themeSelectorDark
+            LIGHT_V2 -> R.id.themeSelectorAdsLight
+            DARK_V2 -> R.id.themeSelectorAdsDark
             SYSTEM_DEFAULT -> R.id.themeSelectorSystemDefault
         }
     }
@@ -95,12 +103,17 @@ class SettingsThemeSelectorFragment : DialogFragment() {
     companion object {
 
         private const val DEFAULT_OPTION_EXTRA = "DEFAULT_OPTION"
+        private const val ADS_THEME_ENABLED = "ADS_THEME_ENABLED"
 
-        fun create(selectedFireAnimation: DuckDuckGoTheme?): SettingsThemeSelectorFragment {
+        fun create(
+            selectedFireAnimation: DuckDuckGoTheme?,
+            adsThemeEnabled: Boolean
+        ): SettingsThemeSelectorFragment {
             val fragment = SettingsThemeSelectorFragment()
 
             fragment.arguments = Bundle().also {
                 it.putSerializable(DEFAULT_OPTION_EXTRA, selectedFireAnimation)
+                it.putBoolean(ADS_THEME_ENABLED, adsThemeEnabled)
             }
             return fragment
         }
