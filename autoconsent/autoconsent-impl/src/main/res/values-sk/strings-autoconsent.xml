@@ -14,10 +14,11 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Autoconsent -->
+    <!-- smartling.placeholder_format = NONE -->
     <string name="autoconsentTitle">Správa kontextových okien súborov cookie</string>
     <string name="autoconsentDescription">Keď DuckDuckGo zistí na vami navštívených lokalitách kontextové okná týkajúce sa súhlasu so súbormi cookie, môžeme automaticky nastaviť vaše možnosti súborov cookie tak, aby ste minimalizovali využívanie súborov cookie a maximalizovali ochranu súkromia, a potom môžeme zavrieť kontextové okná.</string>
     <string name="autoconsentToggle">Nech DuckDuckGo spravuje kontextové okná týkajúce sa súhlasu so súbormi cookie</string>
-
 </resources>
