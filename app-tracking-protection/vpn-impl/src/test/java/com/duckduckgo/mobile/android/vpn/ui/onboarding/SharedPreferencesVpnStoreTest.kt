@@ -18,6 +18,15 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
+import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
+import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -36,6 +45,9 @@ class SharedPreferencesVpnStoreTest {
     var coroutineRule = CoroutineTestRule()
 
     private val sharedPreferencesProvider = mock<VpnSharedPreferencesProvider>()
+    private val vpnHeartBeatDao = mock<VpnHeartBeatDao>()
+    private val vpnFeaturesRegistry = mock<VpnFeaturesRegistry>()
+    private val vpnServiceStateDao = mock<VpnServiceStateStatsDao>()
 
     private lateinit var sharedPreferencesVpnStore: SharedPreferencesVpnStore
 
@@ -46,7 +58,13 @@ class SharedPreferencesVpnStoreTest {
             sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.android.atp.onboarding.store"), eq(true), eq(true))
         ).thenReturn(prefs)
 
-        sharedPreferencesVpnStore = SharedPreferencesVpnStore(sharedPreferencesProvider, coroutineRule.testDispatcherProvider)
+        sharedPreferencesVpnStore = SharedPreferencesVpnStore(
+            sharedPreferencesProvider,
+            coroutineRule.testDispatcherProvider,
+            vpnHeartBeatDao,
+            vpnFeaturesRegistry,
+            vpnServiceStateDao,
+        )
     }
 
     @Test
@@ -113,5 +131,45 @@ class SharedPreferencesVpnStoreTest {
         sharedPreferencesVpnStore.setAlwaysOn(false)
 
         assertFalse(sharedPreferencesVpnStore.isAlwaysOnEnabled())
+    }
+
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun whenVpnLastDisabledByAndroidAndVpnKilledBySystemThenReturnTrue() = runTest {
+        whenever(vpnServiceStateDao.getLastStateStats()).thenReturn(null)
+        whenever(vpnHeartBeatDao.hearBeats()).thenReturn(listOf(HeartBeatEntity(type = VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE)))
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
+
+        assertTrue(sharedPreferencesVpnStore.vpnLastDisabledByAndroid())
+    }
+
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun whenVpnLastDisabledByAndroidAndVpnUnexpectedlyDisabledThenReturnTrue() = runTest {
+        whenever(vpnServiceStateDao.getLastStateStats()).thenReturn(
+            VpnServiceStateStats(state = VpnServiceState.DISABLED)
+        )
+
+        assertTrue(sharedPreferencesVpnStore.vpnLastDisabledByAndroid())
+    }
+
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun whenVpnLastDisabledByAndroidAndVpnDisabledByUserThenReturnFalse() = runTest {
+        whenever(vpnServiceStateDao.getLastStateStats()).thenReturn(
+            VpnServiceStateStats(state = VpnServiceState.DISABLED, stopReason = VpnStoppingReason.SELF_STOP)
+        )
+
+        assertFalse(sharedPreferencesVpnStore.vpnLastDisabledByAndroid())
+    }
+
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun whenVpnLastDisabledByAndroidAndVpnEnabledThenReturnFalse() = runTest {
+        whenever(vpnServiceStateDao.getLastStateStats()).thenReturn(
+            VpnServiceStateStats(state = VpnServiceState.ENABLED)
+        )
+
+        assertFalse(sharedPreferencesVpnStore.vpnLastDisabledByAndroid())
     }
 }
