@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package com.duckduckgo.mobile.android.ui.view
+package com.duckduckgo.mobile.android.ui.view.text
 
 import android.content.Context
 import android.util.AttributeSet
@@ -45,7 +45,7 @@ constructor(
                 R.styleable.SectionHeaderTextView_android_textAppearance,
                 android.R.style.TextAppearance
             )
-        setTextAppearance(context, textAppearanceId)
+        setTextAppearance(textAppearanceId)
 
         val paddingTop = typedArray.getDimensionPixelOffset(R.styleable.SectionHeaderTextView_android_paddingTop, 24)
         val paddingStart = typedArray.getDimensionPixelOffset(R.styleable.SectionHeaderTextView_android_paddingStart, 20)

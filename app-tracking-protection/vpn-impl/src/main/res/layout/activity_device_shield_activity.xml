@@ -56,14 +56,14 @@
                 android:visibility="gone"
                 android:layout_margin="16dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/past_week_activity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="@dimen/keyline_4"
                 android:paddingBottom="@dimen/keyline_2"
                 android:paddingStart="@dimen/keyline_4"
-                android:text="@string/atp_ActivityPastWeek" />
+                android:text="@string/atp_ActivityPastWeek"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -99,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
-            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/most_recent_activity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -125,12 +125,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/keyline_2"
                 android:paddingStart="@dimen/keyline_4"
-                android:text="@string/atp_ActivityAbout" />
+                android:text="@string/atp_ActivityAbout"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_what_are_app_trackers"
@@ -150,13 +150,13 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/atp_ActivityBetaInstructions"/>
 
-            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="@dimen/keyline_4"
                 android:paddingBottom="@dimen/keyline_2"
                 android:paddingStart="@dimen/keyline_4"
-                android:text="@string/atp_ActivityManage" />
+                android:text="@string/atp_ActivityManage"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_manage_protection"

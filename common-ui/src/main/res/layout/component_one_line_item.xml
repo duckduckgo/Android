@@ -20,7 +20,7 @@
                                                    android:clipToPadding="false"
                                                    android:paddingTop="@dimen/keyline_5">
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:id="@+id/label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
