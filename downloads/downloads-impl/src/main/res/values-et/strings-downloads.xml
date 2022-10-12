@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Allalaadimine ebaõnnestus. Kontrolli internetiühendust.</string>
 
     <string name="notificationChannelFileDownloading">Failide allalaadimine</string>
     <string name="notificationChannelFileDownloaded">Fail on alla laaditud</string>
+
     <string name="downloadInProgress">Allalaadimine</string>
+
+    <string name="downloadsDownloadStartedMessage">%s: allalaadimine algas</string>
+    <string name="downloadsDownloadFinishedMessage">%s: allalaadimine on lõpule viidud</string>
+    <string name="downloadsDownloadGenericErrorMessage">Allalaadimine nurjus.</string>
+    <string name="downloadsCancel">Tühista</string>
+    <string name="downloadsRetry">Proovi uuesti</string>
+    <string name="notificationDownloadComplete">Allalaadimine lõpetatud.</string>
+    <string name="notificationDownloadFailed">Allalaadimine nurjus.</string>
 </resources>
