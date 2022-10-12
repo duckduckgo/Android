@@ -16,7 +16,18 @@
 
 <resources>
 
-    <!-- Design System References Colors -->
+    <!-- Design System References Colors
+        daxColorBackground - Bottom Layer - Background of the screen
+        daxColorSurface - First layer on top (Toolbar, Navigation Bar, Dialogs)
+        daxColorContainer - Object container (Favicon rounded background)
+        daxColorPrimaryText - Primary text color
+        daxColorSecondaryText - Secondary text color
+        daxColorDestructive - Destructive element (Destructive button)
+        daxColorLines - Dividers between elements
+        daxColorAccentBlue - Main accent color (Button primary)
+        daxColorAccentYellow
+        daxColorDisabled - Disabled color applied to all elements (text, buttons, etc...)
+    -->
     <attr name="daxColorBackground" format="color"/>
     <attr name="daxColorSurface" format="color"/>
     <attr name="daxColorContainer" format="color"/>

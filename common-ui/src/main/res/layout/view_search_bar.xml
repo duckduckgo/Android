@@ -50,8 +50,8 @@
         android:inputType="textUri|textNoSuggestions"
         android:maxLines="1"
         android:selectAllOnFocus="true"
-        android:textColor="?attr/omnibarTextColor"
-        android:textColorHint="?attr/omnibarHintColor"
+        android:textColor="?attr/daxColorPrimaryText"
+        android:textColorHint="?attr/daxColorSecondaryText"
         android:textCursorDrawable="@drawable/text_cursor"
         android:textSize="16sp"
         android:textStyle="normal"
@@ -60,7 +60,7 @@
         app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_goneMarginEnd="@dimen/keyline_2"
-        tools:text="https://duckduckgo.com/?q=areallylongexampleexample" />
+        tools:text="https://duckduckgo.com/?q=areallylongexampleexample"/>
 
     <com.duckduckgo.mobile.android.ui.view.button.IconButton
         android:id="@+id/clearTextButton"
