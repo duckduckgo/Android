@@ -191,6 +191,121 @@ class DeviceShieldActivityFeedViewModelTest {
         }
     }
 
+    @Test
+    fun whenGetAppsDataCalledAndBothUnprotectedAndProtectedAppsThenEmitTwoItems() = runBlocking {
+        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
+            flowOf(
+                listOf(
+                    TrackingProtectionAppInfo(
+                        packageName = "package1",
+                        name = "One app",
+                        isExcluded = false,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                    TrackingProtectionAppInfo(
+                        packageName = "package2",
+                        name = "Other app",
+                        isExcluded = true,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                )
+            )
+        )
+
+        viewModel.getAppsData().test {
+            assertEquals(
+                listOf(
+                    TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = true),
+                    TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = false)
+                ),
+                awaitItem()
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetAppsDataCalledAndOnlyUnprotectedAppsThenEmitOneItem() = runBlocking {
+        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
+            flowOf(
+                listOf(
+                    TrackingProtectionAppInfo(
+                        packageName = "package1",
+                        name = "One app",
+                        isExcluded = true,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                    TrackingProtectionAppInfo(
+                        packageName = "package2",
+                        name = "Other app",
+                        isExcluded = true,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                )
+            )
+        )
+
+        viewModel.getAppsData().test {
+            assertEquals(
+                listOf(
+                    TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = false)
+                ),
+                awaitItem()
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetAppsDataCalledAndNoAppsThenEmitEmptyList() = runBlocking {
+        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(flowOf(emptyList()))
+
+        viewModel.getAppsData().test {
+            assertEquals(
+                emptyList<TrackerFeedItem>(), awaitItem()
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetAppsDataCalledAndOnlyProtectedAppsThenEmitOneItem() = runBlocking {
+        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
+            flowOf(
+                listOf(
+                    TrackingProtectionAppInfo(
+                        packageName = "package1",
+                        name = "One app",
+                        isExcluded = false,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                    TrackingProtectionAppInfo(
+                        packageName = "package2",
+                        name = "Other app",
+                        isExcluded = false,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                )
+            )
+        )
+
+        viewModel.getAppsData().test {
+            assertEquals(
+                listOf(
+                    TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = true)
+                ),
+                awaitItem()
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
     private suspend fun getAppsAndProtectionInfoReturnsTwoAppsOneWithIsExcludedTrueAndOtherWithIsExcludedFalse() {
         whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
