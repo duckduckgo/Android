@@ -14,14 +14,17 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="common_Today">Täna</string>
     <string name="common_Yesterday">Eile</string>
-    <string name="common_DaysAgo">%1$d päeva tagasi</string>
+    <string name="common_DaysAgo">%d päeva tagasi</string>
     <string name="common_PastWeek">Viimane nädal</string>
     <string name="common_PastMonth">Viimane kuu</string>
-    <string name="common_MinutesAgo">%1$d min tagasi</string>
-    <string name="common_HoursAgo">%1$d h tagasi</string>
+    <string name="common_MinutesAgo">%d m tagasi</string>
+    <string name="common_HoursAgo">%d h tagasi</string>
     <string name="common_JustNow">Just nüüd</string>
     <string name="common_hour_abbreviation">h</string>
     <string name="common_min_abbreviation">min</string>
