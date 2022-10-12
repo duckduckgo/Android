@@ -14,8 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Täytä kirjautumistiedot automaattisesti</string>
 
     <string name="managementLockedModeText">Poista automaattisen täytön lukitus</string>
@@ -34,7 +36,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Lisää vaihtoehtoja</string>
 
     <string name="useSavedLoginDialogTitle">Käytä tallennettuja kirjautumistietoja?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Kirjautumistiedot kohteeseen %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Kirjautuminen kohteeseen %s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Kirjautumistiedot sivustolle</string>
 
     <string name="updateLoginDialogTitle">Päivitetäänkö salasana?</string>
@@ -53,7 +55,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Tallenna muutokset</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopioi käyttäjätunnus</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopioi salasana</string>
-    <string name="credentialManagementEditLastUpdated">Kirjautumistiedot päivitetty viimeksi %1$s</string>
+    <string name="credentialManagementEditLastUpdated">Kirjautumistiedot päivitetty viimeksi %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Tallenna ja täytä kirjautumistiedot automaattisesti</string>
     <string name="credentialManagementViewMenuEdit">Muokkaa</string>

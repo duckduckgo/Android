@@ -14,8 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Sisesta sisselogimisandmed automaatselt</string>
 
     <string name="managementLockedModeText">Ava automaatne täitmine</string>
@@ -34,7 +36,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
     <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud sisselogimist?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Kasuta saidi %1$s sisselogimismandaate</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Sisselogimine: %s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Kasuta saidi sisselogimismandaate</string>
 
     <string name="updateLoginDialogTitle">Kas värskendada parooli?</string>
@@ -53,7 +55,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Salvesta muudatused</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopeeri kasutajanimi</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopeeri parool</string>
-    <string name="credentialManagementEditLastUpdated">Sisselogimist värskendati viimati %1$s</string>
+    <string name="credentialManagementEditLastUpdated">Sisselogimist värskendati viimati %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Salvesta ja täida sisselogimisandmed automaatselt</string>
     <string name="credentialManagementViewMenuEdit">Redigeeri</string>
