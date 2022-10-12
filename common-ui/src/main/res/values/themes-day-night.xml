@@ -22,9 +22,10 @@
     Using resource qualifiers, we can specify a different platform theme for different versions of Android. -->
 
     <style name="Platform.Theme.DuckDuckGo" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/colorSurface</item>
+        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/daxColorSurface</item>
+        <item name="android:windowActivityTransitions" tools:ignore="NewApi">true</item>
         <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
-        <item name="android:navigationBarColor" tools:ignore="NewApi">?android:attr/colorBackground</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">?attr/daxColorBackground</item>
         <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
     </style>
 
@@ -51,6 +52,7 @@
         <item name="autoCompleteTextViewStyle">@style/Widget.DuckDuckGo.AutoCompleteTextView</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialComponents.Dialog.Alert</item>
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Surface</item>
+        <item name="tabStyle">@style/Widget.DuckDuckGo.TabLayout</item>
 
         <!-- Design System Components -->
         <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
@@ -89,10 +91,15 @@
         <item name="colorOnBackground">?attr/daxColorPrimaryText</item>
         <item name="colorOnSurface">?attr/daxColorPrimaryText</item>
         <item name="colorOnError">?attr/daxColorPrimaryText</item>
+
+        <!-- Legacy colors to remove-->
+        <item name="normalTextColor">?attr/daxColorPrimaryText</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
     <style name="Theme.DuckDuckGo.Dark" parent="Theme.DuckDuckGo">
+        <item name="android:windowLightStatusBar" tools:ignore="NewApi">false</item>
+
         <item name="daxColorBackground">@color/gray100</item>
         <item name="daxColorSurface">@color/gray90</item>
         <item name="daxColorContainer">@color/black12</item>
