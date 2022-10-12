@@ -25,6 +25,8 @@ import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
@@ -33,12 +35,15 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompan
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit.DAYS
 import kotlin.time.ExperimentalTime
 
@@ -50,6 +55,8 @@ class DeviceShieldActivityFeedViewModelTest {
     private lateinit var db: VpnDatabase
     private lateinit var viewModel: DeviceShieldActivityFeedViewModel
 
+    private val mockExcludedApps: TrackingProtectionAppsRepository = mock()
+
     @Before
     fun setup() {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
@@ -60,7 +67,8 @@ class DeviceShieldActivityFeedViewModelTest {
         viewModel = DeviceShieldActivityFeedViewModel(
             RealAppTrackerBlockingStatsRepository(db),
             CoroutineTestRule().testDispatcherProvider,
-            RealTimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext)
+            RealTimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext),
+            mockExcludedApps
         )
     }
 
@@ -73,15 +81,6 @@ class DeviceShieldActivityFeedViewModelTest {
     fun whenGetMostRecentTrackersCalledStartWithSkeleton() = runBlocking {
         viewModel.getMostRecentTrackers(timeWindow, false).test {
             assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenGetMostRecentTrackersIsEmptyThenEmitEmpty() = runBlocking {
-        viewModel.getMostRecentTrackers(timeWindow, false).test {
-            assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
-            assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -129,14 +128,127 @@ class DeviceShieldActivityFeedViewModelTest {
     }
 
     @Test
-    fun whenGetMostRecentTrackersIsNotEmptyAndOutsideTimeWindowThenEmitEmpty() = runBlocking {
+    fun whenGetMostRecentTrackersIsNotEmptyAndOutsideTimeWindowThenEmitLoadingSkeleton() = runBlocking {
         db.vpnTrackerDao().insert(dummyTrackers[3])
 
-        // we always start with skeleton, that's why we expect two items
         viewModel.getMostRecentTrackers(timeWindow, false).test {
             assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
-            assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), awaitItem())
             expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetAppsDataCalledAndBothUnprotectedAndProtectedAppsThenEmitTwoItems() = runBlocking {
+        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
+            flowOf(
+                listOf(
+                    TrackingProtectionAppInfo(
+                        packageName = "package1",
+                        name = "One app",
+                        isExcluded = false,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                    TrackingProtectionAppInfo(
+                        packageName = "package2",
+                        name = "Other app",
+                        isExcluded = true,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                )
+            )
+        )
+
+        viewModel.getAppsData().test {
+            assertEquals(
+                listOf(
+                    TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = true),
+                    TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = false)
+                ),
+                awaitItem()
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetAppsDataCalledAndOnlyUnprotectedAppsThenEmitOneItem() = runBlocking {
+        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
+            flowOf(
+                listOf(
+                    TrackingProtectionAppInfo(
+                        packageName = "package1",
+                        name = "One app",
+                        isExcluded = true,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                    TrackingProtectionAppInfo(
+                        packageName = "package2",
+                        name = "Other app",
+                        isExcluded = true,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                )
+            )
+        )
+
+        viewModel.getAppsData().test {
+            assertEquals(
+                listOf(
+                    TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = false)
+                ),
+                awaitItem()
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetAppsDataCalledAndNoAppsThenEmitEmptyList() = runBlocking {
+        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(flowOf(emptyList()))
+
+        viewModel.getAppsData().test {
+            assertEquals(
+                emptyList<TrackerFeedItem>(), awaitItem()
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetAppsDataCalledAndOnlyProtectedAppsThenEmitOneItem() = runBlocking {
+        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
+            flowOf(
+                listOf(
+                    TrackingProtectionAppInfo(
+                        packageName = "package1",
+                        name = "One app",
+                        isExcluded = false,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                    TrackingProtectionAppInfo(
+                        packageName = "package2",
+                        name = "Other app",
+                        isExcluded = false,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                )
+            )
+        )
+
+        viewModel.getAppsData().test {
+            assertEquals(
+                listOf(
+                    TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = true)
+                ),
+                awaitItem()
+            )
             cancelAndConsumeRemainingEvents()
         }
     }
