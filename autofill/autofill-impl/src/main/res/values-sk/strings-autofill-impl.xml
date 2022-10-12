@@ -14,8 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Automatické vyplňovanie prihlasovacích údajov</string>
 
     <string name="managementLockedModeText">Odomknutie automatického vypĺňania</string>
@@ -34,7 +36,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Ďalšie možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Použiť uložené prihlásenie?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Prihlásenie pre %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Prihlásiť sa pre %s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Prihlásenie na stránky</string>
 
     <string name="updateLoginDialogTitle">Aktualizovať heslo?</string>
@@ -53,7 +55,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Uložiť zmeny</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopírovať používateľské meno</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopírovať heslo</string>
-    <string name="credentialManagementEditLastUpdated">Naposledy aktualizované prihlásenie %1$s</string>
+    <string name="credentialManagementEditLastUpdated">Naposledy aktualizované prihlásenie %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Uložiť a automaticky vyplniť prihlásenia</string>
     <string name="credentialManagementViewMenuEdit">Upraviť</string>
