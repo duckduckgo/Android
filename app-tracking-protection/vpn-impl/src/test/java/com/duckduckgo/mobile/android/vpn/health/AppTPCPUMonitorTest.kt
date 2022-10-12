@@ -130,22 +130,22 @@ class AppTPCPUMonitorTest {
         assertWorkerNotRunning()
     }
 
-    @Ignore("This test is flaky, we need to investigate why")
+    @Test
     fun whenCPUAbove30ThresholdSendAlert() {
         assertAlertSent(42.0, 30)
     }
 
-    @Ignore("This test is flaky, we need to investigate why")
+    @Test
     fun whenCPUAbove20ThresholdSendAlert() {
         assertAlertSent(30.0, 20)
     }
 
-    @Ignore("This test is flaky, we need to investigate why")
+    @Test
     fun whenCPUAbove10ThresholdSendAlert() {
         assertAlertSent(10.1, 10)
     }
 
-    @Ignore("This test is flaky, we need to investigate why")
+    @Test
     fun whenCPUAbove5ThresholdSendAlert() {
         assertAlertSent(5.5, 5)
     }
