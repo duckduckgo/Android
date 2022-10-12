@@ -22,6 +22,7 @@
         daxColorContainer - Object container (Favicon rounded background)
         daxColorPrimaryText - Primary text color
         daxColorSecondaryText - Secondary text color
+        daxColorPrimaryIcon - Primary color for icons
         daxColorDestructive - Destructive element (Destructive button)
         daxColorLines - Dividers between elements
         daxColorAccentBlue - Main accent color (Button primary)
@@ -33,6 +34,7 @@
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
     <attr name="daxColorSecondaryText" format="color"/>
+    <attr name="daxColorPrimaryIcon" format="color"/>
     <attr name="daxColorDestructive" format="color"/>
     <attr name="daxColorLines" format="color"/>
     <attr name="daxColorAccentBlue" format="color"/>

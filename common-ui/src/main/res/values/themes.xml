@@ -191,6 +191,7 @@
         <item name="daxColorContainer">@color/black12</item>
         <item name="daxColorPrimaryText">@color/white84</item>
         <item name="daxColorSecondaryText">@color/white60</item>
+        <item name="daxColorPrimaryIcon">@color/white84</item>
         <item name="daxColorDestructive">@color/destructiveRedDark</item>
         <item name="daxColorDisabled">@color/black35</item>
         <item name="daxColorLines">@color/black18</item>
@@ -329,6 +330,7 @@
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorPrimaryText">@color/black84</item>
         <item name="daxColorSecondaryText">@color/black60</item>
+        <item name="daxColorPrimaryIcon">@color/black84</item>
         <item name="daxColorDestructive">@color/destructiveRedLight</item>
         <item name="daxColorDisabled">@color/black35</item>
         <item name="daxColorLines">@color/black12</item>

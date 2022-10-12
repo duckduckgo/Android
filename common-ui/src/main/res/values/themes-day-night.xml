@@ -99,6 +99,9 @@
         <item name="toolbarBgColor">?attr/daxColorSurface</item>
         <item name="omnibarTextColor">?attr/daxColorPrimaryText</item>
         <item name="omnibarHintColor">?attr/daxColorSurface</item>
+        <item name="primaryIconColor">?attr/daxColorPrimaryIcon</item>
+        <item name="primaryIconDisabledColor">?attr/daxColorDisabled</item>
+        <item name="sectionDividerColor">?attr/daxColorLines</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
@@ -110,9 +113,10 @@
         <item name="daxColorContainer">@color/black12</item>
         <item name="daxColorPrimaryText">@color/white84</item>
         <item name="daxColorSecondaryText">@color/white60</item>
+        <item name="daxColorPrimaryIcon">@color/white84</item>
         <item name="daxColorDestructive">@color/destructiveRedDark</item>
         <item name="daxColorDisabled">@color/black35</item>
-        <item name="daxColorLines">@color/black18</item>
+        <item name="daxColorLines">@color/white12</item>
         <item name="daxColorAccentBlue">@color/blue30</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
     </style>
@@ -123,9 +127,10 @@
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorPrimaryText">@color/black84</item>
         <item name="daxColorSecondaryText">@color/black60</item>
+        <item name="daxColorPrimaryIcon">@color/black84</item>
         <item name="daxColorDestructive">@color/destructiveRedLight</item>
         <item name="daxColorDisabled">@color/black35</item>
-        <item name="daxColorLines">@color/black12</item>
+        <item name="daxColorLines">@color/black18</item>
         <item name="daxColorAccentBlue">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
     </style>
