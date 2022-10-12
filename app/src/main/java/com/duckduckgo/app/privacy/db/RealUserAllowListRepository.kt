@@ -20,13 +20,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-interface UserAllowListRepository {
-    fun isDomainInUserAllowList(domain: String): Boolean
-}
-
 @ContributesBinding(AppScope::class)
 class RealUserAllowListRepository @Inject constructor(
     private val userWhitelistDao: UserWhitelistDao,
 ) : UserAllowListRepository {
     override fun isDomainInUserAllowList(domain: String): Boolean = userWhitelistDao.contains(domain)
+
+    override fun domainsInUserAllowList(): List<String> = userWhitelistDao.allDomains()
 }

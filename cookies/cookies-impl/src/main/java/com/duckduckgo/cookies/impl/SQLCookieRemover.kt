@@ -123,7 +123,7 @@ class SQLCookieRemover @Inject constructor(
     }
 
     companion object {
-        private const val COOKIES_TABLE_NAME = "cookies"
+        const val COOKIES_TABLE_NAME = "cookies"
     }
 
     private class PixelSenderDatabaseErrorHandler(

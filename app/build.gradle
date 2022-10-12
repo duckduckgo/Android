@@ -229,6 +229,7 @@ dependencies {
 
     implementation project(':cookies-api')
     implementation project(':cookies-impl')
+    implementation project(':cookies-store')
 
     implementation project(':content-scope-scripts-api')
     implementation project(':content-scope-scripts-impl')

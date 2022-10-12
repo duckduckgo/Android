@@ -41,6 +41,9 @@ abstract class UserWhitelistDao {
     @Query("select * from user_whitelist")
     abstract fun all(): LiveData<List<UserWhitelistedDomain>>
 
+    @Query("select domain from user_whitelist")
+    abstract fun allDomains(): List<String>
+
     @Query("select * from user_whitelist")
     abstract fun allFlow(): Flow<List<UserWhitelistedDomain>>
 

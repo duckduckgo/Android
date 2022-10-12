@@ -1,0 +1,24 @@
+{
+    "readme": "This configuration has only the tracking parameters feature.",
+    "features": {
+        "trackingParameters": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "allowlisted.com",
+                    "reason": "site breakage"
+                }
+            ],
+            "settings": {
+                "parameters": [
+                    "utm_[a-z]+",
+                    "reg*exp",
+                    "gclid",
+                    "fbclid"
+                ]
+            }
+        }
+    },
+    "version": 1635943904459,
+    "unprotectedTemporary": []
+}
