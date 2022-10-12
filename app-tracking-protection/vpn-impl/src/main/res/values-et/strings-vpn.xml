@@ -69,8 +69,8 @@
         <item quantity="other"><![CDATA[Rakenduse jälgimiskaitse blokeeris kõige rohkem jälgimiskatseid rakenduses <b>%1$s</b> ja <b>%2$s</b> (viimase päeva jooksul).]]></item>
     </plurals>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Rakenduse jälgimiskaitse blokeeris <b>%s %d korra rakenduses %s</b> (viimase päeva jooksul).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Rakenduse jälgimiskaitse blokeeris <b>%s %d korra rakenduses %s ja veel ühes rakenduses</b> (viimase päeva jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Rakenduse jälgimiskaitse blokeeris <b>ettevõtte %s %d korra rakenduses %s</b> (viimase päeva jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Rakenduse jälgimiskaitse blokeeris <b>ettevõtte %s %d korra rakenduses %s ja veel ühes rakenduses</b> (viimase päeva jooksul).]]></string>
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Rakenduse jälgimiskaitse blokeeris <b>%s %d korra rakenduses %s ja veel %d rakenduses</b> (viimase päeva jooksul).]]></string>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Rakenduse jälgimiskaitse blokeeris <b>%s %d korda rakenduses %s</b> (viimase päeva jooksul).]]></string>
