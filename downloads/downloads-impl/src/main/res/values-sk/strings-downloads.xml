@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Sťahovanie zlyhalo. Skontrolujte internetové pripojenie.</string>
 
     <string name="notificationChannelFileDownloading">Sťahovanie súboru</string>
     <string name="notificationChannelFileDownloaded">Súbor je stiahnutý</string>
+
     <string name="downloadInProgress">Prebieha sťahovanie</string>
+
+    <string name="downloadsDownloadStartedMessage">Začalo sa sťahovanie %s</string>
+    <string name="downloadsDownloadFinishedMessage">Stiahnutie %s bolo dokončené</string>
+    <string name="downloadsDownloadGenericErrorMessage">Sťahovanie zlyhalo.</string>
+    <string name="downloadsCancel">Zrušiť</string>
+    <string name="downloadsRetry">Opakovanie</string>
+    <string name="notificationDownloadComplete">Sťahovanie je dokončené.</string>
+    <string name="notificationDownloadFailed">Sťahovanie zlyhalo.</string>
 </resources>
