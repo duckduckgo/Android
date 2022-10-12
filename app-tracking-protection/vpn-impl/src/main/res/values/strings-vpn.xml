@@ -222,10 +222,14 @@
     </plurals>
     <string name="atp_ActivityEnabledLabel">This feature is in beta. <annotation type="app_settings_link">Having problems with an app?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is disabled</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android disabled App Tracking Protection</b>. Want to prevent this happening again? <annotation type="re_enable_link">Re-enable</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>A VPN app on your device disabled App Tracking Protection.</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityAbout">About</string>
     <string name="atp_ActivityManage">Manage</string>
     <string name="atp_ActivityRemoveFeature">Disable and Delete Data</string>
+
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Go to your device’s VPN Settings for DuckDuckGo and enable <b>Always-on</b> VPN to prevent Android disabling protection.\n\nMake sure to leave the other setting OFF.]]></string>
+    <string name="atp_AlwaysOnModalHeading">Set to Always-on</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">FAQ</string>
