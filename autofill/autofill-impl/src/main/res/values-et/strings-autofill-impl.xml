@@ -36,7 +36,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
     <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud sisselogimist?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Sisselogimine: %s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Veebisaidi %s sisselogimine</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Kasuta saidi sisselogimismandaate</string>
 
     <string name="updateLoginDialogTitle">Kas värskendada parooli?</string>
