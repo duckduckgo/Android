@@ -14,10 +14,11 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Autoconsent -->
+    <!-- smartling.placeholder_format = NONE -->
     <string name="autoconsentTitle">Gérer les fenêtres contextuelles de cookies</string>
-    <string name="autoconsentDescription">Lorsque DuckDuckGo détecte les fenêtres contextuelles de consentement aux cookies sur les sites que vous visitez, vos préférences peuvent être configurées automatiquement de façon à ce que les cookies soient réduits au minimum et la confidentialité maximisée, puis les fenêtres contextuelles sont fermées.</string>
+    <string name="autoconsentDescription">Lorsque DuckDuckGo détecte les fenêtres contextuelles de consentement aux cookies sur les sites que vous visitez, vos préférences peuvent, dans la mesure du possible, être configurées automatiquement de façon à ce que les cookies soient réduits au minimum et la confidentialité maximisée, puis les fenêtres contextuelles sont fermées.</string>
     <string name="autoconsentToggle">Autoriser DuckDuckGo à gérer les fenêtres contextuelles de consentement aux cookies</string>
-
 </resources>
