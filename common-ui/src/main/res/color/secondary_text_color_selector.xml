@@ -17,5 +17,5 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:color="?attr/listItemDisabledColor" android:state_enabled="false"/>
-    <item android:color="?attr/listItemSubtitleColor" android:state_enabled="true"/>
+    <item android:color="?attr/listItemSecondaryTextColor" android:state_enabled="true"/>
 </selector>

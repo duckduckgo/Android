@@ -25,9 +25,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
-        android:layout_width="match_parent"
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         android:id="@+id/settingsCustomizeTitle"
         android:text="@string/settingsHeadingCustomize"/>
 

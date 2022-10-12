@@ -58,9 +58,9 @@
             <com.duckduckgo.mobile.android.ui.view.InfoPanel
                 android:id="@+id/settings_info"
                 style="@style/Widget.DuckDuckGo.InfoPanel"
-                android:layout_margin="16dp"
                 app:panelBackground="@drawable/info_panel_alert_background"
                 app:panelDrawable="@drawable/ic_alert_color_24"
+                android:layout_margin="16dp"
                 app:panelText="Turn AppTP ON to be able to configure this settings"/>
 
             <!-- Section Config -->
@@ -117,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/sectionTrackersTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -146,7 +146,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:primaryText="Delete Tracking History"
             />
 
@@ -154,8 +153,8 @@
                 android:id="@+id/force_update_blocklist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:primaryText="🔄 Force Update Blocklist"
             />
 
@@ -165,7 +164,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/sectionAppProtection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -176,8 +175,8 @@
                 android:id="@+id/protectAllApps"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:primaryText="Protect all apps"
             />
 
@@ -185,8 +184,8 @@
                 android:id="@+id/restoreDefaultAppProtections"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:primaryText="Restore default protections"
             />
 
@@ -196,11 +195,11 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/sectionTrackersLogging"
                 android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Logging"
+                android:layout_height="wrap_content"
+                android:text="Logging"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -217,11 +216,11 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
-                    android:id="@+id/sectionDiagnosticsTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Diagnostics"
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+                android:id="@+id/sectionDiagnosticsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Diagnostics"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -247,7 +246,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/sectionHealthTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

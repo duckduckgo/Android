@@ -22,7 +22,7 @@
               android:paddingTop="@dimen/keyline_5"
               android:paddingEnd="@dimen/keyline_4">
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingStart="@dimen/keyline_4"
@@ -32,39 +32,39 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
-        android:layout_width="match_parent"
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         android:paddingStart="@dimen/keyline_4"
         android:text="Horizontal divider (Not Full Width)"/>
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         app:fullWidth="false"/>
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
-        android:layout_width="match_parent"
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         android:paddingStart="@dimen/keyline_4"
         android:text="Horizontal divider (Custom margins)"/>
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         android:layout_margin="@dimen/keyline_6"
         app:defaultPadding="false"/>
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
-        android:layout_width="match_parent"
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/keyline_4"
+        android:layout_width="match_parent"
         android:paddingTop="@dimen/keyline_5"
+        android:paddingStart="@dimen/keyline_4"
         android:text="Vertical divider"/>
 
     <LinearLayout
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         android:gravity="center"
         android:orientation="horizontal">
 
