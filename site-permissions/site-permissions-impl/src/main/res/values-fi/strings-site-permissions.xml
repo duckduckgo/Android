@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s haluaa käyttää kameraa ja mikrofonia</string>
-    <string name="sitePermissionsMicDialogTitle">%1$s haluaa käyttää mikrofonia</string>
-    <string name="sitePermissionsCameraDialogTitle">%1$s haluaa käyttää kameraa</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle">\"%1$s\" haluaa käyttää kameraa ja mikrofonia</string>
+    <string name="sitePermissionsMicDialogTitle">\"%1$s\" haluaa käyttää mikrofonia</string>
+    <string name="sitePermissionsCameraDialogTitle">\"%1$s\" haluaa käyttää kameraa</string>
     <string name="sitePermissionsDialogContent">Hallitse myönnettyjä käyttöoikeuksia asetuksissa</string>
     <string name="sitePermissionsDialogDenyButton">Estä</string>
     <string name="sitePermissionsDialogAllowButton">Salli</string>

@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s soovib juurdepääsu kaamerale ja mikrofonile</string>
-    <string name="sitePermissionsMicDialogTitle">%1$s soovib juurdepääsu mikrofonile</string>
-    <string name="sitePermissionsCameraDialogTitle">%1$s soovib juurdepääsu kaamerale</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle">„%1$s“ soovib juurdepääsu kaamerale ja mikrofonile</string>
+    <string name="sitePermissionsMicDialogTitle">„%1$s“ soovib juurdepääsu mikrofonile</string>
+    <string name="sitePermissionsCameraDialogTitle">„%1$s“ soovib juurdepääsu kaamerale</string>
     <string name="sitePermissionsDialogContent">Halda antud lube seadetes</string>
     <string name="sitePermissionsDialogDenyButton">Keela</string>
     <string name="sitePermissionsDialogAllowButton">Luba</string>
