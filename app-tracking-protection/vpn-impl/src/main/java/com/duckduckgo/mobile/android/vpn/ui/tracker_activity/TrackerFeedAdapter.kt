@@ -267,8 +267,9 @@ class TrackerFeedAdapter @Inject constructor(
         val warningImage: View = view.findViewById(R.id.activity_apps_warning_image)
 
         fun bind(item: TrackerFeedItem.TrackerAppsData, onItemClick: (TrackerFeedItem.TrackerAppsData) -> Unit, isLastPosition: Boolean) {
-            appsText.text = context.getString(
-                if (item.isProtected) R.string.atp_ActivityProtectedApps else R.string.atp_ActivityUnprotectedApps,
+            appsText.text = context.resources.getQuantityString(
+                if (item.isProtected) R.plurals.atp_ActivityProtectedApps else R.plurals.atp_ActivityUnprotectedApps,
+                item.appsCount,
                 item.appsCount
             )
             if (item.isProtected) {
