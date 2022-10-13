@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Downloaden mislukt. Controleer uw internetverbinding.</string>
 
     <string name="notificationChannelFileDownloading">Bestand aan het downloaden</string>
     <string name="notificationChannelFileDownloaded">Bestand gedownload</string>
+
     <string name="downloadInProgress">Aan het downloaden</string>
+
+    <string name="downloadsDownloadStartedMessage">Downloaden gestart voor %s</string>
+    <string name="downloadsDownloadFinishedMessage">Downloaden voltooid voor %s</string>
+    <string name="downloadsDownloadGenericErrorMessage">Downloaden mislukt.</string>
+    <string name="downloadsCancel">Annuleren</string>
+    <string name="downloadsRetry">Opnieuw proberen</string>
+    <string name="notificationDownloadComplete">Download voltooid.</string>
+    <string name="notificationDownloadFailed">Downloaden mislukt.</string>
 </resources>
