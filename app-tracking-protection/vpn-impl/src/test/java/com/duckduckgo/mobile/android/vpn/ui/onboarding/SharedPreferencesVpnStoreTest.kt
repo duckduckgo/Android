@@ -28,6 +28,7 @@ import org.junit.Test
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.threeten.bp.Instant
 
 class SharedPreferencesVpnStoreTest {
 
@@ -122,5 +123,19 @@ class SharedPreferencesVpnStoreTest {
         sharedPreferencesVpnStore.appTpEnabledCtaDidShow()
 
         assertTrue(sharedPreferencesVpnStore.didShowAppTpEnabledCta())
+    }
+
+    @Test
+    fun whenGetAppTPOnboardingBannerExpiryTimestampCalledWithoutBeingSetThenReturnDefaultValue() {
+        assertEquals(-1, sharedPreferencesVpnStore.getAppTPOnboardingBannerExpiryTimestamp())
+    }
+
+    @Test
+    fun whenSetAppTPOnboardingBannerExpiryTimestampCalledThenSetValueAndReturnCorrectValueWhenAsked() {
+        val now = Instant.now().toEpochMilli()
+
+        sharedPreferencesVpnStore.setAppTPOnboardingBannerExpiryTimestamp(now)
+
+        assertEquals(now, sharedPreferencesVpnStore.getAppTPOnboardingBannerExpiryTimestamp())
     }
 }

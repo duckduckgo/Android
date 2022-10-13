@@ -29,6 +29,7 @@ import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.BannerState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
@@ -36,6 +37,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import org.threeten.bp.Instant
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -131,6 +133,9 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     fun showAppTpEnabledCtaIfNeeded() {
         if (!vpnStore.didShowAppTpEnabledCta()) {
             vpnStore.appTpEnabledCtaDidShow()
+            val now = Instant.now().toEpochMilli()
+            val expiry = now.plus(TimeUnit.HOURS.toMillis(WINDOW_INTERVAL_HOURS))
+            vpnStore.setAppTPOnboardingBannerExpiryTimestamp(expiry)
             sendCommand(Command.ShowAppTpEnabledCta)
         }
     }
@@ -199,9 +204,18 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         sendCommand(Command.OpenVpnSettings)
     }
 
+    fun bannerState(): BannerState {
+        return if (Instant.now().toEpochMilli() < vpnStore.getAppTPOnboardingBannerExpiryTimestamp()) {
+            BannerState.OnboardingBanner
+        } else {
+            BannerState.NextSessionBanner
+        }
+    }
+
     internal data class TrackerActivityViewState(
         val trackerCountInfo: TrackerCountInfo,
-        val runningState: VpnState
+        val runningState: VpnState,
+        val bannerState: BannerState
     )
 
     internal data class TrackerCountInfo(
@@ -254,6 +268,10 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object CloseScreen : Command()
         object OpenVpnSettings : Command()
         object ShowAppTpEnabledCta : Command()
+    }
+
+    companion object {
+        const val WINDOW_INTERVAL_HOURS = 24L
     }
 }
 

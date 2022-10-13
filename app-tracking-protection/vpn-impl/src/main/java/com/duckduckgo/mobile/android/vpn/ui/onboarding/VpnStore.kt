@@ -39,6 +39,8 @@ interface VpnStore {
     fun isAlwaysOnEnabled(): Boolean
     fun didShowAppTpEnabledCta(): Boolean
     fun appTpEnabledCtaDidShow()
+    fun setAppTPOnboardingBannerExpiryTimestamp(timestamp: Long)
+    fun getAppTPOnboardingBannerExpiryTimestamp(): Long
 
     companion object {
         const val ALWAYS_ON_PROMOTION_DELTA = 3
@@ -103,6 +105,14 @@ class SharedPreferencesVpnStore @Inject constructor(
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN, true) }
     }
 
+    override fun setAppTPOnboardingBannerExpiryTimestamp(timestamp: Long) {
+        preferences.edit { putLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, timestamp) }
+    }
+
+    override fun getAppTPOnboardingBannerExpiryTimestamp(): Long {
+        return preferences.getLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, -1)
+    }
+
     companion object {
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
 
@@ -111,5 +121,6 @@ class SharedPreferencesVpnStore @Inject constructor(
         private const val KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED = "KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED"
         private const val KEY_ALWAYS_ON_MODE_ENABLED = "KEY_ALWAYS_ON_MODE_ENABLED"
         private const val KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN = "KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN"
+        private const val KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP = "KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP"
     }
 }

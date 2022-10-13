@@ -228,6 +228,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel" translatable="false">Protection Disabled</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel" translatable="false">All</string>
     <string name="atp_ActvityViewAppsLabel" translatable="false">View Apps</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel" translatable="false">This feature is in beta. Having issues with an app? <annotation type="app_settings_link">Help Us Improve</annotation></string>
 
     <!-- TODO [ANA] Remove this -->
     <string name="atp_ActivityEmptyListTitle">No new activity</string>
@@ -244,7 +245,8 @@
         <item quantity="one">App</item>
         <item quantity="other">Apps</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">This feature is in beta. <annotation type="app_settings_link">Having problems with an app?</annotation></string>
+    <!-- TODO [ANA] Modified, double check if new key is needed -->
+    <string name="atp_ActivityEnabledLabel">During beta, protection for some apps is automatically disabled. <annotation type="app_settings_link">View Apps</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is disabled</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>A VPN app on your device disabled App Tracking Protection.</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityAbout">About</string>

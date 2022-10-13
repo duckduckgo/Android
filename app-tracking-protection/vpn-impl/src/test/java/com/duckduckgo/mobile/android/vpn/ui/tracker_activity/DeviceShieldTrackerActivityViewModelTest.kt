@@ -47,6 +47,8 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.threeten.bp.Instant
+import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -372,6 +374,26 @@ class DeviceShieldTrackerActivityViewModelTest {
             expectNoEvents()
             verify(vpnStore, never()).appTpEnabledCtaDidShow()
         }
+    }
+
+    @Test
+    fun whenBannerStateCalledAfterMoreThanOneDayThenReturnNextSessionBanner() {
+        val expiredTimestamp = Instant.now().toEpochMilli().minus(TimeUnit.HOURS.toMillis(1))
+        whenever(vpnStore.getAppTPOnboardingBannerExpiryTimestamp()).thenReturn(expiredTimestamp)
+
+        val bannerState = viewModel.bannerState()
+
+        assertEquals(VpnStateMonitor.BannerState.NextSessionBanner, bannerState)
+    }
+
+    @Test
+    fun whenBannerStateCalledAfterLessThanOneDayThenReturnOnboardingBanner() {
+        val notExpiredTimestamp = Instant.now().toEpochMilli().plus(TimeUnit.HOURS.toMillis(1))
+        whenever(vpnStore.getAppTPOnboardingBannerExpiryTimestamp()).thenReturn(notExpiredTimestamp)
+
+        val bannerState = viewModel.bannerState()
+
+        assertEquals(VpnStateMonitor.BannerState.OnboardingBanner, bannerState)
     }
 
     private fun createInMemoryDb(): VpnDatabase {
