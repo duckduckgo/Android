@@ -275,7 +275,7 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchAlwaysOnPromotionDialog() {
-        val dialog = AlwaysOnAlertDialogFragment.newInstance { openVPNSettings() }
+        val dialog = AlwaysOnAlertDialogFragment.newInstance { viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings) }
         dialog.show(
             supportFragmentManager,
             TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG
