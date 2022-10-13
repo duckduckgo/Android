@@ -31,10 +31,6 @@ class ThemingSharedPreferences @Inject constructor(private val context: Context)
         get() = selectedThemeSavedValue()
         set(theme) = preferences.edit { putString(KEY_THEME, themePrefMapper.prefValue(theme)) }
 
-    override var adsThemeEnabled: Boolean
-        get() = preferences.getBoolean(KEY_ADS_ENABLED, false)
-        set(value) = preferences.edit { putBoolean(KEY_ADS_ENABLED, value) }
-
     override fun isCurrentlySelected(theme: DuckDuckGoTheme): Boolean {
         return selectedThemeSavedValue() == theme
     }
@@ -77,6 +73,5 @@ class ThemingSharedPreferences @Inject constructor(private val context: Context)
     companion object {
         const val FILENAME = "com.duckduckgo.app.settings_activity.settings"
         const val KEY_THEME = "THEME"
-        const val KEY_ADS_ENABLED = "KEY_ADS_ENABLED"
     }
 }

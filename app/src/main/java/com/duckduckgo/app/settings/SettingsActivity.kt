@@ -354,7 +354,7 @@ class SettingsActivity :
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
             is Command.LaunchEmailProtectionNotSUpported -> launchEmailProtectionNotSupported()
-            is Command.LaunchThemeSettings -> launchThemeSelector(it.theme, it.adsThemeEnabled)
+            is Command.LaunchThemeSettings -> launchThemeSelector(it.theme)
             is Command.LaunchAppLinkSettings -> launchAppLinksSettingSelector(it.appLinksSettingType)
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
             is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option)
@@ -454,10 +454,9 @@ class SettingsActivity :
     }
 
     private fun launchThemeSelector(
-        theme: DuckDuckGoTheme,
-        adsThemeEnabled: Boolean
+        theme: DuckDuckGoTheme
     ) {
-        val dialog = SettingsThemeSelectorFragment.create(theme, adsThemeEnabled)
+        val dialog = SettingsThemeSelectorFragment.create(theme)
         dialog.show(supportFragmentManager, THEME_SELECTOR_TAG)
     }
 

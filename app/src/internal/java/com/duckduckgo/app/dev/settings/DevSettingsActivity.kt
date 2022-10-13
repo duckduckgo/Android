@@ -101,7 +101,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
                     binding.overrideUserAgentToggle.quietlySetIsChecked(it.overrideUA, overrideUAListener)
                     binding.overrideUserAgentSelector.isEnabled = it.overrideUA
                     binding.overrideUserAgentSelector.setSecondaryText(it.userAgent)
-                    binding.designSystemTheming.quietlySetIsChecked(it.adsThemeEnabled, designSystemThemeListener)
                 }
             }.launchIn(lifecycleScope)
 

@@ -27,7 +27,6 @@ import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.traces.api.StartupTraces
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -45,7 +44,6 @@ class DevSettingsViewModel @Inject constructor(
     private val userAgentProvider: UserAgentProvider,
     private val bookmarksRepository: BookmarksRepository,
     private val favoritesRepository: FavoritesRepository,
-    private val themingDataStore: ThemingDataStore,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -73,8 +71,7 @@ class DevSettingsViewModel @Inject constructor(
                     nextTdsEnabled = devSettingsDataStore.nextTdsEnabled,
                     startupTraceEnabled = startupTraces.isTraceEnabled,
                     overrideUA = devSettingsDataStore.overrideUA,
-                    userAgent = userAgentProvider.userAgent("", false),
-                    adsThemeEnabled = themingDataStore.adsThemeEnabled
+                    userAgent = userAgentProvider.userAgent("", false)
                 )
             )
         }
@@ -136,7 +133,6 @@ class DevSettingsViewModel @Inject constructor(
     }
 
     fun enableDesignSystemTheming(isEnabled: Boolean) {
-        themingDataStore.adsThemeEnabled = isEnabled
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(adsThemeEnabled = isEnabled))
         }

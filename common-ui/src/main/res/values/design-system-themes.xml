@@ -77,33 +77,30 @@
     </style>
 
     <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
-        <item name="colorPrimary">@color/almostBlackDark</item>
-        <item name="colorPrimaryDark">@color/black</item>
-        <item name="colorAccent">@color/cornflowerBlue</item>
 
-        <!--        <item name="colorPrimary">?attr/daxColorBackground</item>-->
-        <!--        <item name="colorPrimaryDark">?attr/daxColorSurface</item>-->
-        <!--        <item name="colorPrimaryVariant">?attr/daxColorBackground</item>-->
-        <!--        <item name="colorSecondary">?attr/daxColorAccentBlue</item>-->
-        <!--        <item name="colorSecondaryVariant">?attr/daxColorAccentBlue</item>-->
-        <!--        <item name="colorAccent">?attr/daxColorAccentBlue</item>-->
+        <item name="colorPrimary">?attr/daxColorBackground</item>
+        <item name="colorPrimaryDark">?attr/daxColorSurface</item>
+        <item name="colorPrimaryVariant">?attr/daxColorBackground</item>
+        <item name="colorSecondary">?attr/daxColorAccentBlue</item>
+        <item name="colorSecondaryVariant">?attr/daxColorAccentBlue</item>
+        <item name="colorAccent">?attr/daxColorAccentBlue</item>
         <!-- colorSurface is mapped to the surface of components such as cards, sheets-->
         <!--and menus. colorError is used to indicate an error state for components such as-->
         <!--text fields.-->
-        <!--        <item name="colorSurface">?attr/daxColorSurface</item>-->
-        <!--        <item name="colorError">?attr/daxColorDestructive</item>-->
+        <item name="colorSurface">?attr/daxColorSurface</item>
+        <item name="colorError">?attr/daxColorDestructive</item>
         <!--"On" colors define how text, icons and strokes are colored in relation to the surface-->
         <!--on which they appear.-->
-        <!--        <item name="colorOnPrimary">?attr/daxColorPrimaryText</item>-->
-        <!--        <item name="colorOnSecondary">?attr/daxColorPrimaryText</item>-->
-        <!--        <item name="colorOnBackground">?attr/daxColorPrimaryText</item>-->
-        <!--        <item name="colorOnSurface">?attr/daxColorPrimaryText</item>-->
-        <!--        <item name="colorOnError">?attr/daxColorPrimaryText</item>-->
+        <item name="colorOnPrimary">?attr/daxColorPrimaryText</item>
+        <item name="colorOnSecondary">?attr/daxColorPrimaryText</item>
+        <item name="colorOnBackground">?attr/daxColorPrimaryText</item>
+        <item name="colorOnSurface">?attr/daxColorPrimaryText</item>
+        <item name="colorOnError">?attr/daxColorPrimaryText</item>
 
         <!--colorBackground appears behind scrollable content and is used for the default window background -->
         <item name="android:colorBackground">?attr/daxColorBackground</item>
         <item name="android:windowBackground">?attr/daxColorBackground</item>
-        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/daxColorSurface</item>
+        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/daxColorBackground</item>
         <item name="android:navigationBarColor" tools:ignore="NewApi">?attr/daxColorBackground</item>
 
     </style>

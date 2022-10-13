@@ -146,11 +146,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchAppIcon : Command()
         object LaunchAddHomeScreenWidget : Command()
         data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
-        data class LaunchThemeSettings(
-            val theme: DuckDuckGoTheme,
-            val adsThemeEnabled: Boolean
-        ) : Command()
-
+        data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
         data class LaunchAppLinkSettings(val appLinksSettingType: AppLinkSettingType) : Command()
         object LaunchGlobalPrivacyControl : Command()
         object LaunchAutoconsent : Command()
@@ -256,7 +252,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun userRequestedToChangeTheme() {
-        viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme, themingDataStore.adsThemeEnabled)) }
+        viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
         pixel.fire(SETTINGS_THEME_OPENED)
     }
 

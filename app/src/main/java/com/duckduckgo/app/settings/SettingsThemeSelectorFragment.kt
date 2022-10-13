@@ -92,17 +92,14 @@ class SettingsThemeSelectorFragment : DialogFragment() {
     companion object {
 
         private const val DEFAULT_OPTION_EXTRA = "DEFAULT_OPTION"
-        private const val ADS_THEME_ENABLED = "ADS_THEME_ENABLED"
 
         fun create(
-            selectedFireAnimation: DuckDuckGoTheme?,
-            adsThemeEnabled: Boolean
+            selectedFireAnimation: DuckDuckGoTheme?
         ): SettingsThemeSelectorFragment {
             val fragment = SettingsThemeSelectorFragment()
 
             fragment.arguments = Bundle().also {
                 it.putSerializable(DEFAULT_OPTION_EXTRA, selectedFireAnimation)
-                it.putBoolean(ADS_THEME_ENABLED, adsThemeEnabled)
             }
             return fragment
         }
