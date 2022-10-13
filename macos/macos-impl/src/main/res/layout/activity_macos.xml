@@ -20,7 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".waitlist.ui.MacOsWaitlistActivity">
+    tools:context=".MacOsActivity">
 
     <include
         android:id="@+id/includeToolbar"
@@ -54,40 +54,13 @@
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="32dp"
-                android:text="@string/macos_waitlist_title"
+                android:text="@string/macos_title"
                 android:textAlignment="center"
                 android:textColor="?attr/settingsItemTextColor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/waitlistDescription"
                 app:layout_constraintTop_toBottomOf="@+id/headerImage" />
-
-            <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLowercase
-                android:id="@+id/waitListButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="38dp"
-                android:layout_marginEnd="24dp"
-                android:text="@string/macos_join_waitlist"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/waitlistDescription" />
-
-            <TextView
-                android:id="@+id/waitlistWindows"
-                style="@style/TextAppearance.DuckDuckGo.Caption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="24dp"
-                android:text="@string/macos_waitlist_windows"
-                android:textAlignment="center"
-                android:textColor="?attr/settingsMinorTextColor"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/waitListButton" />
 
             <TextView
                 android:id="@+id/waitlistDescription"
@@ -98,48 +71,24 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="24dp"
                 android:lineSpacingExtra="0.7sp"
-                android:text="@string/macos_waitlist_code_description"
+                android:text="@string/macos_description_text"
                 android:textAlignment="center"
                 android:textColor="?attr/settingsMinorTextColor"
-                app:layout_constraintBottom_toTopOf="@id/codeFrame"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/statusTitle" />
 
-            <LinearLayout
-                android:id="@+id/codeFrame"
-                android:visibility="gone"
-                android:layout_width="220dp"
-                android:layout_height="100dp"
-                android:layout_marginTop="28dp"
-                android:background="@drawable/background_code_frame"
-                android:orientation="vertical"
+            <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLowercase
+                android:id="@+id/shareButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="38dp"
+                android:layout_marginEnd="24dp"
+                android:text="@string/macos_share_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/waitlistDescription">
-
-                <TextView
-                    style="@style/TextAppearance.DuckDuckGo.Body1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:layout_gravity="center"
-                    android:text="@string/macos_waitlist_code_invite"
-                    android:textColor="@color/white" />
-
-                <TextView
-                    android:id="@+id/inviteCode"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/background_code_text"
-                    android:fontFamily="@font/roboto_mono"
-                    android:gravity="center"
-                    tools:text="F20LPOPSD"
-                    android:textColor="@color/almostBlack"
-                    android:textSize="34sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                app:layout_constraintTop_toBottomOf="@+id/waitlistDescription" />
 
             <TextView
                 android:id="@+id/footerDescription"
@@ -150,27 +99,12 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="24dp"
                 android:gravity="bottom|center_horizontal"
-                android:text="@string/macos_waitlist_footer"
+                android:text="@string/macos_windows"
                 android:textColor="?attr/settingsMinorTextColor"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <com.duckduckgo.mobile.android.ui.view.button.IconButton
-                android:id="@+id/shareImage"
-                android:visibility="gone"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:padding="8dp"
-                android:layout_marginTop="18dp"
-                android:layout_marginBottom="18dp"
-                app:layout_constraintVertical_bias="1"
-                app:layout_constraintTop_toBottomOf="@id/codeFrame"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:srcCompat="@drawable/ic_union" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>

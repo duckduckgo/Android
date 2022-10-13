@@ -688,8 +688,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Răsfoiește în mod privat, cu aplicația noastră pentru Mac</string>
-    <string name="macos_settings_description_list">Ești pe listă!</string>
-    <string name="macos_settings_description_ready">Disponibilă pentru descărcare pe Mac</string>
     <string name="macos_settings_title">Aplicația DuckDuckGo pentru desktop</string>
 
     <!-- Downloads -->

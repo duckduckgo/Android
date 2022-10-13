@@ -684,8 +684,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Mac için uygulamamızla internette gezinirken gizliliğinizi koruyun</string>
-    <string name="macos_settings_description_list">Listedesiniz!</string>
-    <string name="macos_settings_description_ready">Mac cihazlarda indirilebilir</string>
     <string name="macos_settings_title">DuckDuckGo Masaüstü Uygulaması</string>
 
     <!-- Downloads -->
