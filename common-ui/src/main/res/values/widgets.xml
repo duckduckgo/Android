@@ -37,6 +37,11 @@
         <item name="android:popupBackground">@drawable/popup_menu_bg</item>
     </style>
 
+    <!-- Tabs -->
+    <style name="Widget.DuckDuckGo.TabLayout" parent="Widget.MaterialComponents.TabLayout">
+        <item name="tabTextAppearance">@style/TextAppearance.MaterialComponents.Button</item>
+    </style>
+
     <!-- List Items -->
     <style name="Widget.DuckDuckGo.OneLineListItem">
         <item name="android:layout_width">match_parent</item>

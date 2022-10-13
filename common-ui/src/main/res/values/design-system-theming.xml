@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,53 +14,18 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="SplashScreen" parent="AppTheme.Light"/>
+    <!-- The platform theme is where OS version specific flags are used. -->
+    <style name="Platform.Theme.DuckDuckGo" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowActivityTransitions" tools:ignore="NewApi">true</item>
+        <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
+    </style>
 
-    <style name="BaseAppTheme" parent="Theme.MaterialComponents.Light.Bridge"/>
-
-    <style name="AppTheme" parent="BaseAppTheme">
-
-        <!-- These neutral colors cover cases before dynamic theme can be applied
-             such as the app launch color -->
-        <item name="colorPrimary">@color/almostBlackDark</item>
-        <item name="colorPrimaryDark">@color/black</item>
-        <item name="colorAccent">@color/cornflowerBlue</item>
-
-        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
-        <item name="android:windowActivityTransitions">true</item>
-        <item name="android:statusBarColor">?toolbarBgColor</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:colorEdgeEffect">@color/newBlack</item>
-
-        <!-- Old System Components (will be refactored soon) -->
-        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
-        <item name="actionOverflowMenuStyle">@style/PopUpOverflowMenu</item>
-        <item name="actionOverflowButtonStyle">@style/PopUpOverflowButton</item>
-        <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
-        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
-        <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
-        <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
-        <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
-        <item name="sliderStyle">@style/Widget.DuckDuckGo.Slider</item>
-        <item name="switchStyle">@style/Widget.DuckDuckGo.Switch</item>
-
-        <!-- Design System Components -->
-        <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
-        <item name="primaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Primary.Small</item>
-        <item name="secondaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
-        <item name="secondaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
-        <item name="ghostButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Borderless</item>
-        <item name="ghostButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Borderless.Small</item>
-        <item name="primaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Rounded</item>
-        <item name="secondaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Secondary.Rounded</item>
-        <item name="primaryButtonLowercaseStyle">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
-        <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
-        <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
-        <item name="horizontalDividerStyle">@style/Widget.DuckDuckGo.HorizontalDivider</item>
-        <item name="verticalDividerStyle">@style/Widget.DuckDuckGo.VerticalDivider</item>
+    <!--  Our base theme, Base.Theme.DuckDuckGo,
+    is where we override or define default styles for views and text appearance attributes. -->
+    <style name="Base.Theme.DuckDuckGo" parent="Platform.Theme.DuckDuckGo">
 
         <!--Design System Legacy Typography (to be removed when the migration happens) -->
         <item name="textAppearanceHeadline1">@style/TextAppearance.DuckDuckGo.Headline1</item>
@@ -82,9 +46,71 @@
         <item name="textAppearanceH3">@style/Typography.DuckDuckGo.H3</item>
         <item name="textAppearanceH4">@style/Typography.DuckDuckGo.H4</item>
         <item name="textAppearanceH5">@style/Typography.DuckDuckGo.H5</item>
+
+        <!-- Android Components -->
+        <item name="actionOverflowMenuStyle">@style/PopUpOverflowMenu</item>
+        <item name="actionOverflowButtonStyle">@style/PopUpOverflowButton</item>
+        <item name="bottomSheetDialogTheme">@style/Widget.DuckDuckGo.BottomSheetDialog</item>
+        <item name="tabStyle">@style/Widget.DuckDuckGo.TabLayout</item>
+        <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
+        <item name="sliderStyle">@style/Widget.DuckDuckGo.Slider</item>
+        <item name="switchStyle">@style/Widget.DuckDuckGo.Switch</item>
+        <item name="snackbarButtonStyle">@style/Widget.DuckDuckGo.Snackbar</item>
+        <item name="autoCompleteTextViewStyle">@style/Widget.DuckDuckGo.AutoCompleteTextView</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialComponents.Dialog.Alert</item>
+
+        <!-- Design System Components -->
+        <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
+        <item name="primaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Primary.Small</item>
+        <item name="secondaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
+        <item name="secondaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
+        <item name="ghostButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Borderless</item>
+        <item name="ghostButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Borderless.Small</item>
+        <item name="primaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Rounded</item>
+        <item name="secondaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Secondary.Rounded</item>
+        <item name="primaryButtonLowercaseStyle">@style/Widget.DuckDuckGo.Button.Primary.Lowercase</item>
+        <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
+        <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
     </style>
 
-    <style name="AppTheme.BaseDark">
+    <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
+
+        <item name="colorPrimary">?attr/daxColorBackground</item>
+        <item name="colorPrimaryDark">?attr/daxColorSurface</item>
+        <item name="colorPrimaryVariant">?attr/daxColorBackground</item>
+        <item name="colorSecondary">?attr/daxColorAccentBlue</item>
+        <item name="colorSecondaryVariant">?attr/daxColorAccentBlue</item>
+        <item name="colorAccent">?attr/daxColorAccentBlue</item>
+        <!-- colorSurface is mapped to the surface of components such as cards, sheets-->
+        <!--and menus. colorError is used to indicate an error state for components such as-->
+        <!--text fields.-->
+        <item name="colorSurface">?attr/daxColorSurface</item>
+        <item name="colorError">?attr/daxColorDestructive</item>
+        <!--"On" colors define how text, icons and strokes are colored in relation to the surface-->
+        <!--on which they appear.-->
+        <item name="colorOnPrimary">?attr/daxColorPrimaryText</item>
+        <item name="colorOnSecondary">?attr/daxColorPrimaryText</item>
+        <item name="colorOnBackground">?attr/daxColorPrimaryText</item>
+        <item name="colorOnSurface">?attr/daxColorPrimaryText</item>
+        <item name="colorOnError">?attr/daxColorPrimaryText</item>
+
+        <!--colorBackground appears behind scrollable content and is used for the default window background -->
+        <item name="android:colorBackground">?attr/daxColorBackground</item>
+        <item name="android:windowBackground">?attr/daxColorBackground</item>
+        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/toolbarBgColor</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">?attr/toolbarBgColor</item>
+
+    </style>
+
+    <!-- The app theme will mostly contain values for colour attributes -->
+    <style name="Theme.DuckDuckGo.Dark" parent="Theme.DuckDuckGo">
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">false</item>
+        <item name="android:navigationBarColor">?toolbarBgColor</item>
+
+        <!-- Legacy colors to remove-->
         <item name="colorPrimary">@color/darkThemePrimary</item>
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/white</item>
@@ -184,38 +210,26 @@
         <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
         <item name="autofillCredentialListSubtitleColor">@color/paleBrownishGray</item>
 
-        <!-- TODO: For Noelia to remove -->
-        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
+        <!-- Design System Colors Dark -->
+        <item name="daxColorBackground">@color/gray100</item>
+        <item name="daxColorSurface">@color/gray90</item>
+        <item name="daxColorContainer">@color/black12</item>
+        <item name="daxColorPrimaryText">@color/white84</item>
+        <item name="daxColorSecondaryText">@color/white60</item>
+        <item name="daxColorPrimaryIcon">@color/white84</item>
+        <item name="daxColorDestructive">@color/destructiveRedDark</item>
+        <item name="daxColorDisabled">@color/black35</item>
+        <item name="daxColorLines">@color/white12</item>
+        <item name="daxColorAccentBlue">@color/blue30</item>
+        <item name="daxColorAccentYellow">@color/yellow50</item>
     </style>
 
-    <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
+    <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
+        <item name="android:navigationBarColor">@color/white</item>
 
-    <style name="AppTheme.Dark.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.Dark.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="AppTheme.Dark.Transparent">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-    </style>
-
-    <style name="AppTheme.Transparent">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:backgroundDimEnabled">true</item>
-    </style>
-
-    <!-- To create a new color theme, copy this light one and update the suffix as appropriate.
-         Include:
-          * AppTheme.BaseLight
-          * AppTheme.Light
-          * AppTheme.Light in values-v23/themes.xml
-          * SplashTheme.Light
-    -->
-    <style name="AppTheme.BaseLight">
+        <!-- Legacy colors to remove-->
         <item name="colorPrimary">@color/lightThemePrimary</item>
         <item name="colorPrimaryDark">@color/lightThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/almostBlackDark</item>
@@ -313,139 +327,39 @@
         <item name="autofillCredentialListSubtitleColor">@color/brownishGrayTwo</item>
         <item name="appTPHeaderBackground">@color/light_blue</item>
 
-        <!-- TODO: For Noelia to remove -->
-        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
+        <!-- Design System Colors Light -->
+        <item name="daxColorBackground">@color/gray0</item>
+        <item name="daxColorSurface">@color/white</item>
+        <item name="daxColorContainer">@color/black6</item>
+        <item name="daxColorPrimaryText">@color/black84</item>
+        <item name="daxColorSecondaryText">@color/black60</item>
+        <item name="daxColorPrimaryIcon">@color/black84</item>
+        <item name="daxColorDestructive">@color/destructiveRedLight</item>
+        <item name="daxColorDisabled">@color/black35</item>
+        <item name="daxColorLines">@color/black18</item>
+        <item name="daxColorAccentBlue">@color/blue50</item>
+        <item name="daxColorAccentYellow">@color/yellow50</item>
     </style>
 
-    <style name="AppTheme.Light" parent="AppTheme.BaseLight">
-        <!-- The status bar must always be dark prior to API 23 as the light text cannot be changed -->
-        <item name="android:statusBarColor">@color/almostBlack</item>
+    <style name="Theme.DuckDuckGo.Transparent" parent="Theme.DuckDuckGo.Dark">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
-    <style name="AppTheme.Light.ATPOnboarding">
-        <item name="android:statusBarColor">@color/atp_onboardingHeaderBg</item>
-    </style>
-
-    <style name="ModalCardTheme" parent="AppTheme.BaseLight">
-        <item name="colorPrimary">@color/darkThemePrimary</item>
-        <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
-        <item name="colorAccent">@color/cornflowerBlue</item>
+    <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">
         <item name="android:windowBackground">@color/translucentDark</item>
         <item name="android:windowNoTitle">true</item>
-        <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation</item>
         <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+
+        <item name="colorPrimary">@color/darkThemePrimary</item>
+        <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
+        <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="toolbarIconColor">@color/white</item>
     </style>
 
-    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="colorControlNormal">?attr/toolbarIconColor</item>
-        <item name="android:textColorPrimary">?attr/toolbarTextColor</item>
-        <item name="colorControlHighlight">@color/subtleGrayTwo</item>
-    </style>
-
-    <style name="OmnibarToolbarTheme">
-        <item name="colorControlHighlight">@color/subtleGrayTwo</item>
-    </style>
-
-    <style name="TextInputLayoutTheme" parent="Widget.Design.TextInputLayout">
-        <item name="colorControlActivated">?colorAccent</item>
-        <item name="colorControlNormal">?colorAccent</item>
-        <item name="colorControlHighlight">?colorAccent</item>
-        <item name="android:textColor">?normalTextColor</item>
-        <item name="android:textColorSecondary">?normalTextColor</item>
-        <item name="android:textColorHint">?normalTextColor</item>
-    </style>
-
-    <style name="AutoCompleteTextViewStyle" parent="Widget.AppCompat.AutoCompleteTextView">
-        <item name="android:textCursorDrawable">@drawable/text_cursor</item>
-        <item name="android:textColorHint">?attr/omnibarHintColor</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-    </style>
-
-    <style name="PopUpOverflowMenu" parent="@style/Widget.MaterialComponents.PopupMenu.Overflow">
-        <item name="android:popupBackground">@drawable/popup_menu_bg</item>
-    </style>
-
-    <style name="PopUpOverflowButton" parent="@style/Widget.AppCompat.ActionButton.Overflow">
-        <item name="srcCompat">@drawable/ic_overflow</item>
-        <item name="android:src">@drawable/ic_overflow</item>
-    </style>
-
-    <style name="DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-    <style name="PopUpMenuCheckBoxTheme">
-        <item name="colorAccent">@color/cornflowerBlue</item>
-        <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
-    </style>
-
-    <style name="Theme.AndroidVpn" parent="Theme.MaterialComponents.Light.Bridge">
-        <item name="colorPrimary">@color/whiteFive</item>
-        <item name="colorPrimaryDark">@color/whiteFive</item>
-        <item name="colorAccent">@color/warmBlue</item>
-        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
-        <item name="android:windowLightStatusBar">true</item>
-
-        <item name="normalTextColor">@color/almostBlackDark</item>
-        <item name="secondaryTextColor">@color/brownishGrayTwo</item>
-        <item name="settingsMinorTextColor">@color/brownishGrayTwo</item>
-    </style>
-
-    <style name="Theme.AndroidVpn.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="Theme.AndroidVpn.Onboarding" parent="Theme.AndroidVpn.NoActionBar">
-        <item name="android:statusBarColor">@color/grey</item>
-    </style>
-
-    <style name="Theme.AndroidVpn.Trackers">
-        <item name="colorAccent">@color/cornflowerGreen</item>
-    </style>
-
-    <style name="Theme.AndroidVpn.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
-
-    <style name="Theme.AndroidVpn.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
-
-    <style name="SettingsSwitchTheme">
-        <item name="colorControlActivated">@color/cornflowerBlue</item>
-        <item name="colorSwitchThumbNormal">@color/white</item>
-        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
-    </style>
-
-    <style name="BottomSheetDialog" parent="Theme.Design.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
-    </style>
-
-    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
-        <item name="behavior_peekHeight">512dp</item>
-    </style>
-
-    <style name="RadioButtonStyle" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
-        <item name="android:textColor">?attr/normalTextColor</item>
-        <item name="buttonTint">@color/radio_button_tint</item>
-    </style>
-
-    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:textColor">?attr/normalTextColor</item>
-        <item name="android:textColorPrimary">?attr/normalTextColor</item>
-        <item name="android:textColorSecondary">?attr/secondaryTextColor</item>
-        <item name="android:background">?attr/dialogBgColor</item>
-        <item name="colorAccent">@color/cornflowerBlue</item>
-        <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
-        <item name="textColorAlertDialogListItem">?attr/normalTextColor</item>
-        <item name="android:buttonBarButtonStyle">@style/AlertDialogButtonStyle</item>
-        <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButtonStyle</item>
-        <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButtonStyle</item>
-        <item name="buttonBarNeutralButtonStyle">@style/AlertDialogButtonStyle</item>
-    </style>
-
-    <style name="AlertDialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
-        <item name="android:textColor">@color/cornflowerBlue</item>
-    </style>
+    <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Light"/>
 
 </resources>

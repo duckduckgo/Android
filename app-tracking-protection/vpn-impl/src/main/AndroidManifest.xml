@@ -7,7 +7,7 @@
 
     <application
         android:largeHeap="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/Theme.DuckDuckGo.Light">
 
         <activity
             android:name="dummy.ui.VpnDiagnosticsGetUserHealthReportActivity"

@@ -27,7 +27,7 @@
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ToolbarTheme"
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/toolbarBgColor"
-            android:theme="@style/ToolbarTheme"
+            android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
             app:popupTheme="@style/PopUpOverflowMenu"/>
     </com.google.android.material.appbar.AppBarLayout>
 
