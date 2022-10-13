@@ -16,12 +16,47 @@
 
 package com.duckduckgo.mobile.android.vpn.store
 
-import androidx.room.*
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.duckduckgo.mobile.android.vpn.dao.*
-import com.duckduckgo.mobile.android.vpn.model.*
-import com.duckduckgo.mobile.android.vpn.trackers.*
+import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
+import com.duckduckgo.mobile.android.vpn.dao.VpnAddressLookup
+import com.duckduckgo.mobile.android.vpn.dao.VpnAddressLookupDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerSystemAppsOverridesDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnDataStatsDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverState
+import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnNotification
+import com.duckduckgo.mobile.android.vpn.dao.VpnNotificationsDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
+import com.duckduckgo.mobile.android.vpn.dao.VpnRunningStatsDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnStateDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
+import com.duckduckgo.mobile.android.vpn.model.VpnDataStats
+import com.duckduckgo.mobile.android.vpn.model.VpnRunningStats
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
+import com.duckduckgo.mobile.android.vpn.model.VpnState
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
+import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExclusionListMetadata
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverrideListMetadata
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverridePackage
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -29,7 +64,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 @Database(
-    exportSchema = true, version = 24,
+    exportSchema = true, version = 25,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -51,6 +86,7 @@ import org.threeten.bp.format.DateTimeFormatter
         AppTrackerSystemAppOverrideListMetadata::class,
         AppTrackerEntity::class,
         VpnFeatureRemoverState::class,
+        VpnAddressLookup::class,
     ]
 )
 
@@ -68,6 +104,7 @@ abstract class VpnDatabase : RoomDatabase() {
     abstract fun vpnServiceStateDao(): VpnServiceStateStatsDao
     abstract fun vpnSystemAppsOverridesDao(): VpnAppTrackerSystemAppsOverridesDao
     abstract fun vpnFeatureRemoverDao(): VpnFeatureRemoverDao
+    abstract fun vpnAddressLookupDao(): VpnAddressLookupDao
     companion object {
 
         private val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
@@ -125,6 +162,16 @@ abstract class VpnDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_24_TO_25: Migration = object : Migration(24, 25) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `vpn_address_lookup`" +
+                        " (`address` TEXT PRIMARY KEY NOT NULL, " +
+                        "`domain` TEXT NOT NULL)"
+                )
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_18_TO_19,
@@ -133,6 +180,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_21_TO_22,
                 MIGRATION_22_TO_23,
                 MIGRATION_23_TO_24,
+                MIGRATION_24_TO_25,
             )
     }
 }

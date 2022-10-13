@@ -692,8 +692,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Prezerajte súkromne stránky s našou aplikáciou pre Mac</string>
-    <string name="macos_settings_description_list">Ste na zozname!</string>
-    <string name="macos_settings_description_ready">K dispozícii na stiahnutie pre Mac</string>
     <string name="macos_settings_title">Aplikácia DuckDuckGo pre počítač</string>
 
     <!-- Downloads -->

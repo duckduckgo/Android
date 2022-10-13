@@ -684,8 +684,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Privát böngészés Maces alkalmazásunkkal</string>
-    <string name="macos_settings_description_list">Rajta vagy a listán!</string>
-    <string name="macos_settings_description_ready">Letölthető Macre</string>
     <string name="macos_settings_title">DuckDuckGo asztali alkalmazás</string>
 
     <!-- Downloads -->

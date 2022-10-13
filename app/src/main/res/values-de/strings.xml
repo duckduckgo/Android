@@ -684,8 +684,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Privat browsen mit unserer App für Mac</string>
-    <string name="macos_settings_description_list">Du stehst jetzt auf der Warteliste.</string>
-    <string name="macos_settings_description_ready">Verfügbar zum Herunterladen auf Mac</string>
     <string name="macos_settings_title">DuckDuckGo-Desktop-App</string>
 
     <!-- Downloads -->

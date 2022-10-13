@@ -692,8 +692,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Przeglądaj prywatnie za pomocą aplikacji dla komputerów Mac</string>
-    <string name="macos_settings_description_list">Jesteś na liście!</string>
-    <string name="macos_settings_description_ready">Dostępne do pobrania na Mac</string>
     <string name="macos_settings_title">Aplikacja komputerowa DuckDuckGo</string>
 
     <!-- Downloads -->

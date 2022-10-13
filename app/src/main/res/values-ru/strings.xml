@@ -692,8 +692,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Полная конфиденциальность в Интернете, благодаря нашему приложению для Mac</string>
-    <string name="macos_settings_description_list">Теперь вы в списке!</string>
-    <string name="macos_settings_description_ready">Доступна версия для Mac</string>
     <string name="macos_settings_title">Настольное приложение DuckDuckGo</string>
 
     <!-- Downloads -->
