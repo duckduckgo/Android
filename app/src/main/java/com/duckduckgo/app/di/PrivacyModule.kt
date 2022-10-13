@@ -84,7 +84,9 @@ object PrivacyModule {
         thirdPartyCookieManager: ThirdPartyCookieManager,
         adClickManager: AdClickManager,
         fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
-        sitePermissionsManager: SitePermissionsManager
+        sitePermissionsManager: SitePermissionsManager,
+        dispatcherProvider: DispatcherProvider,
+        clearDataPixel: ClearDataPixel
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -98,7 +100,9 @@ object PrivacyModule {
             thirdPartyCookieManager,
             adClickManager,
             fireproofWebsiteRepository,
-            sitePermissionsManager
+            sitePermissionsManager,
+            dispatcherProvider,
+            clearDataPixel
         )
     }
 
