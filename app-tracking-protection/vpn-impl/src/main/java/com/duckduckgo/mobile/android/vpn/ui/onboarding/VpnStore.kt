@@ -96,11 +96,11 @@ class SharedPreferencesVpnStore @Inject constructor(
     }
 
     override fun didShowAppTpEnabledCta(): Boolean {
-        return preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN, false)
+        return preferences.getBoolean(KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN, false)
     }
 
     override fun appTpEnabledCtaDidShow() {
-        preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN, true) }
+        preferences.edit { putBoolean(KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN, true) }
     }
 
     companion object {
@@ -110,6 +110,6 @@ class SharedPreferencesVpnStore @Inject constructor(
         private const val KEY_DEVICE_SHIELD_MANUALLY_ENABLED = "KEY_DEVICE_SHIELD_MANUALLY_ENABLED"
         private const val KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED = "KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED"
         private const val KEY_ALWAYS_ON_MODE_ENABLED = "KEY_ALWAYS_ON_MODE_ENABLED"
-        private const val KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN = "KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN"
+        private const val KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN = "KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN"
     }
 }
