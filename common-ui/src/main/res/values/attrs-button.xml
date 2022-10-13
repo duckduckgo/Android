@@ -16,6 +16,20 @@
 
 <resources>
 
+    <declare-styleable name="DaxButton">
+        <attr name="buttonSize" format="enum">
+            <enum name="small" value="0"/>
+            <enum name="large" value="1"/>
+        </attr>
+        <attr name="buttonType" format="enum">
+            <enum name="primary" value="0"/>
+            <enum name="secondary" value="1"/>
+            <enum name="ghost" value="2"/>
+            <enum name="destructive" value="3"/>
+            <enum name="ghost_destructive" value="4"/>
+        </attr>
+    </declare-styleable>
+
     <attr name="primaryButtonLargeStyle" format="reference"/>
     <attr name="primaryButtonSmallStyle" format="reference"/>
     <attr name="secondaryButtonLargeStyle" format="reference"/>

@@ -27,6 +27,29 @@
               android:paddingEnd="@dimen/keyline_4">
 
     <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="Dax Buttons"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButton
+            android:id="@+id/dax_button_primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:buttonType="primary"
+            android:text="Dax Button Primary"/>
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButton
+            android:id="@+id/dax_button_secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:buttonType="secondary"
+            android:text="Dax Button Secondary"/>
+
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:id="@+id/label"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
