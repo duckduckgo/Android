@@ -273,6 +273,10 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object OpenVpnSettings : Command()
         object ShowAppTpEnabledCta : Command()
     }
+
+    companion object {
+        const val WINDOW_INTERVAL_HOURS = 24L
+    }
 }
 
 internal inline class TrackerCount(val value: Int)

@@ -30,6 +30,7 @@ import org.junit.Test
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.threeten.bp.Instant
 
 class SharedPreferencesVpnStoreTest {
 
