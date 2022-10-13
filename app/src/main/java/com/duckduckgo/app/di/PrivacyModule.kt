@@ -83,7 +83,7 @@ object PrivacyModule {
         dataManager: WebDataManager,
         clearingStore: UnsentForgetAllPixelStore,
         tabRepository: TabRepository,
-        settingsDataStore: SettingsDataStore,
+        settingsDataStore: SettingsDataStore,   
         cookieManager: DuckDuckGoCookieManager,
         appCacheClearer: AppCacheClearer,
         geoLocationPermissions: GeoLocationPermissions,
