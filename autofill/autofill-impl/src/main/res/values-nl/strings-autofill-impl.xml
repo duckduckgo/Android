@@ -14,8 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Login met automatisch invullen</string>
 
     <string name="managementLockedModeText">Automatisch invullen ontgrendelen</string>
@@ -34,7 +36,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Meer opties</string>
 
     <string name="useSavedLoginDialogTitle">Opgeslagen aanmeldgegevens gebruiken?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Aanmeldgegevens voor %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Aanmeldgegevens voor %s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Aanmeldgegevens voor de website</string>
 
     <string name="updateLoginDialogTitle">Wachtwoord bijwerken?</string>
@@ -53,7 +55,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Wijzigingen opslaan</string>
     <string name="credentialManagementEditButtonCopyUsername">Gebruikersnaam kopiëren</string>
     <string name="credentialManagementEditButtonCopyPassword">Wachtwoord kopiëren</string>
-    <string name="credentialManagementEditLastUpdated">Aanmeldgegevens laatste bijgewerkt op %1$s</string>
+    <string name="credentialManagementEditLastUpdated">Aanmeldgegevens laatste bijgewerkt op %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Aanmeldgegevens opslaan en automatisch invullen</string>
     <string name="credentialManagementViewMenuEdit">Bewerken</string>
