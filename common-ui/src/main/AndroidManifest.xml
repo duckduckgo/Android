@@ -20,7 +20,7 @@
     <application>
 
         <activity
-            android:theme="@style/Theme.DuckDuckGo"
+            android:theme="@style/Theme.DuckDuckGo.Light"
             android:name=".themepreview.ui.AppComponentsActivity"
             android:exported="true" />
         <meta-data

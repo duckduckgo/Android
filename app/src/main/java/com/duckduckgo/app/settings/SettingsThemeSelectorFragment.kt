@@ -27,9 +27,7 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK_V2
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT_V2
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 
 class SettingsThemeSelectorFragment : DialogFragment() {
@@ -51,11 +49,6 @@ class SettingsThemeSelectorFragment : DialogFragment() {
                 View.VISIBLE
         }
 
-        if (arguments?.getBoolean(ADS_THEME_ENABLED, false)!!) {
-            rootView.findViewById<RadioButton>(R.id.themeSelectorAdsLight).visibility = View.VISIBLE
-            rootView.findViewById<RadioButton>(R.id.themeSelectorAdsDark).visibility = View.VISIBLE
-        }
-
         updateCurrentSelect(currentOption, rootView.findViewById(R.id.themeSelectorGroup))
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
@@ -68,8 +61,6 @@ class SettingsThemeSelectorFragment : DialogFragment() {
                         R.id.themeSelectorLight -> LIGHT
                         R.id.themeSelectorDark -> DARK
                         R.id.themeSelectorSystemDefault -> SYSTEM_DEFAULT
-                        R.id.themeSelectorAdsLight -> LIGHT_V2
-                        R.id.themeSelectorAdsDark -> DARK_V2
                         else -> LIGHT
                     }
                     val listener = activity as Listener?
@@ -94,8 +85,6 @@ class SettingsThemeSelectorFragment : DialogFragment() {
         return when (this) {
             LIGHT -> R.id.themeSelectorLight
             DARK -> R.id.themeSelectorDark
-            LIGHT_V2 -> R.id.themeSelectorAdsLight
-            DARK_V2 -> R.id.themeSelectorAdsDark
             SYSTEM_DEFAULT -> R.id.themeSelectorSystemDefault
         }
     }

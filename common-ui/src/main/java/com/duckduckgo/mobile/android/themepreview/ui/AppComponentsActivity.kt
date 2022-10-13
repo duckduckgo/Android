@@ -26,9 +26,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ActivityAppComponentsBinding
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK_V2
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT_V2
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class AppComponentsActivity : AppCompatActivity() {
@@ -46,14 +44,8 @@ class AppComponentsActivity : AppCompatActivity() {
         binding.tabLayout.setupWithViewPager(binding.viewPager)
         binding.viewPager.adapter = AppComponentsPagerAdapter(this, supportFragmentManager)
 
-        binding.darkThemeSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK || selectedTheme == DARK_V2) { _, enabled ->
-            themePreferences.selectedTheme = getTheme(enabled, binding.newDesignSystemSwitch.isSwitchChecked())
-            startActivity(intent(this))
-            finish()
-        }
-
-        binding.newDesignSystemSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK_V2 || selectedTheme == LIGHT_V2) { _, enabled ->
-            themePreferences.selectedTheme = getTheme(binding.darkThemeSwitch.isSwitchChecked(), enabled)
+        binding.darkThemeSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK) { _, enabled ->
+            themePreferences.selectedTheme = getTheme(enabled)
             startActivity(intent(this))
             finish()
         }
@@ -61,29 +53,18 @@ class AppComponentsActivity : AppCompatActivity() {
 
     private fun applyLocalTheme(theme: DuckDuckGoTheme) {
         when (theme) {
-            LIGHT_V2 -> setTheme(R.style.Theme_DuckDuckGo_Light)
-            DARK_V2 -> setTheme(R.style.Theme_DuckDuckGo_Dark)
-            DARK -> setTheme(R.style.AppTheme_Dark)
-            else -> setTheme(R.style.AppTheme_Light)
+            DARK -> setTheme(R.style.Theme_DuckDuckGo_Dark)
+            else -> setTheme(R.style.Theme_DuckDuckGo_Light)
         }
     }
 
     private fun getTheme(
-        darkThemeEnabled: Boolean,
-        newDesignSystemEnabled: Boolean
+        darkThemeEnabled: Boolean
     ): DuckDuckGoTheme {
         return if (darkThemeEnabled) {
-            if (newDesignSystemEnabled) {
-                DARK_V2
-            } else {
-                DARK
-            }
+            DARK
         } else {
-            if (newDesignSystemEnabled) {
-                LIGHT_V2
-            } else {
-                LIGHT
-            }
+            LIGHT
         }
     }
 
@@ -98,8 +79,6 @@ class AppComponentsSharedPreferences(private val context: Context) {
     var selectedTheme: DuckDuckGoTheme
         get() {
             return when (preferences.getString(KEY_SELECTED_THEME, DARK.name)) {
-                DARK_V2.name -> DARK_V2
-                LIGHT_V2.name -> LIGHT_V2
                 DARK.name -> DARK
                 else -> LIGHT
             }

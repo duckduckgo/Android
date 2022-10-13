@@ -297,8 +297,6 @@ class SettingsActivity :
             when (selectedTheme) {
                 DuckDuckGoTheme.DARK -> R.string.settingsDarkTheme
                 DuckDuckGoTheme.LIGHT -> R.string.settingsLightTheme
-                DuckDuckGoTheme.DARK_V2 -> R.string.settingsDarkTheme
-                DuckDuckGoTheme.LIGHT_V2 -> R.string.settingsLightTheme
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> R.string.settingsSystemTheme
             }
         )

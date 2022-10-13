@@ -35,9 +35,7 @@ import com.duckduckgo.mobile.android.ui.Theming.Constants.THEME_MAP
 enum class DuckDuckGoTheme {
     SYSTEM_DEFAULT,
     DARK,
-    LIGHT,
-    DARK_V2,
-    LIGHT_V2
+    LIGHT
 }
 
 object Theming {
@@ -47,7 +45,7 @@ object Theming {
         drawableId: Int,
         theme: DuckDuckGoTheme
     ): Drawable? {
-        val themeId: Int = THEME_MAP[Pair(R.style.AppTheme, theme)] ?: R.style.AppTheme_Light
+        val themeId: Int = THEME_MAP[Pair(R.style.AppTheme, theme)] ?: R.style.Theme_DuckDuckGo_Light
         return ResourcesCompat.getDrawable(
             context.resources, drawableId, ContextThemeWrapper(context, themeId).theme
         )
@@ -59,10 +57,8 @@ object Theming {
 
         val THEME_MAP =
             mapOf(
-                Pair(R.style.AppTheme, DuckDuckGoTheme.LIGHT) to R.style.AppTheme_Light,
-                Pair(R.style.AppTheme, DuckDuckGoTheme.DARK) to R.style.AppTheme_Dark,
-                Pair(R.style.Theme_DuckDuckGo, DuckDuckGoTheme.LIGHT_V2) to R.style.Theme_DuckDuckGo_Light,
-                Pair(R.style.Theme_DuckDuckGo, DuckDuckGoTheme.DARK_V2) to R.style.Theme_DuckDuckGo_Dark,
+                Pair(R.style.AppTheme, DuckDuckGoTheme.LIGHT) to R.style.Theme_DuckDuckGo_Light,
+                Pair(R.style.AppTheme, DuckDuckGoTheme.DARK) to R.style.Theme_DuckDuckGo_Dark
             )
     }
 }

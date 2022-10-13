@@ -60,17 +60,6 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:primaryText="Enable Dark Theme" app:showSwitch="true" android:layout_marginTop="16dp"/>
 
-                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/newDesignSystemSwitch"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/imageView"
-                    app:layout_constraintTop_toBottomOf="@+id/darkThemeSwitch"
-                    app:primaryText="Design System v2"
-                    app:showSwitch="true"/>
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
