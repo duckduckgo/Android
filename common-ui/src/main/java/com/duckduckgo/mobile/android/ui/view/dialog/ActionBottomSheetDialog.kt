@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.ui.view.dialog
 
 import android.content.Context
 import android.view.LayoutInflater
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.BottomSheetActionBinding
@@ -52,9 +53,11 @@ class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.cont
 
         binding.actionBottomSheetDialogPrimaryItem.setPrimaryText(builder.primaryItemText)
         builder.primaryItemIcon?.let { binding.actionBottomSheetDialogPrimaryItem.setLeadingIcon(it) }
+        builder.primaryItemTextColor?.let { binding.actionBottomSheetDialogPrimaryItem.setPrimaryTextColor(it) }
 
         binding.actionBottomSheetDialogSecondaryItem.setPrimaryText(builder.secondaryItemText)
         builder.secondaryItemIcon?.let { binding.actionBottomSheetDialogSecondaryItem.setLeadingIcon(it) }
+        builder.secondaryItemTextColor?.let { binding.actionBottomSheetDialogSecondaryItem.setPrimaryTextColor(it) }
     }
 
     class Builder(val context: Context) {
@@ -62,8 +65,10 @@ class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.cont
         var titleText: String? = null
         var primaryItemText: String = ""
         var primaryItemIcon: Int? = null
+        var primaryItemTextColor: Int? = null
         var secondaryItemText: String = ""
         var secondaryItemIcon: Int? = null
+        var secondaryItemTextColor: Int? = null
 
         fun addEventListener(eventListener: EventListener): Builder {
             listener = eventListener
@@ -75,15 +80,25 @@ class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.cont
             return this
         }
 
-        fun onPrimaryItem(text: String, @DrawableRes icon: Int? = null): Builder {
+        fun onPrimaryItem(
+            text: String,
+            @DrawableRes icon: Int? = null,
+            @ColorRes color: Int? = null
+        ): Builder {
             primaryItemText = text
             primaryItemIcon = icon
+            primaryItemTextColor = color
             return this
         }
 
-        fun onSecondaryItem(text: String, @DrawableRes icon: Int? = null): Builder {
+        fun onSecondaryItem(
+            text: String,
+            @DrawableRes icon: Int? = null,
+            @ColorRes color: Int? = null
+        ): Builder {
             secondaryItemText = text
             secondaryItemIcon = icon
+            secondaryItemTextColor = color
             return this
         }
 

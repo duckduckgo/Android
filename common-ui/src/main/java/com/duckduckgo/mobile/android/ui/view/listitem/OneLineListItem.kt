@@ -22,7 +22,9 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
+import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
@@ -88,6 +90,11 @@ class OneLineListItem @JvmOverloads constructor(
     /** Sets the item title */
     fun setPrimaryText(title: String) {
         binding.primaryText.text = title
+    }
+
+    /** Sets title text color */
+    fun setPrimaryTextColor(@ColorRes colorRes: Int) {
+        binding.primaryText.setTextColor(ContextCompat.getColor(context, colorRes))
     }
 
     /** Sets the leading icon image resource */
