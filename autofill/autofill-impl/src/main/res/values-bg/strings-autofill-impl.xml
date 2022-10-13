@@ -14,8 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Автоматично попълване на данни за вход</string>
 
     <string name="managementLockedModeText">Отключете автоматичното попълване</string>
@@ -34,7 +36,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Повече опции</string>
 
     <string name="useSavedLoginDialogTitle">Да се използват ли запазените данни за вход?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Вход за %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Данни за вход за %s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Вход за сайта</string>
 
     <string name="updateLoginDialogTitle">Актуализиране на паролата?</string>
@@ -53,7 +55,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Запазване на промените</string>
     <string name="credentialManagementEditButtonCopyUsername">Копиране на потребителско име</string>
     <string name="credentialManagementEditButtonCopyPassword">Копиране на парола</string>
-    <string name="credentialManagementEditLastUpdated">Последна актуализация на данните за вход %1$s</string>
+    <string name="credentialManagementEditLastUpdated">Последна актуализация на данните за вход за %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Запазване и автоматично попълване на данните за вход</string>
     <string name="credentialManagementViewMenuEdit">Редактиране</string>
