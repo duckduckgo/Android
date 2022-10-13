@@ -94,7 +94,7 @@ class OneLineListItem @JvmOverloads constructor(
     fun setLeadingIcon(idRes: Int) {
         val drawable = VectorDrawableCompat.create(resources, idRes, null)
         binding.leadingIcon.setImageDrawable(drawable)
-        binding.leadingIcon.show()
+        binding.leadingIconBackground.show()
     }
 
     /** Sets the item image resource */
