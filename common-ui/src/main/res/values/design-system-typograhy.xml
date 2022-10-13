@@ -18,7 +18,7 @@
 
     <style name="TextAppearance"/>
     <style name="TextAppearance.DuckDuckGo">
-        <item name="android:textColor">@color/primary_text_color_selector</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
         <item name="android:textStyle">normal</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:letterSpacing">0.0</item>

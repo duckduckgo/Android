@@ -48,7 +48,6 @@
         <item name="textAppearanceH5">@style/Typography.DuckDuckGo.H5</item>
 
         <!-- Android Components -->
-        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Surface</item>
         <item name="actionOverflowMenuStyle">@style/PopUpOverflowMenu</item>
         <item name="actionOverflowButtonStyle">@style/PopUpOverflowButton</item>
         <item name="bottomSheetDialogTheme">@style/Widget.DuckDuckGo.BottomSheetDialog</item>
@@ -100,8 +99,8 @@
         <!--colorBackground appears behind scrollable content and is used for the default window background -->
         <item name="android:colorBackground">?attr/daxColorBackground</item>
         <item name="android:windowBackground">?attr/daxColorBackground</item>
-        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/daxColorBackground</item>
-        <item name="android:navigationBarColor" tools:ignore="NewApi">?attr/daxColorBackground</item>
+        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/toolbarBgColor</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">?attr/toolbarBgColor</item>
 
     </style>
 
