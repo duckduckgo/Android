@@ -336,10 +336,6 @@
         <item name="android:statusBarColor">@color/almostBlack</item>
     </style>
 
-    <style name="AppTheme.Light.ATPOnboarding">
-        <item name="android:statusBarColor">@color/atp_onboardingHeaderBg</item>
-    </style>
-
     <style name="ModalCardTheme" parent="AppTheme.BaseLight">
         <item name="colorPrimary">@color/darkThemePrimary</item>
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
@@ -385,35 +381,6 @@
         <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
     </style>
-
-    <style name="Theme.AndroidVpn" parent="Theme.MaterialComponents.Light.Bridge">
-        <item name="colorPrimary">@color/whiteFive</item>
-        <item name="colorPrimaryDark">@color/whiteFive</item>
-        <item name="colorAccent">@color/warmBlue</item>
-        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
-        <item name="android:windowLightStatusBar">true</item>
-
-        <item name="normalTextColor">@color/almostBlackDark</item>
-        <item name="secondaryTextColor">@color/brownishGrayTwo</item>
-        <item name="settingsMinorTextColor">@color/brownishGrayTwo</item>
-    </style>
-
-    <style name="Theme.AndroidVpn.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="Theme.AndroidVpn.Onboarding" parent="Theme.AndroidVpn.NoActionBar">
-        <item name="android:statusBarColor">@color/grey</item>
-    </style>
-
-    <style name="Theme.AndroidVpn.Trackers">
-        <item name="colorAccent">@color/cornflowerGreen</item>
-    </style>
-
-    <style name="Theme.AndroidVpn.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar"/>
-
-    <style name="Theme.AndroidVpn.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark"/>
 
     <style name="BottomSheetDialog" parent="Theme.Design.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/BottomSheetStyle</item>

@@ -7,13 +7,13 @@
 
     <application
         android:largeHeap="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/Theme.DuckDuckGo">
 
         <activity
             android:name="dummy.ui.VpnDiagnosticsGetUserHealthReportActivity"
             android:exported="false"
             android:parentActivityName="dummy.ui.VpnDiagnosticsActivity"
-            android:process=":vpn" />
+            android:process=":vpn"/>
 
         <activity
             android:name="dummy.ui.VpnControllerActivity"
