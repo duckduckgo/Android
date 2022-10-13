@@ -189,15 +189,15 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenVPNLaunchedAndShouldPromoteAlwaysOnThenShowPromoteAlwaysOnDialogCommandisSent() = runBlocking {
+    fun whenVpnLaunchedAlwaysOnDisabledAndSystemKilledAppTpThenShowAlwaysOnPromotion() = runBlocking {
         whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(6)
         whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(true)
         whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
+        whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(true)
 
         viewModel.commands().test {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, awaitItem())
-            verify(vpnStore).resetAppTPManuallyEnablesCounter()
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowAlwaysOnPromotionDialog, awaitItem())
 
             cancelAndConsumeRemainingEvents()
@@ -205,38 +205,25 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenVPNLaunchedLessThanEnoughTimesThenShowPromoteAlwaysOnDialogCommandisNotSent() = runBlocking {
+    fun whenVpnLaunchedAlwaysOnDisabledAndSystemDidNotKilledAppTpThenDoNotShowAlwaysOnPromotion() = runBlocking {
         whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(1)
         whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(true)
         whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
+        whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(false)
 
         viewModel.commands().test {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, expectMostRecentItem())
-            verify(vpnStore, times(0)).resetAppTPManuallyEnablesCounter()
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenUserForgotAlwaysOnPromotionDialogThenShowPromoteAlwaysOnDialogCommandisNotSent() = runBlocking {
-        whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(6)
-        whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(false)
-        whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
-
-        viewModel.commands().test {
-            viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, expectMostRecentItem())
-            verify(vpnStore, times(0)).resetAppTPManuallyEnablesCounter()
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenVPNInAlwaysOnModeThenShowPromoteAlwaysOnDialogCommandisNotSent() = runBlocking {
+    fun whenVPNInAlwaysOnModeThenShowPromoteAlwaysOnDialogCommandIsNotSent() = runBlocking {
         whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(6)
         whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(true)
         whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(true)
+        whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(true)
 
         viewModel.commands().test {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
