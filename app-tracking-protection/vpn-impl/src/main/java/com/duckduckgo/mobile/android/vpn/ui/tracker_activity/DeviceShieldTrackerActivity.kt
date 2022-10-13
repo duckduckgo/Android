@@ -401,14 +401,26 @@ class DeviceShieldTrackerActivity :
 
     private fun updateRunningState(runningState: VpnState) {
         if (runningState.state == VpnRunningState.ENABLED) {
-            binding.deviceShieldTrackerLabelDisabled.gone()
+            if (runningState.alwaysOnState.isAlwaysOnLockedDown()) {
+                binding.deviceShieldTrackerLabelEnabled.gone()
 
-            binding.deviceShieldTrackerLabelEnabled.apply {
-                setClickableLink(
-                    APPTP_SETTINGS_ANNOTATION,
-                    getText(R.string.atp_ActivityEnabledLabel)
-                ) { launchManageAppsProtection() }
-                show()
+                binding.deviceShieldTrackerLabelDisabled.apply {
+                    setClickableLink(
+                        OPEN_SETTINGS_ANNOTATION,
+                        getText(R.string.atp_AlwaysOnLockDownEnabled)
+                    ) { openVPNSettings() }
+                    show()
+                }
+            } else {
+                binding.deviceShieldTrackerLabelDisabled.gone()
+
+                binding.deviceShieldTrackerLabelEnabled.apply {
+                    setClickableLink(
+                        APPTP_SETTINGS_ANNOTATION,
+                        getText(R.string.atp_ActivityEnabledLabel)
+                    ) { launchManageAppsProtection() }
+                    show()
+                }
             }
         } else {
             binding.deviceShieldTrackerLabelEnabled.gone()
@@ -474,6 +486,7 @@ class DeviceShieldTrackerActivity :
     companion object {
         private const val RESULT_RECEIVER_EXTRA = "RESULT_RECEIVER_EXTRA"
         private const val RE_ENABLE_ANNOTATION = "re_enable_link"
+        private const val OPEN_SETTINGS_ANNOTATION = "open_settings_link"
         private const val ON_LAUNCHED_CALLED_SUCCESS = 0
         private const val MIN_ROWS_FOR_ALL_ACTIVITY = 6
         private const val TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG = "AppTPPromoteAlwaysOnDialog"
