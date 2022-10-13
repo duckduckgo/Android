@@ -27,8 +27,7 @@
         android:id="@+id/appBarLayoutMockup"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?toolbarBgColor"
-        android:theme="@style/AppTheme.Dark.AppBarOverlay">
+        android:background="?toolbarBgColor">
 
         <FrameLayout
             android:id="@+id/omniBarContainerMockup"

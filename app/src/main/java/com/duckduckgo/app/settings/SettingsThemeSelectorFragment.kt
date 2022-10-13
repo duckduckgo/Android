@@ -43,7 +43,6 @@ class SettingsThemeSelectorFragment : DialogFragment() {
 
         val rootView = View.inflate(activity, R.layout.settings_theme_selector_fragment, null)
 
-
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             rootView.findViewById<RadioButton>(R.id.themeSelectorSystemDefault).visibility =
                 View.VISIBLE

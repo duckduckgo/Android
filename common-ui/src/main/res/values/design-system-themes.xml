@@ -360,4 +360,6 @@
         <item name="toolbarIconColor">@color/white</item>
     </style>
 
+    <style name="Theme.SplashScreen" parent="Theme.DuckDuckGo.Light"/>
+
 </resources>
