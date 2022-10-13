@@ -22,15 +22,15 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import javax.inject.Named
 
-interface JSInterfaceMapper {
-    fun clickPayloadToUrl(payload: String): String
+interface PrivacyDashboardPayloadAdapter {
+    fun onUrlClicked(payload: String): String
 }
 
 @ContributesBinding(AppScope::class)
-class AppJSInterfaceMapper @Inject constructor(
+class AppPrivacyDashboardPayloadAdapter @Inject constructor(
     @Named("privacyDashboard") private val moshi: Moshi
-) : JSInterfaceMapper {
-    override fun clickPayloadToUrl(payload: String): String {
+) : PrivacyDashboardPayloadAdapter {
+    override fun onUrlClicked(payload: String): String {
         val payloadAdapter = moshi.adapter(Payload::class.java)
         return kotlin.runCatching { payloadAdapter.fromJson(payload)?.url ?: "" }.getOrDefault("")
     }
