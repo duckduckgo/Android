@@ -187,8 +187,8 @@ class DialogsFragment : Fragment() {
                     button.setOnClickListener {
                         ActionBottomSheetDialog.Builder(requireContext())
                             .setTitle("Title")
-                            .setPrimaryItem("Primary Item")
-                            .setSecondaryItem("Secondary Item")
+                            .setPrimaryItem("Primary Item", R.drawable.ic_add_16)
+                            .setSecondaryItem("Secondary Item", R.drawable.ic_add_16)
                             .addEventListener(object : ActionBottomSheetDialog.EventListener() {
                                 override fun onPrimaryItemClicked() {
                                     Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()

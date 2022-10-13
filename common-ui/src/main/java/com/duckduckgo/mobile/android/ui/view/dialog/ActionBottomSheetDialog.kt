@@ -20,6 +20,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.databinding.BottomSheetActionBinding
 import com.duckduckgo.mobile.android.ui.view.show
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -55,11 +56,13 @@ class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.cont
         }
 
         binding.actionBottomSheetDialogPrimaryItem.setPrimaryText(builder.primaryItemText)
-        builder.primaryItemIcon?.let { binding.actionBottomSheetDialogPrimaryItem.setLeadingIcon(it) }
+        builder.primaryItemIcon?.let { binding.actionBottomSheetDialogPrimaryItem.setLeadingIconDrawable(ContextCompat.getDrawable(context, it)!!) }
         builder.primaryItemTextColor?.let { binding.actionBottomSheetDialogPrimaryItem.setPrimaryTextColor(it) }
 
         binding.actionBottomSheetDialogSecondaryItem.setPrimaryText(builder.secondaryItemText)
-        builder.secondaryItemIcon?.let { binding.actionBottomSheetDialogSecondaryItem.setLeadingIcon(it) }
+        builder.secondaryItemIcon?.let {
+            binding.actionBottomSheetDialogSecondaryItem.setLeadingIconDrawable(ContextCompat.getDrawable(context, it)!!)
+        }
         builder.secondaryItemTextColor?.let { binding.actionBottomSheetDialogSecondaryItem.setPrimaryTextColor(it) }
     }
 

@@ -54,6 +54,7 @@
     <!-- Dialogs -->
     <dimen name="dialogButtonHeight">40dp</dimen>
     <dimen name="dialogImageSize">40dp</dimen>
+    <dimen name="dialogBorderRadius">12dp</dimen>
 
     <!-- Bottom Sheet -->
     <dimen name="actionBottomSheetVerticalPadding">8dp</dimen>

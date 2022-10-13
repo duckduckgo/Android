@@ -88,7 +88,7 @@
 
         <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
             android:id="@+id/actionBottomSheetButtonWithTitle"
-            android:text="Action Bottom Sheet with title"
+            android:text="Action Bottom Sheet with title and icons"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>

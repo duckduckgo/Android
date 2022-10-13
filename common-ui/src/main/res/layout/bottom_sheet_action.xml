@@ -39,14 +39,12 @@
         android:id="@+id/actionBottomSheetDialogPrimaryItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_add_16"
         app:primaryText="Primary Item" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/actionBottomSheetDialogSecondaryItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_red_dax"
         app:primaryText="Secondary Item" />
 
 </LinearLayout>
