@@ -14,8 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Συνδέσεις αυτόματης συμπλήρωσης</string>
 
     <string name="managementLockedModeText">Ξεκλείδωμα της αυτόματης συμπλήρωσης</string>
@@ -34,7 +36,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
 
     <string name="useSavedLoginDialogTitle">Χρήση αποθηκευμένων στοιχείων σύνδεσης;</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Σύνδεση για %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Σύνδεση για %s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Σύνδεση για τον ιστότοπο</string>
 
     <string name="updateLoginDialogTitle">Ενημέρωση κωδικού πρόσβασης;</string>
@@ -53,7 +55,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Αποθήκευση αλλαγών</string>
     <string name="credentialManagementEditButtonCopyUsername">Αντιγραφή ονόματος χρήστη</string>
     <string name="credentialManagementEditButtonCopyPassword">Αντιγραφή κωδικού πρόσβασης</string>
-    <string name="credentialManagementEditLastUpdated">Τελευταία ενημέρωση σύνδεσης %1$s</string>
+    <string name="credentialManagementEditLastUpdated">Τελευταία ενημέρωση σύνδεσης %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Αποθήκευση και αυτόματη συμπλήρωση στοιχείων σύνδεσης</string>
     <string name="credentialManagementViewMenuEdit">Επεξεργασία</string>
