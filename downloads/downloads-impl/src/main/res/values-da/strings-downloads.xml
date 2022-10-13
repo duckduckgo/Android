@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Det var ikke muligt at downloade. Kontroller internetforbindelsen.</string>
 
     <string name="notificationChannelFileDownloading">Fil downloader</string>
     <string name="notificationChannelFileDownloaded">Fil downloadet</string>
+
     <string name="downloadInProgress">Downloader</string>
+
+    <string name="downloadsDownloadStartedMessage">Download startet for %s</string>
+    <string name="downloadsDownloadFinishedMessage">Download afsluttet for %s</string>
+    <string name="downloadsDownloadGenericErrorMessage">Det var ikke muligt at downloade.</string>
+    <string name="downloadsCancel">Afbestil</string>
+    <string name="downloadsRetry">Prøv igen</string>
+    <string name="notificationDownloadComplete">Download fuldført.</string>
+    <string name="notificationDownloadFailed">Det var ikke muligt at downloade.</string>
 </resources>

@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Αποτυχία λήψης. Ελέγξτε τη σύνδεση στο διαδίκτυο.</string>
 
     <string name="notificationChannelFileDownloading">Λήψη αρχείου</string>
     <string name="notificationChannelFileDownloaded">Έγινε λήψη του αρχείου</string>
+
     <string name="downloadInProgress">Λήψη…</string>
+
+    <string name="downloadsDownloadStartedMessage">Άρχισε η λήψη για το %s</string>
+    <string name="downloadsDownloadFinishedMessage">Ολοκληρώθηκε η λήψη για το %s</string>
+    <string name="downloadsDownloadGenericErrorMessage">Αποτυχία λήψης.</string>
+    <string name="downloadsCancel">Ακύρωση</string>
+    <string name="downloadsRetry">Επανάληψη</string>
+    <string name="notificationDownloadComplete">Η λήψη ολοκληρώθηκε.</string>
+    <string name="notificationDownloadFailed">Αποτυχία λήψης.</string>
 </resources>
