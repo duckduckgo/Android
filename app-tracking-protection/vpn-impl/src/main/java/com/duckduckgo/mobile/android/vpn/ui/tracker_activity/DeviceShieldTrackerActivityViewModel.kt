@@ -119,7 +119,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         }
     }
 
-    internal fun launchExcludedApps() {
+    private fun launchExcludedApps() {
         sendCommand(Command.LaunchManageAppsProtection)
     }
 
@@ -143,8 +143,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             ViewEvent.RemoveFeature -> removeFeature()
             ViewEvent.AskToRemoveFeature -> sendCommand(Command.ShowRemoveFeatureConfirmationDialog)
             ViewEvent.StartVpn -> launchVpn()
-            ViewEvent.PromoteAlwaysOnForget -> onForgetPromoteAlwaysOnDialog()
-            ViewEvent.PromoteAlwaysOnRemindLater -> onRemindLaterPromoteAlwaysOnDialog()
             ViewEvent.PromoteAlwaysOnOpenSettings -> onOpenSettingsPromoteAlwaysOnDialog()
         }
 
@@ -167,15 +165,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         vpnFeatureRemover.manuallyRemoveFeature()
         sendCommand(Command.StopVPN)
         sendCommand(Command.CloseScreen)
-    }
-
-    private fun onForgetPromoteAlwaysOnDialog() {
-        deviceShieldPixels.didChooseToForgetPromoteAlwaysOnDialog()
-        vpnStore.onForgetPromoteAlwaysOn()
-    }
-
-    private fun onRemindLaterPromoteAlwaysOnDialog() {
-        deviceShieldPixels.didChooseToDismissPromoteAlwaysOnDialog()
     }
 
     private fun onOpenSettingsPromoteAlwaysOnDialog() {
@@ -210,9 +199,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object RemoveFeature : ViewEvent()
         object StartVpn : ViewEvent()
         object AskToRemoveFeature : ViewEvent()
-
-        object PromoteAlwaysOnForget : ViewEvent()
-        object PromoteAlwaysOnRemindLater : ViewEvent()
 
         object PromoteAlwaysOnOpenSettings : ViewEvent()
     }

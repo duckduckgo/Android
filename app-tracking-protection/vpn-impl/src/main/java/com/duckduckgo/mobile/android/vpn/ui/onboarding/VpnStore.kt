@@ -43,8 +43,6 @@ interface VpnStore {
     // TODO remove
     fun getAppTPManuallyEnables(): Int
     // TODO remove
-    fun onForgetPromoteAlwaysOn()
-    // TODO remove
     fun userAllowsShowPromoteAlwaysOn(): Boolean
     suspend fun setAlwaysOn(enabled: Boolean)
     fun isAlwaysOnEnabled(): Boolean
@@ -90,10 +88,6 @@ class SharedPreferencesVpnStore @Inject constructor(
 
     override fun getAppTPManuallyEnables(): Int {
         return preferences.getInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, 0)
-    }
-
-    override fun onForgetPromoteAlwaysOn() {
-        preferences.edit(commit = true) { putBoolean(KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED, false) }
     }
 
     override fun userAllowsShowPromoteAlwaysOn(): Boolean {

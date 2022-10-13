@@ -332,21 +332,6 @@ class DeviceShieldTrackerActivityViewModelTest {
         }
     }
 
-    @Test
-    fun whenPromoteAlwaysOnRemindLaterThenPixelIsSent() {
-        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnRemindLater)
-
-        verify(deviceShieldPixels).didChooseToDismissPromoteAlwaysOnDialog()
-    }
-
-    @Test
-    fun whenPromoteAlwaysOnForgetThenPixelIsSent() {
-        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnForget)
-
-        verify(deviceShieldPixels).didChooseToForgetPromoteAlwaysOnDialog()
-        verify(vpnStore).onForgetPromoteAlwaysOn()
-    }
-
     private fun createInMemoryDb(): VpnDatabase {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
         return Room.inMemoryDatabaseBuilder(

@@ -110,13 +110,6 @@ class SharedPreferencesVpnStoreTest {
     }
 
     @Test
-    fun whenOnForgetPromoteAlwaysOnThenSetUserAllowsShowPromoteAlwaysOnToTrue() {
-        sharedPreferencesVpnStore.onForgetPromoteAlwaysOn()
-
-        assertFalse(sharedPreferencesVpnStore.userAllowsShowPromoteAlwaysOn())
-    }
-
-    @Test
     fun whenIsAllaysOnEnabledThenReturnDefaultValueFalse() {
         assertFalse(sharedPreferencesVpnStore.isAlwaysOnEnabled())
     }
