@@ -25,4 +25,10 @@ interface UnprotectedTemporary {
      * otherwise.
      */
     fun isAnException(url: String): Boolean
+
+    /** The unprotected temporary exceptions list */
+    val unprotectedTemporaryExceptions: List<UnprotectedTemporaryException>
 }
+
+/** Public data class for Unprotected Temporary Exceptions. */
+data class UnprotectedTemporaryException(val domain: String, val reason: String)

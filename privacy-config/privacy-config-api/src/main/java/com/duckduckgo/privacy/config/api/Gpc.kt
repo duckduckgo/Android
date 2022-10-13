@@ -19,12 +19,6 @@ package com.duckduckgo.privacy.config.api
 /** Public interface for the Gpc feature */
 interface Gpc {
     /**
-     * This method returns a [String] which contains the JS code for GPC to be injected.
-     * @return a [String] containing the JS code gor GPC.
-     */
-    fun getGpcJs(): String
-
-    /**
      * This takes into account two different inputs.
      * 1. If the user enabled or not the GPC feature
      * 2. If the remote configuration has enabled or not the GPC feature. When disabled, the remote
@@ -49,13 +43,6 @@ interface Gpc {
         url: String,
         existingHeaders: Map<String, String>
     ): Boolean
-
-    /**
-     * This method takes a [url] and returns `true` or `false` depending if the given [url] can use
-     * the GPC feature
-     * @return a `true` if the given [url] can use the GPC feature.
-     */
-    fun canGpcBeUsedByUrl(url: String): Boolean
 
     /**
      * This method is used to enable GPC. Note: The remote configuration will take precedence over

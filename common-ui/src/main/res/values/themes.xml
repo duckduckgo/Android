@@ -62,6 +62,26 @@
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
         <item name="horizontalDividerStyle">@style/Widget.DuckDuckGo.HorizontalDivider</item>
         <item name="verticalDividerStyle">@style/Widget.DuckDuckGo.VerticalDivider</item>
+
+        <!--Design System Legacy Typography (to be removed when the migration happens) -->
+        <item name="textAppearanceHeadline1">@style/TextAppearance.DuckDuckGo.Headline1</item>
+        <item name="textAppearanceHeadline2">@style/TextAppearance.DuckDuckGo.Headline2</item>
+        <item name="textAppearanceHeadline3">@style/TextAppearance.DuckDuckGo.Headline3</item>
+        <item name="textAppearanceHeadline4">@style/TextAppearance.DuckDuckGo.Headline4</item>
+        <item name="textAppearanceHeadline5">@style/TextAppearance.DuckDuckGo.Headline5</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.DuckDuckGo.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.DuckDuckGo.Body2</item>
+        <item name="textAppearanceButton">@style/TextAppearance.DuckDuckGo.Button1</item>
+        <item name="textAppearanceButton1">@style/TextAppearance.DuckDuckGo.Button1</item>
+        <item name="textAppearanceButton2">@style/TextAppearance.DuckDuckGo.Button2</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.DuckDuckGo.Caption</item>
+
+        <item name="textAppearanceTitle">@style/Typography.DuckDuckGo.Title</item>
+        <item name="textAppearanceH1">@style/Typography.DuckDuckGo.H1</item>
+        <item name="textAppearanceH2">@style/Typography.DuckDuckGo.H2</item>
+        <item name="textAppearanceH3">@style/Typography.DuckDuckGo.H3</item>
+        <item name="textAppearanceH4">@style/Typography.DuckDuckGo.H4</item>
+        <item name="textAppearanceH5">@style/Typography.DuckDuckGo.H5</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -76,8 +96,8 @@
         <item name="secondaryIconColor">@color/gray70</item>
         <item name="accentIconColor">@color/gray80</item>
         <item name="chipBackgroundColor">@color/gray90</item>
-        <item name="listItemTitleColor">@color/white</item>
-        <item name="listItemSubtitleColor">@color/grayishTwo</item>
+        <item name="listItemPrimaryTextColor">@color/white</item>
+        <item name="listItemSecondaryTextColor">@color/grayishTwo</item>
         <item name="listItemDisabledColor">@color/warGreyTwo</item>
         <item name="subtitleTextColor">@color/grayishTwo</item>
         <item name="toolbarIconColor">@color/white</item>
@@ -268,8 +288,8 @@
         <item name="savedSiteEditTextUnderlineColor">@color/dimmed</item>
         <item name="lightContainerBackground">@color/whiteThree</item>
 
-        <item name="listItemTitleColor">@color/almostBlackDark</item>
-        <item name="listItemSubtitleColor">@color/warmerGray</item>
+        <item name="listItemPrimaryTextColor">@color/almostBlackDark</item>
+        <item name="listItemSecondaryTextColor">@color/warmerGray</item>
         <item name="listItemDisabledColor">@color/warGreyTwo</item>
         <item name="listItemBackgroundColor">@color/whiteFive</item>
         <item name="listItemSeparatorColor">@color/whiteSix</item>

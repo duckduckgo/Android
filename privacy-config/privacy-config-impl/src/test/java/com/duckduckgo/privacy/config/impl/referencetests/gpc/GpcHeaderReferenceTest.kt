@@ -16,8 +16,6 @@
 
 package com.duckduckgo.privacy.config.impl.referencetests.gpc
 
-import android.content.Context
-import android.content.res.Resources
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
@@ -32,7 +30,7 @@ import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.toGpcException
-import org.mockito.kotlin.any
+import com.duckduckgo.privacy.config.store.toUnprotectedTemporaryException
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import com.squareup.moshi.JsonAdapter
@@ -71,13 +69,9 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
 
     @Before
     fun setup() {
-        val context: Context = mock()
-        val resources: Resources = mock()
-        whenever(context.resources).thenReturn(resources)
-        whenever(resources.openRawResource(any())).thenReturn("".byteInputStream())
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(testCase.gpcUserSettingOn)
         mockGpcPrivacyConfig()
-        gpc = RealGpc(context, mockFeatureToggle, mockGpcRepository, RealUnprotectedTemporary(mockUnprotectedTemporaryRepository))
+        gpc = RealGpc(mockFeatureToggle, mockGpcRepository, RealUnprotectedTemporary(mockUnprotectedTemporaryRepository))
     }
 
     @Test
@@ -107,7 +101,9 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
         }
 
         val isEnabled = gpcFeature?.state == "enabled"
-        val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(config?.unprotectedTemporary ?: emptyList())
+        val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(
+            config?.unprotectedTemporary?.map { it.toUnprotectedTemporaryException() } ?: emptyList()
+        )
 
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value, isEnabled)).thenReturn(isEnabled)
         whenever(mockGpcRepository.exceptions).thenReturn(CopyOnWriteArrayList(gpcExceptions))

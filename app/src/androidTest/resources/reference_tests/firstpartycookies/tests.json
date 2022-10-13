@@ -1,0 +1,97 @@
+{
+    "expireFirstPartyTrackingCookies": {
+        "name": "Expire 1p JavaScript cookies",
+        "desc": "Expiration date should be modified for 1p cookies set by scripts according to the policy from config",
+        "tests": [
+            {
+                "name": "below treshold - expiry not modified",
+                "siteURL": "https://example.com/",
+                "scriptURL": "https://tracker.com/script.js",
+                "setDocumentCookie": "foo=bar; Max-Age=1000; Domain=example.com; Path=/; Secure",
+                "expectCookieSet": true,
+                "expectExpiryToBe": 1000,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "above threshold - expiry modified",
+                "siteURL": "https://example.com/",
+                "scriptURL": "https://tracker.com/script.js",
+                "setDocumentCookie": "foo=bar; Max-Age=900000; Domain=example.com; Path=/; Secure",
+                "expectCookieSet": true,
+                "expectExpiryToBe": 86400,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "same origin, above threshold - expiry modified",
+                "siteURL": "https://tracker.com/",
+                "scriptURL": "https://tracker.com/script.js",
+                "setDocumentCookie": "foo=bar; Max-Age=900000; Domain=tracker.com; Path=/; Secure",
+                "expectCookieSet": true,
+                "expectExpiryToBe": 86400,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "same entity, above threshold - expiry modified",
+                "siteURL": "https://tracker.test/",
+                "scriptURL": "https://tracker.com/script.js",
+                "setDocumentCookie": "foo=bar; Max-Age=900000; Domain=tracker.test; Path=/; Secure",
+                "expectCookieSet": true,
+                "expectExpiryToBe": 86400,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "site safelisted locally - expiry not modified",
+                "siteURL": "https://local-exception.test/",
+                "scriptURL": "https://tracker.com/script.js",
+                "setDocumentCookie": "foo=bar; Max-Age=900000; Domain=local-exception.test; Path=/; Secure",
+                "expectCookieSet": true,
+                "expectExpiryToBe": 900000,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "site safelisted globally - expiry not modified",
+                "siteURL": "https://global-exception.test/",
+                "scriptURL": "https://tracker.com/script.js",
+                "setDocumentCookie": "foo=bar; Max-Age=900000; Domain=global-exception.test; Path=/; Secure",
+                "expectCookieSet": true,
+                "expectExpiryToBe": 900000,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "above treshold - unblockable tracking script (action=ignore) - expiry modified",
+                "siteURL": "https://example.com/",
+                "scriptURL": "https://unblockable-tracker.net/script.js",
+                "setDocumentCookie": "foo=bar; Max-Age=900000; Domain=example.com; Path=/; Secure",
+                "expectCookieSet": true,
+                "expectExpiryToBe": 86400,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "above treshold - expiration set to a specific date - expiry modified",
+                "siteURL": "https://example.com/",
+                "scriptURL": "https://tracker.com/script.js",
+                "setDocumentCookie": "foo=bar; expires=Wed, 21 Aug 2030 20:00:00 UTC; Domain=example.com; Path=/; Secure",
+                "expectCookieSet": true,
+                "expectExpiryToBe": 86400,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "below treshold - expiration set in the past - cookie not set",
+                "siteURL": "https://example.com/",
+                "scriptURL": "https://tracker.com/script.js",
+                "setDocumentCookie": "foo=bar; expires=Thu, 01-Jan-1970 00:00:01 GMT; Domain=example.com; Path=/; Secure",
+                "expectCookieSet": false,
+                "exceptPlatforms": []
+            },
+            {
+                "name": "session cookie - expiry not modified",
+                "siteURL": "https://example.com/",
+                "scriptURL": "https://tracker.com/script.js",
+                "setDocumentCookie": "foo=bar",
+                "expectCookieSet": true,
+                "expectExpiryToBe": -1,
+                "exceptPlatforms": []
+            }
+        ]
+    }
+}

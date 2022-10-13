@@ -118,7 +118,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupDeleteTrackingHistory()
         setupForceUpdateBlocklist()
         setupViewDiagnosticsView()
-        setupHealthMonitoring()
+        setupBadHealthMonitoring()
         setupConfigSection()
         setupUiElementsState()
         setupAppProtectionSection()
@@ -177,10 +177,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             .onEach { isEnabled ->
                 binding.ipv6SupportToggle.isEnabled = isEnabled
                 binding.privateDnsToggle.isEnabled = isEnabled
-                binding.cpuMonitorToggle.isEnabled = isEnabled
                 binding.badHealthMonitorToggle.isEnabled = isEnabled
                 binding.badHealthMitigationToggle.isEnabled = isEnabled
-                binding.vpnUnderlyingNetworksToggle.isEnabled = isEnabled
+                binding.vpnInterceptDnsTrafficToggle.isEnabled = isEnabled
                 binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
                 binding.vpnConnectivityChecksToggle.isEnabled = isEnabled
                 binding.debugLoggingToggle.isEnabled = isEnabled
@@ -255,7 +254,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         binding.transparencyModeToggle.setOnCheckedChangeListener(transparencyToggleListener)
     }
 
-    private fun setupHealthMonitoring() {
+    private fun setupBadHealthMonitoring() {
         binding.badHealthMonitorToggle.setIsChecked(appHealthMonitor.isMonitoringStarted())
         binding.badHealthMonitorToggle.setOnCheckedChangeListener(badHealthMonitoringToggleListener)
 
@@ -264,17 +263,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupConfigSection() {
-        with(AppTpSetting.CPUMonitoring) {
-            binding.cpuMonitorToggle.setIsChecked(appTpConfig.isEnabled(this))
-            binding.cpuMonitorToggle.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
-                } else {
-                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
-                }
-            }
-        }
-
         with(AppTpSetting.Ipv6Support) {
             binding.ipv6SupportToggle.setIsChecked(appTpConfig.isEnabled(this))
             binding.ipv6SupportToggle.setOnCheckedChangeListener { _, isChecked ->
@@ -297,9 +285,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        with(AppTpSetting.NetworkSwitchHandling) {
-            binding.vpnUnderlyingNetworksToggle.setIsChecked(appTpConfig.isEnabled(this))
-            binding.vpnUnderlyingNetworksToggle.setOnCheckedChangeListener { _, isChecked ->
+        with(AppTpSetting.InterceptDnsTraffic) {
+            binding.vpnInterceptDnsTrafficToggle.setIsChecked(appTpConfig.isEnabled(this))
+            binding.vpnInterceptDnsTrafficToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
                 } else {

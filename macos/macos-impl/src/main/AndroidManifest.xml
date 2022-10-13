@@ -19,13 +19,13 @@
 
     <application android:supportsRtl="true">
         <activity
-            android:name=".waitlist.ui.MacOsWaitlistActivity"
+            android:name=".MacOsActivity"
             android:exported="false"
             android:label="@string/macos_app"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:screenOrientation="portrait" />
         <receiver
-            android:name=".waitlist.ui.MacOsInviteShareBroadcastReceiver"
+            android:name=".MacOsLinkShareBroadcastReceiver"
             android:exported="false" />
     </application>
 </manifest>

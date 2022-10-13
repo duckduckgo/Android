@@ -1,0 +1,37 @@
+{
+    "readme": "This configuration has only the ampLinks feature",
+    "features": {
+        "ampLinks": {
+            "state": "enabled",
+            "exceptions": [
+                {
+                    "domain": "example2.com",
+                    "reason": "Site breakage"
+                }
+            ],
+            "settings": {
+                "linkFormats": [
+                    "^https?:\\/\\/(?:w{3}\\.)?google\\.\\S{2,}\\/amp\\/s\\/(\\S+)$",
+                    "^https?:\\/\\/\\S+ampproject\\.org\\/v\\/s\\/(\\S+)$"
+                ],
+                "keywords": [
+                    "=amp",
+                    "amp=",
+                    "&amp",
+                    "amp&",
+                    "/amp",
+                    "amp/",
+                    ".amp",
+                    "amp.",
+                    "%amp",
+                    "amp%",
+                    "_amp",
+                    "amp_",
+                    "?amp"
+                ]
+            }
+        }
+    },
+    "version": 1635943904459,
+    "unprotectedTemporary": []
+}

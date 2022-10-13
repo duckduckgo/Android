@@ -24,11 +24,11 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.privacy.config.api.UserAgentException
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.RealUnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.features.useragent.RealUserAgent
-import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -240,6 +240,8 @@ class UserAgentProviderTest {
 
     internal class FakeUserAllowListRepo : UserAllowListRepository {
         override fun isDomainInUserAllowList(domain: String): Boolean = (domain == ALLOWED_HOST)
+
+        override fun domainsInUserAllowList(): List<String> = emptyList()
     }
 
     companion object {
@@ -259,7 +261,7 @@ class UserAgentProviderTest {
         val applicationExceptions = CopyOnWriteArrayList(listOf(UserAgentException(domain = "application.com", reason = "reason")))
         val versionExceptions = CopyOnWriteArrayList(listOf(UserAgentException(domain = "version.com", reason = "reason")))
         val defaultExceptions = CopyOnWriteArrayList(listOf(UserAgentException(domain = "default.com", reason = "reason")))
-        val unprotectedExceptions = CopyOnWriteArrayList(listOf(UnprotectedTemporaryEntity(domain = "unprotected.com", reason = "reason")))
+        val unprotectedExceptions = CopyOnWriteArrayList(listOf(UnprotectedTemporaryException(domain = "unprotected.com", reason = "reason")))
     }
 
     private object Agent {
