@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Ocorreu uma falha na transferência. Verifique a ligação à Internet.</string>
 
     <string name="notificationChannelFileDownloading">A transferir ficheiro</string>
     <string name="notificationChannelFileDownloaded">Ficheiro transferido</string>
+
     <string name="downloadInProgress">A transferir</string>
+
+    <string name="downloadsDownloadStartedMessage">Transferência iniciada de %s</string>
+    <string name="downloadsDownloadFinishedMessage">Transferência concluída de %s</string>
+    <string name="downloadsDownloadGenericErrorMessage">Ocorreu uma falha na transferência.</string>
+    <string name="downloadsCancel">Cancelar</string>
+    <string name="downloadsRetry">Tentar novamente</string>
+    <string name="notificationDownloadComplete">Transferência concluída.</string>
+    <string name="notificationDownloadFailed">Ocorreu uma falha na transferência.</string>
 </resources>
