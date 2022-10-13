@@ -341,4 +341,23 @@
         <item name="daxColorAccentYellow">@color/yellow50</item>
     </style>
 
+    <style name="Theme.DuckDuckGo.Transparent" parent="Theme.DuckDuckGo.Dark">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
+    <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">
+        <item name="android:windowBackground">@color/translucentDark</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+
+        <item name="colorPrimary">@color/darkThemePrimary</item>
+        <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
+        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="toolbarIconColor">@color/white</item>
+    </style>
+
 </resources>

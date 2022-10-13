@@ -17,7 +17,7 @@
 
 <resources>
 
-    <style name="SplashScreen" parent="AppTheme.Light"/>
+    <style name="Theme.SplashScreen" parent="Theme.DuckDuckGo.Light"/>
 
     <style name="BaseAppTheme" parent="Theme.MaterialComponents.Light.Bridge"/>
 
@@ -75,7 +75,6 @@
         <item name="textAppearanceButton1">@style/TextAppearance.DuckDuckGo.Button1</item>
         <item name="textAppearanceButton2">@style/TextAppearance.DuckDuckGo.Button2</item>
         <item name="textAppearanceCaption">@style/TextAppearance.DuckDuckGo.Caption</item>
-
 
     </style>
 

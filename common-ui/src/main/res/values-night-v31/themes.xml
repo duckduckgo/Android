@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <style name="SplashScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.SplashScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowSplashScreenBackground">@color/black</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_dax_splash_screen_icon</item>
         <item name="android:windowSplashScreenAnimationDuration">800</item>
