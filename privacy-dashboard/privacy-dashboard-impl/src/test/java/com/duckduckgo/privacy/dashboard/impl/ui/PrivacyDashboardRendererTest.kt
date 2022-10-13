@@ -24,6 +24,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ProtectionStatusViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.SiteViewState
@@ -81,8 +82,9 @@ class PrivacyDashboardRendererTest {
 
         testee.render(aViewState())
 
-        verify(spyWebView, times(5)).evaluateJavascript(captor.capture(), eq(null))
+        verify(spyWebView, times(6)).evaluateJavascript(captor.capture(), eq(null))
 
+        assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeLocale") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeProtectionStatus") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeParentEntity") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeCertificateData") })
@@ -95,7 +97,10 @@ class PrivacyDashboardRendererTest {
             url = "http://example.com",
             domain = "http://example.com".toUri().domain()!!,
             upgradedHttps = true,
-            parentEntity = null,
+            parentEntity = EntityViewState(
+                displayName = "displayName",
+                prevalence = 12.0
+            ),
             secCertificateViewModels = emptyList(),
             locale = Locale.getDefault().language
         ),
