@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.AndroidAppCacheClearer
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.BackgroundTimeKeeper
+import com.duckduckgo.app.fire.ClearDataPixel
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.fire.DataClearerTimeKeeper
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
