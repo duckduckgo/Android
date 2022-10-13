@@ -21,4 +21,5 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 enum class CookiesPixelName(override val pixelName: String) : Pixel.PixelName {
     COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
     COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de"),
+    COOKIE_DATABASE_EXCEPTION_EXPIRE_ERROR("m_cookie_db_expire_error"),
 }

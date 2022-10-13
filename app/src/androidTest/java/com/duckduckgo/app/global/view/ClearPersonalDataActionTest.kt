@@ -23,6 +23,7 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
+import com.duckduckgo.app.fire.ClearDataPixel
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
@@ -58,24 +59,26 @@ class ClearPersonalDataActionTest {
     private val mockAdClickManager: AdClickManager = mock()
     private val mockFireproofWebsiteRepository: FireproofWebsiteRepositoryAPI = mock()
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
+    private val mockClearDataPixel: ClearDataPixel = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
     @Before
     fun setup() {
         testee = ClearPersonalDataAction(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            mockDataManager,
-            mockClearingUnsentForgetAllPixelStore,
-            mockTabRepository,
-            mockSettingsDataStore,
-            mockCookieManager,
-            mockAppCacheClearer,
-            mockGeoLocationPermissions,
-            mockThirdPartyCookieManager,
-            mockAdClickManager,
-            mockFireproofWebsiteRepository,
-            mockSitePermissionsManager
+            context = InstrumentationRegistry.getInstrumentation().targetContext,
+            dataManager = mockDataManager,
+            clearingStore = mockClearingUnsentForgetAllPixelStore,
+            tabRepository = mockTabRepository,
+            settingsDataStore = mockSettingsDataStore,
+            cookieManager = mockCookieManager,
+            appCacheClearer = mockAppCacheClearer,
+            geoLocationPermissions = mockGeoLocationPermissions,
+            thirdPartyCookieManager = mockThirdPartyCookieManager,
+            adClickManager = mockAdClickManager,
+            fireproofWebsiteRepository = mockFireproofWebsiteRepository,
+            sitePermissionsManager = mockSitePermissionsManager,
+            clearDataPixel = mockClearDataPixel
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
     }

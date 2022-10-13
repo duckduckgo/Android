@@ -1652,10 +1652,10 @@ class BrowserTabFragment :
             }
         }
 
-        setFragmentResultListener(CredentialSavePickerDialog.resultKeyUserDeclinedToSaveCredentials(tabId)) { _, _ ->
+        setFragmentResultListener(CredentialSavePickerDialog.resultKeyShouldPromptToDisableAutofill(tabId)) { _, _ ->
             launch {
                 this@BrowserTabFragment.context?.let {
-                    autofillCredentialsSelectionResultHandler.processUserDeclined(this@BrowserTabFragment.requireContext(), viewModel)
+                    autofillCredentialsSelectionResultHandler.processPromptToDisableAutofill(this@BrowserTabFragment.requireContext(), viewModel)
                 }
             }
         }
@@ -2457,6 +2457,7 @@ class BrowserTabFragment :
                     viewModel.onPrintSelected()
                 }
                 onMenuItemClicked(view.autofillMenuItem) {
+                    pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
                     viewModel.onAutofillMenuSelected()
                 }
             }

@@ -28,14 +28,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:id="@+id/settingsOtherTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/settingsHeadingMore"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settingsOtherDivider" />
+        app:layout_constraintTop_toBottomOf="@id/settingsOtherDivider"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/macOsSetting"

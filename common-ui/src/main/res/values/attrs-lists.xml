@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <!--Default lists attributes-->
+    <attr name="listItemPrimaryTextColor" format="color"/>
+    <attr name="listItemSecondaryTextColor" format="color"/>
+    <attr name="listItemDisabledColor" format="color"/>
+
+    <attr name="oneLineListItemStyle" format="reference"/>
+    <attr name="twoLineListItemStyle" format="reference"/>
+
+    <attr name="primaryText" format="string"/>
+    <attr name="primaryTextColorOverlay" format="color"/>
+    <attr name="secondaryText" format="string"/>
+    <attr name="secondaryTextColorOverlay" format="color"/>
+    <attr name="leadingIcon" format="integer"/>
+    <attr name="trailingIcon" format="integer"/>
+    <attr name="showBetaPill" format="boolean"/>
+    <attr name="showSwitch" format="boolean"/>
+    <attr name="leadingIconBackground">
+        <!-- No background. -->
+        <enum name="none" value="0" />
+        <!-- Oval shape. -->
+        <enum name="circular" value="1" />
+        <!-- Rectangular shape, with optional rounded corners. -->
+        <enum name="rounded" value="2" />
+    </attr>
+    <attr name="textColorOverride" format="color"/>
+
+    <!--One Line Item view-->
+    <declare-styleable name="OneLineListItem">
+        <attr name="primaryText"/>
+        <attr name="primaryTextColorOverlay"/>
+        <attr name="leadingIcon"/>
+        <attr name="leadingIconBackground"/>
+        <attr name="trailingIcon"/>
+        <attr name="showSwitch"/>
+    </declare-styleable>
+
+    <!--Two Line Item view-->
+    <declare-styleable name="TwoLineListItem">
+        <attr name="primaryText"/>
+        <attr name="primaryTextColorOverlay"/>
+        <attr name="secondaryText"/>
+        <attr name="secondaryTextColorOverlay"/>
+        <attr name="leadingIcon"/>
+        <attr name="leadingIconBackground"/>
+        <attr name="trailingIcon"/>
+        <attr name="showBetaPill"/>
+        <attr name="showSwitch"/>
+    </declare-styleable>
+
+</resources>

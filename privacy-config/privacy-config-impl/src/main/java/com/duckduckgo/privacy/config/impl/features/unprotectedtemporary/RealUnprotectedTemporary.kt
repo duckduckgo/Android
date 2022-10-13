@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.impl.features.unprotectedtemporary
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -31,6 +32,9 @@ class RealUnprotectedTemporary @Inject constructor(private val repository: Unpro
     override fun isAnException(url: String): Boolean {
         return matches(url)
     }
+
+    override val unprotectedTemporaryExceptions: List<UnprotectedTemporaryException>
+        get() = repository.exceptions
 
     private fun matches(url: String): Boolean {
         return repository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }

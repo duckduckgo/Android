@@ -63,9 +63,7 @@ import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.macos_api.MacWaitlistState
-import com.duckduckgo.macos_api.MacWaitlistState.*
-import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
+import com.duckduckgo.macos_impl.MacOsActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
@@ -243,7 +241,6 @@ class SettingsActivity :
                     updateAppLinkBehavior(it.appLinksSettingType)
                     updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
                     updateEmailSubtitle(it.emailAddress)
-                    updateMacOsSettings(it.macOsWaitlistState)
                     updateAutofill(it.showAutofill)
                 }
             }.launchIn(lifecycleScope)
@@ -392,16 +389,6 @@ class SettingsActivity :
         }
     }
 
-    private fun updateMacOsSettings(waitlistState: MacWaitlistState) {
-        with(viewsMore) {
-            when (waitlistState) {
-                InBeta -> macOsSetting.setSecondaryText(getString(R.string.macos_settings_description_ready))
-                JoinedWaitlist -> macOsSetting.setSecondaryText(getString(R.string.macos_settings_description_list))
-                NotJoinedQueue -> macOsSetting.setSecondaryText(getString(R.string.macos_settings_description))
-            }
-        }
-    }
-
     @Suppress("NewApi") // we use appBuildConfig
     private fun launchDefaultAppScreen() {
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
@@ -479,7 +466,7 @@ class SettingsActivity :
 
     private fun launchMacOsScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(MacOsWaitlistActivity.intent(this), options)
+        startActivity(MacOsActivity.intent(this), options)
     }
 
     private fun launchAutoconsent() {

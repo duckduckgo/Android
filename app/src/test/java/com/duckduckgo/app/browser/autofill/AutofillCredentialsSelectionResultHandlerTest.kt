@@ -24,15 +24,18 @@ import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler.AutofillCredentialSaver
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler.CredentialInjector
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandlerTest.FakeAuthenticator.AuthorizeEverything
-import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandlerTest.FakeAuthenticator.DenyEverything
+import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandlerTest.FakeAuthenticator.CancelEverything
+import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandlerTest.FakeAuthenticator.FailEverything
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.CredentialSavePickerDialog
 import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Failed
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -50,6 +53,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
     private val credentialsInjector: CredentialInjector = mock()
     private val declineCounter: AutofillDeclineCounter = mock()
     private val autofillStore: AutofillStore = mock()
+    private val pixel: Pixel = mock()
     private val dummyFragment = Fragment()
     private lateinit var deviceAuthenticator: FakeAuthenticator
     private lateinit var testee: AutofillCredentialsSelectionResultHandler
@@ -164,12 +168,44 @@ class AutofillCredentialsSelectionResultHandlerTest {
     }
 
     @Test
+    fun whenCredentialsSelectionMadeThenAuthShownPixelFired() = runTest {
+        setupAuthenticatorAlwaysAuth()
+        val bundle = bundleForSelectionDialog(url = "example.com", cancelled = false, credentials = someLoginCredentials())
+        testee.processAutofillCredentialSelectionResult(bundle, dummyFragment, credentialsInjector)
+        verify(pixel).fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_SHOWN)
+    }
+
+    @Test
+    fun whenCredentialsSelectionMadeAndAuthorizedThenCorrectPixelFired() = runTest {
+        setupAuthenticatorAlwaysAuth()
+        val bundle = bundleForSelectionDialog(url = "example.com", cancelled = false, credentials = someLoginCredentials())
+        testee.processAutofillCredentialSelectionResult(bundle, dummyFragment, credentialsInjector)
+        verify(pixel).fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_SUCCESSFUL)
+    }
+
+    @Test
     fun whenCredentialsSelectionMadeButNotAuthorizedThenAutofillRequestCancelled() = runTest {
-        setupAuthenticatorAlwaysDeny()
+        setupAuthenticatorAlwaysCancel()
         val bundle = bundleForSelectionDialog(url = "example.com", cancelled = false, credentials = someLoginCredentials())
         testee.processAutofillCredentialSelectionResult(bundle, dummyFragment, credentialsInjector)
         verifyAuthenticatorIsCalled()
         verifyAutofillResponseCancelled("example.com")
+    }
+
+    @Test
+    fun whenCredentialsSelectionMadeButAuthCancelledThenCorrectPixelFired() = runTest {
+        setupAuthenticatorAlwaysCancel()
+        val bundle = bundleForSelectionDialog(url = "example.com", cancelled = false, credentials = someLoginCredentials())
+        testee.processAutofillCredentialSelectionResult(bundle, dummyFragment, credentialsInjector)
+        verify(pixel).fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_CANCELLED)
+    }
+
+    @Test
+    fun whenCredentialsSelectionMadeButAuthFailedThenCorrectPixelFired() = runTest {
+        setupAuthenticatorAlwaysFail()
+        val bundle = bundleForSelectionDialog(url = "example.com", cancelled = false, credentials = someLoginCredentials())
+        testee.processAutofillCredentialSelectionResult(bundle, dummyFragment, credentialsInjector)
+        verify(pixel).fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_FAILURE)
     }
 
     @Test
@@ -251,8 +287,13 @@ class AutofillCredentialsSelectionResultHandlerTest {
         testee = initialiseTestee()
     }
 
-    private fun TestScope.setupAuthenticatorAlwaysDeny() {
-        deviceAuthenticator = DenyEverything()
+    private fun TestScope.setupAuthenticatorAlwaysCancel() {
+        deviceAuthenticator = CancelEverything()
+        testee = initialiseTestee()
+    }
+
+    private fun TestScope.setupAuthenticatorAlwaysFail() {
+        deviceAuthenticator = FailEverything()
         testee = initialiseTestee()
     }
 
@@ -261,21 +302,29 @@ class AutofillCredentialsSelectionResultHandlerTest {
             deviceAuthenticator = deviceAuthenticator,
             declineCounter = declineCounter,
             autofillStore = autofillStore,
-            appCoroutineScope = this
+            appCoroutineScope = this,
+            pixel = pixel
         )
     }
 
     private abstract class FakeAuthenticator : DeviceAuthenticator {
 
+        sealed interface Result {
+            object Success : Result
+            object Cancelled : Result
+            object Failure : Result
+        }
+
         var authenticateCalled: Boolean = false
-        abstract val authenticationWillSucceed: Boolean
+        abstract val authResult: Result
 
         private fun authenticationCalled(onResult: (DeviceAuthenticator.AuthResult) -> Unit) {
             authenticateCalled = true
-            if (authenticationWillSucceed) {
-                onResult(Success)
-            } else {
-                onResult(Failed)
+            when (authResult) {
+                is Result.Success -> onResult(Success)
+                is Result.Cancelled -> onResult(AuthResult.UserCancelled)
+                is Result.Failure -> onResult(AuthResult.Error("Authentication failed"))
+
             }
         }
 
@@ -297,7 +346,8 @@ class AutofillCredentialsSelectionResultHandlerTest {
             authenticationCalled(onResult)
         }
 
-        class AuthorizeEverything(override val authenticationWillSucceed: Boolean = true) : FakeAuthenticator()
-        class DenyEverything(override val authenticationWillSucceed: Boolean = false) : FakeAuthenticator()
+        class AuthorizeEverything(override val authResult: Result = Result.Success) : FakeAuthenticator()
+        class FailEverything(override val authResult: Result = Result.Failure) : FakeAuthenticator()
+        class CancelEverything(override val authResult: Result = Result.Cancelled) : FakeAuthenticator()
     }
 }

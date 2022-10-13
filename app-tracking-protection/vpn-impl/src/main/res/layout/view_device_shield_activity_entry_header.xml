@@ -15,15 +15,16 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:id="@+id/timestamp_header"
-          android:background="?attr/colorPrimaryDark"
-          android:layout_height="wrap_content"
-          android:layout_width="match_parent"
-          android:paddingStart="16dp"
-          android:paddingEnd="0dp"
-          android:paddingTop="15dp"
-          android:paddingBottom="16dp"
-          tools:text="Yesterday"
+<com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/timestamp_header"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/colorPrimaryDark"
+    android:paddingStart="16dp"
+    android:paddingTop="15dp"
+    android:paddingEnd="0dp"
+    android:paddingBottom="16dp"
+    tools:text="Yesterday"
 />
