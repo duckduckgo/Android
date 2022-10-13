@@ -201,7 +201,8 @@
     <string name="atp_ActivityAppTrackersFAQ">What Are App Trackers?</string>
     <string name="atp_ActivityReportProblem">Report a problem With an App</string>
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
-    <string name="atp_ActivityManageProtection">Having Problems With An App?</string>
+    <!-- TODO [ANA] Modified, double check if new key is needed -->
+    <string name="atp_ActivityManageProtection">Report Issue with an App</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d tracking attempt blocked from %2$d company in <b>%3$s</b> app]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d tracking attempt blocked from %2$d companies in <b>%3$s</b> app]]></string>
@@ -226,6 +227,7 @@
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel" translatable="false">Protection Enabled</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel" translatable="false">Protection Disabled</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel" translatable="false">All</string>
+    <string name="atp_ActvityViewAppsLabel" translatable="false">View Apps</string>
 
     <!-- TODO [ANA] Remove this -->
     <string name="atp_ActivityEmptyListTitle">No new activity</string>

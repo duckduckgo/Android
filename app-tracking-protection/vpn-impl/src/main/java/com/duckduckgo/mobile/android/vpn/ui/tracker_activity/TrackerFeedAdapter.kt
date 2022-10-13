@@ -57,13 +57,13 @@ class TrackerFeedAdapter @Inject constructor(
         when (holder) {
             is TrackerFeedViewHolder -> holder.bind(
                 trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData,
-                position == trackerFeedItems.size - 1,
+                position == trackerFeedItems.size - 1 && trackerFeedItems.size < 5,
             )
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
             is TrackerAppsDataViewHolder -> holder.bind(
                 trackerFeedItems[position] as TrackerFeedItem.TrackerAppsData,
-                position == trackerFeedItems.size - 1
+                position == trackerFeedItems.size - 1 && trackerFeedItems.size < 5
             )
         }
     }
@@ -172,7 +172,7 @@ class TrackerFeedAdapter @Inject constructor(
 
         fun bind(
             tracker: TrackerFeedItem.TrackerFeedData?,
-            isLastPosition: Boolean
+            shouldHideDivider: Boolean
         ) {
             tracker?.let { item ->
                 with(activityMessage) {
@@ -233,7 +233,7 @@ class TrackerFeedAdapter @Inject constructor(
                         null
                     )
                 }
-                if (isLastPosition) {
+                if (shouldHideDivider) {
                     splitter.hide()
                 } else {
                     splitter.show()
@@ -270,7 +270,7 @@ class TrackerFeedAdapter @Inject constructor(
         val splitter: View = view.findViewById(R.id.activity_apps_splitter)
         val warningImage: View = view.findViewById(R.id.activity_apps_warning_image)
 
-        fun bind(item: TrackerFeedItem.TrackerAppsData, isLastPosition: Boolean) {
+        fun bind(item: TrackerFeedItem.TrackerAppsData, shouldHideDivider: Boolean) {
             appsText.text = context.resources.getQuantityString(
                 if (item.isProtected) R.plurals.atp_ActivityProtectedApps else R.plurals.atp_ActivityUnprotectedApps,
                 item.appsCount,
@@ -284,7 +284,7 @@ class TrackerFeedAdapter @Inject constructor(
             itemView.setOnClickListener {
                 // TODO [ANA] handle this.
             }
-            if (isLastPosition) {
+            if (shouldHideDivider) {
                 splitter.hide()
             } else {
                 splitter.show()

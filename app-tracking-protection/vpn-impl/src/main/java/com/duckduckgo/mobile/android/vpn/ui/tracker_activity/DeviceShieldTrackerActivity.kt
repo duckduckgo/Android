@@ -51,6 +51,7 @@ import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActivity
+import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldActivityBinding
@@ -102,7 +103,7 @@ class DeviceShieldTrackerActivity :
     private var vpnCachedState: VpnState? = null
 
     private val feedConfig = DeviceShieldActivityFeedFragment.ActivityFeedConfig(
-        maxRows = 6,
+        maxRows = 5,
         timeWindow = 5,
         timeWindowUnits = TimeUnit.DAYS,
         showTimeWindowHeadings = false
@@ -148,6 +149,10 @@ class DeviceShieldTrackerActivity :
 
         binding.ctaManageProtection.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
+        }
+
+        binding.ctaManageViewAllApps.setClickListener {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchTrackingProtectionExclusionListActivity)
         }
 
         binding.ctaRemoveFeature.setClickListener {
@@ -250,6 +255,8 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.CloseScreen -> finish()
             is DeviceShieldTrackerActivityViewModel.Command.OpenVpnSettings -> openVPNSettings()
             is DeviceShieldTrackerActivityViewModel.Command.ShowAppTpEnabledCta -> showAppTpEnabledCta()
+            is DeviceShieldTrackerActivityViewModel.Command.LaunchTrackingProtectionExclusionListActivity ->
+                launchTrackingProtectionExclusionListActivity()
         }
     }
 
@@ -394,6 +401,10 @@ class DeviceShieldTrackerActivity :
     private fun launchMostRecentActivity() {
         deviceShieldPixels.didShowDetailedTrackerActivity()
         startActivity(DeviceShieldMostRecentActivity.intent(this))
+    }
+
+    private fun launchTrackingProtectionExclusionListActivity() {
+        startActivity(TrackingProtectionExclusionListActivity.intent(this))
     }
 
     private fun startVPN() {

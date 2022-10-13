@@ -162,6 +162,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             ViewEvent.PromoteAlwaysOnForget -> onForgetPromoteAlwaysOnDialog()
             ViewEvent.PromoteAlwaysOnRemindLater -> onRemindLaterPromoteAlwaysOnDialog()
             ViewEvent.PromoteAlwaysOnOpenSettings -> onOpenSettingsPromoteAlwaysOnDialog()
+            ViewEvent.LaunchTrackingProtectionExclusionListActivity -> sendCommand(Command.LaunchTrackingProtectionExclusionListActivity)
         }
 
     }
@@ -222,6 +223,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchAppTrackersFAQ : ViewEvent()
         object LaunchBetaInstructions : ViewEvent()
         object LaunchMostRecentActivity : ViewEvent()
+        object LaunchTrackingProtectionExclusionListActivity : ViewEvent()
         object RemoveFeature : ViewEvent()
         object StartVpn : ViewEvent()
         object AskToRemoveFeature : ViewEvent()
@@ -243,6 +245,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchAppTrackersFAQ : Command()
         object LaunchBetaInstructions : Command()
         object LaunchMostRecentActivity : Command()
+        object LaunchTrackingProtectionExclusionListActivity : Command()
         object ShowDisableVpnConfirmationDialog : Command()
         object ShowVpnConflictDialog : Command()
         object ShowVpnAlwaysOnConflictDialog : Command()

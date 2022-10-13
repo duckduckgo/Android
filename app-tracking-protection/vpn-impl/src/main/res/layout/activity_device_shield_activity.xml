@@ -121,8 +121,8 @@
                 android:id="@+id/cta_show_all"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/keyline_4"
-                android:paddingStart="72dp"
+                app:primaryText="@string/atp_ActivityCtaShowAll"
+                android:paddingStart="56dp"
                 android:visibility="gone"/>
 
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
@@ -167,6 +167,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/atp_ActivityManageProtection"/>
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/cta_manage_view_all_apps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/atp_ActvityViewAppsLabel"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_remove_feature"
