@@ -37,3 +37,9 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: :vpn-impl:testDebugUnitTest --tests "com.duckduckgo.mobile.android.vpn.health.AppTPCPUMonitorTest"
+          
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-output
+          path: app-tracking-protection/vpn-impl/build/test-results/testDebugUnitTest/binary/output.bin

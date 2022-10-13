@@ -132,21 +132,25 @@ class AppTPCPUMonitorTest {
 
     @Test
     fun whenCPUAbove30ThresholdSendAlert() {
+        print("whenCPUAbove30ThresholdSendAlert\n")
         assertAlertSent(42.0, 30)
     }
 
     @Test
     fun whenCPUAbove20ThresholdSendAlert() {
+        print("whenCPUAbove20ThresholdSendAlert\n")
         assertAlertSent(30.0, 20)
     }
 
     @Test
     fun whenCPUAbove10ThresholdSendAlert() {
+        print("whenCPUAbove10ThresholdSendAlert\n")
         assertAlertSent(10.1, 10)
     }
 
     @Test
     fun whenCPUAbove5ThresholdSendAlert() {
+        print("whenCPUAbove5ThresholdSendAlert\n")
         assertAlertSent(5.5, 5)
     }
 
@@ -180,6 +184,7 @@ class AppTPCPUMonitorTest {
 
         assertStartWorker()
 
+        print("About to verify\n")
         verify(mockDeviceShieldPixels).sendCPUUsageAlert(eq(expectedAlert))
         verifyNoMoreInteractions(mockDeviceShieldPixels)
     }
