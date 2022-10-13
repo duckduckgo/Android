@@ -269,10 +269,10 @@
 
     <!-- Bottom Sheet -->
     <style name="Widget.DuckDuckGo.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/ModalBottomSheetStyle</item>
+        <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.ModalBottomSheetStyle</item>
     </style>
 
-    <style name="ModalBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+    <style name="Widget.DuckDuckGo.ModalBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.BottomSheetDialogCorners</item>
         <item name="android:backgroundTint">?attr/daxDialogBackgroundColor</item>
     </style>

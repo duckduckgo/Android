@@ -169,9 +169,26 @@ class DialogsFragment : Fragment() {
                 view.findViewById<Button>(R.id.actionBottomSheetButton)?.let { button ->
                     button.setOnClickListener {
                         ActionBottomSheetDialog.Builder(requireContext())
+                            .setPrimaryItem("Primary Item")
+                            .setSecondaryItem("Secondary Item")
+                            .addEventListener(object : ActionBottomSheetDialog.EventListener() {
+                                override fun onPrimaryItemClicked() {
+                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                                override fun onSecondaryItemClicked() {
+                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                            .show()
+                    }
+                }
+
+                view.findViewById<Button>(R.id.actionBottomSheetButtonWithTitle)?.let { button ->
+                    button.setOnClickListener {
+                        ActionBottomSheetDialog.Builder(requireContext())
                             .setTitle("Title")
-                            .onPrimaryItem("Primary Item")
-                            .onSecondaryItem("Secondary Item")
+                            .setPrimaryItem("Primary Item")
+                            .setSecondaryItem("Secondary Item")
                             .addEventListener(object : ActionBottomSheetDialog.EventListener() {
                                 override fun onPrimaryItemClicked() {
                                     Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
@@ -185,6 +202,47 @@ class DialogsFragment : Fragment() {
                 }
 
                 view.findViewById<Button>(R.id.promoBottomSheetButton)?.let { button ->
+                    button.setOnClickListener {
+                        PromoBottomSheetDialog.Builder(requireContext())
+                            .setContent("Add our search widget to your home screen for quick, easy access.")
+                            .setPrimaryButton("Button")
+                            .setSecondaryButton("Button")
+                            .addEventListener(object : PromoBottomSheetDialog.EventListener() {
+                                override fun onPrimaryButtonClicked() {
+                                    super.onPrimaryButtonClicked()
+                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                                override fun onSecondaryButtonClicked() {
+                                    super.onSecondaryButtonClicked()
+                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                            .show()
+                    }
+                }
+
+                view.findViewById<Button>(R.id.promoBottomSheetButtonWithTitle)?.let { button ->
+                    button.setOnClickListener {
+                        PromoBottomSheetDialog.Builder(requireContext())
+                            .setTitle("Title")
+                            .setContent("Add our search widget to your home screen for quick, easy access.")
+                            .setPrimaryButton("Button")
+                            .setSecondaryButton("Button")
+                            .addEventListener(object : PromoBottomSheetDialog.EventListener() {
+                                override fun onPrimaryButtonClicked() {
+                                    super.onPrimaryButtonClicked()
+                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                                override fun onSecondaryButtonClicked() {
+                                    super.onSecondaryButtonClicked()
+                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                            .show()
+                    }
+                }
+
+                view.findViewById<Button>(R.id.promoBottomSheetButtonWithImage)?.let { button ->
                     button.setOnClickListener {
                         PromoBottomSheetDialog.Builder(requireContext())
                             .setIcon(R.drawable.ic_bottom_sheet_promo_icon)

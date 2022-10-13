@@ -20,17 +20,20 @@ import android.content.Context
 import android.view.LayoutInflater
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.BottomSheetActionBinding
 import com.duckduckgo.mobile.android.ui.view.show
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.context, R.style.Widget_DuckDuckGo_BottomSheetDialog) {
+class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.context) {
 
     abstract class EventListener {
+        /** Sets a listener to be invoked when the bottom sheet is shown */
         open fun onBottomSheetShown() {}
+        /** Sets a listener to be invoked when the bottom sheet is dismiss */
         open fun onBottomSheetDismissed() {}
+        /** Sets a listener to be invoked when primary item is clicked */
         open fun onPrimaryItemClicked() {}
+        /** Sets a listener to be invoked when secondary item is clicked */
         open fun onSecondaryItemClicked() {}
     }
 
@@ -60,27 +63,48 @@ class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.cont
         builder.secondaryItemTextColor?.let { binding.actionBottomSheetDialogSecondaryItem.setPrimaryTextColor(it) }
     }
 
+    /**
+     * Creates a builder for an action bottom sheet dialog that uses
+     * the default bottom sheet dialog theme.
+     *
+     * @param context the parent context
+     */
     class Builder(val context: Context) {
         var listener: EventListener = DefaultEventListener()
+            private set
         var titleText: String? = null
+            private set
         var primaryItemText: String = ""
+            private set
         var primaryItemIcon: Int? = null
+            private set
         var primaryItemTextColor: Int? = null
+            private set
         var secondaryItemText: String = ""
+            private set
         var secondaryItemIcon: Int? = null
+            private set
         var secondaryItemTextColor: Int? = null
+            private set
 
+        /** Sets event listener for the bottom sheet dialog */
         fun addEventListener(eventListener: EventListener): Builder {
             listener = eventListener
             return this
         }
 
+        /** Sets title text for the bottom sheet dialog (optional) */
         fun setTitle(title: String): Builder {
             titleText = title
             return this
         }
 
-        fun onPrimaryItem(
+        /** Sets primary item for the bottom sheet dialog
+         * @param text primary item text
+         * @param icon primary item leading icon (optional)
+         * @param color primary item text color (optional)
+         **/
+        fun setPrimaryItem(
             text: String,
             @DrawableRes icon: Int? = null,
             @ColorRes color: Int? = null
@@ -91,7 +115,12 @@ class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.cont
             return this
         }
 
-        fun onSecondaryItem(
+        /** Sets secondary item for the bottom sheet dialog
+         * @param text secondary item text
+         * @param icon secondary item leading icon (optional)
+         * @param color secondary item text color (optional)
+         **/
+        fun setSecondaryItem(
             text: String,
             @DrawableRes icon: Int? = null,
             @ColorRes color: Int? = null
@@ -102,6 +131,7 @@ class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.cont
             return this
         }
 
+        /** Start the dialog and display it on screen */
         fun show() {
             val dialog = ActionBottomSheetDialog(this)
             dialog.show()

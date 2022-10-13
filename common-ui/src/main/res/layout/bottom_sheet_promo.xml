@@ -23,7 +23,7 @@
 
     <ImageView
         android:id="@+id/bottomSheetPromoIcon"
-        android:layout_width="48dp"
+        android:layout_width="@dimen/promoBottomSheetImageWidth"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/keyline_4"
         android:adjustViewBounds="true"

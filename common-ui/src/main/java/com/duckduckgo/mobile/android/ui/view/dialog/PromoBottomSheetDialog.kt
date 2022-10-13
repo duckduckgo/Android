@@ -19,17 +19,20 @@ package com.duckduckgo.mobile.android.ui.view.dialog
 import android.content.Context
 import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
-import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.BottomSheetPromoBinding
 import com.duckduckgo.mobile.android.ui.view.show
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-class PromoBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.context, R.style.Widget_DuckDuckGo_BottomSheetDialog) {
+class PromoBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.context) {
 
     abstract class EventListener {
+        /** Sets a listener to be invoked when the bottom sheet is shown */
         open fun onBottomSheetShown() {}
+        /** Sets a listener to be invoked when the bottom sheet is dismiss */
         open fun onBottomSheetDismissed() {}
+        /** Sets a listener to be invoked when primary button is clicked */
         open fun onPrimaryButtonClicked() {}
+        /** Sets a listener to be invoked when secondary button is clicked */
         open fun onSecondaryButtonClicked() {}
     }
 
@@ -60,44 +63,63 @@ class PromoBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.conte
         binding.bottomSheetPromoSecondaryButton.text = builder.secondaryButtonText
     }
 
+    /**
+     * Creates a builder for a promo bottom sheet dialog that uses
+     * the default bottom sheet dialog theme.
+     *
+     * @param context the parent context
+     */
     class Builder(val context: Context) {
         var listener: EventListener = DefaultEventListener()
+            private set
         var icon: Int? = null
+            private set
         var titleText: String? = null
+            private set
         var contentText: String = ""
+            private set
         var primaryButtonText: String = ""
+            private set
         var secondaryButtonText: String = ""
+            private set
 
+        /** Sets event listener for the bottom sheet dialog */
         fun addEventListener(eventListener: EventListener): Builder {
             listener = eventListener
             return this
         }
 
+        /** Sets side image for the bottom sheet dialog (optional) */
         fun setIcon(@DrawableRes iconRes: Int): Builder {
             icon = iconRes
             return this
         }
 
+        /** Sets title text for the bottom sheet dialog (optional) */
         fun setTitle(text: String): Builder {
             titleText = text
             return this
         }
 
+        /** Sets content text for the bottom sheet dialog */
         fun setContent(text: String): Builder {
             contentText = text
             return this
         }
 
+        /** Sets primary button text for the bottom sheet dialog */
         fun setPrimaryButton(text: String): Builder {
             primaryButtonText = text
             return this
         }
 
+        /** Sets secondary button text for the bottom sheet dialog */
         fun setSecondaryButton(text: String): Builder {
             secondaryButtonText = text
             return this
         }
 
+        /** Start the dialog and display it on screen */
         fun show() {
             val dialog = PromoBottomSheetDialog(this)
             dialog.show()

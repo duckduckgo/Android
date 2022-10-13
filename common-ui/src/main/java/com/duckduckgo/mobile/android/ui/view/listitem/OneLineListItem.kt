@@ -94,7 +94,7 @@ class OneLineListItem @JvmOverloads constructor(
 
     /** Sets title text color */
     fun setPrimaryTextColor(@ColorRes colorRes: Int) {
-        binding.primaryText.setTextColor(ContextCompat.getColor(context, colorRes))
+        binding.primaryText.setTextColor(ContextCompat.getColorStateList(context, colorRes))
     }
 
     /** Sets the leading icon image resource */
