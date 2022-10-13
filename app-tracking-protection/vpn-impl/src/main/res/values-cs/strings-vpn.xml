@@ -242,7 +242,6 @@
         <item quantity="many">Aplikace</item>
         <item quantity="other">Aplikace</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Tato funkce je ve fázi beta. <annotation type="app_settings_link">Máš problémy s aplikací?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection je zakázána</b>\nZpůsobila ti APp Tracking Protection problém s tvými aplikacemi? <annotation type="report_issues_link">Oznámit problémy</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPN aplikace ve tvém zařízení vypnula App Tracking Protection.</b>\nZpůsobila ti App Tracking Protection problém s aplikacemi? <annotation type="report_issues_link">Oznámit problémy</annotation></string>
     <string name="atp_ActivityAbout">Informace</string>

@@ -230,7 +230,6 @@
         <item quantity="one">Εφαρμογή</item>
         <item quantity="other">Εφαρμογές</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Αυτή η λειτουργία είναι σε έκδοση beta. <annotation type="app_settings_link">Αντιμετωπίζετε προβλήματα με μια εφαρμογή;</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Η Προστασία παρακολούθησης από εφαρμογές είναι απενεργοποιημένη</b>\nΠροκάλεσε η Προστασία παρακολούθησης από εφαρμογές πρόβλημα στις εφαρμογές σας; <annotation type="report_issues_link">Αναφορά προβλημάτων</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Μια εφαρμογή VPN στη συσκευή σας απενεργοποίησε την Προστασία παρακολούθησης από εφαρμογές.</b>\nΠροκάλεσε η Προστασία παρακολούθησης από εφαρμογές πρόβλημα με τις εφαρμογές σας; <annotation type="report_issues_link">Αναφορά προβλημάτων</annotation></string>
     <string name="atp_ActivityAbout">Σχετικά</string>

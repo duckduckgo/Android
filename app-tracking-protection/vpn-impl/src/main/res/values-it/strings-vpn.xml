@@ -230,7 +230,6 @@
         <item quantity="one">App</item>
         <item quantity="other">App</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Questa funzione è in versione beta. <annotation type="app_settings_link">Problemi con un\'app?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection è disattivata</b>\nApp Tracking Protection ha causato un problema con le tue app? <annotation type="report_issues_link">Segnala problemi</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Un\'app VPN sul tuo dispositivo ha disattivato App Tracking Protection.</b>\nApp Tracking Protection ha causato un problema con le tue app? <annotation type="report_issues_link">Segnala problemi</annotation></string>
     <string name="atp_ActivityAbout">Informazioni</string>

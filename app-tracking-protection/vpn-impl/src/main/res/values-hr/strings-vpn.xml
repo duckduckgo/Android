@@ -242,7 +242,6 @@
         <item quantity="many">aplikacija</item>
         <item quantity="other">aplikacije</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Ova je značajka u beta verziji. <annotation type="app_settings_link">Imate li problema s aplikacijom?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection je onemogućen</b>\nJe li App Tracking Protection uzrokovao problem s tvojim aplikacijama? <annotation type="report_issues_link">Prijavi probleme</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPN aplikacija na tvom uređaju onemogućila je App Tracking Protection</b>\n.Je li App Tracking Protection uzrokovao problem s tvojim aplikacijama? <annotation type="report_issues_link">Prijavi probleme</annotation></string>
     <string name="atp_ActivityAbout">O</string>

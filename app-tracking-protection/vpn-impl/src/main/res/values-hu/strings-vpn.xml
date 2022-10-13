@@ -230,7 +230,6 @@
         <item quantity="one">Alkalmazás</item>
         <item quantity="other">Alkalmazások</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Ez a funkció bétaverzióban van. <annotation type="app_settings_link">Problémáid vannak egy alkalmazással?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Az alkalmazáskövetés elleni védelem le van tiltva</b> Okozott problémát az alkalmazáskövetés elleni védelem az Ön alkalmazásainál? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>A készülékeden lévő VPN alkalmazás kikapcsolta az alkalmazáskövetés elleni védelmet.</b>\nProblémát okozott az alkalmazáskövetés elleni védelem az alkalmazásaidban? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
     <string name="atp_ActivityAbout">További információ</string>

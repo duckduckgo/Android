@@ -230,7 +230,6 @@
         <item quantity="one">Rakendus</item>
         <item quantity="other">Rakendused</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">See funktsioon on beetaversioonis. <annotation type="app_settings_link">Kas rakendusega on probleeme?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Rakenduse jälgimise kaitse on välja lülitatud</b>\nKas rakenduse jälgimise kaitse põhjustas sinu rakendustega probleeme? <annotation type="report_issues_link">Probleemidest teavitamine</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPN-rakendus sinu seadmes on rakenduse jälgimise kaitse keelanud.</b>\nKas rakenduse jälgimise kaitse põhjustas sinu rakendustega probleeme? <annotation type="report_issues_link">Teata probleemidest</annotation></string>
     <string name="atp_ActivityAbout">Teave</string>

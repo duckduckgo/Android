@@ -242,7 +242,6 @@
         <item quantity="many">Aplikacji</item>
         <item quantity="other">Aplikacji</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Ta funkcja jest w fazie beta. <annotation type="app_settings_link">Masz problemy z aplikacją?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Ochrona przed śledzeniem przez aplikacje jest wyłączona.</b>\nCzy ochrona przed śledzeniem przez aplikacje wywołała problem z Twoimi aplikacjami? <annotation type="report_issues_link">Zgłoś problemy</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Aplikacja VPN na Twoim urządzeniu wyłączyła ochronę przed śledzeniem przez aplikacje. </b>\nCzy ochrona przed śledzeniem przez aplikacje wywołała problem z Twoimi aplikacjami? <annotation type="report_issues_link">Zgłoś problemy</annotation></string>
     <string name="atp_ActivityAbout">Informacje</string>
