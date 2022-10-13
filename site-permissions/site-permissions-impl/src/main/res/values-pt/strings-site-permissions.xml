@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s quer aceder à câmara e ao microfone</string>
-    <string name="sitePermissionsMicDialogTitle">%1$s quer aceder ao microfone</string>
-    <string name="sitePermissionsCameraDialogTitle">%1$s quer aceder à câmara</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle">\"%1$s\" pretende aceder à câmara e ao microfone</string>
+    <string name="sitePermissionsMicDialogTitle">\"%1$s\" pretende aceder ao microfone</string>
+    <string name="sitePermissionsCameraDialogTitle">\"%1$s\" pretende aceder à câmara</string>
     <string name="sitePermissionsDialogContent">Faz a gestão das permissões concedidas nas definições</string>
     <string name="sitePermissionsDialogDenyButton">Recusar</string>
     <string name="sitePermissionsDialogAllowButton">Permitir</string>
