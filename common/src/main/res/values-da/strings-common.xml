@@ -14,14 +14,17 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="common_Today">I dag</string>
     <string name="common_Yesterday">I går</string>
-    <string name="common_DaysAgo">%1$d dage siden</string>
+    <string name="common_DaysAgo">%d dage siden</string>
     <string name="common_PastWeek">Seneste Uge</string>
     <string name="common_PastMonth">Seneste Måned</string>
-    <string name="common_MinutesAgo">%1$dm siden</string>
-    <string name="common_HoursAgo">%1$dt siden</string>
+    <string name="common_MinutesAgo">%dm siden</string>
+    <string name="common_HoursAgo">%dh siden</string>
     <string name="common_JustNow">Lige nu</string>
     <string name="common_hour_abbreviation">t</string>
     <string name="common_min_abbreviation">min</string>
