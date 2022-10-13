@@ -107,6 +107,44 @@
       ]
     },
     {
+      "name": "amazon.com",
+      "prehideSelectors": [
+        "span[data-action=\"sp-cc\"][data-sp-cc*=\"rejectAllAction\"]"
+      ],
+      "detectCmp": [
+        {
+          "exists": "span[data-action=\"sp-cc\"][data-sp-cc*=\"rejectAllAction\"]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "span[data-action=\"sp-cc\"][data-sp-cc*=\"rejectAllAction\"]"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForVisible": "#sp-cc-accept"
+        },
+        {
+          "wait": 500
+        },
+        {
+          "click": "#sp-cc-accept"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForVisible": "#sp-cc-rejectall-link"
+        },
+        {
+          "wait": 500
+        },
+        {
+          "click": "#sp-cc-rejectall-link"
+        }
+      ]
+    },
+    {
       "name": "arzt-auskunft.de",
       "prehideSelectors": [
         "#cookiescript_injected"
@@ -757,6 +795,40 @@
       ]
     },
     {
+      "name": "dailymotion.com",
+      "runContext": {
+        "urlPattern": "^https://(www\\.)?dailymotion\\.com/"
+      },
+      "prehideSelectors": [
+        "div[class*=\"Overlay__container\"]:has(div[class*=\"TCF2Popup\"])"
+      ],
+      "detectCmp": [
+        {
+          "exists": "div[class*=\"TCF2Popup\"]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "[class*=\"TCF2Popup\"] a[href^=\"https://www.dailymotion.com/legal/cookiemanagement\"]"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "button[class*=\"TCF2Popup__button\"]:not([class*=\"TCF2Popup__personalize\"])"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "button[class*=\"TCF2ContinueWithoutAcceptingButton\"]"
+        }
+      ],
+      "test": [
+        {
+          "eval": "!!document.cookie.match('dm-euconsent-v2')"
+        }
+      ]
+    },
+    {
       "name": "deepl.com",
       "prehideSelectors": [
         ".dl_cookieBanner_container"
@@ -779,6 +851,42 @@
       "optIn": [
         {
           "click": ".dl_cookieBanner--buttonAll"
+        }
+      ]
+    },
+    {
+      "name": "dmgmedia",
+      "prehideSelectors": [
+        "[data-project=\"mol-fe-cmp\"]"
+      ],
+      "detectCmp": [
+        {
+          "exists": "[data-project=\"mol-fe-cmp\"]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "[data-project=\"mol-fe-cmp\"]"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "[data-project=\"mol-fe-cmp\"] button[class*=primary]"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "[data-project=\"mol-fe-cmp\"] button[class*=basic]"
+        },
+        {
+          "waitForVisible": "[data-project=\"mol-fe-cmp\"] div[class*=\"tabContent\"]"
+        },
+        {
+          "waitForThenClick": "[data-project=\"mol-fe-cmp\"] div[class*=\"toggle\"][class*=\"enabled\"]",
+          "all": true
+        },
+        {
+          "waitForThenClick": "[data-project=\"mol-fe-cmp\"] button[class*=white]"
         }
       ]
     },
@@ -1033,6 +1141,43 @@
       ]
     },
     {
+      "name": "facebook",
+      "runContext": {
+        "urlPattern": "^https://([a-z0-9-]+\\.)?facebook\\.com/"
+      },
+      "prehideSelectors": [
+        "div[data-testid=\"cookie-policy-manage-dialog\"]"
+      ],
+      "detectCmp": [
+        {
+          "exists": "div[data-testid=\"cookie-policy-manage-dialog\"]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "div[data-testid=\"cookie-policy-manage-dialog\"]"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "button[data-cookiebanner=\"accept_button\"]"
+        },
+        {
+          "waitForVisible": "div[data-testid=\"cookie-policy-manage-dialog\"]",
+          "check": "none"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "button[data-cookiebanner=\"accept_only_essential_button\"]"
+        },
+        {
+          "waitForVisible": "div[data-testid=\"cookie-policy-manage-dialog\"]",
+          "check": "none"
+        }
+      ]
+    },
+    {
       "name": "funding-choices",
       "prehideSelectors": [
         ".fc-consent-root,.fc-dialog-container,.fc-dialog-overlay,.fc-dialog-content"
@@ -1064,6 +1209,67 @@
       "optIn": [
         {
           "click": ".fc-cta-consent"
+        }
+      ]
+    },
+    {
+      "name": "google-consent-standalone",
+      "prehideSelectors": [],
+      "detectCmp": [
+        {
+          "exists": "a[href^=\"https://policies.google.com/technologies/cookies\""
+        },
+        {
+          "exists": "form[action^=\"https://consent.\"][action$=\".com/save\"]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "a[href^=\"https://policies.google.com/technologies/cookies\""
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "form[action^=\"https://consent.\"][action$=\".com/save\"]:has(input[name=set_eom][value=false]) button"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "form[action^=\"https://consent.\"][action$=\".com/save\"]:has(input[name=set_eom][value=true]) button"
+        }
+      ]
+    },
+    {
+      "name": "google.com",
+      "prehideSelectors": [
+        ".HTjtHe#xe7COe"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".HTjtHe#xe7COe"
+        },
+        {
+          "exists": ".HTjtHe#xe7COe a[href^=\"https://policies.google.com/technologies/cookies\"]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".HTjtHe#xe7COe button#W0wltc"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".HTjtHe#xe7COe button#L2AGLb"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": ".HTjtHe#xe7COe button#W0wltc"
+        }
+      ],
+      "test": [
+        {
+          "eval": "!!document.cookie.match(/SOCS=CAE/)"
         }
       ]
     },
@@ -1309,6 +1515,50 @@
       ]
     },
     {
+      "name": "linkedin.com",
+      "prehideSelectors": [
+        ".artdeco-global-alert[type=COOKIE_CONSENT]"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".artdeco-global-alert[type=COOKIE_CONSENT]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".artdeco-global-alert[type=COOKIE_CONSENT]"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForVisible": ".artdeco-global-alert[type=COOKIE_CONSENT] button[action-type=ACCEPT]"
+        },
+        {
+          "wait": 500
+        },
+        {
+          "waitForThenClick": ".artdeco-global-alert[type=COOKIE_CONSENT] button[action-type=ACCEPT]"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForVisible": ".artdeco-global-alert[type=COOKIE_CONSENT] button[action-type=DENY]"
+        },
+        {
+          "wait": 500
+        },
+        {
+          "waitForThenClick": ".artdeco-global-alert[type=COOKIE_CONSENT] button[action-type=DENY]"
+        }
+      ],
+      "test": [
+        {
+          "waitForVisible": ".artdeco-global-alert[type=COOKIE_CONSENT]",
+          "check": "none"
+        }
+      ]
+    },
+    {
       "name": "marksandspencer.com",
       "isHidingRule": true,
       "detectCmp": [
@@ -1512,11 +1762,6 @@
         {
           "click": ".js-decline-cookie-policy"
         }
-      ],
-      "test": [
-        {
-          "eval": "document.cookie.includes('_cookies_banner_dismissed=true') && !document.cookie.includes('_cookie_advertising_accepted')"
-        }
       ]
     },
     {
@@ -1552,7 +1797,7 @@
               "waitForVisible": "#moove_gdpr_cookie_modal"
             },
             {
-              "eval": "document.querySelectorAll('#moove_gdpr_cookie_modal input').forEach(i => { if (!i.disabled) i.checked = false }) || true"
+              "eval": "document.querySelectorAll('#moove_gdpr_cookie_modal input').forEach(i => { if (!i.disabled && i.name !== 'moove_gdpr_strict_cookies') i.checked = false }) || true"
             },
             {
               "click": ".moove-gdpr-modal-save-settings"
@@ -1870,6 +2115,110 @@
       ]
     },
     {
+      "name": "privacymanager.io",
+      "prehideSelectors": [
+        "#gdpr-consent-tool-wrapper",
+        "iframe[src^=\"https://cmp-consent-tool.privacymanager.io\"]"
+      ],
+      "runContext": {
+        "urlPattern": "^https://cmp-consent-tool\\.privacymanager\\.io/",
+        "main": false,
+        "frame": true
+      },
+      "detectCmp": [
+        {
+          "exists": "button#save"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "button#save"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "button#save"
+        }
+      ],
+      "optOut": [
+        {
+          "if": {
+            "exists": "#denyAll"
+          },
+          "then": [
+            {
+              "click": "#denyAll"
+            },
+            {
+              "waitForThenClick": ".okButton"
+            }
+          ],
+          "else": [
+            {
+              "waitForThenClick": "#manageSettings"
+            },
+            {
+              "waitFor": ".purposes-overview-list"
+            },
+            {
+              "waitFor": "button#saveAndExit"
+            },
+            {
+              "click": "span[role=checkbox][aria-checked=true]",
+              "all": true,
+              "optional": true
+            },
+            {
+              "click": "button#saveAndExit"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pubtech",
+      "prehideSelectors": [
+        "#pubtech-cmp"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#pubtech-cmp"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#pubtech-cmp #pt-actions"
+        }
+      ],
+      "optIn": [
+        {
+          "if": {
+            "exists": "#pt-accept-all"
+          },
+          "then": [
+            {
+              "click": "#pubtech-cmp #pt-actions #pt-accept-all"
+            }
+          ],
+          "else": [
+            {
+              "click": "#pubtech-cmp #pt-actions button:nth-of-type(2)"
+            }
+          ]
+        }
+      ],
+      "optOut": [
+        {
+          "click": "#pubtech-cmp #pt-close"
+        }
+      ],
+      "test": [
+        {
+          "eval": "document.cookie.includes('euconsent-v2') && (document.cookie.match(/.YAAAAAAAAAAA/) || document.cookie.match(/.aAAAAAAAAAAA/) || document.cookie.match(/.YAAACFgAAAAA/)) "
+        }
+      ]
+    },
+    {
       "name": "quantcast",
       "prehideSelectors": [
         "#qc-cmp2-main,#qc-cmp2-container"
@@ -1908,6 +2257,97 @@
       "optIn": [
         {
           "click": ".qc-cmp2-summary-buttons > button[mode=\"primary\"]"
+        }
+      ]
+    },
+    {
+      "name": "reddit.com",
+      "runContext": {
+        "urlPattern": "^https://www\\.reddit\\.com/"
+      },
+      "prehideSelectors": [
+        "section:has(section > span > a[href^=\"https://www.reddit.com/policies/cookies\"])"
+      ],
+      "detectCmp": [
+        {
+          "exists": "section:has(> span > a[href^=\"https://www.reddit.com/policies/cookies\"])"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "section:has(> span > a[href^=\"https://www.reddit.com/policies/cookies\"])"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "section:has(> span > a[href^=\"https://www.reddit.com/policies/cookies\"]) section form:last-child button"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "section:has(> span > a[href^=\"https://www.reddit.com/policies/cookies\"]) section form:first-child button"
+        }
+      ],
+      "test": [
+        {
+          "eval": "document.cookie.includes('eu_cookie={%22opted%22:true%2C%22nonessential%22:false}')"
+        }
+      ]
+    },
+    {
+      "name": "sibbo",
+      "prehideSelectors": [
+        "sibbo-cmp-layout"
+      ],
+      "detectCmp": [
+        {
+          "exists": "sibbo-cmp-layout"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "sibbo-cmp-layout"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "sibbo-cmp-layout [data-accept-all]"
+        }
+      ],
+      "optOut": [
+        {
+          "click": ".sibbo-panel__aside__buttons a[data-nav=\"purposes\"]"
+        },
+        {
+          "click": ".sibbo-panel__main__header__actions a[data-focusable=\"reject-all\"]"
+        },
+        {
+          "if": {
+            "exists": "[data-view=purposes] .sibbo-panel__main__footer__actions [data-save-and-exit]"
+          },
+          "then": [],
+          "else": [
+            {
+              "waitFor": ".sibbo-panel__main__footer__actions a[data-focusable=\"next\"]:not(.sibbo-cmp-button--disabled)"
+            },
+            {
+              "click": ".sibbo-panel__main__footer__actions a[data-focusable=\"next\"]"
+            },
+            {
+              "click": ".sibbo-panel__main div[data-view=\"purposesLegInt\"] a[data-focusable=\"reject-all\"]"
+            }
+          ]
+        },
+        {
+          "waitFor": ".sibbo-panel__main__footer__actions [data-save-and-exit]:not(.sibbo-cmp-button--disabled)"
+        },
+        {
+          "click": ".sibbo-panel__main__footer__actions [data-save-and-exit]:not(.sibbo-cmp-button--disabled)"
+        }
+      ],
+      "test": [
+        {
+          "eval": "!!window.localStorage.getItem('euconsent-v2')"
         }
       ]
     },
@@ -2233,6 +2673,40 @@
       ]
     },
     {
+      "name": "twitter",
+      "runContext": {
+        "urlPattern": "^https://([a-z0-9-]+\\.)?twitter\\.com/"
+      },
+      "prehideSelectors": [
+        "[data-testid=\"BottomBar\"]"
+      ],
+      "detectCmp": [
+        {
+          "exists": "[data-testid=\"BottomBar\"] div"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "[data-testid=\"BottomBar\"] div"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "[data-testid=\"BottomBar\"] > div:has(>div:first-child>div:last-child>span[role=button]) > div:last-child > div[role=button]:first-child"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "[data-testid=\"BottomBar\"] > div:has(>div:first-child>div:last-child>span[role=button]) > div:last-child > div[role=button]:last-child"
+        }
+      ],
+      "TODOtest": [
+        {
+          "eval": "document.cookie.includes('d_prefs=MjoxLGNvbnNlbnRfdmVyc2lvbjoy')"
+        }
+      ]
+    },
+    {
       "name": "UK Cookie Consent",
       "prehideSelectors": [
         "#catapult-cookie-bar"
@@ -2359,7 +2833,7 @@
     {
       "name": "vodafone.de",
       "runContext": {
-        "url": "https://www.vodafone.de/"
+        "urlPattern": "^https://www\\.vodafone\\.de/"
       },
       "prehideSelectors": [
         ".dip-consent,.dip-consent-container"
@@ -2510,6 +2984,90 @@
       "test": [
         {
           "eval": "document.cookie.includes('userConsent=%7B%22marketing%22%3Afalse')"
+        }
+      ]
+    },
+    {
+      "name": "youtube-desktop",
+      "prehideSelectors": [
+        "tp-yt-iron-overlay-backdrop.opened",
+        "ytd-consent-bump-v2-lightbox"
+      ],
+      "detectCmp": [
+        {
+          "exists": "ytd-consent-bump-v2-lightbox tp-yt-paper-dialog"
+        },
+        {
+          "exists": "ytd-consent-bump-v2-lightbox tp-yt-paper-dialog a[href^=\"https://consent.youtube.com/\"]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "ytd-consent-bump-v2-lightbox tp-yt-paper-dialog"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "ytd-consent-bump-v2-lightbox .eom-buttons .eom-button-row:first-child ytd-button-renderer:last-child #button,ytd-consent-bump-v2-lightbox .eom-buttons .eom-button-row:first-child ytd-button-renderer:last-child button"
+        },
+        {
+          "wait": 500
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "ytd-consent-bump-v2-lightbox .eom-buttons .eom-button-row:first-child ytd-button-renderer:first-child #button,ytd-consent-bump-v2-lightbox .eom-buttons .eom-button-row:first-child ytd-button-renderer:first-child button"
+        },
+        {
+          "wait": 500
+        }
+      ],
+      "test": [
+        {
+          "wait": 500
+        },
+        {
+          "eval": "!!document.cookie.match(/SOCS=CAE/)"
+        }
+      ]
+    },
+    {
+      "name": "youtube-mobile",
+      "prehideSelectors": [
+        ".consent-bump-v2-lightbox"
+      ],
+      "detectCmp": [
+        {
+          "exists": "ytm-consent-bump-v2-renderer"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "ytm-consent-bump-v2-renderer"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "ytm-consent-bump-v2-renderer .privacy-terms + .one-col-dialog-buttons c3-material-button:first-child button, ytm-consent-bump-v2-renderer .privacy-terms + .one-col-dialog-buttons ytm-button-renderer:first-child button"
+        },
+        {
+          "wait": 500
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "ytm-consent-bump-v2-renderer .privacy-terms + .one-col-dialog-buttons c3-material-button:nth-child(2) button, ytm-consent-bump-v2-renderer .privacy-terms + .one-col-dialog-buttons ytm-button-renderer:nth-child(2) button"
+        },
+        {
+          "wait": 500
+        }
+      ],
+      "test": [
+        {
+          "wait": 500
+        },
+        {
+          "eval": "!!document.cookie.match(/SOCS=CAE/)"
         }
       ]
     }

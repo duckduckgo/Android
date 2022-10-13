@@ -1931,7 +1931,7 @@ body.is-disabled #popup-container .site-info .link-secondary:hover {
   opacity: 1;
 }
 .breakage-form__content .breakage-form__message.is-transparent {
-  opacity: 0;
+  display: none;
 }
 .breakage-form__content .breakage-form__success--title {
   padding-top: 15px;
@@ -2262,4 +2262,9 @@ body.is-disabled #popup-container .site-info .link-secondary:hover {
   color: #333333;
   padding: 14px 0 10px 0;
   text-decoration: none;
+}
+
+.platform-limitations {
+  padding: 16px;
+  text-align: center;
 }

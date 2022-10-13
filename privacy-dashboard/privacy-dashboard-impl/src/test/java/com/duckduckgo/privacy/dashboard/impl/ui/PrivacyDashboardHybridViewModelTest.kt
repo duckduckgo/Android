@@ -71,7 +71,7 @@ class PrivacyDashboardHybridViewModelTest {
         siteViewStateMapper = AppSiteViewStateMapper(PublicKeyInfoMapper(androidQAppBuildConfig)),
         requestDataViewStateMapper = AppSiteRequestDataViewStateMapper(),
         protectionStatusViewStateMapper = AppProtectionStatusViewStateMapper(contentBlocking, unprotectedTemporary),
-        jsInterfaceMapper = mock()
+        privacyDashboardPayloadAdapter = mock()
     )
 
     @Test

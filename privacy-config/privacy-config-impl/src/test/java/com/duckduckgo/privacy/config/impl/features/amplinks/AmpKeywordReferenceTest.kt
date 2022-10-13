@@ -63,7 +63,7 @@ class AmpKeywordReferenceTest(private val testCase: TestCase) {
             val test = adapter.fromJson(
                 FileUtilities.loadText(
                     AmpKeywordReferenceTest::class.java.classLoader!!,
-                    "reference_tests/amplinks/amp_links_matching_tests.json"
+                    "reference_tests/amplinks/tests.json"
                 )
             )
             return test?.ampKeywords?.tests ?: emptyList()
@@ -86,11 +86,13 @@ class AmpKeywordReferenceTest(private val testCase: TestCase) {
         val ampLinkKeywords = CopyOnWriteArrayList<String>()
         val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
             AmpKeywordReferenceTest::class.java.classLoader!!,
-            "reference_tests/amplinks/amp_links_reference.json"
+            "reference_tests/amplinks/config_reference.json"
         )
 
-        jsonObject.keys().forEach {
-            val ampLinksFeature: AmpLinksFeature? = jsonAdapter.fromJson(jsonObject.get(it).toString())
+        val features: JSONObject = jsonObject.getJSONObject("features")
+
+        features.keys().forEach {
+            val ampLinksFeature: AmpLinksFeature? = jsonAdapter.fromJson(features.get(it).toString())
             exceptions.addAll(ampLinksFeature!!.exceptions)
             ampLinkKeywords.addAll(ampLinksFeature.settings.keywords)
         }

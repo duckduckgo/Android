@@ -35,6 +35,8 @@ class PrivacyDashboardRenderer(
     private val onClose: () -> Unit
 ) {
 
+    private var lastSeenPrivacyDashboardViewState: ViewState? = null
+
     fun loadDashboard(webView: WebView) {
         webView.addJavascriptInterface(
             PrivacyDashboardJavascriptInterface(
@@ -60,17 +62,28 @@ class PrivacyDashboardRenderer(
         val requestDataAdapter = moshi.adapter(RequestDataViewState::class.java)
         val requestDataJson = requestDataAdapter.toJson(viewState.requestData)
 
-        val protectionsAdapter = moshi.adapter(ProtectionStatusViewState::class.java)
-        val protectionsJson = protectionsAdapter.toJson(viewState.protectionStatus)
-
-        val parentEntityAdapter = moshi.adapter(EntityViewState::class.java)
-        val parentEntityJson = parentEntityAdapter.toJson(viewState.siteViewState.parentEntity)
-
         onPrivacyProtectionSettingChanged(viewState.userChangedValues)
-        webView.evaluateJavascript("javascript:onChangeProtectionStatus($protectionsJson);", null)
-        webView.evaluateJavascript("javascript:onChangeParentEntity($parentEntityJson);", null)
-        webView.evaluateJavascript("javascript:onChangeCertificateData($siteViewStateJson);", null)
-        webView.evaluateJavascript("javascript:onChangeUpgradedHttps(${viewState.siteViewState.upgradedHttps});", null)
+        if (viewState.siteViewState.locale != lastSeenPrivacyDashboardViewState?.siteViewState?.locale) {
+            webView.evaluateJavascript("javascript:onChangeLocale($siteViewStateJson);", null)
+        }
+        if (viewState.protectionStatus != lastSeenPrivacyDashboardViewState?.protectionStatus) {
+            val protectionsAdapter = moshi.adapter(ProtectionStatusViewState::class.java)
+            val protectionsJson = protectionsAdapter.toJson(viewState.protectionStatus)
+            webView.evaluateJavascript("javascript:onChangeProtectionStatus($protectionsJson);", null)
+        }
+        if (viewState.siteViewState.parentEntity != lastSeenPrivacyDashboardViewState?.siteViewState?.parentEntity) {
+            val parentEntityAdapter = moshi.adapter(EntityViewState::class.java)
+            val parentEntityJson = parentEntityAdapter.toJson(viewState.siteViewState.parentEntity)
+            webView.evaluateJavascript("javascript:onChangeParentEntity($parentEntityJson);", null)
+        }
+        if (viewState.siteViewState.secCertificateViewModels != lastSeenPrivacyDashboardViewState?.siteViewState?.secCertificateViewModels) {
+            webView.evaluateJavascript("javascript:onChangeCertificateData($siteViewStateJson);", null)
+        }
+        if (viewState.siteViewState.upgradedHttps != lastSeenPrivacyDashboardViewState?.siteViewState?.upgradedHttps) {
+            webView.evaluateJavascript("javascript:onChangeUpgradedHttps(${viewState.siteViewState.upgradedHttps});", null)
+        }
         webView.evaluateJavascript("javascript:onChangeRequestData(\"${viewState.siteViewState.url}\", $requestDataJson);", null)
+
+        lastSeenPrivacyDashboardViewState = viewState
     }
 }

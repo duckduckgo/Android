@@ -53,6 +53,14 @@ class TwoLineListItem @JvmOverloads constructor(
             binding.primaryText.text = getString(R.styleable.TwoLineListItem_primaryText)
             binding.secondaryText.text = getString(R.styleable.TwoLineListItem_secondaryText)
 
+            if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
+                binding.primaryText.setTextColor(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
+            }
+
+            if (hasValue(R.styleable.TwoLineListItem_secondaryTextColorOverlay)) {
+                binding.secondaryText.setTextColor(getColorStateList(R.styleable.TwoLineListItem_secondaryTextColorOverlay))
+            }
+
             if (hasValue(R.styleable.TwoLineListItem_leadingIcon)) {
                 setLeadingIconDrawable(getDrawable(R.styleable.TwoLineListItem_leadingIcon)!!)
             } else {

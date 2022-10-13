@@ -22,7 +22,7 @@
               android:paddingTop="@dimen/keyline_5"
               android:paddingEnd="@dimen/keyline_4">
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingStart="@dimen/keyline_4"
@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingStart="@dimen/keyline_4"
@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         app:fullWidth="false"/>
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingStart="@dimen/keyline_4"
@@ -55,7 +55,7 @@
         android:layout_margin="@dimen/keyline_6"
         app:defaultPadding="false"/>
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingTop="@dimen/keyline_5"

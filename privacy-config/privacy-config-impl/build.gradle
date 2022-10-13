@@ -33,6 +33,7 @@ dependencies {
     implementation project(path: ':app-store')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':privacy-config-store')
+    implementation project(path: ':content-scope-scripts-api')
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat

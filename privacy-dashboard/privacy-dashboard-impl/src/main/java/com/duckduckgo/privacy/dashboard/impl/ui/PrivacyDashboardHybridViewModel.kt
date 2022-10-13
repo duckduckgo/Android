@@ -54,7 +54,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val siteViewStateMapper: SiteViewStateMapper,
     private val requestDataViewStateMapper: RequestDataViewStateMapper,
     private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
-    private val jsInterfaceMapper: JSInterfaceMapper
+    private val privacyDashboardPayloadAdapter: PrivacyDashboardPayloadAdapter
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -108,10 +108,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         AD_CLICK_ATTRIBUTION("adClickAttribution"),
         OTHER_THIRD_PARTY_REQUEST("otherThirdPartyRequest"),
     }
-
-    data class UserSettingsViewState(
-        val privacyProtectionEnabled: Boolean
-    )
 
     data class SiteViewState(
         val url: String,
@@ -223,7 +219,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     fun onUrlClicked(payload: String) {
         viewModelScope.launch(dispatcher.io()) {
-            jsInterfaceMapper.clickPayloadToUrl(payload).takeIf { it.isNotEmpty() }?.let {
+            privacyDashboardPayloadAdapter.onUrlClicked(payload).takeIf { it.isNotEmpty() }?.let {
                 command.send(OpenURL(it))
             }
         }

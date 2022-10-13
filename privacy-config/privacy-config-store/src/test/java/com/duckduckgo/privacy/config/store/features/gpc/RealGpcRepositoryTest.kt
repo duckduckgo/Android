@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.store.features.gpc
 
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.privacy.config.store.GpcContentScopeConfigEntity
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 import com.duckduckgo.privacy.config.store.GpcHeaderEnabledSiteEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
@@ -43,12 +44,14 @@ class RealGpcRepositoryTest {
     private val mockDatabase: PrivacyConfigDatabase = mock()
     private val mockGpcExceptionsDao: GpcExceptionsDao = mock()
     private val mockGpcHeadersDao: GpcHeadersDao = mock()
+    private val mockGpcContentScopeDao: GpcContentScopeConfigDao = mock()
     private val mockGpcDataStore: GpcDataStore = mock()
 
     @Before
     fun before() {
         whenever(mockDatabase.gpcHeadersDao()).thenReturn(mockGpcHeadersDao)
         whenever(mockDatabase.gpcExceptionsDao()).thenReturn(mockGpcExceptionsDao)
+        whenever(mockDatabase.gpcContentScopeConfigDao()).thenReturn(mockGpcContentScopeDao)
         testee =
             RealGpcRepository(
                 mockGpcDataStore,
@@ -84,10 +87,11 @@ class RealGpcRepositoryTest {
                     coroutineRule.testDispatcherProvider
                 )
 
-            testee.updateAll(listOf(), listOf())
+            testee.updateAll(listOf(), listOf(), configEntity)
 
             verify(mockGpcExceptionsDao).updateAll(anyList())
             verify(mockGpcHeadersDao).updateAll(anyList())
+            verify(mockGpcContentScopeDao).insert(configEntity)
         }
 
     @Test
@@ -104,7 +108,7 @@ class RealGpcRepositoryTest {
             assertEquals(1, testee.exceptions.size)
             reset(mockGpcExceptionsDao)
 
-            testee.updateAll(listOf(), listOf())
+            testee.updateAll(listOf(), listOf(), configEntity)
 
             assertEquals(0, testee.exceptions.size)
         }
@@ -123,9 +127,28 @@ class RealGpcRepositoryTest {
             assertEquals(1, testee.headerEnabledSites.size)
             reset(mockGpcHeadersDao)
 
-            testee.updateAll(listOf(), listOf())
+            testee.updateAll(listOf(), listOf(), configEntity)
 
             assertEquals(0, testee.headerEnabledSites.size)
+        }
+
+    @Test
+    fun whenUpdateAllThenReplaceConfig() =
+        runTest {
+            givenGpcDaoContainsConfig(configEntity)
+            testee =
+                RealGpcRepository(
+                    mockGpcDataStore,
+                    mockDatabase,
+                    TestScope(),
+                    coroutineRule.testDispatcherProvider
+                )
+            assertEquals(configEntity.config, testee.gpcContentScopeConfig)
+            givenGpcDaoContainsConfig(configEntity2)
+
+            testee.updateAll(listOf(), listOf(), configEntity2)
+
+            assertEquals(configEntity2.config, testee.gpcContentScopeConfig)
         }
 
     @Test
@@ -159,8 +182,14 @@ class RealGpcRepositoryTest {
         whenever(mockGpcHeadersDao.getAll()).thenReturn(listOf(gpcHeader))
     }
 
+    private fun givenGpcDaoContainsConfig(configEntity: GpcContentScopeConfigEntity) {
+        whenever(mockGpcContentScopeDao.getConfig()).thenReturn(configEntity)
+    }
+
     companion object {
         val gpcException = GpcExceptionEntity("example.com")
         val gpcHeader = GpcHeaderEnabledSiteEntity("example.com")
+        val configEntity = GpcContentScopeConfigEntity(config = "{\"feature\":{\"state\":\"enabled\"}}")
+        val configEntity2 = GpcContentScopeConfigEntity(config = "{\"feature\":{\"state\":\"disabled\"}}")
     }
 }
