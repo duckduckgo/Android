@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s nori pasiekti kamerą ir mikrofoną</string>
-    <string name="sitePermissionsMicDialogTitle">%1$s nori pasiekti mikrofoną</string>
-    <string name="sitePermissionsCameraDialogTitle">%1$s nori pasiekti kamerą</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle">„%1$s“ nori gauti prieigą prie fotoaparato ir mikrofono</string>
+    <string name="sitePermissionsMicDialogTitle">„%1$s“ nori gauti prieigą prie mikrofono</string>
+    <string name="sitePermissionsCameraDialogTitle">„%1$s“ nori gauti prieigą prie fotoaparato</string>
     <string name="sitePermissionsDialogContent">Tvarkykite suteiktus leidimus nustatymuose</string>
     <string name="sitePermissionsDialogDenyButton">Atsisakyti</string>
     <string name="sitePermissionsDialogAllowButton">Leisti</string>
