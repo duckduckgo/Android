@@ -132,9 +132,9 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     private fun persistCacheToDisk() {
+        addressLookupDao.deleteAll()
         addressLookupLruCache.snapshot().forEach { (key, value) ->
             Timber.d("Persisting to address lookup cache $key -> $value")
-            addressLookupDao.deleteAll()
             addressLookupDao.insert(VpnAddressLookup(key, value))
         }
     }
