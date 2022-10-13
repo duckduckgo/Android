@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
@@ -14,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Неуспешно изтегляне. Проверете интернет връзката.</string>
 
     <string name="notificationChannelFileDownloading">Файлът се изтегля</string>
     <string name="notificationChannelFileDownloaded">Файлът е изтеглен</string>
+
     <string name="downloadInProgress">Изтегля се</string>
+
+    <string name="downloadsDownloadStartedMessage">Стартирано изтегляне на %s</string>
+    <string name="downloadsDownloadFinishedMessage">Завършено изтегляне на %s</string>
+    <string name="downloadsDownloadGenericErrorMessage">Неуспешно изтегляне.</string>
+    <string name="downloadsCancel">Отмени</string>
+    <string name="downloadsRetry">Повторен опит</string>
+    <string name="notificationDownloadComplete">Изтеглянето е завършено.</string>
+    <string name="notificationDownloadFailed">Неуспешно изтегляне.</string>
 </resources>
