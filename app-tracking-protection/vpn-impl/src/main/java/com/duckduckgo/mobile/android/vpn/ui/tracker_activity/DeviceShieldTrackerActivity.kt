@@ -72,7 +72,6 @@ class DeviceShieldTrackerActivity :
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener,
     AppTPDisableConfirmationDialog.Listener,
     AppTPVpnConflictDialog.Listener,
-    AppTPPromoteAlwaysOnDialog.Listener,
     VpnRemoveFeatureConfirmationDialog.Listener {
 
     @Inject
@@ -276,7 +275,7 @@ class DeviceShieldTrackerActivity :
         val dialog = AlwaysOnAlertDialogFragment.newInstance { openVPNSettings() }
         dialog.show(
             supportFragmentManager,
-            AppTPPromoteAlwaysOnDialog.TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG
+            TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG
         )
     }
 
@@ -304,10 +303,6 @@ class DeviceShieldTrackerActivity :
         openVPNSettings()
     }
 
-    override fun onPromoteAlwaysOnGoToVPNSettings() {
-        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings)
-    }
-
     @SuppressLint("InlinedApi")
     private fun openVPNSettings() {
         val intent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
@@ -330,14 +325,6 @@ class DeviceShieldTrackerActivity :
 
     override fun onRemoveFeature() {
         viewModel.removeFeature()
-    }
-
-    override fun onPromoteAlwaysOnRemindLater() {
-        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnRemindLater)
-    }
-
-    override fun onPromoteAlwaysOnForget() {
-        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnForget)
     }
 
     private fun launchBetaInstructions() {
@@ -489,6 +476,7 @@ class DeviceShieldTrackerActivity :
         private const val RE_ENABLE_ANNOTATION = "re_enable_link"
         private const val ON_LAUNCHED_CALLED_SUCCESS = 0
         private const val MIN_ROWS_FOR_ALL_ACTIVITY = 6
+        private const val TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG = "AppTPPromoteAlwaysOnDialog"
 
         private const val REQUEST_ASK_VPN_PERMISSION = 101
 
