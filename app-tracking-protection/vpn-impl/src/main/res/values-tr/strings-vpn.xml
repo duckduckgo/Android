@@ -220,7 +220,6 @@
         <item quantity="one">Uygulama</item>
         <item quantity="other">Uygulama</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Bu özellik beta aşamasındadır. <annotation type="app_settings_link">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Uygulama İzleme Koruması devre dışı</b> Uygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Cihazınızdaki bir VPN uygulaması Uygulama İzleme Koruması\'nı devre dışı bıraktı.</b>\nUygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
     <string name="atp_ActivityAbout">Hakkında</string>

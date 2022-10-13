@@ -226,7 +226,6 @@
         <item quantity="one">lietotne</item>
         <item quantity="other">lietotnes</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Šī funkcija ir beta versijā. <annotation type="app_settings_link">Problēmas ar lietotni?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Lietotņu pretizsekošanas aizsardzība ir atspējota</b>\nVai Lietotņu pretizsekošanas aizsardzība ir radījusi kādu problēmu ar tavām lietotnēm? <annotation type="report_issues_link">Ziņo par problēmām</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Kāda VPN lietotne tavā ierīcē atspējojusi Lietotņu pretizsekošanas aizsardzību.</b>\nVai Lietotņu pretizsekošanas aizsardzība radījusi problēmas lietotnēs? <annotation type="report_issues_link">Ziņo par problēmām</annotation></string>
     <string name="atp_ActivityAbout">Par</string>

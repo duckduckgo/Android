@@ -220,7 +220,6 @@
         <item quantity="one">Sovellus</item>
         <item quantity="other">Sovellukset</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Tämä ominaisuus on beetavaiheessa. <annotation type="app_settings_link">Ongelmia sovelluksen kanssa?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection on poistettu käytöstä</b>\nAiheuttiko App Tracking Protection ongelmia sovelluksissasi? <annotation type="report_issues_link">Ilmoita ongelmista</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Laitteesi VPN poisti App Tracking Protectionin käytöstä.</b>\nAiheuttiko App Tracking Protection ongelman sovelluksissasi? <annotation type="report_issues_link">Ilmoita ongelmista</annotation></string>
     <string name="atp_ActivityAbout">Tietoa meistä</string>
