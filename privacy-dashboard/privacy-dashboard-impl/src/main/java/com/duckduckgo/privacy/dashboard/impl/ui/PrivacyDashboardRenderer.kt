@@ -64,7 +64,7 @@ class PrivacyDashboardRenderer(
 
         onPrivacyProtectionSettingChanged(viewState.userChangedValues)
         if (viewState.siteViewState.locale != lastSeenPrivacyDashboardViewState?.siteViewState?.locale) {
-            webView.evaluateJavascript("javascript:onChangeLocale(${siteViewStateJson});", null)
+            webView.evaluateJavascript("javascript:onChangeLocale($siteViewStateJson);", null)
         }
         if (viewState.protectionStatus != lastSeenPrivacyDashboardViewState?.protectionStatus) {
             val protectionsAdapter = moshi.adapter(ProtectionStatusViewState::class.java)
