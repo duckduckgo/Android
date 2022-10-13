@@ -120,7 +120,7 @@ class NgVpnNetworkStack @Inject constructor(
         fun startPeriodicCachePersistJob() {
             periodicCachePersisterJob += appCoroutineScope.launch(dispatcherProvider.io()) {
                 while (isActive) {
-                    delay(Random.nextLong(60_000, 120_000))
+                    delay(Random.nextLong(300_000, 600_000))
                     persistCacheToDisk()
                 }
             }
