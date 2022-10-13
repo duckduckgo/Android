@@ -232,7 +232,6 @@
         <item quantity="many">приложениях</item>
         <item quantity="other">приложения</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Эта функция доступна в бета-версии. <annotation type="app_settings_link">Возникли проблемы с приложением?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Функция App Tracking Protection отключена</b> \nИз-за нее возникли сбои в приложениях? <annotation type="report_issues_link">Сообщить о проблемах</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPN-приложение на вашем устройстве отключило защиту от слежки.</b>\nЗащите от слежки вызывает сбои в приложениях? <annotation type="report_issues_link">Сообщить о проблемах</annotation></string>
     <string name="atp_ActivityAbout">О нас</string>

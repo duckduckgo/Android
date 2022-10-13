@@ -232,7 +232,6 @@
         <item quantity="few">Aplikacije</item>
         <item quantity="other">Aplikacij</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Ta funkcija je v različici beta. <annotation type="app_settings_link">Imate težave z aplikacijo?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Zaščita pred sledenjem aplikacijam je onemogočena</b>\nAli je zaščita pred sledenjem aplikacijam povzročila težave z vašimi aplikacijami? <annotation type="report_issues_link">Odgovori o vprašanjih </annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Aplikacija VPN v vaši napravi je onemogočila zaščito pred sledenjem aplikacij App Tracking Protection.</b>\nAli je zaščita pred sledenjem aplikacijam App Tracking Protection povzročila težave z vašimi aplikacijami? <annotation type="report_issues_link">Odgovori o vprašanjih</annotation></string>
     <string name="atp_ActivityAbout">O nas</string>
