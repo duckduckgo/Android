@@ -14,8 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Preenchimento automático de inícios de sessão</string>
 
     <string name="managementLockedModeText">Desbloquear o preenchimento automático</string>
@@ -34,7 +36,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mais opções</string>
 
     <string name="useSavedLoginDialogTitle">Utilizar dados de início de sessão guardados?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Dados de início de sessão para %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Início de sessão em %s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Dados de início de sessão para o site</string>
 
     <string name="updateLoginDialogTitle">Atualizar palavra-passe?</string>
@@ -53,7 +55,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Guardar alterações</string>
     <string name="credentialManagementEditButtonCopyUsername">Copiar nome do utilizador</string>
     <string name="credentialManagementEditButtonCopyPassword">Copiar palavra-passe</string>
-    <string name="credentialManagementEditLastUpdated">Dados de início de sessão atualizados pela última vez em %1$s</string>
+    <string name="credentialManagementEditLastUpdated">Início de sessão atualizado pela última vez em %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Guardar e preencher dados de início de sessão automaticamente</string>
     <string name="credentialManagementViewMenuEdit">Editar</string>
