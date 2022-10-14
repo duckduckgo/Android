@@ -162,7 +162,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
                             if (testCase.expectExpiryToBe < 0) {
                                 assertTrue(diff < 0L)
                             } else {
-                                assertTrue(diff == 0L)
+                                assertTrue(diff > -5L && diff < 5L) // Diff within +- 5 seconds
                             }
                             assertNotNull(cookieManager.getCookie(host))
                         } else {
