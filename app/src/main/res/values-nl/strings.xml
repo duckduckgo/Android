@@ -684,8 +684,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Browse privé met onze app voor Mac</string>
-    <string name="macos_settings_description_list">Je staat op de lijst!</string>
-    <string name="macos_settings_description_ready">Beschikbaar om te downloaden op Mac</string>
     <string name="macos_settings_title">DuckDuckGo-bureaubladapp</string>
 
     <!-- Downloads -->

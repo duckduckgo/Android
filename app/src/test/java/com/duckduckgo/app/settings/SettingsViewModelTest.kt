@@ -38,8 +38,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.macos_api.MacOsWaitlist
-import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
@@ -105,9 +103,6 @@ class SettingsViewModelTest {
     private lateinit var mockEmailManager: EmailManager
 
     @Mock
-    private lateinit var mockMacOsWaitlist: MacOsWaitlist
-
-    @Mock
     private lateinit var autofillStore: AutofillStore
 
     @Mock
@@ -133,7 +128,6 @@ class SettingsViewModelTest {
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
-        whenever(mockMacOsWaitlist.getWaitlistState()).thenReturn(MacWaitlistState.NotJoinedQueue)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
         whenever(mockAppBuildConfig.versionName).thenReturn("name")
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)
@@ -151,7 +145,6 @@ class SettingsViewModelTest {
             mockPixel,
             mockAppBuildConfig,
             mockEmailManager,
-            mockMacOsWaitlist,
             autofillStore,
             vpnFeaturesRegistry,
             autoconsent,

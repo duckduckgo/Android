@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'java-library'
-    id 'kotlin'
+package com.duckduckgo.mobile.android.vpn.dao
+
+import androidx.room.*
+
+@Dao
+interface VpnAddressLookupDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(lookup: VpnAddressLookup)
+
+    @Query("select * from vpn_address_lookup")
+    fun getAll(): List<VpnAddressLookup>
+
+    @Query("delete from vpn_address_lookup")
+    fun deleteAll()
 }
 
-apply from: "$rootProject.projectDir/spotless.gradle"
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-dependencies {
-    implementation Kotlin.stdlib.jdk7
-}
+@Entity(tableName = "vpn_address_lookup")
+data class VpnAddressLookup(
+    @PrimaryKey val address: String,
+    val domain: String,
+)

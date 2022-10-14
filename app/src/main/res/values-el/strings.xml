@@ -684,8 +684,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Περιηγηθείτε ιδιωτικά με την εφαρμογή μας για Mac</string>
-    <string name="macos_settings_description_list">Είστε στη λίστα!</string>
-    <string name="macos_settings_description_ready">Διαθέσιμο για λήψη σε Mac</string>
     <string name="macos_settings_title">Εφαρμογή DuckDuckGo για υπολογιστές</string>
 
     <!-- Downloads -->
