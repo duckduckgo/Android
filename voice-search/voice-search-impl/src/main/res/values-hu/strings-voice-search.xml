@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- smartling.placeholder_format = NONE -->
+    <string name="voiceSearchIconContentDescription">Beszédhangalapú keresés</string>
+    <string name="voiceSearchListening">Most beszélhetsz</string>
+    <string name="voiceSearchListeningFooter">A hang feldolgozása az eszközön történik. Nem tároljuk és nem osztjuk meg senkivel, még a DuckDuckGóval sem.</string>
+    <string name="voiceSearchNegativeAction">Mégsem</string>
+    <string name="voiceSearchPermissionRationaleDescription">A DuckDuckGo soha nem hallgatja azt, amit mondasz. A hang feldolgozása az eszközön történik. A hangot nem tároljuk és nem osztjuk meg senkivel.</string>
+    <string name="voiceSearchPermissionRationaleTitle">A Privát beszédhangalapú kereséshez Mikrofon-hozzáférés szükséges</string>
+    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
+    <string name="voiceSearchPermissionRejectedDialogMessage">A DuckDuckGo beszédhangalapú keresésének használatához a rendszerbeállításokban engedélyezned kell a mikrofonhoz való hozzáférést.</string>
+    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Beállítások</string>
+    <string name="voiceSearchPermissionRejectedDialogTitle">Mikrofon-hozzáférés szükséges</string>
+    <string name="voiceSearchTitle">Beszédhangalapú keresés</string>
+</resources>
