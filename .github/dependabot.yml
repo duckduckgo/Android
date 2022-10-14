@@ -1,0 +1,20 @@
+version: 2
+updates:
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-name: "content-scope-scripts"
+    labels:
+      - "content-scope-script update"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-name: "autoconsent"
+    labels:
+      - "autoconsent update"
