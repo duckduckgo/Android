@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Det gick inte att ladda ner. Kontrollera internetanslutningen.</string>
 
     <string name="notificationChannelFileDownloading">Filen laddas ned</string>
     <string name="notificationChannelFileDownloaded">Filen har laddats ner</string>
+
     <string name="downloadInProgress">Laddar ner</string>
+
+    <string name="downloadsDownloadStartedMessage">Nerladdning påbörjad för %s</string>
+    <string name="downloadsDownloadFinishedMessage">Nerladdning klar för %s</string>
+    <string name="downloadsDownloadGenericErrorMessage">Det gick inte att ladda ner.</string>
+    <string name="downloadsCancel">Avbryt</string>
+    <string name="downloadsRetry">Försök igen</string>
+    <string name="notificationDownloadComplete">Nedladdning klar.</string>
+    <string name="notificationDownloadFailed">Det gick inte att ladda ner.</string>
 </resources>
