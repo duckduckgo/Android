@@ -14,8 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Saisie automatique des identifiants</string>
 
     <string name="managementLockedModeText">Déverrouiller la saisie automatique</string>
@@ -34,7 +36,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Plus d\'options</string>
 
     <string name="useSavedLoginDialogTitle">Utiliser l\'identifiant enregistré ?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Identifiant pour %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Identifiant pour %s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Identifiant pour le site</string>
 
     <string name="updateLoginDialogTitle">Modifier le mot de passe ?</string>
@@ -53,7 +55,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Enregistrer les modifications</string>
     <string name="credentialManagementEditButtonCopyUsername">Copier le nom d\'utilisateur</string>
     <string name="credentialManagementEditButtonCopyPassword">Copier le mot de passe</string>
-    <string name="credentialManagementEditLastUpdated">Dernière mise à jour de l\'identifiant %1$s</string>
+    <string name="credentialManagementEditLastUpdated">Dernière mise à jour de l\'identifiant %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Enregistrer et saisir automatiquement les identifiants</string>
     <string name="credentialManagementViewMenuEdit">Modifier</string>
