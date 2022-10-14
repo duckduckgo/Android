@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
@@ -58,6 +57,11 @@
         <item name="textAppearanceH4">@style/Typography.DuckDuckGo.H4</item>
         <item name="textAppearanceH5">@style/Typography.DuckDuckGo.H5</item>
 
+        <!-- Shape -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.DuckDuckGo.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.DuckDuckGo.LargeComponent</item>
+
         <!-- Android Components -->
         <item name="actionOverflowMenuStyle">@style/PopUpOverflowMenu</item>
         <item name="actionOverflowButtonStyle">@style/PopUpOverflowButton</item>
@@ -75,6 +79,9 @@
         <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
 
         <!-- Design System Components -->
+        <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.Primary</item>
+        <item name="daxButtonSecondary">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
+
         <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
         <item name="primaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Primary.Small</item>
         <item name="secondaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
@@ -228,12 +235,15 @@
         <item name="daxColorSurface">@color/gray90</item>
         <item name="daxColorContainer">@color/black12</item>
         <item name="daxColorPrimaryText">@color/white84</item>
+        <item name="daxColorInversePrimaryText">@color/black84</item>
         <item name="daxColorSecondaryText">@color/white60</item>
         <item name="daxColorPrimaryIcon">@color/white84</item>
         <item name="daxColorDestructive">@color/destructiveRedDark</item>
-        <item name="daxColorDisabled">@color/black35</item>
+        <item name="daxColorContainerDisabled">@color/white18</item>
+        <item name="daxColorTextDisabled">@color/white36</item>
         <item name="daxColorLines">@color/white12</item>
         <item name="daxColorAccentBlue">@color/blue30</item>
+        <item name="daxColorButtonPressed">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
     </style>
 
@@ -348,12 +358,15 @@
         <item name="daxColorSurface">@color/white</item>
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorPrimaryText">@color/black84</item>
+        <item name="daxColorInversePrimaryText">@color/white84</item>
         <item name="daxColorSecondaryText">@color/black60</item>
         <item name="daxColorPrimaryIcon">@color/black84</item>
         <item name="daxColorDestructive">@color/destructiveRedLight</item>
-        <item name="daxColorDisabled">@color/black35</item>
+        <item name="daxColorContainerDisabled">@color/black6</item>
+        <item name="daxColorTextDisabled">@color/black36</item>
         <item name="daxColorLines">@color/black18</item>
         <item name="daxColorAccentBlue">@color/blue50</item>
+        <item name="daxColorButtonPressed">@color/blue70</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
     </style>
 
@@ -372,5 +385,21 @@
     </style>
 
     <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Light"/>
+
+    <style name="ShapeAppearance.DuckDuckGo.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/smallShapeCornerRadius</item>
+    </style>
+
+    <style name="ShapeAppearance.DuckDuckGo.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/mediumShapeCornerRadius</item>
+    </style>
+
+    <style name="ShapeAppearance.DuckDuckGo.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/largeShapeCornerRadius</item>
+    </style>
+
 
 </resources>

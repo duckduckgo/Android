@@ -19,16 +19,20 @@ package com.duckduckgo.mobile.android.ui.view.button
 import android.content.Context
 import android.util.AttributeSet
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.ui.view.button.DaxButton.Type.Primary
+import com.duckduckgo.mobile.android.ui.view.button.Size.Small
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Type
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Type.Body1
 import com.google.android.material.button.MaterialButton
 
-class DaxButton @JvmOverloads
-constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = com.google.android.material.R.attr.materialButtonStyle,
-) : MaterialButton(context, attrs, defStyleAttr) {
+open class DaxButton @JvmOverloads constructor(
+    ctx: Context,
+    attrs: AttributeSet,
+    defStyleAttr: Int
+) : MaterialButton(
+    ctx,
+    attrs,
+    defStyleAttr
+) {
 
     init {
         val typedArray =
@@ -39,53 +43,37 @@ constructor(
                 0
             )
 
-        val buttonType = if (typedArray.hasValue(R.styleable.DaxButton_buttonType)) {
-            Type.from(typedArray.getInt(R.styleable.DaxButton_buttonType, 0))
+        val buttonSize = if (typedArray.hasValue(R.styleable.DaxButton_buttonSize)) {
+            Size.from(typedArray.getInt(R.styleable.DaxButton_buttonSize, 0))
         } else {
-            Primary
+            Small
         }
-
         typedArray.recycle()
 
-        setButtonType(buttonType)
-        setTextAppearance(R.style.TextAppearance_DuckDuckGo_Button1)
+        minHeight = resources.getDimensionPixelSize(Size.dimension(buttonSize))
     }
 
-    fun setButtonType(buttonType: Type) {
-        when (buttonType) {
-            Primary -> setButtonPrimary()
-            else -> setButtonSecondary()
+}
+
+enum class Size {
+    Small,
+    Large;
+
+    companion object {
+        fun from(size: Int): Size {
+            // same order as attrs-button.xml
+            return when (size) {
+                0 -> Small
+                1 -> Large
+                else -> Large
+            }
         }
-    }
 
-    private fun setButtonPrimary(){
-        setBackgroundResource(R.drawable.background_blue_button_primary)
-        setTextColor(resources.getColorStateList(R.color.primary_text_color_selector))
-    }
-
-    private fun setButtonSecondary(){
-        setBackgroundResource(R.drawable.background_transparent_button_rounded_corners)
-        setTextColor(resources.getColorStateList(R.color.accent_blue_text_color_selector))
-    }
-
-    enum class Type {
-        Primary,
-        Secondary,
-        Ghost,
-        Destructive,
-        GhostDestructive;
-
-        companion object {
-            fun from(type: Int): Type {
-                // same order as attrs-button.xml
-                return when (type) {
-                    0 -> Primary
-                    1 -> Secondary
-                    2 -> Ghost
-                    3 -> Destructive
-                    4 -> GhostDestructive
-                    else -> Primary
-                }
+        fun dimension(size: Size): Int {
+            return when (size) {
+                Small-> R.dimen.buttonSmallHeight
+                Large-> R.dimen.buttonLargeHeight
+                else -> R.dimen.buttonSmallHeight
             }
         }
     }

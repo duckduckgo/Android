@@ -26,6 +26,11 @@
     <dimen name="keyline_5">24dp</dimen>
     <dimen name="keyline_6">48dp</dimen>
 
+    <!-- Shape radius -->
+    <dimen name="smallShapeCornerRadius">8dp</dimen>
+    <dimen name="mediumShapeCornerRadius">12dp</dimen>
+    <dimen name="largeShapeCornerRadius">16dp</dimen>
+
     <!-- App Components -->
 
     <!-- Toolbar -->

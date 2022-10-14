@@ -158,6 +158,28 @@
     </style>
 
     <!-- Buttons -->
+    <style name="Widget.DuckDuckGo.DaxButton.Primary" parent="Widget.MaterialComponents.Button">
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="android:textColor">@color/primary_text_inverted_color_selector</item>
+        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
+        <item name="backgroundTint">@color/primary_button_background_selector</item>
+        <item name="rippleColor">@color/primary_button_ripple_selector</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="android:textColor">@color/secondary_button_text_color_selector</item>
+        <item name="shapeAppearance">?attr/shapeAppearanceSmallComponent</item>
+        <item name="strokeColor">@color/secondary_button_stroke_selector</item>
+        <item name="rippleColor">@color/primary_button_ripple_selector</item>
+    </style>
+
+    <style name="ThemeOverlay.DuckDuckGo.Button" parent="">
+        <item name="colorPrimary">@color/blue50</item>
+        <item name="colorOnPrimary">@color/blue70</item>
+        <item name="colorOnSurface">?attr/daxColorInversePrimaryText</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.Button" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/white</item>

@@ -34,13 +34,18 @@
     <attr name="daxColorSurface" format="color"/>
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
+    <attr name="daxColorInversePrimaryText" format="color"/>
     <attr name="daxColorSecondaryText" format="color"/>
     <attr name="daxColorPrimaryIcon" format="color"/>
     <attr name="daxColorDestructive" format="color"/>
     <attr name="daxColorLines" format="color"/>
     <attr name="daxColorAccentBlue" format="color"/>
     <attr name="daxColorAccentYellow" format="color"/>
-    <attr name="daxColorDisabled" format="color"/>
+    <attr name="daxColorContainerDisabled" format="color"/>
+    <attr name="daxColorTextDisabled" format="color"/>
+
+    <!-- Component Specific Colors -->
+    <attr name="daxColorButtonPressed" format="color"/>
 
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
@@ -87,6 +92,7 @@
 
     <color name="white84">#D6FFFFFF</color>
     <color name="white60">#99FFFFFF</color>
+    <color name="white36">#5CFFFFFF</color>
     <color name="white18">#2EFFFFFF</color>
     <color name="white12">#1FFFFFFF</color>
     <color name="white">#FFFFFF</color>
