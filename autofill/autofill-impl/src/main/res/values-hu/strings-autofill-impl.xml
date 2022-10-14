@@ -14,8 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Bejelentkezési adatok automatikus kitöltése</string>
 
     <string name="managementLockedModeText">Automatikus kitöltés feloldása</string>
@@ -34,7 +36,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">További lehetőségek</string>
 
     <string name="useSavedLoginDialogTitle">Mentett bejelentkezés használata?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Bejelentkezés - %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">A(z) %s bejelentkezési adatai</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Bejelentkezés webhelyre</string>
 
     <string name="updateLoginDialogTitle">Frissíted a jelszót?</string>
@@ -53,7 +55,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Módosítások mentése</string>
     <string name="credentialManagementEditButtonCopyUsername">Felhasználónév másolása</string>
     <string name="credentialManagementEditButtonCopyPassword">Jelszó másolása</string>
-    <string name="credentialManagementEditLastUpdated">Bejelentkezés utolsó frissítése: %1$s</string>
+    <string name="credentialManagementEditLastUpdated">Bejelentkezés utolsó frissítése: %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Bejelentkezések mentése és automatikus kitöltése</string>
     <string name="credentialManagementViewMenuEdit">Szerkesztés</string>

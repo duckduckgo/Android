@@ -14,8 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Compilazione automatica dei dati di accesso</string>
 
     <string name="managementLockedModeText">Sblocca la compilazione automatica</string>
@@ -34,7 +36,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Altre opzioni</string>
 
     <string name="useSavedLoginDialogTitle">Usare i dati di accesso salvati?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Dati di accesso per %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Accesso per %s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Dati di accesso per il sito</string>
 
     <string name="updateLoginDialogTitle">Aggiornare password?</string>
@@ -53,7 +55,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Salva modifiche</string>
     <string name="credentialManagementEditButtonCopyUsername">Copia nome utente</string>
     <string name="credentialManagementEditButtonCopyPassword">Copia password</string>
-    <string name="credentialManagementEditLastUpdated">Ultimo aggiornamento dei dati di accesso %1$s</string>
+    <string name="credentialManagementEditLastUpdated">Ultimo aggiornamento dei dati di accesso il %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Salva e compila automaticamente i dati di accesso</string>
     <string name="credentialManagementViewMenuEdit">Modifica</string>
