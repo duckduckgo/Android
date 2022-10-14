@@ -14,87 +14,90 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="atp_name">Alkalmazáskövetés elleni védelem</string>
     <string name="refresh">Frissítés</string>
 
     <!-- Debug Screens -->
     <string name="atp_DiagnosticsMenuLabel">Diagnosztika</string>
     <string name="atp_DataMenuLabel">Adatstatisztikák</string>
-    <string name="atp_MeteredConnection">"Mért: %1$s"</string>
-    <string name="atp_ConnectionStatus">"VPN csatlakoztatva: %1$s"</string>
-    <string name="atp_NetworkAvailable">"Internethez csatlakoztatva: %1$s"</string>
-    <string name="atp_DnsServers">"Aktív hálózati DNS: %1$s"</string>
+    <string name="atp_MeteredConnection">"Forgalmi díjas: %s"</string>
+    <string name="atp_ConnectionStatus">"VPN csatlakoztatva: %s"</string>
+    <string name="atp_NetworkAvailable">"Internethez csatlakoztatva: %s"</string>
+    <string name="atp_DnsServers">"Aktív hálózati DNS: %s"</string>
     <string name="atp_AppExitsReasonsTitle">Az alkalmazásból való kilépés okai</string>
     <string name="atp_AppRestartsTitle">Az alkalmazás újraindul</string>
 
     <!-- Diagnostics -->
-    <string name="vpnTimeRunning">Futási idő: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday">A mai napon letiltott nyomkövető cégek: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek">Ezen a héten letiltott nyomkövető cégek: %1$d</string>
+    <string name="vpnTimeRunning">Futási idő: %s</string>
+    <string name="vpnTrackerCompaniesBlockedToday">A mai napon letiltott nyomkövető cégek: %d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek">Ezen a héten letiltott nyomkövető cégek: %d</string>
     <string name="vpnTrackerCompaniesNone">"Még egyetlen nyomkövető cég sem lett letiltva"</string>
-    <string name="vpnTrackersBlockedToday">A mai napon letiltott nyomkövetők: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek">A héten letiltott nyomkövetők: %1$d</string>
+    <string name="vpnTrackersBlockedToday">A mai napon letiltott nyomkövetők: %d</string>
+    <string name="vpnTrackersBlockedThisWeek">Ezen a héten letiltott nyomkövetők: %d</string>
     <string name="vpnTrackersNone">"Még nincsenek letiltott nyomkövetők"</string>
     <string name="vpnNotRunYet">"A VPN még nem futott"</string>
-    <string name="vpnDataTransferred">"%1$1s\n%2$2s csomag"</string>
+    <string name="vpnDataTransferred">"%1s\n%2s csomag"</string>
 
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Problémáid vannak egy alkalmazással?</string>
     <string name="atp_OnInitialNotification">"Az alkalmazáskövetés elleni védelem be van kapcsolva, és letiltja a követési kísérleteket az alkalmazásokban"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Nyomkövető tevékenység keresése… bíp… búp"</string>
-    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ Nyomkövetési kísérletek blokkolva <b>%1$d alkalmazásban</b> (az elmúlt egy órában).]]></item>
-        <item quantity="other"><![CDATA[ Nyomkövetési kísérletek blokkolva <b>%1$d alkalmazásban</b> (az elmúlt egy órában).]]></item>
+    <plurals name="atp_OnNotification">
+        <item quantity="one"><![CDATA[ Nyomkövetési kísérletek blokkolva lettek <b>%d alkalmazásban</b> (az elmúlt órában).]]></item>
+        <item quantity="other"><![CDATA[ Nyomkövetési kísérletek blokkolva lettek <b>%d alkalmazásban</b> (az elmúlt órában).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">Az alkalmazáskövetés elleni védelem ki van kapcsolva. Koppints a nyomkövetési kísérletek blokkolásának folytatásához.</string>
     <string name="atp_RevokedNotification">A készülékeden lévő VPN alkalmazás letiltotta az alkalmazáskövetés elleni védelmet. Koppints az újbóli engedélyezéshez.</string>
 
     <!-- App Tracking Protection Daily Notification -->
-    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet</b> blokkolt (az elmúlt egy napban).]]></string>
-    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt 1 alkalmazásban, %2$s</b> (az elmúlt egy napban).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt</b> (az elmúlt egy napban).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt %2$d alkalmazásban, beleértve a(z) %3$s alkalmazást is</b> (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d nyomkövetési kísérletet</b> blokkolt (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt 1 alkalmazásban, %2$d</b> (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet</b> blokkolt (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt %2$d alkalmazásban, beleértve a(z) %3$d alkalmazást is</b> (az elmúlt egy napban).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[A(z) %1$s megpróbált követni téged <b>%2$d alkalmazásban</b> (az elmúlt egy napban). <b>Továbbiak megjelenítése</b>]]></item>
+    <plurals name="atp_DailyTopCompanyNotification">
+        <item quantity="one"><![CDATA[A(z) %1$d megpróbált követni téged <b>%2$d alkalmazásban</b> (az elmúlt egy napban). <b>Továbbiak megjelenítése</b>]]></item>
         <item quantity="other"><![CDATA[A(z) %1$s megpróbált követni téged <b>%2$d alkalmazásban</b> (az elmúlt egy napban). <b>Továbbiak megjelenítése</b>]]></item>
     </plurals>
 
-     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a legtöbb követési kísérletet a(z) <b>%1$s</b> alkalmazásban (az elmúlt egy napban).]]></item>
-        <item quantity="other"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a legtöbb követési kísérletet a(z) <b>%1$s</b> és a(z) <b>%2$s</b> alkalmazásban (az elmúlt egy napban).]]></item>
+    <plurals name="atp_DailyCompanyBlockedNotification">
+        <item quantity="one"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a legtöbb követési kísérletet a(z) <b>%1$d</b> alkalmazásban (az elmúlt egy napban).]]></item>
+        <item quantity="other"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a legtöbb követési kísérletet a(z) <b>%1$d</b> és a(z) <b>%2$d</b> alkalmazásban (az elmúlt egy napban).]]></item>
     </plurals>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalommal a(z) %3$s</b> alkalmazásban (az elmúlt egy napban).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalommal a(z) %3$s és egy másik alkalmazásban</b> (az elmúlt egy napban).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalommal a(z) %3$s és %4$d másik alkalmazásban</b> (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%s nyomkövetőjét %d alkalommal a(z) %s</b> alkalmazásban (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%s nyomkövetőjét %d alkalommal a(z) %s és egy másik alkalmazásban</b> (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%s nyomkövetőjét %d alkalommal a(z) %s és %d másik alkalmazásban</b> (az elmúlt egy napban).]]></string>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalommal a(z) %3$s alkalmazásban</b> (az elmúlt egy napban).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalommal a(z) %3$s és egy másik alkalmazásban</b> (az elmúlt egy napban).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalommal a(z) %3$s és %4$d másik alkalmazásban</b> (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%s nyomkövetőjét %d alkalommal a(z) %s</b> alkalmazásban (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%s nyomkövetőjét %d alkalommal a(z) %s és egy másik alkalmazásban</b> (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%s nyomkövetőjét %d alkalommal a(z) %s és %d másik alkalmazásban</b> (az elmúlt egy napban).]]></string>
 
     <!-- App Tracking Protection Weekly Notification -->
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet itt:%2$s</b> (az elmúlt héten).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet a(z) %2$s és egy másik alkalmazásban</b> (az elmúlt héten).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet a(z) %2$s és egy %3$d másik alkalmazásban</b> (az elmúlt héten).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet %2$s</b> (az elmúlt héten).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet a(z) %2$s és egy másik alkalmazásban</b> (az elmúlt héten).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet a(z) %2$s és egy %3$d másik alkalmazásban</b> (az elmúlt héten).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%d követési kísérletet a(z) %s alkalmazásban</b> (az elmúlt héten).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%d követési kísérletet a(z) %s és egy másik alkalmazásban</b> (az elmúlt héten).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%d követési kísérletet a(z) %s és %d másik alkalmazásban</b> (az elmúlt héten).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%d követési kísérletet a(z) %s alkalmazásban</b> (az elmúlt héten).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%d követési kísérletet a(z) %s és egy másik alkalmazásban</b> (az elmúlt héten).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%d követési kísérletet a(z) %s és %d másik alkalmazásban</b> (az elmúlt héten).]]></string>
 
-     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét egy %2$d alkalmazásban: %3$s</b> (az elmúlt héten).]]></item>
-        <item quantity="other"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%1$s nyomkövetőjét %2$d alkalmazásban, köztük itt: %3$s</b> (az elmúlt héten).]]></item>
+    <plurals name="atp_WeeklyCompanyTeaserNotification">
+        <item quantity="one"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%s nyomkövetőjét %d alkalmazásban, itt: %s</b> (az elmúlt héten).]]></item>
+        <item quantity="other"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolta a(z) <b>%s nyomkövetőjét %d alkalmazásban, többek között a(z) %s alkalmazásban</b> (az elmúlt héten).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Alkalmazáskövetés elleni védelem bekapcsolása</string>
 
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet itt: %2$s </b> (az elmúlt egy órában).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérlet a(z) %2$s és egy másik alkalmazásban</b> (az elmúlt egy órában).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérlet a(z) %2$s és %3$d másik alkalmazásban</b> (az elmúlt egy órában).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérletet a(z) %2$s alkalmazásban</b> (az elmúlt egy órában).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérlet a(z) %2$s és egy másik alkalmazásban</b> (az elmúlt egy órában).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%1$d követési kísérlet a(z) %2$s és %3$d másik alkalmazásban</b> (az elmúlt egy órában).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%d követési kísérletet a(z) %s alkalmazásban</b> (az elmúlt órában).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%d követési kísérletet a(z) %s és egy másik alkalmazásban</b> (az elmúlt órában).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%d követési kísérletet a(z) %s és %d másik alkalmazásban</b> (az elmúlt órában).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%d követési kísérletet a(z) %s alkalmazásban</b> (az elmúlt órában).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%d követési kísérletet a(z) %s és egy másik alkalmazásban</b> (az elmúlt órában).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Az alkalmazáskövetés elleni védelem blokkolt <b>%d követési kísérletet a(z) %s és %d másik alkalmazásban</b> (az elmúlt órában).]]></string>
 
     <!-- App Tracking Protection Privacy Report -->
     <string name="atp_PrivacyReportEnabledTooltip">Az alkalmazáskövetés elleni védelem be van kapcsolva, és blokkolja a nyomkövetőket a készülékeden</string>
@@ -102,7 +105,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Alkalmazáskövetés elleni védelem bekapcsolása</string>
     <string name="atp_OnboardingLastPageOneTitle">Egy egyszerű lépés az alkalmazások jobb védelme érdekében!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Azt találtuk, hogy a <b>népszerű ingyenes alkalmazások több mint 96\u0025-a</b> lehetővé teszi más cégeknek, hogy nyomon kövessék a személyes adataid még alvás közben is.\n\nNézd meg, hogy mely alkalmazások <b>segítségével követhetnek más cégek,</b> és vedd vissza az irányítást!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">Azt találtuk, hogy a <b>népszerű ingyenes alkalmazások több mint 96%-a</b> lehetővé teszi más cégeknek, hogy nyomon kövessék a személyes adataid még alvás közben is.\n\nNézd meg, hogy mely alkalmazások <b>segítségével követhetnek más cégek,</b> és vedd vissza az irányítást!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Hogyan működik?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Az alkalmazáskövetés elleni védelem <b>észleli és blokkolja más cégek alkalmazáskövetőit,</b> például amikor a Facebook megpróbál nyomon követni egy egészségügyi alkalmazásban.\n\n<b>Ingyenes</b>, és az alkalmazásokat a szokásos módon használhatod. A háttérben dolgozva <b>véd meg éjjel és nappal.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Ki látja az adataidat?</string>
@@ -113,7 +116,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Alkalmazáskövetés elleni védelem</string>
-    <string name="atp_daxOnboardingIntroMessage">A népszerű ingyenes alkalmazások több mint 96\u0025-a lehetővé teszi más cégeknek, hogy nyomon kövessenek, még akkor is, ha éppen nem használod a telefont. Az alkalmazáskövetés elleni védelem felismeri és blokkolja ezeket a követési kísérleteket.</string>
+    <string name="atp_daxOnboardingIntroMessage">A népszerű ingyenes alkalmazások több mint 96%-a lehetővé teszi más cégeknek, hogy nyomon kövessenek, még akkor is, ha éppen nem használod a telefont. Az alkalmazáskövetés elleni védelem felismeri és blokkolja ezeket a követési kísérleteket.</string>
     <string name="atp_daxOnboardingPermissionTitle">Hogyan működik?</string>
     <string name="atp_daxOnboardingPermissionMessage">Az alkalmazáskövetés elleni védelem nem VPN. Az eszköz azonban ekként ismeri fel. Ez azért van, mert a működéshez helyi VPN-kapcsolatot használ. Soha nem irányítja át az alkalmazásadatokat külső szerveren keresztül. <annotation type="learn_more_link">További információ</annotation></string>
 
@@ -141,7 +144,7 @@
     <string name="atp_ExcludeAppsManuallyCTACancel">Mégsem</string>
     <string name="atp_ExcludeAppsManuallyCTAEnable">Engedélyezés</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Visszaállítás</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Manuálisan bekapcsolod a védelmet a(z) %1$s alkalmazás számára?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName">Manuálisan bekapcsolod a védelmet a(z) %s alkalmazás számára?</string>
     <string name="atp_ExcludeAppsManuallyEnableAppLabel">Ebben az alkalmazásban köztudottan problémák lépnek fel, ha a követési kísérletek sikertelenek.</string>
     <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Előfordulhat, hogy az alkalmazásban lévő webhelytartalom nem jelenik meg megfelelően, ha a védelem be van kapcsolva.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">A védelem bekapcsolása elküldi az alkalmazás nevét a DuckDuckGo részére.</string>
@@ -162,7 +165,7 @@
     <!--  Breakage report app list  -->
     <string name="atp_ReportBreakageAppListActivityTitle">Probléma jelentése</string>
     <string name="atp_ReportBreakageAppFeature"><b>Válaszd ki a problémás alkalmazást</b>. A visszajelzésed segít bennünket a fejlődésben!\n\nÁltalános visszajelzésed van az alkalmazáskövetés elleni védelemmel kapcsolatban? Akkor inkább használd <annotation type="use_this_form_link">ezt az űrlapot</annotation>.</string>
-    <string name="atp_ReportBreakageAppEntry">%1$s alkalmazás</string>
+    <string name="atp_ReportBreakageAppEntry">%s alkalmazás</string>
     <string name="atp_ReportBreakageAppSubmitCta">Elküldés</string>
     <string name="atp_ReportBreakageAppNextCta">Következő</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Írd le, mi történik, mire számítottál, és milyen lépések vezettek a problémához.</string>
@@ -189,7 +192,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Az alkalmazáskövetőkről</string>
     <string name="atp_ProfilingInfoTitle">Mik az alkalmazáskövetők?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Valószínűleg hallottál már arról, hogy olyan cégek, mint a Google és a Facebook a háttérben, harmadik felek weboldalain követnek téged. De tudtad, hogy a személyes adataidat is nyomon követik a készülékeden lévő alkalmazásokon keresztül?\n\n<b>Leteszteltünk 100 népszerű ingyenes androidos alkalmazást, és több mint 96\u0025-uk</b> tartalmazott rejtett, harmadik féltől származó nyomkövetőket. Ezek 87\u0025-a küldött adatokat a Google-nak és 68\u0025-a a Facebooknak. Ez akkor is megtörténik, ha éppen nem használod a készüléket.\n\n<b>Az alkalmazásokban lévő nyomkövetők sokkal több információhoz férhetnek hozzá,</b> mint a webhelykövető társaik, például a tartózkodási helyedhez, akár az épület emeletének megállapításával, vagy ahhoz, hogy a munkahelyeden milyen gyakran játszol, és naponta mikor, mennyi ideig alszol. <b>Még ha például nincs is Google- vagy Facebook-fiókod, akkor is gyűjthetnek rólad adatokat az alkalmazásaidon keresztül.</b>\n\nAz nyomkövető hálózatok, mint a Facebook és a Google, ezeket az apró információmorzsákat <b>arra használják, hogy digitális profilt készítsenek rólad.</b> Ezzel a nyomkövető hálózatok manipulálhatják, hogy mit látsz az interneten, és lehetővé teszik a hirdetők számára, hogy az adataid alapján árajánlatot tegyenek az elérésedre.\n\nAz alkalmazásokban lévő nyomkövetők NAGY problémát jelentenek az adatvédelem szempontjából. <b>De a DuckDuckGónak van egy megoldása, amely segíthet.</b>\n\nHa a DuckDuckGo Privacy Browser alkalmazásban engedélyezve van, akkor az alkalmazáskövetés elleni védelem számos nyomkövetőt blokkol a készülékeden lévő alkalmazásokban, miközben DuckDuckGo alkalmazás blokkolja a weboldalakon található nyomkövetőket, amikor böngészel. <b>Ez a kettős védelemmel a nyomkövető cégek összességében kevesebbet fognak tudni rólad</b>, így nagyobb nyugalommal használhatod az alkalmazásokat, tudva, hogy nagyobb védelemben részesülsz.</string>
+    <string name="atp_ProfilingInfoFirstParagraph">Valószínűleg hallottál már arról, hogy olyan cégek, mint a Google és a Facebook a háttérben, harmadik felek weboldalain követnek téged. De tudtad, hogy a személyes adataidat is nyomon követik a készülékeden lévő alkalmazásokon keresztül?\n\n<b>Leteszteltünk 100 népszerű ingyenes androidos alkalmazást, és több mint 96\\%-uk</b> tartalmazott rejtett, harmadik féltől származó nyomkövetőket. Ezek 87\\%-a küldött adatokat a Google-nak és 68\\%-a a Facebooknak. Ez akkor is megtörténik, ha éppen nem használod a készüléket.\n\n<b>Az alkalmazásokban lévő nyomkövetők sokkal több információhoz férhetnek hozzá,</b> mint a webhelykövető társaik, például a tartózkodási helyedhez, akár az épület emeletének megállapításával, vagy ahhoz, hogy a munkahelyeden milyen gyakran játszol, és naponta mikor, mennyi ideig alszol. <b>Még ha például nincs is Google- vagy Facebook-fiókod, akkor is gyűjthetnek rólad adatokat az alkalmazásaidon keresztül.</b>\n\nAz nyomkövető hálózatok, mint a Facebook és a Google, ezeket az apró információmorzsákat <b>arra használják, hogy digitális profilt készítsenek rólad.</b> Ezzel a nyomkövető hálózatok manipulálhatják, hogy mit látsz az interneten, és lehetővé teszik a hirdetők számára, hogy az adataid alapján árajánlatot tegyenek az elérésedre.\n\nAz alkalmazásokban lévő nyomkövetők NAGY problémát jelentenek az adatvédelem szempontjából. <b>De a DuckDuckGónak van egy megoldása, amely segíthet.</b>\n\nHa a DuckDuckGo Privacy Browser alkalmazásban engedélyezve van, akkor az alkalmazáskövetés elleni védelem számos nyomkövetőt blokkol a készülékeden lévő alkalmazásokban, miközben DuckDuckGo alkalmazás blokkolja a weboldalakon található nyomkövetőket, amikor böngészel. <b>Ez a kettős védelemmel a nyomkövető cégek összességében kevesebbet fognak tudni rólad</b>, így nagyobb nyugalommal használhatod az alkalmazásokat, tudva, hogy nagyobb védelemben részesülsz.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Az elmúlt 7 nap</string>
@@ -202,21 +205,29 @@
     <string name="atp_ActivityBetaInstructions">Béta utasítások</string>
     <string name="atp_ActivityManageProtection">Problémáid vannak egy alkalmazással?</string>
 
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
+        <![CDATA[1 nyomkövetési kísérlet blokkolva 1 cégtől a(z) <b>%1$s</b> alkalmazásban]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies" instruction="Placeholder %1$d is the number of companies doing the tracking. Placeholder %2$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 5 companies in Venmo app.">
+        <![CDATA[1 nyomkövetési kísérlet blokkolva %1$d cégtől a(z) <b>%2$s</b> alkalmazásban]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$s is the name of the app doing the tracking. Example: 5 tracking attempts blocked from 1 company in Venmo app.">
+        <![CDATA[%1$d nyomkövetési kísérlet blokkolva 1 cégtől a(z) <b>%2$s</b> alkalmazásban]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
+        <![CDATA[%1$d nyomkövetési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]>
+    </string>
 
     <string name="atp_ActivityEmptyListTitle">Nincs új tevékenység</string>
     <string name="atp_ActivityEmptyListMessage">Továbbra is használd a készülékedet Az alkalmazáskövetés elleni védelem által blokkolt követési kísérletek itt jelennek meg.</string>
     <string name="atp_ActivityPastWeekBlocked">Blokkolt</string>
     <string name="atp_ActivityPastWeekAcross">Itt:</string>
 
-     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Követési kísérlet</item>
         <item quantity="other">Követési kísérletek</item>
     </plurals>
-      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Alkalmazás</item>
         <item quantity="other">Alkalmazások</item>
     </plurals>
@@ -269,18 +280,19 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%1$d kísérlet. A következőket gyűjti:</item>
-        <item quantity="other">%1$d kísérlet. A következőket gyűjti:</item>
+        <item quantity="one">%d kísérlet. A következőket gyűjti:</item>
+        <item quantity="other">%d kísérlet. A következőket gyűjti:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">%1$d követési kísérletet blokkolva</item>
-        <item quantity="other">%1$d követési kísérletet blokkolva</item>
+        <item quantity="one">%d nyomkövetési kísérlet blokkolva</item>
+        <item quantity="other">%d nyomkövetési kísérlet blokkolva</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Az alkalmazással kapcsolatos probléma bejelentése</string>
-    <string name="atp_CompanyDetailsTrackingShowMore">További %1$d megjelenítése</string>
+    <string name="atp_CompanyDetailsTrackingShowMore">%d további megjelenítése</string>
     <string name="atp_CompanyDetailsTrackingLearnMore">Az alkalmazásokban lehetnek más cégek nyomkövetői, például analitikai és marketing célú megoldások. Ha nem blokkolnánk őket, ezek a nyomkövetők még részletesebb digitális profilt készíthetnánek rólad. <annotation type="learn_more_link">További információ.</annotation></string>
     <string name="atp_CompanyDetailsTrackingShowLess">Mutass kevesebbet</string>
     <string name="atp_CompanyDetailsAppInfoPanel">A védelem jelenleg le van tiltva ennél az alkalmazásnál. Ha az alkalmazáskövetés elleni védelem problémát okozott, <annotation type="report_issues_link">jelentsd a hibát</annotation></string>
+    <string name="atp_CompanyDetailsNotAvailableForUninstalledApps" instruction="Toast shown when users tap on item that corresponds to an already uninstalled application">Az eltávolított alkalmazások esetén a nyomkövető adatai nem állnak rendelkezésre</string>
 
     <!--  App Tracking Company Signals -->
     <string name="atp_TrackingSignalAAID">Android hirdetési azonosító</string>
