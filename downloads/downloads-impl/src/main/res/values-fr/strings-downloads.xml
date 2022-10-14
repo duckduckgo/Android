@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Échec du téléchargement. Vérifiez la connexion Internet.</string>
 
     <string name="notificationChannelFileDownloading">Téléchargement du fichier</string>
     <string name="notificationChannelFileDownloaded">Fichier téléchargé</string>
+
     <string name="downloadInProgress">Téléchargement en cours</string>
+
+    <string name="downloadsDownloadStartedMessage">Début du téléchargement pour %s</string>
+    <string name="downloadsDownloadFinishedMessage">Téléchargement terminé pour %s</string>
+    <string name="downloadsDownloadGenericErrorMessage">Échec du téléchargement.</string>
+    <string name="downloadsCancel">Annuler</string>
+    <string name="downloadsRetry">Réessayer</string>
+    <string name="notificationDownloadComplete">Téléchargement terminé.</string>
+    <string name="notificationDownloadFailed">Échec du téléchargement.</string>
 </resources>

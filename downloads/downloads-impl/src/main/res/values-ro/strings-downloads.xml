@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Nu s-a putut descărca. Verifică conexiunea la internet.</string>
 
     <string name="notificationChannelFileDownloading">Descărcare fișier</string>
     <string name="notificationChannelFileDownloaded">Fișier descărcat</string>
+
     <string name="downloadInProgress">Se descarcă</string>
+
+    <string name="downloadsDownloadStartedMessage">Descărcarea a început pentru %s</string>
+    <string name="downloadsDownloadFinishedMessage">Descărcare finalizată pentru %s</string>
+    <string name="downloadsDownloadGenericErrorMessage">Nu s-a putut descărca.</string>
+    <string name="downloadsCancel">Anulează</string>
+    <string name="downloadsRetry">Reîncearcă</string>
+    <string name="notificationDownloadComplete">Descărcare completă.</string>
+    <string name="notificationDownloadFailed">Nu s-a putut descărca.</string>
 </resources>
