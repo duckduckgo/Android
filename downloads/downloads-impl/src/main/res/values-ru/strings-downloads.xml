@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Ошибка загрузки. Проверьте подключение к интернету.</string>
 
     <string name="notificationChannelFileDownloading">Загрузка файла</string>
     <string name="notificationChannelFileDownloaded">Файл загружен</string>
+
     <string name="downloadInProgress">Загрузка</string>
+
+    <string name="downloadsDownloadStartedMessage">Началась загрузка файла %s</string>
+    <string name="downloadsDownloadFinishedMessage">Завершена загрузка %s</string>
+    <string name="downloadsDownloadGenericErrorMessage">Сбой загрузки.</string>
+    <string name="downloadsCancel">Отменить</string>
+    <string name="downloadsRetry">Повторить попытку</string>
+    <string name="notificationDownloadComplete">Загрузка завершена.</string>
+    <string name="notificationDownloadFailed">Сбой загрузки.</string>
 </resources>
