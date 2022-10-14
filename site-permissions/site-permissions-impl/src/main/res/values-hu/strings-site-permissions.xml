@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s hozzá akar férni a kamerához és a mikrofonhoz</string>
-    <string name="sitePermissionsMicDialogTitle">%1$s hozzá akar férni a mikrofonhoz</string>
-    <string name="sitePermissionsCameraDialogTitle">%1$s hozzá akar férni a kamerához</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle">A(z) „%1$s” hozzá akar férni a kamerához és a mikrofonhoz</string>
+    <string name="sitePermissionsMicDialogTitle">A(z) „%1$s” hozzá akar férni a mikrofonhoz</string>
+    <string name="sitePermissionsCameraDialogTitle">A(z) „%1$s” hozzá akar férni a kamerához</string>
     <string name="sitePermissionsDialogContent">A megadott engedélyek a beállításokban kezelhetők</string>
     <string name="sitePermissionsDialogDenyButton">Megtagadás</string>
     <string name="sitePermissionsDialogAllowButton">Engedélyezés</string>
