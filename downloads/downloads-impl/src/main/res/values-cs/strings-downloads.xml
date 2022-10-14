@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Stahování se nezdařilo. Zkontrolujte připojení k internetu.</string>
 
     <string name="notificationChannelFileDownloading">Stahování souboru</string>
     <string name="notificationChannelFileDownloaded">Soubor stažen</string>
+
     <string name="downloadInProgress">Stahování</string>
+
+    <string name="downloadsDownloadStartedMessage">Začal se stahovat soubor %s</string>
+    <string name="downloadsDownloadFinishedMessage">Soubor %s je stažený</string>
+    <string name="downloadsDownloadGenericErrorMessage">Stahování se nezdařilo.</string>
+    <string name="downloadsCancel">Zrušit</string>
+    <string name="downloadsRetry">Zkusit znovu</string>
+    <string name="notificationDownloadComplete">Stahování dokončeno.</string>
+    <string name="notificationDownloadFailed">Stahování se nezdařilo.</string>
 </resources>
