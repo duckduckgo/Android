@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Nedlastingen mislyktes. Sjekk internettforbindelsen.</string>
 
     <string name="notificationChannelFileDownloading">Filen lastes ned</string>
     <string name="notificationChannelFileDownloaded">Filen er lastet ned</string>
+
     <string name="downloadInProgress">Laster ned</string>
+
+    <string name="downloadsDownloadStartedMessage">Nedlasting startet for %s</string>
+    <string name="downloadsDownloadFinishedMessage">Nedlasting fullført for %s</string>
+    <string name="downloadsDownloadGenericErrorMessage">Nedlastingen mislyktes.</string>
+    <string name="downloadsCancel">Avbryt</string>
+    <string name="downloadsRetry">Prøv igjen</string>
+    <string name="notificationDownloadComplete">Nedlastingen er fullført.</string>
+    <string name="notificationDownloadFailed">Nedlastingen mislyktes.</string>
 </resources>

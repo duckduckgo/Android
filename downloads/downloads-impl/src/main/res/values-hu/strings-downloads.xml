@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">A letöltés sikertelen. Ellenőrizd az internetkapcsolatot.</string>
 
     <string name="notificationChannelFileDownloading">Fájl letöltése folyamatban</string>
     <string name="notificationChannelFileDownloaded">Fájl letöltve</string>
+
     <string name="downloadInProgress">Letöltés</string>
+
+    <string name="downloadsDownloadStartedMessage">A letöltés elindult: %@</string>
+    <string name="downloadsDownloadFinishedMessage">A letöltés befejeződött: %s</string>
+    <string name="downloadsDownloadGenericErrorMessage">A letöltés sikertelen.</string>
+    <string name="downloadsCancel">Mégsem</string>
+    <string name="downloadsRetry">Újrapróbálkozás</string>
+    <string name="notificationDownloadComplete">Letöltés kész.</string>
+    <string name="notificationDownloadFailed">A letöltés sikertelen.</string>
 </resources>
