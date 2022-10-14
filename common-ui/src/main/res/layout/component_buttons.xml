@@ -33,21 +33,45 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButton
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/dax_button_primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:buttonType="primary"
-            android:text="Dax Button Primary"/>
+            android:text="Button Primary"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButton
-            android:id="@+id/dax_button_secondary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:buttonType="secondary"
-            android:text="Dax Button Secondary"/>
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        android:id="@+id/dax_button_primary_large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:buttonSize="large"
+        android:text="Button Primary Large"/>
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        android:id="@+id/dax_button_primary_disabled"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:text="Button Primary Disabled"/>
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+        android:id="@+id/dax_button_secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Button Secondary"/>
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+        android:id="@+id/dax_button_secondary_large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:buttonSize="large"
+        android:text="Button Secondary Large"/>
+
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+        android:id="@+id/dax_button_secondary_disabled"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:text="Button Secondary Disabled"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:id="@+id/label"
