@@ -14,8 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Fyll i inloggningar automatiskt</string>
 
     <string name="managementLockedModeText">Lås upp automatisk ifyllning</string>
@@ -34,7 +36,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Fler alternativ</string>
 
     <string name="useSavedLoginDialogTitle">Använd sparad inloggning?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Inloggning för %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Inloggning för %s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Inloggning för webbplatsen</string>
 
     <string name="updateLoginDialogTitle">Uppdatera lösenord?</string>
@@ -53,7 +55,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Spara ändringar</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopiera användarnamn</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopiera lösenord</string>
-    <string name="credentialManagementEditLastUpdated">Inloggningen uppdaterades senast %1$s</string>
+    <string name="credentialManagementEditLastUpdated">Inloggningen uppdaterades senast för %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Spara och fyll i inloggningar automatiskt</string>
     <string name="credentialManagementViewMenuEdit">Redigera</string>
