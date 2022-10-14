@@ -16,11 +16,13 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.RuleExceptions
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
+import java.net.URI
 
 class TdsClient(
     override val name: Client.ClientName,
@@ -31,8 +33,9 @@ class TdsClient(
         url: String,
         documentUrl: String
     ): Client.Result {
-        val tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
-        val matches = matchesTrackerEntry(tracker, url, documentUrl)
+        val cleanedUrl = removePortFromUrl(url)
+        val tracker = trackers.firstOrNull { sameOrSubdomain(cleanedUrl, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
+        val matches = matchesTrackerEntry(tracker, cleanedUrl, documentUrl)
         return Client.Result(
             matches = matches.shouldBlock,
             entityName = tracker.ownerName,
@@ -88,6 +91,15 @@ class TdsClient(
             }
         }
         return false
+    }
+
+    private fun removePortFromUrl(url: String): String {
+        return try {
+            val uri = url.toUri()
+            URI(uri.scheme, uri.host, uri.path, uri.fragment).toString()
+        } catch (e: Exception) {
+            url
+        }
     }
 
     private data class MatchedResult(

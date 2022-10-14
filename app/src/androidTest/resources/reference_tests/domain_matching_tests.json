@@ -217,8 +217,7 @@
                 "exceptPlatforms": [
                     "web-extension",
                     "ios-browser",
-                    "web-extension-mv3",
-                    "android-browser"
+                    "web-extension-mv3"
                 ]
             }
         ]
