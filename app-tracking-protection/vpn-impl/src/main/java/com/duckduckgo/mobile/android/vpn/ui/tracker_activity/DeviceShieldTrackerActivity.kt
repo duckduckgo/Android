@@ -96,6 +96,7 @@ class DeviceShieldTrackerActivity :
 
     private lateinit var deviceShieldSwitch: SwitchView
 
+    // TODO [ANA] Remove this handler once the trackers recyclerview implementation is finished.
     private val handler = Handler(Looper.getMainLooper())
 
     // we might get an update before options menu has been populated; temporarily cache value to use when menu populated
