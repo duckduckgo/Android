@@ -14,14 +14,17 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="common_Today">Danes</string>
     <string name="common_Yesterday">Včeraj</string>
-    <string name="common_DaysAgo">Pred %1$d dnevi</string>
+    <string name="common_DaysAgo">pred %d dnevi</string>
     <string name="common_PastWeek">Prejšni teden</string>
     <string name="common_PastMonth">Pretekli mesec</string>
-    <string name="common_MinutesAgo">Pred %1$d min</string>
-    <string name="common_HoursAgo">Pred %1$d h</string>
+    <string name="common_MinutesAgo">pred %dm</string>
+    <string name="common_HoursAgo">pred %dh</string>
     <string name="common_JustNow">Ravno zdaj</string>
     <string name="common_hour_abbreviation">h</string>
     <string name="common_min_abbreviation">min</string>
