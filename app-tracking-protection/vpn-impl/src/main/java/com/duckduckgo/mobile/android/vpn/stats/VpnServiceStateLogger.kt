@@ -28,6 +28,7 @@ import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.ERROR
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.UNKNOWN
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -52,6 +53,7 @@ class VpnServiceStateLogger @Inject constructor(
     private val vpnDatabase: VpnDatabase,
     private val vpnService: Provider<TrackerBlockingVpnService>,
     private val appBuildConfig: AppBuildConfig,
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : VpnServiceCallbacks {
 
     private val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
@@ -67,6 +69,8 @@ class VpnServiceStateLogger @Inject constructor(
                 incrementalPeriodicChecks {
                     val isAlwaysOnEnabled = vpnService.get().isAlwaysOn
                     val isLockdownEnabled = vpnService.get().isLockdownEnabled
+                    if (isAlwaysOnEnabled) deviceShieldPixels.reportAlwaysOnEnabledDaily()
+                    if (isLockdownEnabled) deviceShieldPixels.reportAlwaysOnLockdownEnabledDaily()
 
                     vpnDatabase.vpnServiceStateDao().insert(
                         VpnServiceStateStats(
