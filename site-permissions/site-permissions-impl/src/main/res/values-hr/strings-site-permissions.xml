@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s traži pristup kameri i mikrofonu</string>
-    <string name="sitePermissionsMicDialogTitle">%1$s traži pristup mikrofonu</string>
-    <string name="sitePermissionsCameraDialogTitle">%1$s traži pristup kameri</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle">\"%1$s\" želi pristupiti kameri i mikrofonu</string>
+    <string name="sitePermissionsMicDialogTitle">\"%1$s\" želi pristupiti mikrofonu</string>
+    <string name="sitePermissionsCameraDialogTitle">\"%1$s\" želi pristupiti kameri</string>
     <string name="sitePermissionsDialogContent">Upravljajte odobrenim dopuštenjima u postavkama</string>
     <string name="sitePermissionsDialogDenyButton">Odbij</string>
     <string name="sitePermissionsDialogAllowButton">Dopusti</string>

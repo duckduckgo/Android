@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s kamera ve mikrofona erişmek istiyor</string>
-    <string name="sitePermissionsMicDialogTitle">%1$s mikrofona erişmek istiyor</string>
-    <string name="sitePermissionsCameraDialogTitle">%1$s kameraya erişmek istiyor</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle">\"%1$s\" kameraya ve mikrofona erişmek istiyor</string>
+    <string name="sitePermissionsMicDialogTitle">\"%1$s\" mikrofona erişmek istiyor</string>
+    <string name="sitePermissionsCameraDialogTitle">\"%1$s\" kameraya erişmek istiyor</string>
     <string name="sitePermissionsDialogContent">Ayarlarda verilen izinleri yönet</string>
     <string name="sitePermissionsDialogDenyButton">Reddet</string>
     <string name="sitePermissionsDialogAllowButton">İzin ver</string>
