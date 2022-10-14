@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s запрашивает доступ к камере и микрофону</string>
-    <string name="sitePermissionsMicDialogTitle">%1$s запрашивает доступ к микрофону</string>
-    <string name="sitePermissionsCameraDialogTitle">%1$s запрашивает доступ к камере</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle">«%1$s» запрашивает доступ к камере и микрофону</string>
+    <string name="sitePermissionsMicDialogTitle">«%1$s» запрашивает доступ к микрофону</string>
+    <string name="sitePermissionsCameraDialogTitle">«%1$s» запрашивает доступ к камере</string>
     <string name="sitePermissionsDialogContent">Предоставленные разрешения можно изменить в настройках</string>
     <string name="sitePermissionsDialogDenyButton">Отказать</string>
     <string name="sitePermissionsDialogAllowButton">Разрешить</string>
