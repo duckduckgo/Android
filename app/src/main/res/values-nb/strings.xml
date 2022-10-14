@@ -14,11 +14,13 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo </string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
     <string name="duckDuckGoPrivacySimplified">Personvern gjort enkelt</string>
     <string name="yes">Ja</string>
     <string name="no">Nei</string>
@@ -27,22 +29,22 @@
     <string name="search">Søk</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Åpne innstillinger for å søke og bruke nettleseren med DuckDuckGo hver gang.</string>
+    <string name="onboardingDefaultBrowserDescription">Åpne innstillinger for å søke og surfe med DuckDuckGo hver gang.</string>
     <string name="onboardingDefaultBrowserTitle">Gjør DuckDuckGo til ditt standardvalg</string>
 
     <!-- Default Browser -->
-    <string name="cannotLaunchDefaultAppSettings">Kan ikke åpne skjermen for appens standardinnstillinger</string>
-    <string name="settingsDefaultBrowserEnabled">Gjør til standard nettleser</string>
+    <string name="cannotLaunchDefaultAppSettings">Kan ikke åpne innstillinger for standardapp</string>
+    <string name="settingsDefaultBrowserEnabled">Gjør til standardnettleser</string>
     <string name="defaultBrowserMaybeLater">Kanskje senere</string>
     <string name="defaultBrowserLetsDoIt">Gjør til standardnettleser</string>
     <string name="defaultBrowserDescriptionNoDefault">Åpne lenker med ro i sinnet, hver gang.</string>
-    <string name="defaultBrowserInstructions">Velg DuckDuckGo og trykk på <font color="#678fff"> Alltid </font>.</string>
+    <string name="defaultBrowserInstructions">Velg DuckDuckGo og trykk på <font color="#678fff">Alltid</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Nettlesermeny</string>
     <string name="refresh">Oppdater</string>
     <string name="back">Tilbake</string>
-    <string name="forward">Fremover</string>
+    <string name="forward">Frem</string>
 
     <string name="omnibarInputHint">Søk eller skriv URL</string>
     <string name="clearButtonContentDescription">Tøm søkefeltet</string>
@@ -53,15 +55,15 @@
     <string name="removeFavoriteMenuTitle">Fjern favoritt</string>
     <string name="favoriteAddedMessage">Favoritt lagt til</string>
     <string name="bookmarkAddedMessage">Bokmerke lagt til</string>
-    <string name="requestDesktopSiteMenuTitle">Skrivebordnettsted</string>
+    <string name="requestDesktopSiteMenuTitle">Skrivebordversjon</string>
     <string name="fireproofWebsiteMenuTitleRemove">Fjern brannsikring</string>
     <string name="requestMobileSiteMenuTitle">Mobilversjon</string>
     <string name="downloadsMenuTitle">Nedlastinger</string>
     <string name="printMenuTitle">Skriv ut siden</string>
     <string name="favoriteDeleteConfirmationMessage">Favoritt er fjernet</string>
     <string name="fireproofDeleteConfirmationMessage">Brannsikring fjernet</string>
-    <string name="privacyProtectionEnabledConfirmationMessage">Personvern aktivert for %1$s</string>
-    <string name="privacyProtectionDisabledConfirmationMessage">Personvern deaktivert for %1$s</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Personvern aktivert for %s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Personvern deaktivert for %s</string>
     <string name="undoSnackbarAction">Angre</string>
 
     <!-- Downloading files -->
@@ -79,7 +81,7 @@
     <string name="nextSearchTermDescription">Finn neste</string>
     <string name="previousSearchTermDescription">Finn forrige</string>
     <string name="closeFindInPageButtonDescription">Lukk finn-på-side-visning</string>
-    <string name="findInPageHint">Finn på side</string>
+    <string name="findInPageHint">Finn på side</string>
     <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
@@ -110,10 +112,10 @@
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Personvern for side</string>
-    <string name="privacyProtectionEnabled">BESKYTTELSE AV STEDET ER AKTIVERT</string>
-    <string name="privacyProtectionDisabled">BESKYTTELSE AV NETTSIDEN DEAKTIVERT</string>
+    <string name="privacyProtectionEnabled">BESKYTTELSE AKTIVERT FOR NETTSTEDET</string>
+    <string name="privacyProtectionDisabled">BESKYTTELSE DEAKTIVERT FOR NETTSTEDET</string>
     <string name="privacyDashboardActivityTitle">Dashbord for personvern</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FORBEDRET FRA &lt;img src=\"%1$d\" /&gt; TIL &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FORBEDRET FRA <img src="%d"></img> TIL <img src="%d"></img></string>
     <string name="privacyGradeContentDescription">Grad av personvern</string>
     <string name="privacyProtectionTemporarilyDisabled">Vi har midlertidig deaktivert personvernbeskyttelse, da det ser ut til å få nettstedet til å slutte å fungere.</string>
 
@@ -131,8 +133,8 @@
     <string name="practicesMixed">Blandet personvernpraksis</string>
     <string name="practicesBad">Dårlig personvernpraksis</string>
     <string name="practicesUnknown">Ukjent personvernpraksis</string>
-    <string name="practicesOverview">Personvernpraksis indikerer hvor mye av den personlige informasjonen du deler med et nettsted som er beskyttet.</string>
-    <string name="practicesTosdrLink">Personvernpraksis fra <b><u>ToS;DR</u></b>.</string>
+    <string name="practicesOverview">Personvernpraksis indikerer i hvilken grad den personlige informasjonen du deler med et nettsted er beskyttet.</string>
+    <string name="practicesTosdrLink">Personvernpraksis fra<b><u>ToS;DR</u></b>.</string>
     <string name="practicesIconContentGood">Ikon for god praksis</string>
     <string name="practicesIconContentBad">Ikon for dårlig praksis</string>
 
@@ -152,20 +154,20 @@
     <string name="domainsLoadedHeadingText">Ingen tredjepartsdomener er lastet</string>
 
     <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Om nettsporingsbeskyttelsen vår</annotation></string>
-    <string name="webTrackingProtectionsUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
+    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
 
     <string name="trackersBlockedNoSectionDescription">Forespørslene fra følgende domener ble lastet.</string>
 
-    <string name="adLoadedSectionDescription">Forespørslene fra følgende domene ble lastet fordi en %1$s-annonse på DuckDuckGo nylig ble klikket på. Disse forespørslene bidrar til å evaluere annonseeffektiviteten. Alle annonser på DuckDuckGo er ikke-profilerende.</string>
+    <string name="adLoadedSectionDescription">Forespørslene fra følgende domene ble lastet inn fordi en %@-annonse på DuckDuckGo nylig ble klikket på. Disse forespørslene bidrar til å evaluere annonseeffektiviteten. Ingen annonser på DuckDuckGo profilerer deg.</string>
     <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Hvordan søkeannonsene våre påvirker beskyttelsen vår</annotation></string>
-    <string name="adLoadedSectionUrl">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
+    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
 
     <string name="domainsLoadedSectionDescription">Forespørslene fra følgende domene ble også lastet.</string>
     <string name="domainsLoadedSectionSingleSectionDescription">Sporingsforespørslene fra følgende domener ble lastet.</string>
     <string name="domainsLoadedSectionEmptyListDescription">Vi oppdaget ingen forespørsler fra tredjepartsdomener.</string>
 
     <string name="domainsLoadedBreakageSectionDescription">Forespørslene fra følgende domene ble lastet for å forhindre brudd på nettstedet.</string>
-    <string name="domainsLoadedAssociatedSectionDescription">Forespørslene fra følgende domene ble lastet fordi de er tilknyttet %1$s.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Forespørslene fra følgende domene ble lastet inn fordi de er tilknyttet %@.</string>
 
     <string name="trackersBlockedText">Forespørsler blokkert fra lasting</string>
     <string name="trackersNotBlockedText">Ingen sporingsforespørsler er blokkert</string>
@@ -179,15 +181,18 @@
     <string name="majorNetworksFound">Store sporingsnettverk er oppdaget</string>
 
     <!-- Fire -->
-    <string name="fireMenu">Tøm data</string>
+    <string name="fireMenu">Slett data</string>
     <string name="fireClearAll">Lukk alle faner og slett data</string>
     <string name="fireCancel">Avbryt</string>
-    <string name="fireDataCleared">Data tømt</string>
+    <string name="fireDataCleared">Data slettet</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Innstillinger</string>
     <string name="settingsMenuItemTitle">Innstillinger</string>
     <string name="settingsHeadingPrivacy">Personvern</string>
+    <string name="settingsHeadingAppearance">Utseende</string>
+    <string name="settingsHeadingCustomize">Tilpass</string>
+    <string name="settingsHeadingAbout">Om</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Versjon</string>
     <string name="leaveFeedback">Del tilbakemelding</string>
@@ -204,9 +209,6 @@
     <string name="settingsAppLinksAskEveryTime">Spør hver gang</string>
     <string name="settingsAppLinksAlways">Alltid</string>
     <string name="settingsAppLinksNever">Aldri</string>
-    <string name="settingsHeadingAppearance">Utseende</string>
-    <string name="settingsHeadingCustomize">Tilpass</string>
-    <string name="settingsHeadingAbout">Om</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Lagre</string>
@@ -234,20 +236,20 @@
     <string name="no_suggestions">Ingen forslag</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Rapporter ødelagt nettsted</string>
+    <string name="brokenSiteReportBrokenSiteMenuItem">Rapporter nettstedfeil</string>
     <string name="brokenSiteHeading">Rapporter nettstedfeil</string>
     <string name="brokenSiteSubmitted">Takk! Tilbakemeldingen er sendt.</string>
     <string name="brokenSitesCategoriesTitle">Beskriv hva som skjedde</string>
     <string name="brokenSitesCategoriesHint">Beskriv hva som skjedde</string>
     <string name="brokenSiteSubmitButton">Send rapport</string>
-    <string name="brokenSiteDescription">Innsending av anonym rapport om ødelagt nettsted, hjelper oss med å feilsøke disse problemene og forbedre appen.</string>
+    <string name="brokenSiteDescription">Når du sender inn en anonym rapport om nettstedfeil, hjelper det oss med å feilsøke disse problemene og forbedre appen.</string>
 
     <string name="brokenSiteCategoryImages">Bildene ble ikke lastet inn</string>
     <string name="brokenSiteCategoryPaywall">Nettstedet ba meg om å deaktivere</string>
     <string name="brokenSiteCategoryComments">Kommentarene ble ikke lastet inn</string>
-    <string name="brokenSiteCategoryVideos">Videoen ble ikke spilt</string>
+    <string name="brokenSiteCategoryVideos">Video ble ikke avspilt</string>
     <string name="brokenSiteCategoryLinks">Linker eller knapper fungerer ikke</string>
-    <string name="brokenSiteCategoryContent">Innhold manglet</string>
+    <string name="brokenSiteCategoryContent">Innhold mangler</string>
     <string name="brokenSiteCategoryLogin">Jeg kan ikke logge inn</string>
     <string name="brokenSiteCategoryUnsupported">Nettleseren er inkompatibel</string>
     <string name="brokenSiteCategoryOther">Noe annet</string>
@@ -256,8 +258,8 @@
     <string name="bookmarksMenuTitle">Bokmerker</string>
     <string name="bookmarksActivityTitle">Bokmerker</string>
     <string name="noBookmarks">Ingen bokmerker lagt til ennå</string>
-    <string name="bookmarkOverflowContentDescription">Flere alternativer for bokmerket %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage">Slettet &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="bookmarkOverflowContentDescription">Flere alternativer for bokmerket %s</string>
+    <string name="bookmarkDeleteConfirmationMessage">Slettet <b>%s</b></string>
     <string name="exportBookmarksMenu">Eksporter</string>
     <string name="exportBookmarksEmpty">Du har ingen bokmerker, ingenting blir eksportert</string>
     <string name="exportBookmarksError">Vi kunne ikke eksportere noen av bokmerkene, noe gikk galt</string>
@@ -284,7 +286,7 @@
     <string name="removeAll">Fjern alle</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Søk på DuckDuckGo</string>
+    <string name="searchWidgetTextHint">Søk med DuckDuckGo</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Legg til i favoritter</string>
@@ -303,14 +305,14 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Legg til på startskjermen</string>
-    <string name="shortcutAddedText">%1$s er lagt til på startskjermen.</string>
+    <string name="shortcutAddedText">%s er lagt til på startskjermen!</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Hjelp oss med å forbedre appen!</string>
     <string name="surveyCtaDescription">Ta vår korte spørreundersøkelse og del tilbakemeldingen din.</string>
     <string name="surveyCtaLaunchButton">Delta i spørreundersøkelsen</string>
     <string name="surveyCtaDismissButton">Nei takk</string>
-    <string name="surveyActivityTitle">Brukerundersøkelse</string>
+    <string name="surveyActivityTitle">Spørreundersøkelse</string>
     <string name="surveyTitle">DUCKDUCKGO-SPØRREUNDERSØKELSE</string>
     <string name="surveyDismissContentDescription">Avvis spørreundersøkelsen</string>
     <string name="surveyLoadingErrorTitle">Å nei!</string>
@@ -318,7 +320,7 @@
 
     <!-- Add widget -->
     <string name="addWidgetCtaTitle">Prøv søke-widgeten vår!</string>
-    <string name="addWidgetCtaDescription">Legg vår søke-widget til på startskjermen for rask og enkel tilgang.</string>
+    <string name="addWidgetCtaDescription">Legg søke-widgeten vår til på startskjermen for rask og enkel tilgang.</string>
     <string name="addWidgetCtaAutoLaunchButton">Legg til widget</string>
     <string name="addWidgetCtaInstructionsLaunchButton">Vis meg</string>
     <string name="addWidgetCtaDismissButton">Avvis</string>
@@ -335,11 +337,11 @@
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">Liker du DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">Vi vil gjerne høre hva du mener.</string>
-    <string name="appEnjoymentDialogPositiveButton">Jeg liker det</string>
+    <string name="appEnjoymentDialogPositiveButton">Jeg liker den</string>
     <string name="appEnjoymentDialogNegativeButton">Det trengs forbedringer</string>
 
     <string name="rateAppDialogTitle">Vurder appen</string>
-    <string name="rateAppDialogMessage">Tilbakemeldingen din er viktig. Del kjærligheten med en anmeldelse.</string>
+    <string name="rateAppDialogMessage">Tilbakemeldingen din er viktig. Legg igjen en vurdering, det blir vi glade for!</string>
     <string name="rateAppDialogPositiveButton">Vurder app</string>
     <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
@@ -354,28 +356,28 @@
     <string name="notificationChannelTutorials">Veiledninger</string>
 
     <!-- Clear Notification -->
-    <string name="clearNotificationTitle">Tømming av data satt til manuell</string>
-    <string name="clearNotificationDescription">Tilpass DuckDuckGo for å tømme netthistorikken etter hver økt.</string>
+    <string name="clearNotificationTitle">Sletting av data satt til manuell</string>
+    <string name="clearNotificationDescription">Tilpass DuckDuckGo for å slette netthistorikken etter hver økt.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Vi beskytter personvernet ditt</string>
     <string name="privacyProtectionNotificationReportTitle">Din personvernrapport</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Når du bruker DuckDuckGo-appen, beskytter den dataene dine ved å blokkere sporing og krypterte tilkoblinger.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Du beskyttet dataene dine ved å sikre %1$d ukrypterte tilkoblinger mens du brukte DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Du beskyttet dataene dine ved å blokkere %1$d sporinger mens du brukte DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription">Du beskyttet dataene dine ved å blokkere %1$d sporinger og sikre %2$d ukrypterte tilkoblinger mens du brukte DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Når du bruker DuckDuckGo-appen, beskytter den dataene dine ved å blokkere sporing og kryptere tilkoblinger.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Du beskyttet dataene dine ved å sikre %d ukrypterte tilkoblinger mens du brukte DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Du beskyttet dataene dine ved å blokkere %d sporinger mens du brukte DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription">Du beskyttet dataene dine ved å blokkere %d sporinger og sikre %d ukrypterte tilkoblinger mens du brukte DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Fortsett å bruke nettleseren</string>
 
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Logg inn</string>
-    <string name="authenticationDialogMessage">%1$s krever brukernavn og passord</string>
+    <string name="authenticationDialogMessage">%s krever brukernavn og passord.</string>
     <string name="authenticationDialogPositiveButton">Logg inn</string>
     <string name="authenticationDialogNegativeButton">Avbryt</string>
     <string name="authenticationDialogUsernameHint">Brukernavn</string>
     <string name="authenticationDialogPasswordHint">Passord</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Søk på DuckDuckGo</string>
+    <string name="systemTextSearchMessage">Søk med DuckDuckGo</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Del tilbakemelding</string>
@@ -384,7 +386,7 @@
     <string name="missingBrowserFeaturesSubtitle">Hvilken nettleserfunksjon kan vi legge til eller forbedre?</string>
     <string name="missingBrowserFeatureSubReasonNavigation">Gå frem, tilbake og/eller oppdater</string>
     <string name="missingBrowserFeatureSubReasonTabManagement">Opprette og håndtere faner</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Blokkering av reklame og pop-uper</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Blokkering av reklame og popups</string>
     <string name="missingBrowserFeatureSubReasonVideos">Se videoer</string>
     <string name="missingBrowserFeatureSubReasonImages">Bruk av bilder</string>
     <string name="missingBrowserFeatureSubReasonBookmarks">Opprette og håndtere bokmerker</string>
@@ -392,7 +394,7 @@
 
     <string name="websiteNotLoadingTitleLong">Problemer med innlasting av nettsteder</string>
     <string name="websiteNotLoadingTitleShort">Problemer med innlasting av nettsteder</string>
-    <string name="websiteNotLoadingSubtitle">Hvilket nettsted er ødelagt?</string>
+    <string name="websiteNotLoadingSubtitle">Hvilket nettsted fungerer ikke?</string>
 
     <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-søket er ikke bra nok</string>
     <string name="searchNotGoodEnoughTitleShort">DuckDuckGo-søkeproblemer</string>
@@ -404,14 +406,14 @@
     <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Bedre autofullføring</string>
     <string name="searchNotGoodEnoughSubReasonOther">Ingen av disse</string>
 
-    <string name="needMoreCustomizationTitleLong">Det fins ikke nok måter å tilpasse appen på</string>
+    <string name="needMoreCustomizationTitleLong">Det finnes ikke nok tilpasningsvalg i appen</string>
     <string name="needMoreCustomizationTitleShort">Tilpasningsproblemer</string>
     <string name="needMoreCustomizationSubtitle">Hvilket tilpasningsvalg kan vi legge til eller forbedre?</string>
     <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Konfigurasjon av startskjermen</string>
     <string name="needMoreCustomizationSubReasonTabDisplay">Hvordan faner vises</string>
     <string name="needMoreCustomizationSubReasonAppLooks">Hvordan appen ser ut</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Hvilke data som tømmes</string>
-    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Når data tømmes</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Hvilke data som slettes</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Når data slettes</string>
     <string name="needMoreCustomizationSubReasonBookmarksDisplay">Hvordan bokmerker vises</string>
     <string name="needMoreCustomizationSubReasonOther">Ingen av disse</string>
 
@@ -434,14 +436,14 @@
     <string name="feedbackNegativeMainReasonPageSubtitle">Hva er det som er mest frustrerende?</string>
     <string name="feedbackNegativeMainReasonPageTitle">Det var leit å høre</string>
     <string name="feedbackShareDetails">Del detaljer</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Har du noen detaljer du ønsker å dele med teamet?</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Har du noe mer du ønsker å dele med teamet?</string>
     <string name="whatHaveYouBeenEnjoying">Hva liker du?</string>
     <string name="awesomeToHear">Flott å høre!</string>
-    <string name="shareTheLoveWithARating">Vennligst del kjærligheten gjennom å vurdere oss i Play-butikken.</string>
+    <string name="shareTheLoveWithARating">Vurder oss i Play-butikken – det blir vi glade for!</string>
     <string name="rateTheApp">VURDER APPEN</string>
     <string name="declineFurtherFeedback">NEI TAKK, JEG ER FERDIG</string>
     <string name="whichBrokenSites">Når opplever du disse problemene?</string>
-    <string name="whichBrokenSitesHint">Hvilke nettsteder har problemer?</string>
+    <string name="whichBrokenSitesHint">Hvilket nettsted har problemer?</string>
     <string name="feedbackSpecificAsPossible">Vær så spesifikk som mulig</string>
     <string name="feedbackInitialDisambiguationTitle">Vi setter i gang!</string>
     <string name="feedbackInitialDisambiguationSubtitle">Hvordan vil du kategorisere tilbakemeldingen din?</string>
@@ -472,28 +474,28 @@
     <string name="daxDialogNext">Neste</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Den er grei</string>
-    <string name="hideTipsTitle">Skjule gjenværende tips?</string>
+    <string name="hideTipsTitle">Skjul gjenværende tips?</string>
     <string name="hideTipsText">Det er bare noen få, og vi prøvde å gjøre dem informative.</string>
     <string name="hideTipsButton">Skjul tips for alltid</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Velkommen til DuckDuckGo!"</string>
-    <string name="onboardingDaxText"><![CDATA[Internett kan være ganske skummelt.<br/><br/>Men ikke bekymre deg! Søk og surfing privat er enklere enn du tror.]]></string>
-    <string name="onboardingLetsDoItButton">La oss gjøre det!</string>
-    <string name="daxIntroCtaText"><![CDATA[Deretter kan du besøke et av favorittnettstedene dine! <br/><br/>Jeg blokkerer sporere slik at de ikke kan spionere på deg. Jeg vil også oppgradere sikkerheten til tilkoblingen din hvis mulig. 🔒]]></string>
+    <string name="onboardingDaxText"><![CDATA[Internettet kan være ganske skummelt.<br/><br/>Men ikke vær redd! Det er enklere enn du tror å søke og surfe privat.]]></string>
+    <string name="onboardingLetsDoItButton">Sett i gang!</string>
+    <string name="daxIntroCtaText"><![CDATA[Deretter kan du besøke et av favorittnettstedene dine!\n\nJeg blokkerer sporingsforsøk slik at de ikke kan spionere på deg. Hvis det er mulig, oppgraderer jeg også sikkerheten på forbindelsen din. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Dette går bra!<br/><br/>Husk: Hver gang du surfer med meg, klippes vingene av en ekkel annonse. 👍]]></string>
     <string name="daxSerpCtaText">DuckDuckGo-søkene dine er anonyme. Alltid. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ og <b>%1$d annen</b> prøvde å spore deg her. <br/><br/>Jeg blokkerte dem!<br/><br/> ☝️Du kan sjekke adresselinjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️]]></item>
-        <item quantity="other"><![CDATA[ og <b>%1$d andre</b> prøvde å spore deg her. <br/><br/>Jeg blokkerte dem!<br/><br/> ☝️Du kan sjekke adresselinjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️]]></item>
+        <item quantity="one"><![CDATA[ og <b>%d andre</b> prøvde å spore deg her. <br/><br/>Jeg blokkerte dem!<br/><br/> ☝️Du kan sjekke adressefeltet for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️]]></item>
+        <item quantity="other"><![CDATA[ og <b>%d andre</b> prøvde å spore deg her. <br/><br/>Jeg blokkerte dem!<br/><br/> ☝️Du kan sjekke adressefeltet for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ prøvde å spore deg her. <br/><br/>Jeg blokkerte dem!<br/><br/> ☝️Du kan sjekke adresselinjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️]]></item>
         <item quantity="other"><![CDATA[ prøvde å spore deg her. <br/><br/>Jeg blokkerte dem!<br/><br/> ☝️Du kan sjekke adresselinjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText"><![CDATA[Når du trykker og blar, blokkerer jeg irriterende trackere. <br/><br/>Gå videre – fortsett å bla!]]></string>
-    <string name="daxMainNetworkCtaText">Pass opp! Jeg klarer ikke å forhindre at %1$s ser aktiviteten din på %2$s &lt;br/&gt;&lt;br/&gt;Men surf med meg, så kan jeg redusere informasjonen %3$s får om deg. Det gjør jeg ved å blokkere vedkommendes sporingsanordninger på mange andre nettsteder.</string>
-    <string name="daxMainNetworkOwnedCtaText">Vennligst merk! Siden %1$s eier %2$s kan jeg ikke hindre dem fra å se aktiviteten din her.&lt;br/&gt;&lt;br/&gt;Men surf med meg, så kan jeg redusere informasjonen %3$s får om deg ved å blokkere sporingsanordningene deres på mange andre nettsteder.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Jeg blokkerer irriterende sporere mens du trykker og blar.\n\nDu kan bare fortsette å surfe!]]></string>
+    <string name="daxMainNetworkCtaText">Pass opp! Jeg klarer ikke å forhindre at %s ser aktiviteten din på %s <br></br><br></br>Men surf med meg, så kan jeg redusere informasjonen %s får om deg, ved å blokkere sporingsanordningene deres på mange andre nettsteder.</string>
+    <string name="daxMainNetworkOwnedCtaText">Pass opp! Siden %s eier %s, kan jeg ikke stoppe dem fra å se aktiviteten din her.<br></br><br></br>Men surf med meg, så kan jeg redusere informasjonen %1$@ får om deg, ved å blokkere sporingsanordningene deres på mange andre nettsteder.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Lagre til nedlastinger</string>
@@ -510,11 +512,11 @@
     <string name="changeIconCtaAccept">Bruk</string>
     <string name="changeIconCtaCancel">Avbryt</string>
     <string name="changeIconDialogTitle">Bruke nytt ikon?</string>
-    <string name="changeIconDialogMessage">Det kan hende at appen lukkes for å bruke endringene. Kom tilbake etter at du har beundret det kjekke, nye ikonet ditt.</string>
+    <string name="changeIconDialogMessage">Det kan hende at appen lukkes for at endringene skal tre i kraft. Kom tilbake etter at du har beundret det kjekke, nye ikonet ditt.</string>
 
     <!-- New dashboard / menu buttons -->
     <string name="manageWhitelist">Ubeskyttede nettsteder</string>
-    <string name="reportBrokenSite">Rapporter ødelagt nettsted</string>
+    <string name="reportBrokenSite">Rapporter nettstedfeil</string>
 
     <!-- Dialogs -->
     <string name="dialogAddTitle">Legg til</string>
@@ -525,8 +527,8 @@
     <string name="whitelistActivityTitle">Ubeskyttede nettsteder</string>
     <string name="enablePrivacyProtection">Aktiver personvernbeskyttelse</string>
     <string name="disablePrivacyProtection">Deaktiver personvernbeskyttelse</string>
-    <string name="whitelistEntryOverflowContentDescription">Flere alternativer for det ubeskyttede nettstedet %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Er du sikker på at du vil fjerne &lt;b&gt;%1$s&lt;/b&gt; fra ubeskyttede nettsteder?</string>
+    <string name="whitelistEntryOverflowContentDescription">Flere alternativer for det ubeskyttede nettstedet %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Er du sikker på at du vil fjerne <b>%s</b> fra ubeskyttede nettsteder?</string>
     <string name="whitelistExplanation">Disse nettstedene blir ikke dekket av personvernbeskyttelse.</string>
     <string name="whitelistNoEntries">Personvernbeskyttelse aktivert for alle nettsteder</string>
     <string name="whitelistDomainHint">www.example.com</string>
@@ -539,20 +541,20 @@
     <string name="fireproofWebsitesActivityTitle">Brannsikre nettsteder</string>
     <string name="settingsFireproofWebsites">Brannsikre nettsteder</string>
     <string name="fireproofWebsiteMenuTitleAdd">Brannsikre denne siden</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; er nå brannsikkert</string>
+    <string name="fireproofWebsiteSnackbarConfirmation"><b>%s</b> er nå brannsikker</string>
     <string name="fireproofWebsiteSnackbarAction">Angre</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Er du sikker på at du vil slette &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="fireproofWebsiteFeatureDescription">Nettsider anvender informasjonskapsler for å holde deg innlogget. Når du gjør en side Brannsikker, vil ikke informasjonskapslene slettes og du holder deg innlogget, selv etter å ha brukt Brannknappen. Vi blokkerer fortsatt tredjeparters sporingsanordninger som blir funnet på Brannsikre nettsteder.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Flere alternativer for brannsikkert nettsted %1$s</string>
-    <string name="fireproofWebsiteLoginDialogTitle">Ønsker du å Brannsikre %1$s?</string>
-    <string name="fireproofWebsiteLoginDialogDescription">Hvis du Brannsikrer denne siden vil du fortsatt være innlogget etter å ha brukt Brannknappen.</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Er du sikker på at du vil slette <b>%s</b>?</string>
+    <string name="fireproofWebsiteFeatureDescription">Nettsteder anvender informasjonskapsler for å holde deg innlogget. Når du gjør en side brannsikker, vil ikke informasjonskapslene slettes og du holder deg innlogget, selv etter å ha brukt brannknappen. Vi blokkerer fortsatt tredjeparters sporingsanordninger som blir funnet på brannsikre nettsteder.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Flere alternativer for brannsikkert nettsted %s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Ønsker du å brannsikre %s?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Hvis du brannsikrer dette nettstedet, vil du fortsatt være innlogget etter å ha brukt brannknappen.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Brannsikre</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ikke nå</string>
     <string name="fireproofWebsiteItemsSectionTitle">Brannsikre nettsteder</string>
     <string name="fireproofWebsiteEmptyListHint">Ingen brannsikre nettsteder ennå</string>
     <string name="fireproofWebsiteSettingSelectionTitle">Brannsikre nettsteder ved pålogging</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Brannsikring fjernet fra alle nettsteder</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Brannsikring fjernet for &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Brannsikring fjernet for <b>%s</b></string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Spør hver gang</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Alltid</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Aldri</string>
@@ -581,11 +583,11 @@
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vil du aktivere posisjonstjenester for DuckDuckGo privatnettleser?</string>
-    <string name="preciseLocationSystemDialogSubtitle">%1$s ber om tillatelse til å se posisjonen til enheten din. Først må du gi appen tillatelse til å sende enhetens posisjon, deretter kan %2$s be om tillatelse.</string>
+    <string name="preciseLocationSystemDialogSubtitle">%s ber om tillatelse til å se posisjonen til enheten din. Først må du gi appen tillatelse til å sende enhetens posisjon, deretter kan {1} be om tillatelse.</string>
     <string name="preciseLocationSystemDialogAllow">Aktiver</string>
     <string name="preciseLocationSystemDialogDeny">Kanskje senere</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ikke spør igjen for dette nettstedet</string>
-    <string name="preciseLocationSiteDialogTitle">Vil du gi %1$s tillatelse til å se posisjonen din?</string>
+    <string name="preciseLocationSiteDialogTitle">Vil du gi %s tillatelse til å se posisjonen din?</string>
     <string name="preciseLocationDDGDialogSubtitle">Vi bruker den anonyme posisjonen kun til å levere bedre resultater, i nærheten av deg. Du kan ombestemme deg senere.</string>
     <string name="preciseLocationSiteDialogSubtitle">Du kan administrere posisjonstillatelser du har gitt til enkeltsider under Innstillinger.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Alltid</string>
@@ -597,14 +599,14 @@
     <string name="preciseLocationEmptyListHint">Ingen nettsider har fått tilgang til posisjon</string>
     <string name="preciseLocationNoSystemPermission">Du må gi denne appen tilgang til posisjon for å administrere posisjonstilgangene du har gitt til enkeltsider.</string>
     <string name="preciseLocationActivityTitle">Posisjon</string>
-    <string name="preciseLocationDeleteConfirmMessage">Er du sikker på at du vil slette &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="preciseLocationDeleteContentDescription">Flere alternativer for posisjonstillateleser i domenet %1$s</string>
+    <string name="preciseLocationDeleteConfirmMessage">Er du sikker på at du vil slette <b>%s</b>?</string>
+    <string name="preciseLocationDeleteContentDescription">Flere alternativer for posisjonstillateleser i domenet %s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Tillatelse gitt</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Tillatelse avslått</string>
-    <string name="preciseLocationSnackbarMessage">Du har tidligere gitt %1$s tillatelse til å se enhetens posisjon.</string>
+    <string name="preciseLocationSnackbarMessage">Du har tidligere gitt %s tillatelse til å se enhetens posisjon.</string>
 
     <!--Fire button education-->
-    <string name="daxClearDataCtaText">Det kan samles opp personopplysninger i nettleseren din. Fysj. Bruk brannknappen til å sette fyr på alt sammen! Prøv det nå! 👇</string>
+    <string name="daxClearDataCtaText">Det kan samles opp personopplysninger i nettleseren din. Fysj. Bruk brannknappen til å sette fyr på alt sammen. Prøv det nå! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
@@ -622,7 +624,7 @@
     <string name="appLinkDialogTitle">Åpne i en annen app?</string>
     <string name="appLinkSnackBarAction">Åpne i app</string>
     <string name="appLinkMultipleSnackBarAction">Velg app</string>
-    <string name="appLinkSnackBarMessage">Du kan åpne denne lenken i %1$s.</string>
+    <string name="appLinkSnackBarMessage">Du kan åpne denne lenken i %s.</string>
     <string name="appLinkMultipleSnackBarMessage">Du kan åpne denne lenken i andre apper.</string>
     <string name="appLinkIntentChooserTitle">Åpne med</string>
     <string name="appLinkMenuItemTitle">Åpne i appen</string>
@@ -631,9 +633,9 @@
     <string name="aliasToClipboardMessage">Ny adresse kopiert til utklippstavlen</string>
     <string name="autofillTooltipUseYourAlias">Bruk %1$s</string>
     <string name="autofillTooltipUseYourAliasDescription">Blokkerer e-postsporere</string>
-    <string name="autofillTooltipGenerateAddress">Generer en privat adresse</string>
+    <string name="autofillTooltipGenerateAddress">Generer privat Duck Address</string>
     <string name="autofillTooltipGenerateAddressDescription">Blokkerer e-postsporere og skjuler adressen din</string>
-    <string name="newEmailAliasMenuTitle">Opprett Duck-adresse</string>
+    <string name="newEmailAliasMenuTitle">Generer Duck-adresse</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Skal vi sende et varsel til deg når det er din tur?</string>
@@ -656,13 +658,13 @@
     <string name="bookmarkFolderEmpty">Tom</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s og %3$d element?</item>
-        <item quantity="other">%1$s%2$s og %3$d elementer?</item>
+        <item quantity="one">%s%s og %d element?</item>
+        <item quantity="other">%s%s og %d elementer?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d element</item>
-        <item quantity="other">%1$d elementer</item>
+        <item quantity="one">%d element</item>
+        <item quantity="other">%d elementer</item>
     </plurals>
 
     <!-- Accessibility-->
@@ -679,7 +681,7 @@
     <string name="settingsPrivacyPolicyDuckduckgo">Personvernerklæring</string>
 
     <!-- Home Screen Widget -->
-    <string name="homeScreenWidgetAdded">%1$s widget er lagt til på startskjermen</string>
+    <string name="homeScreenWidgetAdded">%s-widgeten er lagt til på startskjermen</string>
     <string name="settingsAddHomeScreenWidget">Startskjerm-widget</string>
 
     <!-- MacOs Settings -->
@@ -698,9 +700,9 @@
     <string name="downloadsItemMenuDelete">Slett</string>
     <string name="downloadsItemMenuCancel">Avbryt</string>
     <string name="downloadsActivityMenuDeleteAll">Slett alt</string>
-    <string name="downloadsFileDeletedMessage">Slettet %1$s</string>
+    <string name="downloadsFileDeletedMessage">Slettet %s</string>
     <string name="downloadsAllFilesDeletedMessage">Alle filer er slettet</string>
-    <string name="downloadsMoreOptionsContentDescription">Flere alternativer for %1$s</string>
+    <string name="downloadsMoreOptionsContentDescription">Flere alternativer for %s</string>
     <string name="downloadsUndoActionName">Angre</string>
     <string name="downloadsStateInProgress">Pågår…</string>
 
@@ -711,9 +713,13 @@
     <string name="atp_SettingsDeviceShieldDisabled">Deaktivert</string>
 
     <!-- Autoconsent -->
-    <string name="autoconsentDialogTitle">Det ser ut til at dette nettstedet har et popup-vindu om samtykke til informasjonskapsler👇</string>
+    <!-- smartling.character_limit = 82 -->
+    <string name="autoconsentDialogTitle">Nettstedet ser ut til å ha et popup-vindu om samtykke til informasjonskapsler👇</string>
+    <!-- smartling.character_limit = 160 -->
     <string name="autoconsentDialogDescription">Skal jeg håndtere dette for deg? Jeg kan prøve å minimere informasjonskapslene, maksimere personvernet og skjule popup-vinduer som dette.</string>
-    <string name="autoconsentPrimaryCta">Administrer popup-vinduer om informasjonskapsler</string>
+    <!-- smartling.character_limit = 42 -->
+    <string name="autoconsentPrimaryCta">Administrer vinduer om informasjonskapsler</string>
+    <!-- smartling.character_limit = 42 -->
     <string name="autoconsentSecondaryCta">Nei takk</string>
 
     <string name="autoconsentSetting">Administrer popup-vinduer om informasjonskapsler</string>
@@ -728,11 +734,11 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Administrer nettsteder</string>
     <string name="sitePermissionsSettingsEmptyText">Ingen nettsteder ennå</string>
-    <string name="permissionPerWebsiteText">Tillatelser for «%1$s» </string>
+    <string name="permissionPerWebsiteText">Tillatelser for «%s» </string>
     <string name="permissionsPerWebsiteAskSetting">Spør</string>
     <string name="permissionsPerWebsiteDenySetting">Avvis</string>
     <string name="permissionsPerWebsiteAllowSetting">Tillat</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle">%1$stillatelse for %2$s</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%s-tillatelse for %s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Autofyll</string>
