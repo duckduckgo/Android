@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">İndirme başarısız. İnternet bağlantınızı kontrol edin.</string>
 
     <string name="notificationChannelFileDownloading">Dosya İndiriliyor</string>
     <string name="notificationChannelFileDownloaded">Dosya indirildi</string>
+
     <string name="downloadInProgress">İndiriliyor</string>
+
+    <string name="downloadsDownloadStartedMessage">%s için indirme başlatıldı</string>
+    <string name="downloadsDownloadFinishedMessage">%s için indirme tamamlandı</string>
+    <string name="downloadsDownloadGenericErrorMessage">İndirme başarısız oldu.</string>
+    <string name="downloadsCancel">Vazgeç</string>
+    <string name="downloadsRetry">Yeniden Dene</string>
+    <string name="notificationDownloadComplete">İndirme tamamlandı.</string>
+    <string name="notificationDownloadFailed">İndirme başarısız oldu.</string>
 </resources>
