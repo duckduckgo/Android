@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s souhaite accéder à l\'appareil photo et au micro</string>
-    <string name="sitePermissionsMicDialogTitle">%1$s souhaite accéder au micro</string>
-    <string name="sitePermissionsCameraDialogTitle">%1$s souhaite accéder à l\'appareil photo</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle">« %1$s » souhaite accéder à l\'appareil photo et au micro</string>
+    <string name="sitePermissionsMicDialogTitle">« %1$s » souhaite accéder au micro</string>
+    <string name="sitePermissionsCameraDialogTitle">« %1$s » souhaite accéder à l\'appareil photo</string>
     <string name="sitePermissionsDialogContent">Gérer les autorisations accordées dans les paramètres</string>
     <string name="sitePermissionsDialogDenyButton">Refuser</string>
     <string name="sitePermissionsDialogAllowButton">Autoriser</string>

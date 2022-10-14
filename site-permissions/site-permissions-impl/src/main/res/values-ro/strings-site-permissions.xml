@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s dorește să acceseze camera și microfonul</string>
-    <string name="sitePermissionsMicDialogTitle">%1$s dorește să acceseze microfonul</string>
-    <string name="sitePermissionsCameraDialogTitle">%1$s dorește să acceseze camera</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle">„%1$s” dorește să acceseze camera și microfonul</string>
+    <string name="sitePermissionsMicDialogTitle">„%1$s” dorește să acceseze microfonul</string>
+    <string name="sitePermissionsCameraDialogTitle">„%1$s” dorește să acceseze camera</string>
     <string name="sitePermissionsDialogContent">Gestionează permisiunile acordate din setări</string>
     <string name="sitePermissionsDialogDenyButton">Refuză</string>
     <string name="sitePermissionsDialogAllowButton">Permite</string>
