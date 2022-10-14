@@ -14,8 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Automatické vyplňování přihlašovacích údajů</string>
 
     <string name="managementLockedModeText">Odemknout automatické vyplňování</string>
@@ -34,12 +36,12 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Použít uložené přihlášení?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Přihlášení pro %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Přihlášení pro %s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Přihlášení k webu</string>
 
     <string name="updateLoginDialogTitle">Aktualizovat heslo?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Aktualizuj si heslo</string>
-    <string name="updateLoginDialogButtonNotNow">Nyní nyní</string>
+    <string name="updateLoginDialogButtonNotNow">Teď ne</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zavřít dialogové okno Automatické vyplňování</string>
 
@@ -53,7 +55,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Uložit změny</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopírovat uživatelské jméno</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopírovat heslo</string>
-    <string name="credentialManagementEditLastUpdated">Přihlášení naposledy aktualizováno %1$s</string>
+    <string name="credentialManagementEditLastUpdated">Přihlášení naposledy aktualizováno %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Uložit a automaticky vyplnit přihlášení</string>
     <string name="credentialManagementViewMenuEdit">Upravit</string>
