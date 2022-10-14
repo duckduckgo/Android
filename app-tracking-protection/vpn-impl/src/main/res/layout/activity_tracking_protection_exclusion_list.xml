@@ -56,6 +56,16 @@
                     app:panelDrawable="@drawable/ic_alert_color_24"
                     android:layout_margin="16dp"/>
 
+            <TextView
+                android:id="@+id/excludedAppsFilterText"
+                style="@style/TextAppearance.DuckDuckGo.Body2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="@dimen/keyline_2"
+                android:padding="@dimen/keyline_4"
+                app:drawableEndCompat="@drawable/ic_arrow_down"
+                tools:text="Protection Enabled (11)" />
+
             <com.facebook.shimmer.ShimmerFrameLayout
                     android:id="@+id/deviceShieldExclusionAppListSkeleton"
                     android:layout_width="match_parent"
