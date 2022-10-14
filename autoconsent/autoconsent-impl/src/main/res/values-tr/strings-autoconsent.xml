@@ -14,10 +14,11 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Autoconsent -->
+    <!-- smartling.placeholder_format = NONE -->
     <string name="autoconsentTitle">Çerez Açılır Pencerelerini Yönetin</string>
-    <string name="autoconsentDescription">DuckDuckGo ziyaret ettiğiniz sitelerde çerez onayı açılır pencereleri algılarsa, çerez tercihlerinizi çerezleri en aza indirecek ve gizliliği en üst düzeye çıkaracak şekilde otomatik olarak ayarlayabilir ve ardından açılır pencereleri kapatabiliriz.</string>
+    <string name="autoconsentDescription">DuckDuckGo ziyaret ettiğiniz sitelerde çerez onayı açılır pencereleri tespit ederse çerez tercihlerinizi çerezleri en aza indirecek ve gizliliği en üst düzeye çıkaracak şekilde otomatik olarak ayarlayabilir ve ardından açılır pencereleri kapatabiliriz.</string>
     <string name="autoconsentToggle">DuckDuckGo\'nun çerez izni açılır pencerelerini yönetmesine izin verin</string>
-
 </resources>
