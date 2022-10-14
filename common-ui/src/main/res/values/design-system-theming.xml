@@ -372,7 +372,6 @@
         <item name="autofillCredentialListSubtitleColor">@color/brownishGrayTwo</item>
         <item name="appTPHeaderBackground">@color/light_blue</item>
 
-
         <!-- Design System Reference Colors Light -->
         <item name="daxColorBackground">@color/gray0</item>
         <item name="daxColorBackgroundInverted">@color/gray100</item>
@@ -436,6 +435,5 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/largeShapeCornerRadius</item>
     </style>
-
 
 </resources>
