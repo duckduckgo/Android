@@ -14,14 +14,17 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="common_Today">Astăzi</string>
     <string name="common_Yesterday">Ieri</string>
-    <string name="common_DaysAgo">%1$d zile în urmă</string>
+    <string name="common_DaysAgo">Cu %d zile în urmă</string>
     <string name="common_PastWeek">Ultima Săptămână</string>
     <string name="common_PastMonth">Ultima Lună</string>
-    <string name="common_MinutesAgo">Acum %1$dm</string>
-    <string name="common_HoursAgo">Acum %1$dh</string>
+    <string name="common_MinutesAgo">Cu %dm în urmă</string>
+    <string name="common_HoursAgo">Cu % dh în urmă</string>
     <string name="common_JustNow">Chiar acum</string>
     <string name="common_hour_abbreviation">h</string>
     <string name="common_min_abbreviation">min</string>
