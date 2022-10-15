@@ -20,4 +20,6 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 
 class UserAllowListRepositoryFake : UserAllowListRepository {
     override fun isDomainInUserAllowList(domain: String): Boolean = false
+
+    override fun domainsInUserAllowList(): List<String> = emptyList()
 }

@@ -82,14 +82,13 @@
                 app:drawableEndCompat="@drawable/icon_success"
                 tools:text="Good Privacy Practices" />
 
-            <View
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="20dp"
-                android:layout_marginBottom="8dp"
-                android:background="@color/divider" />
+                android:layout_marginBottom="8dp" />
 
             <TextView
                 android:id="@+id/beforeGrade"

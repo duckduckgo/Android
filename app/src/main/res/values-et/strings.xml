@@ -592,7 +592,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Ainult selle seansi jaoks</string>
     <string name="preciseLocationSiteDialogDenyAlways">Keela alati</string>
     <string name="preciseLocationSiteDialogDenyOnce">Keela selle seansi jaoks</string>
-    <string name="settingsPreciseLocation">Asukoht</string>
     <string name="preciseLocationFeatureDescription">Saidid, mida sa külastad, võivad küsida sinu seadme asukohta. Nad ei saa sellele juurde enne, kui oled andnud selgesõnalise loa. DuckDuckGo kasutab sinu asukohta alati anonüümselt, et edastada kohaliku otsingu tulemused.</string>
     <string name="preciseLocationToggleText">Saidid võivad küsida minu asukohta</string>
     <string name="preciseLocationEmptyListHint">Ühelegi veebisaidile ei ole antud luba asukohale juurdepääsuks</string>
@@ -685,8 +684,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Sirvi privaatselt meie Maci rakendusega</string>
-    <string name="macos_settings_description_list">Olete nimekirjas!</string>
-    <string name="macos_settings_description_ready">Macis allalaadimiseks saadaval</string>
     <string name="macos_settings_title">DuckDuckGo töölauarakendus</string>
 
     <!-- Downloads -->
@@ -714,13 +711,28 @@
     <string name="atp_SettingsDeviceShieldDisabled">Keelatud</string>
 
     <!-- Autoconsent -->
-    <string name="autoconsentDialogTitle">Paistab, et sellel saidil on küpsiste nõusoleku hüpikaken👇</string>
+    <string name="autoconsentDialogTitle">Paistab, et sellel saidil on küpsiste nõusoleku hüpik👇</string>
     <string name="autoconsentDialogDescription">Kas soovid, et ma need sinu eest lahendaksin? Ma võin proovida minimeerida küpsiseid, maksimeerida privaatsust ja sellised hüpikaknad peita.</string>
     <string name="autoconsentPrimaryCta">Halda küpsiste hüpikaknaid</string>
     <string name="autoconsentSecondaryCta">Ei aitäh</string>
 
     <string name="autoconsentSetting">Halda küpsiste hüpikaknaid</string>
     <string name="autoconsentAnimationText">Hallatavad küpsised</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Saidi load</string>
+    <string name="sitePermissionsSettingsDescription">Külastatavad saidid võivad küsida juurdepääsu seadme asukohale, kaamerale või mikrofonile. Need ei pääse neile juurde enne, kui oled selleks andnud selgesõnalise loa.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Luba kõigil saitidel küsida järgmist.</string>
+    <string name="sitePermissionsSettingsLocation">Asukoht</string>
+    <string name="sitePermissionsSettingsCamera">Kaamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Saitide haldamine</string>
+    <string name="sitePermissionsSettingsEmptyText">Saite pole veel</string>
+    <string name="permissionPerWebsiteText">Saidi „%1$s“ load </string>
+    <string name="permissionsPerWebsiteAskSetting">Küsi</string>
+    <string name="permissionsPerWebsiteDenySetting">Keela</string>
+    <string name="permissionsPerWebsiteAllowSetting">Luba</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">Luba %1$s saidile %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automaatne täitmine</string>

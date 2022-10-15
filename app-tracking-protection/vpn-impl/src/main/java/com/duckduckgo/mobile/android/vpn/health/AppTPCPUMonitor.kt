@@ -45,7 +45,8 @@ class AppTPCPUMonitor @Inject constructor(
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         if (appTpFeatureConfig.isEnabled(AppTpSetting.CPUMonitoring)) {
             Timber.d("AppTpSetting.CPUMonitoring is enabled, starting monitoring")
-            val work = PeriodicWorkRequestBuilder<CPUMonitorWorker>(1, TimeUnit.HOURS)
+            val work = PeriodicWorkRequestBuilder<CPUMonitorWorker>(4, TimeUnit.HOURS)
+                .setInitialDelay(10, TimeUnit.MINUTES) // let the CPU usage settle after VPN restart
                 .build()
 
             workManager.enqueueUniquePeriodicWork(APP_TRACKER_CPU_MONITOR_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, work)

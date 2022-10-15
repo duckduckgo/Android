@@ -29,7 +29,7 @@
         android:paddingStart="@dimen/keyline_4"
         android:paddingEnd="@dimen/keyline_4">
 
-        <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="Dialogs"
@@ -71,7 +71,50 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="Bottom Sheet Dialogs"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+            android:id="@+id/actionBottomSheetButton"
+            android:text="Action Bottom Sheet"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+            android:id="@+id/actionBottomSheetButtonWithTitle"
+            android:text="Action Bottom Sheet with title and icons"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+            android:id="@+id/promoBottomSheetButton"
+            android:text="Promo Bottom Sheet"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+            android:id="@+id/promoBottomSheetButtonWithTitle"
+            android:text="Promo Bottom Sheet with title"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
+            android:id="@+id/promoBottomSheetButtonWithImage"
+            android:text="Promo Bottom Sheet with image"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
             android:id="@+id/label"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"

@@ -15,22 +15,23 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/settingsSectionGeneral"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.SwitchCompat
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/setAsDefaultBrowserSetting"
-        style="@style/SettingsSwitch"
-        android:paddingTop="14dp"
-        android:paddingBottom="14dp"
-        android:text="@string/settingsDefaultBrowserEnabled"
-        android:theme="@style/SettingsSwitchTheme" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsDefaultBrowserEnabled"
+        app:showSwitch="true"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/homeScreenWidgetSetting"
-        style="@style/SettingsItemClickable"
-        android:text="@string/settingsAddHomeScreenWidget" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsAddHomeScreenWidget"/>
 
 </LinearLayout>

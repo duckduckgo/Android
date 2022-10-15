@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2020 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,9 +15,9 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/sectionHeader"
-        android:padding="@dimen/keyline_4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+<com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sectionHeader"
+    android:padding="@dimen/keyline_4"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"/>

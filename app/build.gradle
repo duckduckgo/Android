@@ -25,7 +25,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
-
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -41,6 +40,12 @@ android {
                     }
                 }
             }
+        }
+
+        if (project.hasProperty('perf-test')) {
+            buildConfigField "boolean", "IS_PERFORMANCE_TEST", "true"
+        } else {
+            buildConfigField "boolean", "IS_PERFORMANCE_TEST", "false"
         }
     }
     buildFeatures {
@@ -97,9 +102,9 @@ android {
             path "CMakeLists.txt"
         }
     }
-    lintOptions {
-        disable 'ObsoleteLintCustomCheck'
+    lint {
         abortOnError true
+        ignoreTestSources true
         baseline file("lint-baseline.xml")
     }
     testOptions {
@@ -184,7 +189,6 @@ dependencies {
     implementation project(':anrs-impl')
     implementation project(':macos-api')
     implementation project(':macos-impl')
-    implementation project(':macos-store')
 
     implementation project(':remote-messaging-api')
     implementation project(':remote-messaging-impl')
@@ -200,6 +204,9 @@ dependencies {
 
     internalImplementation project(':traces-api')
     internalImplementation project(':traces-impl')
+
+    implementation project(':site-permissions-api')
+    implementation project(':site-permissions-impl')
 
     implementation project(':bandwidth-impl')
     implementation project(':bandwidth-store')
@@ -218,6 +225,13 @@ dependencies {
     implementation project(':autoconsent-api')
     implementation project(':autoconsent-impl')
     implementation project(':autoconsent-store')
+
+    implementation project(':cookies-api')
+    implementation project(':cookies-impl')
+    implementation project(':cookies-store')
+
+    implementation project(':content-scope-scripts-api')
+    implementation project(':content-scope-scripts-impl')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

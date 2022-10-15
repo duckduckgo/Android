@@ -21,6 +21,9 @@ build/
 #Autoconsent
 /node_modules/@duckduckgo/autoconsent/
 
+#Privacy reference tests
+/node_modules/@duckduckgo/privacy-reference-tests/
+
 # Local configuration file (sdk path, etc)
 local.properties
 
@@ -61,12 +64,15 @@ report
 
 .DS_Store
 
-# Ignore everything in node_modules except autofill dist, license and readme
+# Ignore everything in node_modules except
+# - autofill: dist, license and readme
+# - config-scope-scripts: contentScope.js, license and readme
 # Info on the weird syntax here: https://stackoverflow.com/a/54870120/1948947
 !/node_modules/
 /node_modules/*
 !/node_modules/@duckduckgo/
 /node_modules/@duckduckgo/*
+
 !/node_modules/@duckduckgo/autofill/
 /node_modules/@duckduckgo/autofill/*
 !/node_modules/@duckduckgo/autofill/LICENSE.md
@@ -74,3 +80,13 @@ report
 !/node_modules/@duckduckgo/autofill/dist/
 /node_modules/@duckduckgo/autofill/dist/*
 !/node_modules/@duckduckgo/autofill/dist/*
+
+!/node_modules/@duckduckgo/content-scope-scripts/
+/node_modules/@duckduckgo/content-scope-scripts/*
+!/node_modules/@duckduckgo/content-scope-scripts/LICENSE.md
+!/node_modules/@duckduckgo/content-scope-scripts/README.md
+!/node_modules/@duckduckgo/content-scope-scripts/build/
+/node_modules/@duckduckgo/content-scope-scripts/build/*
+!/node_modules/@duckduckgo/content-scope-scripts/build/android/
+/node_modules/@duckduckgo/content-scope-scripts/build/android/*
+!/node_modules/@duckduckgo/content-scope-scripts/build/android/contentScope.js

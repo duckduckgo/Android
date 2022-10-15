@@ -30,7 +30,6 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
-import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
@@ -45,7 +44,8 @@ import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.privacy.config.api.AmpLinks
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -62,7 +62,6 @@ class BrowserWebViewClient(
     private val cookieManagerProvider: CookieManagerProvider,
     private val loginDetector: DOMLoginDetector,
     private val dosDetector: DosDetector,
-    private val gpc: Gpc,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -73,6 +72,7 @@ class BrowserWebViewClient(
     private val internalTestUserChecker: InternalTestUserChecker,
     private val adClickManager: AdClickManager,
     private val autoconsent: Autoconsent,
+    private val contentScopeScripts: ContentScopeScripts
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -263,7 +263,7 @@ class BrowserWebViewClient(
             }
             lastPageStarted = url
             browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
-            injectGpcToDom(webView, url)
+            webView.evaluateJavascript("javascript:${contentScopeScripts.getScript()}", null)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {
             appCoroutineScope.launch(dispatcherProvider.default()) {
@@ -296,17 +296,6 @@ class BrowserWebViewClient(
             appCoroutineScope.launch(dispatcherProvider.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
                 throw e
-            }
-        }
-    }
-
-    private fun injectGpcToDom(
-        webView: WebView,
-        url: String?
-    ) {
-        url?.let {
-            if (gpc.canGpcBeUsedByUrl(url)) {
-                webView.evaluateJavascript("javascript:${gpc.getGpcJs()}", null)
             }
         }
     }

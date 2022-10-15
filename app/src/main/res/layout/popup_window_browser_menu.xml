@@ -63,9 +63,10 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.duckduckgo.mobile.android.ui.view.SectionDivider
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        app:defaultPadding="false"
         android:paddingTop="8dp"
         android:paddingBottom="0dp"/>
 
@@ -95,12 +96,13 @@
                 app:labelText="@string/newTabMenuItem"
                 app:iconDrawable="@drawable/ic_add_16" />
 
-            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:id="@+id/siteOptionsMenuDivider"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
+                app:defaultPadding="false"
+                android:layout_marginTop="@dimen/keyline_empty"
+                android:layout_marginBottom="@dimen/keyline_empty"
                 android:layout_marginStart="@dimen/keyline_5"
                 android:layout_marginEnd="@dimen/keyline_5"/>
 
@@ -132,12 +134,13 @@
                 app:labelText="@string/bookmarksMenuTitle"
                 app:iconDrawable="@drawable/ic_library_16" />
 
-            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:id="@+id/browserOptionsMenuDivider"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:paddingTop="3dp"
                 android:paddingBottom="3dp"
+                app:defaultPadding="false"
                 android:layout_marginStart="@dimen/keyline_5"
                 android:layout_marginEnd="@dimen/keyline_5"/>
 
@@ -205,12 +208,13 @@
                 app:labelText="@string/brokenSiteReportBrokenSiteMenuItem"
                 app:iconDrawable="@drawable/ic_feedback_16" />
 
-            <com.duckduckgo.mobile.android.ui.view.SectionDivider
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:id="@+id/settingsMenuDivider"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:paddingTop="3dp"
                 android:paddingBottom="3dp"
+                app:defaultPadding="false"
                 android:layout_marginStart="@dimen/keyline_5"
                 android:layout_marginEnd="@dimen/keyline_5"/>
 

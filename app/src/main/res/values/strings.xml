@@ -593,7 +593,6 @@
     <string name="preciseLocationSiteDialogAllowOnce">Only for This Session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Deny Always</string>
     <string name="preciseLocationSiteDialogDenyOnce">Deny for This Session</string>
-    <string name="settingsPreciseLocation">Location</string>
     <string name="preciseLocationFeatureDescription">Sites you visit may ask to know your device location. They won\'t be able to access it until you explicitly grant permission. DuckDuckGo only uses your location anonymously to deliver local search results.</string>
     <string name="preciseLocationToggleText">Sites Can Ask for My Location</string>
     <string name="preciseLocationEmptyListHint">No websites granted permission to access location</string>
@@ -633,9 +632,9 @@
     <string name="aliasToClipboardMessage">New address copied to your clipboard</string>
     <string name="autofillTooltipUseYourAlias">Use %1$s</string>
     <string name="autofillTooltipUseYourAliasDescription">Blocks email trackers</string>
-    <string name="autofillTooltipGenerateAddress">Generate a Private Address</string>
+    <string name="autofillTooltipGenerateAddress">Generate Private Duck Address</string>
     <string name="autofillTooltipGenerateAddressDescription">Blocks email trackers and hides your address</string>
-    <string name="newEmailAliasMenuTitle">Create Duck Address</string>
+    <string name="newEmailAliasMenuTitle">Generate Duck Address</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Would you like us to send you a notification when it\'s your turn?</string>
@@ -686,8 +685,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Browse privately with our app for Mac</string>
-    <string name="macos_settings_description_list">You\'re on the list!</string>
-    <string name="macos_settings_description_ready">Available for download on Mac</string>
     <string name="macos_settings_title">DuckDuckGo Desktop App</string>
 
     <!-- Downloads -->
@@ -722,6 +719,21 @@
 
     <string name="autoconsentSetting">Manage Cookie Pop-ups</string>
     <string name="autoconsentAnimationText">Cookies Managed</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Site Permissions</string>
+    <string name="sitePermissionsSettingsDescription">Sites you visit may ask for access to your device’s location, camera, or microphone. They won’t be able to access these unless you explicitly give them permission.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Allow all sites to ask for:</string>
+    <string name="sitePermissionsSettingsLocation">Location</string>
+    <string name="sitePermissionsSettingsCamera">Camera</string>
+    <string name="sitePermissionsSettingsMicrophone">Microphone</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Manage Sites</string>
+    <string name="sitePermissionsSettingsEmptyText">No sites yet</string>
+    <string name="permissionPerWebsiteText">Permissions for \"%s\" </string>
+    <string name="permissionsPerWebsiteAskSetting">Ask</string>
+    <string name="permissionsPerWebsiteDenySetting">Deny</string>
+    <string name="permissionsPerWebsiteAllowSetting">Allow</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle">%s permission for %s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Autofill</string>

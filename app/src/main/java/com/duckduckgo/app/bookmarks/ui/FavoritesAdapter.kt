@@ -211,18 +211,20 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
             val listItem = binding.root
             this.favorite = favorite
 
-            listItem.setContentDescription(
+            listItem.setLeadingIconContentDescription(
                 context.getString(
                     R.string.bookmarkOverflowContentDescription,
                     favorite.title
                 )
             )
 
-            listItem.setTitle(favorite.title)
-            listItem.setSubtitle(parseDisplayUrl(favorite.url))
-            loadFavicon(favorite.url, listItem.imageView())
+            listItem.setPrimaryText(favorite.title)
+            listItem.setSecondaryText(parseDisplayUrl(favorite.url))
 
-            listItem.setOverflowClickListener { anchor ->
+            loadFavicon(favorite.url, listItem.leadingIcon())
+
+            listItem.setTrailingIcon(R.drawable.ic_overflow)
+            listItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, favorite)
             }
 

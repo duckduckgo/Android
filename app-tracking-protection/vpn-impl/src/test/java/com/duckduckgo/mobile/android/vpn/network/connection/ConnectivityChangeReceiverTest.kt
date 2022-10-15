@@ -47,7 +47,7 @@ class ConnectivityChangeReceiverTest {
 
     @Test
     fun whenFeatureDisabledThenDoNotRegisterReceiver() {
-        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)).thenReturn(false)
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic)).thenReturn(false)
         receiver.onVpnStarted(TestScope())
 
         verify(context, never()).registerReceiver(any(), any())
@@ -55,7 +55,7 @@ class ConnectivityChangeReceiverTest {
 
     @Test
     fun whenFeatureDisabledThenDoUnregisterReceiver() {
-        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)).thenReturn(false)
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic)).thenReturn(false)
         receiver.onVpnStopped(TestScope(), VpnStateMonitor.VpnStopReason.SELF_STOP)
 
         verify(context).unregisterReceiver(any())
@@ -63,7 +63,7 @@ class ConnectivityChangeReceiverTest {
 
     @Test
     fun whenFeatureEnabledThenRegisterReceiver() {
-        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)).thenReturn(true)
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic)).thenReturn(true)
         receiver.onVpnStarted(TestScope())
 
         verify(context).registerReceiver(any(), any())
@@ -71,7 +71,7 @@ class ConnectivityChangeReceiverTest {
 
     @Test
     fun whenFeatureEnabledThenUnregisterReceiver() {
-        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)).thenReturn(true)
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic)).thenReturn(true)
         receiver.onVpnStopped(TestScope(), VpnStateMonitor.VpnStopReason.SELF_STOP)
 
         verify(context).unregisterReceiver(any())

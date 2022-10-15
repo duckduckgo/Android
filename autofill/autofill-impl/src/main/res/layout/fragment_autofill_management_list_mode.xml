@@ -14,7 +14,8 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -22,28 +23,16 @@
     android:background="?attr/colorPrimaryDark"
     tools:context="com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementListMode">
 
-    <TextView
-        android:id="@+id/enabledToggleLabel"
-        style="@style/TextAppearance.DuckDuckGo.Body1"
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/enabledToggle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginTop="30dp"
-        android:text="@string/credentialManagementAutofillToggleLabel"
-        app:layout_constraintEnd_toStartOf="@id/enabledToggle"
+        app:primaryText="@string/credentialManagementAutofillToggleLabel"
+        app:showSwitch="true"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/enabledToggle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_4"
-        android:gravity="center_vertical"
-        app:layout_constraintBottom_toBottomOf="@id/enabledToggleLabel"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/enabledToggleLabel" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/logins"
@@ -54,7 +43,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/enabledToggleLabel" />
+        app:layout_constraintTop_toBottomOf="@id/enabledToggle"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

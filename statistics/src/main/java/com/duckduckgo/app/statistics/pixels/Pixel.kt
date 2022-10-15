@@ -74,7 +74,6 @@ interface Pixel {
         const val LAST_USED_DAY = "duck_address_last_used"
         const val WEBVIEW_VERSION = "webview_version"
         const val OS_VERSION = "os_version"
-        const val APP_LINKS_SECURITY_EXCEPTION = "app_links_security_exception"
     }
 
     object PixelValues {

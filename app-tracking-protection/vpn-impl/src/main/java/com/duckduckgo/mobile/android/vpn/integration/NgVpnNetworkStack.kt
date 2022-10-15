@@ -20,10 +20,13 @@ import android.content.Context
 import android.os.ParcelFileDescriptor
 import android.util.LruCache
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
+import com.duckduckgo.mobile.android.vpn.dao.VpnAddressLookup
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
@@ -38,9 +41,14 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.random.Random
+
+private const val LRU_CACHE_SIZE = 2048
 
 @ContributesBinding(
     scope = VpnScope::class,
@@ -59,8 +67,11 @@ class NgVpnNetworkStack @Inject constructor(
     private val appNameResolver: AppNameResolver,
     private val appTrackerRecorder: AppTrackerRecorder,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
     vpnDatabase: VpnDatabase,
 ) : VpnNetworkStack, VpnNetworkCallback {
+
+    private val addressLookupDao = vpnDatabase.vpnAddressLookupDao()
 
     private val packageManager = context.packageManager
     private val vpnAppTrackerBlockingDao = vpnDatabase.vpnAppTrackerBlockingDao()
@@ -68,9 +79,10 @@ class NgVpnNetworkStack @Inject constructor(
     private var tunnelThread: Thread? = null
     private var jniContext = 0L
     private val jniLock = Any()
-    private val dnsResourceCache = LruCache<String, String>(1000)
+    private lateinit var addressLookupLruCache: LruCache<String, String>
     // cache packageId -> app name
     private val appNamesCache = LruCache<String, AppNameResolver.OriginatingApp>(100)
+    private val periodicCachePersisterJob = ConflatedJob()
 
     override val name: String = "ng"
 
@@ -93,10 +105,44 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
+        fun populateLruInMemoryCache() {
+            val cachedEntries = addressLookupDao.getAll()
+            this::addressLookupLruCache.isInitialized || run {
+                addressLookupLruCache = LruCache(LRU_CACHE_SIZE)
+                Timber.d("Warming address lookup cache with ${cachedEntries.size} entries")
+                true
+            }
+            cachedEntries.forEach { entry ->
+                addressLookupLruCache.put(entry.address, entry.domain)
+            }
+        }
+
+        fun startPeriodicCachePersistJob() {
+            periodicCachePersisterJob += appCoroutineScope.launch(dispatcherProvider.io()) {
+                while (isActive) {
+                    delay(Random.nextLong(300_000, 600_000))
+                    persistCacheToDisk()
+                }
+            }
+        }
+
+        populateLruInMemoryCache()
+        startPeriodicCachePersistJob()
         return startNative(tunfd.fd)
     }
 
+    private fun persistCacheToDisk() {
+        addressLookupDao.deleteAll()
+        addressLookupLruCache.snapshot().forEach { (key, value) ->
+            Timber.d("Persisting to address lookup cache $key -> $value")
+            addressLookupDao.insert(VpnAddressLookup(key, value))
+        }
+    }
+
     override fun onStopVpn(): Result<Unit> {
+
+        periodicCachePersisterJob.cancel()
+        persistCacheToDisk()
         return stopNative()
     }
 
@@ -129,12 +175,12 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     override fun onDnsResolved(dnsRR: DnsRR) {
-        dnsResourceCache.put(dnsRR.resource, dnsRR.qName)
+        addressLookupLruCache.put(dnsRR.resource, dnsRR.qName)
         Timber.w("dnsResolved called for $dnsRR")
     }
 
     override fun onSniResolved(sniRR: SniRR) {
-        dnsResourceCache.put(sniRR.resource, sniRR.name)
+        addressLookupLruCache.put(sniRR.resource, sniRR.name)
         Timber.w("sniResolved called for ${sniRR.name} / ${sniRR.resource}")
     }
 
@@ -144,7 +190,7 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     override fun isAddressBlocked(addressRR: AddressRR): Boolean {
-        val hostname = dnsResourceCache[addressRR.address] ?: return false
+        val hostname = addressLookupLruCache[addressRR.address] ?: return false
         val domainAllowed = shouldAllowDomain(hostname, addressRR.uid)
         Timber.w("isAddressBlocked for $addressRR ($hostname) = ${!domainAllowed}")
         return !domainAllowed

@@ -22,9 +22,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
+import com.duckduckgo.mobile.android.ui.view.dialog.ActionBottomSheetDialog
+import com.duckduckgo.mobile.android.ui.view.dialog.PromoBottomSheetDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog.EventListener
@@ -160,6 +163,104 @@ class DialogsFragment : Fragment() {
                             })
                             .build()
                             .show(fragmentManager, StackedAlertDialog.TAG_STACKED_ALERT_DIALOG)
+                    }
+                }
+
+                view.findViewById<Button>(R.id.actionBottomSheetButton)?.let { button ->
+                    button.setOnClickListener {
+                        ActionBottomSheetDialog.Builder(requireContext())
+                            .setPrimaryItem("Primary Item")
+                            .setSecondaryItem("Secondary Item")
+                            .addEventListener(object : ActionBottomSheetDialog.EventListener() {
+                                override fun onPrimaryItemClicked() {
+                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                                override fun onSecondaryItemClicked() {
+                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                            .show()
+                    }
+                }
+
+                view.findViewById<Button>(R.id.actionBottomSheetButtonWithTitle)?.let { button ->
+                    button.setOnClickListener {
+                        ActionBottomSheetDialog.Builder(requireContext())
+                            .setTitle("Title")
+                            .setPrimaryItem("Primary Item", R.drawable.ic_add_16)
+                            .setSecondaryItem("Secondary Item", R.drawable.ic_add_16)
+                            .addEventListener(object : ActionBottomSheetDialog.EventListener() {
+                                override fun onPrimaryItemClicked() {
+                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                                override fun onSecondaryItemClicked() {
+                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                            .show()
+                    }
+                }
+
+                view.findViewById<Button>(R.id.promoBottomSheetButton)?.let { button ->
+                    button.setOnClickListener {
+                        PromoBottomSheetDialog.Builder(requireContext())
+                            .setContent("Add our search widget to your home screen for quick, easy access.")
+                            .setPrimaryButton("Button")
+                            .setSecondaryButton("Button")
+                            .addEventListener(object : PromoBottomSheetDialog.EventListener() {
+                                override fun onPrimaryButtonClicked() {
+                                    super.onPrimaryButtonClicked()
+                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                                override fun onSecondaryButtonClicked() {
+                                    super.onSecondaryButtonClicked()
+                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                            .show()
+                    }
+                }
+
+                view.findViewById<Button>(R.id.promoBottomSheetButtonWithTitle)?.let { button ->
+                    button.setOnClickListener {
+                        PromoBottomSheetDialog.Builder(requireContext())
+                            .setTitle("Title")
+                            .setContent("Add our search widget to your home screen for quick, easy access.")
+                            .setPrimaryButton("Button")
+                            .setSecondaryButton("Button")
+                            .addEventListener(object : PromoBottomSheetDialog.EventListener() {
+                                override fun onPrimaryButtonClicked() {
+                                    super.onPrimaryButtonClicked()
+                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                                override fun onSecondaryButtonClicked() {
+                                    super.onSecondaryButtonClicked()
+                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                            .show()
+                    }
+                }
+
+                view.findViewById<Button>(R.id.promoBottomSheetButtonWithImage)?.let { button ->
+                    button.setOnClickListener {
+                        PromoBottomSheetDialog.Builder(requireContext())
+                            .setIcon(R.drawable.ic_bottom_sheet_promo_icon)
+                            .setTitle("Title")
+                            .setContent("Add our search widget to your home screen for quick, easy access.")
+                            .setPrimaryButton("Button")
+                            .setSecondaryButton("Button")
+                            .addEventListener(object : PromoBottomSheetDialog.EventListener() {
+                                override fun onPrimaryButtonClicked() {
+                                    super.onPrimaryButtonClicked()
+                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                                override fun onSecondaryButtonClicked() {
+                                    super.onSecondaryButtonClicked()
+                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                            .show()
                     }
                 }
 
