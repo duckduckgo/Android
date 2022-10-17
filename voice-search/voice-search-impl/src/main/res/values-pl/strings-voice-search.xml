@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- smartling.placeholder_format = NONE -->
+    <string name="voiceSearchIconContentDescription">Wyszukiwanie głosowe</string>
+    <string name="voiceSearchListening">Mów teraz</string>
+    <string name="voiceSearchListeningFooter">Dźwięk jest przetwarzany na urządzeniu. Dane nie są przechowywane ani udostępniane żadnym podmiotom, w tym DuckDuckGo.</string>
+    <string name="voiceSearchNegativeAction">Anuluj</string>
+    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo nigdy nie rejestruje tego, co mówisz. Dźwięk jest przetwarzany na urządzeniu. Nie jest przechowywany ani nikomu udostępniany.</string>
+    <string name="voiceSearchPermissionRationaleTitle">Wymagany dostęp do mikrofonu na potrzeby prywatnego wyszukiwania głosowego</string>
+    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
+    <string name="voiceSearchPermissionRejectedDialogMessage">Aby korzystać z wyszukiwania głosowego w DuckDuckGo, musisz włączyć dostęp do mikrofonu w ustawieniach systemu.</string>
+    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Ustawienia</string>
+    <string name="voiceSearchPermissionRejectedDialogTitle">Wymagany dostęp do mikrofonu</string>
+    <string name="voiceSearchTitle">Wyszukiwanie głosowe</string>
+</resources>
