@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import androidx.recyclerview.widget.DiffUtil
@@ -48,7 +49,6 @@ class TrackerFeedAdapter @Inject constructor(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), StickyHeaders {
 
     private val trackerFeedItems = mutableListOf<TrackerFeedItem>()
-    private lateinit var onAppClick: (TrackerFeedItem) -> Unit
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
@@ -57,14 +57,12 @@ class TrackerFeedAdapter @Inject constructor(
         when (holder) {
             is TrackerFeedViewHolder -> holder.bind(
                 trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData,
-                onAppClick,
                 position == trackerFeedItems.size - 1,
             )
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
             is TrackerAppsDataViewHolder -> holder.bind(
                 trackerFeedItems[position] as TrackerFeedItem.TrackerAppsData,
-                onAppClick,
                 position == trackerFeedItems.size - 1
             )
         }
@@ -100,10 +98,8 @@ class TrackerFeedAdapter @Inject constructor(
     }
 
     suspend fun updateData(
-        data: List<TrackerFeedItem>,
-        onAppClickListener: (TrackerFeedItem) -> Unit
+        data: List<TrackerFeedItem>
     ) {
-        onAppClick = onAppClickListener
         val newData = data
         val oldData = trackerFeedItems
         val diffResult = withContext(Dispatchers.IO) {
@@ -176,7 +172,6 @@ class TrackerFeedAdapter @Inject constructor(
 
         fun bind(
             tracker: TrackerFeedItem.TrackerFeedData?,
-            onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit,
             isLastPosition: Boolean
         ) {
             tracker?.let { item ->
@@ -227,7 +222,16 @@ class TrackerFeedAdapter @Inject constructor(
                     suppressLayout(true)
                 }
                 itemView.setOnClickListener {
-                    onAppClick(item)
+                    startActivity(
+                        context,
+                        AppTPCompanyTrackersActivity.intent(
+                            context,
+                            item.trackingApp.packageId,
+                            item.trackingApp.appDisplayName,
+                            item.bucket
+                        ),
+                        null
+                    )
                 }
                 if (isLastPosition) {
                     splitter.hide()
@@ -266,7 +270,7 @@ class TrackerFeedAdapter @Inject constructor(
         val splitter: View = view.findViewById(R.id.activity_apps_splitter)
         val warningImage: View = view.findViewById(R.id.activity_apps_warning_image)
 
-        fun bind(item: TrackerFeedItem.TrackerAppsData, onItemClick: (TrackerFeedItem.TrackerAppsData) -> Unit, isLastPosition: Boolean) {
+        fun bind(item: TrackerFeedItem.TrackerAppsData, isLastPosition: Boolean) {
             appsText.text = context.resources.getQuantityString(
                 if (item.isProtected) R.plurals.atp_ActivityProtectedApps else R.plurals.atp_ActivityUnprotectedApps,
                 item.appsCount,
@@ -278,7 +282,7 @@ class TrackerFeedAdapter @Inject constructor(
                 warningImage.show()
             }
             itemView.setOnClickListener {
-                onItemClick(item)
+                // TODO [ANA] handle this.
             }
             if (isLastPosition) {
                 splitter.hide()
