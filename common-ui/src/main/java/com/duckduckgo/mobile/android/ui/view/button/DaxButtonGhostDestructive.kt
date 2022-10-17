@@ -19,10 +19,6 @@ package com.duckduckgo.mobile.android.ui.view.button
 import android.content.Context
 import android.util.AttributeSet
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.ui.view.button.Size.Small
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Type
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Type.Body1
-import com.google.android.material.button.MaterialButton
 
 class DaxButtonGhostDestructive @JvmOverloads constructor(
     ctx: Context,

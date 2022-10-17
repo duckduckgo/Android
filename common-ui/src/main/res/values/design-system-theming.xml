@@ -79,6 +79,7 @@
         <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
         <item name="materialButtonStyle">@style/Widget.DuckDuckGo.DaxButton.Contained.Primary</item>
         <item name="materialButtonOutlinedStyle">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
+        <item name="borderlessButtonStyle">@style/@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
 
         <!-- Design System Components -->
         <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.Contained.Primary</item>
@@ -435,5 +436,6 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/largeShapeCornerRadius</item>
     </style>
+
 
 </resources>
