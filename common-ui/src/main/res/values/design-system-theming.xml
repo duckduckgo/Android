@@ -77,10 +77,15 @@
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="materialButtonStyle">@style/Widget.DuckDuckGo.DaxButton.Contained.Primary</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
 
         <!-- Design System Components -->
-        <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.Primary</item>
+        <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.Contained.Primary</item>
         <item name="daxButtonSecondary">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
+        <item name="daxButtonDestructive">@style/Widget.DuckDuckGo.DaxButton.Contained.Destructive</item>
+        <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
+        <item name="daxButtonGhostDestructive">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhost</item>
 
         <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
         <item name="primaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Primary.Small</item>
@@ -229,22 +234,38 @@
         <item name="autofillDialogOnboardingExplanationColor">@color/gray50</item>
         <item name="autofillCredentialListSubtitleColor">@color/paleBrownishGray</item>
 
-        <!-- Design System Colors Dark -->
+        <!-- Design System Reference Colors Dark -->
         <item name="daxColorBackground">@color/gray100</item>
         <item name="daxColorBackgroundInverted">@color/gray0</item>
         <item name="daxColorSurface">@color/gray90</item>
         <item name="daxColorContainer">@color/black12</item>
         <item name="daxColorPrimaryText">@color/white84</item>
-        <item name="daxColorInversePrimaryText">@color/black84</item>
         <item name="daxColorSecondaryText">@color/white60</item>
         <item name="daxColorPrimaryIcon">@color/white84</item>
-        <item name="daxColorDestructive">@color/destructiveRedDark</item>
+        <item name="daxColorDestructive">@color/red30</item>
         <item name="daxColorContainerDisabled">@color/white18</item>
         <item name="daxColorTextDisabled">@color/white36</item>
         <item name="daxColorLines">@color/white12</item>
         <item name="daxColorAccentBlue">@color/blue30</item>
-        <item name="daxColorButtonPressed">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
+
+        <!-- Design System Component Colors Dark -->
+        <item name="daxColorButtonPrimaryContainer">@color/blue30</item>
+        <item name="daxColorButtonPrimaryContainerPressed">@color/blue50</item>
+        <item name="daxColorButtonSecondaryContainer">@android:color/transparent</item>
+        <item name="daxColorButtonSecondaryContainerPressed">@color/blue30</item>
+        <item name="daxColorButtonDestructiveContainer">@color/red30</item>
+        <item name="daxColorButtonDestructiveContainerPressed">@color/red50</item>
+        <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
+        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/red30_18</item>
+
+        <item name="daxColorButtonPrimaryText">@color/black84</item>
+        <item name="daxColorButtonPrimaryTextPressed">@color/black84</item>
+        <item name="daxColorButtonSecondaryText">@color/blue30</item>
+        <item name="daxColorButtonSecondaryTextPressed">@color/blue20</item>
+        <item name="daxColorButtonDestructiveGhostText">@color/red30</item>
+        <item name="daxColorButtonDestructiveGhostTextPressed">@color/red20</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -352,22 +373,37 @@
         <item name="appTPHeaderBackground">@color/light_blue</item>
 
 
-        <!-- Design System Colors Light -->
+        <!-- Design System Reference Colors Light -->
         <item name="daxColorBackground">@color/gray0</item>
         <item name="daxColorBackgroundInverted">@color/gray100</item>
         <item name="daxColorSurface">@color/white</item>
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorPrimaryText">@color/black84</item>
-        <item name="daxColorInversePrimaryText">@color/white84</item>
         <item name="daxColorSecondaryText">@color/black60</item>
         <item name="daxColorPrimaryIcon">@color/black84</item>
-        <item name="daxColorDestructive">@color/destructiveRedLight</item>
+        <item name="daxColorDestructive">@color/red50</item>
         <item name="daxColorContainerDisabled">@color/black6</item>
         <item name="daxColorTextDisabled">@color/black36</item>
         <item name="daxColorLines">@color/black18</item>
         <item name="daxColorAccentBlue">@color/blue50</item>
-        <item name="daxColorButtonPressed">@color/blue70</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
+
+        <!-- Design System Component Colors Light -->
+        <item name="daxColorButtonPrimaryContainer">@color/blue50</item>
+        <item name="daxColorButtonPrimaryContainerPressed">@color/blue70</item>
+        <item name="daxColorButtonSecondaryContainer">@android:color/transparent</item>
+        <item name="daxColorButtonSecondaryContainerPressed">@color/blue50</item>
+        <item name="daxColorButtonDestructiveContainer">@color/red70</item>
+        <item name="daxColorButtonDestructiveContainerPressed">@color/red70</item>
+        <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
+        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/red60_12</item>
+
+        <item name="daxColorButtonPrimaryText">@color/white</item>
+        <item name="daxColorButtonPrimaryTextPressed">@color/white</item>
+        <item name="daxColorButtonSecondaryText">@color/blue50</item>
+        <item name="daxColorButtonSecondaryTextPressed">@color/blue70</item>
+        <item name="daxColorButtonDestructiveGhostText">@color/red50</item>
+        <item name="daxColorButtonDestructiveGhostTextPressed">@color/red70</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">
