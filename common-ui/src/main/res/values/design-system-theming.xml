@@ -67,7 +67,8 @@
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialComponents.Dialog.Alert</item>
         <item name="materialButtonStyle">@style/Widget.DuckDuckGo.DaxButton.Contained.Primary</item>
         <item name="materialButtonOutlinedStyle">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
-
+        <item name="borderlessButtonStyle">@style/@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
+        
         <!-- Design System Components -->
         <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.Contained.Primary</item>
         <item name="daxButtonSecondary">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
