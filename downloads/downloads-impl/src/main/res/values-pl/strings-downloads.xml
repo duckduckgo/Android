@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Nie udało się pobrać. Sprawdź połączenie internetowe.</string>
 
     <string name="notificationChannelFileDownloading">Pobieranie pliku</string>
     <string name="notificationChannelFileDownloaded">Plik został pobrany</string>
+
     <string name="downloadInProgress">Pobieranie w toku</string>
+
+    <string name="downloadsDownloadStartedMessage">Rozpoczęto pobieranie %s</string>
+    <string name="downloadsDownloadFinishedMessage">Pobieranie %s zakończone</string>
+    <string name="downloadsDownloadGenericErrorMessage">Nie udało się pobrać.</string>
+    <string name="downloadsCancel">Anuluj</string>
+    <string name="downloadsRetry">Ponów</string>
+    <string name="notificationDownloadComplete">Pobieranie zakończone.</string>
+    <string name="notificationDownloadFailed">Nie udało się pobrać.</string>
 </resources>
