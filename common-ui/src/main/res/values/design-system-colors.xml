@@ -16,7 +16,7 @@
 
 <resources>
 
-    <!-- Design System References Colors
+    <!-- Design System Reference Colors
         daxColorBackground - Bottom Layer - Background of the screen
         daxColorSurface - First layer on top (Toolbar, Navigation Bar, Dialogs)
         daxColorContainer - Object container (Favicon rounded background)
@@ -27,13 +27,13 @@
         daxColorLines - Dividers between elements
         daxColorAccentBlue - Main accent color (Button primary)
         daxColorAccentYellow
-        daxColorDisabled - Disabled color applied to all elements (text, buttons, etc...)
+        daxColorContainerDisabled - Disabled color applied to background elements like buttons
+        daxColorTextDisabled - Disabled color applied to text elements
     -->
     <attr name="daxColorBackground" format="color"/>
     <attr name="daxColorSurface" format="color"/>
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
-    <attr name="daxColorInversePrimaryText" format="color"/>
     <attr name="daxColorSecondaryText" format="color"/>
     <attr name="daxColorPrimaryIcon" format="color"/>
     <attr name="daxColorDestructive" format="color"/>
@@ -44,16 +44,34 @@
     <attr name="daxColorTextDisabled" format="color"/>
 
     <!-- Component Specific Colors -->
-    <attr name="daxColorButtonPressed" format="color"/>
+    <attr name="daxColorButtonPrimaryContainer" format="color"/>
+    <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>
+    <attr name="daxColorButtonSecondaryContainer" format="color"/>
+    <attr name="daxColorButtonSecondaryContainerPressed" format="color"/>
+    <attr name="daxColorButtonDestructiveContainer" format="color"/>
+    <attr name="daxColorButtonDestructiveContainerPressed" format="color"/>
+    <attr name="daxColorButtonDestructiveGhostContainer" format="color"/>
+    <attr name="daxColorButtonDestructiveGhostContainerPressed" format="color"/>
+
+    <attr name="daxColorButtonPrimaryText" format="color"/>
+    <attr name="daxColorButtonPrimaryTextPressed" format="color"/>
+    <attr name="daxColorButtonSecondaryText" format="color"/>
+    <attr name="daxColorButtonSecondaryTextPressed" format="color"/>
+    <attr name="daxColorButtonDestructiveGhostText" format="color"/>
+    <attr name="daxColorButtonDestructiveGhostTextPressed" format="color"/>
 
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
-    <color name="destructiveRedLight">#EE1025</color>
-    <color name="destructiveRedDark">#FF5454</color>
 
     <!-- Design System Raw Colors -->
-
+    <color name="red20">#F2A18A</color>
+    <color name="red30">#EB876C</color>
+    <color name="red30_18">#2EEB876C</color>
     <color name="red50">#DE5833</color>
+    <color name="red60">#BC4726</color>
+    <color name="red60_12">#1FBC4726</color>
+    <color name="red70">#9A3216</color>
+
     <color name="purple50">#5132A9</color>
 
     <color name="yellow50">#FFCC33</color>
@@ -75,6 +93,7 @@
     <color name="gray20">#EEEEEE</color>
     <color name="gray0">#FAFAFA</color>
 
+    <color name="blue20">#8FABF9</color>
     <color name="blue30">#7295F6</color>
     <color name="blue50">#3969EF</color>
     <color name="blue60">#2B55CA</color>

@@ -141,7 +141,6 @@
     <style name="Typography.DuckDuckGo.Button">
         <item name="android:textSize">15sp</item>
         <item name="android:lineSpacingExtra">6sp</item>
-        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="Typography.DuckDuckGo.Caption">
