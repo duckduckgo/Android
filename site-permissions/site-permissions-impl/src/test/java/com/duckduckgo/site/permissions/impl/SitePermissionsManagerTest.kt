@@ -16,9 +16,11 @@
 
 package com.duckduckgo.site.permissions.impl
 
+import android.content.pm.PackageManager
 import android.webkit.PermissionRequest
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
@@ -28,8 +30,11 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 @ExperimentalCoroutinesApi
+@RunWith(RobolectricTestRunner::class)
 class SitePermissionsManagerTest {
 
     @ExperimentalCoroutinesApi
@@ -37,8 +42,9 @@ class SitePermissionsManagerTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
+    private val mockPackageManager = mock<PackageManager>()
 
-    private val testee = SitePermissionsManagerImpl(mockSitePermissionsRepository)
+    private val testee = SitePermissionsManagerImpl(mockPackageManager, mockSitePermissionsRepository)
 
     private val url = "https://domain.com/whatever"
 
@@ -60,10 +66,23 @@ class SitePermissionsManagerTest {
             arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_AUDIO_CAPTURE)).thenReturn(false)
+        whenever(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
 
         val permissionsAllowedToAsk = testee.getSitePermissionsAllowedToAsk(url, resources)
         assertEquals(1, permissionsAllowedToAsk.size)
         assertEquals(PermissionRequest.RESOURCE_VIDEO_CAPTURE, permissionsAllowedToAsk.first())
+    }
+
+    @Test
+    fun givenListOfPermissionsNoHardwareCameraThenFilterNotSupportedAndReturnOnlyPermissionsAllowedToAsk() = runTest {
+        val resources =
+            arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
+        whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_AUDIO_CAPTURE)).thenReturn(false)
+        whenever(mockPackageManager.hasSystemFeature(any())).thenReturn(false)
+
+        val permissionsAllowedToAsk = testee.getSitePermissionsAllowedToAsk(url, resources)
+        assertEquals(0, permissionsAllowedToAsk.size)
     }
 
     @Test
