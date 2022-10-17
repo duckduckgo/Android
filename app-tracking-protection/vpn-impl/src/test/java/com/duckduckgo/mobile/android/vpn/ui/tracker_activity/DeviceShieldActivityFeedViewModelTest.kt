@@ -91,34 +91,14 @@ class DeviceShieldActivityFeedViewModelTest {
         db.vpnTrackerDao().insert(dummyTrackers[1])
         db.vpnTrackerDao().insert(dummyTrackers[0])
         db.vpnAppTrackerBlockingDao().insertTrackerEntities(dummySignals)
+        getAppsAndProtectionInfoReturnsEmptyList()
 
         viewModel.getMostRecentTrackers(timeWindow, false).test {
             assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
             assertEquals(
                 listOf(
-                    TrackerFeedItem.TrackerFeedData(
-                        id = dummyTrackers[0].id(),
-                        bucket = dummyTrackers[0].bucket(),
-                        trackingApp = dummyTrackers[0].trackingApp,
-                        trackingCompanyBadges = listOf(
-                            TrackerCompanyBadge.Company(dummyTrackers[0].company, dummyTrackers[0].companyDisplayName),
-                            TrackerCompanyBadge.Company(dummyTrackers[1].company, dummyTrackers[1].companyDisplayName),
-                        ),
-                        timestamp = TEST_TIMESTAMP,
-                        displayTimestamp = "Just Now",
-                        trackersTotalCount = 2
-                    ),
-                    TrackerFeedItem.TrackerFeedData(
-                        id = dummyTrackers[2].id(),
-                        bucket = dummyTrackers[2].bucket(),
-                        trackingApp = dummyTrackers[2].trackingApp,
-                        trackingCompanyBadges = listOf(
-                            TrackerCompanyBadge.Company(dummyTrackers[2].company, dummyTrackers[2].companyDisplayName),
-                        ),
-                        timestamp = TEST_TIMESTAMP,
-                        displayTimestamp = "Just Now",
-                        trackersTotalCount = 1
-                    ),
+                    trackerFeedDataWithTwoTrackers,
+                    trackerFeedDataWithOneTracker,
                 ),
                 awaitItem()
             )
@@ -126,6 +106,79 @@ class DeviceShieldActivityFeedViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun whenGetMostRecentTrackersIsNotEmptyThenStartWithSkeletonThenEmitTwoTrackerFeedDataAndOneTrackerAppsDataWithProtectedApps() =
+        runBlocking {
+            db.vpnTrackerDao().insert(dummyTrackers[2])
+            db.vpnTrackerDao().insert(dummyTrackers[1])
+            db.vpnTrackerDao().insert(dummyTrackers[0])
+            db.vpnAppTrackerBlockingDao().insertTrackerEntities(dummySignals)
+            getAppsAndProtectionInfoReturnsTwoAppsWithIsExcludedFalse()
+
+            viewModel.getMostRecentTrackers(timeWindow, false).test {
+                assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
+                assertEquals(
+                    listOf(
+                        trackerFeedDataWithTwoTrackers,
+                        trackerFeedDataWithOneTracker,
+                        TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = true),
+                    ),
+                    awaitItem()
+                )
+                expectNoEvents()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenGetMostRecentTrackersIsNotEmptyThenStartWithSkeletonThenEmitTwoTrackerFeedDataAndOneTrackerAppsDataWithUnprotectedApps() =
+        runBlocking {
+            db.vpnTrackerDao().insert(dummyTrackers[2])
+            db.vpnTrackerDao().insert(dummyTrackers[1])
+            db.vpnTrackerDao().insert(dummyTrackers[0])
+            db.vpnAppTrackerBlockingDao().insertTrackerEntities(dummySignals)
+            getAppsAndProtectionInfoReturnsTwoAppsWithIsExcludedTrue()
+
+            viewModel.getMostRecentTrackers(timeWindow, false).test {
+                assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
+                assertEquals(
+                    listOf(
+                        trackerFeedDataWithTwoTrackers,
+                        trackerFeedDataWithOneTracker,
+                        TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = false),
+                    ),
+                    awaitItem()
+                )
+                expectNoEvents()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenGetMostRecentTrackersIsNotEmptyThenStartWithSkeletonThenEmitTwoTrackerFeedDataAndTwoTrackerAppsDataWithProtectedAndUnprotectedApps() =
+        runBlocking {
+            db.vpnTrackerDao().insert(dummyTrackers[2])
+            db.vpnTrackerDao().insert(dummyTrackers[1])
+            db.vpnTrackerDao().insert(dummyTrackers[0])
+            db.vpnAppTrackerBlockingDao().insertTrackerEntities(dummySignals)
+            getAppsAndProtectionInfoReturnsTwoAppsOneWithIsExcludedTrueAndOtherWithIsExcludedFalse()
+
+            viewModel.getMostRecentTrackers(timeWindow, false).test {
+                assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
+                assertEquals(
+                    listOf(
+                        trackerFeedDataWithTwoTrackers,
+                        trackerFeedDataWithOneTracker,
+                        TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = true),
+                        TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = false),
+                    ),
+                    awaitItem()
+                )
+                expectNoEvents()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
 
     @Test
     fun whenGetMostRecentTrackersIsNotEmptyAndOutsideTimeWindowThenEmitLoadingSkeleton() = runBlocking {
@@ -138,8 +191,7 @@ class DeviceShieldActivityFeedViewModelTest {
         }
     }
 
-    @Test
-    fun whenGetAppsDataCalledAndBothUnprotectedAndProtectedAppsThenEmitTwoItems() = runBlocking {
+    private suspend fun getAppsAndProtectionInfoReturnsTwoAppsOneWithIsExcludedTrueAndOtherWithIsExcludedFalse() {
         whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
                 listOf(
@@ -160,21 +212,9 @@ class DeviceShieldActivityFeedViewModelTest {
                 )
             )
         )
-
-        viewModel.getAppsData().test {
-            assertEquals(
-                listOf(
-                    TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = true),
-                    TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = false)
-                ),
-                awaitItem()
-            )
-            cancelAndConsumeRemainingEvents()
-        }
     }
 
-    @Test
-    fun whenGetAppsDataCalledAndOnlyUnprotectedAppsThenEmitOneItem() = runBlocking {
+    private suspend fun getAppsAndProtectionInfoReturnsTwoAppsWithIsExcludedTrue() {
         whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
                 listOf(
@@ -195,62 +235,33 @@ class DeviceShieldActivityFeedViewModelTest {
                 )
             )
         )
-
-        viewModel.getAppsData().test {
-            assertEquals(
-                listOf(
-                    TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = false)
-                ),
-                awaitItem()
-            )
-            cancelAndConsumeRemainingEvents()
-        }
     }
 
-    @Test
-    fun whenGetAppsDataCalledAndNoAppsThenEmitEmptyList() = runBlocking {
+    private suspend fun getAppsAndProtectionInfoReturnsTwoAppsWithIsExcludedFalse() {
+        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
+            flowOf(
+                listOf(
+                    TrackingProtectionAppInfo(
+                        packageName = "package1",
+                        name = "One app",
+                        isExcluded = false,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                    TrackingProtectionAppInfo(
+                        packageName = "package2",
+                        name = "Other app",
+                        isExcluded = false,
+                        knownProblem = 0,
+                        userModified = false
+                    ),
+                )
+            )
+        )
+    }
+
+    private suspend fun getAppsAndProtectionInfoReturnsEmptyList() {
         whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(flowOf(emptyList()))
-
-        viewModel.getAppsData().test {
-            assertEquals(
-                emptyList<TrackerFeedItem>(), awaitItem()
-            )
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenGetAppsDataCalledAndOnlyProtectedAppsThenEmitOneItem() = runBlocking {
-        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
-            flowOf(
-                listOf(
-                    TrackingProtectionAppInfo(
-                        packageName = "package1",
-                        name = "One app",
-                        isExcluded = false,
-                        knownProblem = 0,
-                        userModified = false
-                    ),
-                    TrackingProtectionAppInfo(
-                        packageName = "package2",
-                        name = "Other app",
-                        isExcluded = false,
-                        knownProblem = 0,
-                        userModified = false
-                    ),
-                )
-            )
-        )
-
-        viewModel.getAppsData().test {
-            assertEquals(
-                listOf(
-                    TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = true)
-                ),
-                awaitItem()
-            )
-            cancelAndConsumeRemainingEvents()
-        }
     }
 
     companion object {
@@ -346,4 +357,29 @@ private val dummyTrackers = listOf(
             appDisplayName = "DuckDuckGo"
         )
     )
+)
+
+private val trackerFeedDataWithTwoTrackers = TrackerFeedItem.TrackerFeedData(
+    id = dummyTrackers[0].id(),
+    bucket = dummyTrackers[0].bucket(),
+    trackingApp = dummyTrackers[0].trackingApp,
+    trackingCompanyBadges = listOf(
+        TrackerCompanyBadge.Company(dummyTrackers[0].company, dummyTrackers[0].companyDisplayName),
+        TrackerCompanyBadge.Company(dummyTrackers[1].company, dummyTrackers[1].companyDisplayName),
+    ),
+    timestamp = TEST_TIMESTAMP,
+    displayTimestamp = "Just Now",
+    trackersTotalCount = 2
+)
+
+private val trackerFeedDataWithOneTracker = TrackerFeedItem.TrackerFeedData(
+    id = dummyTrackers[2].id(),
+    bucket = dummyTrackers[2].bucket(),
+    trackingApp = dummyTrackers[2].trackingApp,
+    trackingCompanyBadges = listOf(
+        TrackerCompanyBadge.Company(dummyTrackers[2].company, dummyTrackers[2].companyDisplayName),
+    ),
+    timestamp = TEST_TIMESTAMP,
+    displayTimestamp = "Just Now",
+    trackersTotalCount = 1
 )

@@ -69,6 +69,13 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         return@withContext statsRepository.getMostRecentVpnTrackers { timeWindow.asString() }
             .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
             .map { aggregateDataPerApp(it, showHeadings) }
+            .combine(getAppsData()) { recentTrackersList, appsList ->
+                if (recentTrackersList.isEmpty()) {
+                    listOf(TrackerFeedItem.TrackerDescriptionFeed) + appsList
+                } else {
+                    recentTrackersList + appsList
+                }
+            }
             .flowOn(Dispatchers.Default)
             .onStart {
                 startTickerRefresher()
@@ -77,7 +84,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
             }
     }
 
-    suspend fun getAppsData(): Flow<List<TrackerFeedItem>> = withContext(dispatcherProvider.io()) {
+    private suspend fun getAppsData(): Flow<List<TrackerFeedItem>> = withContext(dispatcherProvider.io()) {
         return@withContext excludedApps.getAppsAndProtectionInfo().map { list ->
             val unprotectedCount = list.count { it.isExcluded }
             val protectedCount = list.size - unprotectedCount

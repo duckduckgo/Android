@@ -35,7 +35,6 @@ import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayou
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -81,13 +80,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
                     config.timeWindowUnits
                 ),
                 config.showTimeWindowHeadings
-            ).combine(activityFeedViewModel.getAppsData()) { recentTrackersList, appsList ->
-                if (recentTrackersList.isEmpty()) {
-                    listOf(TrackerFeedItem.TrackerDescriptionFeed) + appsList
-                } else {
-                    recentTrackersList + appsList
-                }
-            }
+            )
                 .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
                 .collect {
                     feedListener?.onTrackerListShowed(it.size)
