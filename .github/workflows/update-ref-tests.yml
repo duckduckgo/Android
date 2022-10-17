@@ -1,0 +1,61 @@
+name: Update Reference Tests
+
+on:
+  schedule:
+    - cron: '0 1 * * *' # run at 1 AM UTC
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  update-ref-tests:
+    name: Update reference tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install npm-check-updates
+        run: npm install -g npm-check-updates
+
+      - name: Install copy-files-from-to
+        run: npm install -g copy-files-from-to
+
+      - name: Check for updates
+        id: update-check
+        continue-on-error: true
+        run: ncu @duckduckgo/privacy-reference-tests --errorLevel 2
+
+      - name: Update reference tests
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        run: ncu @duckduckgo/privacy-reference-tests -u
+
+      - name: Install package
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        run: npm install
+
+      - name: Copy files
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        run: copy-files-from-to
+
+      - name: Create PR
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        uses: peter-evans/create-pull-request@v4
+        with:
+          base: "develop"
+          title: "Update reference tests to latest version"
+          author: daxmobile <daxmobile@users.noreply.github.com>
+          token: ${{ secrets.GT_DAXMOBILE }}
+          commit-message: "Update reference tests to latest version"
+          labels: reference tests, automated pr
+          branch: automated/update-ref-tests-dependencies
+          body: |
+            - Automated reference tests dependency update
+            
+            This PR updates the reference tests dependency to the latest available version and copies the necessary files.
+            - [ ] All tests must pass
