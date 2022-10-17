@@ -35,7 +35,6 @@ import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayou
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter.*
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
