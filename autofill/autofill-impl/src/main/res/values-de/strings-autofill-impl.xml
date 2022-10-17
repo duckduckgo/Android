@@ -14,8 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
+    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Anmeldedaten automatisch ausfüllen</string>
 
     <string name="managementLockedModeText">Autovervollständigen freischalten</string>
@@ -34,12 +36,12 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Weitere Optionen</string>
 
     <string name="useSavedLoginDialogTitle">Gespeicherte Anmeldedaten verwenden?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Anmeldedaten für %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">Login für %s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Anmeldedaten für Website</string>
 
     <string name="updateLoginDialogTitle">Passwort aktualisieren?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Passwort aktualisieren</string>
-    <string name="updateLoginDialogButtonNotNow">Nicht jetzt</string>
+    <string name="updateLoginDialogButtonNotNow">Jetzt nicht</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Autovervollständigen-Dialog schließen</string>
 
@@ -53,7 +55,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Änderungen speichern</string>
     <string name="credentialManagementEditButtonCopyUsername">Benutzername kopieren</string>
     <string name="credentialManagementEditButtonCopyPassword">Passwort kopieren</string>
-    <string name="credentialManagementEditLastUpdated">Anmeldedaten zuletzt aktualisiert: %1$s</string>
+    <string name="credentialManagementEditLastUpdated">Login zuletzt aktualisiert %s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Anmeldedaten speichern und automatisch ausfüllen</string>
     <string name="credentialManagementViewMenuEdit">Bearbeiten</string>
