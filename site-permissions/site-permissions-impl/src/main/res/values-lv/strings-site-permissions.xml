@@ -15,9 +15,9 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">%1$s vēlas piekļūt kamerai un mikrofonam</string>
-    <string name="sitePermissionsMicDialogTitle">%1$s vēlas piekļūt mikrofonam</string>
-    <string name="sitePermissionsCameraDialogTitle">%1$s vēlas piekļūt kamerai</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle">\"%1$s\" vēlas piekļūt kamerai un mikrofonam</string>
+    <string name="sitePermissionsMicDialogTitle">\"%1$s\" vēlas piekļūt mikrofonam</string>
+    <string name="sitePermissionsCameraDialogTitle">\"%1$s\" vēlas piekļūt kamerai</string>
     <string name="sitePermissionsDialogContent">Pārvaldiet piešķirtās atļaujas iestatījumos</string>
     <string name="sitePermissionsDialogDenyButton">Liegt</string>
     <string name="sitePermissionsDialogAllowButton">Atļaut</string>
