@@ -68,7 +68,7 @@ class AppBadHealthStateHandlerTest {
     fun setup() {
         MockitoAnnotations.openMocks(this)
 
-        AndroidThreeTen.init(context)
+        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
 
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppHealthDatabase::class.java)
             .allowMainThreadQueries()
