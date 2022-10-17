@@ -158,8 +158,8 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
         excludingReason: Int
     ): String {
         return when (excludingReason) {
-            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> context.getString(R.string.atp_ExcludedReasonLoadsWebsites)
-            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> context.getString(R.string.atp_ExcludedReasonKnownIssues)
+            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON, TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON ->
+                context.getString(R.string.atp_ExcludedReasonKnownIssues)
             else -> ""
         }
     }

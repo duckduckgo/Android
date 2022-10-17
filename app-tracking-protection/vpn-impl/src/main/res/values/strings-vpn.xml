@@ -135,6 +135,7 @@
     <string name="atp_ExcludedAppsEnabledLabel">During beta, DuckDuckGo may disable protection for some apps to resolve known content loading issues. Your custom settings won’t change unless you restore to default settings.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection is disabled</b> Did App Tracking Protection cause a problem with your apps <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ExcludedAppsReport">Report Problem With Another App</string>
+    <!-- TODO [ANA] To be removed -->
     <string name="atp_ExcludedReasonLoadsWebsites">Loads websites</string>
     <!-- TODO [ANA] Modified, double check if new key is needed -->
     <string name="atp_ExcludedReasonKnownIssues">App issues may occur if enabled</string>
