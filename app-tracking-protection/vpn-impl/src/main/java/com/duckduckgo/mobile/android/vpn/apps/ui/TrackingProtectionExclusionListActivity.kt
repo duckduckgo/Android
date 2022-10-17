@@ -43,6 +43,7 @@ import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityTrackingProtectionExclusionListBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
@@ -158,6 +159,7 @@ class TrackingProtectionExclusionListActivity :
         val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
 
         if (isListEnabled) {
+            // TODO [ANA] Do we want to hide this banner until we know its content so it doesn't jump?
             binding.excludedAppsEnabledVPNLabel.show()
             binding.excludedAppsDisabledVPNLabel.gone()
         } else {
@@ -185,8 +187,23 @@ class TrackingProtectionExclusionListActivity :
         shimmerLayout.stopShimmer()
         val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
         binding.excludedAppsFilterText.text = getString(viewState.filterResId!!, viewState.excludedApps.size)
+        binding.excludedAppsFilterText.show()
         adapter.update(viewState.excludedApps, isListEnabled)
+        renderBanner(viewState.showDefaultBanner)
         shimmerLayout.gone()
+    }
+
+    private fun renderBanner(showLearnWhyBanner: Boolean) {
+        if (showLearnWhyBanner) {
+            binding.excludedAppsEnabledVPNLabel.setText(getString(R.string.atp_ExcludedAppsEnabledLabel))
+        } else {
+            binding.excludedAppsEnabledVPNLabel.apply {
+                setClickableLink(
+                    LEARN_WHY_ANNOTATION,
+                    getText(R.string.atp_ExcludedAppsEnabledLearnWhyLabel)
+                ) { launchFaq() }
+            }
+        }
     }
 
     private fun processCommand(command: Command) {
@@ -270,12 +287,17 @@ class TrackingProtectionExclusionListActivity :
         viewModel.launchFeedback()
     }
 
+    private fun launchFaq() {
+        startActivity(DeviceShieldFAQActivity.intent(this))
+    }
+
     private fun getAppsFilterOrDefault(): AppsFilter {
         return intent.getSerializableExtra(KEY_FILTER_LIST) as AppsFilter? ?: AppsFilter.ALL
     }
 
     companion object {
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
+        private const val LEARN_WHY_ANNOTATION = "learn_why_link"
         private const val KEY_LIST_ENABLED = "KEY_LIST_ENABLED"
         private const val KEY_FILTER_LIST = "KEY_FILTER_LIST"
 

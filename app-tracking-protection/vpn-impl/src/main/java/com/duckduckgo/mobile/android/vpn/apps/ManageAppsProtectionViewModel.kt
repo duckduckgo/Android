@@ -84,11 +84,20 @@ class ManageAppsProtectionViewModel @Inject constructor(
             .combine(filterState.asStateFlow()) { list, filter ->
                 val protectedApps = list.filter { !it.isExcluded }
                 val unprotectedApps = list.filter { it.isExcluded }
+                val showDefaultBanner = list.any { it.isProblematic() && !it.isExcluded }
 
                 when (filter) {
-                    AppsFilter.PROTECTED_ONLY -> return@combine ViewState(protectedApps, R.string.atp_ExcludedAppsFilterProtectedLabel)
-                    AppsFilter.UNPROTECTED_ONLY -> return@combine ViewState(unprotectedApps, R.string.atp_ExcludedAppsFilterUnprotectedLabel)
-                    else -> return@combine ViewState(list, R.string.atp_ExcludedAppsFilterAllLabel)
+                    AppsFilter.PROTECTED_ONLY -> return@combine ViewState(
+                        protectedApps,
+                        R.string.atp_ExcludedAppsFilterProtectedLabel,
+                        showDefaultBanner
+                    )
+                    AppsFilter.UNPROTECTED_ONLY -> return@combine ViewState(
+                        unprotectedApps,
+                        R.string.atp_ExcludedAppsFilterUnprotectedLabel,
+                        showDefaultBanner
+                    )
+                    else -> return@combine ViewState(list, R.string.atp_ExcludedAppsFilterAllLabel, showDefaultBanner)
                 }
             }
     }
@@ -251,7 +260,11 @@ private data class ManualProtectionSnapshot(
     val snapshot: List<Pair<String, Boolean>>
 )
 
-internal data class ViewState(val excludedApps: List<TrackingProtectionAppInfo>, @StringRes val filterResId: Int? = null)
+internal data class ViewState(
+    val excludedApps: List<TrackingProtectionAppInfo>,
+    @StringRes val filterResId: Int? = null,
+    val showDefaultBanner: Boolean = false
+)
 
 internal sealed class Command {
     object RestartVpn : Command()

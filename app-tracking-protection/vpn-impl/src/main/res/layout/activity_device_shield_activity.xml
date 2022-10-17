@@ -172,7 +172,7 @@
                 android:id="@+id/cta_manage_view_all_apps"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/atp_ActvityViewAppsLabel"/>
+                app:primaryText="@string/atp_ActivityViewAppsLabel"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_remove_feature"

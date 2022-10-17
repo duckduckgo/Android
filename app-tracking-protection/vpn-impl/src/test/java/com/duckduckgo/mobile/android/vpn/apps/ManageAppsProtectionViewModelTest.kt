@@ -349,6 +349,38 @@ class ManageAppsProtectionViewModelTest {
         }
     }
 
+    @Test
+    fun whenAtLeastOneAppManuallyExcludedAndGetProtectedAppsCalledThenShowDefaultBannerIsFalse() = runTest {
+        val expectedShowDefaultBanner = false
+        val allApps = listOf(appWithKnownIssues, appManuallyExcluded)
+        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
+            flowOf(
+                allApps
+            )
+        )
+        viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.ALL)
+
+        viewModel.getProtectedApps().test {
+            assertEquals(ViewState(allApps, R.string.atp_ExcludedAppsFilterAllLabel, expectedShowDefaultBanner), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenAtLeastOneAppProblematicNotExcludedAndGetProtectedAppsCalledThenShowDefaultBannerIsTrue() = runTest {
+        val expectedShowDefaultBanner = true
+        val allApps = listOf(appWithKnownIssues, appProblematicNotExcluded)
+        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
+            flowOf(
+                allApps
+            )
+        )
+        viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.ALL)
+
+        viewModel.getProtectedApps().test {
+            assertEquals(ViewState(allApps, R.string.atp_ExcludedAppsFilterAllLabel, expectedShowDefaultBanner), awaitItem())
+        }
+    }
+
     private val appWithKnownIssues = TrackingProtectionAppInfo(
         packageName = "com.package.name",
         name = "App",
@@ -387,5 +419,15 @@ class ManageAppsProtectionViewModelTest {
         isExcluded = false,
         knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
         userModified = false
+    )
+
+    private val appProblematicNotExcluded = TrackingProtectionAppInfo(
+        packageName = "com.package.name",
+        name = "App",
+        type = "None",
+        category = AppCategory.Undefined,
+        isExcluded = false,
+        knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
+        userModified = true
     )
 }

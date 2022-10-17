@@ -64,6 +64,7 @@
                 android:background="?selectableItemBackground"
                 android:drawablePadding="@dimen/keyline_2"
                 android:padding="@dimen/keyline_4"
+                android:visibility="invisible"
                 app:drawableEndCompat="@drawable/ic_arrow_down"
                 tools:text="Protection Enabled (11)" />
 
