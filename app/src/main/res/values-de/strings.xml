@@ -158,7 +158,7 @@
 
     <string name="trackersBlockedNoSectionDescription">Die Anfragen der folgenden Domain wurden geladen.</string>
 
-    <string name="adLoadedSectionDescription">Die Anfragen der folgenden Domain wurden geladen, da kürzlich eine %-Werbung auf DuckDuckGo angeklickt wurde. Diese Anfragen helfen bei der Bewertung der Effektivität von Werbung. Werbung auf DuckDuckGo erstellt keine Profile von dir.</string>
+    <string name="adLoadedSectionDescription">Die Anfragen der folgenden Domain wurden geladen, da kürzlich eine %s-Werbung auf DuckDuckGo angeklickt wurde. Diese Anfragen helfen bei der Bewertung der Effektivität von Werbung. Werbung auf DuckDuckGo erstellt keine Profile von dir.</string>
     <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Wie sich unsere Suchanzeigen auf unseren Schutz auswirken</annotation></string>
     <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
 
@@ -167,7 +167,7 @@
     <string name="domainsLoadedSectionEmptyListDescription">Wir haben keine Anfragen von Drittanbieter-Domains erkannt.</string>
 
     <string name="domainsLoadedBreakageSectionDescription">Die Anfragen der folgenden Domain wurden geladen, um eine Störung der Website zu verhindern.</string>
-    <string name="domainsLoadedAssociatedSectionDescription">Die Anforderungen der folgenden Domain wurden geladen, da sie mit % verknüpft sind.</string>
+    <string name="domainsLoadedAssociatedSectionDescription">Die Anforderungen der folgenden Domain wurden geladen, da sie mit %s verknüpft sind.</string>
 
     <string name="trackersBlockedText">Blockierte Anfragen</string>
     <string name="trackersNotBlockedText">Keine Tracking-Anfragen blockiert</string>
@@ -363,8 +363,8 @@
     <string name="privacyProtectionNotificationDefaultTitle">Wir schützen deine Privatsphäre</string>
     <string name="privacyProtectionNotificationReportTitle">Dein Datenschutzbericht</string>
     <string name="privacyProtectionNotificationDefaultDescription">Die Verwendung der DuckDuckGo-App schützt deine Daten, indem Tracker blockiert und Verbindungen verschlüsselt werden.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Du hast deine Daten geschützt, indem du % unverschlüsselte Verbindungen bei der Verwendung von DuckDuckGo gesichert hast.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Du hast deine Daten geschützt, indem du %-Tracker bei der Verwendung von DuckDuckGo blockiert hast.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Du hast deine Daten geschützt, indem du %d unverschlüsselte Verbindungen bei der Verwendung von DuckDuckGo gesichert hast.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Du hast deine Daten geschützt, indem du %d-Tracker bei der Verwendung von DuckDuckGo blockiert hast.</string>
     <string name="privacyProtectionNotificationBothDescription">Du hast deine Daten geschützt, indem du %d Tracker blockiert und %d unverschlüsselte Verbindungen gesichert hast, während du DuckDuckGo benutzt hast.</string>
     <string name="privacyProtectionNotificationLaunchButton">Weiter browsen</string>
 
@@ -486,8 +486,8 @@
     <string name="daxEndCtaText"><![CDATA[Gut gemacht!<br/><br/>Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Werbung ihren Schrecken. 👍]]></string>
     <string name="daxSerpCtaText">Deine DuckDuckGo-Suchanfragen sind anonym. Immer. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ und <b>% weiteres Tracker-Netzwerk</b> haben versucht, dich hier zu tracken. <br/><br/>Ich habe sie blockiert!<br/><br/> ☝️Du kannst in der Adressleiste sehen, wer dich beim Besuch einer neuen Website tracken will.]]></item>
-        <item quantity="other"><![CDATA[ und <b>% andere haben</b> versucht, dich hier zu verfolgen. <br/><br/>Ich habe sie blockiert! <br/><br/>☝️ Sie können in der Adressleiste nachsehen, wer versucht, Sie zu verfolgen, wenn Sie eine neue Website besuchen. ️]]></item>
+        <item quantity="one"><![CDATA[ und <b>%d weiteres Tracker-Netzwerk</b> haben versucht, dich hier zu tracken. <br/><br/>Ich habe sie blockiert!<br/><br/> ☝️Du kannst in der Adressleiste sehen, wer dich beim Besuch einer neuen Website tracken will.]]></item>
+        <item quantity="other"><![CDATA[ und <b>%D weitere Tracker-Netzwerke</b> haben versucht, dich hier zu tracken. <br/><br/>Ich habe sie blockiert!<br/><br/> ☝️ Du kannst in der Adressleiste sehen, wer dich beim Besuch einer neuen Website tracken will.]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ hat versucht, dich hier zu tracken. <br/><br/>Ich habe das blockiert!<br/><br/> ☝️Du kannst in der URL-Leiste überprüfen, wer versucht, dich zu tracken, wenn du eine neue Website besuchst.]]></item>
@@ -546,7 +546,7 @@
     <string name="fireproofWebsiteDeleteConfirmMessage">Möchtest du <b>%s</b> wirklich löschen?</string>
     <string name="fireproofWebsiteFeatureDescription">Websites sorgen mit Cookies dafür, dass du angemeldet bleibst. Wenn du eine Website feuerfest machst, werden Cookies nicht gelöscht und du bleibst angemeldet – auch nach Verwendung der Schaltfläche „Feuer“. Wir blockieren weiterhin auf feuerfest gemachten Websites gefundene Tracker von Dritten.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Weitere Optionen für die feuersichere Website %s</string>
-    <string name="fireproofWebsiteLoginDialogTitle">Möchtest du % feuerfest machen?</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Möchtest du %s feuerfest machen?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Wenn du diese Website feuerfest machst, bleibst du nach Verwendung der Schaltfläche „Feuer“ angemeldet.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Feuerfest machen</string>
     <string name="fireproofWebsiteLoginDialogNegative">Jetzt nicht</string>
@@ -583,7 +583,7 @@
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Gerätestandort für DuckDuckGo Privacy Browser freigeben?</string>
-    <string name="preciseLocationSystemDialogSubtitle">% erfragt deinen Gerätestandort. Zuerst musst du der App die Befugnis geben, den Standort deines Geräts weiterzugeben. Erst dann kann % um Erlaubnis bitten.</string>
+    <string name="preciseLocationSystemDialogSubtitle">%s erfragt deinen Gerätestandort. Zuerst musst du der App die Befugnis geben, den Standort deines Geräts weiterzugeben. Erst dann kann %s um Erlaubnis bitten.</string>
     <string name="preciseLocationSystemDialogAllow">Aktivieren</string>
     <string name="preciseLocationSystemDialogDeny">Vielleicht später</string>
     <string name="preciseLocationSystemDialogNeverAllow">Für diese Website nicht erneut fragen</string>
@@ -603,7 +603,7 @@
     <string name="preciseLocationDeleteContentDescription">Weitere Optionen für Standortberechtigungen in der Domain %s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Gewährt</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Abgelehnt</string>
-    <string name="preciseLocationSnackbarMessage">Du hast % in der Vergangenheit den Zugriff auf deinen Gerätestandort gewährt.</string>
+    <string name="preciseLocationSnackbarMessage">Du hast %s in der Vergangenheit den Zugriff auf deinen Gerätestandort gewährt.</string>
 
     <!--Fire button education-->
     <string name="daxClearDataCtaText">In deinem Browser können sich personenbezogene Daten ablagern. Igitt. Mit der Schaltfläche „Feuer“ brennst du alles weg. Probier’s gleich aus! 👇</string>
