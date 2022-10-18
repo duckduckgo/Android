@@ -25,7 +25,7 @@
     <string name="atp_DiagnosticsMenuLabel">Diagnostikk</string>
     <string name="atp_DataMenuLabel">Datastatistikk</string>
     <string name="atp_MeteredConnection">"Målt: %s"</string>
-    <string name="atp_ConnectionStatus">"VPN tilkoblet: % s"</string>
+    <string name="atp_ConnectionStatus">"VPN tilkoblet: %s"</string>
     <string name="atp_NetworkAvailable">"Koblet til internett: %s"</string>
     <string name="atp_DnsServers">"DNS for aktivt nettverk: %s"</string>
     <string name="atp_AppExitsReasonsTitle">Årsaker til lukking av appen</string>
@@ -36,7 +36,7 @@
     <string name="vpnTrackerCompaniesBlockedToday">Sporingsselskaper blokkert i dag: %s</string>
     <string name="vpnTrackerCompaniesBlockedThisWeek">Sporingsselskaper blokkert denne uken: %s</string>
     <string name="vpnTrackerCompaniesNone">"Ingen sporingsselskaper er blokkert ennå"</string>
-    <string name="vpnTrackersBlockedToday">Sporere blokkert i dag: % d</string>
+    <string name="vpnTrackersBlockedToday">Sporere blokkert i dag: %d</string>
     <string name="vpnTrackersBlockedThisWeek">Sporere blokkert denne uken: %d</string>
     <string name="vpnTrackersNone">"Ingen sporere er blokkert ennå"</string>
     <string name="vpnNotRunYet">"VPN er ikke brukt ennå"</string>
