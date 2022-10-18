@@ -132,10 +132,12 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     private fun persistCacheToDisk() {
-        addressLookupDao.deleteAll()
-        addressLookupLruCache.snapshot().forEach { (key, value) ->
-            Timber.d("Persisting to address lookup cache $key -> $value")
-            addressLookupDao.insert(VpnAddressLookup(key, value))
+        if (this::addressLookupLruCache.isInitialized) {
+            addressLookupDao.deleteAll()
+            addressLookupLruCache.snapshot().forEach { (key, value) ->
+                Timber.d("Persisting to address lookup cache $key -> $value")
+                addressLookupDao.insert(VpnAddressLookup(key, value))
+            }
         }
     }
 
@@ -175,12 +177,16 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     override fun onDnsResolved(dnsRR: DnsRR) {
-        addressLookupLruCache.put(dnsRR.resource, dnsRR.qName)
+        if (this::addressLookupLruCache.isInitialized) {
+            addressLookupLruCache.put(dnsRR.resource, dnsRR.qName)
+        }
         Timber.w("dnsResolved called for $dnsRR")
     }
 
     override fun onSniResolved(sniRR: SniRR) {
-        addressLookupLruCache.put(sniRR.resource, sniRR.name)
+        if (this::addressLookupLruCache.isInitialized) {
+            addressLookupLruCache.put(sniRR.resource, sniRR.name)
+        }
         Timber.w("sniResolved called for ${sniRR.name} / ${sniRR.resource}")
     }
 
@@ -190,6 +196,7 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     override fun isAddressBlocked(addressRR: AddressRR): Boolean {
+        if (!this::addressLookupLruCache.isInitialized) return false
         val hostname = addressLookupLruCache[addressRR.address] ?: return false
         val domainAllowed = shouldAllowDomain(hostname, addressRR.uid)
         Timber.w("isAddressBlocked for $addressRR ($hostname) = ${!domainAllowed}")
