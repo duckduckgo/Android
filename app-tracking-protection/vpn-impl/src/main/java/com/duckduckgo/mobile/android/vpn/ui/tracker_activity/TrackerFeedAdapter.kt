@@ -57,13 +57,13 @@ class TrackerFeedAdapter @Inject constructor(
         when (holder) {
             is TrackerFeedViewHolder -> holder.bind(
                 trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData,
-                position == trackerFeedItems.size - 1 && trackerFeedItems.size < 5,
+                position == trackerFeedItems.size - 1 && trackerFeedItems.size < MAX_FEED_ITEMS_SIZE,
             )
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
             is TrackerAppsDataViewHolder -> holder.bind(
                 trackerFeedItems[position] as TrackerFeedItem.TrackerAppsData,
-                position == trackerFeedItems.size - 1 && trackerFeedItems.size < 5
+                position == trackerFeedItems.size - 1 && trackerFeedItems.size < MAX_FEED_ITEMS_SIZE
             )
         }
     }
@@ -322,5 +322,7 @@ class TrackerFeedAdapter @Inject constructor(
         private const val HEADER_TYPE = 2
         private const val DESCRIPTION_TYPE = 3
         private const val APPS_STATE_TYPE = 4
+
+        private const val MAX_FEED_ITEMS_SIZE = 5
     }
 }
