@@ -22,10 +22,10 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.leftDrawable
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
@@ -112,6 +112,8 @@ interface AppProtectionListener {
 }
 
 class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private val context = itemView.context
+
     fun bind(
         isListEnabled: Boolean,
         excludedAppInfo: TrackingProtectionAppInfo,
@@ -126,20 +128,39 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
             if (excludedAppInfo.isExcluded) {
                 itemView.deviceShieldAppExclusionReason.text =
                     getAppExcludingReasonText(itemView.context, excludedAppInfo.knownProblem)
-                itemView.deviceShieldAppExclusionReason.leftDrawable(getAppExcludingReasonIcon(excludedAppInfo.knownProblem))
                 itemView.deviceShieldAppExclusionReason.show()
+                itemView.deviceShieldAppEntryWarningIcon.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        getAppExcludingReasonIcon(excludedAppInfo.knownProblem)
+                    )
+                )
+                itemView.deviceShieldAppEntryWarningIcon.show()
             } else {
                 itemView.deviceShieldAppExclusionReason.text = itemView.context.getString(R.string.atp_ExcludedReasonManuallyEnabled)
-                itemView.deviceShieldAppExclusionReason.leftDrawable(com.duckduckgo.mobile.android.R.drawable.ic_link_blue_16)
                 itemView.deviceShieldAppExclusionReason.show()
+                itemView.deviceShieldAppEntryWarningIcon.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        com.duckduckgo.mobile.android.R.drawable.ic_link_blue_16
+                    )
+                )
+                itemView.deviceShieldAppEntryWarningIcon.show()
             }
         } else {
             if (excludedAppInfo.isExcluded) {
                 itemView.deviceShieldAppExclusionReason.text = itemView.context.getString(R.string.atp_ExcludedReasonManuallyDisabled)
-                itemView.deviceShieldAppExclusionReason.leftDrawable(com.duckduckgo.mobile.android.R.drawable.ic_link_blue_16)
                 itemView.deviceShieldAppExclusionReason.show()
+                itemView.deviceShieldAppEntryWarningIcon.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        com.duckduckgo.mobile.android.R.drawable.ic_link_blue_16
+                    )
+                )
+                itemView.deviceShieldAppEntryWarningIcon.show()
             } else {
                 itemView.deviceShieldAppExclusionReason.gone()
+                itemView.deviceShieldAppEntryWarningIcon.gone()
             }
         }
 

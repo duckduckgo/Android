@@ -30,13 +30,23 @@
         android:id="@+id/deviceShieldAppEntryIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_1"
+        android:paddingBottom="@dimen/keyline_1"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_globe_gray_16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/deviceShieldAppEntryWarningIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_alert_yellow"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="@id/deviceShieldAppEntryIcon"
+        app:layout_constraintEnd_toEndOf="@id/deviceShieldAppEntryIcon" />
 
     <TextView
         android:id="@+id/deviceShieldAppEntryName"
@@ -81,12 +91,11 @@
         style="@style/TextAppearance.AppCompat.Caption"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_alert_yellow_16"
-        android:drawablePadding="@dimen/keyline_1"
         android:textColor="@color/brownishGrayTwo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/deviceShieldAppEntryName"
         app:layout_constraintStart_toStartOf="@+id/deviceShieldAppEntryName"
-        app:layout_constraintTop_toBottomOf="@+id/deviceShieldAppEntryName"/>
+        app:layout_constraintTop_toBottomOf="@+id/deviceShieldAppEntryName"
+        tools:text="App issues may occur if enabled"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
