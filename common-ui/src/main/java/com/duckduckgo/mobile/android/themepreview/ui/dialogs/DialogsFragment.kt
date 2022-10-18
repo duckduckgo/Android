@@ -61,15 +61,16 @@ class DialogsFragment : Fragment() {
                         .setMessage(R.string.text_dialog_message)
                         .setPositiveButton(R.string.text_dialog_positive)
                         .setNegativeButton(R.string.text_dialog_negative)
-                        .addEventListener(object : EventListener() {
-                            override fun onPositiveButtonClicked() {
-                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
-                            }
+                        .addEventListener(
+                            object : EventListener() {
+                                override fun onPositiveButtonClicked() {
+                                    Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                                }
 
-                            override fun onNegativeButtonClicked() {
-                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
-                            }
-                        },
+                                override fun onNegativeButtonClicked() {
+                                    Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                                }
+                            },
                         )
                         .build()
                         .show(fragmentManager, TextAlertDialog.TAG_TEXT_ALERT_DIALOG)
@@ -86,11 +87,12 @@ class DialogsFragment : Fragment() {
                         .setPositiveButton(R.string.text_dialog_positive)
                         .setNegativeButton(R.string.text_dialog_negative)
                         .setOptions(listOf(R.string.text_dialog_option, R.string.text_dialog_option, R.string.text_dialog_option))
-                        .addEventListener(object : RadioListAlertDialog.EventListener() {
-                            override fun onRadioItemSelected(selectedItem: Int) {
-                                Snackbar.make(it, "Radio Button $selectedItem selected", Snackbar.LENGTH_SHORT).show()
-                            }
-                        },
+                        .addEventListener(
+                            object : RadioListAlertDialog.EventListener() {
+                                override fun onRadioItemSelected(selectedItem: Int) {
+                                    Snackbar.make(it, "Radio Button $selectedItem selected", Snackbar.LENGTH_SHORT).show()
+                                }
+                            },
                         )
                         .build()
                         .show(fragmentManager, RadioListAlertDialog.TAG_RADIO_LIST_ALERT_DIALOG)
@@ -106,15 +108,16 @@ class DialogsFragment : Fragment() {
                         .setMessage(R.string.text_dialog_message)
                         .setPositiveButton(R.string.text_dialog_positive)
                         .setNegativeButton(R.string.text_dialog_negative)
-                        .addEventListener(object : EventListener() {
-                            override fun onPositiveButtonClicked() {
-                                Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
-                            }
+                        .addEventListener(
+                            object : EventListener() {
+                                override fun onPositiveButtonClicked() {
+                                    Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
+                                }
 
-                            override fun onNegativeButtonClicked() {
-                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
-                            }
-                        },
+                                override fun onNegativeButtonClicked() {
+                                    Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                                }
+                            },
                         )
                         .build()
                         .show(fragmentManager, TextAlertDialog.TAG_TEXT_ALERT_DIALOG)
@@ -135,11 +138,12 @@ class DialogsFragment : Fragment() {
                                 R.string.text_dialog_positive,
                             ),
                         )
-                        .addEventListener(object : StackedAlertDialog.EventListener() {
-                            override fun onButtonClicked(position: Int) {
-                                Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
-                            }
-                        },
+                        .addEventListener(
+                            object : StackedAlertDialog.EventListener() {
+                                override fun onButtonClicked(position: Int) {
+                                    Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
+                                }
+                            },
                         )
                         .build()
                         .show(fragmentManager, StackedAlertDialog.TAG_STACKED_ALERT_DIALOG)
@@ -160,11 +164,12 @@ class DialogsFragment : Fragment() {
                                     R.string.text_dialog_positive,
                                 ),
                             )
-                            .addEventListener(object : StackedAlertDialog.EventListener() {
-                                override fun onButtonClicked(position: Int) {
-                                    Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
-                                }
-                            },
+                            .addEventListener(
+                                object : StackedAlertDialog.EventListener() {
+                                    override fun onButtonClicked(position: Int) {
+                                        Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
+                                    }
+                                },
                             )
                             .build()
                             .show(fragmentManager, StackedAlertDialog.TAG_STACKED_ALERT_DIALOG)
@@ -183,7 +188,8 @@ class DialogsFragment : Fragment() {
                                 override fun onSecondaryItemClicked() {
                                     Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
                                 }
-                            },)
+                            },
+                            )
                             .show()
                     }
                 }
@@ -201,7 +207,8 @@ class DialogsFragment : Fragment() {
                                 override fun onSecondaryItemClicked() {
                                     Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
                                 }
-                            },)
+                            },
+                            )
                             .show()
                     }
                 }
@@ -221,7 +228,8 @@ class DialogsFragment : Fragment() {
                                     super.onSecondaryButtonClicked()
                                     Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
                                 }
-                            },)
+                            },
+                            )
                             .show()
                     }
                 }
@@ -242,7 +250,8 @@ class DialogsFragment : Fragment() {
                                     super.onSecondaryButtonClicked()
                                     Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
                                 }
-                            },)
+                            },
+                            )
                             .show()
                     }
                 }
@@ -264,7 +273,8 @@ class DialogsFragment : Fragment() {
                                     super.onSecondaryButtonClicked()
                                     Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
                                 }
-                            },)
+                            },
+                            )
                             .show()
                     }
                 }

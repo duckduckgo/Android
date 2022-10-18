@@ -70,24 +70,25 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feed
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        recyclerAdapter = SubReasonAdapter(object : (FeedbackTypeSubReasonDisplay) -> Unit {
-            override fun invoke(reason: FeedbackTypeSubReasonDisplay) {
-                when (reason.subReason) {
-                    is MissingBrowserFeaturesSubReasons -> {
-                        listener?.userSelectedSubReasonMissingBrowserFeatures(mainReason, reason.subReason)
-                    }
-                    is SearchNotGoodEnoughSubReasons -> {
-                        listener?.userSelectedSubReasonSearchNotGoodEnough(mainReason, reason.subReason)
-                    }
-                    is CustomizationSubReasons -> {
-                        listener?.userSelectedSubReasonNeedMoreCustomization(mainReason, reason.subReason)
-                    }
-                    is PerformanceSubReasons -> {
-                        listener?.userSelectedSubReasonAppIsSlowOrBuggy(mainReason, reason.subReason)
+        recyclerAdapter = SubReasonAdapter(
+            object : (FeedbackTypeSubReasonDisplay) -> Unit {
+                override fun invoke(reason: FeedbackTypeSubReasonDisplay) {
+                    when (reason.subReason) {
+                        is MissingBrowserFeaturesSubReasons -> {
+                            listener?.userSelectedSubReasonMissingBrowserFeatures(mainReason, reason.subReason)
+                        }
+                        is SearchNotGoodEnoughSubReasons -> {
+                            listener?.userSelectedSubReasonSearchNotGoodEnough(mainReason, reason.subReason)
+                        }
+                        is CustomizationSubReasons -> {
+                            listener?.userSelectedSubReasonNeedMoreCustomization(mainReason, reason.subReason)
+                        }
+                        is PerformanceSubReasons -> {
+                            listener?.userSelectedSubReasonAppIsSlowOrBuggy(mainReason, reason.subReason)
+                        }
                     }
                 }
-            }
-        },
+            },
         )
 
         activity?.let {

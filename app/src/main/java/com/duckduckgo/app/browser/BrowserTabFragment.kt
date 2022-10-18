@@ -571,13 +571,14 @@ class BrowserTabFragment :
             viewModel.onViewRecreated()
         }
 
-        lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onStop(owner: LifecycleOwner) {
-                if (isVisible) {
-                    updateOrDeleteWebViewPreview()
+        lifecycle.addObserver(
+            object : DefaultLifecycleObserver {
+                override fun onStop(owner: LifecycleOwner) {
+                    if (isVisible) {
+                        updateOrDeleteWebViewPreview()
+                    }
                 }
-            }
-        },
+            },
         )
 
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
@@ -1159,19 +1160,20 @@ class BrowserTabFragment :
             ).setAction(action) {
                 pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED)
                 openAppLink(appLink)
-            }.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                override fun onShown(transientBottomBar: Snackbar?) {
-                    super.onShown(transientBottomBar)
-                    pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
-                }
+            }.addCallback(
+                object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onShown(transientBottomBar: Snackbar?) {
+                        super.onShown(transientBottomBar)
+                        pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
+                    }
 
-                override fun onDismissed(
-                    transientBottomBar: Snackbar?,
-                    event: Int,
-                ) {
-                    super.onDismissed(transientBottomBar, event)
-                }
-            },
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int,
+                    ) {
+                        super.onDismissed(transientBottomBar, event)
+                    }
+                },
             )
 
             appLinksSnackBar?.setDuration(6000)?.show()

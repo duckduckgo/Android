@@ -78,12 +78,13 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
         binding.onboardingPager.adapter = DeviceShieldOnboardingAdapter(viewModel.pages) {
             launchFAQ()
         }
-        binding.onboardingPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                showOnboardingPage(position)
-                super.onPageSelected(position)
-            }
-        },
+        binding.onboardingPager.registerOnPageChangeCallback(
+            object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    showOnboardingPage(position)
+                    super.onPageSelected(position)
+                }
+            },
         )
 
         binding.onboardingClose.setOnClickListener {

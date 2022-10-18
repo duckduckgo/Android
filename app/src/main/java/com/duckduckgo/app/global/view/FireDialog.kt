@@ -170,14 +170,15 @@ class FireDialog(
         setCanceledOnTouchOutside(false)
         binding.fireAnimationView.show()
         binding.fireAnimationView.playAnimation()
-        binding.fireAnimationView.addAnimatorListener(object : Animator.AnimatorListener {
-            override fun onAnimationRepeat(animation: Animator) {}
-            override fun onAnimationCancel(animation: Animator) {}
-            override fun onAnimationStart(animation: Animator) {}
-            override fun onAnimationEnd(animation: Animator) {
-                onFireDialogClearAllEvent(AnimationFinished)
-            }
-        },
+        binding.fireAnimationView.addAnimatorListener(
+            object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(animation: Animator) {}
+                override fun onAnimationCancel(animation: Animator) {}
+                override fun onAnimationStart(animation: Animator) {}
+                override fun onAnimationEnd(animation: Animator) {
+                    onFireDialogClearAllEvent(AnimationFinished)
+                }
+            },
         )
     }
 

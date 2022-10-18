@@ -139,15 +139,16 @@ class TrackingProtectionExclusionListActivity :
     }
 
     private fun setupRecycler() {
-        adapter = TrackingProtectionAppsAdapter(object : AppProtectionListener {
-            override fun onAppProtectionChanged(
-                excludedAppInfo: TrackingProtectionAppInfo,
-                enabled: Boolean,
-                position: Int,
-            ) {
-                viewModel.onAppProtectionChanged(excludedAppInfo, position, enabled)
-            }
-        },
+        adapter = TrackingProtectionAppsAdapter(
+            object : AppProtectionListener {
+                override fun onAppProtectionChanged(
+                    excludedAppInfo: TrackingProtectionAppInfo,
+                    enabled: Boolean,
+                    position: Int,
+                ) {
+                    viewModel.onAppProtectionChanged(excludedAppInfo, position, enabled)
+                }
+            },
         )
 
         val recyclerView = binding.excludedAppsRecycler

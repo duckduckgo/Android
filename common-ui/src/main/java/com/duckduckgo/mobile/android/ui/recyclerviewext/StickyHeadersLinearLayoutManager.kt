@@ -435,15 +435,16 @@ class StickyHeadersLinearLayoutManager<T>(
         // If we have a pending scroll wait until the end of layout and scroll again.
         if (mPendingScrollPosition != RecyclerView.NO_POSITION) {
             val vto: ViewTreeObserver = mStickyHeader!!.viewTreeObserver
-            vto.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
-                override fun onGlobalLayout() {
-                    vto.removeOnGlobalLayoutListener(this)
-                    if (mPendingScrollPosition != RecyclerView.NO_POSITION) {
-                        scrollToPositionWithOffset(mPendingScrollPosition, mPendingScrollOffset)
-                        setPendingScroll(RecyclerView.NO_POSITION, INVALID_OFFSET)
+            vto.addOnGlobalLayoutListener(
+                object : OnGlobalLayoutListener {
+                    override fun onGlobalLayout() {
+                        vto.removeOnGlobalLayoutListener(this)
+                        if (mPendingScrollPosition != RecyclerView.NO_POSITION) {
+                            scrollToPositionWithOffset(mPendingScrollPosition, mPendingScrollOffset)
+                            setPendingScroll(RecyclerView.NO_POSITION, INVALID_OFFSET)
+                        }
                     }
-                }
-            },
+                },
             )
         }
     }
