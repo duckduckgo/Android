@@ -28,7 +28,6 @@ import org.junit.Test
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import org.threeten.bp.Instant
 
 class SharedPreferencesVpnStoreTest {
 
@@ -132,10 +131,10 @@ class SharedPreferencesVpnStoreTest {
 
     @Test
     fun whenSetAppTPOnboardingBannerExpiryTimestampCalledThenSetValueAndReturnCorrectValueWhenAsked() {
-        val now = Instant.now().toEpochMilli()
+        assertEquals(-1, sharedPreferencesVpnStore.getAppTPOnboardingBannerExpiryTimestamp())
 
-        sharedPreferencesVpnStore.setAppTPOnboardingBannerExpiryTimestamp(now)
+        sharedPreferencesVpnStore.setAppTPOnboardingBannerExpiryTimestamp()
 
-        assertEquals(now, sharedPreferencesVpnStore.getAppTPOnboardingBannerExpiryTimestamp())
+        assertTrue(sharedPreferencesVpnStore.getAppTPOnboardingBannerExpiryTimestamp() > -1)
     }
 }

@@ -33,10 +33,17 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.BannerState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.threeten.bp.Instant
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -133,9 +140,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     fun showAppTpEnabledCtaIfNeeded() {
         if (!vpnStore.didShowAppTpEnabledCta()) {
             vpnStore.appTpEnabledCtaDidShow()
-            val now = Instant.now().toEpochMilli()
-            val expiry = now.plus(TimeUnit.HOURS.toMillis(WINDOW_INTERVAL_HOURS))
-            vpnStore.setAppTPOnboardingBannerExpiryTimestamp(expiry)
+            vpnStore.setAppTPOnboardingBannerExpiryTimestamp()
             sendCommand(Command.ShowAppTpEnabledCta)
         }
     }
@@ -268,10 +273,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object CloseScreen : Command()
         object OpenVpnSettings : Command()
         object ShowAppTpEnabledCta : Command()
-    }
-
-    companion object {
-        const val WINDOW_INTERVAL_HOURS = 24L
     }
 }
 

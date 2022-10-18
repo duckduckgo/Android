@@ -24,6 +24,8 @@ import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
+import org.threeten.bp.Instant
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface VpnStore {
@@ -39,7 +41,7 @@ interface VpnStore {
     fun isAlwaysOnEnabled(): Boolean
     fun didShowAppTpEnabledCta(): Boolean
     fun appTpEnabledCtaDidShow()
-    fun setAppTPOnboardingBannerExpiryTimestamp(timestamp: Long)
+    fun setAppTPOnboardingBannerExpiryTimestamp()
     fun getAppTPOnboardingBannerExpiryTimestamp(): Long
 
     companion object {
@@ -105,8 +107,10 @@ class SharedPreferencesVpnStore @Inject constructor(
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN, true) }
     }
 
-    override fun setAppTPOnboardingBannerExpiryTimestamp(timestamp: Long) {
-        preferences.edit { putLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, timestamp) }
+    override fun setAppTPOnboardingBannerExpiryTimestamp() {
+        val now = Instant.now().toEpochMilli()
+        val expiryTimestamp = now.plus(TimeUnit.HOURS.toMillis(WINDOW_INTERVAL_HOURS))
+        preferences.edit { putLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, expiryTimestamp) }
     }
 
     override fun getAppTPOnboardingBannerExpiryTimestamp(): Long {
@@ -122,5 +126,7 @@ class SharedPreferencesVpnStore @Inject constructor(
         private const val KEY_ALWAYS_ON_MODE_ENABLED = "KEY_ALWAYS_ON_MODE_ENABLED"
         private const val KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN = "KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN"
         private const val KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP = "KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP"
+
+        private const val WINDOW_INTERVAL_HOURS = 24L
     }
 }
