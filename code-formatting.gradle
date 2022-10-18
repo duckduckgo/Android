@@ -17,5 +17,5 @@ spotless {
 }
 
 kotlinter {
-    disabledRules = ['no-wildcard-imports']
+    disabledRules = ['no-wildcard-imports', 'filename', 'package-name', 'annotation-spacing']
 }
