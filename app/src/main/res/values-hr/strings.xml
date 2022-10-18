@@ -550,7 +550,7 @@
     <string name="fireproofWebsiteDeleteConfirmMessage">Sigurno želiš izbrisati <b>%s</b>?</string>
     <string name="fireproofWebsiteFeatureDescription">Web-mjesta oslanjaju se na kolačiće kako bi te zadržala prijavljenim/om. Kada je web-mjesto označeno kao zaštićeno, kolačići neće biti izbrisani i ostat ćeš prijavljen/a čak i nakon upotrebe gumba Fire. I dalje blokiramo alate za praćenje trećih strana koje pronađemo na zaštićenim web-mjestima označenim kao Fireproof.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Dodatne mogućnosti za zaštićenu web lokaciju %s</string>
-    <string name="fireproofWebsiteLoginDialogTitle">Želiš li web lokaciju %@ označiti kao zaštićenu?</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Želiš li web lokaciju %s označiti kao zaštićenu?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Postavljanjem Fireproof za ovo web-mjesto i dalje ćete ostati prijavljeni nakon korištenja gumba Fire.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Fireproof</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne sada</string>

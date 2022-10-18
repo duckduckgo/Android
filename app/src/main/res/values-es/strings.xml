@@ -546,7 +546,7 @@
     <string name="fireproofWebsiteDeleteConfirmMessage">¿Seguro que deseas eliminar <b>%s</b>?</string>
     <string name="fireproofWebsiteFeatureDescription">Los sitios web dependen de cookies para mantener tu sesión iniciada. Cuando marcas una web como «a prueba de fuego» no se borrarán las cookies y tu sesión permanecerá iniciada, incluso después de utilizar el botón Fuego. Seguiremos bloqueando rastreadores de terceros que se encuentren en sitios web a prueba de fuego.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Más opciones para el sitio web a prueba de fuego %s</string>
-    <string name="fireproofWebsiteLoginDialogTitle">¿Quieres marcar %s como a prueba de incendios?</string>
+    <string name="fireproofWebsiteLoginDialogTitle">¿Quieres marcar %s como a prueba de fuego?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Marcar esta página como a prueba de fuego hará que la sesión se mantenga iniciada después de usar el botón Fuego.</string>
     <string name="fireproofWebsiteLoginDialogPositive">A prueba de fuego</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ahora no</string>

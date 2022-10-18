@@ -548,7 +548,7 @@
     <string name="fireproofWebsiteDeleteConfirmMessage">Vai tiešām vēlies dzēst <b>%s</b>?</string>
     <string name="fireproofWebsiteFeatureDescription">Vietnes lieto sīkfailus, lai tu varētu turpināt būt pierakstījies(-usies). Padarot vietni ugunsdrošu, sīkfaili netiek dzēsti, bet tu vari turpināt būt pierakstījies(-usies) arī pēc Uguns pogas lietošanas. Mēs joprojām bloķēsim trešo pušu izsekotājus, kas atrodami ugunsdrošās vietnēs.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Citas opcijas ugunsdrošai vietnei %s</string>
-    <string name="fireproofWebsiteLoginDialogTitle">Vai vēlies padarīt %@ ugunsdrošu?</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Vai vēlies padarīt %s ugunsdrošu?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Padarot šo vietni ugunsdrošu, varēsi turpināt būt pierakstījies(-usies) arī pēc Uguns pogas lietošanas.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Padarīt ugunsdrošu</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne tagad</string>

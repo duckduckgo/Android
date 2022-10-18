@@ -495,7 +495,7 @@
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Jeg blokkerer irriterende sporere mens du trykker og blar.\n\nDu kan bare fortsette å surfe!]]></string>
     <string name="daxMainNetworkCtaText">Pass opp! Jeg klarer ikke å forhindre at %s ser aktiviteten din på %s <br></br><br></br>Men surf med meg, så kan jeg redusere informasjonen %s får om deg, ved å blokkere sporingsanordningene deres på mange andre nettsteder.</string>
-    <string name="daxMainNetworkOwnedCtaText">Pass opp! Siden %s eier %s, kan jeg ikke stoppe dem fra å se aktiviteten din her.<br></br><br></br>Men surf med meg, så kan jeg redusere informasjonen %1$@ får om deg, ved å blokkere sporingsanordningene deres på mange andre nettsteder.</string>
+    <string name="daxMainNetworkOwnedCtaText">Pass opp! Siden %s eier %s, kan jeg ikke stoppe dem fra å se aktiviteten din her.<br></br><br></br>Men surf med meg, så kan jeg redusere informasjonen %s får om deg, ved å blokkere sporingsanordningene deres på mange andre nettsteder.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Lagre til nedlastinger</string>
