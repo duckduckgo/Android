@@ -71,19 +71,19 @@
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Der App-Tracking-Schutz <b>hat %d %d Mal in %s</b> (letzter Tag) blockiert.]]></string>
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Der App-Tracking-Schutz blockierte <b>%s %d Zeit in %s und 1 weitere App</b> (letzter Tag).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Der App-Tracking-Schutz <b>hat % % Zeit in % und % anderen Apps</b> (letzter Tag) blockiert.]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[App Tracking Protection <b>hat %s %d-mal in %s und %d anderen Apps</b> blockiert (vergangener Tag).]]></string>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Der App-Tracking-Schutz <b>hat in % (letzter Tag) % % Mal</b> blockiert.]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Der App Tracking-Schutz blockiert <b>% %-mal in % und 1 weitere App</b> (letzter Tag).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection<b>% % mal in % und % anderen Apps</b> blockiert (vergangener Tag).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[App Tracking Protection <b>hat %s %d-mal in %s</b> blockiert (vergangener Tag).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[App Tracking Protection <b>hat %s %d-mal in %s und 1 weiterer App</b> blockiert (vergangener Tag).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection <b>hat %s %d-mal in %s und %d anderen Apps</b> blockiert (vergangener Tag).]]></string>
 
     <!-- App Tracking Protection Weekly Notification -->
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[App Tracking Protection hat <b>%d Tracking-Versuch in %s</b> blockiert (vergangene Woche).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[App Tracking Protection hat <b>%d Tracking-Versuch in %s</b> und 1 weiteren App blockiert (vergangene Woche).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[App Tracking Protection hat <b>% Tracking-Versuch in %</b> und weiteren Apps blockiert (vergangene Woche).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Der App-Tracking-Schutz blockierte <b>% Tracking-Versuche in %</b> (letzte Woche).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[App Tracking Protection hat <b>% Tracking-Versuch in %</b> und 1 weiteren App blockiert (vergangene Woche).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection hat <b>% Tracking-Versuch in %</b> und weiteren Apps blockiert (vergangene Woche).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[App Tracking Protection hat <b>%d Tracking-Versuch in %s</b> und %d weiteren Apps blockiert (vergangene Woche).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[App Tracking Protection hat <b>%d Tracking-Versuche in %s</b> blockiert (vergangene Woche).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[App Tracking Protection hat <b>%d Tracking-Versuche in %s</b> und 1 weiteren App blockiert (vergangene Woche).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection hat <b>%d Tracking-Versuche in %s</b> und %d weiteren Apps blockiert (vergangene Woche).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
         <item quantity="one"><![CDATA[Der App-Tracking-Schutz <b>hat %s für %s App blockiert, einschließlich %s</b> (letzte Woche).]]></item>
@@ -93,11 +93,11 @@
     <string name="atp_EnableCTA">App Tracking Protection aktivieren</string>
 
     <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[App Tracking Protection hat <b>%d Tracking-Versuch in %s</b> blockiert (vergangene Stunde).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[App Tracking Protection hat <b>{0} Tracking-Versuch in {1}</b> und 1 weiteren App blockiert (letzte Stunde).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[App Tracking Protection hat <b>% Tracking-Versuch in %</b> und weiteren Apps blockiert (vergangene Stunde).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Der App-Tracking-Schutz blockierte <b>% Tracking-Versuche in %</b> (letzte Stunde).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[App Tracking Protection hat <b>{0} Tracking-Versuch in {1}</b> und 1 weiteren App blockiert (letzte Stunde).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection hat <b>% Tracking-Versuch in %</b> und weiteren Apps blockiert (vergangene Stunde).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[App Tracking Protection hat <b>%d Tracking-Versuch in %s und 1 weiteren App</b> blockiert (vergangene Stunde).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[App Tracking Protection hat <b>%d Tracking-Versuch in %s und %d weiteren Apps</b> blockiert (vergangene Stunde).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[App Tracking Protection hat <b>%d Tracking-Versuche in %s</b> blockiert (vergangene Stunde).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[App Tracking Protection hat <b>%d Tracking-Versuche in %s und 1 weiteren App</b> blockiert (vergangene Stunde).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection hat <b>%d Tracking-Versuche in %s und %d weiteren Apps</b> blockiert (vergangene Stunde).]]></string>
 
     <!-- App Tracking Protection Privacy Report -->
     <string name="atp_PrivacyReportEnabledTooltip">App Tracking Protection ist aktiviert und blockiert Tracker auf deinem gesamten Gerät</string>
@@ -209,7 +209,7 @@
         <![CDATA[1 Tracking-Versuch von 1 Unternehmen in <b>%1$s</b> App blockiert]]>
     </string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies" instruction="Placeholder %1$d is the number of companies doing the tracking. Placeholder %2$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 5 companies in Venmo app.">
-        <![CDATA[1 Tracking-Versuch von 1 Unternehmen in <b>%2$s</b> App blockiert]]>
+        <![CDATA[1 Tracking-Versuch von %1$d Unternehmen in <b>%2$s</b> App blockiert]]>
     </string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$s is the name of the app doing the tracking. Example: 5 tracking attempts blocked from 1 company in Venmo app.">
         <![CDATA[%1$d Tracking-Versuche, die von 1 Unternehmen in der App <b>%2$s</b> blockiert wurden]]>
