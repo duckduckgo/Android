@@ -19,8 +19,8 @@ package com.duckduckgo.securestorage.impl
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedBytes
 import com.duckduckgo.securestorage.store.SecureStorageKeyRepository
-import okio.ByteString.Companion.decodeBase64
 import java.security.Key
+import okio.ByteString.Companion.decodeBase64
 
 class FakeSecureStorageKeyRepository(private val canUseEncryption: Boolean) : SecureStorageKeyRepository {
     override var password: ByteArray? = null
@@ -34,19 +34,19 @@ class FakeSecureStorageKeyRepository(private val canUseEncryption: Boolean) : Se
 class FakeEncryptionHelper constructor(
     private val expectedEncryptedData: String,
     private val expectedEncryptedIv: String,
-    private val expectedDecryptedData: String
+    private val expectedDecryptedData: String,
 ) : EncryptionHelper {
     override fun encrypt(
         raw: ByteArray,
-        key: Key
+        key: Key,
     ): EncryptedBytes = EncryptedBytes(
         expectedEncryptedData.decodeBase64()!!.toByteArray(),
-        expectedEncryptedIv.decodeBase64()!!.toByteArray()
+        expectedEncryptedIv.decodeBase64()!!.toByteArray(),
     )
 
     override fun decrypt(
         toDecrypt: EncryptedBytes,
-        key: Key
+        key: Key,
     ): ByteArray = expectedDecryptedData.decodeBase64()!!.toByteArray()
 }
 
@@ -57,6 +57,6 @@ class FakeSecureStorageKeyGenerator constructor(private val key: Key) : SecureSt
 
     override fun generateKeyFromPassword(
         password: String,
-        salt: ByteArray
+        salt: ByteArray,
     ): Key = key
 }

@@ -24,10 +24,10 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 interface AutofillMessagePoster {
     suspend fun postMessage(webView: WebView?, message: String)
@@ -38,7 +38,6 @@ class AutofillWebViewMessagePoster @Inject constructor() : AutofillMessagePoster
 
     @SuppressLint("RequiresFeature")
     override suspend fun postMessage(webView: WebView?, message: String) {
-
         webView?.let { wv ->
             withContext(Dispatchers.Main) {
                 if (!WebViewFeature.isFeatureSupported(WebViewFeature.POST_WEB_MESSAGE)) {

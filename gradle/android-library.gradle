@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-apply from: "$rootDir/spotless.gradle"
+apply from: "$rootDir/code-formatting.gradle"
 
 android {
     compileSdkVersion compile_sdk

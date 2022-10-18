@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealStartupTraces @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : StartupTraces {
 
     private val preferences: SharedPreferences

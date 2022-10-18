@@ -20,7 +20,7 @@ data class Exemption(
     val hostTldPlusOne: String,
     val navigationExemptionDeadline: Long,
     val exemptionDeadline: Long,
-    val adClickActivePixelFired: Boolean = false
+    val adClickActivePixelFired: Boolean = false,
 ) {
     fun isExpired(): Boolean {
         val now = System.currentTimeMillis()

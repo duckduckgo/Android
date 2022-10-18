@@ -31,27 +31,27 @@ import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.UserCancelled
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface AuthLauncher {
     fun launch(
         @StringRes featureAuthText: Int,
         fragment: Fragment,
-        onResult: (AuthResult) -> Unit
+        onResult: (AuthResult) -> Unit,
     )
 
     fun launch(
         @StringRes featureAuthText: Int,
         fragmentActivity: FragmentActivity,
-        onResult: (AuthResult) -> Unit
+        onResult: (AuthResult) -> Unit,
     )
 }
 
 @ContributesBinding(AppScope::class)
 class RealAuthLauncher @Inject constructor(
     private val context: Context,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : AuthLauncher {
     private val biometricPromptInfoBuilder by lazy {
         BiometricPrompt.PromptInfo.Builder()
@@ -61,12 +61,12 @@ class RealAuthLauncher @Inject constructor(
     override fun launch(
         @StringRes featureAuthText: Int,
         fragment: Fragment,
-        onResult: (AuthResult) -> Unit
+        onResult: (AuthResult) -> Unit,
     ) {
         val prompt = BiometricPrompt(
             fragment,
             ContextCompat.getMainExecutor(context),
-            getCallBack(onResult)
+            getCallBack(onResult),
         )
 
         prompt.authenticate(getPromptInfo(featureAuthText))
@@ -75,23 +75,23 @@ class RealAuthLauncher @Inject constructor(
     override fun launch(
         @StringRes featureAuthText: Int,
         fragmentActivity: FragmentActivity,
-        onResult: (AuthResult) -> Unit
+        onResult: (AuthResult) -> Unit,
     ) {
         val prompt = BiometricPrompt(
             fragmentActivity,
             ContextCompat.getMainExecutor(context),
-            getCallBack(onResult)
+            getCallBack(onResult),
         )
 
         prompt.authenticate(getPromptInfo(featureAuthText))
     }
 
     private fun getCallBack(
-        onResult: (AuthResult) -> Unit
+        onResult: (AuthResult) -> Unit,
     ): BiometricPrompt.AuthenticationCallback = object : BiometricPrompt.AuthenticationCallback() {
         override fun onAuthenticationError(
             errorCode: Int,
-            errString: CharSequence
+            errString: CharSequence,
         ) {
             super.onAuthenticationError(errorCode, errString)
             Timber.d("onAuthenticationError: (%d) %s", errorCode, errString)
@@ -120,7 +120,7 @@ class RealAuthLauncher @Inject constructor(
         // BIOMETRIC_STRONG | DEVICE_CREDENTIAL is unsupported on API 28-29. Setting an unsupported value on an affected Android version will result in an error when calling build().
         return if (appBuildConfig.sdkInt != Build.VERSION_CODES.Q && appBuildConfig.sdkInt != Build.VERSION_CODES.P) {
             biometricPromptInfoBuilder.setAllowedAuthenticators(
-                BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL,
             )
         } else {
             biometricPromptInfoBuilder.setDeviceCredentialAllowed(true)

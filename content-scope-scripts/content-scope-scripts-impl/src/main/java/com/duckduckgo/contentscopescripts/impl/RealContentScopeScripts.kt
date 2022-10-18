@@ -39,7 +39,7 @@ class RealContentScopeScripts @Inject constructor(
     private val allowList: UserWhiteListRepository,
     private val contentScopeJSReader: ContentScopeJSReader,
     private val appBuildConfig: AppBuildConfig,
-    private val unprotectedTemporary: UnprotectedTemporary
+    private val unprotectedTemporary: UnprotectedTemporary,
 ) : ContentScopeScripts {
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
@@ -174,5 +174,5 @@ class RealContentScopeScripts @Inject constructor(
 
 data class PluginParameters(
     val config: String,
-    val preferences: String
+    val preferences: String,
 )

@@ -32,11 +32,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class InitMessageHandlerPlugin @Inject constructor(
@@ -121,7 +121,7 @@ class InitMessageHandlerPlugin @Inject constructor(
         val autoAction: String?,
         val disabledCmps: List<String>,
         val enablePrehide: Boolean,
-        val detectRetries: Int
+        val detectRetries: Int,
     )
 
     // rules can actually be null, but we will always pass them through

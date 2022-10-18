@@ -23,13 +23,13 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewPropertyAnimator
 import android.widget.FrameLayout
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.voice.impl.databinding.ViewVoiceRecognizingIndicatorBinding
+import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion.MAX_VOLUME
+import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion.MIN_VOLUME
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Action
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Action.INDICATOR_CLICKED
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Model
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion.MAX_VOLUME
-import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion.MIN_VOLUME
-import com.duckduckgo.voice.impl.databinding.ViewVoiceRecognizingIndicatorBinding
 import java.util.*
 
 interface VoiceRecognizingIndicator {
@@ -38,18 +38,18 @@ interface VoiceRecognizingIndicator {
     fun destroy()
 
     data class Model(
-        val volume: Float
+        val volume: Float,
     )
 
     enum class Action {
-        INDICATOR_CLICKED
+        INDICATOR_CLICKED,
     }
 }
 
 class VoiceRecognizingIndicatorView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr), VoiceRecognizingIndicator {
 
     companion object {

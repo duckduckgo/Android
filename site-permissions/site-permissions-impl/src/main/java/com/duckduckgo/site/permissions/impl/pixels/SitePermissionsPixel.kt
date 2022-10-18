@@ -27,7 +27,7 @@ class SitePermissionsPixel {
         SITE_PERMISSIONS_SETTINGS_VISITED("m_site_permissions_settings_visited"),
         SITE_PERMISSIONS_ASK_DISABLED("m_site_permission_ask_disabled"),
         SITE_PERMISSIONS_ASK_ENABLED("m_site_permission_ask_enabled"),
-        SITE_PERMISSIONS_SETTING_CHANGED("m_website_permissions_setting_changed")
+        SITE_PERMISSIONS_SETTING_CHANGED("m_website_permissions_setting_changed"),
     }
 
     object PixelParameter {

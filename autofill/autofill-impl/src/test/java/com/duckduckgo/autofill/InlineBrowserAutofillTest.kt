@@ -27,7 +27,6 @@ import com.duckduckgo.autofill.domain.app.LoginTriggerType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
-
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,13 +42,13 @@ class InlineBrowserAutofillTest {
     private val testCallback = object : Callback {
         override suspend fun onCredentialsAvailableToInject(
             credentials: List<LoginCredentials>,
-            triggerType: LoginTriggerType
+            triggerType: LoginTriggerType,
         ) {
         }
 
         override suspend fun onCredentialsAvailableToSave(
             currentUrl: String,
-            credentials: LoginCredentials
+            credentials: LoginCredentials,
         ) {
         }
 
@@ -89,7 +88,7 @@ class InlineBrowserAutofillTest {
             id = 1,
             domain = "hello.com",
             username = "test",
-            password = "test123"
+            password = "test123",
         )
         testee.injectCredentials(toInject)
 

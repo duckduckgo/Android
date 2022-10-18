@@ -20,7 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class BandwidthPixelName(override val pixelName: String) : Pixel.PixelName {
     BANDWIDTH("m_bandwidth"),
-    APPTP_BANDWIDTH("m_apptp_bandwidth")
+    APPTP_BANDWIDTH("m_apptp_bandwidth"),
 }
 
 object BandwidthPixelParameter {

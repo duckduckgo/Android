@@ -22,24 +22,24 @@ import androidx.core.content.edit
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_DEVICE_AUTH_DISABLED
 import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_CAPABLE
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_DEVICE_AUTH_DISABLED
 import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE_AND_DEVICE_AUTH_DISABLED
 import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_UNKNOWN_ERROR
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 interface AutofillPixelSender {
     suspend fun hasDeterminedCapabilities(): Boolean
     fun sendCapabilitiesPixel(
         secureStorageAvailable: Boolean,
-        deviceAuthAvailable: Boolean
+        deviceAuthAvailable: Boolean,
     )
 
     fun sendCapabilitiesUndeterminablePixel()
@@ -51,7 +51,7 @@ class AutofillUniquePixelSender @Inject constructor(
     private val pixel: Pixel,
     private val context: Context,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : AutofillPixelSender {
 
     val preferences: SharedPreferences
@@ -63,7 +63,7 @@ class AutofillUniquePixelSender @Inject constructor(
 
     override fun sendCapabilitiesPixel(
         secureStorageAvailable: Boolean,
-        deviceAuthAvailable: Boolean
+        deviceAuthAvailable: Boolean,
     ) {
         appCoroutineScope.launch(dispatchers.default()) {
             sendPixel(secureStorageAvailable, deviceAuthAvailable).let {
@@ -82,9 +82,8 @@ class AutofillUniquePixelSender @Inject constructor(
 
     private fun sendPixel(
         secureStorageAvailable: Boolean,
-        deviceAuthAvailable: Boolean
+        deviceAuthAvailable: Boolean,
     ): AutofillPixelNames {
-
         val pixelName = if (secureStorageAvailable && deviceAuthAvailable) {
             AUTOFILL_DEVICE_CAPABILITY_CAPABLE
         } else if (!secureStorageAvailable && !deviceAuthAvailable) {

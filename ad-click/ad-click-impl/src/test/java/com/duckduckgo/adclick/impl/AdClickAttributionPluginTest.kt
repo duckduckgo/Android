@@ -45,7 +45,7 @@ class AdClickAttributionPluginTest {
     fun before() {
         testee = AdClickAttributionPlugin(
             mockAdClickAttributionRepository,
-            mockFeatureTogglesRepository
+            mockFeatureTogglesRepository,
         )
     }
 
@@ -94,7 +94,7 @@ class AdClickAttributionPluginTest {
             linkFormats = linkFormatCaptor.capture(),
             allowList = allowlistCaptor.capture(),
             expirations = expirationCaptor.capture(),
-            detections = detectionsCaptor.capture()
+            detections = detectionsCaptor.capture(),
         )
 
         val linkFormatEntity = linkFormatCaptor.firstValue

@@ -24,9 +24,9 @@ import com.duckduckgo.adclick.impl.pixels.AdClickPixelParameters.AD_CLICK_PAGELO
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import org.threeten.bp.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import org.threeten.bp.Instant
 
 interface AdClickPixels {
     fun fireAdClickActivePixel(exemption: Exemption?): Boolean
@@ -38,7 +38,7 @@ interface AdClickPixels {
 @ContributesBinding(AppScope::class)
 class RealAdClickPixels @Inject constructor(
     private val pixel: Pixel,
-    private val context: Context
+    private val context: Context,
 ) : AdClickPixels {
 
     private val preferences: SharedPreferences

@@ -34,7 +34,7 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
         url: String,
         credentials: List<LoginCredentials>,
         triggerType: LoginTriggerType,
-        tabId: String
+        tabId: String,
     ): DialogFragment {
         return AutofillSelectCredentialsDialogFragment.instance(url, credentials, triggerType, tabId)
     }
@@ -42,7 +42,7 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
     override fun autofillSavingCredentialsDialog(
         url: String,
         credentials: LoginCredentials,
-        tabId: String
+        tabId: String,
     ): DialogFragment {
         return AutofillSavingCredentialsDialogFragment.instance(url, credentials, tabId)
     }
@@ -50,7 +50,7 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
     override fun autofillSavingUpdateCredentialsDialog(
         url: String,
         credentials: LoginCredentials,
-        tabId: String
+        tabId: String,
     ): DialogFragment {
         return AutofillUpdatingExistingCredentialsDialogFragment.instance(url, credentials, tabId)
     }

@@ -26,21 +26,21 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.*
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.*
+import timber.log.Timber
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class AppTpBandwidthCollector @Inject constructor(
     private val context: Context,
     private val bandwidthRepository: BandwidthRepository,
     private val pixel: Pixel,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
 
     private var job = ConflatedJob()
@@ -92,7 +92,7 @@ class AppTpBandwidthCollector @Inject constructor(
     }
 
     private fun getPixelParams(
-        buckets: List<BandwidthData>
+        buckets: List<BandwidthData>,
     ): Map<String, String> {
         val period = buckets[NUM_BUCKETS_PER_PERIOD - 1].timestamp - buckets[0].timestamp
         val totalAppKiloBytes = (buckets[NUM_BUCKETS_PER_PERIOD - 1].appBytes - buckets[0].appBytes) / KB
@@ -112,13 +112,13 @@ class AppTpBandwidthCollector @Inject constructor(
             AppTpBandwidthPixelParameter.TOTAL_DEVICE_KILOBYTES to totalDeviceKiloBytes.toString(),
             AppTpBandwidthPixelParameter.TIMESTAMPS to buckets.map { it.timestamp }.joinToString(","),
             AppTpBandwidthPixelParameter.APP_KILOBYTES to appKilobytes.joinToString(","),
-            AppTpBandwidthPixelParameter.DEVICE_KILOBYTES to deviceKilobytes.joinToString(",")
+            AppTpBandwidthPixelParameter.DEVICE_KILOBYTES to deviceKilobytes.joinToString(","),
         )
     }
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         Timber.v("AppTpBandwidthCollector - onVpnStopped called")
         bandwidthRepository.deleteAllBuckets()

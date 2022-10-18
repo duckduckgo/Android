@@ -1,4 +1,5 @@
 apply plugin: 'com.diffplug.spotless'
+apply plugin: 'org.jmailen.kotlinter'
 
 spotless {
     java {
@@ -13,4 +14,8 @@ spotless {
         indentWithSpaces()
         trimTrailingWhitespace()
     }
+}
+
+kotlinter {
+    disabledRules = ['no-wildcard-imports']
 }

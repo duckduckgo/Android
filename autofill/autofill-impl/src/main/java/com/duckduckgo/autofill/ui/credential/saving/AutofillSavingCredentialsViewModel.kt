@@ -41,7 +41,7 @@ class AutofillSavingCredentialsViewModel @Inject constructor() : ViewModel() {
 
         return DisplayStringResourceIds(
             title = title,
-            ctaButton = ctaButton
+            ctaButton = ctaButton,
         )
     }
 
@@ -73,6 +73,6 @@ class AutofillSavingCredentialsViewModel @Inject constructor() : ViewModel() {
 
     data class DisplayStringResourceIds(
         @StringRes val title: Int,
-        @StringRes val ctaButton: Int
+        @StringRes val ctaButton: Int,
     )
 }

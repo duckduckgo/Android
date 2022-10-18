@@ -40,11 +40,11 @@ import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 interface AutofillJavascriptInterface {
 
@@ -71,7 +71,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val autofillDomainFormatter: AutofillDomainFormatter,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
-    private val currentUrlProvider: UrlProvider = WebViewUrlProvider(dispatcherProvider)
+    private val currentUrlProvider: UrlProvider = WebViewUrlProvider(dispatcherProvider),
 ) : AutofillJavascriptInterface {
 
     override var callback: Callback? = null
@@ -118,7 +118,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
     private fun filterRequestedSubtypes(
         request: AutofillDataRequest,
-        credentials: List<LoginCredentials>
+        credentials: List<LoginCredentials>,
     ): List<LoginCredentials> {
         return when (request.subType) {
             USERNAME -> credentials.filterNot { it.username.isNullOrBlank() }
@@ -128,7 +128,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
     private fun handleUnknownRequestMainType(
         request: AutofillDataRequest,
-        url: String
+        url: String,
     ) {
         Timber.w("Autofill type %s unsupported", request.mainType)
         callback?.noCredentialsAvailable(url)
@@ -139,7 +139,6 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         Timber.i("storeFormData called, credentials provided to be persisted")
 
         getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
-
             val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
             val title = autofillDomainFormatter.extractDomain(currentUrl)
 
@@ -182,20 +181,20 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private fun LoginCredentials.asJsCredentials(): JavascriptCredentials {
         return JavascriptCredentials(
             username = username,
-            password = password
+            password = password,
         )
     }
 
     private fun JavascriptCredentials.asLoginCredentials(
         url: String,
-        title: String?
+        title: String?,
     ): LoginCredentials {
         return LoginCredentials(
             id = null,
             domain = url,
             username = username,
             password = password,
-            domainTitle = title
+            domainTitle = title,
         )
     }
 

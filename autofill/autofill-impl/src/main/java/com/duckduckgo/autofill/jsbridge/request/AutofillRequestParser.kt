@@ -19,9 +19,9 @@ package com.duckduckgo.autofill.jsbridge.request
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 interface AutofillRequestParser {
     suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest
@@ -45,5 +45,4 @@ class AutofillJsonRequestParser @Inject constructor(val moshi: Moshi) : Autofill
             autofillStoreFormDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
         }
     }
-
 }

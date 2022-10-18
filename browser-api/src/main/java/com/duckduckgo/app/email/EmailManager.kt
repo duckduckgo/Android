@@ -25,7 +25,7 @@ interface EmailManager {
     fun storeCredentials(
         token: String,
         username: String,
-        cohort: String
+        cohort: String,
     )
 
     fun signOut()

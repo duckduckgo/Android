@@ -24,6 +24,7 @@ import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode
+import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -34,7 +35,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.reflect.KClass
 
 @ExperimentalCoroutinesApi
 class AutofillSettingsViewModelTest {
@@ -133,7 +133,7 @@ class AutofillSettingsViewModelTest {
         testee.viewState.test {
             assertEquals(
                 CredentialMode.Editing(credentials, startedCredentialModeWithEdit = false, hasPopulatedFields = true),
-                this.awaitItem().credentialMode
+                this.awaitItem().credentialMode,
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -148,7 +148,7 @@ class AutofillSettingsViewModelTest {
         testee.commands.test {
             assertEquals(
                 ShowCredentialMode(credentials, isLaunchedDirectly = false),
-                this.awaitItem().first()
+                this.awaitItem().first(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -156,7 +156,7 @@ class AutofillSettingsViewModelTest {
         testee.viewState.test {
             assertEquals(
                 CredentialMode.Editing(credentials, startedCredentialModeWithEdit = true, hasPopulatedFields = false),
-                this.awaitItem().credentialMode
+                this.awaitItem().credentialMode,
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -193,7 +193,7 @@ class AutofillSettingsViewModelTest {
                     ExitDisabledMode,
                     ExitLockedMode,
                 ),
-                this.expectMostRecentItem().toList()
+                this.expectMostRecentItem().toList(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -214,9 +214,9 @@ class AutofillSettingsViewModelTest {
                     ExitListMode,
                     ExitCredentialMode,
                     ExitLockedMode,
-                    ShowDisabledMode
+                    ShowDisabledMode,
                 ),
-                this.expectMostRecentItem().toList()
+                this.expectMostRecentItem().toList(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -304,9 +304,9 @@ class AutofillSettingsViewModelTest {
                     ExitListMode,
                     ExitCredentialMode,
                     ExitLockedMode,
-                    ShowDisabledMode
+                    ShowDisabledMode,
                 ),
-                this.expectMostRecentItem().toList()
+                this.expectMostRecentItem().toList(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -324,7 +324,7 @@ class AutofillSettingsViewModelTest {
             val finalResult = this.expectMostRecentItem()
             assertEquals(
                 CredentialMode.Editing(credentials, saveable = false, startedCredentialModeWithEdit = false, hasPopulatedFields = true),
-                finalResult.credentialMode
+                finalResult.credentialMode,
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -353,7 +353,7 @@ class AutofillSettingsViewModelTest {
         testee.commands.test {
             assertEquals(
                 listOf(LaunchDeviceAuth),
-                this.expectMostRecentItem().toList()
+                this.expectMostRecentItem().toList(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -375,7 +375,7 @@ class AutofillSettingsViewModelTest {
         testee.commands.test {
             assertEquals(
                 listOf(LaunchDeviceAuth, LaunchDeviceAuth),
-                this.expectMostRecentItem().toList()
+                this.expectMostRecentItem().toList(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -398,7 +398,7 @@ class AutofillSettingsViewModelTest {
             id = -1,
             domain = "example.com",
             username = "username",
-            password = "password"
+            password = "password",
         )
     }
 

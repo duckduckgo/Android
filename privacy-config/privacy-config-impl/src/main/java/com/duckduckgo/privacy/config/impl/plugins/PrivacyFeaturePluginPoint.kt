@@ -22,7 +22,7 @@ import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 
 @ContributesPluginPoint(
     scope = AppScope::class,
-    boundType = PrivacyFeaturePlugin::class
+    boundType = PrivacyFeaturePlugin::class,
 )
 @Suppress("unused")
 interface PrivacyFeaturePluginPoint

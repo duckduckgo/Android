@@ -60,10 +60,10 @@ class RealSecureStorageTest {
             username = "user@test.com",
             id = 1,
             domainTitle = "test",
-            lastUpdatedMillis = 1000L
+            lastUpdatedMillis = 1000L,
         ),
         password = expectedDecryptedData,
-        notes = expectedDecryptedData
+        notes = expectedDecryptedData,
     )
 
     private val testEntity = WebsiteLoginCredentialsEntity(
@@ -75,7 +75,7 @@ class RealSecureStorageTest {
         notes = expectedEncryptedData,
         notesIv = expectedEncryptedIv,
         domainTitle = "test",
-        lastUpdatedInMillis = 1000L
+        lastUpdatedInMillis = 1000L,
     )
 
     @Before
@@ -83,14 +83,14 @@ class RealSecureStorageTest {
         MockitoAnnotations.openMocks(this)
         whenever(l2DataTransformer.decrypt(any(), any())).thenReturn(expectedDecryptedData)
         whenever(l2DataTransformer.encrypt(any())).thenReturn(
-            EncryptedString(expectedEncryptedData, expectedEncryptedIv)
+            EncryptedString(expectedEncryptedData, expectedEncryptedIv),
         )
         testee = RealSecureStorage(
             object : SecureStorageRepository.Factory {
                 override fun get(): SecureStorageRepository = secureStorageRepository
             },
             coroutineRule.testDispatcherProvider,
-            l2DataTransformer
+            l2DataTransformer,
         )
     }
 
@@ -134,7 +134,7 @@ class RealSecureStorageTest {
     @Test
     fun whenAllWebsiteLoginDetailsRequestedThenGetAllEntitiesAndReturnAllDetailsOnly() = runTest {
         whenever(secureStorageRepository.websiteLoginCredentials()).thenReturn(
-            MutableStateFlow(listOf(testEntity))
+            MutableStateFlow(listOf(testEntity)),
         )
 
         val result = testee.websiteLoginDetails().first()
@@ -145,7 +145,7 @@ class RealSecureStorageTest {
     @Test
     fun whenWebsiteLoginDetailsForDomainRequestedThenGetEntityForDomainAndReturnDetailsOnly() = runTest {
         whenever(secureStorageRepository.websiteLoginCredentialsForDomain("test.com")).thenReturn(
-            MutableStateFlow(listOf(testEntity))
+            MutableStateFlow(listOf(testEntity)),
         )
 
         val result = testee.websiteLoginDetailsForDomain("test.com").first()
@@ -156,7 +156,7 @@ class RealSecureStorageTest {
     @Test
     fun whenAllWebsiteLoginCredentialsRequestedThenGetAllEntitiesAndReturnIncludingDecryptedPassword() = runTest {
         whenever(secureStorageRepository.websiteLoginCredentials()).thenReturn(
-            MutableStateFlow(listOf(testEntity))
+            MutableStateFlow(listOf(testEntity)),
         )
 
         val result = testee.websiteLoginDetailsWithCredentials().first()
@@ -167,7 +167,7 @@ class RealSecureStorageTest {
     @Test
     fun whenWebsiteLoginCredentialsForDomainRequestedThenGetEntityForDomainAndReturnIncludingDecryptedPassword() = runTest {
         whenever(secureStorageRepository.websiteLoginCredentialsForDomain("test.com")).thenReturn(
-            MutableStateFlow(listOf(testEntity))
+            MutableStateFlow(listOf(testEntity)),
         )
 
         val result = testee.websiteLoginDetailsWithCredentialsForDomain("test.com").first()
@@ -258,7 +258,7 @@ class RealSecureStorageTest {
                 override fun get(): SecureStorageRepository? = null
             },
             coroutineRule.testDispatcherProvider,
-            l2DataTransformer
+            l2DataTransformer,
         )
     }
 

@@ -33,8 +33,8 @@ class RealRuntimeConfigurationWriterTest {
             expectedJson,
             testee.generateResponseGetAvailableInputTypes(
                 credentialsAvailable = false,
-                emailAvailable = true
-            )
+                emailAvailable = true,
+            ),
         )
     }
 
@@ -51,7 +51,7 @@ class RealRuntimeConfigurationWriterTest {
             "};"
         Assert.assertEquals(
             expectedJson,
-            testee.generateContentScope()
+            testee.generateContentScope(),
         )
     }
 
@@ -60,7 +60,7 @@ class RealRuntimeConfigurationWriterTest {
         val expectedJson = "userUnprotectedDomains = [];"
         Assert.assertEquals(
             expectedJson,
-            testee.generateUserUnprotectedDomains()
+            testee.generateUserUnprotectedDomains(),
         )
     }
 
@@ -91,8 +91,8 @@ class RealRuntimeConfigurationWriterTest {
             expectedJson,
             testee.generateUserPreferences(
                 autofillCredentials = true,
-                showInlineKeyIcon = true
-            )
+                showInlineKeyIcon = true,
+            ),
         )
     }
 }

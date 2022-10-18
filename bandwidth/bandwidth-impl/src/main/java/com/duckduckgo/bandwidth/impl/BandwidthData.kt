@@ -21,5 +21,5 @@ import java.util.concurrent.TimeUnit
 data class BandwidthData(
     val timestamp: Long = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()),
     val appBytes: Long,
-    val totalBytes: Long
+    val totalBytes: Long,
 )

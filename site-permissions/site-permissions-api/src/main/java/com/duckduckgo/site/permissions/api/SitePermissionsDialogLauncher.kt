@@ -33,6 +33,6 @@ interface SitePermissionsDialogLauncher {
         tabId: String,
         permissionsRequested: Array<String>,
         request: PermissionRequest,
-        permissionsGrantedListener: SitePermissionsGrantedListener
+        permissionsGrantedListener: SitePermissionsGrantedListener,
     )
 }

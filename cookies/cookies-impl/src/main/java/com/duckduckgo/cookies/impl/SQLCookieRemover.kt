@@ -28,12 +28,12 @@ import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.CookieRemover
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @Named("cookieManagerRemover")
@@ -56,7 +56,7 @@ class SQLCookieRemover @Inject constructor(
     private val fireproofRepository: FireproofRepository,
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val exceptionPixel: ExceptionPixel,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : CookieRemover {
 
     private val databaseErrorHandler = PixelSenderDatabaseErrorHandler(offlinePixelCountDataStore)
@@ -86,7 +86,7 @@ class SQLCookieRemover @Inject constructor(
 
     private fun removeCookies(
         databasePath: String,
-        excludedSites: List<String>
+        excludedSites: List<String>,
     ): Boolean {
         var deleteExecuted = false
         openReadableDatabase(databasePath)?.apply {
@@ -112,7 +112,7 @@ class SQLCookieRemover @Inject constructor(
             return ""
         }
         return excludedSites.foldIndexed(
-            ""
+            "",
         ) { pos, acc, _ ->
             if (pos == 0) {
                 "host_key NOT LIKE ?"
@@ -127,7 +127,7 @@ class SQLCookieRemover @Inject constructor(
     }
 
     private class PixelSenderDatabaseErrorHandler(
-        private val offlinePixelCountDataStore: OfflinePixelCountDataStore
+        private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     ) : DatabaseErrorHandler {
 
         private val delegate = DefaultDatabaseErrorHandler()

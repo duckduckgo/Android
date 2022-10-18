@@ -53,7 +53,7 @@ interface SecureStorageKeyRepository {
 }
 
 class RealSecureStorageKeyRepository constructor(
-    private val keyStore: SecureStorageKeyStore
+    private val keyStore: SecureStorageKeyStore,
 ) : SecureStorageKeyRepository {
     override var password: ByteArray?
         get() = keyStore.getKey(KEY_GENERATED_PASSWORD)

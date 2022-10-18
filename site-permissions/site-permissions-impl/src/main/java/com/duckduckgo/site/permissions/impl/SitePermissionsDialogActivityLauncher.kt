@@ -46,7 +46,7 @@ import javax.inject.Inject
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
     private val sitePermissionsRepository: SitePermissionsRepository,
-    private val pixel: Pixel
+    private val pixel: Pixel,
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
@@ -60,7 +60,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         systemPermissionsHelper.registerPermissionLaunchers(
             caller,
             this::onResultSystemPermissionRequest,
-            this::onResultMultipleSystemPermissionsRequest
+            this::onResultMultipleSystemPermissionsRequest,
         )
     }
 
@@ -70,7 +70,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         tabId: String,
         permissionsRequested: Array<String>,
         request: PermissionRequest,
-        permissionsGrantedListener: SitePermissionsGrantedListener
+        permissionsGrantedListener: SitePermissionsGrantedListener,
     ) {
         sitePermissionRequest = request
         siteURL = url
@@ -81,7 +81,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         when {
             permissionsRequested.size == 2 -> {
                 showSitePermissionsRationaleDialog(
-                    R.string.sitePermissionsMicAndCameraDialogTitle, url, this::askForMicAndCameraPermissions, PixelValue.BOTH
+                    R.string.sitePermissionsMicAndCameraDialogTitle,
+                    url,
+                    this::askForMicAndCameraPermissions,
+                    PixelValue.BOTH,
                 )
             }
             permissionsRequested.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) -> {
@@ -97,7 +100,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         @StringRes titleRes: Int,
         url: String,
         onPermissionAllowed: () -> Unit,
-        pixelParamValue: String
+        pixelParamValue: String,
     ) {
         pixel.fire(SitePermissionsPixelName.SITE_PERMISSION_DIALOG_SHOWN, mapOf(PixelParameter.SITE_PERMISSION to pixelParamValue))
         AlertDialog.Builder(activity).apply {
@@ -128,8 +131,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 systemPermissionsHelper.requestMultiplePermissions(
                     arrayOf(
                         Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.MODIFY_AUDIO_SETTINGS
-                    )
+                        Manifest.permission.MODIFY_AUDIO_SETTINGS,
+                    ),
                 )
             }
             else -> {
@@ -137,8 +140,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     arrayOf(
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.MODIFY_AUDIO_SETTINGS,
-                        Manifest.permission.CAMERA
-                    )
+                        Manifest.permission.CAMERA,
+                    ),
                 )
             }
         }
@@ -285,5 +288,5 @@ fun String.websiteFromGeoLocationsApiOrigin(): String {
 enum class SitePermissionsRequestedType {
     CAMERA,
     AUDIO,
-    CAMERA_AND_AUDIO
+    CAMERA_AND_AUDIO,
 }

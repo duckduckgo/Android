@@ -27,7 +27,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealUserAgent @Inject constructor(
     private val userAgentRepository: UserAgentRepository,
-    private val unprotectedTemporary: UnprotectedTemporary
+    private val unprotectedTemporary: UnprotectedTemporary,
 ) : UserAgent {
 
     override fun isAnApplicationException(url: String): Boolean {

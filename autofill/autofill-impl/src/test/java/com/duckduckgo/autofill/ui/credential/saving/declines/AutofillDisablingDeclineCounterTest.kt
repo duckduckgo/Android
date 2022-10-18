@@ -192,7 +192,7 @@ class AutofillDisablingDeclineCounterTest {
         testee = AutofillDisablingDeclineCounter(
             autofillStore = autofillStore,
             appCoroutineScope = this,
-            dispatchers = coroutineTestRule.testDispatcherProvider
+            dispatchers = coroutineTestRule.testDispatcherProvider,
         )
     }
 

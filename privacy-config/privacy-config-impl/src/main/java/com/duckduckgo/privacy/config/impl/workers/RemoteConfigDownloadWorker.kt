@@ -40,10 +40,11 @@ import timber.log.Timber
 @ContributesWorker(AppScope::class)
 class PrivacyConfigDownloadWorker(
     context: Context,
-    workerParameters: WorkerParameters
+    workerParameters: WorkerParameters,
 ) : CoroutineWorker(context, workerParameters) {
     @Inject
     lateinit var privacyConfigDownloader: PrivacyConfigDownloader
+
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
@@ -61,11 +62,11 @@ class PrivacyConfigDownloadWorker(
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
 class PrivacyConfigDownloadWorkerScheduler @Inject constructor(
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {

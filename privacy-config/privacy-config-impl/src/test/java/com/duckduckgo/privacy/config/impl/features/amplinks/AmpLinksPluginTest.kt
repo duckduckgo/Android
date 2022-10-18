@@ -65,7 +65,7 @@ class AmpLinksPluginTest {
     fun whenFeatureNameMatchesAmpLinksAndIsNotEnabledThenStoreFeatureDisabled() {
         val jsonString = FileUtilities.loadText(
             AmpLinksPluginTest::class.java.classLoader!!,
-            "json/amp_links_disabled.json"
+            "json/amp_links_disabled.json",
         )
 
         testee.store(FEATURE_NAME_VALUE, jsonString)

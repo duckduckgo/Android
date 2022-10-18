@@ -25,5 +25,5 @@ data class BandwidthEntity(
     @PrimaryKey val id: Int = 0,
     val timestamp: Long,
     val appBytes: Long,
-    val totalBytes: Long
+    val totalBytes: Long,
 )

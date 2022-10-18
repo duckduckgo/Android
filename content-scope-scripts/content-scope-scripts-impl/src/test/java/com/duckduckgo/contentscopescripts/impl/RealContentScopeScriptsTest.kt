@@ -89,7 +89,7 @@ class RealContentScopeScriptsTest {
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
                 " [\"foo.com\"], {\"versionNumber\":1234})",
-            js
+            js,
         )
 
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -114,7 +114,7 @@ class RealContentScopeScriptsTest {
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
                 " [\"example.com\"], {\"globalPrivacyControlValue\":false,\"versionNumber\":1234})",
-            js
+            js,
         )
 
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -140,7 +140,7 @@ class RealContentScopeScriptsTest {
                 "\"config1\":{\"state\":\"enabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
                 " [\"example.com\"], {\"globalPrivacyControlValue\":true,\"versionNumber\":1234})",
-            js
+            js,
         )
 
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -165,7 +165,7 @@ class RealContentScopeScriptsTest {
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"}]}," +
                 " [\"example.com\"], {\"versionNumber\":1234})",
-            js
+            js,
         )
 
         verify(mockUnprotectedTemporary, times(4)).unprotectedTemporaryExceptions

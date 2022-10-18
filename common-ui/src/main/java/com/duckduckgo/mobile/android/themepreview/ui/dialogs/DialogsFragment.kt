@@ -181,14 +181,15 @@ class DialogsFragment : Fragment() {
                         ActionBottomSheetDialog.Builder(requireContext())
                             .setPrimaryItem("Primary Item")
                             .setSecondaryItem("Secondary Item")
-                            .addEventListener(object : ActionBottomSheetDialog.EventListener() {
-                                override fun onPrimaryItemClicked() {
-                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                                override fun onSecondaryItemClicked() {
-                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                            },
+                            .addEventListener(
+                                object : ActionBottomSheetDialog.EventListener() {
+                                    override fun onPrimaryItemClicked() {
+                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                    override fun onSecondaryItemClicked() {
+                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
                             )
                             .show()
                     }
@@ -200,14 +201,15 @@ class DialogsFragment : Fragment() {
                             .setTitle("Title")
                             .setPrimaryItem("Primary Item", R.drawable.ic_add_16)
                             .setSecondaryItem("Secondary Item", R.drawable.ic_add_16)
-                            .addEventListener(object : ActionBottomSheetDialog.EventListener() {
-                                override fun onPrimaryItemClicked() {
-                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                                override fun onSecondaryItemClicked() {
-                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                            },
+                            .addEventListener(
+                                object : ActionBottomSheetDialog.EventListener() {
+                                    override fun onPrimaryItemClicked() {
+                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                    override fun onSecondaryItemClicked() {
+                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
                             )
                             .show()
                     }
@@ -219,16 +221,17 @@ class DialogsFragment : Fragment() {
                             .setContent("Add our search widget to your home screen for quick, easy access.")
                             .setPrimaryButton("Button")
                             .setSecondaryButton("Button")
-                            .addEventListener(object : PromoBottomSheetDialog.EventListener() {
-                                override fun onPrimaryButtonClicked() {
-                                    super.onPrimaryButtonClicked()
-                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                                override fun onSecondaryButtonClicked() {
-                                    super.onSecondaryButtonClicked()
-                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                            },
+                            .addEventListener(
+                                object : PromoBottomSheetDialog.EventListener() {
+                                    override fun onPrimaryButtonClicked() {
+                                        super.onPrimaryButtonClicked()
+                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                    override fun onSecondaryButtonClicked() {
+                                        super.onSecondaryButtonClicked()
+                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
                             )
                             .show()
                     }
@@ -241,16 +244,17 @@ class DialogsFragment : Fragment() {
                             .setContent("Add our search widget to your home screen for quick, easy access.")
                             .setPrimaryButton("Button")
                             .setSecondaryButton("Button")
-                            .addEventListener(object : PromoBottomSheetDialog.EventListener() {
-                                override fun onPrimaryButtonClicked() {
-                                    super.onPrimaryButtonClicked()
-                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                                override fun onSecondaryButtonClicked() {
-                                    super.onSecondaryButtonClicked()
-                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                            },
+                            .addEventListener(
+                                object : PromoBottomSheetDialog.EventListener() {
+                                    override fun onPrimaryButtonClicked() {
+                                        super.onPrimaryButtonClicked()
+                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                    override fun onSecondaryButtonClicked() {
+                                        super.onSecondaryButtonClicked()
+                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
                             )
                             .show()
                     }
@@ -264,16 +268,17 @@ class DialogsFragment : Fragment() {
                             .setContent("Add our search widget to your home screen for quick, easy access.")
                             .setPrimaryButton("Button")
                             .setSecondaryButton("Button")
-                            .addEventListener(object : PromoBottomSheetDialog.EventListener() {
-                                override fun onPrimaryButtonClicked() {
-                                    super.onPrimaryButtonClicked()
-                                    Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                                override fun onSecondaryButtonClicked() {
-                                    super.onSecondaryButtonClicked()
-                                    Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
-                                }
-                            },
+                            .addEventListener(
+                                object : PromoBottomSheetDialog.EventListener() {
+                                    override fun onPrimaryButtonClicked() {
+                                        super.onPrimaryButtonClicked()
+                                        Toast.makeText(context, "Primary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                    override fun onSecondaryButtonClicked() {
+                                        super.onSecondaryButtonClicked()
+                                        Toast.makeText(context, "Secondary Item Clicked", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
                             )
                             .show()
                     }

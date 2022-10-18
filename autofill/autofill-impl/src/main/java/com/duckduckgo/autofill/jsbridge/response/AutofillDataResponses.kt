@@ -20,7 +20,7 @@ import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
 
 data class ContainingCredentials(
     val type: String = "getAutofillDataResponse",
-    val success: CredentialSuccessResponse
+    val success: CredentialSuccessResponse,
 ) {
 
     data class CredentialSuccessResponse(
@@ -31,15 +31,15 @@ data class ContainingCredentials(
 
 data class EmptyResponse(
     val type: String = "getAutofillDataResponse",
-    val success: EmptyCredentialResponse
+    val success: EmptyCredentialResponse,
 ) {
 
     data class EmptyCredentialResponse(
-        val action: String = "non"
+        val action: String = "non",
     )
 }
 
 data class AvailableInputSuccessResponse(
     val credentials: Boolean,
-    val email: Boolean
+    val email: Boolean,
 )

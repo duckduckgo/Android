@@ -18,28 +18,27 @@ package com.duckduckgo.downloads.impl
 
 import android.util.Base64
 import androidx.annotation.WorkerThread
-import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.impl.DataUriParser.GeneratedFilename
 import com.duckduckgo.downloads.impl.DataUriParser.ParseResult
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
-import timber.log.Timber
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
+import timber.log.Timber
 
 class DataUriDownloader @Inject constructor(
-    private val dataUriParser: DataUriParser
+    private val dataUriParser: DataUriParser,
 ) {
 
     @WorkerThread
     fun download(
         pending: PendingFileDownload,
-        callback: DownloadCallback
+        callback: DownloadCallback,
     ) {
-
         try {
             when (val parsedDataUri = dataUriParser.generate(pending.url)) {
                 is ParseResult.Invalid -> {
@@ -57,8 +56,8 @@ class DataUriDownloader @Inject constructor(
                             fileName = file.name,
                             contentLength = 0L,
                             filePath = file.absolutePath,
-                            createdAt = DatabaseDateFormatter.timestamp()
-                        )
+                            createdAt = DatabaseDateFormatter.timestamp(),
+                        ),
                     )
 
                     runCatching {
@@ -82,7 +81,7 @@ class DataUriDownloader @Inject constructor(
 
     private fun writeBytesToFiles(
         data: String?,
-        file: File
+        file: File,
     ) {
         val imageByteArray = Base64.decode(data, Base64.DEFAULT)
         file.writeBytes(imageByteArray)
@@ -90,7 +89,7 @@ class DataUriDownloader @Inject constructor(
 
     private fun initialiseFilesOnDisk(
         pending: PendingFileDownload,
-        generatedFilename: GeneratedFilename
+        generatedFilename: GeneratedFilename,
     ): File {
         val downloadDirectory = pending.directory
         val file = File(downloadDirectory, generatedFilename.toString())

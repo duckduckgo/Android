@@ -28,6 +28,7 @@ import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.util.concurrent.CopyOnWriteArrayList
 import junit.framework.TestCase.assertEquals
 import org.json.JSONObject
 import org.junit.Before
@@ -36,7 +37,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
-import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class AdClickAttributionLinkFormatsReferenceTest(private val testCase: TestCase) {
@@ -64,8 +64,8 @@ class AdClickAttributionLinkFormatsReferenceTest(private val testCase: TestCase)
             val test = adapter.fromJson(
                 FileUtilities.loadText(
                     AdClickAttributionLinkFormatsReferenceTest::class.java.classLoader!!,
-                    "reference_tests/adclickattribution/ad_click_attribution_matching_tests.json"
-                )
+                    "reference_tests/adclickattribution/ad_click_attribution_matching_tests.json",
+                ),
             )
             return test?.adClickLinkFormats?.tests ?: emptyList()
         }
@@ -82,7 +82,7 @@ class AdClickAttributionLinkFormatsReferenceTest(private val testCase: TestCase)
         val adClickLinkFormats = CopyOnWriteArrayList<AdClickAttributionLinkFormatEntity>()
         val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
             AdClickAttributionLinkFormatsReferenceTest::class.java.classLoader!!,
-            "reference_tests/adclickattribution/ad_click_attribution_reference.json"
+            "reference_tests/adclickattribution/ad_click_attribution_reference.json",
         )
 
         val linkFormatList: List<AdClickAttributionLinkFormat>? = jsonAdapter.fromJson(jsonObject.toString())?.settings?.linkFormats
@@ -91,9 +91,9 @@ class AdClickAttributionLinkFormatsReferenceTest(private val testCase: TestCase)
                 list.map {
                     AdClickAttributionLinkFormatEntity(
                         url = it.url,
-                        adDomainParameterName = it.adDomainParameterName.orEmpty()
+                        adDomainParameterName = it.adDomainParameterName.orEmpty(),
                     )
-                }
+                },
             )
         }
         whenever(mockRepository.linkFormats).thenReturn(adClickLinkFormats)
@@ -108,10 +108,10 @@ class AdClickAttributionLinkFormatsReferenceTest(private val testCase: TestCase)
     data class AdClickLinkFormatTest(
         val name: String,
         val desc: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class ReferenceTest(
-        val adClickLinkFormats: AdClickLinkFormatTest
+        val adClickLinkFormats: AdClickLinkFormatTest,
     )
 }

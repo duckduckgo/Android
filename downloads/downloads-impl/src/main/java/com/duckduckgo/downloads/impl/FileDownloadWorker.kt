@@ -28,22 +28,24 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
-import kotlinx.coroutines.withContext
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 @ContributesWorker(AppScope::class)
 class FileDownloadWorker(
     context: Context,
-    workerParameters: WorkerParameters
+    workerParameters: WorkerParameters,
 ) : CoroutineWorker(context, workerParameters) {
 
     @Inject lateinit var networkFileDownloader: NetworkFileDownloader
+
     @Inject lateinit var callback: FileDownloadCallback
+
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     override suspend fun doWork(): Result = withContext(dispatcherProvider.io()) {
@@ -65,6 +67,7 @@ private const val CONTENT_DISPOSITION = "CONTENT_DISPOSITION"
 private const val MIME_TYPE = "MIME_TYPE"
 private const val SUBFOLDER = "SUBFOLDER"
 private const val DIRECTORY = "DIRECTORY"
+
 @VisibleForTesting
 internal const val IS_URL_COMPRESSED = "IS_URL_COMPRESSED"
 private const val MAX_URL_DATA_BYTES = MAX_DATA_BYTES * 0.9
@@ -91,7 +94,7 @@ fun Data.toPendingFileDownload(): FileDownloader.PendingFileDownload {
         mimeType = getString(MIME_TYPE),
         subfolder = getString(SUBFOLDER)!!,
         directory = File(getString(DIRECTORY)!!),
-        isUrlCompressed = false
+        isUrlCompressed = false,
     )
 }
 

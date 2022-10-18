@@ -32,23 +32,23 @@ interface EncryptionHelper {
     @Throws(SecureStorageException::class)
     fun encrypt(
         raw: ByteArray,
-        key: Key
+        key: Key,
     ): EncryptedBytes
 
     @Throws(SecureStorageException::class)
     fun decrypt(
         toDecrypt: EncryptedBytes,
-        key: Key
+        key: Key,
     ): ByteArray
 
     class EncryptedBytes(
         val data: ByteArray,
-        val iv: ByteArray
+        val iv: ByteArray,
     )
 
     class EncryptedString(
         val data: String,
-        val iv: String
+        val iv: String,
     )
 }
 
@@ -60,7 +60,7 @@ class RealEncryptionHelper @Inject constructor() : EncryptionHelper {
     @Synchronized
     override fun encrypt(
         raw: ByteArray,
-        key: Key
+        key: Key,
     ): EncryptedBytes {
         val encrypted = try {
             encryptionCipher.init(Cipher.ENCRYPT_MODE, key)
@@ -76,7 +76,7 @@ class RealEncryptionHelper @Inject constructor() : EncryptionHelper {
     @Synchronized
     override fun decrypt(
         toDecrypt: EncryptedBytes,
-        key: Key
+        key: Key,
     ): ByteArray {
         return try {
             val ivSpec = GCMParameterSpec(GCM_PARAM_SPEC_LENGTH, toDecrypt.iv)

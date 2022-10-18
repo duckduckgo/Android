@@ -28,16 +28,16 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.vpn.network.api.*
 import com.duckduckgo.vpn.network.impl.models.Allowed
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import com.duckduckgo.vpn.network.impl.models.Packet
 import com.duckduckgo.vpn.network.impl.models.ResourceRecord
 import com.duckduckgo.vpn.network.impl.models.Usage
-import timber.log.Timber
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import java.net.InetSocketAddress
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlin.system.exitProcess
+import timber.log.Timber
 
 @ContributesBinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
@@ -179,7 +179,7 @@ class RealVpnNetwork @Inject constructor(
               sport=$sport
               daddr=$daddr
               dport=$dport
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) return Process.INVALID_UID

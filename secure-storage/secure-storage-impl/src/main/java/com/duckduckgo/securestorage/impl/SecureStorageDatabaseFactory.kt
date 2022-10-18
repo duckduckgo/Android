@@ -23,8 +23,8 @@ import com.duckduckgo.securestorage.store.db.ALL_MIGRATIONS
 import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import net.sqlcipher.database.SupportFactory
 import javax.inject.Inject
+import net.sqlcipher.database.SupportFactory
 
 interface SecureStorageDatabaseFactory {
     fun getDatabase(): SecureStorageDatabase?
@@ -34,7 +34,7 @@ interface SecureStorageDatabaseFactory {
 @ContributesBinding(AppScope::class)
 class RealSecureStorageDatabaseFactory @Inject constructor(
     private val context: Context,
-    private val keyProvider: SecureStorageKeyProvider
+    private val keyProvider: SecureStorageKeyProvider,
 ) : SecureStorageDatabaseFactory {
     private var _database: SecureStorageDatabase? = null
 
@@ -51,7 +51,7 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
             _database = Room.databaseBuilder(
                 context,
                 SecureStorageDatabase::class.java,
-                "secure_storage_database_encrypted.db"
+                "secure_storage_database_encrypted.db",
             ).openHelperFactory(SupportFactory(keyProvider.getl1Key()))
                 .addMigrations(*ALL_MIGRATIONS)
                 .enableMultiInstanceInvalidation()

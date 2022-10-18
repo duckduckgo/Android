@@ -65,7 +65,7 @@ internal class AnrException(thread: Thread) : Exception("ANR detected") {
         ps: PrintStream,
         locale: Locale,
         thread: Thread,
-        stack: Array<StackTraceElement>
+        stack: Array<StackTraceElement>,
     ) {
         ps.println(String.format(locale, "\t%s (%s)", thread.name, thread.state))
         for (element in stack) {

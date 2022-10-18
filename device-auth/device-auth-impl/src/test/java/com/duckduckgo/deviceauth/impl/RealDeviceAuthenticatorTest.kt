@@ -49,7 +49,7 @@ class RealDeviceAuthenticatorTest {
         testee = RealDeviceAuthenticator(
             deviceAuthChecker,
             appBuildConfig,
-            authLauncher
+            authLauncher,
         )
     }
 

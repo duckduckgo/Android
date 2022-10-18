@@ -28,7 +28,7 @@ interface AutofillPrefsStore {
 }
 
 class RealAutofillPrefsStore constructor(
-    private val applicationContext: Context
+    private val applicationContext: Context,
 ) : AutofillPrefsStore {
 
     private val prefs: SharedPreferences by lazy {

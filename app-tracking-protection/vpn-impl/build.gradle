@@ -19,7 +19,6 @@ plugins {
     id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'kotlin-android-extensions'
-    id 'org.jmailen.kotlinter'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"

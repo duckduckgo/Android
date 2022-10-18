@@ -24,5 +24,5 @@ data class BandwidthBucketEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val timestamp: Long,
     val appBytes: Long,
-    val totalBytes: Long
+    val totalBytes: Long,
 )

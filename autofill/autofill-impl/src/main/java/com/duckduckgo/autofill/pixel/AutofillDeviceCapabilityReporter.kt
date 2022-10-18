@@ -25,20 +25,20 @@ import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class AutofillDeviceCapabilityReporter @Inject constructor(
     private val pixel: AutofillPixelSender,
     private val secureStorage: SecureStorage,
     private val deviceAuthenticator: DeviceAuthenticator,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DefaultLifecycleObserver {
 
     @UiThread
@@ -46,7 +46,6 @@ class AutofillDeviceCapabilityReporter @Inject constructor(
         Timber.i("Autofill device capability reporter created")
 
         appCoroutineScope.launch {
-
             if (pixel.hasDeterminedCapabilities()) {
                 Timber.v("Already determined device autofill capabilities previously")
                 return@launch
@@ -59,7 +58,7 @@ class AutofillDeviceCapabilityReporter @Inject constructor(
                 Timber.d(
                     "Autofill device capabilities:" +
                         "\nSecure storage available: $secureStorageAvailable" +
-                        "\nDevice auth available: $deviceAuthAvailable"
+                        "\nDevice auth available: $deviceAuthAvailable",
                 )
 
                 pixel.sendCapabilitiesPixel(secureStorageAvailable, deviceAuthAvailable)

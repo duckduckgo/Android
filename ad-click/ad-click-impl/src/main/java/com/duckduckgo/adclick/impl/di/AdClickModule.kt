@@ -51,7 +51,7 @@ class AdClickModule {
     fun provideAdClickAttributionRepository(
         database: AdClickDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): AdClickAttributionRepository {
         return RealAdClickAttributionRepository(database, coroutineScope, dispatcherProvider)
     }

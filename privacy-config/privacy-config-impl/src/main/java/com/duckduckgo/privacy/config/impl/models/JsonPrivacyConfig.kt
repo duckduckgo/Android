@@ -23,5 +23,5 @@ data class JsonPrivacyConfig(
     val version: Long,
     val readme: String,
     val features: Map<String, JSONObject?>,
-    val unprotectedTemporary: List<UnprotectedTemporaryEntity>
+    val unprotectedTemporary: List<UnprotectedTemporaryEntity>,
 )

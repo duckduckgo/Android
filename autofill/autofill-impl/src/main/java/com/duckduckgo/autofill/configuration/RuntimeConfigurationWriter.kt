@@ -26,14 +26,14 @@ import javax.inject.Inject
 interface RuntimeConfigurationWriter {
     fun generateResponseGetAvailableInputTypes(
         credentialsAvailable: Boolean,
-        emailAvailable: Boolean
+        emailAvailable: Boolean,
     ): String
 
     fun generateContentScope(): String
     fun generateUserUnprotectedDomains(): String
     fun generateUserPreferences(
         autofillCredentials: Boolean,
-        showInlineKeyIcon: Boolean
+        showInlineKeyIcon: Boolean,
     ): String
 }
 
@@ -44,7 +44,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
 
     override fun generateResponseGetAvailableInputTypes(
         credentialsAvailable: Boolean,
-        emailAvailable: Boolean
+        emailAvailable: Boolean,
     ): String {
         val availableInputTypes = AvailableInputSuccessResponse(credentialsAvailable, emailAvailable)
         return availableInputTypesAdapter.toJson(availableInputTypes)
@@ -78,7 +78,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
 
     override fun generateUserPreferences(
         autofillCredentials: Boolean,
-        showInlineKeyIcon: Boolean
+        showInlineKeyIcon: Boolean,
     ): String {
         return """
             userPreferences = {

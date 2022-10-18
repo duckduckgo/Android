@@ -50,9 +50,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialAutofillPickerDialog {
@@ -79,7 +79,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         pixelNameDialogEvent(Shown)?.let { pixel.fire(it) }
 
@@ -119,7 +119,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             lifecycleOwner = this,
             faviconManager = faviconManager,
             credentialTextExtractor = CredentialTextExtractor(requireContext()),
-            credentials = getAvailableCredentials()
+            credentials = getAvailableCredentials(),
         ) { selectedCredentials ->
 
             pixelNameDialogEvent(Selected)?.let { pixel.fire(it) }
@@ -182,9 +182,8 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             url: String,
             credentials: List<LoginCredentials>,
             triggerType: LoginTriggerType,
-            tabId: String
+            tabId: String,
         ): AutofillSelectCredentialsDialogFragment {
-
             val cr = ArrayList<LoginCredentials>(credentials)
 
             val fragment = AutofillSelectCredentialsDialogFragment()

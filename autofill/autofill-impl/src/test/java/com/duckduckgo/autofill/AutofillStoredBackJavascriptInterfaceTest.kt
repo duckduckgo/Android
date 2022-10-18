@@ -75,7 +75,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
             coroutineScope = coroutineScope,
             currentUrlProvider = currentUrlProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            autofillDomainFormatter = autofillDomainFormatter
+            autofillDomainFormatter = autofillDomainFormatter,
         )
         testee.callback = testCallback
         testee.webView = testWebView
@@ -129,8 +129,8 @@ class AutofillStoredBackJavascriptInterfaceTest {
         whenever(autofillStore.getCredentials(any())).thenReturn(
             listOf(
                 loginCredential(username = null, password = "foo"),
-                loginCredential(username = null, password = "bar")
-            )
+                loginCredential(username = null, password = "bar"),
+            ),
         )
         initiateGetAutofillDataRequest()
         assertCredentialsUnavailable()
@@ -143,8 +143,8 @@ class AutofillStoredBackJavascriptInterfaceTest {
             listOf(
                 loginCredential(username = null, password = "foo"),
                 loginCredential(username = null, password = "bar"),
-                loginCredential(username = "foo", password = "bar")
-            )
+                loginCredential(username = "foo", password = "bar"),
+            ),
         )
         initiateGetAutofillDataRequest()
         assertCredentialsAvailable()
@@ -161,7 +161,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
                 loginCredential(username = null, password = "bar"),
                 loginCredential(username = null, password = "bar"),
                 loginCredential(username = "username2", password = null),
-            )
+            ),
         )
         initiateGetAutofillDataRequest()
         assertCredentialsAvailable()
@@ -182,8 +182,8 @@ class AutofillStoredBackJavascriptInterfaceTest {
         whenever(autofillStore.getCredentials(any())).thenReturn(
             listOf(
                 loginCredential(username = "foo", password = null),
-                loginCredential(username = "bar", password = null)
-            )
+                loginCredential(username = "bar", password = null),
+            ),
         )
         initiateGetAutofillDataRequest()
         assertCredentialsUnavailable()
@@ -196,8 +196,8 @@ class AutofillStoredBackJavascriptInterfaceTest {
             listOf(
                 loginCredential(username = null, password = null),
                 loginCredential(username = "foobar", password = null),
-                loginCredential(username = "foo", password = "bar")
-            )
+                loginCredential(username = "foo", password = "bar"),
+            ),
         )
         initiateGetAutofillDataRequest()
         assertCredentialsAvailable()
@@ -215,7 +215,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
                 loginCredential(username = null, password = "password2"),
                 loginCredential(username = null, password = "password3"),
 
-            )
+            ),
         )
         initiateGetAutofillDataRequest()
         assertCredentialsAvailable()
@@ -275,7 +275,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
 
     private fun assertCredentialsContains(
         property: (LoginCredentials) -> String?,
-        vararg expected: String?
+        vararg expected: String?,
     ) {
         val numberExpected = expected.size
         val numberMatched = testCallback.credentialsToInject?.filter { expected.contains(property(it)) }?.count()
@@ -284,7 +284,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
 
     private fun loginCredential(
         username: String?,
-        password: String?
+        password: String?,
     ) = LoginCredentials(0, "example.com", username, password)
 
     private suspend fun setupRequestForSubTypeUsername() {
@@ -329,7 +329,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
 
         override suspend fun onCredentialsAvailableToSave(
             currentUrl: String,
-            credentials: LoginCredentials
+            credentials: LoginCredentials,
         ) {
             credentialsToSave = credentials
         }

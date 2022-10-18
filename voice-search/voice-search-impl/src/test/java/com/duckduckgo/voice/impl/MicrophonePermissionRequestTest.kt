@@ -17,10 +17,10 @@
 package com.duckduckgo.voice.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action.LaunchPermissionRequest
 import com.duckduckgo.voice.impl.fakes.FakeActivityResultLauncherWrapper
 import com.duckduckgo.voice.impl.fakes.FakeVoiceSearchPermissionDialogsLauncher
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -54,7 +54,7 @@ class MicrophonePermissionRequestTest {
             pixel,
             voiceSearchRepository,
             voiceSearchPermissionDialogsLauncher,
-            activityResultLauncherWrapper
+            activityResultLauncherWrapper,
         )
     }
 

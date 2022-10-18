@@ -5,11 +5,10 @@ plugins {
     id 'kotlin-kapt'
     id 'com.squareup.anvil'
     id 'com.duckduckgo.buildtime'
-    id 'org.jmailen.kotlinter'
 }
 
 apply from: '../versioning.gradle'
-apply from: "$rootDir/spotless.gradle"
+apply from: "$rootDir/code-formatting.gradle"
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false

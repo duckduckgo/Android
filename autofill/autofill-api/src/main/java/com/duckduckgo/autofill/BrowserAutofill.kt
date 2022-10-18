@@ -51,7 +51,6 @@ interface BrowserAutofill {
      * @param credentials The credentials to be passed to the JS layer. Can be null to indicate credentials won't be autofilled.
      */
     fun injectCredentials(credentials: LoginCredentials?)
-
 }
 
 /**

@@ -27,10 +27,10 @@ import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 interface FirstPartyCookiesModifier {
     suspend fun expireFirstPartyCookies(): Boolean
@@ -67,7 +67,7 @@ class RealFirstPartyCookiesModifier @Inject constructor(
             return "expires_utc > $timestampThreshold AND is_httponly = 0"
         }
         return excludedSites.foldIndexed(
-            ""
+            "",
         ) { pos, acc, site ->
             if (pos == 0) {
                 "expires_utc > $timestampThreshold AND is_httponly = 0 AND host_key != '$site' AND host_key NOT LIKE '%.$site'"
@@ -94,7 +94,7 @@ class RealFirstPartyCookiesModifier @Inject constructor(
                      UPDATE ${SQLCookieRemover.COOKIES_TABLE_NAME}
                      SET expires_utc=$timestampMaxAge
                      WHERE ${buildSQLWhereClause(timestampThreshold)}
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
                 updateExecuted = true
             } catch (exception: Exception) {

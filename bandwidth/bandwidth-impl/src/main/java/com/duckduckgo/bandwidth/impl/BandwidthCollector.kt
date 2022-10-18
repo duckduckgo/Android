@@ -32,10 +32,9 @@ interface BandwidthCollector {
 @ContributesBinding(AppScope::class)
 class RealBandwidthCollector @Inject constructor(
     val bandwidthRepository: BandwidthRepository,
-    val pixel: Pixel
+    val pixel: Pixel,
 ) : BandwidthCollector {
     override fun collect() {
-
         val lastBandwidthData = bandwidthRepository.getStoredBandwidthData()
         val currentBandwidthData = bandwidthRepository.getCurrentBandwidthData().also { bandwidthRepository.persistBandwidthData(it) }
 
@@ -49,7 +48,7 @@ class RealBandwidthCollector @Inject constructor(
 
     private fun getPixelParams(
         currentBandwidthData: BandwidthData,
-        lastBandwidthData: BandwidthData
+        lastBandwidthData: BandwidthData,
     ): Map<String, String> {
         val period = currentBandwidthData.timestamp - lastBandwidthData.timestamp
         val appBytes = currentBandwidthData.appBytes - lastBandwidthData.appBytes
@@ -58,7 +57,7 @@ class RealBandwidthCollector @Inject constructor(
         return mapOf(
             PERIOD to period.toString(),
             APP_BYTES to appBytes.toString(),
-            TOTAL_BYTES to totalBytes.toString()
+            TOTAL_BYTES to totalBytes.toString(),
         )
     }
 }

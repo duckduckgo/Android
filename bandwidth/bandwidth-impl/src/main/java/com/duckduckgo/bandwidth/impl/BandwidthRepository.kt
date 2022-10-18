@@ -36,13 +36,13 @@ interface BandwidthRepository {
 @ContributesBinding(AppScope::class)
 class RealBandwidthRepository @Inject constructor(
     val trafficStatsProvider: TrafficStatsProvider,
-    val database: BandwidthDatabase
+    val database: BandwidthDatabase,
 ) : BandwidthRepository {
 
     override fun getCurrentBandwidthData(): BandwidthData {
         return BandwidthData(
             appBytes = trafficStatsProvider.getAppRxBytes() + trafficStatsProvider.getAppTxBytes(),
-            totalBytes = trafficStatsProvider.getTotalRxBytes() + trafficStatsProvider.getTotalTxBytes()
+            totalBytes = trafficStatsProvider.getTotalRxBytes() + trafficStatsProvider.getTotalTxBytes(),
         )
     }
 
@@ -51,8 +51,8 @@ class RealBandwidthRepository @Inject constructor(
             BandwidthEntity(
                 timestamp = bandwidthData.timestamp,
                 appBytes = bandwidthData.appBytes,
-                totalBytes = bandwidthData.totalBytes
-            )
+                totalBytes = bandwidthData.totalBytes,
+            ),
         )
     }
 
@@ -62,7 +62,7 @@ class RealBandwidthRepository @Inject constructor(
         return BandwidthData(
             timestamp = bandwidthEntity.timestamp,
             appBytes = bandwidthEntity.appBytes,
-            totalBytes = bandwidthEntity.totalBytes
+            totalBytes = bandwidthEntity.totalBytes,
         )
     }
 
@@ -71,8 +71,8 @@ class RealBandwidthRepository @Inject constructor(
             BandwidthBucketEntity(
                 timestamp = bucket.timestamp,
                 appBytes = bucket.appBytes,
-                totalBytes = bucket.totalBytes
-            )
+                totalBytes = bucket.totalBytes,
+            ),
         )
     }
 
