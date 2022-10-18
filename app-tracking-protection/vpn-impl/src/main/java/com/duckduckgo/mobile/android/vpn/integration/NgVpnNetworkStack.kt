@@ -79,7 +79,7 @@ class NgVpnNetworkStack @Inject constructor(
     private var tunnelThread: Thread? = null
     private var jniContext = 0L
     private val jniLock = Any()
-    private lateinit var addressLookupLruCache: LruCache<String, String>
+    private val addressLookupLruCache = LruCache<String, String>(LRU_CACHE_SIZE)
     // cache packageId -> app name
     private val appNamesCache = LruCache<String, AppNameResolver.OriginatingApp>(100)
     private val periodicCachePersisterJob = ConflatedJob()
@@ -107,11 +107,7 @@ class NgVpnNetworkStack @Inject constructor(
     override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
         fun populateLruInMemoryCache() {
             val cachedEntries = addressLookupDao.getAll()
-            this::addressLookupLruCache.isInitialized || run {
-                addressLookupLruCache = LruCache(LRU_CACHE_SIZE)
-                Timber.d("Warming address lookup cache with ${cachedEntries.size} entries")
-                true
-            }
+            Timber.d("Warming address lookup cache with ${cachedEntries.size} entries")
             cachedEntries.forEach { entry ->
                 addressLookupLruCache.put(entry.address, entry.domain)
             }
