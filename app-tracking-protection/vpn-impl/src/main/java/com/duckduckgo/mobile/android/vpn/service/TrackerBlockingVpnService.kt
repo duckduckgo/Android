@@ -37,6 +37,7 @@ import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
+import com.duckduckgo.mobile.android.vpn.network.util.asRoute
 import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
 import com.duckduckgo.mobile.android.vpn.network.util.getSystemActiveNetworkDefaultDns
 import com.duckduckgo.mobile.android.vpn.network.util.isLocal
@@ -48,12 +49,11 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNoti
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import dagger.android.AndroidInjection
+import kotlinx.coroutines.*
+import timber.log.Timber
 import java.net.Inet4Address
 import java.net.InetAddress
 import javax.inject.Inject
-import kotlinx.coroutines.*
-import timber.log.Timber
-
 @InjectWith(VpnScope::class)
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
@@ -90,10 +90,26 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     @Inject lateinit var vpnNetworkStack: VpnNetworkStack
 
+    private val isInterceptDnsTrafficEnabled by lazy {
+        appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic)
+    }
+
+    private val isIpv6SupportEnabled by lazy {
+        appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support)
+    }
+
+    private val isPrivateDnsSupportEnabled by lazy {
+        appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport)
+    }
+
+    private val isAlwaysSetDNSEnabled by lazy {
+        appTpFeatureConfig.isEnabled(AppTpSetting.AlwaysSetDNS)
+    }
+
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
             name: ComponentName?,
-            service: IBinder?,
+            service: IBinder?
         ) {
             Timber.d("Connected to state monitor service")
             vpnStateServiceReference = service
@@ -111,7 +127,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             code: Int,
             data: Parcel,
             reply: Parcel?,
-            flags: Int,
+            flags: Int
         ): Boolean {
             if (code == LAST_CALL_TRANSACTION) {
                 onRevoke()
@@ -152,7 +168,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     override fun onStartCommand(
         intent: Intent?,
         flags: Int,
-        startId: Int,
+        startId: Int
     ): Int {
         Timber.d("VPN log onStartCommand: ${intent?.action}")
 
@@ -184,7 +200,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             return@withContext
         }
 
-        if (appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)) {
+        if (isInterceptDnsTrafficEnabled) {
             applicationContext.getActiveNetwork()?.let { an ->
                 Timber.v("Setting underlying network $an")
                 setUnderlyingNetworks(arrayOf(an))
@@ -203,6 +219,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         Intent(applicationContext, VpnStateMonitorService::class.java).also {
             bindService(it, vpnStateServiceConnection, Context.BIND_AUTO_CREATE)
         }
+
     }
 
     private suspend fun establishVpnInterface() {
@@ -216,13 +233,25 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             // See https://developer.android.com/reference/android/net/VpnService.Builder#allowFamily(int) for more info as to why
             allowFamily(AF_INET6)
 
+            val dnsList = getDns()
+
             // TODO: eventually routes will be set by remote config
             if (appBuildConfig.isPerformanceTest && appBuildConfig.isInternalBuild()) {
                 // Currently allowing host PC address 10.0.2.2 when running performance test on an emulator (normally we don't route local traffic)
                 // The address is also isolated to minimize network interference during performance tests
                 VpnRoutes.includedTestRoutes.forEach { addRoute(it.address, it.maskWidth) }
             } else {
-                VpnRoutes.includedRoutes.forEach { addRoute(it.address, it.maskWidth) }
+                val vpnRoutes = VpnRoutes.includedRoutes.toMutableSet()
+                if (isInterceptDnsTrafficEnabled) {
+                    // we need to make sure that all DNS traffic goes through the VPN. Specifically when the DNS server is on the local network
+                    dnsList.filterIsInstance<Inet4Address>().forEach { addr ->
+                        addr.asRoute()?.let {
+                            Timber.d("Adding DNS address $it to VPN routes")
+                            vpnRoutes.add(it)
+                        }
+                    }
+                }
+                vpnRoutes.forEach { addRoute(it.address, it.maskWidth) }
             }
 
             // Add the route for all Global Unicast Addresses. This is the IPv6 equivalent to
@@ -236,8 +265,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             configureMeteredConnection()
 
             // Set DNS
-            getDns().forEach { addr ->
-                if (appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support) || addr is Inet4Address) {
+            dnsList.forEach { addr ->
+                if (isIpv6SupportEnabled || addr is Inet4Address) {
                     Timber.v("Adding DNS $addr")
                     runCatching {
                         addDnsServer(addr)
@@ -261,7 +290,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 Timber.w("Limiting VPN to test apps only:\n${INCLUDED_APPS_FOR_TESTING.joinToString(separator = "\n") { it }}")
             } else {
                 safelyAddDisallowedApps(
-                    deviceShieldExcludedApps.getExclusionAppsList(),
+                    deviceShieldExcludedApps.getExclusionAppsList()
                 )
             }
 
@@ -289,7 +318,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         val dns = mutableSetOf<InetAddress>()
 
         // System DNS
-        if (appTpFeatureConfig.isEnabled(AppTpSetting.SetActiveNetworkDns)) {
+        if (isInterceptDnsTrafficEnabled) {
             kotlin.runCatching {
                 applicationContext.getSystemActiveNetworkDefaultDns()
                     .map { InetAddress.getByName(it) }
@@ -303,20 +332,20 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
 
         // Android Private DNS (added by the user)
-        if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport) && vpnPreferences.isPrivateDnsEnabled) {
+        if (isPrivateDnsSupportEnabled && vpnPreferences.isPrivateDnsEnabled) {
             runCatching {
                 InetAddress.getAllByName(applicationContext.getPrivateDnsServerName())
             }.getOrNull()?.run { dns.addAll(this) }
         }
 
         // This is purely internal, never to go to production
-        if (appBuildConfig.isInternalBuild() && appTpFeatureConfig.isEnabled(AppTpSetting.AlwaysSetDNS)) {
+        if (appBuildConfig.isInternalBuild() && isAlwaysSetDNSEnabled) {
             if (dns.isEmpty()) {
                 kotlin.runCatching {
                     Timber.d("Adding cloudflare DNS")
                     dns.add(InetAddress.getByName("1.1.1.1"))
                     dns.add(InetAddress.getByName("1.0.0.1"))
-                    if (appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support)) {
+                    if (isIpv6SupportEnabled) {
                         dns.add(InetAddress.getByName("2606:4700:4700::1111"))
                         dns.add(InetAddress.getByName("2606:4700:4700::1001"))
                     }
@@ -444,7 +473,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         startForeground(
             VPN_FOREGROUND_SERVICE_ID,
             DeviceShieldEnabledNotificationBuilder
-                .buildDeviceShieldEnabledNotification(applicationContext, deviceShieldNotification, ongoingNotificationPressedHandler),
+                .buildDeviceShieldEnabledNotification(applicationContext, deviceShieldNotification, ongoingNotificationPressedHandler)
         )
     }
 
@@ -536,7 +565,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         internal suspend fun restartVpnService(
             context: Context,
-            forceGc: Boolean = false,
+            forceGc: Boolean = false
         ) = withContext(Dispatchers.Default) {
             val applicationContext = context.applicationContext
             if (isServiceRunning(applicationContext)) {
@@ -579,6 +608,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         "eu.vspeed.android",
         "net.fireprobe.android",
         "com.philips.lighting.hue2",
-        "com.duckduckgo.mobile.android.debug",
+        "com.duckduckgo.mobile.android.debug"
     )
 }

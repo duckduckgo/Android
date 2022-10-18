@@ -22,11 +22,12 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
+import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
-import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.recursiveEnable
@@ -36,7 +37,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 class OneLineListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.oneLineListItemStyle,
+    defStyleAttr: Int = R.attr.oneLineListItemStyle
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewOneLineListItemBinding by viewBinding()
@@ -46,17 +47,13 @@ class OneLineListItem @JvmOverloads constructor(
             attrs,
             R.styleable.OneLineListItem,
             0,
-            R.style.Widget_DuckDuckGo_OneLineListItem,
+            R.style.Widget_DuckDuckGo_OneLineListItem
         ).apply {
 
             binding.primaryText.text = getString(R.styleable.OneLineListItem_primaryText)
-            if (hasValue(R.styleable.OneLineListItem_listItemTitleColor)) {
-                binding.primaryText.setTextColor(
-                    getColor(
-                        R.styleable.OneLineListItem_listItemTitleColor,
-                        context.getColorFromAttr(R.attr.listItemTitleColor),
-                    ),
-                )
+
+            if (hasValue(R.styleable.OneLineListItem_primaryTextColorOverlay)) {
+                binding.primaryText.setTextColor(getColorStateList(R.styleable.OneLineListItem_primaryTextColorOverlay))
             }
 
             if (hasValue(R.styleable.OneLineListItem_leadingIcon)) {
@@ -95,11 +92,16 @@ class OneLineListItem @JvmOverloads constructor(
         binding.primaryText.text = title
     }
 
+    /** Sets title text color */
+    fun setPrimaryTextColor(@ColorRes colorRes: Int) {
+        binding.primaryText.setTextColor(ContextCompat.getColorStateList(context, colorRes))
+    }
+
     /** Sets the leading icon image resource */
     fun setLeadingIcon(idRes: Int) {
         val drawable = VectorDrawableCompat.create(resources, idRes, null)
         binding.leadingIcon.setImageDrawable(drawable)
-        binding.leadingIcon.show()
+        binding.leadingIconBackground.show()
     }
 
     /** Sets the item image resource */
@@ -186,7 +188,7 @@ class OneLineListItem @JvmOverloads constructor(
     /** Allows to set a new value to the switch, without triggering the onChangeListener */
     fun quietlySetIsChecked(
         newCheckedState: Boolean,
-        changeListener: CompoundButton.OnCheckedChangeListener?,
+        changeListener: CompoundButton.OnCheckedChangeListener?
     ) {
         binding.trailingSwitch.quietlySetIsChecked(newCheckedState, changeListener)
     }
