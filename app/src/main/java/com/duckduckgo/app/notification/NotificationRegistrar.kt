@@ -47,7 +47,7 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class NotificationRegistrar @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -58,7 +58,7 @@ class NotificationRegistrar @Inject constructor(
     private val pixel: Pixel,
     private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>,
     private val notificationPluginPoint: PluginPoint<NotificationPlugin>,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : DefaultLifecycleObserver {
 
     object NotificationId {
@@ -73,12 +73,12 @@ class NotificationRegistrar @Inject constructor(
         val TUTORIALS = Channel(
             "com.duckduckgo.tutorials",
             R.string.notificationChannelTutorials,
-            NotificationManagerCompat.IMPORTANCE_DEFAULT
+            NotificationManagerCompat.IMPORTANCE_DEFAULT,
         )
         val APP_TP_WAITLIST = Channel(
             "com.duckduckgo.apptp",
             VpnR.string.atp_WaitlistActivityWaitlistTitle,
-            NotificationManagerCompat.IMPORTANCE_HIGH
+            NotificationManagerCompat.IMPORTANCE_HIGH,
         )
         // Do not add new channels here, instead follow https://app.asana.com/0/1125189844152671/1201842645469204
     }
@@ -100,7 +100,7 @@ class NotificationRegistrar @Inject constructor(
 
     private val channels = listOf(
         ChannelType.TUTORIALS,
-        ChannelType.APP_TP_WAITLIST
+        ChannelType.APP_TP_WAITLIST,
     )
 
     private fun registerApp() {

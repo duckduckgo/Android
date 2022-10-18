@@ -38,7 +38,7 @@ import timber.log.Timber
 @ContributesWorker(AppScope::class)
 class AppTrackerExclusionListUpdateWorker(
     context: Context,
-    workerParameters: WorkerParameters
+    workerParameters: WorkerParameters,
 ) : CoroutineWorker(context, workerParameters) {
     @Inject
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
@@ -81,7 +81,7 @@ class AppTrackerExclusionListUpdateWorker(
                 Timber.d("Updating the app tracker system app overrides, eTag: ${sysAppsOverrides.etag.value}")
                 vpnDatabase.vpnSystemAppsOverridesDao().upsertSystemAppOverrides(
                     sysAppsOverrides.overridePackages,
-                    AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag)
+                    AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag),
                 )
 
                 vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
@@ -127,10 +127,10 @@ class AppTrackerExclusionListUpdateWorker(
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class AppTrackerExclusionListUpdateWorkerScheduler @Inject constructor(
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {

@@ -101,12 +101,12 @@ class TrackerNetworksAdapterTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
 
         val section = TrackerNetworksSection(descriptionRes, 2, null, TrackerStatus.ALLOWED)
         val entitiesMap = mapOf(
-            TestEntity("A", "A", 0.0) as Entity to listOf(trackingEvent)
+            TestEntity("A", "A", 0.0) as Entity to listOf(trackingEvent),
         ).toSortedMap(compareBy { it.displayName })
 
         return mapOf(section to entitiesMap).toSortedMap(compareBy { it.trackerStatus })
@@ -120,16 +120,16 @@ class TrackerNetworksAdapterTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
 
         val firstSection = TrackerNetworksSection(R.string.domainsLoadedSectionDescription, 2, null, TrackerStatus.ALLOWED)
         val secondSection = TrackerNetworksSection(R.string.domainsLoadedBreakageSectionDescription, 2, null, TrackerStatus.SITE_BREAKAGE_ALLOWED)
         val firstEntitiesMap = mapOf(
-            TestEntity("A", "A", 0.0) as Entity to listOf(trackingEvent)
+            TestEntity("A", "A", 0.0) as Entity to listOf(trackingEvent),
         ).toSortedMap(compareBy { it.displayName })
         val secondEntitiesMap = mapOf(
-            TestEntity("B", "B", 0.0) as Entity to listOf(trackingEvent)
+            TestEntity("B", "B", 0.0) as Entity to listOf(trackingEvent),
         ).toSortedMap(compareBy { it.displayName })
 
         return mapOf(firstSection to firstEntitiesMap, secondSection to secondEntitiesMap).toSortedMap(compareBy { it.trackerStatus })
@@ -143,7 +143,7 @@ class TrackerNetworksAdapterTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val minorNetworkList = listOf(trackingEvent, trackingEvent)
         val majorNetworkList = listOf(trackingEvent, trackingEvent)
@@ -151,7 +151,7 @@ class TrackerNetworksAdapterTest {
         val section = TrackerNetworksSection(1, 2, null, TrackerStatus.ALLOWED)
         val entitiesMap = mapOf(
             TestEntity("A", "A", 0.0) as Entity to minorNetworkList,
-            TestEntity("B", "B", 0.0) as Entity to majorNetworkList
+            TestEntity("B", "B", 0.0) as Entity to majorNetworkList,
         ).toSortedMap(compareBy { it.displayName })
 
         return mapOf(section to entitiesMap).toSortedMap(compareBy { it.trackerStatus })

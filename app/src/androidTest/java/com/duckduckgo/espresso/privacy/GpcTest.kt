@@ -50,8 +50,8 @@ class GpcTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            queryExtra = "https://privacy-test-pages.glitch.me/privacy-protections/gpc/"
-        )
+            queryExtra = "https://privacy-test-pages.glitch.me/privacy-protections/gpc/",
+        ),
     )
 
     @Test @PrivacyTest

@@ -38,7 +38,7 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class VpnServiceStateLogger @Inject constructor(private val vpnDatabase: VpnDatabase) : VpnServiceCallbacks {
@@ -54,7 +54,7 @@ class VpnServiceStateLogger @Inject constructor(private val vpnDatabase: VpnData
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         coroutineScope.launch(dispatcher) {
             Timber.d("VpnServiceStateLogger, new state DISABLED, reason $vpnStopReason")

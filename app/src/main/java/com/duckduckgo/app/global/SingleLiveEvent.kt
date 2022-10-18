@@ -41,7 +41,7 @@ class SingleLiveEvent<T> : MutableLiveData<T>() {
     @MainThread
     override fun observe(
         owner: LifecycleOwner,
-        observer: Observer<in T>
+        observer: Observer<in T>,
     ) {
         if (hasActiveObservers()) {
             Timber.w("Multiple observers registered but only one will be notified of changes.")

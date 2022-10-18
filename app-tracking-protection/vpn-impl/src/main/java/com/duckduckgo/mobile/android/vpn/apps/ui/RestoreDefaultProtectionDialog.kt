@@ -61,7 +61,7 @@ class RestoreDefaultProtectionDialog : DialogFragment() {
 
     private fun configureListeners(
         restoreCTA: Button,
-        cancelCTA: Button
+        cancelCTA: Button,
     ) {
         restoreCTA.setOnClickListener {
             dismiss()

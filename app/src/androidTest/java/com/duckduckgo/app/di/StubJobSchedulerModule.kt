@@ -28,7 +28,7 @@ import dagger.SingleInstanceIn
 @Module
 @ContributesTo(
     scope = AppScope::class,
-    replaces = [JobsModule::class]
+    replaces = [JobsModule::class],
 )
 class StubJobSchedulerModule {
 
@@ -38,7 +38,7 @@ class StubJobSchedulerModule {
         return object : JobScheduler() {
             override fun enqueue(
                 job: JobInfo,
-                work: JobWorkItem
+                work: JobWorkItem,
             ): Int = RESULT_SUCCESS
 
             override fun schedule(job: JobInfo): Int = RESULT_SUCCESS

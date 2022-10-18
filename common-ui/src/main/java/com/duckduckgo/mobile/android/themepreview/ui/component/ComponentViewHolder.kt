@@ -53,19 +53,19 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         ComponentViewHolder(inflate(parent, R.layout.component_checkbox))
 
     class InfoPanelComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel))
 
     class SearchBarComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_search_bar))
 
     class MenuItemComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_menu_item))
 
     class OneLineListItemComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_one_line_item)) {
         override fun bind(component: Component) {
             view.findViewById<OneLineListItem>(R.id.oneLineListItem).apply {
@@ -103,7 +103,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     }
 
     class TwoLineItemComponentViewHolder(
-        parent: ViewGroup
+        parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_two_line_item)) {
         override fun bind(component: Component) {
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithoutImage).apply {
@@ -185,7 +185,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             is Action.PerformEndAction -> Toast.makeText(
                 parent.context,
                 "End icon clicked!",
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_SHORT,
             ).show()
         }
     }
@@ -193,7 +193,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     companion object {
         fun create(
             parent: ViewGroup,
-            viewType: Int
+            viewType: Int,
         ): ComponentViewHolder {
             return when (Component.values()[viewType]) {
                 Component.BUTTON -> ButtonComponentViewHolder(parent)
@@ -217,7 +217,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
         private fun inflate(
             parent: ViewGroup,
-            layout: Int
+            layout: Int,
         ): View {
             return LayoutInflater.from(parent.context).inflate(layout, parent, false)
         }

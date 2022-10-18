@@ -61,7 +61,7 @@ class WebViewHttpAuthStoreTest {
             databaseLocator,
             coroutineRule.testDispatcherProvider,
             TestScope(),
-            appBuildConfig
+            appBuildConfig,
         )
 
     @Before
@@ -79,7 +79,7 @@ class WebViewHttpAuthStoreTest {
                 host = "host",
                 realm = "realm",
                 username = "name",
-                password = "pass"
+                password = "pass",
             )
         }
         val times = (android.os.Build.VERSION_CODES.O..android.os.Build.VERSION_CODES.S).toList().size
@@ -108,7 +108,7 @@ class WebViewHttpAuthStoreTest {
                 host = "host",
                 realm = "realm",
                 username = "name",
-                password = "pass"
+                password = "pass",
             )
         }
         val times = (android.os.Build.VERSION_CODES.M..android.os.Build.VERSION_CODES.N_MR1).toList().size

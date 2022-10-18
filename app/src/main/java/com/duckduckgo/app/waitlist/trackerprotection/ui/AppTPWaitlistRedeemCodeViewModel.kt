@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 @ContributesViewModel(ActivityScope::class)
 class AppTPWaitlistRedeemCodeViewModel @Inject constructor(
     private val waitlistManager: AppTPWaitlistManager,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     private val viewStateFlow: MutableStateFlow<ViewState> =

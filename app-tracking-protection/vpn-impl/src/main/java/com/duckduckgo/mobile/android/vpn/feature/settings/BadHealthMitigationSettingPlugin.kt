@@ -28,11 +28,11 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = AppTpSettingPlugin::class
+    boundType = AppTpSettingPlugin::class,
 )
 class BadHealthMitigationSettingPlugin @Inject constructor(
     private val appTpFeatureConfig: AppTpFeatureConfig,
-    private val healthTriggersRepository: AppHealthTriggersRepository
+    private val healthTriggersRepository: AppHealthTriggersRepository,
 ) : AppTpSettingPlugin {
     private val jsonAdapter = Moshi.Builder().add(JSONObjectAdapter()).build().adapter(JsonConfigModel::class.java)
 
@@ -68,16 +68,16 @@ class BadHealthMitigationSettingPlugin @Inject constructor(
 
     private data class JsonConfigModel(
         val state: String,
-        val settings: BadHealthMitigationFeatureSettings?
+        val settings: BadHealthMitigationFeatureSettings?,
     )
 
     private data class BadHealthMitigationFeatureSettings(
-        val triggers: Map<String, JSONObject?>?
+        val triggers: Map<String, JSONObject?>?,
     )
 
     private data class JsonHealthTrigger(
         val state: String,
-        val threshold: Int?
+        val threshold: Int?,
     ) {
         fun toHealthTrigger(name: String): HealthTrigger {
             return HealthTrigger(name, state, threshold)
@@ -87,7 +87,7 @@ class BadHealthMitigationSettingPlugin @Inject constructor(
     private data class HealthTrigger(
         val name: String,
         val state: String,
-        val threshold: Int?
+        val threshold: Int?,
     ) {
         fun toEntity(): HealthTriggerEntity {
             return HealthTriggerEntity(name, state.lowercase() == "enabled", threshold)

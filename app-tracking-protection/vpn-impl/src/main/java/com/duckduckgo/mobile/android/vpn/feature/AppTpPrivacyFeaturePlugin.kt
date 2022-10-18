@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class AppTpPrivacyFeaturePlugin @Inject constructor(
-    plugins: DaggerSet<AppTpSettingPlugin>
+    plugins: DaggerSet<AppTpSettingPlugin>,
 ) : PrivacyFeaturePlugin {
 
     private val settings = plugins.sortedBy { it.settingName.value }
@@ -60,7 +60,7 @@ class AppTpPrivacyFeaturePlugin @Inject constructor(
 interface AppTpSettingPlugin {
     fun store(
         name: SettingName,
-        jsonString: String
+        jsonString: String,
     ): Boolean
 
     val settingName: SettingName

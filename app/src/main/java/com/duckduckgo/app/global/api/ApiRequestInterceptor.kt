@@ -26,7 +26,7 @@ import okhttp3.Response
 class ApiRequestInterceptor(
     context: Context,
     private val userAgentProvider: UserAgentProvider,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : Interceptor {
 
     private val userAgent: String by lazy {

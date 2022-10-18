@@ -176,7 +176,7 @@ class WebViewLongPressHandlerTest {
             anyInt(),
             eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB),
             anyInt(),
-            eq(R.string.openInNewBackgroundTab)
+            eq(R.string.openInNewBackgroundTab),
         )
     }
 

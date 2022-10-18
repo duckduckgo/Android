@@ -31,7 +31,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         fun onAppProtectionDisabled(
             appName: String,
             packageName: String,
-            report: Boolean = false
+            report: Boolean = false,
         )
     }
 
@@ -83,7 +83,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
     private fun configureListeners(
         reportCTA: Button,
-        skipCTA: Button
+        skipCTA: Button,
     ) {
         reportCTA.setOnClickListener {
             dismiss()

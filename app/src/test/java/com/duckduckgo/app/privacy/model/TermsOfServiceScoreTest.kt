@@ -43,7 +43,7 @@ class TermsOfServiceScoreTest(private val testCase: TermsOfServiceScoreTestCase)
                 TermsOfServiceScoreTestCase(7, TermsOfService(classification = "C", score = 0)),
                 TermsOfServiceScoreTestCase(7, TermsOfService(classification = null, score = 101)),
                 TermsOfServiceScoreTestCase(10, TermsOfService(classification = "D", score = 0)),
-                TermsOfServiceScoreTestCase(10, TermsOfService(classification = null, score = 151))
+                TermsOfServiceScoreTestCase(10, TermsOfService(classification = null, score = 151)),
 
             )
         }
@@ -52,5 +52,5 @@ class TermsOfServiceScoreTest(private val testCase: TermsOfServiceScoreTestCase)
 
 data class TermsOfServiceScoreTestCase(
     val expectedScore: Int,
-    val terms: TermsOfService
+    val terms: TermsOfService,
 )

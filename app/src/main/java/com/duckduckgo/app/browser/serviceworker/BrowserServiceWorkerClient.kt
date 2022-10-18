@@ -33,7 +33,7 @@ import timber.log.Timber
 @SingleInstanceIn(AppScope::class)
 class BrowserServiceWorkerClient @Inject constructor(
     private val requestInterceptor: RequestInterceptor,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
 ) : ServiceWorkerClientCompat() {
 
     override fun shouldInterceptRequest(request: WebResourceRequest): WebResourceResponse? {

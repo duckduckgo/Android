@@ -60,7 +60,7 @@ class RealAppTPWaitlistWorkRequestBuilder @Inject constructor() : AppTPWaitlistW
 @ContributesWorker(AppScope::class)
 class AppTPWaitlistWorker(
     private val context: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(context, workerParams) {
 
     @Inject

@@ -79,7 +79,7 @@ class BookmarksViewModelTest {
             faviconManager,
             savedSitesManager,
             pixel,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
@@ -94,9 +94,9 @@ class BookmarksViewModelTest {
             flowOf(
                 Pair(
                     listOf(bookmark),
-                    listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder)
-                )
-            )
+                    listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder),
+                ),
+            ),
         )
     }
 
@@ -188,7 +188,7 @@ class BookmarksViewModelTest {
             flow {
                 emit(emptyList())
                 emit(listOf(favorite))
-            }
+            },
         )
         testee
         verify(viewStateObserver).onChanged(viewStateCaptor.capture())
@@ -249,7 +249,7 @@ class BookmarksViewModelTest {
     fun whenDeleteEmptyBookmarkFolderRequestedThenDeleteFolderAndIssueConfirmDeleteBookmarkFolderCommand() = runTest {
         val bookmarkFolderBranch = BookmarkFolderBranch(
             listOf(bookmarkEntity),
-            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))
+            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId)),
         )
         whenever(bookmarksRepository.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
 
@@ -266,7 +266,7 @@ class BookmarksViewModelTest {
     fun whenDeleteNonEmptyBookmarkFolderRequestedThenIssueDeleteBookmarkFolderCommand() = runTest {
         val bookmarkFolderBranch = BookmarkFolderBranch(
             listOf(bookmarkEntity),
-            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))
+            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId)),
         )
         whenever(bookmarksRepository.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
 
@@ -281,7 +281,7 @@ class BookmarksViewModelTest {
     fun whenInsertRecentlyDeletedBookmarksAndFoldersThenInsertCachedFolderBranch() = runTest {
         val bookmarkFolderBranch = BookmarkFolderBranch(
             listOf(bookmarkEntity),
-            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))
+            listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId)),
         )
 
         testee.insertDeletedFolderBranch(bookmarkFolderBranch)

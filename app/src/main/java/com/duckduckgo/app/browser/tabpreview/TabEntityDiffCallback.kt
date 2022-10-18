@@ -24,14 +24,14 @@ class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
 
     override fun areItemsTheSame(
         oldItem: TabEntity,
-        newItem: TabEntity
+        newItem: TabEntity,
     ): Boolean {
         return oldItem.tabId == newItem.tabId
     }
 
     override fun areContentsTheSame(
         oldItem: TabEntity,
-        newItem: TabEntity
+        newItem: TabEntity,
     ): Boolean {
         return oldItem.tabPreviewFile == newItem.tabPreviewFile &&
             oldItem.viewed == newItem.viewed &&
@@ -40,7 +40,7 @@ class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
 
     override fun getChangePayload(
         oldItem: TabEntity,
-        newItem: TabEntity
+        newItem: TabEntity,
     ): Bundle {
         val diffBundle = Bundle()
 

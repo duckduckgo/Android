@@ -31,7 +31,7 @@ import timber.log.Timber
 @ContributesViewModel(ActivityScope::class)
 class LaunchViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
-    private val appReferrerStateListener: AppInstallationReferrerStateListener
+    private val appReferrerStateListener: AppInstallationReferrerStateListener,
 ) :
     ViewModel() {
 

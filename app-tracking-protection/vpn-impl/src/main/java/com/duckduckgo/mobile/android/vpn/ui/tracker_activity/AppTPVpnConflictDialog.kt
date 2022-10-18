@@ -47,7 +47,7 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
 
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
-            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog
+            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog,
         )
             .setView(rootView)
 
@@ -62,7 +62,7 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
         titleView: TextView,
         messageView: TextView,
         startCta: Button,
-        endCta: Button
+        endCta: Button,
     ) {
         arguments?.let { args ->
             val isAlwaysOn = args.getBoolean(KEY_ALWAYS_ON_CONFLICT)
@@ -78,7 +78,7 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
         titleView: TextView,
         messageView: TextView,
         startCta: Button,
-        endCta: Button
+        endCta: Button,
     ) {
         configureVpnConflictText(titleView, messageView)
         configureVpnConflictListeners(startCta, endCta)
@@ -86,7 +86,7 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
 
     private fun configureVpnConflictText(
         titleView: TextView,
-        messageView: TextView
+        messageView: TextView,
     ) {
         titleView.setText(getText(R.string.atp_VpnConflictDialogTitle))
         messageView.setText(getText(R.string.atp_VpnConflictDialogMessage))
@@ -94,7 +94,7 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
 
     private fun configureVpnConflictListeners(
         startCta: Button,
-        endCta: Button
+        endCta: Button,
     ) {
         endCta.setText(R.string.atp_VpnConflictDialogGotIt)
         endCta.setOnClickListener {
@@ -111,7 +111,7 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
         titleView: TextView,
         messageView: TextView,
         startCta: Button,
-        endCta: Button
+        endCta: Button,
     ) {
         configureAlwaysOnText(titleView, messageView)
         configureAlwaysOnListeners(startCta, endCta)
@@ -119,7 +119,7 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
 
     private fun configureAlwaysOnText(
         titleView: TextView,
-        messageView: TextView
+        messageView: TextView,
     ) {
         titleView.setText(getText(R.string.atp_VpnConflictAlwaysOnDialogTitle))
         messageView.setText(getText(R.string.atp_VpnConflictDialogAlwaysOnMessage))
@@ -127,7 +127,7 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
 
     private fun configureAlwaysOnListeners(
         startCta: Button,
-        endCta: Button
+        endCta: Button,
     ) {
         endCta.setText(R.string.atp_VpnConflictDialogOpenSettings)
         endCta.setOnClickListener {

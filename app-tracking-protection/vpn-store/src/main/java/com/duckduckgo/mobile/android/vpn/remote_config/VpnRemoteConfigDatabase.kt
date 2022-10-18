@@ -26,8 +26,8 @@ import androidx.room.TypeConverters
     exportSchema = true,
     version = 1,
     entities = [
-        VpnConfigToggle::class
-    ]
+        VpnConfigToggle::class,
+    ],
 )
 @TypeConverters()
 abstract class VpnRemoteConfigDatabase : RoomDatabase() {

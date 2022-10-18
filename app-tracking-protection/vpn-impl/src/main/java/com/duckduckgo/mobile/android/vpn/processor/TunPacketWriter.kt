@@ -33,7 +33,7 @@ import xyz.hexene.localvpn.ByteBufferPool
 class TunPacketWriter @AssistedInject constructor(
     @Assisted private val tunInterface: ParcelFileDescriptor,
     private val queues: VpnQueues,
-    private val healthMetricCounter: HealthMetricCounter
+    private val healthMetricCounter: HealthMetricCounter,
 ) : Runnable {
 
     private var running = false

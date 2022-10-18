@@ -52,7 +52,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
     private val vpnFeatureRemover: VpnFeatureRemover,
     private val dispatchers: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
@@ -64,7 +64,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         when (vpnStopReason) {
             VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
@@ -109,7 +109,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
         workManager.enqueueUniquePeriodicWork(
             VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG,
             ExistingPeriodicWorkPolicy.KEEP,
-            request
+            request,
         )
     }
 
@@ -151,7 +151,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
         context.packageManager.setComponentEnabledSetting(
             receiver,
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-            PackageManager.DONT_KILL_APP
+            PackageManager.DONT_KILL_APP,
         )
     }
 }

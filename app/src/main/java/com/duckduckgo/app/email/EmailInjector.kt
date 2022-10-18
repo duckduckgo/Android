@@ -30,18 +30,18 @@ interface EmailInjector {
 
     fun addJsInterface(
         webView: WebView,
-        onTooltipShown: () -> Unit
+        onTooltipShown: () -> Unit,
     )
 
     fun injectAddressInEmailField(
         webView: WebView,
         alias: String?,
-        url: String?
+        url: String?,
     )
 
     fun notifyWebAppSignEvent(
         webView: WebView,
-        url: String?
+        url: String?,
     )
 }
 
@@ -51,17 +51,17 @@ class EmailInjectorJs(
     private val dispatcherProvider: DispatcherProvider,
     private val featureToggle: FeatureToggle,
     private val javaScriptInjector: JavascriptInjector,
-    private val autofill: Autofill
+    private val autofill: Autofill,
 ) : EmailInjector {
 
     override fun addJsInterface(
         webView: WebView,
-        onTooltipShown: () -> Unit
+        onTooltipShown: () -> Unit,
     ) {
         // We always add the interface irrespectively if the feature is enabled or not
         webView.addJavascriptInterface(
             EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, featureToggle, autofill, onTooltipShown),
-            JAVASCRIPT_INTERFACE_NAME
+            JAVASCRIPT_INTERFACE_NAME,
         )
     }
 
@@ -69,7 +69,7 @@ class EmailInjectorJs(
     override fun injectAddressInEmailField(
         webView: WebView,
         alias: String?,
-        url: String?
+        url: String?,
     ) {
         url?.let {
             if (isFeatureEnabled() && !autofill.isAnException(url)) {
@@ -81,7 +81,7 @@ class EmailInjectorJs(
     @UiThread
     override fun notifyWebAppSignEvent(
         webView: WebView,
-        url: String?
+        url: String?,
     ) {
         url?.let {
             if (isFeatureEnabled() && isDuckDuckGoUrl(url) && !emailManager.isSignedIn()) {

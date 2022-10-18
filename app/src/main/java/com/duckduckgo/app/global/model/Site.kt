@@ -65,7 +65,7 @@ interface Site {
 
     data class SiteGrades(
         val grade: PrivacyGrade,
-        val improvedGrade: PrivacyGrade
+        val improvedGrade: PrivacyGrade,
     )
 
     var urlParametersRemoved: Boolean

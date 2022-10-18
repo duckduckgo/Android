@@ -48,7 +48,7 @@ object VpnModule {
     @Named("DetectOriginatingAppPackageModern")
     fun providesOriginatingAppResolverModern(
         connectivityManager: ConnectivityManager,
-        packageManager: PackageManager
+        packageManager: PackageManager,
     ): OriginatingAppPackageIdentifier {
         return DetectOriginatingAppPackageModern(connectivityManager, packageManager)
     }
@@ -59,7 +59,7 @@ object VpnModule {
     fun providesOriginatingAppResolverLegacy(
         packageManager: PackageManager,
         networkFileConnectionMatcher: NetworkFileConnectionMatcher,
-        @VpnCoroutineScope vpnCoroutineScope: CoroutineScope
+        @VpnCoroutineScope vpnCoroutineScope: CoroutineScope,
     ): OriginatingAppPackageIdentifier {
         return DetectOriginatingAppPackageLegacy(packageManager, networkFileConnectionMatcher, vpnCoroutineScope)
     }
@@ -92,7 +92,7 @@ object VpnModule {
     @Provides
     fun provideAndroidHostnameExtractor(
         hostnameHeaderExtractor: HostnameHeaderExtractor,
-        encryptedRequestHostExtractor: EncryptedRequestHostExtractor
+        encryptedRequestHostExtractor: EncryptedRequestHostExtractor,
     ): HostnameExtractor {
         return AndroidHostnameExtractor(hostnameHeaderExtractor, encryptedRequestHostExtractor)
     }
@@ -101,7 +101,7 @@ object VpnModule {
     @Provides
     fun providesPacketPersister(
         vpnDatabase: VpnDatabase,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): PacketPersister {
         return if (appBuildConfig.isDebug) {
             RoomPacketPersister(vpnDatabase)
@@ -119,7 +119,7 @@ object VpnModule {
         payloadBytesExtractor: PayloadBytesExtractor,
         vpnDatabase: VpnDatabase,
         tlsContentTypeExtractor: ContentTypeExtractor,
-        requestInterceptors: PluginPoint<VpnTrackerDetectorInterceptor>
+        requestInterceptors: PluginPoint<VpnTrackerDetectorInterceptor>,
     ): VpnTrackerDetector {
         return DomainBasedTrackerDetector(
             hostnameExtractor,
@@ -128,7 +128,7 @@ object VpnModule {
             payloadBytesExtractor,
             tlsContentTypeExtractor,
             vpnDatabase,
-            requestInterceptors
+            requestInterceptors,
         )
     }
 

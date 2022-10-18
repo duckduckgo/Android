@@ -21,12 +21,12 @@ import xyz.hexene.localvpn.Packet
 
 data class QueuedBuffer(
     val buffer: ByteBuffer,
-    val createdTime: Long = System.nanoTime()
+    val createdTime: Long = System.nanoTime(),
 )
 
 data class QueuedPacket(
     val packet: Packet,
-    val createdTime: Long = System.nanoTime()
+    val createdTime: Long = System.nanoTime(),
 )
 
 fun QueuedBuffer.lagTimeNanoseconds(): Long = System.nanoTime() - createdTime

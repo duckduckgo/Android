@@ -43,7 +43,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     private val packageManager: PackageManager,
     private val appInstallationReferrerParser: AppInstallationReferrerParser,
     private val appReferrerDataStore: AppReferrerDataStore,
-    private val variantManager: VariantManager
+    private val variantManager: VariantManager,
 ) : InstallReferrerStateListener, AppInstallationReferrerStateListener, AtbInitializerListener {
 
     private val referralClient = InstallReferrerClient.newBuilder(context).build()

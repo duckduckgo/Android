@@ -31,7 +31,7 @@ interface VpnBugReporter {
 @ContributesBinding(VpnScope::class)
 class RealVpnBugReporter @Inject constructor(
     private val vpnStateCollector: VpnStateCollector,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnBugReporter {
     override suspend fun generateBugReport(): String {
         return withContext(dispatcherProvider.io()) {

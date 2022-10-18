@@ -52,14 +52,14 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         return inflater.inflate(R.layout.view_device_shield_activity_feed, container, false)
     }
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
             val stickyHeadersLayoutManager =
@@ -72,9 +72,9 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
             activityFeedViewModel.getMostRecentTrackers(
                 TimeWindow(
                     config.timeWindow.toLong(),
-                    config.timeWindowUnits
+                    config.timeWindowUnits,
                 ),
-                config.showTimeWindowHeadings
+                config.showTimeWindowHeadings,
             )
                 .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
                 .collect {
@@ -85,8 +85,8 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
                                 requireContext(),
                                 trackerFeedData.trackingApp.packageId,
                                 trackerFeedData.trackingApp.appDisplayName,
-                                trackerFeedData.bucket
-                            )
+                                trackerFeedData.bucket,
+                            ),
                         )
                     }
                 }
@@ -113,7 +113,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
             maxRows = Int.MAX_VALUE,
             timeWindow = 5,
             timeWindowUnits = TimeUnit.DAYS,
-            showTimeWindowHeadings = true
+            showTimeWindowHeadings = true,
         )
 
         fun newInstance(config: ActivityFeedConfig): DeviceShieldActivityFeedFragment {
@@ -127,7 +127,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
         val maxRows: Int,
         val timeWindow: Int,
         val timeWindowUnits: TimeUnit,
-        val showTimeWindowHeadings: Boolean
+        val showTimeWindowHeadings: Boolean,
     ) {
         fun unboundedRows(): Boolean = maxRows == Int.MAX_VALUE
     }

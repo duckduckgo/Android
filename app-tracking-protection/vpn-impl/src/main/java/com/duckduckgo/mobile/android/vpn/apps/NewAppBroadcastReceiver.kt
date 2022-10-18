@@ -41,20 +41,20 @@ import timber.log.Timber
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 class NewAppBroadcastReceiver @Inject constructor(
     private val applicationContext: Context,
     private val appCategoryDetector: AppCategoryDetector,
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
 
     @MainThread
     override fun onReceive(
         context: Context,
-        intent: Intent
+        intent: Intent,
     ) {
         when (intent.action) {
             Intent.ACTION_PACKAGE_ADDED -> intent.data?.schemeSpecificPart?.let { restartVpn(it) }
@@ -106,7 +106,7 @@ class NewAppBroadcastReceiver @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         Timber.v("New app receiver stopped")
         unregister()

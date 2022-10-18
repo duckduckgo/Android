@@ -23,7 +23,7 @@ data class TermsOfService(
     val score: Int = 0,
     val classification: String? = null,
     val goodPrivacyTerms: List<String> = ArrayList(),
-    val badPrivacyTerms: List<String> = ArrayList()
+    val badPrivacyTerms: List<String> = ArrayList(),
 ) {
 
     val practices: PrivacyPractices.Summary

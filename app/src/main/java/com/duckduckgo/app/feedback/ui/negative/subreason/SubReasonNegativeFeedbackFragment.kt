@@ -41,22 +41,22 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feed
     interface DisambiguationNegativeFeedbackListener {
         fun userSelectedSubReasonMissingBrowserFeatures(
             mainReason: MainReason,
-            subReason: MissingBrowserFeaturesSubReasons
+            subReason: MissingBrowserFeaturesSubReasons,
         )
 
         fun userSelectedSubReasonSearchNotGoodEnough(
             mainReason: MainReason,
-            subReason: SearchNotGoodEnoughSubReasons
+            subReason: SearchNotGoodEnoughSubReasons,
         )
 
         fun userSelectedSubReasonNeedMoreCustomization(
             mainReason: MainReason,
-            subReason: CustomizationSubReasons
+            subReason: CustomizationSubReasons,
         )
 
         fun userSelectedSubReasonAppIsSlowOrBuggy(
             mainReason: MainReason,
-            subReason: PerformanceSubReasons
+            subReason: PerformanceSubReasons,
         )
     }
 
@@ -87,7 +87,7 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feed
                     }
                 }
             }
-        })
+        },)
 
         activity?.let {
             binding.recyclerView.layoutManager = LinearLayoutManager(it)

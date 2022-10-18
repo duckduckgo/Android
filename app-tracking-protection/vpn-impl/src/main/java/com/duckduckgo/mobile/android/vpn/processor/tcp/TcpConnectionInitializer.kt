@@ -41,7 +41,7 @@ interface ConnectionInitializer {
         val destinationPort: Int,
         val sourcePort: Int,
         val packet: Packet,
-        val responseBuffer: ByteBuffer
+        val responseBuffer: ByteBuffer,
     ) {
 
         fun key(): String {
@@ -71,7 +71,7 @@ interface ConnectionInitializer {
 @ContributesBinding(VpnScope::class)
 class TcpConnectionInitializer @Inject constructor(
     private val queues: VpnQueues,
-    networkChannelCreatorProvider: Provider<NetworkChannelCreator>
+    networkChannelCreatorProvider: Provider<NetworkChannelCreator>,
 ) : ConnectionInitializer {
 
     private val networkChannelCreator by lazy { networkChannelCreatorProvider.get() }
@@ -100,7 +100,7 @@ class TcpConnectionInitializer @Inject constructor(
                 TCPHeader.RST.toByte(),
                 0,
                 params.packet.tcpHeader.sequenceNumber + 1,
-                params.packet.tcpPayloadSize(true)
+                params.packet.tcpPayloadSize(true),
             )
             queues.networkToDevice.offer(params.responseBuffer)
             null

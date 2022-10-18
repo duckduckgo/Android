@@ -51,7 +51,7 @@ class UserAgentProvider constructor(
     private val userAgent: UserAgent,
     private val toggle: FeatureToggle,
     private val userAllowListRepository: UserAllowListRepository,
-    private val dispatcher: DispatcherProvider
+    private val dispatcher: DispatcherProvider,
 ) {
 
     private val baseAgent: String by lazy { concatWithSpaces(mobilePrefix, getWebKitVersionOnwards(false)) }
@@ -71,7 +71,7 @@ class UserAgentProvider constructor(
      */
     fun userAgent(
         url: String? = null,
-        isDesktop: Boolean = false
+        isDesktop: Boolean = false,
     ): String {
         val host = url?.toUri()?.host
         val shouldUseDefaultUserAgent = if (host != null) userAgent.isADefaultException(host) else false
@@ -121,7 +121,7 @@ class UserAgentProvider constructor(
 
     private fun containsExcludedPath(
         url: String?,
-        site: DesktopAgentSiteOnly
+        site: DesktopAgentSiteOnly,
     ): Boolean {
         return if (url != null) {
             val segments = url.toUri().pathSegments
@@ -165,13 +165,13 @@ class UserAgentProvider constructor(
         val fallbackDefaultUA = "$mobilePrefix AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/96.0.4664.104 Mobile Safari/537.36"
 
         val sitesThatShouldUseDesktopAgent = listOf(
-            DesktopAgentSiteOnly("m.facebook.com", listOf("dialog", "sharer"))
+            DesktopAgentSiteOnly("m.facebook.com", listOf("dialog", "sharer")),
         )
     }
 
     data class DesktopAgentSiteOnly(
         val host: String,
-        val excludedPaths: List<String> = emptyList()
+        val excludedPaths: List<String> = emptyList(),
     )
 }
 

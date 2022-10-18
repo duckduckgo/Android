@@ -87,8 +87,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             val referenceTest = adapter.fromJson(
                 FileUtilities.loadText(
                     BrokenSitesReferenceTest::class.java.classLoader!!,
-                    "reference_tests/brokensites/tests.json"
-                )
+                    "reference_tests/brokensites/tests.json",
+                ),
             )
             return referenceTest?.reportURL?.tests?.filterNot { it.exceptPlatforms.contains("android-browser") } ?: emptyList()
         }
@@ -99,7 +99,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         MockitoAnnotations.openMocks(this)
         testee = BrokenSiteSubmitter(
             mockStatisticsDataStore, mockVariantManager, mockTdsMetadataDao, mockGpc, mockFeatureToggle, mockPixel,
-            TestScope(), mockAppBuildConfig, coroutineRule.testDispatcherProvider
+            TestScope(), mockAppBuildConfig, coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -129,7 +129,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             urlParametersRemoved = testCase.urlParametersRemoved.toBoolean(),
             consentManaged = testCase.consentManaged.toBoolean(),
             consentOptOutFailed = testCase.consentOptOutFailed.toBoolean(),
-            consentSelfTestFailed = testCase.consentSelfTestFailed.toBoolean()
+            consentSelfTestFailed = testCase.consentSelfTestFailed.toBoolean(),
         )
 
         testee.submitBrokenSiteFeedback(brokenSite)
@@ -176,20 +176,20 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val urlParametersRemoved: String,
         val consentManaged: String,
         val consentOptOutFailed: String,
-        val consentSelfTestFailed: String
+        val consentSelfTestFailed: String,
     )
 
     data class UrlParam(
         val name: String,
-        val value: String
+        val value: String,
     )
 
     data class BrokenSiteTest(
         val name: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class ReferenceTest(
-        val reportURL: BrokenSiteTest
+        val reportURL: BrokenSiteTest,
     )
 }

@@ -38,7 +38,7 @@ import timber.log.Timber
  */
 class DeleteTrackersDebugReceiver(
     context: Context,
-    receiver: (Intent) -> Unit
+    receiver: (Intent) -> Unit,
 ) : InternalFeatureReceiver(context, receiver) {
 
     override fun intentAction(): String = ACTION
@@ -54,7 +54,7 @@ class DeleteTrackersDebugReceiver(
 class DeleteTrackersDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : VpnServiceCallbacks {
     private val className: String
         get() = DeleteTrackersDebugReceiver::class.java.simpleName
@@ -75,7 +75,7 @@ class DeleteTrackersDebugReceiverRegister @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         receiver?.unregister()
     }

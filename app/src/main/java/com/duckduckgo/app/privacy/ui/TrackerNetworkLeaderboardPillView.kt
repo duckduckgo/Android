@@ -35,7 +35,7 @@ class TrackerNetworkLeaderboardPillView : FrameLayout {
 
     constructor(
         context: Context,
-        attrs: AttributeSet?
+        attrs: AttributeSet?,
     ) : super(context, attrs, 0) {
         initLayout()
     }
@@ -43,7 +43,7 @@ class TrackerNetworkLeaderboardPillView : FrameLayout {
     constructor(
         context: Context,
         attrs: AttributeSet?,
-        defStyleAttr: Int
+        defStyleAttr: Int,
     ) : super(context, attrs, defStyleAttr) {
         initLayout()
     }
@@ -54,7 +54,7 @@ class TrackerNetworkLeaderboardPillView : FrameLayout {
 
     fun render(
         networkEntity: NetworkLeaderboardEntry?,
-        totalSitesVisited: Int
+        totalSitesVisited: Int,
     ) {
         networkEntity ?: return
         icon.setImageResource(renderer.networkPillIcon(context, networkEntity.networkName) ?: R.drawable.network_pill_generic)

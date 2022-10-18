@@ -51,8 +51,8 @@ class DuckDuckGoAppLinksHandlerTest {
                 urlString = "example.com",
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = true,
-                appLinksEnabled = true
-            )
+                appLinksEnabled = true,
+            ),
         )
     }
 
@@ -64,8 +64,8 @@ class DuckDuckGoAppLinksHandlerTest {
                 urlString = "foo.com",
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = false,
-                appLinksEnabled = true
-            )
+                appLinksEnabled = true,
+            ),
         )
         verify(mockCallback).invoke()
     }
@@ -78,8 +78,8 @@ class DuckDuckGoAppLinksHandlerTest {
                 urlString = "foo.com",
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = true,
-                appLinksEnabled = true
-            )
+                appLinksEnabled = true,
+            ),
         )
         verifyNoInteractions(mockCallback)
     }
@@ -92,8 +92,8 @@ class DuckDuckGoAppLinksHandlerTest {
                 urlString = "foo.com",
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = true,
-                appLinksEnabled = true
-            )
+                appLinksEnabled = true,
+            ),
         )
         verifyNoInteractions(mockCallback)
     }
@@ -112,8 +112,8 @@ class DuckDuckGoAppLinksHandlerTest {
                 urlString = "example.com",
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = true,
-                appLinksEnabled = false
-            )
+                appLinksEnabled = false,
+            ),
         )
     }
 
@@ -126,8 +126,8 @@ class DuckDuckGoAppLinksHandlerTest {
                 urlString = "example.com",
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = true,
-                appLinksEnabled = true
-            )
+                appLinksEnabled = true,
+            ),
         )
     }
 
@@ -140,8 +140,8 @@ class DuckDuckGoAppLinksHandlerTest {
                 urlString = "example.com",
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = true,
-                appLinksEnabled = true
-            )
+                appLinksEnabled = true,
+            ),
         )
     }
 
@@ -154,8 +154,8 @@ class DuckDuckGoAppLinksHandlerTest {
                 urlString = "foo.example.com",
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = true,
-                appLinksEnabled = true
-            )
+                appLinksEnabled = true,
+            ),
         )
     }
 
@@ -169,8 +169,8 @@ class DuckDuckGoAppLinksHandlerTest {
                 urlString = "example.com",
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = true,
-                appLinksEnabled = true
-            )
+                appLinksEnabled = true,
+            ),
         )
         assertEquals("example.com", testee.previousUrl)
         verify(mockCallback).invoke()
@@ -186,8 +186,8 @@ class DuckDuckGoAppLinksHandlerTest {
                 urlString = "example.com",
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = true,
-                appLinksEnabled = true
-            )
+                appLinksEnabled = true,
+            ),
         )
         assertEquals("foo.example.com", testee.previousUrl)
         verifyNoInteractions(mockCallback)
@@ -202,8 +202,8 @@ class DuckDuckGoAppLinksHandlerTest {
                 urlString = "example.com",
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = true,
-                appLinksEnabled = true
-            )
+                appLinksEnabled = true,
+            ),
         )
         assertEquals("example.com", testee.previousUrl)
         verify(mockCallback).invoke()
@@ -218,8 +218,8 @@ class DuckDuckGoAppLinksHandlerTest {
                 urlString = "example.com",
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = false,
-                appLinksEnabled = true
-            )
+                appLinksEnabled = true,
+            ),
         )
         assertEquals("example.com", testee.previousUrl)
         verify(mockCallback).invoke()

@@ -110,8 +110,8 @@ class TrackerNetworksViewModelTest {
                 entity = DummyEntity.MINOR_ENTITY_A,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
@@ -159,8 +159,8 @@ class TrackerNetworksViewModelTest {
                 DummyEntity.MAJOR_ENTITY_A,
                 null,
                 TrackerStatus.SITE_BREAKAGE_ALLOWED,
-                TrackerType.OTHER
-            )
+                TrackerType.OTHER,
+            ),
         )
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
@@ -181,7 +181,7 @@ class TrackerNetworksViewModelTest {
                     Pair(DummyEntity.MAJOR_ENTITY_A, 1),
                     Pair(DummyEntity.MAJOR_ENTITY_B, 2),
                     Pair(DummyEntity.MINOR_ENTITY_A, 3),
-                    Pair(DummyEntity.MINOR_ENTITY_B, 1)
+                    Pair(DummyEntity.MINOR_ENTITY_B, 1),
                 )
                 entitiesMap?.keys?.forEachIndexed { index, entity ->
                     assertEquals(expected[index].first, entity)
@@ -201,8 +201,8 @@ class TrackerNetworksViewModelTest {
                 entity = DummyEntity.MINOR_ENTITY_A,
                 surrogateId = null,
                 status = TrackerStatus.ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
@@ -243,8 +243,8 @@ class TrackerNetworksViewModelTest {
                 DummyEntity.MAJOR_ENTITY_A,
                 null,
                 TrackerStatus.SITE_BREAKAGE_ALLOWED,
-                TrackerType.OTHER
-            )
+                TrackerType.OTHER,
+            ),
         )
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
@@ -265,7 +265,7 @@ class TrackerNetworksViewModelTest {
 
                 val entitiesMap = result[it]
                 val expected = listOf(
-                    Pair(DummyEntity.MAJOR_ENTITY_A, 1)
+                    Pair(DummyEntity.MAJOR_ENTITY_A, 1),
                 )
                 entitiesMap?.keys?.forEachIndexed { index, entity ->
                     assertEquals(expected[index].first, entity)
@@ -279,7 +279,7 @@ class TrackerNetworksViewModelTest {
 
                 val entitiesMap = result[it]
                 val expected = listOf(
-                    Pair(DummyEntity.MAJOR_ENTITY_A, 1)
+                    Pair(DummyEntity.MAJOR_ENTITY_A, 1),
                 )
                 entitiesMap?.keys?.forEachIndexed { index, entity ->
                     assertEquals(expected[index].first, entity)
@@ -294,7 +294,7 @@ class TrackerNetworksViewModelTest {
                 val entitiesMap = result[it]
                 val expected = listOf(
                     Pair(DummyEntity.MINOR_ENTITY_A, 2),
-                    Pair(DummyEntity.MINOR_ENTITY_B, 1)
+                    Pair(DummyEntity.MINOR_ENTITY_B, 1),
                 )
                 entitiesMap?.keys?.forEachIndexed { index, entity ->
                     assertEquals(expected[index].first, entity)
@@ -306,7 +306,7 @@ class TrackerNetworksViewModelTest {
 
     private fun site(
         url: String = "",
-        trackingEvents: List<TrackingEvent> = emptyList()
+        trackingEvents: List<TrackingEvent> = emptyList(),
     ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)

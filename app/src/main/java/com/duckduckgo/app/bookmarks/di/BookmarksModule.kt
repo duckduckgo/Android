@@ -54,7 +54,7 @@ class BookmarksModule {
         bookmarksDao: BookmarksDao,
         favoritesDao: FavoritesDao,
         bookmarksRepository: BookmarksRepository,
-        savedSitesParser: SavedSitesParser
+        savedSitesParser: SavedSitesParser,
     ): SavedSitesImporter {
         return RealSavedSitesImporter(context.contentResolver, bookmarksDao, favoritesDao, bookmarksRepository, savedSitesParser)
     }
@@ -72,7 +72,7 @@ class BookmarksModule {
         savedSitesParser: SavedSitesParser,
         favoritesRepository: FavoritesRepository,
         bookmarksRepository: BookmarksRepository,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): SavedSitesExporter {
         return RealSavedSitesExporter(context.contentResolver, favoritesRepository, bookmarksRepository, savedSitesParser, dispatcherProvider)
     }
@@ -82,7 +82,7 @@ class BookmarksModule {
     fun bookmarkManager(
         savedSitesImporter: SavedSitesImporter,
         savedSitesExporter: SavedSitesExporter,
-        pixel: Pixel
+        pixel: Pixel,
     ): SavedSitesManager {
         return RealSavedSitesManager(savedSitesImporter, savedSitesExporter, pixel)
     }
@@ -91,7 +91,7 @@ class BookmarksModule {
     @SingleInstanceIn(AppScope::class)
     fun favoriteRepository(
         favoritesDao: FavoritesDao,
-        faviconManager: Lazy<FaviconManager>
+        faviconManager: Lazy<FaviconManager>,
     ): FavoritesRepository {
         return FavoritesDataRepository(favoritesDao, faviconManager)
     }
@@ -101,7 +101,7 @@ class BookmarksModule {
     fun bookmarkFoldersRepository(
         bookmarkFoldersDao: BookmarkFoldersDao,
         bookmarksDao: BookmarksDao,
-        appDatabase: AppDatabase
+        appDatabase: AppDatabase,
     ): BookmarksRepository {
         return BookmarksDataRepository(bookmarkFoldersDao, bookmarksDao, appDatabase)
     }

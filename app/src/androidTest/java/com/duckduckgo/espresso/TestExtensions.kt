@@ -31,7 +31,7 @@ import org.hamcrest.StringDescription
 fun waitForView(
     viewMatcher: Matcher<View>,
     timeout: Long = 10000,
-    waitForDisplayed: Boolean = true
+    waitForDisplayed: Boolean = true,
 ): ViewAction {
     return object : ViewAction {
         override fun getConstraints(): Matcher<View> {
@@ -47,7 +47,7 @@ fun waitForView(
 
         override fun perform(
             uiController: UiController,
-            view: View
+            view: View,
         ) {
             uiController.loopMainThreadUntilIdle()
             val startTime = System.currentTimeMillis()

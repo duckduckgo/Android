@@ -51,7 +51,7 @@ class PrivacyDashboardViewModel @Inject constructor(
     networkLeaderboardDao: NetworkLeaderboardDao,
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -69,7 +69,7 @@ class PrivacyDashboardViewModel @Inject constructor(
         val sitesVisited: Int,
         val trackerNetworkEntries: List<NetworkLeaderboardEntry>,
         val shouldReloadPage: Boolean,
-        val isSiteInTempAllowedList: Boolean
+        val isSiteInTempAllowedList: Boolean,
     )
 
     sealed class Command {
@@ -106,7 +106,7 @@ class PrivacyDashboardViewModel @Inject constructor(
         val networkCount = viewState.value?.trackerNetworkEntries?.count() ?: 0
         viewState.value = viewState.value?.copy(
             shouldShowTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(siteCount, networkCount),
-            sitesVisited = siteCount
+            sitesVisited = siteCount,
         )
     }
 
@@ -115,7 +115,7 @@ class PrivacyDashboardViewModel @Inject constructor(
         val networkEntries = networkLeaderboardEntries ?: emptyList()
         viewState.value = viewState.value?.copy(
             shouldShowTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(domainCount, networkEntries.count()),
-            trackerNetworkEntries = networkEntries
+            trackerNetworkEntries = networkEntries,
         )
     }
 
@@ -128,7 +128,7 @@ class PrivacyDashboardViewModel @Inject constructor(
 
     private fun showTrackerNetworkLeaderboard(
         siteVisitedCount: Int,
-        networkCount: Int
+        networkCount: Int,
     ): Boolean {
         return siteVisitedCount > LEADERBOARD_MIN_DOMAINS_EXCLUSIVE && networkCount >= LEADERBOARD_MIN_NETWORKS
     }
@@ -158,7 +158,7 @@ class PrivacyDashboardViewModel @Inject constructor(
             sitesVisited = 0,
             trackerNetworkEntries = emptyList(),
             shouldReloadPage = false,
-            isSiteInTempAllowedList = false
+            isSiteInTempAllowedList = false,
         )
     }
 
@@ -182,7 +182,7 @@ class PrivacyDashboardViewModel @Inject constructor(
                 allTrackersBlocked = site.allTrackersBlocked,
                 toggleEnabled = toggleEnabled,
                 practices = site.privacyPractices.summary,
-                isSiteInTempAllowedList = isInTemporaryAllowlist
+                isSiteInTempAllowedList = isInTemporaryAllowlist,
             )
         }
     }
@@ -198,7 +198,7 @@ class PrivacyDashboardViewModel @Inject constructor(
 
         viewState.value = viewState.value?.copy(
             toggleEnabled = enabled,
-            shouldReloadPage = true
+            shouldReloadPage = true,
         )
 
         val domain = site?.domain ?: return

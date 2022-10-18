@@ -39,7 +39,7 @@ class SurveyDownloader @Inject constructor(
     private val surveyDao: SurveyDao,
     private val emailManager: EmailManager,
     private val atpCohortManager: AtpCohortManager,
-    private val atpWaitlistStateRepository: AtpWaitlistStateRepository
+    private val atpWaitlistStateRepository: AtpWaitlistStateRepository,
 ) {
 
     private fun getSurveyResponse(): Response<SurveyGroup?> {
@@ -93,7 +93,7 @@ class SurveyDownloader @Inject constructor(
                             surveyGroup.id,
                             calculateUrlWithParameters(surveyOption),
                             surveyOption.installationDay,
-                            SCHEDULED
+                            SCHEDULED,
                         )
                         else -> null
                     }

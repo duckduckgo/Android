@@ -40,7 +40,7 @@ class SurveyViewModel @Inject constructor(
     private val statisticsStore: StatisticsDataStore,
     private val appInstallStore: AppInstallStore,
     private val appBuildConfig: AppBuildConfig,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     sealed class Command {

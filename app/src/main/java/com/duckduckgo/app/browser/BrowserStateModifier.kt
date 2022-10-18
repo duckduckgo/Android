@@ -35,7 +35,7 @@ class BrowserStateModifier {
             canFindInPage = true,
             addFavorite = HighlightableButton.Visible(),
             addToHomeEnabled = true,
-            canPrintPage = true
+            canPrintPage = true,
         )
     }
 
@@ -53,7 +53,7 @@ class BrowserStateModifier {
             canChangeBrowsingMode = false,
             addToHomeEnabled = false,
             canGoBack = false,
-            canPrintPage = false
+            canPrintPage = false,
         )
     }
 }

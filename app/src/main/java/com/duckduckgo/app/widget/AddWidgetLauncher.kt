@@ -41,7 +41,7 @@ interface AddWidgetLauncher {
 class AddWidgetCompatLauncher @Inject constructor(
     @Named("appWidgetManagerAddWidgetLauncher") private val defaultAddWidgetLauncher: AddWidgetLauncher,
     @Named("legacyAddWidgetLauncher") private val legacyAddWidgetLauncher: AddWidgetLauncher,
-    private val widgetCapabilities: WidgetCapabilities
+    private val widgetCapabilities: WidgetCapabilities,
 ) : AddWidgetLauncher {
 
     override fun launchAddWidget(activity: Activity?) {
@@ -79,7 +79,7 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor() : AddWidgetLaunche
             context,
             CODE_ADD_WIDGET,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         ) // Will not return null since FLAG_UPDATE_CURRENT has been supplied
     }
 }

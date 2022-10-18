@@ -51,14 +51,14 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     private fun validateInput(
         newValue: String,
-        existingValue: String
+        existingValue: String,
     ) =
         if (newValue.isNotBlank()) newValue else existingValue
 
     private fun populateFields(
         titleInput: EditText,
         urlInput: EditText,
-        savedLocation: EditText
+        savedLocation: EditText,
     ) {
         titleInput.setText(getExistingTitle())
         urlInput.setText(getExistingUrl())
@@ -77,12 +77,12 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
             is SavedSite.Bookmark -> {
                 val parentId = arguments?.getLong(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: 0
                 listener?.onSavedSiteEdited(
-                    savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId)
+                    savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId),
                 )
             }
             is SavedSite.Favorite -> {
                 listener?.onSavedSiteEdited(
-                    savedSite.copy(title = updatedTitle, url = updatedUrl)
+                    savedSite.copy(title = updatedTitle, url = updatedUrl),
                 )
             }
         }
@@ -124,7 +124,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         fun instance(
             savedSite: SavedSite,
             parentFolderId: Long = 0,
-            parentFolderName: String? = null
+            parentFolderName: String? = null,
         ): EditSavedSiteDialogFragment {
             val dialog = EditSavedSiteDialogFragment()
             val bundle = Bundle()

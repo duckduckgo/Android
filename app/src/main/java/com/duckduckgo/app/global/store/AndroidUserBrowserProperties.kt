@@ -37,7 +37,7 @@ class AndroidUserBrowserProperties(
     private val widgetCapabilities: WidgetCapabilities,
     private val emailManager: EmailManager,
     private val searchCountDao: SearchCountDao,
-    private val appDaysUsedRepository: AppDaysUsedRepository
+    private val appDaysUsedRepository: AppDaysUsedRepository,
 ) : UserBrowserProperties {
     override fun appTheme(): DuckDuckGoTheme {
         return themingDataStore.theme

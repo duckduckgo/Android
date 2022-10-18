@@ -28,7 +28,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class SiteFactory @Inject constructor(
     private val privacyPractices: PrivacyPractices,
-    private val entityLookup: EntityLookup
+    private val entityLookup: EntityLookup,
 ) {
 
     /**
@@ -40,7 +40,7 @@ class SiteFactory @Inject constructor(
     fun buildSite(
         url: String,
         title: String? = null,
-        httpUpgraded: Boolean = false
+        httpUpgraded: Boolean = false,
     ): Site {
         return SiteMonitor(url, title, httpUpgraded)
     }
@@ -62,6 +62,6 @@ class SiteFactory @Inject constructor(
         val url: String,
         val practices: PrivacyPractices.Practices,
         val entity: Entity?,
-        val prevalence: Double?
+        val prevalence: Double?,
     )
 }

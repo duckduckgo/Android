@@ -35,7 +35,7 @@ import okio.ByteString.Companion.encodeUtf8
 
 fun ImageView.loadFavicon(
     file: File,
-    domain: String
+    domain: String,
 ) {
     val defaultDrawable = generateDefaultDrawable(this.context, domain)
     Glide.with(context).clear(this@loadFavicon)
@@ -51,7 +51,7 @@ fun ImageView.loadFavicon(
 
 fun ImageView.loadFavicon(
     bitmap: Bitmap?,
-    domain: String
+    domain: String,
 ) {
     val defaultDrawable = generateDefaultDrawable(this.context, domain)
     Glide.with(context).clear(this)
@@ -71,7 +71,7 @@ fun ImageView.loadDefaultFavicon(domain: String) {
 
 fun generateDefaultDrawable(
     context: Context,
-    domain: String
+    domain: String,
 ): Drawable {
     return object : Drawable() {
         private val baseHost: String = domain.toUri().baseHost ?: ""
@@ -98,7 +98,7 @@ fun generateDefaultDrawable(
             "#ECCC7B",
             "#E7A538",
             "#DD6B4C",
-            "#D65D62"
+            "#D65D62",
         )
 
         private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {

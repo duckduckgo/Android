@@ -22,20 +22,20 @@ import androidx.room.TypeConverter
 import java.io.Serializable
 
 @Entity(
-    tableName = "survey"
+    tableName = "survey",
 )
 data class Survey(
     @PrimaryKey val surveyId: String,
     val url: String?,
     val daysInstalled: Int?,
-    var status: Status
+    var status: Status,
 ) : Serializable {
 
     enum class Status {
         NOT_ALLOCATED,
         SCHEDULED,
         CANCELLED,
-        DONE
+        DONE,
     }
 
     class StatusTypeConverter {

@@ -38,7 +38,7 @@ interface LocationPermissionsRepositoryAPI {
 class LocationPermissionsRepository @Inject constructor(
     private val locationPermissionsDao: LocationPermissionsDao,
     private val faviconManager: Lazy<FaviconManager>,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : LocationPermissionsRepositoryAPI {
 
     override fun getLocationPermissionsSync(): List<LocationPermissionEntity> = locationPermissionsDao.allPermissions()
@@ -47,7 +47,7 @@ class LocationPermissionsRepository @Inject constructor(
 
     override suspend fun savePermission(
         domain: String,
-        permission: LocationPermissionType
+        permission: LocationPermissionType,
     ): LocationPermissionEntity? {
         val locationPermissionEntity = LocationPermissionEntity(domain = domain, permission = permission)
         val id = withContext(dispatchers.io()) {

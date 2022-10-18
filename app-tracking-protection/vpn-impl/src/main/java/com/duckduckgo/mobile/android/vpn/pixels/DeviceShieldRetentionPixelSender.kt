@@ -26,7 +26,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class DeviceShieldRetentionPixelSender @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : RefreshRetentionAtbPlugin {
 
     override fun onSearchRetentionAtbRefreshed() {

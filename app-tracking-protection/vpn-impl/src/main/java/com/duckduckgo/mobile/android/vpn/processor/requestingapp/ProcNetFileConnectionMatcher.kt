@@ -32,12 +32,12 @@ interface NetworkFileConnectionMatcher {
     suspend fun searchNetworkFile(
         file: File,
         pattern: Pattern,
-        connectionInfo: ConnectionInfo
+        connectionInfo: ConnectionInfo,
     ): NetworkFileSearchResult
 
     fun matchesConnection(
         connectionInfo: ConnectionInfo,
-        localPort: Int
+        localPort: Int,
     ): Boolean {
         return connectionInfo.sourcePort == localPort
     }
@@ -49,7 +49,7 @@ class ProcNetFileConnectionMatcher : NetworkFileConnectionMatcher {
     override suspend fun searchNetworkFile(
         file: File,
         pattern: Pattern,
-        connectionInfo: ConnectionInfo
+        connectionInfo: ConnectionInfo,
     ): NetworkFileSearchResult {
         BufferedReader(FileReader(file)).use { reader ->
             return searchLineByLine(reader, pattern, connectionInfo, file)
@@ -60,7 +60,7 @@ class ProcNetFileConnectionMatcher : NetworkFileConnectionMatcher {
         reader: BufferedReader,
         pattern: Pattern,
         connectionInfo: ConnectionInfo,
-        file: File
+        file: File,
     ): NetworkFileSearchResult {
         var matcher: Matcher
 

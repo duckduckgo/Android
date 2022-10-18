@@ -32,7 +32,7 @@ class WelcomePageViewModel(
     private val appInstallStore: AppInstallStore,
     private val context: Context,
     private val pixel: Pixel,
-    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
 ) : ViewModel() {
 
     fun reduce(event: WelcomePageView.Event): Flow<WelcomePageView.State> {
@@ -64,7 +64,7 @@ class WelcomePageViewModel(
 
         pixel.fire(
             AppPixelName.DEFAULT_BROWSER_SET,
-            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
+            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
         )
 
         emit(WelcomePageView.State.Finish)
@@ -77,7 +77,7 @@ class WelcomePageViewModel(
 
         pixel.fire(
             AppPixelName.DEFAULT_BROWSER_NOT_SET,
-            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
+            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
         )
 
         emit(WelcomePageView.State.Finish)
@@ -89,7 +89,7 @@ class WelcomePageViewModelFactory(
     private val appInstallStore: AppInstallStore,
     private val context: Context,
     private val pixel: Pixel,
-    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -99,7 +99,7 @@ class WelcomePageViewModelFactory(
                     appInstallStore,
                     context,
                     pixel,
-                    defaultRoleBrowserDialog
+                    defaultRoleBrowserDialog,
                 )
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }

@@ -35,7 +35,7 @@ interface AppTPWaitlistManager {
     fun notifyOnJoinedWaitlist()
     fun joinWaitlist(
         timestamp: Int,
-        token: String
+        token: String,
     )
 
     suspend fun redeemCode(inviteCode: String): RedeemCodeResult
@@ -47,7 +47,7 @@ class AndroidAppTPWaitlistManager @Inject constructor(
     private val service: AppTrackingProtectionWaitlistService,
     private val dataStore: AppTrackingProtectionWaitlistDataStore,
     private val repository: AtpWaitlistStateRepository,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : AppTPWaitlistManager {
 
     override suspend fun fetchInviteCode(): FetchCodeResult {
@@ -78,7 +78,7 @@ class AndroidAppTPWaitlistManager @Inject constructor(
 
     override fun joinWaitlist(
         timestamp: Int,
-        token: String
+        token: String,
     ) {
         if (dataStore.waitlistTimestamp == -1) {
             dataStore.waitlistTimestamp = timestamp

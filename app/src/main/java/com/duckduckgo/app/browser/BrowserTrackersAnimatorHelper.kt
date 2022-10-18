@@ -62,7 +62,7 @@ class BrowserTrackersAnimatorHelper(
     private val cookieScene: ViewGroup,
     private val dummyCookieView: View,
     private val container: ConstraintLayout,
-    private val appTheme: AppTheme
+    private val appTheme: AppTheme,
 ) {
     private var trackersAnimation: AnimatorSet = AnimatorSet()
     private var pulseAnimation: AnimatorSet = AnimatorSet()
@@ -127,7 +127,7 @@ class BrowserTrackersAnimatorHelper(
                                             cookieView.gone()
                                             isCookiesAnimationRunning = false
                                             listener?.onAnimationFinished()
-                                        }
+                                        },
                                     )
                                     start()
                                 }
@@ -135,7 +135,7 @@ class BrowserTrackersAnimatorHelper(
                                 isCookiesAnimationRunning = false
                                 listener?.onAnimationFinished()
                             }
-                        }
+                        },
                     )
                     start()
                 }
@@ -144,7 +144,7 @@ class BrowserTrackersAnimatorHelper(
             override fun onTransitionCancel(transition: Transition) {}
             override fun onTransitionPause(transition: Transition) {}
             override fun onTransitionResume(transition: Transition) {}
-        })
+        },)
 
         // After slide out finished, hide view and fade in omnibar views
         slideOutCookiesTransition.addListener(object : TransitionListener {
@@ -164,7 +164,7 @@ class BrowserTrackersAnimatorHelper(
             override fun onTransitionCancel(transition: Transition) {}
             override fun onTransitionPause(transition: Transition) {}
             override fun onTransitionResume(transition: Transition) {}
-        })
+        },)
 
         // When lottie animation begins, begin the transition to slide in the text
         cookieView.addAnimatorListener(object : AnimatorListener {
@@ -174,7 +174,7 @@ class BrowserTrackersAnimatorHelper(
             override fun onAnimationEnd(p0: Animator) {}
             override fun onAnimationCancel(p0: Animator) {}
             override fun onAnimationRepeat(p0: Animator) {}
-        })
+        },)
 
         // Here the animations begins. Fade out omnibar, fade in dummy view and after that start lottie animation
         AnimatorSet().apply {
@@ -183,7 +183,7 @@ class BrowserTrackersAnimatorHelper(
                 cookieScene.show()
                 cookieScene.alpha = 1F
                 cookieView.playAnimation()
-            })
+            },)
             start()
         }
     }
@@ -197,7 +197,7 @@ class BrowserTrackersAnimatorHelper(
     fun startTrackersAnimation(
         context: Context,
         cta: Cta?,
-        entities: List<Entity>?
+        entities: List<Entity>?,
     ) {
         if (entities.isNullOrEmpty()) {
             listener?.onAnimationFinished()
@@ -232,7 +232,7 @@ class BrowserTrackersAnimatorHelper(
             val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
                 privacyGradeView,
                 PropertyValuesHolder.ofFloat("scaleX", 1f, 0.9f, 1f),
-                PropertyValuesHolder.ofFloat("scaleY", 1f, 0.9f, 1f)
+                PropertyValuesHolder.ofFloat("scaleY", 1f, 0.9f, 1f),
             )
             scaleDown.repeatCount = ObjectAnimator.INFINITE
             scaleDown.duration = PULSE_ANIMATION_DURATION
@@ -260,7 +260,7 @@ class BrowserTrackersAnimatorHelper(
 
     fun cancelAnimations(
         omnibarViews: List<View>,
-        container: ViewGroup
+        container: ViewGroup,
     ) {
         stopTrackersAnimation()
         stopPulseAnimation()
@@ -291,14 +291,14 @@ class BrowserTrackersAnimatorHelper(
                 isPartialTrackersAnimationRunning = false
                 listener?.onAnimationFinished()
                 tryToStartCookiesAnimation(context)
-            })
+            },)
         }
     }
 
     private fun getLogosViewListInContainer(
         context: Context,
         container: ViewGroup,
-        entities: List<Entity>
+        entities: List<Entity>,
     ): List<View> {
         container.removeAllViews()
         container.alpha = 0f
@@ -309,7 +309,7 @@ class BrowserTrackersAnimatorHelper(
     private fun createLogosViewList(
         context: Context,
         container: ViewGroup,
-        resourcesId: List<TrackerLogo>
+        resourcesId: List<TrackerLogo>,
     ): List<View> {
         return resourcesId.map {
             val frameLayout = when (it) {
@@ -343,7 +343,7 @@ class BrowserTrackersAnimatorHelper(
 
     private fun createImageView(
         context: Context,
-        resId: Int
+        resId: Int,
     ): ImageView {
         val imageView = ImageView(context)
         imageView.scaleType = ImageView.ScaleType.CENTER_CROP
@@ -364,7 +364,7 @@ class BrowserTrackersAnimatorHelper(
 
     private fun createTrackerTextLogo(
         context: Context,
-        trackerLogo: TrackerLogo.LetterLogo
+        trackerLogo: TrackerLogo.LetterLogo,
     ): FrameLayout {
         val animatedDrawable = createAnimatedDrawable(context)
 
@@ -385,7 +385,7 @@ class BrowserTrackersAnimatorHelper(
 
     private fun createTrackerStackedLogo(
         context: Context,
-        trackerLogo: TrackerLogo.StackedLogo
+        trackerLogo: TrackerLogo.StackedLogo,
     ): FrameLayout {
         val imageView = createImageView(context, trackerLogo.resId)
         val frameLayout = createFrameLayoutContainer(context)
@@ -397,7 +397,7 @@ class BrowserTrackersAnimatorHelper(
 
     private fun createTrackerImageLogo(
         context: Context,
-        trackerLogo: TrackerLogo.ImageLogo
+        trackerLogo: TrackerLogo.ImageLogo,
     ): FrameLayout {
         val imageView = createImageView(context, trackerLogo.resId)
         val animatedDrawable = createAnimatedDrawable(context)
@@ -411,7 +411,7 @@ class BrowserTrackersAnimatorHelper(
 
     private fun createTrackerLogoList(
         context: Context,
-        entities: List<Entity>
+        entities: List<Entity>,
     ): List<TrackerLogo> {
         if (context.packageName == null) return emptyList()
         val trackerLogoList = entities
@@ -454,7 +454,7 @@ class BrowserTrackersAnimatorHelper(
         context: Context,
         container: ConstraintLayout,
         omnibarViews: List<View>,
-        logoViews: List<View>
+        logoViews: List<View>,
     ): AnimatorSet {
         val finalAnimation = AnimatorSet().apply {
             play(animateLogosSlideOut(logoViews))
@@ -466,21 +466,21 @@ class BrowserTrackersAnimatorHelper(
         return AnimatorSet().apply {
             playSequentially(
                 createPartialTrackersAnimation(container, omnibarViews, logoViews),
-                finalAnimation
+                finalAnimation,
             )
             start()
             addListener(onEnd = {
                 isPartialTrackersAnimationRunning = false
                 listener?.onAnimationFinished()
                 tryToStartCookiesAnimation(context)
-            })
+            },)
         }
     }
 
     private fun createPartialTrackersAnimation(
         container: ConstraintLayout,
         omnibarViews: List<View>,
-        logoViews: List<View>
+        logoViews: List<View>,
     ): AnimatorSet {
         applyConstraintSet(container, logoViews)
         container.alpha = 1f
@@ -495,7 +495,7 @@ class BrowserTrackersAnimatorHelper(
 
     private fun applyConstraintSet(
         container: ConstraintLayout,
-        views: List<View>
+        views: List<View>,
     ) {
         val constraints = ConstraintSet()
         constraints.clone(container)
@@ -529,7 +529,7 @@ class BrowserTrackersAnimatorHelper(
                 ConstraintSet.RIGHT,
                 viewIds,
                 null,
-                ConstraintSet.CHAIN_SPREAD
+                ConstraintSet.CHAIN_SPREAD,
             )
         }
 
@@ -590,7 +590,7 @@ class BrowserTrackersAnimatorHelper(
 
     private fun animateSlideIn(
         view: View,
-        margin: Float
+        margin: Float,
     ): ObjectAnimator {
         return ObjectAnimator.ofFloat(view, "x", 0f, margin + view.translationX).apply {
             duration = DEFAULT_ANIMATION_DURATION
@@ -605,7 +605,7 @@ class BrowserTrackersAnimatorHelper(
 
     private fun animateFadeOut(
         view: View,
-        durationInMs: Long = DEFAULT_ANIMATION_DURATION
+        durationInMs: Long = DEFAULT_ANIMATION_DURATION,
     ): ObjectAnimator {
         return ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
             duration = durationInMs
@@ -614,7 +614,7 @@ class BrowserTrackersAnimatorHelper(
 
     private fun animateFadeIn(
         view: View,
-        durationInMs: Long = DEFAULT_ANIMATION_DURATION
+        durationInMs: Long = DEFAULT_ANIMATION_DURATION,
     ): ObjectAnimator {
         return ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
             duration = durationInMs
@@ -645,7 +645,7 @@ sealed class TrackerLogo(val resId: Int) {
     class ImageLogo(resId: Int) : TrackerLogo(resId)
     class LetterLogo(
         val trackerLetter: String = "",
-        resId: Int = R.drawable.other_tracker_bg
+        resId: Int = R.drawable.other_tracker_bg,
     ) : TrackerLogo(resId)
 
     class StackedLogo(resId: Int = R.drawable.other_tracker_bg) : TrackerLogo(resId)

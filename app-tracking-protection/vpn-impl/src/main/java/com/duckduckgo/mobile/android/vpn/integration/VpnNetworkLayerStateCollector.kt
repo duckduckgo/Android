@@ -25,7 +25,7 @@ import org.json.JSONObject
 
 @ContributesMultibinding(VpnScope::class)
 class VpnNetworkLayerStateCollector @Inject constructor(
-    private val vpnNetworkStack: VpnNetworkStack
+    private val vpnNetworkStack: VpnNetworkStack,
 ) : VpnStateCollectorPlugin {
 
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {

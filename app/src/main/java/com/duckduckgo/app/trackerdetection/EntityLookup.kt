@@ -39,7 +39,7 @@ interface EntityLookup {
 @SingleInstanceIn(AppScope::class)
 class TdsEntityLookup @Inject constructor(
     private val entityDao: TdsEntityDao,
-    private val domainEntityDao: TdsDomainEntityDao
+    private val domainEntityDao: TdsDomainEntityDao,
 ) : EntityLookup {
 
     var entities: List<TdsEntity> = emptyList()

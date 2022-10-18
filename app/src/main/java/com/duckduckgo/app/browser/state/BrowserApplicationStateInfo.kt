@@ -30,7 +30,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class BrowserApplicationStateInfo @Inject constructor(
-    private val observers: DaggerSet<BrowserLifecycleObserver>
+    private val observers: DaggerSet<BrowserLifecycleObserver>,
 ) : ActivityLifecycleCallbacks {
     private var created = 0
     private var started = 0
@@ -41,7 +41,7 @@ class BrowserApplicationStateInfo @Inject constructor(
 
     override fun onActivityCreated(
         activity: Activity,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         if (created++ == 0 && !overrideIsFreshLaunch) isFreshLaunch = true
     }

@@ -30,12 +30,12 @@ import kotlinx.coroutines.launch
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 class UnprotectedAppsBucketPixelSender @Inject constructor(
     private val excludedApps: TrackingProtectionAppsRepository,
     private val deviceShieldPixels: DeviceShieldPixels,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {

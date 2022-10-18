@@ -26,7 +26,7 @@ interface UserAllowListRepository {
 
 @ContributesBinding(AppScope::class)
 class RealUserAllowListRepository @Inject constructor(
-    private val userWhitelistDao: UserWhitelistDao
+    private val userWhitelistDao: UserWhitelistDao,
 ) : UserAllowListRepository {
     override fun isDomainInUserAllowList(domain: String): Boolean = userWhitelistDao.contains(domain)
 }

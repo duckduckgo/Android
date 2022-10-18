@@ -26,10 +26,10 @@ import okhttp3.Response
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class
+    boundType = ApiInterceptorPlugin::class,
 )
 class ApiDevTdsInterceptor @Inject constructor(
-    private val devSettingsDataStore: DevSettingsDataStore
+    private val devSettingsDataStore: DevSettingsDataStore,
 ) : ApiInterceptorPlugin, Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {

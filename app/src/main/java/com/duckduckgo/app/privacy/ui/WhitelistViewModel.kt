@@ -38,12 +38,12 @@ import kotlinx.coroutines.withContext
 class WhitelistViewModel @Inject constructor(
     private val dao: UserWhitelistDao,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
         val showWhitelist: Boolean = true,
-        val whitelist: List<UserWhitelistedDomain> = emptyList()
+        val whitelist: List<UserWhitelistedDomain> = emptyList(),
     )
 
     sealed class Command {
@@ -72,7 +72,7 @@ class WhitelistViewModel @Inject constructor(
     private fun onUserWhitelistChanged(entries: List<UserWhitelistedDomain>) {
         viewState.value = viewState.value?.copy(
             showWhitelist = entries.isNotEmpty(),
-            whitelist = entries
+            whitelist = entries,
         )
     }
 
@@ -96,7 +96,7 @@ class WhitelistViewModel @Inject constructor(
 
     fun onEntryEdited(
         old: UserWhitelistedDomain,
-        new: UserWhitelistedDomain
+        new: UserWhitelistedDomain,
     ) {
         if (!UriString.isValidDomain(new.domain)) {
             command.value = ShowWhitelistFormatError

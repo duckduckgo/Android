@@ -37,22 +37,22 @@ data class AppTrackerBlocklist(
     val etag: ETag = ETag.InvalidETag,
     val blocklist: List<AppTracker> = listOf(),
     val appPackages: List<AppTrackerPackage> = listOf(),
-    val entities: List<AppTrackerEntity> = listOf()
+    val entities: List<AppTrackerEntity> = listOf(),
 )
 
 data class AppTrackerExclusionList(
     val etag: ETag = ETag.InvalidETag,
-    val excludedPackages: List<AppTrackerExcludedPackage> = listOf()
+    val excludedPackages: List<AppTrackerExcludedPackage> = listOf(),
 )
 
 data class AppTrackerSystemAppOverrideList(
     val etag: ETag = ETag.InvalidETag,
-    val overridePackages: List<AppTrackerSystemAppOverridePackage> = listOf()
+    val overridePackages: List<AppTrackerSystemAppOverridePackage> = listOf(),
 )
 
 data class AppTrackerRuleList(
     val etag: ETag = ETag.InvalidETag,
-    val trackerExceptionRules: List<AppTrackerExceptionRule> = listOf()
+    val trackerExceptionRules: List<AppTrackerExceptionRule> = listOf(),
 )
 
 sealed class ETag {
@@ -76,7 +76,7 @@ interface AppTrackerListDownloader {
 
 @ContributesBinding(AppScope::class)
 class RealAppTrackerListDownloader @Inject constructor(
-    private val appTrackerListService: AppTrackerListService
+    private val appTrackerListService: AppTrackerListService,
 ) : AppTrackerListDownloader {
     override fun downloadAppTrackerBlocklist(): AppTrackerBlocklist {
         Timber.d("Downloading the app tracker blocklist...")
@@ -101,7 +101,7 @@ class RealAppTrackerListDownloader @Inject constructor(
 
         Timber.d(
             "Received the app tracker remote lists. blocklist size: ${blocklist.size}, " +
-                "app-packages size: ${packages.size}, entities size: ${trackerEntities.size}"
+                "app-packages size: ${packages.size}, entities size: ${trackerEntities.size}",
         )
 
         return AppTrackerBlocklist(etag = ETag.ValidETag(eTag), blocklist = blocklist, appPackages = packages, entities = trackerEntities)

@@ -28,8 +28,8 @@ import androidx.room.RoomDatabase
     version = 1,
     entities =
     [
-        SimpleEvent::class
-    ]
+        SimpleEvent::class,
+    ],
 )
 abstract class HealthStatsDatabase : RoomDatabase() {
     abstract fun healthStatDao(): HealthStatDao
@@ -41,7 +41,7 @@ abstract class HealthStat(open val timestamp: Long = 0)
 data class SimpleEvent(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val type: String,
-    override val timestamp: Long
+    override val timestamp: Long,
 ) : HealthStat(timestamp) {
 
     @Suppress("FunctionName")
@@ -81,11 +81,11 @@ interface HealthStatDao {
     @Query("SELECT count(*) FROM SimpleEvent WHERE timestamp >= :timestamp AND type=:type")
     fun eventCount(
         type: String,
-        timestamp: Long
+        timestamp: Long,
     ): Long
 
     @Query(
-        "DELETE FROM SimpleEvent WHERE id IN (SELECT id FROM SimpleEvent ORDER BY timestamp DESC LIMIT -1 OFFSET :maxNumberToKeep)"
+        "DELETE FROM SimpleEvent WHERE id IN (SELECT id FROM SimpleEvent ORDER BY timestamp DESC LIMIT -1 OFFSET :maxNumberToKeep)",
     )
     fun purgeOldMetrics(maxNumberToKeep: Int = MAX_NUMBER_HEALTH_METRICS_TO_RETAIN)
 }

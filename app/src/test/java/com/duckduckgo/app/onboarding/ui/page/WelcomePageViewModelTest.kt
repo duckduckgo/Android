@@ -78,7 +78,7 @@ class WelcomePageViewModelTest {
             appInstallStore = appInstallStore,
             context = mock(),
             pixel = pixel,
-            defaultRoleBrowserDialog = defaultRoleBrowserDialog
+            defaultRoleBrowserDialog = defaultRoleBrowserDialog,
         )
 
         viewEvents = events.asFlow().flatMapLatest { viewModel.reduce(it) }
@@ -135,7 +135,7 @@ class WelcomePageViewModelTest {
             verify(defaultRoleBrowserDialog).dialogShown()
             verify(pixel).fire(
                 AppPixelName.DEFAULT_BROWSER_SET,
-                mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
+                mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
             )
         }
     }
@@ -149,7 +149,7 @@ class WelcomePageViewModelTest {
             verify(defaultRoleBrowserDialog).dialogShown()
             verify(pixel).fire(
                 AppPixelName.DEFAULT_BROWSER_NOT_SET,
-                mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
+                mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
             )
         }
     }

@@ -45,7 +45,7 @@ class HealthClassifierTest {
     @Test
     fun whenNumberOfSocketReadExceptionsAboveRemoteThresholdThenReportsBadHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("socketReadExceptionAlerts", true, 5))
+            listOf(HealthTriggerEntity("socketReadExceptionAlerts", true, 5)),
         )
         testee.determineHealthSocketChannelReadExceptions(10, "socketReadExceptionAlerts").assertBadHealth()
     }
@@ -53,7 +53,7 @@ class HealthClassifierTest {
     @Test
     fun whenNumberOfSocketReadExceptionsThenDefaultIsReturnGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("socketReadExceptionAlerts", true))
+            listOf(HealthTriggerEntity("socketReadExceptionAlerts", true)),
         )
         testee.determineHealthSocketChannelReadExceptions(Long.MAX_VALUE, "socketReadExceptionAlerts").assertGoodHealth()
     }
@@ -61,7 +61,7 @@ class HealthClassifierTest {
     @Test
     fun whenNumberOfSocketReadExceptionsDisabledThenAlwaysReturnGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("socketReadExceptionAlerts", false, 5))
+            listOf(HealthTriggerEntity("socketReadExceptionAlerts", false, 5)),
         )
         testee.determineHealthSocketChannelReadExceptions(10, "socketReadExceptionAlerts").assertGoodHealth()
     }
@@ -79,7 +79,7 @@ class HealthClassifierTest {
     @Test
     fun whenNumberOfSocketWriteExceptionsBelowRemoteThresholdThenReportsGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("socketWriteExceptionAlerts", true, 10))
+            listOf(HealthTriggerEntity("socketWriteExceptionAlerts", true, 10)),
         )
         testee.determineHealthSocketChannelWriteExceptions(5, "socketWriteExceptionAlerts").assertGoodHealth()
     }
@@ -87,7 +87,7 @@ class HealthClassifierTest {
     @Test
     fun whenNumberOfSocketWriteExceptionsAboveRemoteThresholdThenReportsGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("socketWriteExceptionAlerts", true, 5))
+            listOf(HealthTriggerEntity("socketWriteExceptionAlerts", true, 5)),
         )
         testee.determineHealthSocketChannelWriteExceptions(10, "socketWriteExceptionAlerts").assertBadHealth()
     }
@@ -95,7 +95,7 @@ class HealthClassifierTest {
     @Test
     fun whenNumberOfSocketWriteExceptionsDisabledThenAlwaysReturnGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("socketWriteExceptionAlerts", false))
+            listOf(HealthTriggerEntity("socketWriteExceptionAlerts", false)),
         )
         testee.determineHealthSocketChannelWriteExceptions(10, "socketWriteExceptionAlerts").assertGoodHealth()
     }
@@ -113,7 +113,7 @@ class HealthClassifierTest {
     @Test
     fun whenNumberOfSocketConnectExceptionsBelowRemoteThresholdThenReportsGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("socketConnectExceptionAlerts", true))
+            listOf(HealthTriggerEntity("socketConnectExceptionAlerts", true)),
         )
         testee.determineHealthSocketChannelConnectExceptions(5, "socketConnectExceptionAlerts").assertGoodHealth()
     }
@@ -121,7 +121,7 @@ class HealthClassifierTest {
     @Test
     fun whenNumberOfSocketConnectExceptionsAboveRemoteThresholdThenReportsBadHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("socketConnectExceptionAlerts", true, 5))
+            listOf(HealthTriggerEntity("socketConnectExceptionAlerts", true, 5)),
         )
         testee.determineHealthSocketChannelConnectExceptions(10, "socketConnectExceptionAlerts").assertBadHealth()
     }
@@ -129,7 +129,7 @@ class HealthClassifierTest {
     @Test
     fun whenNumberOfSocketConnectExceptionsDisabledThenAlwaysReturnGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("socketConnectExceptionAlerts", false))
+            listOf(HealthTriggerEntity("socketConnectExceptionAlerts", false)),
         )
         testee.determineHealthSocketChannelConnectExceptions(10, "socketConnectExceptionAlerts").assertGoodHealth()
     }
@@ -172,7 +172,7 @@ class HealthClassifierTest {
     @Test
     fun whenLotsOfTunInputsButNoQueueReadsRateBelowRemoteThresholdThenReportsBadHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("tunInputsQueueReadRate", true))
+            listOf(HealthTriggerEntity("tunInputsQueueReadRate", true)),
         )
 
         // success rate: 10%
@@ -194,7 +194,7 @@ class HealthClassifierTest {
     @Test
     fun whenLotsOfTunInputsAndQueueReadsAndRemoteThresholdThenReportsGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("tunInputsQueueReadRate", true))
+            listOf(HealthTriggerEntity("tunInputsQueueReadRate", true)),
         )
 
         // success rate: 100%
@@ -216,7 +216,7 @@ class HealthClassifierTest {
     @Test
     fun whenNoNetworkConnectivityAlertsBelowRemoteThresholdThenGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("noNetworkConnectivityAlert", true, 10))
+            listOf(HealthTriggerEntity("noNetworkConnectivityAlert", true, 10)),
         )
         testee.determineHealthVpnConnectivity(5, "noNetworkConnectivityAlert").assertGoodHealth()
     }
@@ -234,7 +234,7 @@ class HealthClassifierTest {
     @Test
     fun whenNoNetworkConnectivityAlertsAboveRemoteThresholdThenGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("noNetworkConnectivityAlert", true))
+            listOf(HealthTriggerEntity("noNetworkConnectivityAlert", true)),
         )
         testee.determineHealthVpnConnectivity(10, "noNetworkConnectivityAlert").assertBadHealth()
     }
@@ -242,7 +242,7 @@ class HealthClassifierTest {
     @Test
     fun whenNoNetworkConnectivityDisabledAlwaysReturnGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("noNetworkConnectivityAlert", false, 5))
+            listOf(HealthTriggerEntity("noNetworkConnectivityAlert", false, 5)),
         )
         testee.determineHealthVpnConnectivity(10, "noNetworkConnectivityAlert").assertGoodHealth()
     }
@@ -250,7 +250,7 @@ class HealthClassifierTest {
     @Test
     fun whenTunReadExceptionAlertsBelowRemoteThresholdThenGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("tunReadExceptionAlerts", true, 10))
+            listOf(HealthTriggerEntity("tunReadExceptionAlerts", true, 10)),
         )
         testee.determineHealthTunReadExceptions(5, "tunReadExceptionAlerts").assertGoodHealth()
     }
@@ -258,7 +258,7 @@ class HealthClassifierTest {
     @Test
     fun whenTunReadExceptionAlertsAboveRemoteThresholdThenGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("tunReadExceptionAlerts", true))
+            listOf(HealthTriggerEntity("tunReadExceptionAlerts", true)),
         )
         testee.determineHealthTunReadExceptions(10, "tunReadExceptionAlerts").assertBadHealth()
     }
@@ -266,7 +266,7 @@ class HealthClassifierTest {
     @Test
     fun whenTunReadExceptionAlertsDisabledAlwaysReturnGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("tunReadExceptionAlerts", false, 5))
+            listOf(HealthTriggerEntity("tunReadExceptionAlerts", false, 5)),
         )
         testee.determineHealthTunReadExceptions(10, "tunReadExceptionAlerts").assertGoodHealth()
     }
@@ -274,7 +274,7 @@ class HealthClassifierTest {
     @Test
     fun whenTunWriteExceptionAlertsBelowRemoteThresholdThenGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("tunWriteExceptionAlerts", true, 10))
+            listOf(HealthTriggerEntity("tunWriteExceptionAlerts", true, 10)),
         )
         testee.determineHealthTunWriteExceptions(5, "tunWriteExceptionAlerts").assertGoodHealth()
     }
@@ -282,7 +282,7 @@ class HealthClassifierTest {
     @Test
     fun whenTunWriteExceptionAlertsAboveRemoteThresholdThenGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("tunWriteExceptionAlerts", true, 5))
+            listOf(HealthTriggerEntity("tunWriteExceptionAlerts", true, 5)),
         )
         testee.determineHealthTunWriteExceptions(10, "tunWriteExceptionAlerts").assertBadHealth()
     }
@@ -290,7 +290,7 @@ class HealthClassifierTest {
     @Test
     fun whenTunWriteExceptionAlertsAboveDefaultThresholdThenGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("tunWriteExceptionAlerts", true))
+            listOf(HealthTriggerEntity("tunWriteExceptionAlerts", true)),
         )
         testee.determineHealthTunWriteExceptions(2, "tunWriteExceptionAlerts").assertBadHealth()
     }
@@ -298,7 +298,7 @@ class HealthClassifierTest {
     @Test
     fun whenTunWriteExceptionAlertsDisabledAlwaysReturnGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("tunWriteExceptionAlerts", false, 1))
+            listOf(HealthTriggerEntity("tunWriteExceptionAlerts", false, 1)),
         )
         testee.determineHealthTunWriteExceptions(2, "tunWriteExceptionAlerts").assertGoodHealth()
     }
@@ -306,7 +306,7 @@ class HealthClassifierTest {
     @Test
     fun whenTunWriteIOExceptionAlertsBelowRemoteThresholdThenGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("tunWriteIOMemoryExceptionsAlerts", true, 10))
+            listOf(HealthTriggerEntity("tunWriteIOMemoryExceptionsAlerts", true, 10)),
         )
 
         testee.determineHealthTunWriteMemoryExceptions(5, "tunWriteIOMemoryExceptionsAlerts").assertGoodHealth()
@@ -315,7 +315,7 @@ class HealthClassifierTest {
     @Test
     fun whenTunWriteIOExceptionAlertsAboveRemoteThresholdThenGoodHealth() {
         whenever(thresholds.triggers()).thenReturn(
-            listOf(HealthTriggerEntity("tunWriteIOMemoryExceptionsAlerts", true))
+            listOf(HealthTriggerEntity("tunWriteIOMemoryExceptionsAlerts", true)),
         )
         testee.determineHealthTunWriteMemoryExceptions(10, "tunWriteIOMemoryExceptionsAlerts").assertBadHealth()
     }

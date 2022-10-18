@@ -107,7 +107,7 @@ class BrowserModule {
         urlDetector: DuckDuckGoUrlDetector,
         statisticsStore: StatisticsDataStore,
         variantManager: VariantManager,
-        appReferrerDataStore: AppReferrerDataStore
+        appReferrerDataStore: AppReferrerDataStore,
     ): RequestRewriter {
         return DuckDuckGoRequestRewriter(urlDetector, statisticsStore, variantManager, appReferrerDataStore)
     }
@@ -134,7 +134,7 @@ class BrowserModule {
         printInjector: PrintInjector,
         internalTestUserChecker: InternalTestUserChecker,
         adClickManager: AdClickManager,
-        autoconsent: Autoconsent
+        autoconsent: Autoconsent,
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -157,7 +157,7 @@ class BrowserModule {
             printInjector,
             internalTestUserChecker,
             adClickManager,
-            autoconsent
+            autoconsent,
         )
     }
 
@@ -171,7 +171,7 @@ class BrowserModule {
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        urlExtractor: DOMUrlExtractor
+        urlExtractor: DOMUrlExtractor,
     ): UrlExtractingWebViewClient {
         return UrlExtractingWebViewClient(
             webViewHttpAuthStore,
@@ -182,14 +182,14 @@ class BrowserModule {
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
-            urlExtractor
+            urlExtractor,
         )
     }
 
     @Provides
     fun webViewLongPressHandler(
         context: Context,
-        pixel: Pixel
+        pixel: Pixel,
     ): LongPressHandler {
         return WebViewLongPressHandler(context, pixel)
     }
@@ -197,7 +197,7 @@ class BrowserModule {
     @Provides
     fun defaultWebBrowserCapability(
         context: Context,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): DefaultBrowserDetector {
         return AndroidDefaultBrowserDetector(context, appBuildConfig)
     }
@@ -208,7 +208,7 @@ class BrowserModule {
     fun defaultBrowserObserver(
         defaultBrowserDetector: DefaultBrowserDetector,
         appInstallStore: AppInstallStore,
-        pixel: Pixel
+        pixel: Pixel,
     ): LifecycleObserver {
         return DefaultBrowserObserver(defaultBrowserDetector, appInstallStore, pixel)
     }
@@ -224,7 +224,7 @@ class BrowserModule {
         webViewSessionStorage: WebViewSessionStorage,
         cookieManager: DuckDuckGoCookieManager,
         fileDeleter: FileDeleter,
-        webViewHttpAuthStore: WebViewHttpAuthStore
+        webViewHttpAuthStore: WebViewHttpAuthStore,
     ): WebDataManager =
         WebViewDataManager(context, webViewSessionStorage, cookieManager, fileDeleter, webViewHttpAuthStore)
 
@@ -243,7 +243,7 @@ class BrowserModule {
         packageManager: PackageManager,
         ampLinks: AmpLinks,
         trackingParameters: TrackingParameters,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, appBuildConfig)
 
     @Provides
@@ -255,7 +255,7 @@ class BrowserModule {
         userAgent: UserAgent,
         toggle: FeatureToggle,
         userAllowListRepository: UserAllowListRepository,
-        dispatcher: DispatcherProvider
+        dispatcher: DispatcherProvider,
     ): UserAgentProvider {
         return UserAgentProvider(
             defaultUserAgent,
@@ -264,7 +264,7 @@ class BrowserModule {
             userAgent,
             toggle,
             userAllowListRepository,
-            dispatcher
+            dispatcher,
         )
     }
 
@@ -277,7 +277,7 @@ class BrowserModule {
         gpc: Gpc,
         userAgentProvider: UserAgentProvider,
         adClickManager: AdClickManager,
-        cloakedCnameDetector: CloakedCnameDetector
+        cloakedCnameDetector: CloakedCnameDetector,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -287,7 +287,7 @@ class BrowserModule {
             gpc,
             userAgentProvider,
             adClickManager,
-            cloakedCnameDetector
+            cloakedCnameDetector,
         )
 
     @Provides
@@ -311,7 +311,7 @@ class BrowserModule {
     @Provides
     fun webViewPreviewPersister(
         context: Context,
-        fileDeleter: FileDeleter
+        fileDeleter: FileDeleter,
     ): WebViewPreviewPersister {
         return FileBasedWebViewPreviewPersister(context, fileDeleter)
     }
@@ -321,7 +321,7 @@ class BrowserModule {
     fun faviconPersister(
         context: Context,
         fileDeleter: FileDeleter,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): FaviconPersister {
         return FileBasedFaviconPersister(context, fileDeleter, dispatcherProvider)
     }
@@ -349,14 +349,14 @@ class BrowserModule {
     @Provides
     fun navigationAwareLoginDetector(
         settingsDataStore: SettingsDataStore,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
     ): NavigationAwareLoginDetector {
         return NextPageLoginDetection(settingsDataStore, appCoroutineScope)
     }
 
     @Provides
     fun downloadFileService(@Named("api") retrofit: Retrofit): DownloadFileService = retrofit.create(
-        DownloadFileService::class.java
+        DownloadFileService::class.java,
     )
 
     @Provides
@@ -365,7 +365,7 @@ class BrowserModule {
         callback: FileDownloadCallback,
         workManager: WorkManager,
         @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): FileDownloader {
         return AndroidFileDownloader(dataUriDownloader, callback, workManager, coroutineScope, dispatcherProvider)
     }
@@ -376,14 +376,14 @@ class BrowserModule {
         pixel: Pixel,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         appSettingsPreferencesStore: SettingsDataStore,
-        dispatchers: DispatcherProvider
+        dispatchers: DispatcherProvider,
     ): FireproofDialogsEventHandler {
         return BrowserTabFireproofDialogsEventHandler(
             userEventsStore,
             pixel,
             fireproofWebsiteRepository,
             appSettingsPreferencesStore,
-            dispatchers
+            dispatchers,
         )
     }
 
@@ -391,7 +391,7 @@ class BrowserModule {
     @Provides
     fun thirdPartyCookieManager(
         cookieManagerProvider: CookieManagerProvider,
-        authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
+        authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository,
     ): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository)
     }

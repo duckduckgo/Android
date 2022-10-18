@@ -69,7 +69,7 @@ class UrlExtractingWebViewClientTest {
             thirdPartyCookieManager,
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
-            urlExtractor
+            urlExtractor,
         )
         whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
     }

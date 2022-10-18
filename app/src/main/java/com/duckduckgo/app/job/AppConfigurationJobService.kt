@@ -27,7 +27,7 @@ import timber.log.Timber
 
 @Deprecated(
     "This is the old sync service which uses JobScheduler. " +
-        "A new version, `AppConfigurationWorker` uses WorkManager and should be used going forwards."
+        "A new version, `AppConfigurationWorker` uses WorkManager and should be used going forwards.",
 )
 @InjectWith(ActivityScope::class)
 class AppConfigurationJobService : JobService() {

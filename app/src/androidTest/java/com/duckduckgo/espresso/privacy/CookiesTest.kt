@@ -50,8 +50,8 @@ class CookiesTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            queryExtra = "https://privacy-test-pages.glitch.me/privacy-protections/storage-blocking/?store"
-        )
+            queryExtra = "https://privacy-test-pages.glitch.me/privacy-protections/storage-blocking/?store",
+        ),
     )
 
     @Test @PrivacyTest
@@ -105,7 +105,7 @@ class CookiesTest {
             "safe third party header cookie",
             "tracking third party header cookie",
             "safe third party iframe - JS cookie",
-            "tracking third party iframe - JS cookie"
+            "tracking third party iframe - JS cookie",
         )
     }
 

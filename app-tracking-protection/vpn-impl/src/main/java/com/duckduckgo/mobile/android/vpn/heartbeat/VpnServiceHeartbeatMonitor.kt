@@ -60,7 +60,7 @@ class VpnServiceHeartbeatMonitorModule {
 }
 
 class VpnServiceHeartbeatMonitor(
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -89,7 +89,7 @@ class VpnServiceHeartbeatMonitor(
 @ContributesWorker(AppScope::class)
 class VpnServiceHeartbeatMonitorWorker(
     val context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     @Inject
     lateinit var vpnPhoenixDao: VpnPhoenixDao
@@ -129,7 +129,7 @@ class VpnHeartbeatDeviceBootMonitor : BroadcastReceiver() {
 
     override fun onReceive(
         context: Context,
-        intent: Intent
+        intent: Intent,
     ) {
         AndroidInjection.inject(this, context)
 

@@ -96,7 +96,7 @@ class FileBasedWebViewPreviewPersisterTest {
 
     private fun verifyExistingPreviewExcludedFromDeletion(
         exclusionList: List<String>,
-        newTabPreviewFilename: String
+        newTabPreviewFilename: String,
     ) {
         assertEquals(1, exclusionList.size)
         assertTrue(exclusionList.contains(newTabPreviewFilename))
@@ -104,7 +104,7 @@ class FileBasedWebViewPreviewPersisterTest {
 
     private fun verifyTabIdUsedAsDirectory(
         tabId: String,
-        path: File
+        path: File,
     ) {
         assertTrue(path.parent.endsWith(tabId))
     }

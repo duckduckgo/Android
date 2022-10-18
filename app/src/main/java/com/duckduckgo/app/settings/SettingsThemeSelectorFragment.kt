@@ -70,7 +70,7 @@ class SettingsThemeSelectorFragment : DialogFragment() {
 
     private fun updateCurrentSelect(
         currentOption: DuckDuckGoTheme,
-        radioGroup: RadioGroup
+        radioGroup: RadioGroup,
     ) {
         val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)

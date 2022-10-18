@@ -27,7 +27,7 @@ import javax.inject.Inject
 @SingleInstanceIn(ActivityScope::class)
 @ContributesBinding(ActivityScope::class)
 class ActivityViewModelFactory @Inject constructor(
-    private val viewModelFactoryPluginPoint: ActivityViewModelFactoryPluginPoint
+    private val viewModelFactoryPluginPoint: ActivityViewModelFactoryPluginPoint,
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

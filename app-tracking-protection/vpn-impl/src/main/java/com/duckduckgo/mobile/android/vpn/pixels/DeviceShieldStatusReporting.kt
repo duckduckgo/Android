@@ -58,7 +58,7 @@ object DeviceShieldStatusReportingModule {
 }
 
 class DeviceShieldStatusReporting(
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
 ) : LifecycleEventObserver {
 
     override fun onStateChanged(source: LifecycleOwner, event: Event) {
@@ -84,7 +84,7 @@ class DeviceShieldStatusReporting(
 @ContributesWorker(AppScope::class)
 class DeviceShieldStatusReportingWorker(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels

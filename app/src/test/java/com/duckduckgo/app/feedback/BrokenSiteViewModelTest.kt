@@ -132,7 +132,7 @@ class BrokenSiteViewModelTest {
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
-            consentSelfTestFailed = false
+            consentSelfTestFailed = false,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
@@ -148,7 +148,7 @@ class BrokenSiteViewModelTest {
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
-            consentSelfTestFailed = false
+            consentSelfTestFailed = false,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -167,7 +167,7 @@ class BrokenSiteViewModelTest {
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
-            consentSelfTestFailed = false
+            consentSelfTestFailed = false,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
@@ -183,7 +183,7 @@ class BrokenSiteViewModelTest {
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
-            consentSelfTestFailed = false
+            consentSelfTestFailed = false,
         )
 
         verify(mockPixel, never()).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to nullUrl))
@@ -203,7 +203,7 @@ class BrokenSiteViewModelTest {
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
-            consentSelfTestFailed = false
+            consentSelfTestFailed = false,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
@@ -219,7 +219,7 @@ class BrokenSiteViewModelTest {
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
-            consentSelfTestFailed = false
+            consentSelfTestFailed = false,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -239,7 +239,7 @@ class BrokenSiteViewModelTest {
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
-            consentSelfTestFailed = false
+            consentSelfTestFailed = false,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
@@ -255,7 +255,7 @@ class BrokenSiteViewModelTest {
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
-            consentSelfTestFailed = false
+            consentSelfTestFailed = false,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to trackingUrl))
@@ -273,7 +273,7 @@ class BrokenSiteViewModelTest {
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
-            consentSelfTestFailed = false
+            consentSelfTestFailed = false,
         )
         selectAndAcceptCategory()
 
@@ -292,7 +292,7 @@ class BrokenSiteViewModelTest {
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
-            consentSelfTestFailed = false
+            consentSelfTestFailed = false,
         )
         selectAndAcceptCategory()
 
@@ -312,7 +312,7 @@ class BrokenSiteViewModelTest {
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
-            consentSelfTestFailed = false
+            consentSelfTestFailed = false,
         )
         selectAndAcceptCategory(categoryIndex)
 
@@ -331,7 +331,7 @@ class BrokenSiteViewModelTest {
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
-            consentSelfTestFailed = false
+            consentSelfTestFailed = false,
         )
         selectAndAcceptCategory(0)
         testee.onCategoryIndexChanged(1)
@@ -350,7 +350,7 @@ class BrokenSiteViewModelTest {
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
-            consentSelfTestFailed = false
+            consentSelfTestFailed = false,
         )
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()

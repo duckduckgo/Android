@@ -146,24 +146,25 @@ class DownloadsActivity : DuckDuckGoActivity() {
         Snackbar.make(
             binding.root,
             getString(command.messageId, command.arg),
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).setAction(R.string.downloadsUndoActionName) {
             // noop, handled in onDismissed callback
         }.addCallback(object : Snackbar.Callback() {
             override fun onDismissed(
                 transientBottomBar: Snackbar?,
-                event: Int
+                event: Int,
             ) {
                 when (event) {
                     // handle the UNDO action here as we only have one
                     BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION -> viewModel.insert(command.items)
                     BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE,
                     BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL,
-                    BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT -> handleDeleteAll(command.items)
+                    BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT,
+                    -> handleDeleteAll(command.items)
                     BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE -> { /* noop */ }
                 }
             }
-        }).show()
+        },).show()
     }
 
     private fun handleDeleteAll(items: List<DownloadItem>) {

@@ -33,7 +33,7 @@ interface AppTrackerBlockingStatsRepository {
 
     data class TimeWindow(
         val value: Long,
-        val unit: TimeUnit
+        val unit: TimeUnit,
     ) {
         fun asString(): String {
             return DatabaseDateFormatter.timestamp(LocalDateTime.now().minusSeconds(unit.toSeconds(value)))
@@ -52,57 +52,57 @@ interface AppTrackerBlockingStatsRepository {
 
     fun getVpnTrackers(
         startTime: () -> String,
-        endTime: String = noEndDate()
+        endTime: String = noEndDate(),
     ): Flow<List<VpnTracker>>
 
     fun getMostRecentVpnTrackers(startTime: () -> String): Flow<List<BucketizedVpnTracker>>
 
     fun getVpnTrackersSync(
         startTime: () -> String,
-        endTime: String = noEndDate()
+        endTime: String = noEndDate(),
     ): List<VpnTracker>
 
     fun getTrackersForAppFromDate(
         date: String,
-        packageName: String
+        packageName: String,
     ): Flow<List<VpnTrackerCompanySignal>>
 
     fun getRunningTimeMillis(
         startTime: () -> String,
-        endTime: String = noEndDate()
+        endTime: String = noEndDate(),
     ): Flow<Long>
 
     fun getVpnDataStats(
         startTime: () -> String,
-        endTime: String = noEndDate()
+        endTime: String = noEndDate(),
     ): Flow<DataStats>
 
     fun getVpnRestartHistory(): List<VpnPhoenixEntity>
     fun deleteVpnRestartHistory()
     fun getBlockedTrackersCountBetween(
         startTime: () -> String,
-        endTime: String = noEndDate()
+        endTime: String = noEndDate(),
     ): Flow<Int>
 
     fun getTrackingAppsCountBetween(
         startTime: () -> String,
-        endTime: String = noEndDate()
+        endTime: String = noEndDate(),
     ): Flow<Int>
 }
 
 data class DataStats(
     val sent: DataTransfer = DataTransfer(),
-    val received: DataTransfer = DataTransfer()
+    val received: DataTransfer = DataTransfer(),
 )
 
 data class DataTransfer(
     val dataSize: Long = 0,
-    val numberPackets: Long = 0
+    val numberPackets: Long = 0,
 )
 
 @ContributesBinding(AppScope::class)
 class RealAppTrackerBlockingStatsRepository @Inject constructor(
-    val vpnDatabase: VpnDatabase
+    val vpnDatabase: VpnDatabase,
 ) : AppTrackerBlockingStatsRepository {
 
     private val trackerDao = vpnDatabase.vpnTrackerDao()
@@ -117,7 +117,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
 
     override fun getVpnTrackers(
         startTime: () -> String,
-        endTime: String
+        endTime: String,
     ): Flow<List<VpnTracker>> {
         return trackerDao.getTrackersBetween(startTime(), endTime)
             .conflate()
@@ -129,7 +129,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
     @WorkerThread
     override fun getVpnTrackersSync(
         startTime: () -> String,
-        endTime: String
+        endTime: String,
     ): List<VpnTracker> {
         return trackerDao.getTrackersBetweenSync(startTime(), endTime)
             .filter { tracker -> tracker.timestamp >= startTime() }
@@ -145,7 +145,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
     @WorkerThread
     override fun getTrackersForAppFromDate(
         date: String,
-        packageName: String
+        packageName: String,
     ): Flow<List<VpnTrackerCompanySignal>> {
         return trackerDao.getTrackersForAppFromDate(date, packageName)
             .conflate()
@@ -154,7 +154,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
 
     override fun getRunningTimeMillis(
         startTime: () -> String,
-        endTime: String
+        endTime: String,
     ): Flow<Long> {
         return runningTimeDao.getRunningStatsBetween(startTime(), endTime)
             .conflate()
@@ -168,7 +168,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
 
     override fun getVpnDataStats(
         startTime: () -> String,
-        endTime: String
+        endTime: String,
     ): Flow<DataStats> {
         return statsDao.getDataStatsBetween(startTime(), endTime)
             .conflate()
@@ -193,7 +193,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
     @WorkerThread
     override fun getBlockedTrackersCountBetween(
         startTime: () -> String,
-        endTime: String
+        endTime: String,
     ): Flow<Int> {
         return trackerDao.getTrackersCountBetween(startTime(), endTime)
             .conflate()
@@ -203,7 +203,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
     @WorkerThread
     override fun getTrackingAppsCountBetween(
         startTime: () -> String,
-        endTime: String
+        endTime: String,
     ): Flow<Int> {
         return trackerDao.getTrackingAppsCountBetween(startTime(), endTime)
             .conflate()
@@ -225,7 +225,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
 
         return DataStats(
             sent = DataTransfer(dataSent, packetsSent),
-            received = DataTransfer(dataReceived, packetsReceived)
+            received = DataTransfer(dataReceived, packetsReceived),
         )
     }
 }

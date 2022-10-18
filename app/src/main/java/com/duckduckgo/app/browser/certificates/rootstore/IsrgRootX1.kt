@@ -28,7 +28,7 @@ import java.security.cert.CertificateFactory
  * Let's Encrypt ISRG Root X1 (self-signed) ROOT certificate
  */
 class IsrgRootX1(
-    private val context: Context
+    private val context: Context,
 ) : LetsEncryptCertificate {
 
     private val certificate: Certificate by lazy {

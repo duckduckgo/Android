@@ -205,7 +205,7 @@ class SurveyDownloaderTest {
     private fun surveyWithAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
             SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, null, emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, null, emptyList()),
         )
         return SurveyGroup(id, surveyOptions)
     }
@@ -213,7 +213,7 @@ class SurveyDownloaderTest {
     private fun surveyNoAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
             SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, null, emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, null, emptyList()),
         )
         return SurveyGroup(id, surveyOptions)
     }
@@ -227,8 +227,8 @@ class SurveyDownloaderTest {
                 true,
                 null,
                 null,
-                listOf(SurveyUrlParameter.EmailCohortParam.parameter)
-            )
+                listOf(SurveyUrlParameter.EmailCohortParam.parameter),
+            ),
         )
         return SurveyGroup(id, surveyOptions)
     }
@@ -242,8 +242,8 @@ class SurveyDownloaderTest {
                 null,
                 true,
                 null,
-                listOf(SurveyUrlParameter.AtpCohortParam.parameter)
-            )
+                listOf(SurveyUrlParameter.AtpCohortParam.parameter),
+            ),
         )
         return SurveyGroup(id, surveyOptions)
     }
@@ -257,8 +257,8 @@ class SurveyDownloaderTest {
                 null,
                 isAtpEverEnabledRequired = true,
                 isAtpWaitlistRequired = true,
-                urlParameters = emptyList()
-            )
+                urlParameters = emptyList(),
+            ),
         )
         return SurveyGroup(id, surveyOptions)
     }

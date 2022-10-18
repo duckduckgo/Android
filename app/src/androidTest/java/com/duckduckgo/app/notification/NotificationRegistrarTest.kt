@@ -64,7 +64,7 @@ class NotificationRegistrarTest {
             mockPixel,
             mockSchedulableNotificationPluginPoint,
             mockNotificationPluginPoint,
-            appBuildConfig
+            appBuildConfig,
         )
     }
 

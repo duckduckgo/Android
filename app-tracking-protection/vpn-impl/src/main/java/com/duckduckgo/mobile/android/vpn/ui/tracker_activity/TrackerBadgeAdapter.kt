@@ -38,14 +38,14 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): TrackerBadgeViewHolder {
         return TrackerBadgeViewHolder.create(parent)
     }
 
     override fun onBindViewHolder(
         holder: TrackerBadgeViewHolder,
-        position: Int
+        position: Int,
     ) {
         holder.bind(trackers[position])
     }
@@ -90,7 +90,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
                         .beginConfig()
                         .fontSize(50)
                         .endConfig()
-                        .buildRound(trackerInfo.companyName.take(1), Color.DKGRAY)
+                        .buildRound(trackerInfo.companyName.take(1), Color.DKGRAY),
                 )
             } else {
                 iconBadge.setImageResource(badge)
@@ -103,7 +103,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         private fun badgeIcon(
             context: Context,
             networkName: String,
-            prefix: String = "tracking_network_logo_"
+            prefix: String = "tracking_network_logo_",
         ): Int? {
             val drawable = "$prefix$networkName"
                 .replace(" ", "_")

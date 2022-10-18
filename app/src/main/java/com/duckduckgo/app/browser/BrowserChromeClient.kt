@@ -41,7 +41,7 @@ class BrowserChromeClient @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
-    private val sitePermissionsManager: SitePermissionsManager
+    private val sitePermissionsManager: SitePermissionsManager,
 ) : WebChromeClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -50,7 +50,7 @@ class BrowserChromeClient @Inject constructor(
 
     override fun onShowCustomView(
         view: View,
-        callback: CustomViewCallback?
+        callback: CustomViewCallback?,
     ) {
         try {
             Timber.d("on show custom view")
@@ -84,7 +84,7 @@ class BrowserChromeClient @Inject constructor(
 
     override fun onProgressChanged(
         webView: WebView,
-        newProgress: Int
+        newProgress: Int,
     ) {
         try {
             Timber.d("onProgressChanged ${webView.url}, $newProgress")
@@ -101,7 +101,7 @@ class BrowserChromeClient @Inject constructor(
 
     override fun onReceivedIcon(
         webView: WebView,
-        icon: Bitmap
+        icon: Bitmap,
     ) {
         webView.url?.let {
             Timber.i("Favicon bitmap received: ${webView.url}")
@@ -112,7 +112,7 @@ class BrowserChromeClient @Inject constructor(
     override fun onReceivedTouchIconUrl(
         view: WebView?,
         url: String?,
-        precomposed: Boolean
+        precomposed: Boolean,
     ) {
         Timber.i("Favicon touch received: ${view?.url}, $url")
         val visitedUrl = view?.url ?: return
@@ -123,7 +123,7 @@ class BrowserChromeClient @Inject constructor(
 
     override fun onReceivedTitle(
         view: WebView,
-        title: String
+        title: String,
     ) {
         try {
             webViewClientListener?.titleReceived(title)
@@ -138,7 +138,7 @@ class BrowserChromeClient @Inject constructor(
     override fun onShowFileChooser(
         webView: WebView,
         filePathCallback: ValueCallback<Array<Uri>>,
-        fileChooserParams: FileChooserParams
+        fileChooserParams: FileChooserParams,
     ): Boolean {
         return try {
             webViewClientListener?.showFileChooser(filePathCallback, fileChooserParams)
@@ -160,7 +160,7 @@ class BrowserChromeClient @Inject constructor(
         view: WebView?,
         isDialog: Boolean,
         isUserGesture: Boolean,
-        resultMsg: Message?
+        resultMsg: Message?,
     ): Boolean {
         val isGesture = if (appBuildConfig.isTest) true else isUserGesture
         if (isGesture && resultMsg?.obj is WebView.WebViewTransport) {
@@ -189,7 +189,7 @@ class BrowserChromeClient @Inject constructor(
 
     override fun onGeolocationPermissionsShowPrompt(
         origin: String,
-        callback: GeolocationPermissions.Callback
+        callback: GeolocationPermissions.Callback,
     ) {
         webViewClientListener?.onSiteLocationPermissionRequested(origin, callback)
     }

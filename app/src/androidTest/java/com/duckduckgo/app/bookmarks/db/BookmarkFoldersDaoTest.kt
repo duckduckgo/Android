@@ -49,13 +49,13 @@ class BookmarkFoldersDaoTest {
     private val bookmarkFolderList = listOf(
         BookmarkFolderEntity(id = 1, name = "name", parentId = 0),
         BookmarkFolderEntity(id = 2, name = "another name", parentId = 1),
-        BookmarkFolderEntity(id = 3, name = "subfolder name", parentId = 1)
+        BookmarkFolderEntity(id = 3, name = "subfolder name", parentId = 1),
     )
 
     private val bookmarksList = listOf(
         BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1),
         BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 3),
-        BookmarkEntity(id = 3, title = "bookmark title", url = "www.bar.example.com", parentId = 3)
+        BookmarkEntity(id = 3, title = "bookmark title", url = "www.bar.example.com", parentId = 3),
     )
 
     @Before

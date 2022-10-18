@@ -31,7 +31,7 @@ class HttpsUpgradeDataDownloader @Inject constructor(
     private val service: HttpsUpgradeService,
     private val httpsUpgrader: HttpsUpgrader,
     private val dataPersister: HttpsDataPersister,
-    private val bloomFalsePositivesDao: HttpsFalsePositivesDao
+    private val bloomFalsePositivesDao: HttpsFalsePositivesDao,
 ) {
 
     fun download(): Completable {

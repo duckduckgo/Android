@@ -35,7 +35,7 @@ sealed class ReportBreakageCategory(@StringRes val category: Int, val key: Strin
     object ConnectionCategory :
         ReportBreakageCategory(
             R.string.atp_ReportBreakageCategoryConnection,
-            CONNECTION_CATEGORY_KEY
+            CONNECTION_CATEGORY_KEY,
         )
     object IotCategory :
         ReportBreakageCategory(R.string.atp_ReportBreakageCategoryIot, IOT_CATEGORY_KEY)

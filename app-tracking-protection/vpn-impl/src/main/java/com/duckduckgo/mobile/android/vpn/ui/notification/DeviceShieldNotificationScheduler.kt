@@ -48,7 +48,7 @@ object DeviceShieldNotificationSchedulerModule {
     fun provideDeviceShieldNotificationScheduler(
         @VpnCoroutineScope coroutineScope: CoroutineScope,
         workManager: WorkManager,
-        vpnDatabase: VpnDatabase
+        vpnDatabase: VpnDatabase,
     ): LifecycleObserver {
         return DeviceShieldNotificationScheduler(coroutineScope, workManager, vpnDatabase)
     }
@@ -60,7 +60,7 @@ object DeviceShieldNotificationSchedulerModule {
 class DeviceShieldNotificationScheduler(
     private val coroutineScope: CoroutineScope,
     private val workManager: WorkManager,
-    private val vpnDatabase: VpnDatabase
+    private val vpnDatabase: VpnDatabase,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -135,7 +135,7 @@ class DeviceShieldNotificationScheduler(
 @ContributesWorker(AppScope::class)
 class DeviceShieldDailyNotificationWorker(
     val context: Context,
-    val params: WorkerParameters
+    val params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     @Inject
     lateinit var notificationPressedHandler: DailyNotificationPressedHandler
@@ -167,7 +167,7 @@ class DeviceShieldDailyNotificationWorker(
             if (timesRun >= DeviceShieldNotificationScheduler.TOTAL_DAILY_NOTIFICATIONS) {
                 Timber.v(
                     "Vpn Daily notification has ran $timesRun times out of" +
-                        " ${DeviceShieldNotificationScheduler.TOTAL_DAILY_NOTIFICATIONS}, we don't need to ran it anymore"
+                        " ${DeviceShieldNotificationScheduler.TOTAL_DAILY_NOTIFICATIONS}, we don't need to ran it anymore",
                 )
                 return Result.success()
             } else {
@@ -202,7 +202,7 @@ class DeviceShieldDailyNotificationWorker(
 @ContributesWorker(AppScope::class)
 class DeviceShieldWeeklyNotificationWorker(
     val context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     @Inject
     lateinit var notificationPressedHandler: WeeklyNotificationPressedHandler
@@ -231,7 +231,7 @@ class DeviceShieldWeeklyNotificationWorker(
             val notification = deviceShieldAlertNotificationBuilder.buildStatusNotification(
                 context,
                 deviceShieldNotification,
-                notificationPressedHandler
+                notificationPressedHandler,
             )
             deviceShieldPixels.didShowWeeklyNotification(deviceShieldNotification.notificationVariant)
             notificationManager.notify(Companion.VPN_WEEKLY_NOTIFICATION_ID, notification)

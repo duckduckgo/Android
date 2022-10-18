@@ -42,31 +42,31 @@ class InfoPanel : FrameLayout {
     constructor(context: Context) : this(context, null)
     constructor(
         context: Context,
-        attrs: AttributeSet?
+        attrs: AttributeSet?,
     ) : this(
         context,
         attrs,
-        R.style.Widget_DuckDuckGo_InfoPanel
+        R.style.Widget_DuckDuckGo_InfoPanel,
     )
 
     constructor(
         context: Context,
         attrs: AttributeSet?,
-        defStyle: Int
+        defStyle: Int,
     ) : super(context, attrs, defStyle) {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.InfoPanel)
         setText(attributes.getString(R.styleable.InfoPanel_panelText) ?: "")
         setImageResource(
             attributes.getResourceId(
                 R.styleable.InfoPanel_panelDrawable,
-                R.drawable.ic_link_color_24
-            )
+                R.drawable.ic_link_color_24,
+            ),
         )
         setBackgroundResource(
             attributes.getResourceId(
                 R.styleable.InfoPanel_panelBackground,
-                R.drawable.info_panel_tooltip_background
-            )
+                R.drawable.info_panel_tooltip_background,
+            ),
         )
         attributes.recycle()
     }
@@ -81,7 +81,7 @@ class InfoPanel : FrameLayout {
     fun setClickableLink(
         annotation: String,
         fullText: CharSequence,
-        onClick: () -> Unit
+        onClick: () -> Unit,
     ) {
         val spannedText = fullText as SpannedString
         val spannableString = SpannableString(spannedText)
@@ -98,19 +98,19 @@ class InfoPanel : FrameLayout {
                     clickableSpan,
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 setSpan(
                     UnderlineSpan(),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 setSpan(
                     ForegroundColorSpan(context.getColorFromAttr(R.attr.normalTextColor)),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
         }

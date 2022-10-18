@@ -49,7 +49,7 @@ class ShortcutReceiver : BroadcastReceiver(), DefaultLifecycleObserver {
 
     override fun onReceive(
         context: Context,
-        intent: Intent?
+        intent: Intent?,
     ) {
         AndroidInjection.inject(this, context)
         onShortcutAdded(context, intent)

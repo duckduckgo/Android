@@ -90,10 +90,10 @@ class FakeAppTrackerRepository : AppTrackerRepository {
                 isCdn = false,
                 owner = TrackerOwner(
                     name = this,
-                    displayName = this
+                    displayName = this,
                 ),
-                app = TrackerApp(1, 1.0)
-            )
+                app = TrackerApp(1, 1.0),
+            ),
         )
     }
 }

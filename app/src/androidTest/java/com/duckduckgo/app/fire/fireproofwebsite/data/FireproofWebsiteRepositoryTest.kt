@@ -142,7 +142,7 @@ class FireproofWebsiteRepositoryTest {
             ".mobile.twitter.com",
             "mobile.twitter.com",
             ".twitter.com",
-            ".com"
+            ".com",
         )
 
         val hostsToPreserve = fireproofWebsiteRepository.fireproofWebsites()
@@ -169,7 +169,7 @@ class FireproofWebsiteRepositoryTest {
             "example.com",
             "twitter.com",
             ".twitter.com",
-            ".com"
+            ".com",
         )
 
         val hostsToPreserve = fireproofWebsiteRepository.fireproofWebsites()

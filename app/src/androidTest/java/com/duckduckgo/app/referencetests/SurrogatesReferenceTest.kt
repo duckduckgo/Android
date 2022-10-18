@@ -108,7 +108,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         fakeUserAgent,
         fakeToggle,
         fakeUserAllowListRepository,
-        coroutinesTestRule.testDispatcherProvider
+        coroutinesTestRule.testDispatcherProvider,
     )
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()
@@ -124,7 +124,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             var surrogateTests: SurrogateTest? = null
             val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
                 SurrogatesReferenceTest::class.java.classLoader!!,
-                "reference_tests/domain_matching_tests.json"
+                "reference_tests/domain_matching_tests.json",
             )
 
             jsonObject.keys().forEach {
@@ -139,7 +139,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     data class SurrogateTest(
         val name: String,
         val desc: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class TestCase(
@@ -148,7 +148,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         val requestURL: String,
         val requestType: String,
         val expectAction: String,
-        val expectRedirect: String
+        val expectRedirect: String,
     )
 
     @UiThreadTest
@@ -166,7 +166,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             gpc = mockGpc,
             userAgentProvider = userAgentProvider,
             adClickManager = mockAdClickManager,
-            cloakedCnameDetector = mockCloakedCnameDetector
+            cloakedCnameDetector = mockCloakedCnameDetector,
         )
     }
 
@@ -178,7 +178,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             request = mockRequest,
             documentUrl = testCase.siteURL,
             webView = webView,
-            webViewClientListener = null
+            webViewClientListener = null,
         )
 
         when (testCase.expectAction) {
@@ -211,7 +211,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
                 mockContentBlocking,
                 mockTrackerAllowlist,
                 mockWebTrackersBlockedDao,
-                mockAdClickManager
+                mockAdClickManager,
             )
 
         val json = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/tracker_radar_reference.json")
@@ -239,7 +239,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
 
     private fun assertRedirectCorrectlyDone(
         response: WebResourceResponse?,
-        expectedRedirect: String
+        expectedRedirect: String,
     ) {
         val result = response?.let {
             val test = String(it.data.readBytes()).trim()

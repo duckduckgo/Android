@@ -29,19 +29,19 @@ interface VpnStateMonitor {
     fun getStateFlow(vpnFeature: VpnFeature): Flow<VpnState>
     data class VpnState(
         val state: VpnRunningState,
-        val stopReason: VpnStopReason? = null
+        val stopReason: VpnStopReason? = null,
     )
 
     enum class VpnRunningState {
         ENABLED,
         DISABLED,
-        INVALID
+        INVALID,
     }
 
     enum class VpnStopReason {
         SELF_STOP,
         ERROR,
         REVOKED,
-        UNKNOWN
+        UNKNOWN,
     }
 }

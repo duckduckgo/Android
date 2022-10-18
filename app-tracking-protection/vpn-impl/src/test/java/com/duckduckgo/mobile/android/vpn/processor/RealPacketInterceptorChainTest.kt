@@ -27,7 +27,7 @@ class RealPacketInterceptorChainTest {
     private val testRequest = PacketRequest(
         PacketInfo(4, 0, InetAddress.getByName("1.1.1.1"), 1, InetAddress.getByName("1.1.1.1"), 2),
         ByteBuffer.allocate(0),
-        mock()
+        mock(),
     )
 
     @Test(expected = IllegalStateException::class)
@@ -39,10 +39,10 @@ class RealPacketInterceptorChainTest {
     fun whenOneInterceptorThenCallThroughIt() {
         val result = RealPacketInterceptorChain(
             listOf(
-                VpnPacketInterceptor { return@VpnPacketInterceptor 1 }
+                VpnPacketInterceptor { return@VpnPacketInterceptor 1 },
             ),
             0,
-            testRequest
+            testRequest,
         ).proceed(testRequest)
 
         assertEquals(1, result)
@@ -55,10 +55,10 @@ class RealPacketInterceptorChainTest {
                 VpnPacketInterceptor { chain -> return@VpnPacketInterceptor chain.proceed(chain.request()) },
                 VpnPacketInterceptor { chain -> return@VpnPacketInterceptor chain.proceed(chain.request()) },
                 VpnPacketInterceptor { chain -> return@VpnPacketInterceptor chain.proceed(chain.request()) },
-                VpnPacketInterceptor { return@VpnPacketInterceptor 1 }
+                VpnPacketInterceptor { return@VpnPacketInterceptor 1 },
             ),
             0,
-            testRequest
+            testRequest,
         ).proceed(testRequest)
 
         assertEquals(1, result)
@@ -71,10 +71,10 @@ class RealPacketInterceptorChainTest {
                 VpnPacketInterceptor { chain -> return@VpnPacketInterceptor chain.proceed(chain.request()) },
                 VpnPacketInterceptor { return@VpnPacketInterceptor 2 },
                 VpnPacketInterceptor { chain -> return@VpnPacketInterceptor chain.proceed(chain.request()) },
-                VpnPacketInterceptor { return@VpnPacketInterceptor 1 }
+                VpnPacketInterceptor { return@VpnPacketInterceptor 1 },
             ),
             0,
-            testRequest
+            testRequest,
         ).proceed(testRequest)
 
         assertEquals(2, result)

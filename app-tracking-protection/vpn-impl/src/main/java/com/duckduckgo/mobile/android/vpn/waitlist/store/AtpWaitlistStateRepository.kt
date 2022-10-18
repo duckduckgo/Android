@@ -30,7 +30,7 @@ interface AtpWaitlistStateRepository {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class WaitlistStateRepository @Inject constructor(
-    private val dataStore: AppTrackingProtectionWaitlistDataStore
+    private val dataStore: AppTrackingProtectionWaitlistDataStore,
 ) : AtpWaitlistStateRepository {
 
     override fun getState(): WaitlistState {

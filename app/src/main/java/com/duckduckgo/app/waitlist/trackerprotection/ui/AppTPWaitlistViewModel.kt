@@ -43,7 +43,7 @@ class AppTPWaitlistViewModel @Inject constructor(
     private val waitlistService: AppTrackingProtectionWaitlistService,
     private val workManager: WorkManager,
     private val workRequestBuilder: AppTPWaitlistWorkRequestBuilder,
-    private val deviceShieldPixels: DeviceShieldPixels
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : ViewModel() {
 
     private val viewStateFlow: MutableStateFlow<ViewState> =
@@ -95,7 +95,7 @@ class AppTPWaitlistViewModel @Inject constructor(
 
     private fun joinedWaitlist(
         timestamp: Int,
-        token: String
+        token: String,
     ) {
         viewModelScope.launch {
             waitlistManager.joinWaitlist(timestamp, token)

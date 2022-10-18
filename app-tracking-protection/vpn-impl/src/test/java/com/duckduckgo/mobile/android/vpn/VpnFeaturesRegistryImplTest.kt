@@ -44,7 +44,7 @@ class VpnFeaturesRegistryImplTest {
         vpnServiceWrapper = TestVpnServiceWrapper()
 
         whenever(
-            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.android.vpn.feature.registry.v1"), eq(true), eq(false))
+            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.android.vpn.feature.registry.v1"), eq(true), eq(false)),
         ).thenReturn(prefs)
 
         vpnFeaturesRegistry = VpnFeaturesRegistryImpl(vpnServiceWrapper, sharedPreferencesProvider)
@@ -155,7 +155,7 @@ class VpnFeaturesRegistryImplTest {
 
     private enum class TestVpnFeatures(override val featureName: String) : VpnFeature {
         FOO("FOO"),
-        BAR("BAR")
+        BAR("BAR"),
     }
 
     private class TestVpnServiceWrapper : VpnServiceWrapper(InstrumentationRegistry.getInstrumentation().context) {

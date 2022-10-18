@@ -27,7 +27,7 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class
+    boundType = PixelInterceptorPlugin::class,
 )
 class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInterceptorPlugin {
     override fun intercept(chain: Interceptor.Chain): Response {

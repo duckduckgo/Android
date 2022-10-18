@@ -86,7 +86,7 @@ class RadioListAlertDialog(val builder: Builder) : DialogFragment() {
 
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
-            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog
+            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog,
         )
             .setView(binding.root)
 
@@ -118,28 +118,28 @@ class RadioListAlertDialog(val builder: Builder) : DialogFragment() {
         var selectedOption = 0
 
         fun setTitle(
-            @StringRes textId: Int
+            @StringRes textId: Int,
         ): Builder {
             titleText = context.getText(textId)
             return this
         }
 
         fun setMessage(
-            @StringRes textId: Int
+            @StringRes textId: Int,
         ): Builder {
             messageText = context.getText(textId)
             return this
         }
 
         fun setTitle(
-            text: CharSequence
+            text: CharSequence,
         ): Builder {
             titleText = text
             return this
         }
 
         fun setMessage(
-            text: CharSequence
+            text: CharSequence,
         ): Builder {
             messageText = text
             return this
@@ -147,7 +147,7 @@ class RadioListAlertDialog(val builder: Builder) : DialogFragment() {
 
         fun setOptions(
             @StringRes stackedButtonTextId: List<Int>,
-            selectedItem: Int = 0
+            selectedItem: Int = 0,
         ): Builder {
             stackedButtonTextId.forEach {
                 optionList.add(context.getText(it))
@@ -162,7 +162,7 @@ class RadioListAlertDialog(val builder: Builder) : DialogFragment() {
         }
 
         fun setNegativeButton(
-            @StringRes textId: Int
+            @StringRes textId: Int,
         ): Builder {
             negativeButtonText = context.getText(textId)
             return this

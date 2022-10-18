@@ -46,7 +46,7 @@ class BandwidthSchedulerTest {
         verify(mockWorkManager).enqueueUniquePeriodicWork(
             eq(BANDWIDTH_WORKER_TAG),
             eq(KEEP),
-            any()
+            any(),
         )
     }
 

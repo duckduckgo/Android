@@ -49,7 +49,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
     interface SiteLocationPermissionDialogListener {
         fun onSiteLocationPermissionSelected(
             domain: String,
-            permission: LocationPermissionType
+            permission: LocationPermissionType,
         )
     }
 
@@ -85,13 +85,13 @@ class SiteLocationPermissionDialog : DialogFragment() {
             binding.siteAllowAlwaysLocationPermission,
             binding.siteAllowOnceLocationPermission,
             binding.siteDenyOnceLocationPermission,
-            binding.siteDenyAlwaysLocationPermission
+            binding.siteDenyAlwaysLocationPermission,
         )
         hideExtraViews(
             binding.siteAllowOnceLocationPermission,
             binding.siteDenyOnceLocationPermission,
             binding.siteAllowOnceLocationPermissionDivider,
-            binding.siteDenyLocationPermissionDivider
+            binding.siteDenyLocationPermissionDivider,
         )
         makeCancellable()
 
@@ -141,7 +141,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         allowAlways: TextView,
         allowOnce: TextView,
         denyOnce: TextView,
-        denyAlways: TextView
+        denyAlways: TextView,
     ) {
         val originUrl = getOriginUrl()
         allowAlways.setOnClickListener {
@@ -166,7 +166,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         allowOnce: TextView,
         denyOnce: TextView,
         dividerOne: View,
-        dividerTwo: View
+        dividerTwo: View,
     ) {
         if (isEditingPermissions()) {
             dividerOne.gone()
@@ -212,7 +212,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         fun instance(
             origin: String,
             isEditingPermission: Boolean,
-            tabId: String
+            tabId: String,
         ): SiteLocationPermissionDialog {
             return SiteLocationPermissionDialog().also { fragment ->
                 val bundle = Bundle()

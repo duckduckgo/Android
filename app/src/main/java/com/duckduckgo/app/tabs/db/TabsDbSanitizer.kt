@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 
 @SingleInstanceIn(AppScope::class)
 class TabsDbSanitizer @Inject constructor(
-    private val tabRepository: TabRepository
+    private val tabRepository: TabRepository,
 ) : DefaultLifecycleObserver {
 
     override fun onStart(owner: LifecycleOwner) {

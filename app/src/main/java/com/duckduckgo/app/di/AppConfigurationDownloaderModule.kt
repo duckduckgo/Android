@@ -33,13 +33,13 @@ open class AppConfigurationDownloaderModule {
         trackerDataDownloader: TrackerDataDownloader,
         httpsUpgradeDataDownloader: HttpsUpgradeDataDownloader,
         resourceSurrogateDownloader: ResourceSurrogateListDownloader,
-        surveyDownloader: SurveyDownloader
+        surveyDownloader: SurveyDownloader,
     ): ConfigurationDownloader {
         return AppConfigurationDownloader(
             trackerDataDownloader,
             httpsUpgradeDataDownloader,
             resourceSurrogateDownloader,
-            surveyDownloader
+            surveyDownloader,
         )
     }
 }

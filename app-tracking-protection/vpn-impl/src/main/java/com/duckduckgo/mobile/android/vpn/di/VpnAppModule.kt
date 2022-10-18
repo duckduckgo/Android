@@ -48,7 +48,7 @@ object VpnAppModule {
     @Provides
     fun provideVpnDatabaseCallbackProvider(
         context: Context,
-        vpnDatabase: Provider<VpnDatabase>
+        vpnDatabase: Provider<VpnDatabase>,
     ): VpnDatabaseCallbackProvider {
         return VpnDatabaseCallbackProvider(context, vpnDatabase)
     }
@@ -61,7 +61,7 @@ object VpnAppModule {
     @Provides
     fun bindVpnDatabase(
         context: Context,
-        vpnDatabaseCallbackProvider: VpnDatabaseCallbackProvider
+        vpnDatabaseCallbackProvider: VpnDatabaseCallbackProvider,
     ): VpnDatabase {
         return Room.databaseBuilder(context, VpnDatabase::class.java, "vpn.db")
             .enableMultiInstanceInvalidation()
@@ -86,7 +86,7 @@ object VpnAppModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideAppTrackerLoader(
-        vpnDatabase: VpnDatabase
+        vpnDatabase: VpnDatabase,
     ): AppTrackerRepository {
         return RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao(), vpnDatabase.vpnSystemAppsOverridesDao())
     }
@@ -106,7 +106,7 @@ object VpnAppModule {
     @SingleInstanceIn(AppScope::class)
     fun provideVpnFeaturesRegistry(
         context: Context,
-        sharedPreferencesProvider: VpnSharedPreferencesProvider
+        sharedPreferencesProvider: VpnSharedPreferencesProvider,
     ): VpnFeaturesRegistry {
         return VpnFeaturesRegistryImpl(VpnServiceWrapper(context), sharedPreferencesProvider)
     }

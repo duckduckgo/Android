@@ -43,7 +43,7 @@ class SearchAndFavoritesGridCalculatorKtTest {
         companion object {
             data class TestCase(
                 val expectedColumns: Int,
-                val width: Int
+                val width: Int,
             )
 
             @JvmStatic
@@ -58,7 +58,7 @@ class SearchAndFavoritesGridCalculatorKtTest {
                     TestCase(5, 348),
                     TestCase(6, 416),
                     TestCase(7, 484),
-                    TestCase(8, 552)
+                    TestCase(8, 552),
                 )
             }
         }
@@ -81,7 +81,7 @@ class SearchAndFavoritesGridCalculatorKtTest {
         companion object {
             data class TestCase(
                 val expectedRows: Int,
-                val width: Int
+                val width: Int,
             )
 
             @JvmStatic
@@ -97,7 +97,7 @@ class SearchAndFavoritesGridCalculatorKtTest {
                     TestCase(4, 564),
                     TestCase(4, 662),
                     TestCase(4, 760),
-                    TestCase(4, 858)
+                    TestCase(4, 858),
                 )
             }
         }

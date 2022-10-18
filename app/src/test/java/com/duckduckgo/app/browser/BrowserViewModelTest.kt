@@ -95,7 +95,7 @@ class BrowserViewModelTest {
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
             appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
-            pixel = mockPixel
+            pixel = mockPixel,
         )
 
         testee.command.observeForever(mockCommandObserver)

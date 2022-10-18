@@ -316,7 +316,7 @@ class StatisticsRequesterJsonTest {
 
     private fun queueResponseFromFile(
         filename: String,
-        responseCode: Int = 200
+        responseCode: Int = 200,
     ) {
         val response = MockResponse()
             .setBody(loadText(StatisticsRequesterJsonTest::class.java.classLoader!!, "$JSON_DIR/$filename"))
@@ -328,7 +328,7 @@ class StatisticsRequesterJsonTest {
     @Suppress("SameParameterValue")
     private fun queueResponseFromString(
         responseBody: String,
-        responseCode: Int = 200
+        responseCode: Int = 200,
     ) {
         val response = MockResponse()
             .setBody(responseBody)

@@ -34,7 +34,7 @@ class OriginatingAppPackageIdentifierStrategyTest {
     private val testee = OriginatingAppPackageIdentifierStrategy(
         modern = mockResolverModern,
         legacy = mockResolverLegacy,
-        appBuildConfig = mockAppBuildConfig
+        appBuildConfig = mockAppBuildConfig,
     )
 
     @Test

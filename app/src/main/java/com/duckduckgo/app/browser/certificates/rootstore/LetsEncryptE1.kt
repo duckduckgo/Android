@@ -29,7 +29,7 @@ import java.security.cert.CertificateFactory
  * It is signed by [IsrgRootX2]
  */
 class LetsEncryptE1(
-    private val context: Context
+    private val context: Context,
 ) : LetsEncryptCertificate {
 
     private val certificate: Certificate by lazy {

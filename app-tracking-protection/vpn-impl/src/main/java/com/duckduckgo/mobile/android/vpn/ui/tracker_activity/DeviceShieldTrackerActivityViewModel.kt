@@ -48,7 +48,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val vpnDetector: VpnDetector,
     private val vpnFeatureRemover: VpnFeatureRemover,
     private val vpnStore: VpnStore,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -192,12 +192,12 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     internal data class TrackerActivityViewState(
         val trackerCountInfo: TrackerCountInfo,
-        val runningState: VpnState
+        val runningState: VpnState,
     )
 
     internal data class TrackerCountInfo(
         val trackers: TrackerCount,
-        val apps: TrackingAppCount
+        val apps: TrackingAppCount,
     ) {
         fun stringTrackerCount(): String {
             return String.format(Locale.US, "%,d", trackers.value)

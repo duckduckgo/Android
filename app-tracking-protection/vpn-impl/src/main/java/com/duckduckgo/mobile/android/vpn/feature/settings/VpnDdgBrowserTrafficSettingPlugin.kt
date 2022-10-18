@@ -25,10 +25,10 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = AppTpSettingPlugin::class
+    boundType = AppTpSettingPlugin::class,
 )
 class VpnDdgBrowserTrafficSettingPlugin @Inject constructor(
-    private val appTpFeatureConfig: AppTpFeatureConfig
+    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : AppTpSettingPlugin {
     private val jsonAdapter = Moshi.Builder().build().adapter(JsonConfigModel::class.java)
 

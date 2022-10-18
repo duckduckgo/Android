@@ -36,7 +36,7 @@ interface SuggestionViewHolderFactory {
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     )
 }
 
@@ -52,7 +52,7 @@ class SearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val searchSuggestionViewHolder = holder as AutoCompleteViewHolder.SearchSuggestionViewHolder
         searchSuggestionViewHolder.bind(suggestion as AutoCompleteSearchSuggestion, immediateSearchClickListener, editableSearchClickListener)
@@ -71,7 +71,7 @@ class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val bookmarkSuggestionViewHolder = holder as AutoCompleteViewHolder.BookmarkSuggestionViewHolder
         bookmarkSuggestionViewHolder.bind(suggestion as AutoCompleteBookmarkSuggestion, immediateSearchClickListener, editableSearchClickListener)
@@ -89,7 +89,7 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         // do nothing
     }
@@ -101,7 +101,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         fun bind(
             item: AutoCompleteSearchSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
-            editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+            editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
             phrase.text = item.phrase
 
@@ -117,7 +117,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         fun bind(
             item: AutoCompleteBookmarkSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
-            editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+            editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
             title.text = item.title
             url.text = item.url

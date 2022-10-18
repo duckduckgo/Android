@@ -103,7 +103,7 @@ class QueryParamReferrerParserTest {
 
     private fun verifyCampaignReferrerFound(
         expectedReferrer: String,
-        result: ParsedReferrerResult
+        result: ParsedReferrerResult,
     ) {
         assertTrue(result is CampaignReferrerFound)
         val value = (result as CampaignReferrerFound).campaignSuffix

@@ -27,7 +27,7 @@ import timber.log.Timber
 @RequiresApi(Build.VERSION_CODES.Q)
 class DetectOriginatingAppPackageModern(
     private val connectivityManager: ConnectivityManager,
-    private val packageManager: PackageManager
+    private val packageManager: PackageManager,
 ) : OriginatingAppPackageIdentifier {
 
     override fun resolvePackageId(connectionInfo: ConnectionInfo): String {
@@ -40,7 +40,7 @@ class DetectOriginatingAppPackageModern(
     private fun getConnectionOwnerUid(
         connectionInfo: ConnectionInfo,
         source: InetSocketAddress,
-        destination: InetSocketAddress
+        destination: InetSocketAddress,
     ): Int {
         return try {
             connectivityManager.getConnectionOwnerUid(connectionInfo.protocolNumber, source, destination)

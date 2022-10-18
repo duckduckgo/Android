@@ -67,7 +67,7 @@ class WelcomePage : OnboardingPageFragment() {
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -118,7 +118,7 @@ class WelcomePage : OnboardingPageFragment() {
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         if (requestCode == DEFAULT_BROWSER_ROLE_MANAGER_DIALOG) {
             if (resultCode == RESULT_OK) {

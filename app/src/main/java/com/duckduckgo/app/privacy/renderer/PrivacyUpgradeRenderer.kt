@@ -26,7 +26,7 @@ class PrivacyUpgradeRenderer {
         context: Context,
         before: PrivacyGrade,
         after: PrivacyGrade,
-        privacyOn: Boolean
+        privacyOn: Boolean,
     ): String {
         if (before != after) {
             return context.getString(R.string.privacyProtectionUpgraded, before.smallIcon(), after.smallIcon())

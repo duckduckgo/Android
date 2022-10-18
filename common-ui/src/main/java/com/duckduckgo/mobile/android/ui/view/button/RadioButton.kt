@@ -24,9 +24,9 @@ import com.google.android.material.radiobutton.MaterialRadioButton
 class RadioButton @JvmOverloads constructor(
     ctx: Context,
     attrs: AttributeSet?,
-    defStyleAttr: Int = R.attr.radioButtonStyle
+    defStyleAttr: Int = R.attr.radioButtonStyle,
 ) : MaterialRadioButton(
     ctx,
     attrs,
-    defStyleAttr
+    defStyleAttr,
 )

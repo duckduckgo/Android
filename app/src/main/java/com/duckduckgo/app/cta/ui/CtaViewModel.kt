@@ -68,7 +68,7 @@ class CtaViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val appTheme: AppTheme
+    private val appTheme: AppTheme,
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
     var canShowAutoconsentCta: AtomicBoolean = AtomicBoolean(false)
@@ -97,7 +97,7 @@ class CtaViewModel @Inject constructor(
             CtaId.DAX_DIALOG_TRACKERS_FOUND,
             CtaId.DAX_DIALOG_NETWORK,
             CtaId.DAX_FIRE_BUTTON,
-            CtaId.DAX_END
+            CtaId.DAX_END,
         )
     }
 
@@ -176,7 +176,7 @@ class CtaViewModel @Inject constructor(
         isBrowserShowing: Boolean,
         site: Site? = null,
         favoritesOnboarding: Boolean = false,
-        locale: Locale = Locale.getDefault()
+        locale: Locale = Locale.getDefault(),
     ): Cta? {
         surveyCta(locale)?.let {
             return it

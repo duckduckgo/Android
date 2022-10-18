@@ -36,7 +36,7 @@ sealed class CertificateValidationState {
 }
 
 class TrustedCertificateStoreImpl(
-    private val letsEncryptCertificateProvider: LetsEncryptCertificateProvider
+    private val letsEncryptCertificateProvider: LetsEncryptCertificateProvider,
 ) : TrustedCertificateStore {
 
     /**
@@ -85,7 +85,7 @@ class TrustedCertificateStoreImpl(
     @Throws(CertificateExpiredException::class, CertificateNotYetValidException::class)
     private fun validate(
         cert: Certificate,
-        issuerCertificate: Certificate
+        issuerCertificate: Certificate,
     ) {
         if (issuerCertificate.type == CertificateTypes.X509) {
             (issuerCertificate as X509Certificate).checkValidity()

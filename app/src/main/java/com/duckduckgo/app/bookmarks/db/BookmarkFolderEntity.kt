@@ -23,5 +23,5 @@ import androidx.room.PrimaryKey
 data class BookmarkFolderEntity(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
     var name: String,
-    var parentId: Long
+    var parentId: Long,
 )

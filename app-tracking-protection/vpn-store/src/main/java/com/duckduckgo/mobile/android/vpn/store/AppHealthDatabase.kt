@@ -35,12 +35,12 @@ import com.squareup.moshi.Types
     version = 6,
     entities = [
         AppHealthState::class,
-        HealthTriggerEntity::class
-    ]
+        HealthTriggerEntity::class,
+    ],
 )
 @TypeConverters(
     AppHealthDatabaseConverters::class,
-    AppHealthState.HealthEventTypeConverter::class
+    AppHealthState.HealthEventTypeConverter::class,
 )
 abstract class AppHealthDatabase : RoomDatabase() {
 

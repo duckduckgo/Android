@@ -37,7 +37,7 @@ import timber.log.Timber
 class TrackerProtectionFlipperPlugin @Inject constructor(
     vpnDatabase: VpnDatabase,
     private val dispatcherProvider: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : FlipperPlugin {
 
     private var job = ConflatedJob()

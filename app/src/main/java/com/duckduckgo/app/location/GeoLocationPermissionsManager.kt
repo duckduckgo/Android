@@ -40,7 +40,7 @@ class GeoLocationPermissionsManager @Inject constructor(
     private val context: Context,
     private val permissionsRepository: LocationPermissionsRepository,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : GeoLocationPermissions {
 
     override fun isDeviceLocationEnabled(): Boolean {

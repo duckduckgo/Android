@@ -115,7 +115,7 @@ fun View.recursiveEnable(enabled: Boolean) {
 
 fun CompoundButton.quietlySetIsChecked(
     newCheckedState: Boolean,
-    changeListener: CompoundButton.OnCheckedChangeListener?
+    changeListener: CompoundButton.OnCheckedChangeListener?,
 ) {
     setOnCheckedChangeListener(null)
     isChecked = newCheckedState
@@ -124,7 +124,7 @@ fun CompoundButton.quietlySetIsChecked(
 
 fun View.makeSnackbarWithNoBottomInset(
     text: CharSequence,
-    @Duration duration: Int
+    @Duration duration: Int,
 ): Snackbar {
     val snackbar = Snackbar.make(this, text, duration)
     snackbar.isGestureInsetBottomIgnored = true
@@ -133,7 +133,7 @@ fun View.makeSnackbarWithNoBottomInset(
 
 fun View.makeSnackbarWithNoBottomInset(
     @StringRes resId: Int,
-    @Duration duration: Int
+    @Duration duration: Int,
 ): Snackbar {
     val snackbar = Snackbar.make(this, resId, duration)
     snackbar.isGestureInsetBottomIgnored = true
@@ -142,7 +142,7 @@ fun View.makeSnackbarWithNoBottomInset(
 
 fun Slider.quietlySetValue(
     newValue: Float,
-    listener: Slider.OnChangeListener
+    listener: Slider.OnChangeListener,
 ) {
     removeOnChangeListener(listener)
     value = newValue

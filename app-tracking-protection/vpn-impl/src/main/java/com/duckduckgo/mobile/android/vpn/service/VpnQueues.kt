@@ -63,7 +63,7 @@ class VpnQueues @Inject constructor() : VpnQueuesTimeLogger {
     override fun millisSinceLastDeviceToNetworkWrite(): Long {
         return min(
             (tcpDeviceToNetwork as LoggingLinkedBlockingDeque).millisSinceLastOffer(),
-            (udpDeviceToNetwork as LoggingLinkedBlockingDeque).millisSinceLastOffer()
+            (udpDeviceToNetwork as LoggingLinkedBlockingDeque).millisSinceLastOffer(),
         )
     }
 
@@ -75,7 +75,7 @@ class VpnQueues @Inject constructor() : VpnQueuesTimeLogger {
         return minOf(
             (tcpDeviceToNetwork as LoggingLinkedBlockingDeque).millisSinceLastTake(),
             (udpDeviceToNetwork as LoggingLinkedBlockingDeque).millisSinceLastTake(),
-            (networkToDevice as LoggingLinkedBlockingDeque).millisSinceLastTake()
+            (networkToDevice as LoggingLinkedBlockingDeque).millisSinceLastTake(),
         )
     }
 
@@ -98,7 +98,7 @@ private class LoggingLinkedBlockingDeque<T> : LinkedBlockingDeque<T>() {
     override fun offer(
         e: T,
         timeout: Long,
-        unit: TimeUnit?
+        unit: TimeUnit?,
     ): Boolean {
         updateLastOffer()
         return super.offer(e, timeout, unit)

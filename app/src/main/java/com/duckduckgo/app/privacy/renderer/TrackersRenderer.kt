@@ -27,7 +27,7 @@ class TrackersRenderer {
     fun trackersText(
         context: Context,
         trackersBlockedCount: Int,
-        specialDomainsLoadedCount: Int
+        specialDomainsLoadedCount: Int,
     ): String {
         val resource = if (trackersBlockedCount > 0) {
             R.string.trackersBlockedText
@@ -41,7 +41,7 @@ class TrackersRenderer {
 
     fun domainsLoadedText(
         context: Context,
-        domainsLoadedCount: Int
+        domainsLoadedCount: Int,
     ): String {
         val resource = if (domainsLoadedCount > 0) {
             R.string.domainsLoadedText
@@ -53,7 +53,7 @@ class TrackersRenderer {
 
     fun majorNetworksText(
         context: Context,
-        majorNetworkCount: Int
+        majorNetworkCount: Int,
     ): String {
         val resource = if (majorNetworkCount > 0) R.string.majorNetworksFound else R.string.majorNetworksNoFound
         return context.resources.getString(resource)
@@ -64,7 +64,7 @@ class TrackersRenderer {
         trackersBlockedCount: Int,
         specialDomainsLoadedCount: Int,
         toggleEnabled: Boolean?,
-        largeIcon: Boolean = false
+        largeIcon: Boolean = false,
     ): Int {
         return when {
             toggleEnabled == false && trackersBlockedCount + specialDomainsLoadedCount > 0 ->
@@ -79,7 +79,7 @@ class TrackersRenderer {
     @DrawableRes
     fun networkPillIcon(
         context: Context,
-        networkName: String
+        networkName: String,
     ): Int? {
         return networkIcon(context, networkName, "network_pill_")
     }
@@ -87,7 +87,7 @@ class TrackersRenderer {
     @DrawableRes
     fun networkLogoIcon(
         context: Context,
-        networkName: String
+        networkName: String,
     ): Int? {
         return networkIcon(context, networkName, "network_logo_")
     }
@@ -95,7 +95,7 @@ class TrackersRenderer {
     private fun networkIcon(
         context: Context,
         networkName: String,
-        prefix: String
+        prefix: String,
     ): Int? {
         val drawable = "$prefix$networkName"
             .replace(" ", "_")
@@ -108,7 +108,7 @@ class TrackersRenderer {
 
     fun networkPercentage(
         network: NetworkLeaderboardEntry,
-        totalDomainsVisited: Int
+        totalDomainsVisited: Int,
     ): String? {
         if (totalDomainsVisited == 0 || network.count == 0) return ""
         val to100 = ((network.count / totalDomainsVisited.toFloat()) * 100).toInt()

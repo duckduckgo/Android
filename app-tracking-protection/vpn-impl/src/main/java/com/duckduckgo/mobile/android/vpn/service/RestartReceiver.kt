@@ -34,13 +34,13 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class RestartReceiver @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val context: Context,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.getStringExtra("action")?.lowercase() == "restart") {

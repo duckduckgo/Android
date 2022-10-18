@@ -43,7 +43,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
 
     override fun onReceive(
         context: Context,
-        intent: Intent
+        intent: Intent,
     ) {
         AndroidInjection.inject(this, context)
 
@@ -66,7 +66,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
 fun goAsync(
     pendingResult: BroadcastReceiver.PendingResult?,
     coroutineScope: CoroutineScope = GlobalScope,
-    block: suspend () -> Unit
+    block: suspend () -> Unit,
 ) {
     coroutineScope.launch(Dispatchers.IO) {
         try {

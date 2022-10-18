@@ -23,18 +23,18 @@ interface HostnameExtractor {
 
     fun extract(
         tcb: TCB,
-        payloadBytes: ByteArray
+        payloadBytes: ByteArray,
     ): String?
 }
 
 class AndroidHostnameExtractor(
     private val hostnameHeaderExtractor: HostnameHeaderExtractor,
-    private val encryptedRequestHostExtractor: EncryptedRequestHostExtractor
+    private val encryptedRequestHostExtractor: EncryptedRequestHostExtractor,
 ) : HostnameExtractor {
 
     override fun extract(
         tcb: TCB,
-        payloadBytes: ByteArray
+        payloadBytes: ByteArray,
     ): String? {
         if (tcb.hostName != null) return tcb.hostName
         determineHost(tcb, payloadBytes)
@@ -44,7 +44,7 @@ class AndroidHostnameExtractor(
 
     private fun determineHost(
         tcb: TCB,
-        payloadBytes: ByteArray
+        payloadBytes: ByteArray,
     ) {
         var host = encryptedRequestHostExtractor.extract(payloadBytes)
         if (host != null) {

@@ -60,7 +60,7 @@ class OfflinePixelSenderTest {
         val params = mapOf(
             EXCEPTION_MESSAGE to "test",
             EXCEPTION_APP_VERSION to "version",
-            EXCEPTION_TIMESTAMP to "2020-04-29T13:32:45+0000"
+            EXCEPTION_TIMESTAMP to "2020-04-29T13:32:45+0000",
         )
 
         testee.sendOfflinePixels().blockingAwait()

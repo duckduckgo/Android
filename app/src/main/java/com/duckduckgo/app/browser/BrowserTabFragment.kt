@@ -404,7 +404,7 @@ class BrowserTabFragment :
             cookieScene = scene_root,
             dummyCookieView = cookieDummyView,
             container = animationContainer,
-            appTheme = appTheme
+            appTheme = appTheme,
         )
     }
 
@@ -539,7 +539,7 @@ class BrowserTabFragment :
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         return inflater.inflate(R.layout.fragment_browser_tab, container, false)
     }
@@ -577,7 +577,7 @@ class BrowserTabFragment :
                     updateOrDeleteWebViewPreview()
                 }
             }
-        })
+        },)
 
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
@@ -668,7 +668,7 @@ class BrowserTabFragment :
 
     private fun addHomeShortcut(
         homeShortcut: Command.AddHomeShortcut,
-        context: Context
+        context: Context,
     ) {
         shortcutBuilder.requestPinShortcut(context, homeShortcut)
     }
@@ -678,49 +678,49 @@ class BrowserTabFragment :
             viewLifecycleOwner,
             Observer {
                 it?.let { renderer.renderAutocomplete(it) }
-            }
+            },
         )
 
         viewModel.globalLayoutState.observe(
             viewLifecycleOwner,
             Observer {
                 it?.let { renderer.renderGlobalViewState(it) }
-            }
+            },
         )
 
         viewModel.browserViewState.observe(
             viewLifecycleOwner,
             Observer {
                 it?.let { renderer.renderBrowserViewState(it) }
-            }
+            },
         )
 
         viewModel.loadingViewState.observe(
             viewLifecycleOwner,
             Observer {
                 it?.let { renderer.renderLoadingIndicator(it) }
-            }
+            },
         )
 
         viewModel.omnibarViewState.observe(
             viewLifecycleOwner,
             Observer {
                 it?.let { renderer.renderOmnibar(it) }
-            }
+            },
         )
 
         viewModel.findInPageViewState.observe(
             viewLifecycleOwner,
             Observer {
                 it?.let { renderer.renderFindInPageState(it) }
-            }
+            },
         )
 
         viewModel.accessibilityViewState.observe(
             viewLifecycleOwner,
             Observer {
                 it?.let { renderer.applyAccessibilitySettings(it) }
-            }
+            },
         )
 
         viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
@@ -729,21 +729,21 @@ class BrowserTabFragment :
             viewLifecycleOwner,
             Observer {
                 processCommand(it)
-            }
+            },
         )
 
         viewModel.survey.observe(
             viewLifecycleOwner,
             Observer {
                 it.let { viewModel.onSurveyChanged(it) }
-            }
+            },
         )
 
         viewModel.privacyGradeViewState.observe(
             viewLifecycleOwner,
             Observer {
                 it.let { renderer.renderPrivacyGrade(it) }
-            }
+            },
         )
 
         addTabsObserver()
@@ -787,7 +787,7 @@ class BrowserTabFragment :
                 it?.let {
                     decorator.renderTabIcon(it)
                 }
-            }
+            },
         )
     }
 
@@ -821,7 +821,7 @@ class BrowserTabFragment :
 
     private fun navigate(
         url: String,
-        headers: Map<String, String>
+        headers: Map<String, String>,
     ) {
         hideKeyboard()
         renderer.hideFindInPage()
@@ -904,8 +904,8 @@ class BrowserTabFragment :
                     it.view,
                     ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                    )
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                    ),
                 )
             }
             is Command.DownloadImage -> requestImageDownload(it.url, it.requestUserConfirmation)
@@ -933,7 +933,7 @@ class BrowserTabFragment :
                     fallbackUrl = it.nonHttpAppLink.fallbackUrl,
                     fallbackIntent = it.nonHttpAppLink.fallbackIntent,
                     useFirstActivityFound = false,
-                    headers = it.headers
+                    headers = it.headers,
                 )
             }
             is Command.ExtractUrlFromCloakedAmpLink -> {
@@ -1031,7 +1031,7 @@ class BrowserTabFragment :
             clipboard?.setPrimaryClip(clip)
             rootView.makeSnackbarWithNoBottomInset(
                 getString(R.string.aliasToClipboardMessage),
-                Snackbar.LENGTH_LONG
+                Snackbar.LENGTH_LONG,
             ).show()
         }
     }
@@ -1048,14 +1048,14 @@ class BrowserTabFragment :
     private fun locationPermissionsHaveNotBeenGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             requireActivity(),
-            Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION,
         ) != PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
     }
 
     private fun checkSystemLocationPermission(
         domain: String,
-        deniedForever: Boolean
+        deniedForever: Boolean,
     ) {
         if (locationPermissionsHaveNotBeenGranted()) {
             if (deniedForever) {
@@ -1073,9 +1073,9 @@ class BrowserTabFragment :
         requestPermissions(
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION,
             ),
-            PERMISSION_REQUEST_GEO_LOCATION
+            PERMISSION_REQUEST_GEO_LOCATION,
         )
     }
 
@@ -1103,7 +1103,7 @@ class BrowserTabFragment :
         val snackbar =
             rootView.makeSnackbarWithNoBottomInset(
                 getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()),
-                Snackbar.LENGTH_SHORT
+                Snackbar.LENGTH_SHORT,
             )
         snackbar.view.setOnClickListener {
             browserActivity?.launchSitePermissionsSettings()
@@ -1154,7 +1154,7 @@ class BrowserTabFragment :
 
             appLinksSnackBar = view.makeSnackbarWithNoBottomInset(
                 message,
-                Snackbar.LENGTH_LONG
+                Snackbar.LENGTH_LONG,
             ).setAction(action) {
                 pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED)
                 openAppLink(appLink)
@@ -1166,11 +1166,11 @@ class BrowserTabFragment :
 
                 override fun onDismissed(
                     transientBottomBar: Snackbar?,
-                    event: Int
+                    event: Int,
                 ) {
                     super.onDismissed(transientBottomBar, event)
                 }
-            })
+            },)
 
             appLinksSnackBar?.setDuration(6000)?.show()
         }
@@ -1216,7 +1216,7 @@ class BrowserTabFragment :
     private fun getChooserIntent(
         url: String?,
         title: String,
-        excludedComponents: List<ComponentName>
+        excludedComponents: List<ComponentName>,
     ): Intent {
         val urlIntent = Intent.parseUri(url, Intent.URI_ANDROID_APP_SCHEME)
         urlIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -1230,7 +1230,7 @@ class BrowserTabFragment :
         fallbackUrl: String? = null,
         fallbackIntent: Intent? = null,
         useFirstActivityFound: Boolean = true,
-        headers: Map<String, String> = emptyMap()
+        headers: Map<String, String> = emptyMap(),
     ) {
         context?.let {
             val pm = it.packageManager
@@ -1260,7 +1260,7 @@ class BrowserTabFragment :
         pm: PackageManager?,
         intent: Intent,
         activities: List<ResolveInfo>,
-        useFirstActivityFound: Boolean
+        useFirstActivityFound: Boolean,
     ) {
         if (activities.size == 1 || useFirstActivityFound) {
             val activity = activities.first()
@@ -1276,7 +1276,7 @@ class BrowserTabFragment :
 
     private fun askToFireproofWebsite(
         context: Context,
-        fireproofWebsite: FireproofWebsiteEntity
+        fireproofWebsite: FireproofWebsiteEntity,
     ) {
         val isShowing = loginDetectionDialog?.isShowing
 
@@ -1299,7 +1299,7 @@ class BrowserTabFragment :
 
     private fun askToAutomateFireproofWebsite(
         context: Context,
-        fireproofWebsite: FireproofWebsiteEntity
+        fireproofWebsite: FireproofWebsiteEntity,
     ) {
         val isShowing = automaticFireproofDialog?.isShowing
 
@@ -1340,7 +1340,7 @@ class BrowserTabFragment :
 
     private fun launchExternalAppDialog(
         context: Context,
-        onClick: () -> Unit
+        onClick: () -> Unit,
     ) {
         val isShowing = alertDialog?.isShowing
 
@@ -1368,7 +1368,7 @@ class BrowserTabFragment :
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         if (requestCode == REQUEST_CODE_CHOOSE_FILE) {
             handleFileUploadResult(resultCode, data)
@@ -1377,7 +1377,7 @@ class BrowserTabFragment :
 
     private fun handleFileUploadResult(
         resultCode: Int,
-        intent: Intent?
+        intent: Intent?,
     ) {
         if (resultCode != RESULT_OK || intent == null) {
             Timber.i("Received resultCode $resultCode (or received null intent) indicating user did not select any files")
@@ -1404,7 +1404,7 @@ class BrowserTabFragment :
 
     private fun saveBasicAuthCredentials(
         request: BasicAuthenticationRequest,
-        credentials: BasicAuthenticationCredentials
+        credentials: BasicAuthenticationCredentials,
     ) {
         webView?.let {
             webViewHttpAuthStore.setHttpAuthUsernamePassword(
@@ -1412,7 +1412,7 @@ class BrowserTabFragment :
                 host = request.host,
                 realm = request.realm,
                 username = credentials.username,
-                password = credentials.password
+                password = credentials.password,
             )
         }
     }
@@ -1426,7 +1426,7 @@ class BrowserTabFragment :
             },
             editableSearchClickListener = {
                 viewModel.onUserSelectedToEditQuery(it.phrase)
-            }
+            },
         )
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
@@ -1455,7 +1455,7 @@ class BrowserTabFragment :
 
     private fun createQuickAccessItemHolder(
         recyclerView: RecyclerView,
-        apapter: FavoritesQuickAccessAdapter
+        apapter: FavoritesQuickAccessAdapter,
     ): ItemTouchHelper {
         return ItemTouchHelper(
             QuickAccessDragTouchItemListener(
@@ -1465,8 +1465,8 @@ class BrowserTabFragment :
                         viewModel.onQuickAccessListChanged(listElements)
                         recyclerView.disableAnimation()
                     }
-                }
-            )
+                },
+            ),
         ).also {
             it.attachToRecyclerView(recyclerView)
         }
@@ -1474,7 +1474,7 @@ class BrowserTabFragment :
 
     private fun createQuickAccessAdapter(
         originPixel: AppPixelName,
-        onMoveListener: (RecyclerView.ViewHolder) -> Unit
+        onMoveListener: (RecyclerView.ViewHolder) -> Unit,
     ): FavoritesQuickAccessAdapter {
         return FavoritesQuickAccessAdapter(
             this,
@@ -1485,7 +1485,7 @@ class BrowserTabFragment :
                 viewModel.onUserSubmittedQuery(it.favorite.url)
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
-            { viewModel.onDeleteQuickAccessItemRequested(it.favorite) }
+            { viewModel.onDeleteQuickAccessItemRequested(it.favorite) },
         )
     }
 
@@ -1542,7 +1542,7 @@ class BrowserTabFragment :
                     return@OnEditorActionListener true
                 }
                 false
-            }
+            },
         )
 
         clearTextButton.setOnClickListener { omnibarTextInput.setText("") }
@@ -1571,7 +1571,7 @@ class BrowserTabFragment :
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
             webViewContainer,
-            true
+            true,
         ).findViewById(R.id.browserWebView) as DuckDuckGoWebView
 
         webView?.let {
@@ -1697,7 +1697,7 @@ class BrowserTabFragment :
     private suspend fun showAuthenticationSavedOrUpdatedSnackbar(
         loginCredentials: LoginCredentials,
         @StringRes messageResourceId: Int,
-        delay: Long = 200
+        delay: Long = 200,
     ) {
         delay(delay)
         withContext(Dispatchers.Main) {
@@ -1774,7 +1774,7 @@ class BrowserTabFragment :
     override fun onCreateContextMenu(
         menu: ContextMenu,
         view: View,
-        menuInfo: ContextMenu.ContextMenuInfo?
+        menuInfo: ContextMenu.ContextMenuInfo?,
     ) {
         webView?.hitTestResult?.let {
             val target = getLongPressTarget(it) ?: return
@@ -1801,16 +1801,16 @@ class BrowserTabFragment :
             hitTestResult.type == IMAGE_TYPE -> LongPressTarget(
                 url = hitTestResult.extra,
                 imageUrl = hitTestResult.extra,
-                type = hitTestResult.type
+                type = hitTestResult.type,
             )
             hitTestResult.type == SRC_IMAGE_ANCHOR_TYPE -> LongPressTarget(
                 url = getTargetUrlForImageSource(),
                 imageUrl = hitTestResult.extra,
-                type = hitTestResult.type
+                type = hitTestResult.type,
             )
             else -> LongPressTarget(
                 url = hitTestResult.extra,
-                type = hitTestResult.type
+                type = hitTestResult.type,
             )
         }
     }
@@ -1842,7 +1842,7 @@ class BrowserTabFragment :
         val addBookmarkDialog = EditSavedSiteDialogFragment.instance(
             savedSiteChangedViewState.savedSite,
             savedSiteChangedViewState.bookmarkFolder?.id ?: 0,
-            savedSiteChangedViewState.bookmarkFolder?.name
+            savedSiteChangedViewState.bookmarkFolder?.name,
         )
         addBookmarkDialog.show(childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
         addBookmarkDialog.listener = viewModel
@@ -1856,7 +1856,7 @@ class BrowserTabFragment :
         viewModel.deleteQuickAccessItem(savedSite)
         rootView.makeSnackbarWithNoBottomInset(
             message,
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.insertQuickAccessItem(savedSite)
         }.show()
@@ -1865,7 +1865,7 @@ class BrowserTabFragment :
     private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
         rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteSnackbarConfirmation, entity.website()), FROM_HTML_MODE_LEGACY),
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.onFireproofWebsiteSnackbarUndoClicked(entity)
         }.show()
@@ -1874,7 +1874,7 @@ class BrowserTabFragment :
     private fun removeFireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
         rootView.makeSnackbarWithNoBottomInset(
             getString(R.string.fireproofDeleteConfirmationMessage),
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).apply {
             setAction(R.string.fireproofWebsiteSnackbarAction) {
                 viewModel.onRemoveFireproofWebsiteSnackbarUndoClicked(entity)
@@ -1886,7 +1886,7 @@ class BrowserTabFragment :
     private fun privacyProtectionEnabledConfirmation(domain: String) {
         rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.privacyProtectionEnabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).apply {
             setAction(R.string.undoSnackbarAction) {
                 viewModel.onEnablePrivacyProtectionSnackbarUndoClicked(domain)
@@ -1898,7 +1898,7 @@ class BrowserTabFragment :
     private fun privacyProtectionDisabledConfirmation(domain: String) {
         rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).apply {
             setAction(R.string.undoSnackbarAction) {
                 viewModel.onDisablePrivacyProtectionSnackbarUndoClicked(domain)
@@ -1922,7 +1922,7 @@ class BrowserTabFragment :
     override fun onFindResultReceived(
         activeMatchOrdinal: Int,
         numberOfMatches: Int,
-        isDoneCounting: Boolean
+        isDoneCounting: Boolean,
     ) {
         viewModel.onFindResultsReceived(activeMatchOrdinal, numberOfMatches)
     }
@@ -1964,7 +1964,7 @@ class BrowserTabFragment :
 
     private fun refreshUserAgent(
         url: String?,
-        isDesktop: Boolean
+        isDesktop: Boolean,
     ) {
         val currentAgent = webView?.settings?.userAgentString
         val newAgent = userAgentProvider.userAgent(url, isDesktop)
@@ -2074,13 +2074,13 @@ class BrowserTabFragment :
         url: String,
         contentDisposition: String?,
         mimeType: String,
-        requestUserConfirmation: Boolean
+        requestUserConfirmation: Boolean,
     ) {
         pendingFileDownload = PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,
-            subfolder = Environment.DIRECTORY_DOWNLOADS
+            subfolder = Environment.DIRECTORY_DOWNLOADS,
         )
 
         if (hasWriteStoragePermission()) {
@@ -2092,11 +2092,11 @@ class BrowserTabFragment :
 
     private fun requestImageDownload(
         url: String,
-        requestUserConfirmation: Boolean
+        requestUserConfirmation: Boolean,
     ) {
         pendingFileDownload = PendingFileDownload(
             url = url,
-            subfolder = Environment.DIRECTORY_PICTURES
+            subfolder = Environment.DIRECTORY_PICTURES,
         )
 
         if (hasWriteStoragePermission()) {
@@ -2150,7 +2150,7 @@ class BrowserTabFragment :
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         when (requestCode) {
             PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE -> {
@@ -2215,7 +2215,7 @@ class BrowserTabFragment :
                     override fun historicalPageSelected(stackIndex: Int) {
                         viewModel.historicalPageSelected(stackIndex)
                     }
-                }
+                },
             ).show()
         }
     }
@@ -2237,7 +2237,7 @@ class BrowserTabFragment :
 
     private fun launchHideTipsDialog(
         context: Context,
-        cta: Cta
+        cta: Cta,
     ) {
         AlertDialog.Builder(context)
             .setTitle(R.string.hideTipsTitle)
@@ -2303,7 +2303,7 @@ class BrowserTabFragment :
         fun newInstance(
             tabId: String,
             query: String? = null,
-            skipHome: Boolean
+            skipHome: Boolean,
         ): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
@@ -2377,7 +2377,7 @@ class BrowserTabFragment :
                 browserActivity?.launchFire()
                 pixel.fire(
                     AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-                    mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString())
+                    mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
                 )
             }
 
@@ -2387,7 +2387,7 @@ class BrowserTabFragment :
         private fun createPopupMenu() {
             popupMenu = BrowserPopupMenu(
                 context = requireContext(),
-                layoutInflater = layoutInflater
+                layoutInflater = layoutInflater,
             )
             val view = popupMenu.contentView
             popupMenu.apply {
@@ -2718,7 +2718,7 @@ class BrowserTabFragment :
             if (fontSizeChanged) {
                 Timber.v(
                     "Accessibility: UpdateAccessibilitySetting fontSizeChanged " +
-                        "from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}"
+                        "from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}",
                 )
 
                 webView.settings.textZoom = viewState.fontSize.toInt()
@@ -2792,7 +2792,7 @@ class BrowserTabFragment :
 
         private fun showRemoteMessage(
             message: RemoteMessage,
-            newMessage: Boolean
+            newMessage: Boolean,
         ) {
             val shouldRender = newMessage || messageCta.isGone
 
@@ -2815,7 +2815,7 @@ class BrowserTabFragment :
 
         private fun showCta(
             configuration: Cta,
-            favorites: List<QuickAccessFavorite>
+            favorites: List<QuickAccessFavorite>,
         ) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
@@ -2912,7 +2912,7 @@ class BrowserTabFragment :
 
         private fun showHomeCta(
             configuration: HomePanelCta,
-            favorites: List<QuickAccessFavorite>
+            favorites: List<QuickAccessFavorite>,
         ) {
             hideDaxCta()
             if (ctaContainer.isEmpty()) {
@@ -2926,7 +2926,7 @@ class BrowserTabFragment :
 
         private fun showHomeBackground(
             favorites: List<QuickAccessFavorite>,
-            hideLogo: Boolean = false
+            hideLogo: Boolean = false,
         ) {
             if (favorites.isEmpty()) {
                 if (hideLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
@@ -3013,7 +3013,7 @@ class BrowserTabFragment :
 
         private fun shouldUpdateOmnibarTextInput(
             viewState: OmnibarViewState,
-            omnibarInput: String?
+            omnibarInput: String?,
         ) =
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
     }
@@ -3024,7 +3024,7 @@ class BrowserTabFragment :
                 printManager.print(
                     url,
                     printAdapter,
-                    PrintAttributes.Builder().build()
+                    PrintAttributes.Builder().build(),
                 )
             }
         }
@@ -3059,7 +3059,7 @@ class BrowserTabFragment :
 
     override fun onSiteLocationPermissionSelected(
         domain: String,
-        permission: LocationPermissionType
+        permission: LocationPermissionType,
     ) {
         viewModel.onSiteLocationPermissionSelected(domain, permission)
     }

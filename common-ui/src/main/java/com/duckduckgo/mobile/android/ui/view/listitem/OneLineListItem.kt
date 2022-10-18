@@ -36,7 +36,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 class OneLineListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.oneLineListItemStyle
+    defStyleAttr: Int = R.attr.oneLineListItemStyle,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewOneLineListItemBinding by viewBinding()
@@ -46,7 +46,7 @@ class OneLineListItem @JvmOverloads constructor(
             attrs,
             R.styleable.OneLineListItem,
             0,
-            R.style.Widget_DuckDuckGo_OneLineListItem
+            R.style.Widget_DuckDuckGo_OneLineListItem,
         ).apply {
 
             binding.primaryText.text = getString(R.styleable.OneLineListItem_primaryText)
@@ -54,8 +54,8 @@ class OneLineListItem @JvmOverloads constructor(
                 binding.primaryText.setTextColor(
                     getColor(
                         R.styleable.OneLineListItem_listItemTitleColor,
-                        context.getColorFromAttr(R.attr.listItemTitleColor)
-                    )
+                        context.getColorFromAttr(R.attr.listItemTitleColor),
+                    ),
                 )
             }
 
@@ -186,7 +186,7 @@ class OneLineListItem @JvmOverloads constructor(
     /** Allows to set a new value to the switch, without triggering the onChangeListener */
     fun quietlySetIsChecked(
         newCheckedState: Boolean,
-        changeListener: CompoundButton.OnCheckedChangeListener?
+        changeListener: CompoundButton.OnCheckedChangeListener?,
     ) {
         binding.trailingSwitch.quietlySetIsChecked(newCheckedState, changeListener)
     }

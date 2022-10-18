@@ -31,7 +31,7 @@ class WebsiteNotification(
     private val url: String,
     @StringRes private val title: Int,
     @StringRes private val description: Int,
-    private val pixelSuffix: String
+    private val pixelSuffix: String,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacy.website.$pixelSuffix"
@@ -54,7 +54,7 @@ open class WebsiteNotificationSpecification(
     url: String,
     @StringRes titleRes: Int,
     @StringRes descriptionRes: Int,
-    override val pixelSuffix: String
+    override val pixelSuffix: String,
 ) :
     NotificationSpec {
     override val bundle: Bundle = Bundle().apply { putString(WEBSITE_KEY, url) }

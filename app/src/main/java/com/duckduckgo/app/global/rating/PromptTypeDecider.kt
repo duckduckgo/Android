@@ -36,7 +36,7 @@ class InitialPromptTypeDecider(
     private val initialPromptDecider: ShowPromptDecider,
     private val secondaryPromptDecider: ShowPromptDecider,
     private val context: Context,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : PromptTypeDecider {
 
     override suspend fun determineInitialPromptType(): AppEnjoymentPromptOptions {

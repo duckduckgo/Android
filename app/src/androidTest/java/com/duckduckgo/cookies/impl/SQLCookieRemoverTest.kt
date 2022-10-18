@@ -138,14 +138,14 @@ class SQLCookieRemoverTest {
         repository: FireproofRepository = FireproofWebsiteRepository(fireproofWebsiteDao, DefaultDispatcherProvider(), mock()),
         offlinePixelCountDataStore: OfflinePixelCountDataStore = mockOfflinePixelCountDataStore,
         exceptionPixel: ExceptionPixel = ExceptionPixel(mockPixel, RootExceptionFinder()),
-        dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
+        dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     ): SQLCookieRemover {
         return SQLCookieRemover(
             databaseLocator,
             repository,
             offlinePixelCountDataStore,
             exceptionPixel,
-            dispatcherProvider
+            dispatcherProvider,
         )
     }
 }

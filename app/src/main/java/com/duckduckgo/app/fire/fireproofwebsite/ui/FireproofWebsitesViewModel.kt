@@ -40,12 +40,12 @@ class FireproofWebsitesViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore,
-    private val userEventsStore: UserEventsStore
+    private val userEventsStore: UserEventsStore,
 ) : ViewModel() {
 
     data class ViewState(
         val automaticFireproofSetting: AutomaticFireproofSetting = AutomaticFireproofSetting.NEVER,
-        val fireproofWebsitesEntities: List<FireproofWebsiteEntity> = emptyList()
+        val fireproofWebsitesEntities: List<FireproofWebsiteEntity> = emptyList(),
     )
 
     sealed class Command {
@@ -63,7 +63,7 @@ class FireproofWebsitesViewModel @Inject constructor(
 
     init {
         _viewState.value = ViewState(
-            automaticFireproofSetting = settingsDataStore.automaticFireproofSetting
+            automaticFireproofSetting = settingsDataStore.automaticFireproofSetting,
         )
         fireproofWebsites.observeForever(fireproofWebsitesObserver)
     }
@@ -75,7 +75,7 @@ class FireproofWebsitesViewModel @Inject constructor(
 
     private fun onPreservedCookiesEntitiesChanged(entities: List<FireproofWebsiteEntity>) {
         _viewState.value = _viewState.value?.copy(
-            fireproofWebsitesEntities = entities
+            fireproofWebsitesEntities = entities,
         )
     }
 

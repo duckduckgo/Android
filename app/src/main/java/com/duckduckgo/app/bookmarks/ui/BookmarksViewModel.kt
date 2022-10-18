@@ -48,14 +48,14 @@ class BookmarksViewModel @Inject constructor(
     private val faviconManager: FaviconManager,
     private val savedSitesManager: SavedSitesManager,
     private val pixel: Pixel,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkFolderListener, ViewModel() {
 
     data class ViewState(
         val enableSearch: Boolean = false,
         val bookmarks: List<Bookmark> = emptyList(),
         val favorites: List<Favorite> = emptyList(),
-        val bookmarkFolders: List<BookmarkFolder> = emptyList()
+        val bookmarkFolders: List<BookmarkFolder> = emptyList(),
     )
 
     sealed class Command {
@@ -67,7 +67,7 @@ class BookmarksViewModel @Inject constructor(
         class DeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class ConfirmDeleteBookmarkFolder(
             val bookmarkFolder: BookmarkFolder,
-            val folderBranch: BookmarkFolderBranch
+            val folderBranch: BookmarkFolderBranch,
         ) : Command()
 
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
@@ -231,12 +231,12 @@ class BookmarksViewModel @Inject constructor(
 
     private fun onBookmarkItemsChanged(
         bookmarks: List<Bookmark>,
-        bookmarkFolders: List<BookmarkFolder>
+        bookmarkFolders: List<BookmarkFolder>,
     ) {
         viewState.value = viewState.value?.copy(
             bookmarks = bookmarks,
             bookmarkFolders = bookmarkFolders,
-            enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH
+            enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
         )
     }
 

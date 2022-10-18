@@ -30,12 +30,12 @@ data class BrokenSite(
     val urlParametersRemoved: Boolean,
     val consentManaged: Boolean,
     val consentOptOutFailed: Boolean,
-    val consentSelfTestFailed: Boolean
+    val consentSelfTestFailed: Boolean,
 )
 
 sealed class BrokenSiteCategory(
     @StringRes val category: Int,
-    val key: String
+    val key: String,
 ) {
     object ImagesCategory : BrokenSiteCategory(R.string.brokenSiteCategoryImages, IMAGES_CATEGORY_KEY)
     object PaywallCategory : BrokenSiteCategory(R.string.brokenSiteCategoryPaywall, PAYWALL_CATEGORY_KEY)

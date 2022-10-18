@@ -39,7 +39,7 @@ class DatabaseDateFormatter {
 
         fun duration(
             start: String,
-            end: String = FORMATTER_SECONDS.format(LocalDateTime.now())
+            end: String = FORMATTER_SECONDS.format(LocalDateTime.now()),
         ): Duration {
             val startTime = LocalDateTime.parse(start, FORMATTER_SECONDS)
             val endTime = LocalDateTime.parse(end, FORMATTER_SECONDS)

@@ -69,7 +69,7 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
                 // will return true when duration is >= 60 mins
                 TestCase(false, APP_EXIT_OR_60_MINS, MINUTES.toMillis(59), timeNow()),
                 TestCase(true, APP_EXIT_OR_60_MINS, MINUTES.toMillis(60), timeNow()),
-                TestCase(true, APP_EXIT_OR_60_MINS, MINUTES.toMillis(61), timeNow())
+                TestCase(true, APP_EXIT_OR_60_MINS, MINUTES.toMillis(61), timeNow()),
             )
         }
     }
@@ -82,7 +82,7 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
 
     private fun getPastTimestamp(
         millisPreviously: Long,
-        timeNow: Long
+        timeNow: Long,
     ): Long {
         return Calendar.getInstance().also {
             it.timeInMillis = timeNow
@@ -94,6 +94,6 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
         val expected: Boolean,
         val clearWhenOption: ClearWhenOption,
         val durationBackgrounded: Long,
-        val timeNow: () -> Long
+        val timeNow: () -> Long,
     )
 }

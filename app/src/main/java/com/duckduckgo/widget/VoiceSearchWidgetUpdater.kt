@@ -27,7 +27,7 @@ import android.content.Intent.ACTION_LOCALE_CHANGED
 class VoiceSearchWidgetUpdater : BroadcastReceiver() {
     override fun onReceive(
         context: Context,
-        intent: Intent
+        intent: Intent,
     ) {
         if (intent.action == ACTION_LOCALE_CHANGED) {
             updateWidgets(context.applicationContext)
@@ -39,7 +39,7 @@ class VoiceSearchWidgetUpdater : BroadcastReceiver() {
             broadcastUpdate(
                 it,
                 context,
-                SearchWidget::class.java
+                SearchWidget::class.java,
             )
         }
 
@@ -47,7 +47,7 @@ class VoiceSearchWidgetUpdater : BroadcastReceiver() {
             broadcastUpdate(
                 it,
                 context,
-                SearchWidgetLight::class.java
+                SearchWidgetLight::class.java,
             )
         }
 
@@ -55,7 +55,7 @@ class VoiceSearchWidgetUpdater : BroadcastReceiver() {
             broadcastUpdate(
                 it,
                 context,
-                SearchAndFavoritesWidget::class.java
+                SearchAndFavoritesWidget::class.java,
             )
         }
     }
@@ -63,7 +63,7 @@ class VoiceSearchWidgetUpdater : BroadcastReceiver() {
     private fun broadcastUpdate(
         id: IntArray,
         context: Context,
-        clazz: Class<*>
+        clazz: Class<*>,
     ) {
         val intent = Intent(context, clazz)
         intent.action = ACTION_APPWIDGET_UPDATE

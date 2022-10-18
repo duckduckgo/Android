@@ -46,7 +46,7 @@ object AppTrackingProtectionModule {
         notification: AppTPWaitlistCodeNotification,
         notificationSender: NotificationSender,
         dispatcherProvider: DispatcherProvider,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
     ): TrackingProtectionWaitlistCodeFetcher {
         return AppTrackingProtectionWaitlistCodeFetcher(
             workManager,
@@ -55,7 +55,7 @@ object AppTrackingProtectionModule {
             notification,
             notificationSender,
             dispatcherProvider,
-            appCoroutineScope
+            appCoroutineScope,
         )
     }
 

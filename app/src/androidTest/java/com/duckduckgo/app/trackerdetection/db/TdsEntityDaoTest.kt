@@ -54,7 +54,7 @@ class TdsEntityDaoTest {
         val list = listOf(
             TdsEntity("Entity 1 Ltd", "Entity 1", 1.0),
             TdsEntity("Entity 2 Ltd", "Entity 2", 2.0),
-            TdsEntity("Entity 3 Ltd", "Entity 3", 3.0)
+            TdsEntity("Entity 3 Ltd", "Entity 3", 3.0),
         )
 
         entityDao.updateAll(list)
@@ -62,7 +62,7 @@ class TdsEntityDaoTest {
         val updates = listOf(
             TdsEntity("Entity 3 LTd", "Entity 3", 4.0),
             TdsEntity("Entity 4 Ltd", "Entity 4", 5.0),
-            TdsEntity("Entity 5 LtD", "Entity 5", 6.0)
+            TdsEntity("Entity 5 LtD", "Entity 5", 6.0),
         )
 
         entityDao.updateAll(updates)
@@ -77,7 +77,7 @@ class TdsEntityDaoTest {
         val list = listOf(
             TdsEntity("Entity 1 Ltd", "Entity A", 0.0),
             TdsEntity("Entity 1 Ltd", "Entity B", 0.0),
-            TdsEntity("Entity 1 Ltd", "Entity C", 0.0)
+            TdsEntity("Entity 1 Ltd", "Entity C", 0.0),
         )
 
         entityDao.updateAll(list)
@@ -90,7 +90,7 @@ class TdsEntityDaoTest {
         val list = listOf(
             TdsEntity("Entity 1 Ltd", "Entity 1", 1.0),
             TdsEntity("Entity 2 Ltd", "Entity 2", 2.0),
-            TdsEntity("Entity 3 Ltd", "Entity 3", 3.0)
+            TdsEntity("Entity 3 Ltd", "Entity 3", 3.0),
         )
 
         entityDao.updateAll(list)

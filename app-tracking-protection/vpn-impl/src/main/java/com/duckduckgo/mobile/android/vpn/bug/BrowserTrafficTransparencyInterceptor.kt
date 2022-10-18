@@ -31,7 +31,7 @@ class BrowserTrafficTransparencyInterceptor @Inject constructor() : VpnTrackerDe
 
     override fun interceptTrackerRequest(
         hostname: String,
-        packageId: String
+        packageId: String,
     ): RequestTrackerType? {
         return when {
             // we should never really block anything in our app, even if/when we pass its traffic through the VPN

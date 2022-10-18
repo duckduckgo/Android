@@ -29,7 +29,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 class PrivacyProtectionNotification(
     private val context: Context,
     private val notificationDao: NotificationDao,
-    private val privacyProtectionCountDao: PrivacyProtectionCountDao
+    private val privacyProtectionCountDao: PrivacyProtectionCountDao,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacy.privacyprotection"
@@ -52,7 +52,7 @@ class PrivacyProtectionNotification(
 class PrivacyProtectionNotificationSpecification(
     context: Context,
     trackers: Int,
-    upgrades: Int
+    upgrades: Int,
 ) : NotificationSpec {
 
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS

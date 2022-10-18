@@ -130,7 +130,7 @@ abstract class TabsDao {
     @Transaction
     open fun deleteTabAndUpdateSelection(
         tab: TabEntity,
-        newSelectedTab: TabEntity? = null
+        newSelectedTab: TabEntity? = null,
     ) {
         deleteTab(tab)
 
@@ -166,6 +166,6 @@ abstract class TabsDao {
         tabId: String,
         url: String?,
         title: String?,
-        viewed: Boolean
+        viewed: Boolean,
     )
 }

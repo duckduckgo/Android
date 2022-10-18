@@ -44,14 +44,14 @@ class DevSettingsViewModel @Inject constructor(
     private val userAgentProvider: UserAgentProvider,
     private val bookmarksRepository: BookmarksRepository,
     private val favoritesRepository: FavoritesRepository,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
         val nextTdsEnabled: Boolean = false,
         val startupTraceEnabled: Boolean = false,
         val overrideUA: Boolean = false,
-        val userAgent: String = ""
+        val userAgent: String = "",
     )
 
     sealed class Command {
@@ -70,8 +70,8 @@ class DevSettingsViewModel @Inject constructor(
                     nextTdsEnabled = devSettingsDataStore.nextTdsEnabled,
                     startupTraceEnabled = startupTraces.isTraceEnabled,
                     overrideUA = devSettingsDataStore.overrideUA,
-                    userAgent = userAgentProvider.userAgent("", false)
-                )
+                    userAgent = userAgentProvider.userAgent("", false),
+                ),
             )
         }
     }

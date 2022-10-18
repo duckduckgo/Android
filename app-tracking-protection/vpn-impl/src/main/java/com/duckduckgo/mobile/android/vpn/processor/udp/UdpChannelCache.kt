@@ -27,14 +27,14 @@ import timber.log.Timber
 @SingleInstanceIn(VpnScope::class)
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnMemoryCollectorPlugin::class
+    boundType = VpnMemoryCollectorPlugin::class,
 )
 class UdpChannelCache @Inject constructor() : LruCache<String, UdpPacketProcessor.ChannelDetails>(500), VpnMemoryCollectorPlugin {
     override fun entryRemoved(
         evicted: Boolean,
         key: String?,
         oldValue: UdpPacketProcessor.ChannelDetails?,
-        newValue: UdpPacketProcessor.ChannelDetails?
+        newValue: UdpPacketProcessor.ChannelDetails?,
     ) {
         Timber.i("UDP channel cache entry removed: $key. Evicted? $evicted")
         if (evicted) {

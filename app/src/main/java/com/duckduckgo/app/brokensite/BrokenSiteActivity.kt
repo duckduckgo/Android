@@ -74,7 +74,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             urlParametersRemoved = urlParametersRemoved,
             consentManaged = consentManaged,
             consentOptOutFailed = consentOptOutFailed,
-            consentSelfTestFailed = consentSelfTestFailed
+            consentSelfTestFailed = consentSelfTestFailed,
         )
     }
 
@@ -145,7 +145,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            data: BrokenSiteData
+            data: BrokenSiteData,
         ): Intent {
             val intent = Intent(context, BrokenSiteActivity::class.java)
             intent.putExtra(URL_EXTRA, data.url)

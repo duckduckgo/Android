@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 @SingleInstanceIn(VpnScope::class)
 class VpnRunningTimeLogger @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
-    private val vpnDatabase: VpnDatabase
+    private val vpnDatabase: VpnDatabase,
 ) : VpnServiceCallbacks {
 
     private val job = ConflatedJob()
@@ -53,7 +53,7 @@ class VpnRunningTimeLogger @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         job.cancel()
         // vpn stopped, ensure we log the stopped timestamp

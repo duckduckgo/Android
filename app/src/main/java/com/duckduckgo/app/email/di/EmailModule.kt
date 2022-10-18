@@ -46,7 +46,7 @@ class EmailModule {
         emailService: EmailService,
         emailDataStore: EmailDataStore,
         dispatcherProvider: DispatcherProvider,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
     ): EmailManager {
         return AppEmailManager(emailService, emailDataStore, dispatcherProvider, appCoroutineScope)
     }
@@ -58,7 +58,7 @@ class EmailModule {
         dispatcherProvider: DispatcherProvider,
         featureToggle: FeatureToggle,
         javascriptInjector: JavascriptInjector,
-        autofill: Autofill
+        autofill: Autofill,
     ): EmailInjector {
         return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider, featureToggle, javascriptInjector, autofill)
     }
@@ -66,7 +66,7 @@ class EmailModule {
     @Provides
     fun providesEmailDataStore(
         context: Context,
-        pixel: Pixel
+        pixel: Pixel,
     ): EmailDataStore {
         return EmailEncryptedSharedPreferences(context, pixel)
     }

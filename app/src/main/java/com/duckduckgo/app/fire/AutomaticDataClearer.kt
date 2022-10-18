@@ -54,11 +54,11 @@ interface DataClearer {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = DataClearer::class
+    boundType = DataClearer::class,
 )
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = BrowserLifecycleObserver::class
+    boundType = BrowserLifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
 class AutomaticDataClearer @Inject constructor(
@@ -67,7 +67,7 @@ class AutomaticDataClearer @Inject constructor(
     private val clearDataAction: ClearDataAction,
     private val dataClearerTimeKeeper: BackgroundTimeKeeper,
     private val dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : DataClearer, BrowserLifecycleObserver, CoroutineScope {
 
     private val clearJob: Job = Job()
@@ -171,7 +171,7 @@ class AutomaticDataClearer @Inject constructor(
             it.enqueue(workRequest)
             Timber.i(
                 "Work request scheduled, ${durationMillis}ms from now, " +
-                    "to clear data if the user hasn't returned to the app. job id: ${workRequest.id}"
+                    "to clear data if the user hasn't returned to the app. job id: ${workRequest.id}",
             )
         }
     }
@@ -222,7 +222,7 @@ class AutomaticDataClearer @Inject constructor(
     private fun shouldClearData(
         cleanWhenOption: ClearWhenOption,
         appUsedSinceLastClear: Boolean,
-        appIconChanged: Boolean
+        appIconChanged: Boolean,
     ): Boolean {
         Timber.d("Determining if data should be cleared for option $cleanWhenOption")
 
@@ -254,7 +254,7 @@ class AutomaticDataClearer @Inject constructor(
 
         val enoughTimePassed = dataClearerTimeKeeper.hasEnoughTimeElapsed(
             backgroundedTimestamp = settingsDataStore.appBackgroundedTimestamp,
-            clearWhenOption = cleanWhenOption
+            clearWhenOption = cleanWhenOption,
         )
         Timber.d("Has enough time passed to trigger the data clear? $enoughTimePassed")
 

@@ -21,7 +21,7 @@ import com.duckduckgo.di.scopes.VpnScope
 
 @ContributesPluginPoint(
     scope = VpnScope::class,
-    boundType = VpnTrackerDetectorInterceptor::class
+    boundType = VpnTrackerDetectorInterceptor::class,
 )
 @Suppress("unused")
 interface VpnTrackerDetectorInterceptorPluginPoint

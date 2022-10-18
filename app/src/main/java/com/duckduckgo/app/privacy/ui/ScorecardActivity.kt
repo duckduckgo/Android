@@ -132,7 +132,7 @@ class ScorecardActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            tabId: String
+            tabId: String,
         ): Intent {
             val intent = Intent(context, ScorecardActivity::class.java)
             intent.tabId = tabId

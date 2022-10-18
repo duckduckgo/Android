@@ -117,7 +117,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     private fun onWebsiteNotification(
         intent: Intent,
-        pixelSuffix: String
+        pixelSuffix: String,
     ) {
         val url = intent.getStringExtra(WebsiteNotificationSpecification.WEBSITE_KEY)
         val newIntent = BrowserActivity.intent(context, queryExtra = url)
@@ -181,7 +181,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         fun pendingNotificationHandlerIntent(
             context: Context,
             eventType: String,
-            specification: NotificationSpec
+            specification: NotificationSpec,
         ): PendingIntent {
             val intent = Intent(context, NotificationHandlerService::class.java)
             intent.type = eventType

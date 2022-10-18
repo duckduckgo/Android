@@ -27,7 +27,7 @@ import timber.log.Timber
 class ResourceSurrogateListDownloader @Inject constructor(
     private val service: ResourceSurrogateListService,
     private val surrogatesDataStore: ResourceSurrogateDataStore,
-    private val resourceSurrogateLoader: ResourceSurrogateLoader
+    private val resourceSurrogateLoader: ResourceSurrogateLoader,
 ) {
 
     fun downloadList(): Completable {

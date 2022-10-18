@@ -47,8 +47,8 @@ class RequestBlockingTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            "https://privacy-test-pages.glitch.me/privacy-protections/request-blocking/?run"
-        )
+            "https://privacy-test-pages.glitch.me/privacy-protections/request-blocking/?run",
+        ),
     )
 
     @Test @PrivacyTest

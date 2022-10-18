@@ -39,7 +39,7 @@ interface WebViewClientListener {
     fun onSitePermissionRequested(request: PermissionRequest, sitePermissionsAllowedToAsk: Array<String>)
     fun onSiteLocationPermissionRequested(
         origin: String,
-        callback: GeolocationPermissions.Callback
+        callback: GeolocationPermissions.Callback,
     )
 
     fun titleReceived(newTitle: String)
@@ -53,12 +53,12 @@ interface WebViewClientListener {
     fun exitFullScreen()
     fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
-        fileChooserParams: WebChromeClient.FileChooserParams
+        fileChooserParams: WebChromeClient.FileChooserParams,
     )
 
     fun handleAppLink(
         appLink: SpecialUrlDetector.UrlType.AppLink,
-        isForMainFrame: Boolean
+        isForMainFrame: Boolean,
     ): Boolean
 
     fun handleNonHttpAppLink(nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink): Boolean
@@ -77,12 +77,12 @@ interface WebViewClientListener {
     fun dosAttackDetected()
     fun iconReceived(
         url: String,
-        icon: Bitmap
+        icon: Bitmap,
     )
 
     fun iconReceived(
         visitedUrl: String,
-        iconUrl: String
+        iconUrl: String,
     )
 
     fun prefetchFavicon(url: String)

@@ -35,7 +35,7 @@ class AppNameResolver(private val packageManager: PackageManager) {
 
     data class OriginatingApp(
         val packageId: String,
-        val appName: String
+        val appName: String,
     ) {
         override fun toString(): String = "package=$packageId ($appName)"
 

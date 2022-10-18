@@ -37,7 +37,7 @@ interface EmailDataStore {
 
 class EmailEncryptedSharedPreferences(
     private val context: Context,
-    private val pixel: Pixel
+    private val pixel: Pixel,
 ) : EmailDataStore {
 
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
@@ -52,7 +52,7 @@ class EmailEncryptedSharedPreferences(
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                     .build(),
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
             )
         } catch (e: IOException) {
             pixel.enqueueFire(AppPixelName.ENCRYPTED_IO_EXCEPTION)

@@ -77,7 +77,7 @@ class SurveyViewModelTest {
             mockStatisticsStore,
             mockAppInstallStore,
             mockAppBuildConfig,
-            coroutineTestRule.testDispatcherProvider
+            coroutineTestRule.testDispatcherProvider,
         )
         testee.command.observeForever(mockCommandObserver)
     }

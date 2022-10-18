@@ -40,7 +40,7 @@ class AndroidVpnReminderReceiverManager @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val notificationManager: NotificationManagerCompat,
     private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : VpnReminderReceiverManager {
 
     override fun showReminderNotificationIfVpnDisabled(context: Context) {

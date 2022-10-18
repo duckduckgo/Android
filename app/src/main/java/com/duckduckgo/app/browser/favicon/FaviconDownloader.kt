@@ -33,7 +33,7 @@ interface FaviconDownloader {
         file: File,
         cornerRadius: Int,
         width: Int,
-        height: Int
+        height: Int,
     ): Bitmap?
 
     suspend fun getFaviconFromUrl(uri: Uri): Bitmap?
@@ -41,7 +41,7 @@ interface FaviconDownloader {
 
 class GlideFaviconDownloader @Inject constructor(
     private val context: Context,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : FaviconDownloader {
 
     override suspend fun getFaviconFromDisk(file: File): Bitmap? {
@@ -62,7 +62,7 @@ class GlideFaviconDownloader @Inject constructor(
         file: File,
         cornerRadius: Int,
         width: Int,
-        height: Int
+        height: Int,
     ): Bitmap? {
         return withContext(dispatcherProvider.io()) {
             return@withContext runCatching {

@@ -99,7 +99,7 @@ class TrackersRendererTest {
         val resource = testee.networksIcon(
             trackersBlockedCount = 1,
             specialDomainsLoadedCount = 0,
-            toggleEnabled = false
+            toggleEnabled = false,
         )
         assertEquals(R.drawable.networks_icon_bad, resource)
     }
@@ -109,7 +109,7 @@ class TrackersRendererTest {
         val resource = testee.networksIcon(
             trackersBlockedCount = 0,
             specialDomainsLoadedCount = 1,
-            toggleEnabled = false
+            toggleEnabled = false,
         )
         assertEquals(R.drawable.networks_icon_bad, resource)
     }
@@ -119,7 +119,7 @@ class TrackersRendererTest {
         val resource = testee.networksIcon(
             trackersBlockedCount = 0,
             specialDomainsLoadedCount = 0,
-            toggleEnabled = false
+            toggleEnabled = false,
         )
         assertEquals(R.drawable.networks_icon_good, resource)
     }
@@ -129,7 +129,7 @@ class TrackersRendererTest {
         val resource = testee.networksIcon(
             trackersBlockedCount = 0,
             specialDomainsLoadedCount = 1,
-            toggleEnabled = true
+            toggleEnabled = true,
         )
         assertEquals(R.drawable.networks_icon_neutral, resource)
     }
@@ -139,7 +139,7 @@ class TrackersRendererTest {
         val resource = testee.networksIcon(
             trackersBlockedCount = 0,
             specialDomainsLoadedCount = 0,
-            toggleEnabled = true
+            toggleEnabled = true,
         )
         assertEquals(R.drawable.networks_icon_good, resource)
     }
@@ -149,7 +149,7 @@ class TrackersRendererTest {
         val resource = testee.networksIcon(
             trackersBlockedCount = 1,
             specialDomainsLoadedCount = 0,
-            toggleEnabled = true
+            toggleEnabled = true,
         )
         assertEquals(R.drawable.networks_icon_good, resource)
     }
@@ -159,7 +159,7 @@ class TrackersRendererTest {
         val resource = testee.networksIcon(
             trackersBlockedCount = 1,
             specialDomainsLoadedCount = 1,
-            toggleEnabled = true
+            toggleEnabled = true,
         )
         assertEquals(R.drawable.networks_icon_good, resource)
     }
@@ -170,7 +170,7 @@ class TrackersRendererTest {
             trackersBlockedCount = 1,
             specialDomainsLoadedCount = 1,
             toggleEnabled = true,
-            largeIcon = true
+            largeIcon = true,
         )
         assertEquals(R.drawable.networks_icon_good_large, resource)
     }

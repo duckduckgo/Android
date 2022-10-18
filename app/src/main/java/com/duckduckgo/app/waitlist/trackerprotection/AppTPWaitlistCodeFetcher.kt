@@ -42,7 +42,7 @@ class AppTrackingProtectionWaitlistCodeFetcher(
     private val notification: SchedulableNotification,
     private val notificationSender: NotificationSender,
     private val dispatcherProvider: DispatcherProvider,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
 ) : TrackingProtectionWaitlistCodeFetcher {
 
     override fun onStart(owner: LifecycleOwner) {

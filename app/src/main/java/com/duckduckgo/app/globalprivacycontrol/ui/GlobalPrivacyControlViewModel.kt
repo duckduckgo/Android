@@ -33,12 +33,12 @@ import javax.inject.Inject
 class GlobalPrivacyControlViewModel @Inject constructor(
     private val pixel: Pixel,
     featureToggle: FeatureToggle,
-    private val gpc: Gpc
+    private val gpc: Gpc,
 ) : ViewModel() {
 
     data class ViewState(
         val globalPrivacyControlEnabled: Boolean = false,
-        val globalPrivacyControlFeatureEnabled: Boolean = false
+        val globalPrivacyControlFeatureEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -52,7 +52,7 @@ class GlobalPrivacyControlViewModel @Inject constructor(
     init {
         _viewState.value = ViewState(
             globalPrivacyControlEnabled = gpc.isEnabled(),
-            globalPrivacyControlFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value, true)
+            globalPrivacyControlFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value, true),
         )
         pixel.fire(SETTINGS_DO_NOT_SELL_SHOWN)
     }

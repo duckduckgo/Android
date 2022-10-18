@@ -23,7 +23,7 @@ import kotlinx.coroutines.withContext
 
 class AuthCookiesAllowedDomainsRepository @Inject constructor(
     private val authCookiesAllowedDomainsDao: AuthCookiesAllowedDomainsDao,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) {
 
     suspend fun addDomain(domain: String): Long? {

@@ -20,7 +20,7 @@ import xyz.hexene.localvpn.TCB
 
 data class TcbState(
     val clientState: TCB.TCBStatus = TCB.TCBStatus.CLOSED,
-    val serverState: TCB.TCBStatus = TCB.TCBStatus.LISTEN
+    val serverState: TCB.TCBStatus = TCB.TCBStatus.LISTEN,
 ) {
     override fun toString(): String {
         return "Server: $serverState. Client: $clientState"

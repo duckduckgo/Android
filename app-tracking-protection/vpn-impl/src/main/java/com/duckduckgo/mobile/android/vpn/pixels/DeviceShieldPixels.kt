@@ -414,7 +414,7 @@ interface DeviceShieldPixels {
 @SingleInstanceIn(AppScope::class)
 class RealDeviceShieldPixels @Inject constructor(
     private val pixel: Pixel,
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider
+    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : DeviceShieldPixels {
 
     private val preferences: SharedPreferences
@@ -458,7 +458,7 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun enableFromReminderNotification() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION_UNIQUE,
-            tag = FIRST_ENABLE_ENTRY_POINT_TAG
+            tag = FIRST_ENABLE_ENTRY_POINT_TAG,
         )
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION)
@@ -467,7 +467,7 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun enableFromOnboarding() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_UNIQUE,
-            tag = FIRST_ENABLE_ENTRY_POINT_TAG
+            tag = FIRST_ENABLE_ENTRY_POINT_TAG,
         )
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING)
@@ -476,7 +476,7 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun enableFromDaxOnboarding() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_UNIQUE,
-            tag = FIRST_ENABLE_ENTRY_POINT_TAG
+            tag = FIRST_ENABLE_ENTRY_POINT_TAG,
         )
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING)
@@ -485,7 +485,7 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun enableFromQuickSettingsTile() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE_UNIQUE,
-            tag = FIRST_ENABLE_ENTRY_POINT_TAG
+            tag = FIRST_ENABLE_ENTRY_POINT_TAG,
         )
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE)
@@ -494,7 +494,7 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun enableFromSummaryTrackerActivity() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY_UNIQUE,
-            tag = FIRST_ENABLE_ENTRY_POINT_TAG
+            tag = FIRST_ENABLE_ENTRY_POINT_TAG,
         )
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY)
@@ -512,25 +512,25 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun didShowDailyNotification(variant: Int) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixelNames.DID_SHOW_DAILY_NOTIFICATION.pixelName, variant)
+            String.format(Locale.US, DeviceShieldPixelNames.DID_SHOW_DAILY_NOTIFICATION.pixelName, variant),
         )
     }
 
     override fun didPressOnDailyNotification(variant: Int) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixelNames.DID_PRESS_DAILY_NOTIFICATION.pixelName, variant)
+            String.format(Locale.US, DeviceShieldPixelNames.DID_PRESS_DAILY_NOTIFICATION.pixelName, variant),
         )
     }
 
     override fun didShowWeeklyNotification(variant: Int) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixelNames.DID_SHOW_WEEKLY_NOTIFICATION.pixelName, variant)
+            String.format(Locale.US, DeviceShieldPixelNames.DID_SHOW_WEEKLY_NOTIFICATION.pixelName, variant),
         )
     }
 
     override fun didPressOnWeeklyNotification(variant: Int) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixelNames.DID_PRESS_WEEKLY_NOTIFICATION.pixelName, variant)
+            String.format(Locale.US, DeviceShieldPixelNames.DID_PRESS_WEEKLY_NOTIFICATION.pixelName, variant),
         )
     }
 
@@ -736,7 +736,7 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun sendHealthMonitorAlert(alertName: String) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixelNames.ATP_APP_HEALTH_ALERT_DAILY.pixelName, alertName)
+            String.format(Locale.US, DeviceShieldPixelNames.ATP_APP_HEALTH_ALERT_DAILY.pixelName, alertName),
         )
     }
 
@@ -779,7 +779,7 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun didOpenExclusionListActivityFromManageAppsProtectionScreen() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_MANAGE_APPS_PROTECTION_UNIQUE,
-            tag = FIRST_OPEN_ENTRY_POINT_TAG
+            tag = FIRST_OPEN_ENTRY_POINT_TAG,
         )
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_MANAGE_APPS_PROTECTION_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_MANAGE_APPS_PROTECTION)
@@ -893,14 +893,14 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun reportUnprotectedAppsBucket(bucketSize: Int) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY.pixelName, bucketSize)
+            String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY.pixelName, bucketSize),
         )
         firePixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET.pixelName, bucketSize))
     }
 
     private fun firePixel(
         p: DeviceShieldPixelNames,
-        payload: Map<String, String> = emptyMap()
+        payload: Map<String, String> = emptyMap(),
     ) {
         firePixel(p.pixelName, payload, p.enqueue)
     }
@@ -908,7 +908,7 @@ class RealDeviceShieldPixels @Inject constructor(
     private fun firePixel(
         pixelName: String,
         payload: Map<String, String> = emptyMap(),
-        enqueue: Boolean = false
+        enqueue: Boolean = false,
     ) {
         if (enqueue) {
             pixel.enqueueFire(pixelName, payload)
@@ -919,7 +919,7 @@ class RealDeviceShieldPixels @Inject constructor(
 
     private fun tryToFireDailyPixel(
         pixel: DeviceShieldPixelNames,
-        payload: Map<String, String> = emptyMap()
+        payload: Map<String, String> = emptyMap(),
     ) {
         tryToFireDailyPixel(pixel.pixelName, payload, pixel.enqueue)
     }
@@ -927,7 +927,7 @@ class RealDeviceShieldPixels @Inject constructor(
     private fun tryToFireDailyPixel(
         pixelName: String,
         payload: Map<String, String> = emptyMap(),
-        enqueue: Boolean = false
+        enqueue: Boolean = false,
     ) {
         val now = getUtcIsoLocalDate()
         val timestamp = preferences.getString(pixelName.appendTimestampSuffix(), null)
@@ -947,7 +947,7 @@ class RealDeviceShieldPixels @Inject constructor(
     private fun tryToFireUniquePixel(
         pixel: DeviceShieldPixelNames,
         tag: String? = null,
-        payload: Map<String, String> = emptyMap()
+        payload: Map<String, String> = emptyMap(),
     ) {
         val didExecuteAlready = preferences.getBoolean(tag ?: pixel.pixelName, false)
 

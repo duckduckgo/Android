@@ -50,7 +50,7 @@ class BlobConverterInjectorJsTest {
 
     private fun getJsToEvaluate(): String {
         val js = InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(
-            R.raw.blob_converter
+            R.raw.blob_converter,
         )
             .bufferedReader()
             .use { it.readText() }

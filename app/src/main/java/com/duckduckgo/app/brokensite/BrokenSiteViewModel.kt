@@ -37,13 +37,13 @@ import javax.inject.Inject
 class BrokenSiteViewModel @Inject constructor(
     private val pixel: Pixel,
     private val brokenSiteSender: BrokenSiteSender,
-    private val ampLinks: AmpLinks
+    private val ampLinks: AmpLinks,
 ) : ViewModel() {
 
     data class ViewState(
         val indexSelected: Int = -1,
         val categorySelected: BrokenSiteCategory? = null,
-        val submitAllowed: Boolean = false
+        val submitAllowed: Boolean = false,
     )
 
     sealed class Command {
@@ -62,7 +62,7 @@ class BrokenSiteViewModel @Inject constructor(
         ContentCategory,
         LoginCategory,
         UnsupportedCategory,
-        OtherCategory
+        OtherCategory,
     )
     private var blockedTrackers: String = ""
     private var surrogates: String = ""
@@ -86,7 +86,7 @@ class BrokenSiteViewModel @Inject constructor(
         urlParametersRemoved: Boolean,
         consentManaged: Boolean,
         consentOptOutFailed: Boolean,
-        consentSelfTestFailed: Boolean
+        consentSelfTestFailed: Boolean,
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
@@ -110,7 +110,7 @@ class BrokenSiteViewModel @Inject constructor(
         viewState.value = viewState.value?.copy(
             indexSelected = indexSelected,
             categorySelected = categories.elementAtOrNull(indexSelected),
-            submitAllowed = canSubmit()
+            submitAllowed = canSubmit(),
         )
     }
 
@@ -127,7 +127,7 @@ class BrokenSiteViewModel @Inject constructor(
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
             pixel.fire(
                 AppPixelName.BROKEN_SITE_REPORTED,
-                mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl)
+                mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl),
             )
         }
         command.value = Command.ConfirmAndFinish
@@ -136,7 +136,7 @@ class BrokenSiteViewModel @Inject constructor(
     @VisibleForTesting
     fun getBrokenSite(
         urlString: String,
-        webViewVersion: String
+        webViewVersion: String,
     ): BrokenSite {
         val category = categories[viewValue.indexSelected]
         return BrokenSite(
@@ -150,7 +150,7 @@ class BrokenSiteViewModel @Inject constructor(
             urlParametersRemoved = urlParametersRemoved,
             consentManaged = consentManaged,
             consentOptOutFailed = consentOptOutFailed,
-            consentSelfTestFailed = consentSelfTestFailed
+            consentSelfTestFailed = consentSelfTestFailed,
         )
     }
 

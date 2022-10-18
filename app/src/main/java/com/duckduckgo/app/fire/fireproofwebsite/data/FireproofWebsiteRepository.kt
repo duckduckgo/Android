@@ -41,17 +41,17 @@ interface FireproofWebsiteRepositoryAPI {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = FireproofRepository::class
+    boundType = FireproofRepository::class,
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = FireproofWebsiteRepositoryAPI::class
+    boundType = FireproofWebsiteRepositoryAPI::class,
 )
 @SingleInstanceIn(AppScope::class)
 class FireproofWebsiteRepository @Inject constructor(
     private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val dispatchers: DispatcherProvider,
-    private val faviconManager: Lazy<FaviconManager>
+    private val faviconManager: Lazy<FaviconManager>,
 ) : FireproofRepository, FireproofWebsiteRepositoryAPI {
 
     override fun fireproofWebsites(): List<String> {
@@ -62,7 +62,7 @@ class FireproofWebsiteRepository @Inject constructor(
             acceptedHosts.add(host)
             host.split(".")
                 .foldRight(
-                    ""
+                    "",
                 ) { next, acc ->
                     val acceptedHost = ".$next$acc"
                     acceptedHosts.add(acceptedHost)

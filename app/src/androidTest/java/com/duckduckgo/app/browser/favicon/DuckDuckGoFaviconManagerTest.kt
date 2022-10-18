@@ -79,7 +79,7 @@ class DuckDuckGoFaviconManagerTest {
             favoritesRepository = mockFavoriteRepository,
             faviconDownloader = mockFaviconDownloader,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            autofillStore = mockAutofillStore
+            autofillStore = mockAutofillStore,
         )
     }
 

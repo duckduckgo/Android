@@ -24,5 +24,5 @@ enum class ClearWhenOption {
     APP_EXIT_OR_60_MINS,
 
     // only available to debug builds
-    APP_EXIT_OR_5_SECONDS
+    APP_EXIT_OR_5_SECONDS,
 }

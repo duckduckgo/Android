@@ -141,8 +141,8 @@ class DeviceShieldWeeklyNotificationFactoryTest {
             company = "Google",
             appContainingTracker = trackingApp2(),
             timestamp = DatabaseDateFormatter.bucketByHour(
-                LocalDateTime.now().plusHours(2)
-            )
+                LocalDateTime.now().plusHours(2),
+            ),
         )
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(1)
@@ -161,7 +161,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerCompanyId: Int = -1,
         company: String = "Tracking LLC",
         appContainingTracker: TrackingApp = defaultApp(),
-        timestamp: String = DatabaseDateFormatter.bucketByHour()
+        timestamp: String = DatabaseDateFormatter.bucketByHour(),
     ) {
         val tracker = VpnTracker(
             trackerCompanyId = trackerCompanyId,
@@ -169,7 +169,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
             timestamp = timestamp,
             company = company,
             companyDisplayName = company,
-            trackingApp = appContainingTracker
+            trackingApp = appContainingTracker,
         )
         vpnTrackerDao.insert(tracker)
     }

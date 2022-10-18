@@ -112,7 +112,7 @@ class CurrentMemorySnapshot @Inject constructor(val applicationContext: Context)
     data class ProcessMemoryConsumption(
         val pid: Int,
         val name: String,
-        val memoryPssMb: Int
+        val memoryPssMb: Int,
     ) {
         override fun toString(): String {
             return String.format("pid: %d, %d MB, %s", pid, memoryPssMb, name)
@@ -134,7 +134,7 @@ class CurrentMemorySnapshot @Inject constructor(val applicationContext: Context)
             totalMemoryConsumed, totalMemoryBrowserProcess, totalMemoryVpnProcess,
             percentageHeapUsed, heapAllocated, heapMax, heapRemaining,
             percentageNativeUsed, nativeAllocated, nativeMax, nativeRemaining,
-            percentageDeviceUsed, deviceAllocated, deviceMax, deviceRemaining
+            percentageDeviceUsed, deviceAllocated, deviceMax, deviceRemaining,
         )
     }
 

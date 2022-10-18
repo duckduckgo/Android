@@ -40,7 +40,7 @@ class ConnectivityChangeReceiver @Inject constructor(
     private val vpnConfig: AppTpFeatureConfig,
     private val vpnPreferences: VpnPreferences,
     private val context: Context,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : VpnServiceCallbacks {
 
     private val connectivityChangedReceiver: BroadcastReceiver = object : BroadcastReceiver() {

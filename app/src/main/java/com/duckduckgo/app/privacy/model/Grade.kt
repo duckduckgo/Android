@@ -25,7 +25,7 @@ import timber.log.Timber
 
 class Grade(
     val https: Boolean = false,
-    val httpsAutoUpgrade: Boolean = false
+    val httpsAutoUpgrade: Boolean = false,
 ) {
 
     enum class Grading {
@@ -43,7 +43,7 @@ class Grade(
 
         @Json(name = "D-")
         D_MINUS,
-        UNKNOWN
+        UNKNOWN,
     }
 
     data class Score(
@@ -51,14 +51,14 @@ class Grade(
         val score: Int,
         val httpsScore: Int,
         val trackerScore: Int,
-        val privacyScore: Int
+        val privacyScore: Int,
     )
 
     sealed class Scores {
 
         data class ScoresAvailable(
             val site: Score,
-            val enhanced: Score
+            val enhanced: Score,
         ) : Scores()
 
         object ScoresUnavailable : Scores()
@@ -72,7 +72,7 @@ class Grade(
 
     fun updateData(
         privacyScore: Int?,
-        parentEntity: Entity?
+        parentEntity: Entity?,
     ) {
         this.privacyScore = privacyScore
         parentEntity?.let {
@@ -127,7 +127,7 @@ class Grade(
             httpsScore = siteHttpsScore,
             privacyScore = privacyScore,
             score = siteTotalScore,
-            trackerScore = siteTrackerScore
+            trackerScore = siteTrackerScore,
         )
 
         val enhanced = Score(
@@ -135,7 +135,7 @@ class Grade(
             httpsScore = enhancedHttpsScore,
             privacyScore = privacyScore,
             score = enhancedTotalScore,
-            trackerScore = enhancedTrackerScore
+            trackerScore = enhancedTrackerScore,
         )
 
         return ScoresAvailable(site = site, enhanced = enhanced)

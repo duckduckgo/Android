@@ -164,7 +164,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             this,
             {
                 it?.let { renderOnboardingViewState(it) }
-            }
+            },
         )
         viewModel.resultsViewState.observe(
             this,
@@ -177,13 +177,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                         renderQuickAccessItems(it)
                     }
                 }
-            }
+            },
         )
         viewModel.command.observe(
             this,
             {
                 processCommand(it)
-            }
+            },
         )
     }
 
@@ -204,7 +204,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             },
             editableSearchClickListener = {
                 viewModel.onUserSelectedToEditQuery(it.phrase)
-            }
+            },
         )
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
     }
@@ -228,7 +228,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             { viewHolder -> itemTouchHelper.startDrag(viewHolder) },
             { viewModel.onQuickAccessItemClicked(it) },
             { viewModel.onEditQuickAccessItemRequested(it) },
-            { viewModel.onDeleteQuickAccessItemRequested(it) }
+            { viewModel.onDeleteQuickAccessItemRequested(it) },
         )
         itemTouchHelper = ItemTouchHelper(
             QuickAccessDragTouchItemListener(
@@ -237,8 +237,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     override fun onListChanged(listElements: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
                         viewModel.onQuickAccessListChanged(listElements)
                     }
-                }
-            )
+                },
+            ),
         )
 
         itemTouchHelper.attachToRecyclerView(quickAccessRecyclerView)
@@ -299,7 +299,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     return@OnEditorActionListener true
                 }
                 false
-            }
+            },
         )
 
         omnibarTextInput.removeTextChangedListener(textChangeWatcher)
@@ -378,7 +378,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         Snackbar.make(
             binding.root,
             message,
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.insertQuickAccessItem(savedSite)
         }.show()
@@ -442,7 +442,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
         fun fromWidget(
             context: Context,
-            launchVoice: Boolean = false
+            launchVoice: Boolean = false,
         ): Intent {
             val intent = Intent(context, SystemSearchActivity::class.java)
             intent.putExtra(WIDGET_SEARCH_EXTRA, true)
@@ -453,7 +453,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
         fun fromFavWidget(
             context: Context,
-            launchVoice: Boolean = false
+            launchVoice: Boolean = false,
         ): Intent {
             val intent = Intent(context, SystemSearchActivity::class.java)
             intent.putExtra(WIDGET_SEARCH_WITH_FAVS_EXTRA, true)

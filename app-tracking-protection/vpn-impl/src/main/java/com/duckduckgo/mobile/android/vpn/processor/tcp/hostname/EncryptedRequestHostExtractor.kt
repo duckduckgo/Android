@@ -80,7 +80,7 @@ class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: Tl
     private fun findServerNameIndicationHeaderStart(
         packet: ByteArray,
         extensionStartIndex: Int,
-        extensionsLength: Int
+        extensionsLength: Int,
     ): Int {
         var extensionBytesSearched = 0
         var index = extensionStartIndex
@@ -155,7 +155,7 @@ class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: Tl
     // first byte must be multiplied by 256 (or shl 8), then added to second
     private fun addHigherLowerOrderBytes(
         higherOrderByte: HigherOrderByte,
-        lowerOrderByte: LowerOrderByte
+        lowerOrderByte: LowerOrderByte,
     ): Int {
         val higherInt = higherOrderByte.byte.toInt() shl 8 and 0xFF00
         val lowerInt = lowerOrderByte.byte.toInt() and 0x00FF

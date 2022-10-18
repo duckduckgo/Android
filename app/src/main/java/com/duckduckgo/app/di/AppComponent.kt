@@ -71,8 +71,8 @@ import retrofit2.Retrofit
         CertificateTrustedStoreModule::class,
         WelcomePageModule::class,
         FormatterModule::class,
-        EmailModule::class
-    ]
+        EmailModule::class,
+    ],
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 

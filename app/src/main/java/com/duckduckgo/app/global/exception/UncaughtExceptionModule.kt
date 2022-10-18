@@ -36,7 +36,7 @@ class UncaughtExceptionModule {
     fun uncaughtWebViewExceptionRepository(
         uncaughtExceptionDao: UncaughtExceptionDao,
         rootExceptionFinder: RootExceptionFinder,
-        deviceInfo: DeviceInfo
+        deviceInfo: DeviceInfo,
     ): UncaughtExceptionRepository {
         return UncaughtExceptionRepositoryDb(uncaughtExceptionDao, rootExceptionFinder, deviceInfo)
     }
@@ -48,7 +48,7 @@ class UncaughtExceptionModule {
         uncaughtExceptionRepository: UncaughtExceptionRepository,
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): AlertingUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
         return AlertingUncaughtExceptionHandler(
@@ -57,7 +57,7 @@ class UncaughtExceptionModule {
             uncaughtExceptionRepository,
             dispatcherProvider,
             appCoroutineScope,
-            appBuildConfig
+            appBuildConfig,
         )
     }
 

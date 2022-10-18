@@ -30,7 +30,7 @@ private const val IS_INITIALIZED = "IS_INITIALIZED"
 
 internal class VpnFeaturesRegistryImpl(
     private val vpnServiceWrapper: VpnServiceWrapper,
-    private val sharedPreferencesProvider: VpnSharedPreferencesProvider
+    private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : VpnFeaturesRegistry, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val preferences: SharedPreferences

@@ -34,12 +34,12 @@ import timber.log.Timber
 @WorkerThread
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class ResourceSurrogateLoader @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val resourceSurrogates: ResourceSurrogates,
-    private val surrogatesDataStore: ResourceSurrogateDataStore
+    private val surrogatesDataStore: ResourceSurrogateDataStore,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -99,8 +99,8 @@ class ResourceSurrogateLoader @Inject constructor(
                         scriptId = scriptId,
                         name = ruleName,
                         mimeType = mimeType,
-                        jsFunction = functionBuilder.toString()
-                    )
+                        jsFunction = functionBuilder.toString(),
+                    ),
                 )
 
                 functionBuilder.setLength(0)

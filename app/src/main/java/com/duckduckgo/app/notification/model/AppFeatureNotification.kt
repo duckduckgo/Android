@@ -31,7 +31,7 @@ class AppFeatureNotification(
     @StringRes private val title: Int,
     @StringRes private val description: Int,
     private val pixelSuffix: String,
-    override val launchIntent: String = APP_LAUNCH
+    override val launchIntent: String = APP_LAUNCH,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacy.app.feature.$pixelSuffix"
@@ -51,7 +51,7 @@ class AppFeatureNotificationSpecification(
     context: Context,
     @StringRes titleRes: Int,
     @StringRes descriptionRes: Int,
-    override val pixelSuffix: String
+    override val pixelSuffix: String,
 ) : NotificationSpec {
     override val bundle: Bundle = Bundle()
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS

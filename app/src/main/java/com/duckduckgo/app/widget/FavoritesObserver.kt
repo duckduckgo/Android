@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 class FavoritesObserver @Inject constructor(
     context: Context,
     private val favoritesRepository: FavoritesRepository,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
 ) : DefaultLifecycleObserver {
 
     private val instance = AppWidgetManager.getInstance(context)

@@ -41,7 +41,7 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
      */
     class EmptyFavoritesWidgetItemFactory(
         val context: Context,
-        intent: Intent
+        intent: Intent,
     ) : RemoteViewsFactory {
 
         @Inject

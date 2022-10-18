@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 
 @WrongScope(
     comment = "To use the right scope we first need to enable dagger component nesting",
-    correctScope = ActivityScope::class
+    correctScope = ActivityScope::class,
 )
 @InjectWith(VpnScope::class)
 class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
@@ -83,7 +83,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         binding.appBreakageFormDisclaimer.text =
             HtmlCompat.fromHtml(
                 getString(R.string.atp_ReportBreakageFormDisclaimerText),
-                HtmlCompat.FROM_HTML_MODE_LEGACY
+                HtmlCompat.FROM_HTML_MODE_LEGACY,
             )
     }
 
@@ -138,8 +138,8 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
                     customMetadata =
                     Base64.encodeToString(
                         metadataReporter.getVpnStateMetadata(brokenApp.appPackageId).toByteArray(),
-                        Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE
-                    )
+                        Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
+                    ),
                 )
             deviceShieldPixels.sendAppBreakageReport(issue.toMap())
             setResult(RESULT_OK, Intent().apply { issue.addToIntent(this) })

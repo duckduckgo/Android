@@ -26,7 +26,7 @@ class FileChooserIntentBuilder @Inject constructor() {
 
     fun intent(
         acceptTypes: Array<String>,
-        canChooseMultiple: Boolean = false
+        canChooseMultiple: Boolean = false,
     ): Intent {
         return Intent(Intent.ACTION_GET_CONTENT).also {
             it.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -73,7 +73,7 @@ class FileChooserIntentBuilder @Inject constructor() {
 
     private fun configureSelectableFileTypes(
         intent: Intent,
-        acceptTypes: Array<String>
+        acceptTypes: Array<String>,
     ) {
         intent.type = "*/*"
 
@@ -93,7 +93,7 @@ class FileChooserIntentBuilder @Inject constructor() {
 
     private fun configureAllowMultipleFile(
         intent: Intent,
-        canChooseMultiple: Boolean
+        canChooseMultiple: Boolean,
     ) {
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, canChooseMultiple)
     }

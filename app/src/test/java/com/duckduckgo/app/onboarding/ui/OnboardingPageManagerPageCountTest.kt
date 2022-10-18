@@ -65,7 +65,7 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
         fun testData(): Array<TestCase> {
             return arrayOf(
                 TestCase(false, 1, otherVariant),
-                TestCase(true, 2, otherVariant)
+                TestCase(true, 2, otherVariant),
             )
         }
     }
@@ -81,6 +81,6 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
     data class TestCase(
         val defaultBrowserPage: Boolean,
         val expectedPageCount: Int,
-        val variant: Variant
+        val variant: Variant,
     )
 }

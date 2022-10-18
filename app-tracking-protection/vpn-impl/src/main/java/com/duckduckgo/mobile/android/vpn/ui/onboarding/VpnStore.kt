@@ -47,7 +47,7 @@ interface VpnStore {
 @SingleInstanceIn(AppScope::class)
 class SharedPreferencesVpnStore @Inject constructor(
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnStore {
 
     private val preferences: SharedPreferences

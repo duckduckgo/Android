@@ -51,7 +51,7 @@ class TrackerDetectorClientTypeTest {
         mockContentBlocking,
         mockTrackerAllowlist,
         mockWebTrackersBlockedDao,
-        mockAdClickManager
+        mockAdClickManager,
     )
 
     @Before
@@ -74,7 +74,7 @@ class TrackerDetectorClientTypeTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         assertEquals(expected, testee.evaluate(url, documentUrl))
     }
@@ -89,7 +89,7 @@ class TrackerDetectorClientTypeTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         assertEquals(expected, testee.evaluate(url, documentUrl))
     }

@@ -29,7 +29,7 @@ interface UserEventsStore {
 
 class AppUserEventsStore @Inject constructor(
     private val userEventsDao: UserEventsDao,
-    private val dispatcher: DispatcherProvider
+    private val dispatcher: DispatcherProvider,
 ) : UserEventsStore {
 
     override suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity? {

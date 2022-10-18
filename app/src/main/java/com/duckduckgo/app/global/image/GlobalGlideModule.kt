@@ -39,7 +39,7 @@ class GlobalGlideModule : AppGlideModule() {
     override fun registerComponents(
         context: Context,
         glide: Glide,
-        registry: Registry
+        registry: Registry,
     ) {
         val okHttpClientBuilder = OkHttpClient.Builder()
             .addInterceptor { chain: Interceptor.Chain ->
@@ -72,7 +72,7 @@ class GlobalGlideModule : AppGlideModule() {
                 registry.replace(
                     GlideUrl::class.java,
                     InputStream::class.java,
-                    OkHttpUrlLoader.Factory(okHttpClientBuilder.build())
+                    OkHttpUrlLoader.Factory(okHttpClientBuilder.build()),
                 )
             } catch (t: Throwable) {
                 Timber.d("Error registering GlideModule for GlideUrl: $t")
@@ -85,7 +85,7 @@ class GlobalGlideModule : AppGlideModule() {
         registry.replace(
             GlideUrl::class.java,
             InputStream::class.java,
-            OkHttpUrlLoader.Factory(okHttpClientBuilder.build())
+            OkHttpUrlLoader.Factory(okHttpClientBuilder.build()),
         )
     }
 

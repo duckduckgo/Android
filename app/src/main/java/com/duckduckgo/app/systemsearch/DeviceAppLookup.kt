@@ -27,7 +27,7 @@ data class DeviceApp(
     val shortName: String,
     val packageName: String,
     val launchIntent: Intent,
-    private var icon: Drawable? = null
+    private var icon: Drawable? = null,
 ) {
     fun retrieveIcon(packageManager: PackageManager): Drawable {
         return icon ?: packageManager.getApplicationIcon(packageName).also {

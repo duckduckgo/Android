@@ -39,7 +39,7 @@ import timber.log.Timber
 class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
     private val dispatcherProvider: DispatcherProvider,
-    private val timeDiffFormatter: TimeDiffFormatter
+    private val timeDiffFormatter: TimeDiffFormatter,
 ) : ViewModel() {
 
     private val MAX_BADGES_TO_DISPLAY = 5
@@ -61,7 +61,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
 
     suspend fun getMostRecentTrackers(
         timeWindow: TimeWindow,
-        showHeadings: Boolean
+        showHeadings: Boolean,
     ): Flow<List<TrackerFeedItem>> = withContext(dispatcherProvider.io()) {
         return@withContext statsRepository.getMostRecentVpnTrackers { timeWindow.asString() }
             .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
@@ -77,7 +77,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
 
     private suspend fun aggregateDataPerApp(
         trackerData: List<BucketizedVpnTracker>,
-        showHeadings: Boolean
+        showHeadings: Boolean,
     ): List<TrackerFeedItem> {
         val sourceData = mutableListOf<TrackerFeedItem>()
         val perSessionData = trackerData.groupBy { it.bucket }
@@ -107,8 +107,8 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
                             companyName = trackerCompanyName,
                             companyDisplayName = trackerCompanyDisplayName,
                             timestamp = timestamp,
-                            companyPrevalence = trackerCompanyPrevalence
-                        )
+                            companyPrevalence = trackerCompanyPrevalence,
+                        ),
                     )
                     totalTrackerCount += trackerBucket.value.size
                 }
@@ -124,16 +124,16 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
                         bucket = item.bucket,
                         trackingApp = TrackingApp(
                             item.trackerCompanySignal.tracker.trackingApp.packageId,
-                            item.trackerCompanySignal.tracker.trackingApp.appDisplayName
+                            item.trackerCompanySignal.tracker.trackingApp.appDisplayName,
                         ),
                         trackersTotalCount = totalTrackerCount,
                         trackingCompanyBadges = mapTrackingCompanies(trackingCompanyInfo),
                         timestamp = item.trackerCompanySignal.tracker.timestamp,
                         displayTimestamp = timeDiffFormatter.formatTimePassed(
                             LocalDateTime.now(),
-                            LocalDateTime.parse(item.trackerCompanySignal.tracker.timestamp)
-                        )
-                    )
+                            LocalDateTime.parse(item.trackerCompanySignal.tracker.timestamp),
+                        ),
+                    ),
                 )
             }
         }
@@ -162,6 +162,6 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         val companyName: String,
         val companyDisplayName: String,
         val timestamp: String,
-        val companyPrevalence: Int
+        val companyPrevalence: Int,
     )
 }

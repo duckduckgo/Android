@@ -111,7 +111,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity(), FireproofSettingsSelecto
         Snackbar.make(
             binding.root,
             message,
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.onSnackBarUndoFireproof(entity)
         }.show()
@@ -123,7 +123,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity(), FireproofSettingsSelecto
         Snackbar.make(
             binding.root,
             message,
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.onSnackBarUndoRemoveAllWebsites(removedWebsitesEntities)
         }.show()

@@ -55,7 +55,7 @@ class BrowserViewModel @Inject constructor(
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
     private val dispatchers: DispatcherProvider,
-    private val pixel: Pixel
+    private val pixel: Pixel,
 ) : AppEnjoymentDialogFragment.Listener,
     RateAppDialogFragment.Listener,
     GiveFeedbackDialogFragment.Listener,
@@ -66,7 +66,7 @@ class BrowserViewModel @Inject constructor(
         get() = Dispatchers.Main
 
     data class ViewState(
-        val hideWebContent: Boolean = true
+        val hideWebContent: Boolean = true,
     )
 
     sealed class Command {
@@ -137,18 +137,18 @@ class BrowserViewModel @Inject constructor(
     suspend fun onOpenInNewTabRequested(
         query: String,
         sourceTabId: String? = null,
-        skipHome: Boolean = false
+        skipHome: Boolean = false,
     ): String {
         return if (sourceTabId != null) {
             tabRepository.addFromSourceTab(
                 url = queryUrlConverter.convertQueryToUrl(query),
                 skipHome = skipHome,
-                sourceTabId = sourceTabId
+                sourceTabId = sourceTabId,
             )
         } else {
             tabRepository.add(
                 url = queryUrlConverter.convertQueryToUrl(query),
-                skipHome = skipHome
+                skipHome = skipHome,
             )
         }
     }

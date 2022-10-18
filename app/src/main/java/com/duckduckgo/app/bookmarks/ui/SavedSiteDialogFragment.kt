@@ -85,7 +85,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         _binding = DialogFragmentSavedSiteBinding.inflate(inflater, container, false)
         configureClickListeners()
@@ -118,7 +118,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
                     }
                 }
                 false
-            }
+            },
         )
     }
 
@@ -155,8 +155,8 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
                                 context,
                                 it,
                                 arguments?.getSerializable(KEY_CURRENT_FOLDER) as BookmarkFolder,
-                                showAddFolderMenu
-                            )
+                                showAddFolderMenu,
+                            ),
                         )
                     } else {
                         launcher.launch(BookmarkFoldersActivity.intent(context, it, showAddFolderMenu = showAddFolderMenu))
@@ -211,5 +211,5 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 enum class ValidationState {
     CHANGED,
     UNCHANGED,
-    INVALID
+    INVALID,
 }

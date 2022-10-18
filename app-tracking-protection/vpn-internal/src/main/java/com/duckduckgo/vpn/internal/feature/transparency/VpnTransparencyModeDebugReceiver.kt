@@ -38,7 +38,7 @@ import timber.log.Timber
  */
 class TransparencyModeDebugReceiver(
     context: Context,
-    receiver: (Intent) -> Unit
+    receiver: (Intent) -> Unit,
 ) : InternalFeatureReceiver(context, receiver) {
 
     override fun intentAction(): String = ACTION
@@ -71,7 +71,7 @@ class TransparencyModeDebugReceiver(
 @ContributesMultibinding(VpnScope::class)
 class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val context: Context,
-    private val trackerDetectorInterceptor: TransparencyTrackerDetectorInterceptor
+    private val trackerDetectorInterceptor: TransparencyTrackerDetectorInterceptor,
 ) : VpnServiceCallbacks {
 
     private val stateRefresherJob = ConflatedJob()
@@ -101,7 +101,7 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         Timber.i("Debug receiver TransparencyModeDebugReceiver turning OFF transparency mode")
         trackerDetectorInterceptor.setEnable(false)

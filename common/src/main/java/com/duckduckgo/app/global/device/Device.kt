@@ -25,7 +25,7 @@ interface DeviceInfo {
 
     enum class FormFactor(val description: String) {
         PHONE("phone"),
-        TABLET("tablet")
+        TABLET("tablet"),
     }
 
     val appVersion: String
@@ -68,7 +68,7 @@ class ContextDeviceInfo(private val context: Context) : DeviceInfo {
             TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 600f,
-                context.resources.displayMetrics
+                context.resources.displayMetrics,
             )
                 .toInt()
         return if (smallestSize >= tabletSize) {

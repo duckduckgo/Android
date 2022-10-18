@@ -124,8 +124,8 @@ class AppTpFeatureTogglesPluginTest {
         whenever(
             appTpFeatureToggleRepository.get(
                 AppTpFeatureName.AppTrackerProtection,
-                true
-            )
+                true,
+            ),
         ).thenReturn(true)
     }
 
@@ -133,8 +133,8 @@ class AppTpFeatureTogglesPluginTest {
         whenever(
             appTpFeatureToggleRepository.get(
                 AppTpFeatureName.AppTrackerProtection,
-                true
-            )
+                true,
+            ),
         ).thenReturn(false)
     }
 
@@ -142,16 +142,16 @@ class AppTpFeatureTogglesPluginTest {
         whenever(
             appTpFeatureToggleRepository.get(
                 AppTpFeatureName.AppTrackerProtection,
-                defaultValue
-            )
+                defaultValue,
+            ),
         ).thenReturn(defaultValue)
     }
 
     private fun givenAppVersionIsEqualToMinSupportedVersion() {
         whenever(
             appTpFeatureToggleRepository.getMinSupportedVersion(
-                AppTpFeatureName.AppTrackerProtection
-            )
+                AppTpFeatureName.AppTrackerProtection,
+            ),
         ).thenReturn(1234)
 
         whenever(mockAppBuildConfig.versionCode).thenReturn(1234)
@@ -160,8 +160,8 @@ class AppTpFeatureTogglesPluginTest {
     private fun givenAppVersionIsGreaterThanMinSupportedVersion() {
         whenever(
             appTpFeatureToggleRepository.getMinSupportedVersion(
-                AppTpFeatureName.AppTrackerProtection
-            )
+                AppTpFeatureName.AppTrackerProtection,
+            ),
         ).thenReturn(1234)
 
         whenever(mockAppBuildConfig.versionCode).thenReturn(5678)
@@ -170,8 +170,8 @@ class AppTpFeatureTogglesPluginTest {
     private fun givenAppVersionIsSmallerThanMinSupportedVersion() {
         whenever(
             appTpFeatureToggleRepository.getMinSupportedVersion(
-                AppTpFeatureName.AppTrackerProtection
-            )
+                AppTpFeatureName.AppTrackerProtection,
+            ),
         ).thenReturn(1234)
 
         whenever(mockAppBuildConfig.versionCode).thenReturn(123)

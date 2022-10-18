@@ -45,7 +45,7 @@ class DosDetector @Inject constructor() {
 
     private fun reset(
         url: Uri?,
-        currentLoadTime: Long
+        currentLoadTime: Long,
     ) {
         dosCount = 0
         lastUrl = url

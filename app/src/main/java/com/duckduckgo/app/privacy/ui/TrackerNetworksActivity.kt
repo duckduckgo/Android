@@ -93,7 +93,7 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
                 !allTrackersBlocked -> R.string.domainsLoadedOverviewProtectionsOff
                 emptyView -> R.string.domainsLoadedOverviewEmpty
                 else -> R.string.domainsLoadedOverview
-            }
+            },
         )
         webTrackingProtections.addClickableLink("learn_more_link", getText(R.string.webTrackingProtectionsText)) {
             openUrl(getString(R.string.webTrackingProtectionsUrl))
@@ -106,7 +106,7 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
                 R.string.domainsLoadedActivityTitle
             } else {
                 R.string.trackersActivityTitle
-            }
+            },
         )
         setupToolbar(toolbar)
     }
@@ -146,7 +146,7 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
             tabId: String,
             domainsLoaded: Boolean = false,
             trackingRequestsBannerIconId: Int? = null,
-            protectionsDisabled: Boolean? = null
+            protectionsDisabled: Boolean? = null,
         ): Intent {
             return Intent(context, TrackerNetworksActivity::class.java).apply {
                 this.tabId = tabId

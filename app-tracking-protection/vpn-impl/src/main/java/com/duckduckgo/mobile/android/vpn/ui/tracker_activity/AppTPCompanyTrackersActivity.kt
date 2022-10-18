@@ -124,7 +124,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             viewModel.loadData(
                 getDate(),
-                getPackage()
+                getPackage(),
             )
         }
 
@@ -139,7 +139,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         binding.trackingAttempts.text = resources.getQuantityString(
             R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
             viewState.totalTrackingAttempts,
-            viewState.totalTrackingAttempts
+            viewState.totalTrackingAttempts,
         )
         binding.includeToolbar.appTrackedAgo.text = viewState.lastTrackerBlockedAgo
 
@@ -150,7 +150,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         binding.appDisabledInfoPanel.apply {
             setClickableLink(
                 InfoPanel.REPORT_ISSUES_ANNOTATION,
-                getText(R.string.atp_CompanyDetailsAppInfoPanel)
+                getText(R.string.atp_CompanyDetailsAppInfoPanel),
             ) { launchFeedback() }
             show()
         }
@@ -242,7 +242,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             context: Context,
             packageName: String,
             appDisplayName: String,
-            bucket: String
+            bucket: String,
         ): Intent {
             val intent = Intent(context, AppTPCompanyTrackersActivity::class.java)
             intent.putExtra(EXTRA_PACKAGE_NAME, packageName)

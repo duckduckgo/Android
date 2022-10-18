@@ -38,11 +38,11 @@ interface AppTrackerRecorder {
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 @ContributesBinding(
     scope = VpnScope::class,
-    boundType = AppTrackerRecorder::class
+    boundType = AppTrackerRecorder::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : VpnServiceCallbacks, AppTrackerRecorder {
@@ -65,7 +65,7 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         Timber.i("Batched app tracker recorder stopped")
         periodicInsertionJob.cancel()

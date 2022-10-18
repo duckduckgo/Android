@@ -23,13 +23,13 @@ import com.duckduckgo.mobile.android.vpn.store.AppHealthTriggersRepository
 import javax.inject.Inject
 
 class HealthClassifier @Inject constructor(
-    private val appHealthTriggersRepository: AppHealthTriggersRepository
+    private val appHealthTriggersRepository: AppHealthTriggersRepository,
 ) {
 
     fun determineHealthTunInputQueueReadRatio(
         tunInputs: Long,
         queueReads: QueueReads,
-        name: String
+        name: String,
     ): HealthState {
         if (tunInputs < 100) return Initializing
 
@@ -134,7 +134,7 @@ class HealthClassifier @Inject constructor(
 
     fun determineHealthIpPackets(
         ipv4PacketCount: Long,
-        ipv6PacketCount: Long
+        ipv6PacketCount: Long,
     ): HealthState {
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("ipPacket-types", rawMetrics, informational = true)
@@ -173,7 +173,7 @@ class HealthClassifier @Inject constructor(
 
         private fun percentage(
             numerator: Long,
-            denominator: Long
+            denominator: Long,
         ): Double {
             if (denominator == 0L) return 0.0
             return numerator.toDouble() / denominator * 100
@@ -185,5 +185,5 @@ data class QueueReads(
     val queueReads: Long,
     val queueTCPReads: Long,
     val queueUDPReads: Long,
-    val unknownPackets: Long
+    val unknownPackets: Long,
 )

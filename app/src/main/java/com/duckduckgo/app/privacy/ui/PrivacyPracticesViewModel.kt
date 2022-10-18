@@ -31,14 +31,14 @@ import kotlinx.coroutines.flow.*
 
 @ContributesViewModel(ActivityScope::class)
 class PrivacyPracticesViewModel @Inject constructor(
-    private val tabRepository: TabRepository
+    private val tabRepository: TabRepository,
 ) : ViewModel() {
 
     data class ViewState(
         val domain: String = "",
         val practices: PrivacyPractices.Summary = UNKNOWN,
         val goodTerms: List<String> = emptyList(),
-        val badTerms: List<String> = emptyList()
+        val badTerms: List<String> = emptyList(),
     )
 
     @OptIn(InternalCoroutinesApi::class)
@@ -50,10 +50,10 @@ class PrivacyPracticesViewModel @Inject constructor(
                         domain = site.domain ?: "",
                         practices = site.privacyPractices.summary,
                         goodTerms = site.privacyPractices.goodReasons,
-                        badTerms = site.privacyPractices.badReasons
-                    )
+                        badTerms = site.privacyPractices.badReasons,
+                    ),
                 )
-            }
+            },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 }

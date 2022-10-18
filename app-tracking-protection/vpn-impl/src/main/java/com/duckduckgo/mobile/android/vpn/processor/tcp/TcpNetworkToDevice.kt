@@ -60,7 +60,7 @@ class TcpNetworkToDevice(
     private val packetPersister: PacketPersister,
     private val tcbCloser: TCBCloser,
     private val vpnCoroutineScope: CoroutineScope,
-    private val healthMetricCounter: HealthMetricCounter
+    private val healthMetricCounter: HealthMetricCounter,
 ) : Runnable {
 
     override fun run() {
@@ -170,20 +170,20 @@ class TcpNetworkToDevice(
         packet: Packet,
         receiveBuffer: ByteBuffer,
         tcb: TCB,
-        readBytes: Int
+        readBytes: Int,
     ) {
         Timber.v(
             "Network-to-device packet %s. %d bytes. %s",
             tcb.ipAndPort,
             readBytes,
-            logPacketDetails(packet, tcb.sequenceNumberToClient.get(), tcb.acknowledgementNumberToClient.get())
+            logPacketDetails(packet, tcb.sequenceNumberToClient.get(), tcb.acknowledgementNumberToClient.get()),
         )
         packet.updateTcpBuffer(
             receiveBuffer,
             (PSH or ACK).toByte(),
             tcb.sequenceNumberToClient.get(),
             tcb.acknowledgementNumberToClient.get(),
-            readBytes
+            readBytes,
         )
 
         tcb.sequenceNumberToClient.addAndGet(readBytes.toLong())
@@ -195,14 +195,14 @@ class TcpNetworkToDevice(
     private fun handleEndOfStream(
         tcb: TCB,
         packet: Packet,
-        key: SelectionKey
+        key: SelectionKey,
     ) {
         Timber.d(
             "Network-to-device end of stream %s. %s %dms after creation %s",
             tcb.ipAndPort,
             tcb.tcbState,
             TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tcb.creationTime),
-            logPacketDetails(packet, tcb.sequenceNumberToClient.get(), tcb.acknowledgementNumberToClient.get())
+            logPacketDetails(packet, tcb.sequenceNumberToClient.get(), tcb.acknowledgementNumberToClient.get()),
         )
 
         key.cancel()
@@ -226,7 +226,7 @@ class TcpNetworkToDevice(
 
     private fun sendReset(
         packet: Packet,
-        tcb: TCB
+        tcb: TCB,
     ) {
         val buffer = ByteBufferPool.acquire()
         packet.updateTcpBuffer(
@@ -234,7 +234,7 @@ class TcpNetworkToDevice(
             (RST or ACK).toByte(),
             tcb.sequenceNumberToClient.get(),
             tcb.acknowledgementNumberToClient.get(),
-            0
+            0,
         )
         tcb.sequenceNumberToClient.incrementAndGet()
         offerToNetworkToDeviceQueue(buffer, tcb, packet)
@@ -260,7 +260,7 @@ class TcpNetworkToDevice(
                     (SYN or ACK).toByte(),
                     tcb.sequenceNumberToClient.get(),
                     tcb.acknowledgementNumberToClient.get(),
-                    0
+                    0,
                 )
 
                 offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)
@@ -291,7 +291,7 @@ class TcpNetworkToDevice(
     private fun offerToNetworkToDeviceQueue(
         buffer: ByteBuffer,
         tcb: TCB,
-        packet: Packet
+        packet: Packet,
     ) {
         logPacket(tcb, packet)
         queues.networkToDevice.offer(buffer)
@@ -299,7 +299,7 @@ class TcpNetworkToDevice(
 
     private fun logPacket(
         tcb: TCB,
-        packet: Packet
+        packet: Packet,
     ) {
         Timber.v(
             "New packet. %s. %s. %s. Packet length: %d. Data length: %d",
@@ -307,7 +307,7 @@ class TcpNetworkToDevice(
             tcb.tcbState,
             logPacketDetails(packet, packet.tcpHeader.sequenceNumber, packet.tcpHeader.acknowledgementNumber),
             packet.ipHeader.totalLength,
-            packet.tcpPayloadSize(false)
+            packet.tcpPayloadSize(false),
         )
     }
 

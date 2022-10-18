@@ -84,7 +84,7 @@ class RxPixelSenderTest {
             mockDeviceInfo,
             object : StatisticsLibraryConfig {
                 override fun shouldFirePixelsAsDev() = true
-            }
+            },
         )
     }
 
@@ -173,9 +173,9 @@ class RxPixelSenderTest {
                 pixelName = "mp",
                 atb = "atbvariant",
                 additionalQueryParams = params + mapOf("appVersion" to "1.0.0"),
-                encodedQueryParams = emptyMap()
+                encodedQueryParams = emptyMap(),
             ),
-            pixels.first()
+            pixels.first(),
         )
     }
 
@@ -195,9 +195,9 @@ class RxPixelSenderTest {
                 pixelName = "mp",
                 atb = "atbvariant",
                 additionalQueryParams = mapOf("appVersion" to "1.0.0"),
-                encodedQueryParams = emptyMap()
+                encodedQueryParams = emptyMap(),
             ),
-            pixels.first()
+            pixels.first(),
         )
     }
 
@@ -208,7 +208,7 @@ class RxPixelSenderTest {
             pixelName = "mp",
             atb = "atbvariant",
             additionalQueryParams = mapOf("appVersion" to "1.0.0"),
-            encodedQueryParams = emptyMap()
+            encodedQueryParams = emptyMap(),
         )
         pendingPixelDao.insert(pixelEntity)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
@@ -220,7 +220,7 @@ class RxPixelSenderTest {
             "phone",
             pixelEntity.atb,
             pixelEntity.additionalQueryParams,
-            pixelEntity.encodedQueryParams
+            pixelEntity.encodedQueryParams,
         )
     }
 
@@ -231,7 +231,7 @@ class RxPixelSenderTest {
             pixelName = "mp",
             atb = "atbvariant",
             additionalQueryParams = mapOf("appVersion" to "1.0.0"),
-            encodedQueryParams = emptyMap()
+            encodedQueryParams = emptyMap(),
         )
         pendingPixelDao.insert(pixelEntity)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
@@ -249,7 +249,7 @@ class RxPixelSenderTest {
             pixelName = "mp",
             atb = "atbvariant",
             additionalQueryParams = mapOf("appVersion" to "1.0.0"),
-            encodedQueryParams = emptyMap()
+            encodedQueryParams = emptyMap(),
         )
         pendingPixelDao.insert(pixelEntity)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
@@ -268,7 +268,7 @@ class RxPixelSenderTest {
             pixelName = "mp",
             atb = "atbvariant",
             additionalQueryParams = mapOf("appVersion" to "1.0.0"),
-            encodedQueryParams = emptyMap()
+            encodedQueryParams = emptyMap(),
         )
         pendingPixelDao.insert(pixelEntity, times = 5)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
@@ -280,13 +280,13 @@ class RxPixelSenderTest {
             "phone",
             pixelEntity.atb,
             pixelEntity.additionalQueryParams,
-            pixelEntity.encodedQueryParams
+            pixelEntity.encodedQueryParams,
         )
     }
 
     private fun assertPixelEntity(
         expectedEntity: PixelEntity,
-        pixelEntity: PixelEntity
+        pixelEntity: PixelEntity,
     ) {
         assertEquals(expectedEntity.pixelName, pixelEntity.pixelName)
         assertEquals(expectedEntity.atb, pixelEntity.atb)
@@ -325,7 +325,7 @@ class RxPixelSenderTest {
 
     private fun PendingPixelDao.insert(
         pixel: PixelEntity,
-        times: Int
+        times: Int,
     ) {
         for (x in 1..times) {
             this.insert(pixel)

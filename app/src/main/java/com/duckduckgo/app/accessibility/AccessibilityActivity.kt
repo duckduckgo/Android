@@ -82,7 +82,7 @@ class AccessibilityActivity : DuckDuckGoActivity() {
 
     private fun renderFontSize(
         fontSize: Float,
-        overrideSystemFontSize: Boolean
+        overrideSystemFontSize: Boolean,
     ) {
         Timber.v("AccessibilityActSettings: renderFontSize $fontSize")
 

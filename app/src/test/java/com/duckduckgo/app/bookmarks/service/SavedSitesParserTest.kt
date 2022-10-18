@@ -138,7 +138,7 @@ class SavedSitesParserTest {
         val firstBookmark = bookmarks.first()
         assertEquals(
             "https://www.theguardian.com/international",
-            firstBookmark.url
+            firstBookmark.url,
         )
         assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
@@ -159,7 +159,7 @@ class SavedSitesParserTest {
         val firstBookmark = bookmarks.first()
         assertEquals(
             "https://www.theguardian.com/international",
-            firstBookmark.url
+            firstBookmark.url,
         )
         assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
@@ -180,7 +180,7 @@ class SavedSitesParserTest {
         val firstBookmark = bookmarks.first()
         assertEquals(
             "https://www.theguardian.com/international",
-            firstBookmark.url
+            firstBookmark.url,
         )
         assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
@@ -202,7 +202,7 @@ class SavedSitesParserTest {
         val firstBookmark = bookmarks.first()
         assertEquals(
             "https://www.theguardian.com/international",
-            firstBookmark.url
+            firstBookmark.url,
         )
         assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
@@ -223,7 +223,7 @@ class SavedSitesParserTest {
         val firstBookmark = bookmarks.first()
         assertEquals(
             "https://www.apple.com/uk",
-            firstBookmark.url
+            firstBookmark.url,
         )
         assertEquals("Apple", firstBookmark.title)
 

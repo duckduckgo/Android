@@ -132,7 +132,7 @@ class TrackingProtectionExclusionListActivity :
         binding.excludedAppsDisabledVPNLabel.apply {
             setClickableLink(
                 REPORT_ISSUES_ANNOTATION,
-                getText(R.string.atp_ActivityDisabledLabel)
+                getText(R.string.atp_ActivityDisabledLabel),
             ) { launchFeedback() }
         }
         setupRecycler()
@@ -143,11 +143,11 @@ class TrackingProtectionExclusionListActivity :
             override fun onAppProtectionChanged(
                 excludedAppInfo: TrackingProtectionAppInfo,
                 enabled: Boolean,
-                position: Int
+                position: Int,
             ) {
                 viewModel.onAppProtectionChanged(excludedAppInfo, position, enabled)
             }
-        })
+        },)
 
         val recyclerView = binding.excludedAppsRecycler
         val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
@@ -187,11 +187,11 @@ class TrackingProtectionExclusionListActivity :
         when (command) {
             is Command.RestartVpn -> restartVpn()
             is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(
-                command.excludingReason
+                command.excludingReason,
             )
             is Command.ShowEnableProtectionDialog -> showEnableProtectionDialog(
                 command.excludingReason,
-                command.position
+                command.position,
             )
             is Command.LaunchFeedback -> reportBreakage.launch(command.reportBreakageScreen)
             else -> { /* noop */ }
@@ -209,18 +209,18 @@ class TrackingProtectionExclusionListActivity :
         val dialog = ManuallyDisableAppProtectionDialog.instance(excludedAppInfo)
         dialog.show(
             supportFragmentManager,
-            ManuallyDisableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_DISABLE
+            ManuallyDisableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_DISABLE,
         )
     }
 
     private fun showEnableProtectionDialog(
         excludedAppInfo: TrackingProtectionAppInfo,
-        position: Int
+        position: Int,
     ) {
         val dialog = ManuallyEnableAppProtectionDialog.instance(excludedAppInfo, position)
         dialog.show(
             supportFragmentManager,
-            ManuallyEnableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_ENABLE
+            ManuallyEnableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_ENABLE,
         )
     }
 
@@ -254,7 +254,7 @@ class TrackingProtectionExclusionListActivity :
         private const val KEY_LIST_ENABLED = "KEY_LIST_ENABLED"
         fun intent(
             context: Context,
-            isRunning: Boolean = true
+            isRunning: Boolean = true,
         ): Intent {
             val intent = Intent(context, TrackingProtectionExclusionListActivity::class.java)
             intent.putExtra(KEY_LIST_ENABLED, isRunning)

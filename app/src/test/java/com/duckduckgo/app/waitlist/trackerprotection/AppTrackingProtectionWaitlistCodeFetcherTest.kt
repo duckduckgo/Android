@@ -58,7 +58,7 @@ class AppTrackingProtectionWaitlistCodeFetcherTest {
             mockNotification,
             mockNotificationSender,
             coroutineRule.testDispatcherProvider,
-            TestScope()
+            TestScope(),
         )
     }
 

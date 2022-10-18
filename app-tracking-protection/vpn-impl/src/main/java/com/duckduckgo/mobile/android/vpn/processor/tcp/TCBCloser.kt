@@ -39,7 +39,7 @@ class TCBCloser @Inject constructor(private val socketWriter: TcpSocketWriter) {
         connectionParams: ConnectionInitializer.TcpConnectionParams,
         queues: VpnQueues,
         payloadSize: Int,
-        isFIN: Boolean
+        isFIN: Boolean,
     ) {
         val buffer = ByteBufferPool.acquire()
         val tcb = connectionParams.tcbOrClose() ?: return
@@ -57,7 +57,7 @@ class TCBCloser @Inject constructor(private val socketWriter: TcpSocketWriter) {
                 tcb.ipAndPort,
                 tcb.requestingAppPackage, tcb.trackerHostName,
                 responseSeq, responseAck,
-                tcb.sequenceNumberToClient.get(), tcb.acknowledgementNumberToClient.get(), payloadSize
+                tcb.sequenceNumberToClient.get(), tcb.acknowledgementNumberToClient.get(), payloadSize,
             )
 
             tcb.referencePacket.updateTcpBuffer(buffer, (Packet.TCPHeader.RST or Packet.TCPHeader.ACK).toByte(), responseSeq, responseAck, 0)

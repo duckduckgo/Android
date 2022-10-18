@@ -37,12 +37,12 @@ class VpnUncaughtExceptionHandler(
     private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
 ) : UncaughtExceptionHandler {
 
     override fun uncaughtException(
         thread: Thread,
-        throwable: Throwable
+        throwable: Throwable,
     ) {
         Timber.e(throwable, "VPN uncaughtException")
         recordExceptionAndAllowCrash(thread, throwable)
@@ -50,7 +50,7 @@ class VpnUncaughtExceptionHandler(
 
     private fun recordExceptionAndAllowCrash(
         thread: Thread,
-        originalException: Throwable
+        originalException: Throwable,
     ) {
         coroutineScope.launch(dispatcherProvider.io() + NonCancellable) {
             try {
@@ -75,7 +75,7 @@ object VpnExceptionModule {
         @AppCoroutineScope vpnCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
-        uncaughtExceptionRepository: UncaughtExceptionRepository
+        uncaughtExceptionRepository: UncaughtExceptionRepository,
     ): VpnUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
         return VpnUncaughtExceptionHandler(
@@ -83,7 +83,7 @@ object VpnExceptionModule {
             vpnCoroutineScope,
             dispatcherProvider,
             offlinePixelCountDataStore,
-            uncaughtExceptionRepository
+            uncaughtExceptionRepository,
         )
     }
 }

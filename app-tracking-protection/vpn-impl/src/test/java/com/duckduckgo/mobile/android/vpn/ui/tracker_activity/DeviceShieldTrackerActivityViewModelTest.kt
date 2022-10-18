@@ -78,14 +78,14 @@ class DeviceShieldTrackerActivityViewModelTest {
             vpnDetector,
             vpnFeatureRemover,
             vpnStore,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
     @Test
     fun whenGetRunningStateThenReturnRunningState() = runTest {
         whenever(vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN)).thenReturn(
-            flow { emit(VpnStateMonitor.VpnState(VpnStateMonitor.VpnRunningState.ENABLED)) }
+            flow { emit(VpnStateMonitor.VpnState(VpnStateMonitor.VpnRunningState.ENABLED)) },
         )
 
         viewModel.getRunningState().test {
@@ -351,7 +351,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
         return Room.inMemoryDatabaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            VpnDatabase::class.java
+            VpnDatabase::class.java,
         )
             .allowMainThreadQueries()
             .build()

@@ -40,7 +40,7 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
 
     fun update(
         newList: List<TrackingProtectionAppInfo>,
-        isListStateEnabled: Boolean = true
+        isListStateEnabled: Boolean = true,
     ) {
         isListEnabled = isListStateEnabled
         val oldData = excludedApps
@@ -55,7 +55,7 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): TrackingProtectionAppViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.view_device_shield_excluded_app_entry, parent, false)
@@ -64,7 +64,7 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
 
     override fun onBindViewHolder(
         holder: TrackingProtectionAppViewHolder,
-        position: Int
+        position: Int,
     ) {
         val excludedAppInfo = excludedApps[position]
         holder.bind(isListEnabled, excludedAppInfo, position, listener)
@@ -80,7 +80,7 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
 
     private class DiffCallback(
         private val oldList: List<TrackingProtectionAppInfo>,
-        private val newList: List<TrackingProtectionAppInfo>
+        private val newList: List<TrackingProtectionAppInfo>,
     ) :
         DiffUtil.Callback() {
         override fun getOldListSize() = oldList.size
@@ -89,14 +89,14 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
 
         override fun areItemsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return oldList[oldItemPosition].packageName == newList[newItemPosition].packageName
         }
 
         override fun areContentsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
@@ -107,7 +107,7 @@ interface AppProtectionListener {
     fun onAppProtectionChanged(
         excludedAppInfo: TrackingProtectionAppInfo,
         enabled: Boolean,
-        position: Int
+        position: Int,
     )
 }
 
@@ -116,7 +116,7 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
         isListEnabled: Boolean,
         excludedAppInfo: TrackingProtectionAppInfo,
         position: Int,
-        listener: AppProtectionListener
+        listener: AppProtectionListener,
     ) {
         val appIcon = itemView.context.packageManager.safeGetApplicationIcon(excludedAppInfo.packageName)
         itemView.deviceShieldAppEntryIcon.setImageDrawable(appIcon)
@@ -155,7 +155,7 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
 
     private fun getAppExcludingReasonText(
         context: Context,
-        excludingReason: Int
+        excludingReason: Int,
     ): String {
         return when (excludingReason) {
             TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> context.getString(R.string.atp_ExcludedReasonLoadsWebsites)

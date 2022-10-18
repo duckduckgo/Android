@@ -40,7 +40,7 @@ class ScorecardViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val userWhitelistDao: UserWhitelistDao,
     private val contentBlocking: ContentBlocking,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -57,7 +57,7 @@ class ScorecardViewModel @Inject constructor(
         val privacyOn: Boolean = true,
         val showIsMemberOfMajorNetwork: Boolean = false,
         val showEnhancedGrade: Boolean = false,
-        val isSiteInTempAllowedList: Boolean = false
+        val isSiteInTempAllowedList: Boolean = false,
     )
 
     fun scoreCard(tabId: String): StateFlow<ViewState> = flow {
@@ -73,7 +73,7 @@ class ScorecardViewModel @Inject constructor(
         site: Site,
         domain: String,
         isWhitelisted: Boolean,
-        isSiteAContentBlockingException: Boolean
+        isSiteAContentBlockingException: Boolean,
     ): ViewState {
         val grades = site.calculateGrades()
         val grade = grades.grade
@@ -93,7 +93,7 @@ class ScorecardViewModel @Inject constructor(
             privacyOn = !isWhitelisted && !isSiteAContentBlockingException,
             showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
             showEnhancedGrade = grade != improvedGrade,
-            isSiteInTempAllowedList = isSiteAContentBlockingException
+            isSiteInTempAllowedList = isSiteAContentBlockingException,
         )
     }
 }

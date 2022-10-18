@@ -85,7 +85,7 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
     private fun updateCurrentSelect(
         currentOption: ClearWhenOption,
-        radioGroup: RadioGroup
+        radioGroup: RadioGroup,
     ) {
         val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)

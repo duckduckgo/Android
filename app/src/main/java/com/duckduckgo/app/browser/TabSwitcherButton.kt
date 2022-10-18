@@ -27,7 +27,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 class TabSwitcherButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewTabSwitcherButtonBinding by viewBinding()

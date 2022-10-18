@@ -22,11 +22,11 @@ data class TermsOfServiceJson(
     val score: Int,
     @field:Json(name = "class")
     val classification: Any,
-    val match: Match
+    val match: Match,
 ) {
 
     data class Match(
         val good: List<String>,
-        val bad: List<String>
+        val bad: List<String>,
     )
 }

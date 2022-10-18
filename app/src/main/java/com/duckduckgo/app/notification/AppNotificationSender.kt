@@ -33,7 +33,7 @@ class AppNotificationSender(
     private val manager: NotificationManagerCompat,
     private val factory: NotificationFactory,
     private val notificationDao: NotificationDao,
-    private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>
+    private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>,
 ) : NotificationSender {
 
     override suspend fun sendNotification(notification: SchedulableNotification) {

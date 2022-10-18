@@ -77,7 +77,7 @@ class RealBandwidthCollectorTest {
         val params = mapOf(
             BandwidthPixelParameter.PERIOD to period.toString(),
             BandwidthPixelParameter.APP_BYTES to appBytes.toString(),
-            BandwidthPixelParameter.TOTAL_BYTES to totalBytes.toString()
+            BandwidthPixelParameter.TOTAL_BYTES to totalBytes.toString(),
         )
 
         verify(mockPixel).fire(BANDWIDTH, params)

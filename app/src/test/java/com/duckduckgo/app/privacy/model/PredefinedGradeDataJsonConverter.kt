@@ -25,7 +25,7 @@ class PredefinedGradeDataJsonConverter {
     class GradeTestCase(
         val expected: Grade.Scores.ScoresAvailable,
         val input: Input,
-        val url: String
+        val url: String,
     ) {
 
         class Input(
@@ -33,19 +33,19 @@ class PredefinedGradeDataJsonConverter {
             val httpsAutoUpgrade: Boolean,
             val parentEntity: Entity?,
             val privacyScore: Int?,
-            val trackers: Array<Tracker>
+            val trackers: Array<Tracker>,
         )
 
         class Tracker(
             val blocked: Boolean,
-            val parentEntity: Entity
+            val parentEntity: Entity,
         )
     }
 
     class JsonGradeTestCase(
         val expected: Grade.Scores.ScoresAvailable,
         val input: JsonInput,
-        val url: String
+        val url: String,
     ) {
 
         class JsonInput(
@@ -54,13 +54,13 @@ class PredefinedGradeDataJsonConverter {
             val parentEntity: String?,
             val privacyScore: Int?,
             val trackers: Array<JsonTracker>,
-            val parentTrackerPrevalence: Double?
+            val parentTrackerPrevalence: Double?,
         )
 
         class JsonTracker(
             val blocked: Boolean,
             val parentEntity: String,
-            val prevalence: Double?
+            val prevalence: Double?,
         )
     }
 }
@@ -74,7 +74,7 @@ fun PredefinedGradeDataJsonConverter.JsonGradeTestCase.JsonInput.toInput(): Inpu
         httpsAutoUpgrade,
         entity(parentEntity, parentTrackerPrevalence),
         privacyScore,
-        trackerList.toTypedArray()
+        trackerList.toTypedArray(),
     )
 }
 
@@ -84,7 +84,7 @@ fun PredefinedGradeDataJsonConverter.JsonGradeTestCase.toGradeTestCase(): Predef
 
 private fun entity(
     name: String?,
-    prevalence: Double?
+    prevalence: Double?,
 ): Entity {
     if (name == null) return TestingEntity("", "", 0.0)
     return TestingEntity(name, name, prevalence ?: 0.0)

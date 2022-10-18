@@ -37,15 +37,15 @@ interface AccessibilitySettingsDataStore {
 class AccessibilitySettingsSharedPreferences(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
 ) : AccessibilitySettingsDataStore {
 
     private val accessibilityStateFlow = MutableStateFlow(
         AccessibilitySettings(
             overrideSystemFontSize = false,
             fontSize = FONT_SIZE_DEFAULT,
-            forceZoom = false
-        )
+            forceZoom = false,
+        ),
     )
 
     private val preferences: SharedPreferences
@@ -108,5 +108,5 @@ class AccessibilitySettingsSharedPreferences(
 data class AccessibilitySettings(
     val overrideSystemFontSize: Boolean,
     val fontSize: Float,
-    val forceZoom: Boolean
+    val forceZoom: Boolean,
 )

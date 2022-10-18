@@ -32,12 +32,12 @@ import kotlinx.coroutines.withContext
 @ContributesViewModel(ActivityScope::class)
 class AuditSettingsViewModel @Inject constructor(
     private val userAllowListDao: UserWhitelistDao,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
         val nextTdsEnabled: Boolean = false,
-        val startupTraceEnabled: Boolean = false
+        val startupTraceEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -52,7 +52,7 @@ class AuditSettingsViewModel @Inject constructor(
 
     fun goToUrl(
         url: String,
-        protectionsEnabled: Boolean = true
+        protectionsEnabled: Boolean = true,
     ) {
         viewModelScope.launch {
             if (protectionsEnabled) {

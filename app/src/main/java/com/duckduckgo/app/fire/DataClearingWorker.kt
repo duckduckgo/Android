@@ -35,7 +35,7 @@ import timber.log.Timber
 @ContributesWorker(AppScope::class)
 class DataClearingWorker(
     context: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(context, workerParams), CoroutineScope {
 
     @Inject

@@ -57,7 +57,7 @@ class EmailJavascriptInterfaceTest {
             DuckDuckGoUrlDetector(),
             coroutineRule.testDispatcherProvider,
             mockFeatureToggle,
-            mockAutofill
+            mockAutofill,
         ) { counter++ }
 
         whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName.value)).thenReturn(true)

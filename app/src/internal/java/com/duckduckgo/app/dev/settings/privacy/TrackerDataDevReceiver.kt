@@ -37,7 +37,7 @@ import timber.log.Timber
 class TrackerDataDevReceiver(
     context: Context,
     intentAction: String = DOWNLOAD_TDS_INTENT_ACTION,
-    private val receiver: (Intent) -> Unit
+    private val receiver: (Intent) -> Unit,
 ) : BroadcastReceiver() {
     init {
         context.registerReceiver(this, IntentFilter(intentAction))
@@ -45,7 +45,7 @@ class TrackerDataDevReceiver(
 
     override fun onReceive(
         context: Context,
-        intent: Intent
+        intent: Intent,
     ) {
         receiver(intent)
     }
@@ -57,12 +57,12 @@ class TrackerDataDevReceiver(
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class TrackerDataDevReceiverRegister @Inject constructor(
     private val context: Context,
     private val trackderDataDownloader: TrackerDataDownloader,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : DefaultLifecycleObserver {
 
     @SuppressLint("CheckResult")
@@ -80,7 +80,7 @@ class TrackerDataDevReceiverRegister @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     { Toast.makeText(context, "Tds data downloaded", Toast.LENGTH_LONG).show() },
-                    { Toast.makeText(context, "Error while downloading Tds ${it.localizedMessage}", Toast.LENGTH_LONG).show() }
+                    { Toast.makeText(context, "Error while downloading Tds ${it.localizedMessage}", Toast.LENGTH_LONG).show() },
                 )
         }
     }

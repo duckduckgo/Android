@@ -33,13 +33,13 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 class AlwaysOnMonitor @Inject constructor(
     private val vpnStore: VpnStore,
     private val appBuildConfig: AppBuildConfig,
     private val vpnService: Provider<TrackerBlockingVpnService>,
-    private val deviceShieldPixels: DeviceShieldPixels
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : VpnServiceCallbacks {
 
     @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
@@ -69,7 +69,7 @@ class AlwaysOnMonitor @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         // no-op
     }

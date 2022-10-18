@@ -44,7 +44,7 @@ class RealSavedSitesExporter(
     private val favoritesRepository: FavoritesRepository,
     private val bookmarksRepository: BookmarksRepository,
     private val savedSitesParser: SavedSitesParser,
-    private val dispatcher: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatcher: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SavedSitesExporter {
 
     override suspend fun export(uri: Uri): ExportSavedSitesResult {
@@ -60,7 +60,7 @@ class RealSavedSitesExporter(
 
     private fun storeHtml(
         uri: Uri,
-        content: String
+        content: String,
     ): ExportSavedSitesResult {
         return try {
             if (content.isEmpty()) {
@@ -93,7 +93,7 @@ class RealSavedSitesExporter(
     private fun populateNode(
         parentNode: TreeNode<FolderTreeItem>,
         parentId: Long,
-        currentDepth: Int
+        currentDepth: Int,
     ) {
         val bookmarkFolders = bookmarksRepository.getBookmarkFoldersByParentId(parentId)
 
@@ -119,7 +119,7 @@ data class FolderTreeItem(
     val name: String,
     val parentId: Long,
     val url: String?,
-    val depth: Int
+    val depth: Int,
 )
 
 typealias FolderTree = TreeNode<FolderTreeItem>

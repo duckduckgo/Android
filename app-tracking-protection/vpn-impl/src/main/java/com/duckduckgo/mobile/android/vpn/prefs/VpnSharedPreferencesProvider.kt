@@ -30,7 +30,7 @@ private const val MIGRATED_TO_HARMONY = "migrated_to_harmony"
 
 @ContributesBinding(AppScope::class)
 class VpnSharedPreferencesProviderImpl @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : VpnSharedPreferencesProvider {
     override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean): SharedPreferences {
         return if (multiprocess) {

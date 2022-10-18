@@ -33,7 +33,7 @@ import timber.log.Timber
 @SingleInstanceIn(VpnScope::class)
 class RealVpnStateCollector @Inject constructor(
     private val vpnStateCollectors: PluginPoint<VpnStateCollectorPlugin>,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnStateCollector {
 
     override suspend fun collectVpnState(appPackageId: String?): JSONObject {
@@ -52,7 +52,7 @@ class RealVpnStateCollector @Inject constructor(
 
 @ContributesPluginPoint(
     scope = VpnScope::class,
-    boundType = VpnStateCollectorPlugin::class
+    boundType = VpnStateCollectorPlugin::class,
 )
 @Suppress("unused")
 interface VpnStateCollectorPluginPoint

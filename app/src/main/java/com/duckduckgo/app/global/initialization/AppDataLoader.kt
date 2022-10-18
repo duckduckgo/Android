@@ -31,12 +31,12 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class AppDataLoader @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val termsOfServiceStore: TermsOfServiceStore,
-    private val privacyPractices: PrivacyPractices
+    private val privacyPractices: PrivacyPractices,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {

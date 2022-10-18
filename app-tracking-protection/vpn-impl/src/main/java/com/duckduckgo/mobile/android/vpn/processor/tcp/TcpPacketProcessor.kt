@@ -70,13 +70,13 @@ constructor(
     tcpSocketWriter: TcpSocketWriter,
     recentAppTrackerCache: RecentAppTrackerCache,
     @Assisted private val vpnCoroutineScope: CoroutineScope,
-    healthMetricCounter: HealthMetricCounter
+    healthMetricCounter: HealthMetricCounter,
 ) : Runnable {
 
     @AssistedFactory
     interface Factory {
         fun build(
-            coroutineScope: CoroutineScope
+            coroutineScope: CoroutineScope,
         ): TcpPacketProcessor
     }
 
@@ -96,7 +96,7 @@ constructor(
             packetPersister = packetPersister,
             tcbCloser = tcbCloser,
             vpnCoroutineScope = vpnCoroutineScope,
-            healthMetricCounter = healthMetricCounter
+            healthMetricCounter = healthMetricCounter,
         )
     private val tcpDeviceToNetwork =
         TcpDeviceToNetwork(
@@ -114,7 +114,7 @@ constructor(
             payloadBytesExtractor = payloadBytesExtractor,
             recentAppTrackerCache = recentAppTrackerCache,
             vpnCoroutineScope = vpnCoroutineScope,
-            healthMetricCounter = healthMetricCounter
+            healthMetricCounter = healthMetricCounter,
         )
 
     override fun run() {
@@ -151,24 +151,24 @@ constructor(
         val tcb: TCB,
         val connectionParams: TcpConnectionParams,
         val ackNumber: Long,
-        val seqNumber: Long
+        val seqNumber: Long,
     )
 
     companion object {
         fun logPacketDetails(
             packet: Packet,
             sequenceNumber: Long?,
-            acknowledgementNumber: Long?
+            acknowledgementNumber: Long?,
         ): String {
             with(packet.tcpHeader) {
                 return "\tflags:[ ${isSYN.printFlag("SYN")}" +
                     "${isACK.printFlag("ACK")}${isFIN.printFlag("FIN")}${isPSH.printFlag("PSH")}${
                     isRST.printFlag(
-                        "RST"
+                        "RST",
                     )
                     }${
                     isURG.printFlag(
-                        "URG"
+                        "URG",
                     )
                     }]. [sequenceNumber=$sequenceNumber, ackNumber=$acknowledgementNumber]"
             }
@@ -195,7 +195,7 @@ constructor(
             queues: VpnQueues,
             packet: Packet,
             payloadSize: Int,
-            triggeredByServerEndOfStream: Boolean
+            triggeredByServerEndOfStream: Boolean,
         ) {
             val buffer = ByteBufferPool.acquire()
             synchronized(this) {
@@ -211,7 +211,7 @@ constructor(
                     (FIN or ACK).toByte(),
                     responseSeq,
                     responseAck,
-                    0
+                    0,
                 )
 
                 if (triggeredByServerEndOfStream) {
@@ -228,7 +228,7 @@ constructor(
                     responseAck,
                     sequenceNumberToClient.get(),
                     acknowledgementNumberToClient.get(),
-                    payloadSize
+                    payloadSize,
                 )
             }
 
@@ -243,7 +243,7 @@ constructor(
 
         fun TCB.sendAck(
             queues: VpnQueues,
-            packet: Packet
+            packet: Packet,
         ) {
             synchronized(this) {
                 val payloadSize = packet.tcpPayloadSize(true)
@@ -256,7 +256,7 @@ constructor(
                     Timber.v(
                         "%s - Sending ACK from network to device. Flags contain RST, SYN or FIN so incremented acknowledge number to %d",
                         ipAndPort,
-                        acknowledgementNumberToClient.get()
+                        acknowledgementNumberToClient.get(),
                     )
                 }
 
@@ -265,7 +265,7 @@ constructor(
                     ipAndPort,
                     payloadSize,
                     acknowledgementNumberToClient.get(),
-                    sequenceNumberToClient.get()
+                    sequenceNumberToClient.get(),
                 )
 
                 val buffer = ByteBufferPool.acquire()
@@ -274,7 +274,7 @@ constructor(
                     (ACK).toByte(),
                     sequenceNumberToClient.get(),
                     acknowledgementNumberToClient.get(),
-                    0
+                    0,
                 )
                 // sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
                 queues.networkToDevice.offer(buffer)
@@ -300,7 +300,7 @@ constructor(
 
         fun increaseOrWraparound(
             current: Long,
-            increment: Long
+            increment: Long,
         ): Long {
             return (current + increment) % MAX_SEQUENCE_NUMBER
         }

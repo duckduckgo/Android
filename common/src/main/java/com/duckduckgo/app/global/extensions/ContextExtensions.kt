@@ -28,7 +28,7 @@ import timber.log.Timber
 @RequiresApi(R)
 fun Context.historicalExitReasonsByProcessName(
     name: String,
-    n: Int = 10
+    n: Int = 10,
 ): List<String> {
     val activityManager = applicationContext.getSystemService(ACTIVITY_SERVICE) as ActivityManager
 

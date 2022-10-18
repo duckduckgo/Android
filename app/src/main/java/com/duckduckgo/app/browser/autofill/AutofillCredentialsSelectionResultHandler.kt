@@ -45,7 +45,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
     private val declineCounter: AutofillDeclineCounter,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val autofillStore: AutofillStore
+    private val autofillStore: AutofillStore,
 ) {
 
     fun processAutofillCredentialSelectionResult(result: Bundle, browserTabFragment: Fragment, credentialInjector: CredentialInjector) {

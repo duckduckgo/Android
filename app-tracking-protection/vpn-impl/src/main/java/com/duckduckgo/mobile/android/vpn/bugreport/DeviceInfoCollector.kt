@@ -25,7 +25,7 @@ import org.json.JSONObject
 
 @ContributesMultibinding(VpnScope::class)
 class DeviceInfoCollector @Inject constructor(
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : VpnStateCollectorPlugin {
     override val collectorName: String
         get() = "deviceInfo"

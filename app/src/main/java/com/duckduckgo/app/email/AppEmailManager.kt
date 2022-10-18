@@ -33,7 +33,7 @@ class AppEmailManager(
     private val emailService: EmailService,
     private val emailDataStore: EmailDataStore,
     private val dispatcherProvider: DispatcherProvider,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
 ) : EmailManager {
 
     private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
@@ -48,7 +48,7 @@ class AppEmailManager(
     override fun storeCredentials(
         token: String,
         username: String,
-        cohort: String
+        cohort: String,
     ) {
         emailDataStore.cohort = cohort
         emailDataStore.emailToken = token

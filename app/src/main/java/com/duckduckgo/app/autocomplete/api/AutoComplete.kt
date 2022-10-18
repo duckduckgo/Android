@@ -37,20 +37,20 @@ interface AutoComplete {
 
     data class AutoCompleteResult(
         val query: String,
-        val suggestions: List<AutoCompleteSuggestion>
+        val suggestions: List<AutoCompleteSuggestion>,
     )
 
     sealed class AutoCompleteSuggestion(open val phrase: String) {
         data class AutoCompleteSearchSuggestion(
             override val phrase: String,
-            val isUrl: Boolean
+            val isUrl: Boolean,
         ) :
             AutoCompleteSuggestion(phrase)
 
         data class AutoCompleteBookmarkSuggestion(
             override val phrase: String,
             val title: String,
-            val url: String
+            val url: String,
         ) :
             AutoCompleteSuggestion(phrase)
     }
@@ -60,7 +60,7 @@ interface AutoComplete {
 class AutoCompleteApi @Inject constructor(
     private val autoCompleteService: AutoCompleteService,
     private val bookmarksDao: BookmarksDao,
-    private val favoritesRepository: FavoritesRepository
+    private val favoritesRepository: FavoritesRepository,
 ) : AutoComplete {
 
     override fun autoComplete(query: String): Observable<AutoCompleteResult> {
@@ -73,7 +73,7 @@ class AutoCompleteApi @Inject constructor(
                 getAutoCompleteFavoritesResults(query),
                 { bookmarks, favorites ->
                     (favorites + bookmarks).take(2)
-                }
+                },
             )
 
         return savedSitesObservable.zipWith(
@@ -81,9 +81,9 @@ class AutoCompleteApi @Inject constructor(
             { bookmarksResults, searchResults ->
                 AutoCompleteResult(
                     query = query,
-                    suggestions = (bookmarksResults + searchResults).distinctBy { it.phrase }
+                    suggestions = (bookmarksResults + searchResults).distinctBy { it.phrase },
                 )
-            }
+            },
         )
     }
 
@@ -125,7 +125,7 @@ class AutoCompleteApi @Inject constructor(
 
     private fun rankBookmarks(
         query: String,
-        bookmarks: List<BookmarkEntity>
+        bookmarks: List<BookmarkEntity>,
     ): List<SavedSite> {
         return bookmarks.asSequence()
             .map { SavedSite.Bookmark(it.id, it.title ?: "", it.url, it.parentId) }
@@ -134,7 +134,7 @@ class AutoCompleteApi @Inject constructor(
 
     private fun rankFavorites(
         query: String,
-        favorites: List<SavedSite.Favorite>
+        favorites: List<SavedSite.Favorite>,
     ): List<SavedSite> {
         return favorites.asSequence().sortByRank(query)
     }
@@ -151,7 +151,7 @@ class AutoCompleteApi @Inject constructor(
 
     private fun scoreTitle(
         rankedBookmark: RankedBookmark,
-        query: String
+        query: String,
     ): RankedBookmark {
         if (rankedBookmark.savedSite.title.startsWith(query, ignoreCase = true)) {
             rankedBookmark.score += 200
@@ -164,7 +164,7 @@ class AutoCompleteApi @Inject constructor(
 
     private fun scoreTokens(
         rankedBookmark: RankedBookmark,
-        query: String
+        query: String,
     ): RankedBookmark {
         val savedSite = rankedBookmark.savedSite
         val domain = savedSite.url.toUri().baseHost
@@ -199,7 +199,7 @@ class AutoCompleteApi @Inject constructor(
 
     private data class RankedBookmark(
         val savedSite: SavedSite,
-        var score: Int = BOOKMARK_SCORE
+        var score: Int = BOOKMARK_SCORE,
     )
 
     companion object {

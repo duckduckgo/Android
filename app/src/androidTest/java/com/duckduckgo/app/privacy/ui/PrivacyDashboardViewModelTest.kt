@@ -76,7 +76,7 @@ class PrivacyDashboardViewModelTest {
             networkLeaderboardDao,
             mockPixel,
             TestScope(),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
@@ -279,7 +279,7 @@ class PrivacyDashboardViewModelTest {
         allTrackersBlocked: Boolean = true,
         privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN,
         grade: PrivacyGrade = PrivacyGrade.UNKNOWN,
-        improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN
+        improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN,
     ): Site {
         val site: Site = mock()
         whenever(site.uri).thenReturn("https://example.com".toUri())

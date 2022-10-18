@@ -38,7 +38,7 @@ class PlaintextHostExtractorTest {
             Connection: Keep-Alive
             Accept-Encoding: gzip
             User-Agent: okhttp/4.3.1
-        """
+        """,
         )
         assertEquals("example.com", testee.extract(requestHostAvailable))
     }
@@ -52,7 +52,7 @@ class PlaintextHostExtractorTest {
             Accept-Encoding: gzip
             Host: example.com
             User-Agent: okhttp/4.3.1
-        """
+        """,
         )
         assertEquals("example.com", testee.extract(requestHostAvailableOutOfOrder))
     }
@@ -65,7 +65,7 @@ class PlaintextHostExtractorTest {
             Connection: Keep-Alive
             Accept-Encoding: gzip
             User-Agent: okhttp/4.3.1
-        """
+        """,
         )
         assertNull(testee.extract(requestHostMissing))
     }
@@ -79,7 +79,7 @@ class PlaintextHostExtractorTest {
             Connection: Keep-Alive
             Accept-Encoding: gzip
             User-Agent: okhttp/4.3.1
-        """
+        """,
         )
         assertNull(testee.extract(requestHostEmpty))
     }
@@ -90,7 +90,7 @@ class PlaintextHostExtractorTest {
             """
             GET / HTTP/1.1
             Host:
-        """
+        """,
         )
         assertNull(testee.extract(requestMalformed))
     }

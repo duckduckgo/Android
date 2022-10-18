@@ -176,7 +176,7 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
             Snackbar.make(
                 uuidTextView,
                 "UUID is now copied to the Clipboard",
-                Snackbar.LENGTH_SHORT
+                Snackbar.LENGTH_SHORT,
             )
                 .show()
         }
@@ -188,19 +188,19 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
 
     private fun renderDataStats(
         dataSent: DataTransfer,
-        dataReceived: DataTransfer
+        dataReceived: DataTransfer,
     ) {
         dataSentTextView.text =
             getString(
                 R.string.vpnDataTransferred,
                 dataSizeFormatter.format(dataSent.dataSize),
-                packetsFormatter.format(dataSent.numberPackets)
+                packetsFormatter.format(dataSent.numberPackets),
             )
         dataReceivedTextView.text =
             getString(
                 R.string.vpnDataTransferred,
                 dataSizeFormatter.format(dataReceived.dataSize),
-                packetsFormatter.format(dataReceived.numberPackets)
+                packetsFormatter.format(dataReceived.numberPackets),
             )
     }
 
@@ -234,7 +234,7 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
     }
 
     private fun renderLastWeekWebTrackerData(
-        trackerData: VpnControllerViewModel.WebTrackersBlocked
+        trackerData: VpnControllerViewModel.WebTrackersBlocked,
     ) {
         webTrackerCompaniesBlockedWeekTextView.text =
             generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = true)
@@ -248,7 +248,7 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
         } else {
             return getString(
                 R.string.vpnTimeRunning,
-                TimePassed.fromMilliseconds(timeRunningMillis).format(resources = resources)
+                TimePassed.fromMilliseconds(timeRunningMillis).format(resources = resources),
             )
         }
     }
@@ -274,7 +274,7 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
 
     private fun generateTrackerCompaniesBlocked(
         totalTrackerCompanies: Int,
-        displayWeek: Boolean
+        displayWeek: Boolean,
     ): String {
         return if (totalTrackerCompanies == 0) {
             applicationContext.getString(R.string.vpnTrackerCompaniesNone)
@@ -282,12 +282,12 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
             return if (displayWeek) {
                 applicationContext.getString(
                     R.string.vpnTrackerCompaniesBlockedThisWeek,
-                    totalTrackerCompanies
+                    totalTrackerCompanies,
                 )
             } else {
                 applicationContext.getString(
                     R.string.vpnTrackerCompaniesBlockedToday,
-                    totalTrackerCompanies
+                    totalTrackerCompanies,
                 )
             }
         }
@@ -295,7 +295,7 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
 
     private fun generateTrackersBlocked(
         totalTrackers: Int,
-        displayWeek: Boolean
+        displayWeek: Boolean,
     ): String {
         return if (totalTrackers == 0) {
             applicationContext.getString(R.string.vpnTrackersNone)

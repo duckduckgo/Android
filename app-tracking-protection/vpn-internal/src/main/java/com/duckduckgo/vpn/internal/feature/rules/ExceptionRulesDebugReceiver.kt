@@ -42,7 +42,7 @@ import timber.log.Timber
 class ExceptionRulesDebugReceiver(
     context: Context,
     intentAction: String = ACTION,
-    private val receiver: (Intent) -> Unit
+    private val receiver: (Intent) -> Unit,
 ) : BroadcastReceiver() {
 
     init {
@@ -52,7 +52,7 @@ class ExceptionRulesDebugReceiver(
 
     override fun onReceive(
         context: Context,
-        intent: Intent
+        intent: Intent,
     ) {
         receiver(intent)
     }
@@ -62,7 +62,7 @@ class ExceptionRulesDebugReceiver(
 
         fun ruleIntent(
             packageId: String,
-            domain: String
+            domain: String,
         ): Intent {
             return Intent(ACTION).apply {
                 putExtra("app", packageId)
@@ -75,7 +75,7 @@ class ExceptionRulesDebugReceiver(
 @ContributesMultibinding(VpnScope::class)
 class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val context: Context,
-    private val exclusionRulesRepository: ExclusionRulesRepository
+    private val exclusionRulesRepository: ExclusionRulesRepository,
 ) : VpnServiceCallbacks {
 
     private val exceptionRulesSavedState = mutableListOf<AppTrackerExceptionRule>()
@@ -101,7 +101,7 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         Timber.i("Debug receiver ExceptionRulesDebugReceiver restoring exception rules")
 

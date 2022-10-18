@@ -52,7 +52,7 @@ class DefaultBrowserObserverTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
         whenever(mockAppInstallStore.defaultBrowser).thenReturn(false)
         val params = mapOf(
-            Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString()
+            Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
         )
 
         testee.onResume(mockOwner)

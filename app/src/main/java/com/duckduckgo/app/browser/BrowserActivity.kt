@@ -199,7 +199,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     private fun openNewTab(
         tabId: String,
         url: String? = null,
-        skipHome: Boolean
+        skipHome: Boolean,
     ): BrowserTabFragment {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
@@ -218,7 +218,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     private fun addOrReplaceNewTab(
         fragment: BrowserTabFragment,
-        tabId: String
+        tabId: String,
     ) {
         val transaction = supportFragmentManager.beginTransaction()
         val tab = currentTab
@@ -413,7 +413,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
             pixel = pixel,
             settingsDataStore = settingsDataStore,
             userEventsStore = userEventsStore,
-            appCoroutineScope = appCoroutineScope
+            appCoroutineScope = appCoroutineScope,
         )
         dialog.clearStarted = {
             removeObservers()
@@ -432,7 +432,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     fun openInNewTab(
         query: String,
-        sourceTabId: String?
+        sourceTabId: String?,
     ) {
         launch {
             viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId)
@@ -441,7 +441,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     fun openMessageInNewTab(
         message: Message,
-        sourceTabId: String?
+        sourceTabId: String?,
     ) {
         openMessageInNewTabJob = launch {
             val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
@@ -469,7 +469,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         if (requestCode == DASHBOARD_REQUEST_CODE) {
             viewModel.receivedDashboardResult(resultCode)
@@ -500,7 +500,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
                     toolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
                 }
             },
-            300
+            300,
         )
     }
 
@@ -510,7 +510,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
             context: Context,
             queryExtra: String? = null,
             newSearch: Boolean = false,
-            notifyDataCleared: Boolean = false
+            notifyDataCleared: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -589,7 +589,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     private data class CombinedInstanceState(
         val originalInstanceState: Bundle?,
-        val newInstanceState: Bundle?
+        val newInstanceState: Bundle?,
     )
 }
 

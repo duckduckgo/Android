@@ -125,7 +125,7 @@ class DeviceAppLookupTest {
             DeviceApp(DDG_MUSIC, "", Intent()),
             DeviceApp(FILES, "", Intent()),
             DeviceApp(LIVE_DDG, "", Intent()),
-            DeviceApp(APP_WITH_RESERVED_CHARS, "", Intent())
+            DeviceApp(APP_WITH_RESERVED_CHARS, "", Intent()),
         )
     }
 }

@@ -143,7 +143,7 @@ class FileChooserIntentBuilderTest {
 
     private fun buildIntent(
         data: String? = null,
-        clipData: List<String>? = null
+        clipData: List<String>? = null,
     ): Intent {
         return Intent().also {
             if (data != null) {

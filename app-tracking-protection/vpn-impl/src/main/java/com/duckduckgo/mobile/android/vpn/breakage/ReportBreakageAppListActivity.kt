@@ -101,7 +101,7 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
 
     override fun onInstalledAppSelected(
         installedApp: InstalledApp,
-        position: Int
+        position: Int,
     ) {
         viewModel.onAppSelected(installedApp)
     }
@@ -109,7 +109,7 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
     private fun addClickableLink(
         annotation: String,
         text: CharSequence,
-        onClick: () -> Unit
+        onClick: () -> Unit,
     ): SpannableString {
         val fullText = text as SpannedString
         val spannableString = SpannableString(fullText)
@@ -126,21 +126,21 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
                     clickableSpan,
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 setSpan(
                     UnderlineSpan(),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 setSpan(
                     ForegroundColorSpan(
-                        ContextCompat.getColor(baseContext, com.duckduckgo.mobile.android.R.color.cornflowerBlue)
+                        ContextCompat.getColor(baseContext, com.duckduckgo.mobile.android.R.color.cornflowerBlue),
                     ),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
         }
@@ -156,7 +156,7 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
         with(binding.appBreakageReportFeature) {
             text = addClickableLink(
                 USE_THIS_FORM_ANNOTATION,
-                getText(R.string.atp_ReportBreakageAppFeature)
+                getText(R.string.atp_ReportBreakageAppFeature),
             ) { sendAppFeedback.launch(null) }
             movementMethod = LinkMovementMethod.getInstance()
         }
@@ -185,8 +185,8 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
                 reportBreakage.launch(
                     ReportBreakageScreen.IssueDescriptionForm(
                         appName = command.selectedApp.name,
-                        appPackageId = command.selectedApp.packageName
-                    )
+                        appPackageId = command.selectedApp.packageName,
+                    ),
                 )
             }
             is ReportBreakageAppListView.Command.SendBreakageInfo -> {

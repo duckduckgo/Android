@@ -24,6 +24,6 @@ interface VpnServiceCallbacks {
 
     fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     )
 }

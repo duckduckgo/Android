@@ -33,7 +33,7 @@ interface FavoritesRepository {
     fun favoritesSync(): List<SavedSite.Favorite>
     fun insert(
         title: String,
-        url: String
+        url: String,
     ): SavedSite.Favorite
 
     fun insert(favorite: SavedSite.Favorite)
@@ -49,26 +49,26 @@ interface FavoritesRepository {
 sealed class SavedSite(
     open val id: Long,
     open val title: String,
-    open val url: String
+    open val url: String,
 ) : Serializable {
     data class Favorite(
         override val id: Long,
         override val title: String,
         override val url: String,
-        val position: Int
+        val position: Int,
     ) : SavedSite(id, title, url)
 
     data class Bookmark(
         override val id: Long,
         override val title: String,
         override val url: String,
-        val parentId: Long
+        val parentId: Long,
     ) : SavedSite(id, title, url)
 }
 
 class FavoritesDataRepository(
     private val favoritesDao: FavoritesDao,
-    private val faviconManager: Lazy<FaviconManager>
+    private val faviconManager: Lazy<FaviconManager>,
 ) : FavoritesRepository {
     override fun favoritesCountByDomain(domain: String): Int {
         return favoritesDao.favoritesCountByUrl(domain)
@@ -85,7 +85,7 @@ class FavoritesDataRepository(
 
     override fun insert(
         title: String,
-        url: String
+        url: String,
     ): SavedSite.Favorite {
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
         val lastPosition = favoritesDao.getLastPosition() ?: 0

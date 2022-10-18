@@ -58,7 +58,7 @@ class ManageAppsProtectionViewModelTest {
             trackingProtectionAppsRepository,
             appTrackersRepository,
             deviceShieldPixels,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -268,7 +268,7 @@ class ManageAppsProtectionViewModelTest {
         category = AppCategory.Undefined,
         isExcluded = true,
         knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
-        userModified = false
+        userModified = false,
     )
 
     private val appLoadsWebsites = TrackingProtectionAppInfo(
@@ -278,7 +278,7 @@ class ManageAppsProtectionViewModelTest {
         category = AppCategory.Undefined,
         isExcluded = true,
         knownProblem = TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON,
-        userModified = false
+        userModified = false,
     )
 
     private val appManuallyExcluded = TrackingProtectionAppInfo(
@@ -288,7 +288,7 @@ class ManageAppsProtectionViewModelTest {
         category = AppCategory.Undefined,
         isExcluded = true,
         knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
-        userModified = true
+        userModified = true,
     )
 
     private val appWithoutIssues = TrackingProtectionAppInfo(
@@ -298,6 +298,6 @@ class ManageAppsProtectionViewModelTest {
         category = AppCategory.Undefined,
         isExcluded = false,
         knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
-        userModified = false
+        userModified = false,
     )
 }

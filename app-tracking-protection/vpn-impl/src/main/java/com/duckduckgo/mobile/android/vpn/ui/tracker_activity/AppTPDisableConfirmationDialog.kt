@@ -45,7 +45,7 @@ class AppTPDisableConfirmationDialog private constructor(private val listener: L
 
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
-            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog
+            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog,
         )
             .setView(rootView)
 
@@ -59,7 +59,7 @@ class AppTPDisableConfirmationDialog private constructor(private val listener: L
     private fun configureListeners(
         disableOneApp: Button,
         disableAllApps: Button,
-        cancel: Button
+        cancel: Button,
     ) {
         disableOneApp.setOnClickListener {
             dismiss()

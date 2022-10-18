@@ -32,7 +32,7 @@ class AppHealthMonitorManager @Inject constructor(private val appHealthMonitor: 
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         appHealthMonitor.stopMonitoring()
     }

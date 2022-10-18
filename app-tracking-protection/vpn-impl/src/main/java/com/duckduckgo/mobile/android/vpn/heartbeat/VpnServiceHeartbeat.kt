@@ -37,13 +37,13 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class VpnServiceHeartbeat @Inject constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
 
     private var job = ConflatedJob()
@@ -69,7 +69,7 @@ class VpnServiceHeartbeat @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         Timber.v("onVpnStopped called")
         when (vpnStopReason) {

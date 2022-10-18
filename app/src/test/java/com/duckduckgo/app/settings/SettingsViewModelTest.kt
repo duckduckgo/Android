@@ -154,7 +154,7 @@ class SettingsViewModelTest {
             mockMacOsWaitlist,
             autofillStore,
             vpnFeaturesRegistry,
-            autoconsent
+            autoconsent,
         )
     }
 
@@ -374,7 +374,7 @@ class SettingsViewModelTest {
         verify(mockAppSettingsDataStore).showAppLinksPrompt = true
 
         verify(mockPixel).fire(
-            AppPixelName.SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED
+            AppPixelName.SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED,
         )
     }
 
@@ -385,7 +385,7 @@ class SettingsViewModelTest {
         verify(mockAppSettingsDataStore).showAppLinksPrompt = false
 
         verify(mockPixel).fire(
-            AppPixelName.SETTINGS_APP_LINKS_ALWAYS_SELECTED
+            AppPixelName.SETTINGS_APP_LINKS_ALWAYS_SELECTED,
         )
     }
 
@@ -396,7 +396,7 @@ class SettingsViewModelTest {
         verify(mockAppSettingsDataStore).showAppLinksPrompt = false
 
         verify(mockPixel).fire(
-            AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED
+            AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED,
         )
     }
 
@@ -555,7 +555,7 @@ class SettingsViewModelTest {
 
         verify(mockPixel).fire(
             AppPixelName.FIRE_ANIMATION_NEW_SELECTED,
-            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_WHIRLPOOL)
+            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_WHIRLPOOL),
         )
     }
 
@@ -567,7 +567,7 @@ class SettingsViewModelTest {
 
         verify(mockPixel, times(0)).fire(
             AppPixelName.FIRE_ANIMATION_NEW_SELECTED,
-            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO)
+            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO),
         )
     }
 

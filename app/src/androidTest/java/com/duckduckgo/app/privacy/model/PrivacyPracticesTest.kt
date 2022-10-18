@@ -66,8 +66,8 @@ class PrivacyPracticesTest {
     fun whenUrlButNoParentEntityThenStillHasScore() = runTest {
         whenever(mockTermsStore.terms).thenReturn(
             listOf(
-                TermsOfService("example.com", classification = "D")
-            )
+                TermsOfService("example.com", classification = "D"),
+            ),
         )
 
         assertEquals(10, testee.privacyPracticesFor("http://www.example.com").score)
@@ -80,8 +80,8 @@ class PrivacyPracticesTest {
                 TermsOfService("sibling1.com", classification = "A"),
                 TermsOfService("sibling2.com", classification = "B"),
                 TermsOfService("sibling3.com", classification = "C"),
-                TermsOfService("sibling4.com", classification = "D")
-            )
+                TermsOfService("sibling4.com", classification = "D"),
+            ),
         )
 
         entityDao.insertAll(
@@ -89,8 +89,8 @@ class PrivacyPracticesTest {
                 TdsEntity("Network Inc", "Network", 0.0),
                 TdsEntity("Network Inc", "Network", 0.0),
                 TdsEntity("Network Inc", "Network", 0.0),
-                TdsEntity("Network Inc", "Network", 0.0)
-            )
+                TdsEntity("Network Inc", "Network", 0.0),
+            ),
         )
 
         domainEntityDao.insertAll(
@@ -98,8 +98,8 @@ class PrivacyPracticesTest {
                 TdsDomainEntity("sibling1.com", "Network Inc"),
                 TdsDomainEntity("sibling2.com", "Network Inc"),
                 TdsDomainEntity("sibling3.com", "Network Inc"),
-                TdsDomainEntity("sibling4.com", "Network Inc")
-            )
+                TdsDomainEntity("sibling4.com", "Network Inc"),
+            ),
         )
 
         testee.loadData()

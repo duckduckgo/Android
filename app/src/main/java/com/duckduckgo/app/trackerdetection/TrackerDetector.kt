@@ -41,7 +41,7 @@ interface TrackerDetector {
     fun evaluate(
         url: String,
         documentUrl: String,
-        checkFirstParty: Boolean = true
+        checkFirstParty: Boolean = true,
     ): TrackingEvent?
 }
 
@@ -53,7 +53,7 @@ class TrackerDetectorImpl @Inject constructor(
     private val contentBlocking: ContentBlocking,
     private val trackerAllowlist: TrackerAllowlist,
     private val webTrackersBlockedDao: WebTrackersBlockedDao,
-    private val adClickManager: AdClickManager
+    private val adClickManager: AdClickManager,
 ) : TrackerDetector {
 
     private val clients = CopyOnWriteArrayList<Client>()
@@ -69,7 +69,7 @@ class TrackerDetectorImpl @Inject constructor(
     override fun evaluate(
         url: String,
         documentUrl: String,
-        checkFirstParty: Boolean
+        checkFirstParty: Boolean,
     ): TrackingEvent? {
         if (checkFirstParty && firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
@@ -112,13 +112,13 @@ class TrackerDetectorImpl @Inject constructor(
 
     private fun firstParty(
         firstUrl: String,
-        secondUrl: String
+        secondUrl: String,
     ): Boolean =
         sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl)
 
     private fun sameNetworkName(
         url: String,
-        documentUrl: String
+        documentUrl: String,
     ): Boolean {
         val firstNetwork = entityLookup.entityForUrl(url) ?: return false
         val secondNetwork = entityLookup.entityForUrl(documentUrl) ?: return false

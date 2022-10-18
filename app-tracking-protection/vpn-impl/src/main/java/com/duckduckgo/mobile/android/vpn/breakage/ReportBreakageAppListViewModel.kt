@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class ReportBreakageAppListViewModel @Inject constructor(
-    private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository
+    private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository,
 ) : ViewModel() {
 
     private val selectedAppFlow = MutableStateFlow<InstalledApp?>(null)

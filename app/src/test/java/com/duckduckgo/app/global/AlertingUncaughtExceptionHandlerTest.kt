@@ -53,7 +53,7 @@ class AlertingUncaughtExceptionHandlerTest {
             mockUncaughtExceptionRepository,
             coroutineTestRule.testDispatcherProvider,
             TestScope(),
-            mockAppBuildConfig
+            mockAppBuildConfig,
         )
     }
 

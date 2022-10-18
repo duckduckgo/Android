@@ -44,7 +44,7 @@ interface TcpSocketWriter {
     fun writeToSocket(tcb: TCB)
     fun addToWriteQueue(
         pendingWriteData: PendingWriteData,
-        skipQueue: Boolean
+        skipQueue: Boolean,
     )
 
     fun removeFromWriteQueue(tcb: TCB)
@@ -53,16 +53,16 @@ interface TcpSocketWriter {
 @SingleInstanceIn(VpnScope::class)
 @ContributesBinding(
     scope = VpnScope::class,
-    boundType = TcpSocketWriter::class
+    boundType = TcpSocketWriter::class,
 )
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnMemoryCollectorPlugin::class
+    boundType = VpnMemoryCollectorPlugin::class,
 )
 class RealTcpSocketWriter @Inject constructor(
     @TcpNetworkSelector private val selector: Selector,
     private val queues: VpnQueues,
-    interceptorPlugins: PluginPoint<VpnPacketInterceptor>
+    interceptorPlugins: PluginPoint<VpnPacketInterceptor>,
 ) : TcpSocketWriter, VpnMemoryCollectorPlugin {
 
     // added an initial capacity based on what I observed from the low memory pixels we send
@@ -73,13 +73,13 @@ class RealTcpSocketWriter @Inject constructor(
                 val request = chain.request()
                 Timber.v("Proceed with packet request ${request.packetInfo}")
                 request.byteChannel.safeWrite(request.byteBuffer)
-            }
+            },
         )
     }.toList()
 
     override fun addToWriteQueue(
         pendingWriteData: PendingWriteData,
-        skipQueue: Boolean
+        skipQueue: Boolean,
     ) {
         val queue = pendingWriteData.tcb.writeQueue()
         if (skipQueue) queue.addFirst(pendingWriteData) else queue.add(pendingWriteData)
@@ -87,7 +87,7 @@ class RealTcpSocketWriter @Inject constructor(
             "Added to write queue. Size is now %d for %s. there are %d TCB instances in the write queue",
             queue.size,
             getLogLabel(pendingWriteData.tcb),
-            writeQueue.keys.size
+            writeQueue.keys.size,
         )
     }
 
@@ -117,7 +117,7 @@ class RealTcpSocketWriter @Inject constructor(
                 tcb.ipAndPort,
                 writeData.payloadSize,
                 writeData.ackNumber,
-                writeData.seqNumber
+                writeData.seqNumber,
             )
 
             val payloadBuffer = writeData.payloadBuffer
@@ -128,7 +128,7 @@ class RealTcpSocketWriter @Inject constructor(
             val packetRequest = PacketRequest(
                 packetInfo = tcb.referencePacket.toPacketInfo(),
                 byteBuffer = payloadBuffer,
-                byteChannel = socket
+                byteChannel = socket,
             )
             val chain = RealPacketInterceptorChain(interceptors, 0, packetRequest)
             val bytesWritten: Int = chain.proceed(packetRequest)
@@ -161,7 +161,7 @@ class RealTcpSocketWriter @Inject constructor(
         writeData: PendingWriteData,
         bytesWritten: Int,
         payloadBuffer: ByteBuffer,
-        payloadSize: Int
+        payloadSize: Int,
     ) {
         Timber.e("Partially written data. %d bytes written. %d bytes remain out of %d", bytesWritten, payloadBuffer.remaining(), payloadSize)
 
@@ -174,7 +174,7 @@ class RealTcpSocketWriter @Inject constructor(
     private fun fullyWritten(
         tcb: TCB,
         writeData: PendingWriteData,
-        connectionParams: TcpConnectionParams
+        connectionParams: TcpConnectionParams,
     ) {
         tcb.acknowledgementNumberToClient.set(writeData.ackNumber)
         tcb.acknowledgementNumberToServer.set(writeData.seqNumber)
@@ -188,7 +188,7 @@ class RealTcpSocketWriter @Inject constructor(
             seqToClient,
             tcb.acknowledgementNumberToClient.get(),
             ackToServer,
-            seqAckDiff
+            seqAckDiff,
         )
 
         val responseBuffer = connectionParams.responseBuffer
@@ -198,7 +198,7 @@ class RealTcpSocketWriter @Inject constructor(
             Packet.TCPHeader.ACK.toByte(),
             tcb.sequenceNumberToClient.get(),
             tcb.acknowledgementNumberToClient.get(),
-            0
+            0,
         )
         ByteBufferPool.release(writeData.payloadBuffer)
         queues.networkToDevice.offer(responseBuffer)
@@ -224,7 +224,7 @@ class RealTcpSocketWriter @Inject constructor(
             destinationAddress = ipHeader.sourceAddress,
             destinationPort = tcpHeader.sourcePort,
             sourceAddress = ipHeader.destinationAddress,
-            sourcePort = tcpHeader.destinationPort
+            sourcePort = tcpHeader.destinationPort,
         )
     }
 

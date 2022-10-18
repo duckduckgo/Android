@@ -40,7 +40,7 @@ class PrivacyReportViewModel @Inject constructor(
     private val vpnStore: VpnStore,
     private val vpnFeatureRemover: VpnFeatureRemover,
     vpnStateMonitor: VpnStateMonitor,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     val viewStateFlow = vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN).combine(getReport()) { vpnState, trackersBlocked ->
@@ -77,13 +77,13 @@ class PrivacyReportViewModel @Inject constructor(
         data class ViewState(
             val vpnState: VpnState,
             val trackersBlocked: TrackersBlocked,
-            val isFeatureEnabled: Boolean
+            val isFeatureEnabled: Boolean,
         )
 
         data class TrackersBlocked(
             val latestApp: String,
             val otherAppsSize: Int,
-            val trackers: Int
+            val trackers: Int,
         )
     }
 }

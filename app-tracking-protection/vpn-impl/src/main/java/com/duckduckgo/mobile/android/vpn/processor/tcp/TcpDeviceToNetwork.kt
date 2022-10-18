@@ -78,7 +78,7 @@ class TcpDeviceToNetwork(
     private val payloadBytesExtractor: PayloadBytesExtractor,
     private val recentAppTrackerCache: RecentAppTrackerCache,
     private val vpnCoroutineScope: CoroutineScope,
-    private val healthMetricCounter: HealthMetricCounter
+    private val healthMetricCounter: HealthMetricCounter,
 ) : Runnable {
 
     override fun run() {
@@ -125,7 +125,7 @@ class TcpDeviceToNetwork(
     }
 
     private fun processPacketTcbNotInitialized(
-        connectionParams: TcpConnectionParams
+        connectionParams: TcpConnectionParams,
     ) {
         val packet = connectionParams.packet
         val totalPacketLength = connectionParams.packet.backingBuffer.limit()
@@ -136,10 +136,10 @@ class TcpDeviceToNetwork(
             TcpPacketProcessor.logPacketDetails(
                 packet,
                 packet.tcpHeader.sequenceNumber,
-                packet.tcpHeader.acknowledgementNumber
+                packet.tcpHeader.acknowledgementNumber,
             ),
             totalPacketLength,
-            packet.tcpPayloadSize(true)
+            packet.tcpPayloadSize(true),
         )
         TcpStateFlow.newPacket(connectionParams.key(), TcbState(), packet.asPacketType(), -1).events.forEach {
             when (it) {
@@ -151,7 +151,7 @@ class TcpDeviceToNetwork(
                             ACK.toByte(),
                             0,
                             connectionParams.packet.tcpHeader.sequenceNumber + 1,
-                            0
+                            0,
                         )
                         queues.networkToDevice.offer(connectionParams.responseBuffer)
                     }
@@ -163,7 +163,7 @@ class TcpDeviceToNetwork(
                             RST.toByte(),
                             0,
                             connectionParams.packet.tcpHeader.sequenceNumber + 1,
-                            0
+                            0,
                         )
                         queues.networkToDevice.offer(connectionParams.responseBuffer)
                     }
@@ -174,7 +174,7 @@ class TcpDeviceToNetwork(
     }
 
     private fun processPacketTcbExists(
-        connectionParams: TcpConnectionParams
+        connectionParams: TcpConnectionParams,
     ) {
         val packet = connectionParams.packet
         val payloadBuffer = connectionParams.packet.backingBuffer
@@ -189,10 +189,10 @@ class TcpDeviceToNetwork(
             TcpPacketProcessor.logPacketDetails(
                 packet,
                 packet.tcpHeader.sequenceNumber,
-                packet.tcpHeader.acknowledgementNumber
+                packet.tcpHeader.acknowledgementNumber,
             ),
             totalPacketLength,
-            packet.tcpPayloadSize(true)
+            packet.tcpPayloadSize(true),
         )
 
         if (packet.tcpHeader.isACK) {
@@ -203,7 +203,7 @@ class TcpDeviceToNetwork(
             connectionParams.key(),
             tcb.tcbState,
             packet.asPacketType(tcb.finSequenceNumberToClient),
-            tcb.sequenceNumberToClientInitial.get()
+            tcb.sequenceNumberToClientInitial.get(),
         )
         Timber.v("Action: %s for %s", action.events, tcb.ipAndPort)
         Timber.v("payloadBuffer size: %s", payloadBuffer)
@@ -229,7 +229,7 @@ class TcpDeviceToNetwork(
     }
 
     private fun closeConnection(
-        connectionParams: TcpConnectionParams
+        connectionParams: TcpConnectionParams,
     ) {
         TCB.getTCB(connectionParams.key())?.let {
             tcbCloser.closeConnection(it)
@@ -251,7 +251,7 @@ class TcpDeviceToNetwork(
                             (SYN or ACK).toByte(),
                             tcb.sequenceNumberToClient.get(),
                             tcb.acknowledgementNumberToClient.get(),
-                            0
+                            0,
                         )
                         tcb.sequenceNumberToClient.incrementAndGet()
                         queues.networkToDevice.offer(params.responseBuffer)
@@ -272,7 +272,7 @@ class TcpDeviceToNetwork(
     private fun isARetryForRecentlyBlockedTracker(
         requestingApp: OriginatingApp,
         hostName: String?,
-        payloadSize: Int
+        payloadSize: Int,
     ): Boolean {
         if (hostName == null) return false
         val recentTrackerEvent = recentAppTrackerCache.getRecentTrackingAttempt(requestingApp.packageId, hostName, payloadSize) ?: return false
@@ -282,7 +282,7 @@ class TcpDeviceToNetwork(
     }
 
     private fun processPacket(
-        connectionParams: TcpConnectionParams
+        connectionParams: TcpConnectionParams,
     ) {
         val packet = connectionParams.packet
         val payloadBuffer = packet.backingBuffer
@@ -310,7 +310,7 @@ class TcpDeviceToNetwork(
                 requestType,
                 hostName,
                 isLocalAddress,
-                isATrackerRetryRequest
+                isATrackerRetryRequest,
             )
 
             if (requestType is RequestTrackerType.Tracker) {
@@ -319,7 +319,7 @@ class TcpDeviceToNetwork(
                     connectionParams,
                     requestingApp,
                     packet,
-                    payloadSize
+                    payloadSize,
                 )
                 ByteBufferPool.release(payloadBuffer)
                 return
@@ -355,7 +355,7 @@ class TcpDeviceToNetwork(
         connectionParams: TcpConnectionParams,
         requestingApp: OriginatingApp,
         packet: Packet,
-        payloadSize: Int
+        payloadSize: Int,
     ) {
         // we should never get here with null TCB
         val tcb = connectionParams.tcbOrClose() ?: return
@@ -378,14 +378,14 @@ class TcpDeviceToNetwork(
             tcb.requestingAppPackage,
             tcb.trackerHostName,
             tcb.ipAndPort,
-            ghostingDuration
+            ghostingDuration,
         )
     }
 
     private fun determineHostName(
         tcb: TCB,
         packet: Packet,
-        payloadBuffer: ByteBuffer
+        payloadBuffer: ByteBuffer,
     ): String? {
         if (tcb.hostName != null) return tcb.hostName
         val payloadBytes = payloadBytesExtractor.extract(packet, payloadBuffer)
@@ -398,7 +398,7 @@ class TcpDeviceToNetwork(
         requestingApp: OriginatingApp,
         payloadBuffer: ByteBuffer,
         isLocalAddress: Boolean,
-        hostName: String?
+        hostName: String?,
     ): RequestTrackerType {
         Timber.v("Determining if a tracker. Already determined? %s", tcb.trackerTypeDetermined)
         if (tcb.trackerTypeDetermined) {
@@ -406,7 +406,7 @@ class TcpDeviceToNetwork(
                 (RequestTrackerType.Tracker(tcb.trackerHostName))
             } else {
                 RequestTrackerType.NotTracker(
-                    tcb.hostName ?: packet.ipHeader.destinationAddress.hostName
+                    tcb.hostName ?: packet.ipHeader.destinationAddress.hostName,
                 )
             }
         }
@@ -420,7 +420,7 @@ class TcpDeviceToNetwork(
 
     private fun determineRequestingApp(
         tcb: TCB,
-        packet: Packet
+        packet: Packet,
     ): OriginatingApp {
         if (tcb.requestingAppDetermined) {
             return OriginatingApp(tcb.requestingAppPackage ?: "unknown package", tcb.requestingAppName ?: "unknown app")

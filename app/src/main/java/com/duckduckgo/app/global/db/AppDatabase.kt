@@ -98,8 +98,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         LocationPermissionEntity::class,
         PixelEntity::class,
         WebTrackerBlocked::class,
-        AuthCookieAllowedDomainEntity::class
-    ]
+        AuthCookieAllowedDomainEntity::class,
+    ],
 )
 
 @TypeConverters(
@@ -114,7 +114,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
     StageTypeConverter::class,
     UserEventTypeConverter::class,
     LocationPermissionTypeConverter::class,
-    QueryParamsTypeConverter::class
+    QueryParamsTypeConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -157,7 +157,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             database.execSQL("CREATE INDEX `index_tabs_tabId` on `tabs` (tabId)")
             database.execSQL(
                 "CREATE TABLE `tab_selection` (`id` INTEGER NOT NULL, `tabId` TEXT, PRIMARY KEY(`id`), " +
-                    "FOREIGN KEY(`tabId`) REFERENCES `tabs`(`tabId`) ON UPDATE NO ACTION ON DELETE SET NULL)"
+                    "FOREIGN KEY(`tabId`) REFERENCES `tabs`(`tabId`) ON UPDATE NO ACTION ON DELETE SET NULL)",
             )
             database.execSQL("CREATE INDEX `index_tab_selection_tabId` on `tab_selection` (tabId)")
         }
@@ -175,7 +175,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             database.execSQL("DROP TABLE `https_upgrade_domain`")
             database.execSQL(
                 "CREATE TABLE `https_bloom_filter_spec` (`id` INTEGER NOT NULL, `errorRate` REAL NOT NULL, " +
-                    "`totalEntries` INTEGER NOT NULL, `sha256` TEXT NOT NULL, PRIMARY KEY(`id`))"
+                    "`totalEntries` INTEGER NOT NULL, `sha256` TEXT NOT NULL, PRIMARY KEY(`id`))",
             )
             database.execSQL("CREATE TABLE `https_whitelisted_domain` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
         }
@@ -204,7 +204,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `entity_list` (`entityName` TEXT NOT NULL, `domainName` TEXT NOT NULL, " +
-                    "PRIMARY KEY(`domainName`))"
+                    "PRIMARY KEY(`domainName`))",
             )
         }
     }
@@ -213,7 +213,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `survey` (`surveyId` TEXT NOT NULL, `url` TEXT, `daysInstalled` INTEGER, " +
-                    "`status` TEXT NOT NULL, PRIMARY KEY(`surveyId`))"
+                    "`status` TEXT NOT NULL, PRIMARY KEY(`surveyId`))",
             )
         }
     }
@@ -236,7 +236,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             database.execSQL("CREATE TABLE IF NOT EXISTS `app_days_used` (`date` TEXT NOT NULL, PRIMARY KEY(`date`))")
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `app_enjoyment` (`eventType` INTEGER NOT NULL, `promptCount` INTEGER NOT NULL, " +
-                    "`timestamp` INTEGER NOT NULL, `primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)"
+                    "`timestamp` INTEGER NOT NULL, `primaryKey` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
             )
         }
     }
@@ -245,7 +245,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `privacy_protection_count` (`key` TEXT NOT NULL, " +
-                    "`blocked_tracker_count` INTEGER NOT NULL, `upgrade_count` INTEGER NOT NULL, PRIMARY KEY(`key`))"
+                    "`blocked_tracker_count` INTEGER NOT NULL, `upgrade_count` INTEGER NOT NULL, PRIMARY KEY(`key`))",
             )
         }
     }
@@ -263,7 +263,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             database.execSQL("CREATE TABLE IF NOT EXISTS `sites_visited` (`key` TEXT NOT NULL, `count` INTEGER NOT NULL, PRIMARY KEY(`key`))")
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `network_leaderboard` (`networkName` TEXT NOT NULL, " +
-                    "`count` INTEGER NOT NULL, PRIMARY KEY(`networkName`))"
+                    "`count` INTEGER NOT NULL, PRIMARY KEY(`networkName`))",
             )
         }
     }
@@ -278,7 +278,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `UncaughtExceptionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                    "`exceptionSource` TEXT NOT NULL, `message` TEXT NOT NULL)"
+                    "`exceptionSource` TEXT NOT NULL, `message` TEXT NOT NULL)",
             )
         }
     }
@@ -291,15 +291,15 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             database.execSQL("DELETE FROM `network_leaderboard`")
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `tds_tracker` (`domain` TEXT NOT NULL, `defaultAction` TEXT NOT NULL, " +
-                    "`ownerName` TEXT NOT NULL, `rules` TEXT NOT NULL, `categories` TEXT NOT NULL, PRIMARY KEY(`domain`))"
+                    "`ownerName` TEXT NOT NULL, `rules` TEXT NOT NULL, `categories` TEXT NOT NULL, PRIMARY KEY(`domain`))",
             )
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `tds_entity` (`name` TEXT NOT NULL, `displayName` TEXT NOT NULL, " +
-                    "`prevalence` REAL NOT NULL, PRIMARY KEY(`name`))"
+                    "`prevalence` REAL NOT NULL, PRIMARY KEY(`name`))",
             )
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `tds_domain_entity` (`domain` TEXT NOT NULL, `entityName` TEXT NOT NULL, " +
-                    "PRIMARY KEY(`domain`))"
+                    "PRIMARY KEY(`domain`))",
             )
             database.execSQL("CREATE TABLE IF NOT EXISTS `temporary_tracking_whitelist` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
         }
@@ -325,10 +325,10 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             val userStage = UserStage(appStage = appStage)
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `$USER_STAGE_TABLE_NAME` " +
-                    "(`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))"
+                    "(`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))",
             )
             database.execSQL(
-                "INSERT INTO $USER_STAGE_TABLE_NAME VALUES (${userStage.key}, \"${userStage.appStage}\") "
+                "INSERT INTO $USER_STAGE_TABLE_NAME VALUES (${userStage.key}, \"${userStage.appStage}\") ",
             )
         }
     }
@@ -338,7 +338,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             database.execSQL("DROP TABLE `UncaughtExceptionEntity`")
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `UncaughtExceptionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                    "`exceptionSource` TEXT NOT NULL, `message` TEXT NOT NULL, `version` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)"
+                    "`exceptionSource` TEXT NOT NULL, `message` TEXT NOT NULL, `version` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)",
             )
         }
     }
@@ -365,7 +365,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\"" +
-                    " WHERE appStage = \"USE_OUR_APP_NOTIFICATION\""
+                    " WHERE appStage = \"USE_OUR_APP_NOTIFICATION\"",
             )
         }
     }
@@ -379,12 +379,12 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
                     "(tabId TEXT NOT NULL, url TEXT, title TEXT, skipHome INTEGER NOT NULL, viewed INTEGER NOT NULL, " +
                     "position INTEGER NOT NULL, tabPreviewFile TEXT, sourceTabId TEXT," +
                     " PRIMARY KEY(tabId)," +
-                    " FOREIGN KEY(sourceTabId) REFERENCES tabs(tabId) ON UPDATE SET NULL ON DELETE SET NULL )"
+                    " FOREIGN KEY(sourceTabId) REFERENCES tabs(tabId) ON UPDATE SET NULL ON DELETE SET NULL )",
             )
             database.execSQL(
                 "INSERT INTO tabs_new (tabId, url, title, skipHome, viewed, position, tabPreviewFile) " +
                     "SELECT tabId, url, title, skipHome, viewed, position, tabPreviewFile " +
-                    "FROM tabs"
+                    "FROM tabs",
             )
             database.execSQL("DROP TABLE tabs")
             database.execSQL("ALTER TABLE tabs_new RENAME TO tabs")
@@ -396,7 +396,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `locationPermissions` (`domain` TEXT NOT NULL, " +
-                    "`permission` INTEGER NOT NULL, PRIMARY KEY(`domain`))"
+                    "`permission` INTEGER NOT NULL, PRIMARY KEY(`domain`))",
             )
         }
     }
@@ -407,7 +407,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             database.execSQL("DROP TABLE `https_whitelisted_domain`")
             database.execSQL(
                 "CREATE TABLE `https_bloom_filter_spec` (`id` INTEGER NOT NULL, `bitCount` INTEGER NOT NULL, " +
-                    "`errorRate` REAL NOT NULL, `totalEntries` INTEGER NOT NULL, `sha256` TEXT NOT NULL, PRIMARY KEY(`id`))"
+                    "`errorRate` REAL NOT NULL, `totalEntries` INTEGER NOT NULL, `sha256` TEXT NOT NULL, PRIMARY KEY(`id`))",
             )
             database.execSQL("CREATE TABLE `https_false_positive_domain` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
         }
@@ -417,7 +417,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `pixel_store` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                    "`pixelName` TEXT NOT NULL, `atb` TEXT NOT NULL, `additionalQueryParams` TEXT NOT NULL, `encodedQueryParams` TEXT NOT NULL)"
+                    "`pixelName` TEXT NOT NULL, `atb` TEXT NOT NULL, `additionalQueryParams` TEXT NOT NULL, `encodedQueryParams` TEXT NOT NULL)",
             )
         }
     }
@@ -432,7 +432,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" " +
-                    "WHERE appStage = \"${AppStage.DAX_ONBOARDING}\""
+                    "WHERE appStage = \"${AppStage.DAX_ONBOARDING}\"",
             )
         }
     }
@@ -441,7 +441,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `bookmarks_temp` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                    "title TEXT, url TEXT NOT NULL, UNIQUE (url) ON CONFLICT REPLACE)"
+                    "title TEXT, url TEXT NOT NULL, UNIQUE (url) ON CONFLICT REPLACE)",
             )
             database.execSQL("INSERT INTO `bookmarks_temp` (id, title, url) SELECT * FROM `bookmarks`")
             database.execSQL("DROP TABLE `bookmarks`")
@@ -476,7 +476,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" " +
-                    "WHERE appStage = \"USE_OUR_APP_NOTIFICATION\" OR appStage = \"USE_OUR_APP_ONBOARDING\""
+                    "WHERE appStage = \"USE_OUR_APP_NOTIFICATION\" OR appStage = \"USE_OUR_APP_ONBOARDING\"",
             )
             database.execSQL("DELETE FROM user_events WHERE id = \"USE_OUR_APP_SHORTCUT_ADDED\" OR id = \"USE_OUR_APP_FIREPROOF_DIALOG_SEEN\"")
             database.execSQL("DELETE FROM dismissed_cta WHERE ctaId = \"USE_OUR_APP\" OR ctaId = \"USE_OUR_APP_DELETION\"")
@@ -487,7 +487,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `favorites` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL," +
-                    " `url` TEXT NOT NULL, `position` INTEGER NOT NULL)"
+                    " `url` TEXT NOT NULL, `position` INTEGER NOT NULL)",
             )
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_favorites_title_url` ON `favorites` (`title`, `url`)")
         }
@@ -503,11 +503,11 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `bookmark_folders` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                    "`name` TEXT NOT NULL, `parentId` INTEGER NOT NULL)"
+                    "`name` TEXT NOT NULL, `parentId` INTEGER NOT NULL)",
             )
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `bookmarks_temp` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                    "title TEXT, url TEXT NOT NULL, parentId INTEGER NOT NULL DEFAULT 0, UNIQUE (url, parentId) ON CONFLICT REPLACE)"
+                    "title TEXT, url TEXT NOT NULL, parentId INTEGER NOT NULL DEFAULT 0, UNIQUE (url, parentId) ON CONFLICT REPLACE)",
             )
             database.execSQL("INSERT INTO `bookmarks_temp` (id, title, url) SELECT * FROM `bookmarks`")
             database.execSQL("DROP TABLE `bookmarks`")
@@ -537,7 +537,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `web_trackers_blocked` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                    "trackerUrl TEXT NOT NULL, trackerCompany TEXT NOT NULL, timestamp TEXT NOT NULL)"
+                    "trackerUrl TEXT NOT NULL, trackerCompany TEXT NOT NULL, timestamp TEXT NOT NULL)",
             )
         }
     }
@@ -553,7 +553,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
 
             database.execSQL(
                 "UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" " +
-                    "WHERE appStage = \"${AppStage.DAX_ONBOARDING}\""
+                    "WHERE appStage = \"${AppStage.DAX_ONBOARDING}\"",
             )
         }
     }
@@ -570,7 +570,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `tds_cname_entity` (`cloakedHostName` TEXT NOT NULL, " +
-                    "`uncloakedHostName` TEXT NOT NULL, PRIMARY KEY(`cloakedHostName`))"
+                    "`uncloakedHostName` TEXT NOT NULL, PRIMARY KEY(`cloakedHostName`))",
             )
         }
     }
@@ -579,7 +579,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `bookmarks_temp` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                    "title TEXT, url TEXT NOT NULL, parentId INTEGER NOT NULL DEFAULT 0, UNIQUE (url, parentId) ON CONFLICT REPLACE)"
+                    "title TEXT, url TEXT NOT NULL, parentId INTEGER NOT NULL DEFAULT 0, UNIQUE (url, parentId) ON CONFLICT REPLACE)",
             )
             database.execSQL("INSERT INTO `bookmarks_temp` (id, title, url, parentId) SELECT * FROM `bookmarks`")
             database.execSQL("DROP TABLE `bookmarks`")
@@ -643,12 +643,12 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_40_TO_41,
             MIGRATION_41_TO_42,
             MIGRATION_42_TO_43,
-            MIGRATION_43_TO_44
+            MIGRATION_43_TO_44,
         )
 
     @Deprecated(
         message = "This class should be only used by database migrations.",
-        replaceWith = ReplaceWith(expression = "UserStageStore", imports = ["com.duckduckgo.app.onboarding.store"])
+        replaceWith = ReplaceWith(expression = "UserStageStore", imports = ["com.duckduckgo.app.onboarding.store"]),
     )
     private inner class OldOnboardingStore {
         private val fileName = "com.duckduckgo.app.onboarding.settings"

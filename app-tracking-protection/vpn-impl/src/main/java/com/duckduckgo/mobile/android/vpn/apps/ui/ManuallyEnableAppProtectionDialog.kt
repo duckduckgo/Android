@@ -106,7 +106,7 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
 
     private fun configureListeners(
         enableCTA: Button,
-        skipCTA: Button
+        skipCTA: Button,
     ) {
         enableCTA.setOnClickListener {
             dismiss()
@@ -145,7 +145,7 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
 
         fun instance(
             appInfo: TrackingProtectionAppInfo,
-            position: Int
+            position: Int,
         ): ManuallyEnableAppProtectionDialog {
             return ManuallyEnableAppProtectionDialog().also { fragment ->
                 val bundle = Bundle()

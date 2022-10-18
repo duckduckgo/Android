@@ -60,13 +60,13 @@ class ApiRequestInterceptorTest {
             fakeUserAgent,
             fakeToggle,
             fakeUserAllowListRepository,
-            coroutinesTestRule.testDispatcherProvider
+            coroutinesTestRule.testDispatcherProvider,
         )
 
         testee = ApiRequestInterceptor(
             InstrumentationRegistry.getInstrumentation().context,
             userAgentProvider,
-            appBuildConfig
+            appBuildConfig,
         )
     }
 

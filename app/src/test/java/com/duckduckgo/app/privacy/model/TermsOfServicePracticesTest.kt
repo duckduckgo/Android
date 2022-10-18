@@ -64,7 +64,7 @@ class TermsOfServicePracticesTest(private val testCase: TermsOfServicePracticesT
                 TermsOfServicePracticesTestCase(POOR, TermsOfService(score = 1)),
                 TermsOfServicePracticesTestCase(POOR, TermsOfService(score = 10)),
                 TermsOfServicePracticesTestCase(POOR, TermsOfService(score = 100)),
-                TermsOfServicePracticesTestCase(POOR, TermsOfService(score = 1000))
+                TermsOfServicePracticesTestCase(POOR, TermsOfService(score = 1000)),
 
             )
         }
@@ -73,5 +73,5 @@ class TermsOfServicePracticesTest(private val testCase: TermsOfServicePracticesT
 
 data class TermsOfServicePracticesTestCase(
     val expectedPractices: PrivacyPractices.Summary,
-    val terms: TermsOfService
+    val terms: TermsOfService,
 )

@@ -41,7 +41,7 @@ class TunPacketReader @AssistedInject constructor(
     private val queues: VpnQueues,
     private val healthMetricCounter: HealthMetricCounter,
     private val deviceShieldPixels: DeviceShieldPixels,
-    private val appTpFeatureConfig: AppTpFeatureConfig
+    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : Runnable {
 
     private var running = false

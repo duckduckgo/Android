@@ -65,7 +65,7 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         val view = inflater.inflate(R.layout.fragment_device_shield_cta, container, false)
 
@@ -149,18 +149,18 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
                 0 -> resources.getString(
                     R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps,
                     trackersBlocked,
-                    lastTrackingApp
+                    lastTrackingApp,
                 )
                 1 -> resources.getString(
                     R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp,
                     trackersBlocked,
-                    lastTrackingApp
+                    lastTrackingApp,
                 )
                 else -> resources.getString(
                     R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps,
                     trackersBlocked,
                     lastTrackingApp,
-                    otherApps
+                    otherApps,
                 )
             }
         } else {
@@ -168,18 +168,18 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
                 0 -> resources.getString(
                     R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps,
                     trackersBlocked,
-                    lastTrackingApp
+                    lastTrackingApp,
                 )
                 1 -> resources.getString(
                     R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp,
                     trackersBlocked,
-                    lastTrackingApp
+                    lastTrackingApp,
                 )
                 else -> resources.getString(
                     R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps,
                     trackersBlocked,
                     lastTrackingApp,
-                    otherApps
+                    otherApps,
                 )
             }
         }

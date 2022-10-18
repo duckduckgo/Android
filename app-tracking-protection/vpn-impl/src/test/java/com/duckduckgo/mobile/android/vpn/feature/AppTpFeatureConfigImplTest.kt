@@ -50,7 +50,7 @@ class AppTpFeatureConfigImplTest {
             coroutineRule.testScope,
             appBuildConfig,
             vpnRemoteConfigDatabase,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -97,7 +97,7 @@ class AppTpFeatureConfigImplTest {
             coroutineRule.testScope,
             appBuildConfig,
             vpnRemoteConfigDatabase,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
 
         AppTpSetting.values().forEach {

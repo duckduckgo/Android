@@ -82,7 +82,7 @@ class SettingsViewModel @Inject constructor(
     private val macOsWaitlist: MacOsWaitlist,
     private val autofillStore: AutofillStore,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val autoconsent: Autoconsent
+    private val autoconsent: Autoconsent,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -104,13 +104,13 @@ class SettingsViewModel @Inject constructor(
         val emailAddress: String? = null,
         val macOsWaitlistState: MacWaitlistState = MacWaitlistState.NotJoinedQueue,
         val showAutofill: Boolean = false,
-        val autoconsentEnabled: Boolean = false
+        val autoconsentEnabled: Boolean = false,
     )
 
     data class AutomaticallyClearData(
         val clearWhatOption: ClearWhatOption,
         val clearWhenOption: ClearWhenOption,
-        val clearWhenOptionEnabled: Boolean = true
+        val clearWhenOptionEnabled: Boolean = true,
     )
 
     sealed class Command {
@@ -174,8 +174,8 @@ class SettingsViewModel @Inject constructor(
                     emailAddress = emailManager.getEmailAddress(),
                     macOsWaitlistState = macOsWaitlist.getWaitlistState(),
                     showAutofill = autofillStore.autofillAvailable,
-                    autoconsentEnabled = autoconsent.isSettingEnabled()
-                )
+                    autoconsentEnabled = autoconsent.isSettingEnabled(),
+                ),
             )
         }
     }
@@ -190,7 +190,7 @@ class SettingsViewModel @Inject constructor(
                 val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
                 if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
                     viewState.value = currentViewState().copy(
-                        appTrackingProtectionEnabled = isDeviceShieldEnabled
+                        appTrackingProtectionEnabled = isDeviceShieldEnabled,
                     )
                 }
                 delay(1_000)
@@ -341,7 +341,7 @@ class SettingsViewModel @Inject constructor(
 
     private fun getAppLinksSettingsState(
         appLinksEnabled: Boolean,
-        showAppLinksPrompt: Boolean
+        showAppLinksPrompt: Boolean,
     ): AppLinkSettingType {
         return if (appLinksEnabled) {
             if (showAppLinksPrompt) {
@@ -375,9 +375,9 @@ class SettingsViewModel @Inject constructor(
                     automaticallyClearData = AutomaticallyClearData(
                         clearWhatOption = clearWhatNewSetting,
                         clearWhenOption = settingsDataStore.automaticallyClearWhenOption,
-                        clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatNewSetting)
-                    )
-                )
+                        clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatNewSetting),
+                    ),
+                ),
             )
         }
     }
@@ -402,9 +402,9 @@ class SettingsViewModel @Inject constructor(
                 currentViewState().copy(
                     automaticallyClearData = AutomaticallyClearData(
                         settingsDataStore.automaticallyClearWhatOption,
-                        clearWhenNewSetting
-                    )
-                )
+                        clearWhenNewSetting,
+                    ),
+                ),
             )
         }
     }
@@ -479,5 +479,5 @@ class SettingsViewModel @Inject constructor(
 enum class AppLinkSettingType {
     ASK_EVERYTIME,
     ALWAYS,
-    NEVER
+    NEVER,
 }

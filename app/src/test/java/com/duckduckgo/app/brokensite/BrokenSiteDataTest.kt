@@ -92,7 +92,7 @@ class BrokenSiteDataTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val anotherEvent = TrackingEvent(
             documentUrl = "http://www.example.com/test",
@@ -101,7 +101,7 @@ class BrokenSiteDataTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         site.trackerDetected(event)
         site.trackerDetected(anotherEvent)
@@ -118,7 +118,7 @@ class BrokenSiteDataTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val anotherEvent = TrackingEvent(
             documentUrl = "http://www.example.com/test",
@@ -127,7 +127,7 @@ class BrokenSiteDataTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         site.trackerDetected(event)
         site.trackerDetected(anotherEvent)
@@ -144,7 +144,7 @@ class BrokenSiteDataTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         site.trackerDetected(event)
         assertEquals(".tracker.com", BrokenSiteData.fromSite(site).blockedTrackers)
@@ -179,7 +179,7 @@ class BrokenSiteDataTest {
 
     private fun buildSite(
         url: String,
-        httpsUpgraded: Boolean = false
+        httpsUpgraded: Boolean = false,
     ): Site {
         return SiteMonitor(url, "", upgradedHttps = httpsUpgraded)
     }

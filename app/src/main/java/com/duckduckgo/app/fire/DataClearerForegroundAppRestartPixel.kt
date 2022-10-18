@@ -42,7 +42,7 @@ import timber.log.Timber
 @SingleInstanceIn(AppScope::class)
 class DataClearerForegroundAppRestartPixel @Inject constructor(
     private val context: Context,
-    private val pixel: Pixel
+    private val pixel: Pixel,
 ) : DefaultLifecycleObserver {
     private var detectedUserIntent: Boolean = false
 
@@ -86,7 +86,7 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
 
     private fun incrementCount(
         counter: Int,
-        sharedPrefKey: String
+        sharedPrefKey: String,
     ) {
         val updated = counter + 1
         preferences.edit(commit = true) {
@@ -96,7 +96,7 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
 
     private fun firePendingPixels(
         counter: Int,
-        pixelName: Pixel.PixelName
+        pixelName: Pixel.PixelName,
     ) {
         if (counter > 0) {
             for (i in 1..counter) {

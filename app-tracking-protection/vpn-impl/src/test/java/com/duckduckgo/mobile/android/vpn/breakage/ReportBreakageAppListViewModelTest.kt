@@ -89,9 +89,9 @@ class ReportBreakageAppListViewModelTest {
             assertEquals(
                 ReportBreakageAppListView.State(
                     listOf(InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name)),
-                    false
+                    false,
                 ),
-                awaitItem()
+                awaitItem(),
             )
         }
     }
@@ -104,11 +104,11 @@ class ReportBreakageAppListViewModelTest {
             protectedAppsChannel.send(listOf(appWithoutIssues, appWithIssues))
             val expected = listOf(
                 InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name),
-                InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name, isSelected = true)
+                InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name, isSelected = true),
             )
             assertEquals(
                 ReportBreakageAppListView.State(expected, true),
-                awaitItem()
+                awaitItem(),
             )
         }
     }
@@ -121,11 +121,11 @@ class ReportBreakageAppListViewModelTest {
             protectedAppsChannel.send(listOf(appWithoutIssues, appWithIssues))
             val expected = listOf(
                 InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name),
-                InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name)
+                InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name),
             )
             assertEquals(
                 ReportBreakageAppListView.State(expected, false),
-                awaitItem()
+                awaitItem(),
             )
         }
     }
@@ -138,7 +138,7 @@ class ReportBreakageAppListViewModelTest {
             viewModel.onBreakageSubmitted(IssueReport())
 
             val expectedCommand = ReportBreakageAppListView.Command.SendBreakageInfo(
-                IssueReport(appPackageId = selectedApp.packageName)
+                IssueReport(appPackageId = selectedApp.packageName),
             )
 
             assertEquals(expectedCommand, awaitItem())
@@ -154,7 +154,7 @@ class ReportBreakageAppListViewModelTest {
             viewModel.onBreakageSubmitted(IssueReport(description = "description"))
 
             val expectedCommand = ReportBreakageAppListView.Command.SendBreakageInfo(
-                IssueReport(description = "description", appPackageId = selectedApp.packageName)
+                IssueReport(description = "description", appPackageId = selectedApp.packageName),
             )
 
             assertEquals(expectedCommand, awaitItem())
@@ -169,7 +169,7 @@ class ReportBreakageAppListViewModelTest {
         category = AppCategory.Undefined,
         isExcluded = false,
         knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
-        userModified = false
+        userModified = false,
     )
 
     private val appWithIssues = TrackingProtectionAppInfo(
@@ -179,6 +179,6 @@ class ReportBreakageAppListViewModelTest {
         category = AppCategory.Undefined,
         isExcluded = false,
         knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
-        userModified = false
+        userModified = false,
     )
 }

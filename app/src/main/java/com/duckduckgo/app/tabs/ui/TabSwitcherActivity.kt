@@ -134,8 +134,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                     override fun onSwiped(tab: TabEntity) {
                         onTabDeleted(tab)
                     }
-                }
-            )
+                },
+            ),
         )
         swipeListener.attachToRecyclerView(tabsRecycler)
 
@@ -203,7 +203,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             pixel = pixel,
             settingsDataStore = settingsDataStore,
             userEventsStore = userEventsStore,
-            appCoroutineScope = appCoroutineScope
+            appCoroutineScope = appCoroutineScope,
         )
         dialog.show()
     }
@@ -237,19 +237,21 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             .addCallback(object : Snackbar.Callback() {
                 override fun onDismissed(
                     transientBottomBar: Snackbar?,
-                    event: Int
+                    event: Int,
                 ) {
                     when (event) {
                         // handle the UNDO action here as we only have one
                         BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION -> launch { viewModel.undoDeletableTab(tab) }
                         BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE,
-                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT -> launch { viewModel.purgeDeletableTabs() }
+                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT,
+                        -> launch { viewModel.purgeDeletableTabs() }
                         BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE,
-                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL -> { /* noop */
+                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL,
+                        -> { /* noop */
                         }
                     }
                 }
-            })
+            },)
             .apply { view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text).maxLines = 1 }
             .show()
     }
@@ -293,7 +295,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     companion object {
         fun intent(
             context: Context,
-            selectedTabId: String? = null
+            selectedTabId: String? = null,
         ): Intent {
             val intent = Intent(context, TabSwitcherActivity::class.java)
             intent.putExtra(EXTRA_KEY_SELECTED_TAB, selectedTabId)

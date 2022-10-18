@@ -137,7 +137,7 @@ class QueryUrlConverterTest {
 
     private fun assertDuckDuckGoSearchQuery(
         query: String,
-        url: String
+        url: String,
     ) {
         val uri = Uri.parse(url)
         assertEquals("duckduckgo.com", uri.host)

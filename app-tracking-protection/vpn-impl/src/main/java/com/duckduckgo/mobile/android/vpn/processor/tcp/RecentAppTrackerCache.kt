@@ -31,7 +31,7 @@ class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser
         trackerDomain: String?,
         tcbId: String,
         payloadSize: Int,
-        timestamp: Long = System.currentTimeMillis()
+        timestamp: Long = System.currentTimeMillis(),
     ) {
         if (trackerDomain == null) return
 
@@ -44,7 +44,7 @@ class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser
     fun getRecentTrackingAttempt(
         appPackage: String,
         hostName: String,
-        payloadSize: Int
+        payloadSize: Int,
     ): RecentTrackerEvent? {
         synchronized(recentTrackingAttempts) {
             val trackers = recentTrackingAttempts[appPackage]
@@ -61,7 +61,7 @@ class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser
         trackerDomain: String,
         tcbId: String,
         payloadSize: Int,
-        timestamp: Long
+        timestamp: Long,
     ) {
         val trackingEvents = getTrackerListForDomain(trackers, trackerDomain)
         trackingEvents.add(RecentTrackerEvent(appPackage, trackerDomain, payloadSize, tcbId, timestamp))
@@ -69,7 +69,7 @@ class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser
 
     private fun getTrackerListForDomain(
         trackers: MutableMap<String, MutableList<RecentTrackerEvent>>,
-        trackerDomain: String
+        trackerDomain: String,
     ): MutableList<RecentTrackerEvent> {
         val existingList = trackers[trackerDomain]
         if (existingList != null) return existingList
@@ -121,7 +121,7 @@ class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser
     private fun pruneEmptyMapKeys(
         trackingEvents: MutableList<RecentTrackerEvent>?,
         trackersForApp: MutableMap<String, MutableList<RecentTrackerEvent>>?,
-        connection: RecentTrackerEvent
+        connection: RecentTrackerEvent,
     ) {
         if (trackingEvents.isNullOrEmpty()) trackersForApp?.remove(connection.trackerDomain)
         if (trackersForApp.isNullOrEmpty()) recentTrackingAttempts.remove(connection.appPackage)
@@ -136,6 +136,6 @@ class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser
         val trackerDomain: String,
         val payloadSize: Int,
         val tcbCacheKey: String,
-        val timestamp: Long = System.currentTimeMillis()
+        val timestamp: Long = System.currentTimeMillis(),
     )
 }

@@ -29,11 +29,11 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class
+    boundType = PixelInterceptorPlugin::class,
 )
 class CohortPixelInterceptor @Inject constructor(
     private val cohortCalculator: CohortCalculator,
-    private val cohortStore: CohortStore
+    private val cohortStore: CohortStore,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
@@ -75,7 +75,7 @@ class CohortPixelInterceptor @Inject constructor(
         private val EXCEPTIONS = listOf(
             "m_atp_ev_enabled_onboarding_",
             "m_atp_ev_cpu_usage_above_",
-            "m_atp_unprotected_apps_bucket_"
+            "m_atp_unprotected_apps_bucket_",
         )
     }
 }

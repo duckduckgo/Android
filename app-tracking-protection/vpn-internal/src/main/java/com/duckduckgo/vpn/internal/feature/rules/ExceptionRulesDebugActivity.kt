@@ -122,7 +122,7 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
 
     private fun List<AppTrackerExceptionRule>.containsRule(
         packageName: String,
-        domain: String
+        domain: String,
     ): Boolean {
         forEach { exclusionRule ->
             if (exclusionRule.rule == domain && exclusionRule.packageNames.contains(packageName)) return true
@@ -148,7 +148,7 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
 
     override fun onTrackerClicked(
         view: View,
-        enabled: Boolean
+        enabled: Boolean,
     ) {
         lifecycleScope.launch(Dispatchers.IO) {
             val tag = (view.tag as String?).orEmpty()
@@ -171,11 +171,11 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
 
 private data class InstalledApp(
     val packageName: String,
-    val name: String? = null
+    val name: String? = null,
 )
 
 private data class InstalledAppTrackers(
     val packageName: String,
     val name: String? = null,
-    val blockedDomains: Set<String>
+    val blockedDomains: Set<String>,
 )

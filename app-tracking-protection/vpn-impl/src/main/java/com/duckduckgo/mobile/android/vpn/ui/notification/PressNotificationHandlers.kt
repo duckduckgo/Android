@@ -27,11 +27,11 @@ import timber.log.Timber
 private const val INVALID_NOTIFICATION_VARIANT = -1
 
 class ReminderNotificationPressedHandler @Inject constructor(
-    private val deviceShieldPixels: DeviceShieldPixels
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
     override fun onReceiveResult(
         resultCode: Int,
-        resultData: Bundle?
+        resultData: Bundle?,
     ) {
         Timber.v("Reminder notification pressed")
         deviceShieldPixels.didPressReminderNotification()
@@ -39,11 +39,11 @@ class ReminderNotificationPressedHandler @Inject constructor(
 }
 
 class OngoingNotificationPressedHandler @Inject constructor(
-    private val deviceShieldPixels: DeviceShieldPixels
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
     override fun onReceiveResult(
         resultCode: Int,
-        resultData: Bundle?
+        resultData: Bundle?,
     ) {
         Timber.v("Ongoing notification pressed")
         deviceShieldPixels.didPressOngoingNotification()
@@ -51,14 +51,14 @@ class OngoingNotificationPressedHandler @Inject constructor(
 }
 
 class WeeklyNotificationPressedHandler @Inject constructor(
-    private val deviceShieldPixels: DeviceShieldPixels
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
 
     var notificationVariant: Int = INVALID_NOTIFICATION_VARIANT
 
     override fun onReceiveResult(
         resultCode: Int,
-        resultData: Bundle?
+        resultData: Bundle?,
     ) {
         Timber.v("Weekly notification pressed")
         if (notificationVariant == INVALID_NOTIFICATION_VARIANT) {
@@ -70,14 +70,14 @@ class WeeklyNotificationPressedHandler @Inject constructor(
 }
 
 class DailyNotificationPressedHandler @Inject constructor(
-    private val deviceShieldPixels: DeviceShieldPixels
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
 
     var notificationVariant: Int = INVALID_NOTIFICATION_VARIANT
 
     override fun onReceiveResult(
         resultCode: Int,
-        resultData: Bundle?
+        resultData: Bundle?,
     ) {
         Timber.v("Daily notification pressed")
         if (notificationVariant == INVALID_NOTIFICATION_VARIANT) {

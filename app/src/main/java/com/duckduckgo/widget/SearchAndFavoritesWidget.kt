@@ -45,7 +45,8 @@ import timber.log.Timber
 enum class WidgetTheme {
     LIGHT,
     DARK,
-    SYSTEM_DEFAULT;
+    SYSTEM_DEFAULT,
+    ;
 
     companion object {
         fun getThemeFrom(value: String?): WidgetTheme {
@@ -84,7 +85,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
 
     override fun onReceive(
         context: Context,
-        intent: Intent?
+        intent: Intent?,
     ) {
         inject(context)
         super.onReceive(context, intent)
@@ -93,7 +94,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray
+        appWidgetIds: IntArray,
     ) {
         Timber.i("SearchAndFavoritesWidget - onUpdate")
         appCoroutineScope.launch {
@@ -108,7 +109,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int,
-        newOptions: Bundle
+        newOptions: Bundle,
     ) {
         Timber.i("SearchAndFavoritesWidget - onAppWidgetOptionsChanged")
         appCoroutineScope.launch {
@@ -119,7 +120,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
 
     override fun onDeleted(
         context: Context,
-        appWidgetIds: IntArray
+        appWidgetIds: IntArray,
     ) {
         appCoroutineScope.launch(dispatchers.io()) {
             appWidgetIds.forEach {
@@ -133,7 +134,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int,
-        newOptions: Bundle?
+        newOptions: Bundle?,
     ) {
         val widgetTheme = withContext(dispatchers.io()) {
             widgetPrefs.widgetTheme(appWidgetId)
@@ -165,7 +166,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
 
     private fun getLayoutThemed(
         numColumns: Int,
-        theme: WidgetTheme
+        theme: WidgetTheme,
     ): Int {
         // numcolumns method is not available for remoteViews. We rely on different xml to use different values on that attribute
         return when (theme) {
@@ -205,7 +206,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     private fun getCurrentWidgetSize(
         context: Context,
         appWidgetOptions: Bundle,
-        newOptions: Bundle?
+        newOptions: Bundle?,
     ): Pair<Int, Int> {
         var portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
         var landsWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
@@ -242,7 +243,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         context: Context,
         appWidgetId: Int,
         remoteViews: RemoteViews,
-        widgetTheme: WidgetTheme
+        widgetTheme: WidgetTheme,
     ) {
         val favoriteItemClickIntent = Intent(context, BrowserActivity::class.java)
         val pendingIntentFlags = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
@@ -263,7 +264,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         context: Context,
         appWidgetId: Int,
         remoteViews: RemoteViews,
-        widgetTheme: WidgetTheme
+        widgetTheme: WidgetTheme,
     ) {
         remoteViews.setOnClickPendingIntent(R.id.emptyGridViewContainer, buildOnboardingPendingIntent(context, appWidgetId))
 
@@ -285,7 +286,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
 
     private fun buildOnboardingPendingIntent(
         context: Context,
-        appWidgetId: Int
+        appWidgetId: Int,
     ): PendingIntent {
         val intent = BrowserActivity.intent(context, newSearch = true)
         intent.putExtra(FAVORITES_ONBOARDING_EXTRA, true)

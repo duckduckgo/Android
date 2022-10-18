@@ -34,7 +34,7 @@ interface NavigationAwareLoginDetector {
 
 data class LoginDetected(
     val authLoginDomain: String,
-    val forwardedToDomain: String
+    val forwardedToDomain: String,
 )
 
 sealed class NavigationEvent {
@@ -55,7 +55,7 @@ sealed class NavigationEvent {
 class NextPageLoginDetection constructor(
     private val settingsDataStore: SettingsDataStore,
     private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : NavigationAwareLoginDetector {
 
     override val loginEventLiveData = MutableLiveData<LoginDetected>()
@@ -211,7 +211,7 @@ class NextPageLoginDetection constructor(
         data class TwoFactorAuthFlow(val loginDomain: String) : LoginResult()
         data class LoginDetected(
             val authLoginDomain: String,
-            val forwardedToDomain: String
+            val forwardedToDomain: String,
         ) : LoginResult()
 
         object Unknown : LoginResult()

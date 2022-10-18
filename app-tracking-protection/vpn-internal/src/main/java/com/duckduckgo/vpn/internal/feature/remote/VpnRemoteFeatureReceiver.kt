@@ -54,7 +54,7 @@ private const val TYPE = "type"
 
 class VpnRemoteFeatureReceiver(
     context: Context,
-    receiver: (Intent) -> Unit
+    receiver: (Intent) -> Unit,
 ) : InternalFeatureReceiver(context, receiver) {
 
     override fun intentAction(): String = REMOTE_FEATURE
@@ -93,7 +93,7 @@ class VpnRemoteFeatureReceiver(
 class VpnRemoteFeatureReceiverRegister @Inject constructor(
     private val context: Context,
     private val appTpFeatureConfig: AppTpFeatureConfig,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
 
     private var receiver: VpnRemoteFeatureReceiver? = null
@@ -139,7 +139,7 @@ class VpnRemoteFeatureReceiverRegister @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         receiver?.unregister()
     }

@@ -33,7 +33,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
     private val context: Context,
-    private val pixel: Pixel
+    private val pixel: Pixel,
 ) : AppTrackingProtectionWaitlistDataStore {
 
     private val encryptedPreferences: SharedPreferences? by lazy {
@@ -50,7 +50,7 @@ class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                     .build(),
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
             )
         } catch (e: IOException) {
             pixel.enqueueFire(DeviceShieldPixelNames.ATP_ENCRYPTED_IO_EXCEPTION)

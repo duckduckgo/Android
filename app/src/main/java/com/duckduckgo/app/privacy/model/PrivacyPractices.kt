@@ -28,14 +28,14 @@ interface PrivacyPractices : DataLoadable {
         POOR,
         GOOD,
         MIXED,
-        UNKNOWN
+        UNKNOWN,
     }
 
     data class Practices(
         val score: Int,
         val summary: Summary,
         val goodReasons: List<String>,
-        val badReasons: List<String>
+        val badReasons: List<String>,
     )
 
     fun privacyPracticesFor(url: String): Practices
@@ -48,7 +48,7 @@ interface PrivacyPractices : DataLoadable {
 
 class PrivacyPracticesImpl @Inject constructor(
     private val termsOfServiceStore: TermsOfServiceStore,
-    private val entityLookup: EntityLookup
+    private val entityLookup: EntityLookup,
 ) : PrivacyPractices {
 
     private var entityScores: Map<String, Int> = mapOf()

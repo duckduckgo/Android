@@ -32,7 +32,7 @@ inline fun <reified T : ViewBinding> Fragment.viewBinding() =
 
 class FragmentViewBindingDelegate<T : ViewBinding>(
     bindingClass: Class<T>,
-    fragment: Fragment
+    fragment: Fragment,
 ) : ReadOnlyProperty<Fragment, T> {
 
     // LazyThreadSafetyMode.NONE because it will never be initialised from ore than one thread
@@ -50,14 +50,14 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
                         nullifyBindingHandler.post { binding = null }
                         super.onDestroy(owner)
                     }
-                }
+                },
             )
         }
     }
 
     override fun getValue(
         thisRef: Fragment,
-        property: KProperty<*>
+        property: KProperty<*>,
     ): T {
         // onCreateView maybe be called between the onDestroyView and the next Main thread run-loop.
         // Because nullifyBindingHandler has to post to null the binding, it may happen that

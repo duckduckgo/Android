@@ -75,7 +75,7 @@ class ClearPersonalDataActionTest {
             mockThirdPartyCookieManager,
             mockAdClickManager,
             mockFireproofWebsiteRepository,
-            mockSitePermissionsManager
+            mockSitePermissionsManager,
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
     }

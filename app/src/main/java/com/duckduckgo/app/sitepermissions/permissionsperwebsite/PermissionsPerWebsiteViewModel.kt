@@ -49,7 +49,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository,
     private val locationPermissionsRepository: LocationPermissionsRepository,
     private val settingsDataStore: SettingsDataStore,
-    private val pixel: Pixel
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -59,7 +59,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     data class ViewState(
-        val websitePermissions: List<WebsitePermissionSetting> = listOf()
+        val websitePermissions: List<WebsitePermissionSetting> = listOf(),
     )
 
     sealed class Command {
@@ -79,7 +79,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
 
     private fun convertToWebsitePermissionSettings(
         sitePermissionsEntity: SitePermissionsEntity?,
-        locationPermissionEntity: LocationPermissionEntity?
+        locationPermissionEntity: LocationPermissionEntity?,
     ): List<WebsitePermissionSetting> {
         val locationSetting = when (settingsDataStore.appLocationPermission) {
             true -> WebsitePermissionSettingType.mapToWebsitePermissionSetting(locationPermissionEntity?.permission?.name)
@@ -100,24 +100,24 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
     private fun getSettingsList(
         locationSetting: WebsitePermissionSettingType,
         cameraSetting: WebsitePermissionSettingType,
-        micSetting: WebsitePermissionSettingType
+        micSetting: WebsitePermissionSettingType,
     ): List<WebsitePermissionSetting> {
         return listOf(
             WebsitePermissionSetting(
                 R.drawable.ic_location,
                 R.string.sitePermissionsSettingsLocation,
-                locationSetting
+                locationSetting,
             ),
             WebsitePermissionSetting(
                 R.drawable.ic_camera,
                 R.string.sitePermissionsSettingsCamera,
-                cameraSetting
+                cameraSetting,
             ),
             WebsitePermissionSetting(
                 R.drawable.ic_microphone,
                 R.string.sitePermissionsSettingsMicrophone,
-                micSetting
-            )
+                micSetting,
+            ),
         )
     }
 
@@ -179,19 +179,19 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
         }
         pixel.fire(
             SitePermissionsPixelName.SITE_PERMISSIONS_SETTING_CHANGED,
-            mapOf(PixelParameter.SITE_PERMISSION to permissionParamValue, PixelParameter.VALUE to permissionChangedValue)
+            mapOf(PixelParameter.SITE_PERMISSION to permissionParamValue, PixelParameter.VALUE to permissionChangedValue),
         )
     }
 
     private fun updateSitePermissionsSetting(
         askCameraSetting: WebsitePermissionSettingType,
         askMicSetting: WebsitePermissionSettingType,
-        url: String
+        url: String,
     ) {
         val sitePermissionsEntity = SitePermissionsEntity(
             domain = url,
             askCameraSetting = askCameraSetting.toSitePermissionSettingEntityType().name,
-            askMicSetting = askMicSetting.toSitePermissionSettingEntityType().name
+            askMicSetting = askMicSetting.toSitePermissionSettingEntityType().name,
         )
         viewModelScope.launch {
             sitePermissionsRepository.savePermission(sitePermissionsEntity)

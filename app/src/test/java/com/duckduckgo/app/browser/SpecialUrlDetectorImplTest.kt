@@ -69,7 +69,7 @@ class SpecialUrlDetectorImplTest {
             packageManager = mockPackageManager,
             ampLinks = mockAmpLinks,
             trackingParameters = mockTrackingParameters,
-            appBuildConfig = appBuildConfig
+            appBuildConfig = appBuildConfig,
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
     }
@@ -121,13 +121,13 @@ class SpecialUrlDetectorImplTest {
                 listOf(
                     buildAppResolveInfo(),
                     buildBrowserResolveInfo(),
-                    ResolveInfo()
-                )
+                    ResolveInfo(),
+                ),
             )
             val type = testee.determineType("https://example.com")
             verify(mockPackageManager).queryIntentActivities(
                 argThat { hasCategory(Intent.CATEGORY_BROWSABLE) },
-                eq(PackageManager.GET_RESOLVED_FILTER)
+                eq(PackageManager.GET_RESOLVED_FILTER),
             )
             assertTrue(type is AppLink)
             val appLinkType = type as AppLink
@@ -146,13 +146,13 @@ class SpecialUrlDetectorImplTest {
                     buildAppResolveInfo(),
                     buildAppResolveInfo(),
                     buildBrowserResolveInfo(),
-                    ResolveInfo()
-                )
+                    ResolveInfo(),
+                ),
             )
             val type = testee.determineType("https://example.com")
             verify(mockPackageManager).queryIntentActivities(
                 argThat { hasCategory(Intent.CATEGORY_BROWSABLE) },
-                eq(PackageManager.GET_RESOLVED_FILTER)
+                eq(PackageManager.GET_RESOLVED_FILTER),
             )
             assertTrue(type is AppLink)
             val appLinkType = type as AppLink

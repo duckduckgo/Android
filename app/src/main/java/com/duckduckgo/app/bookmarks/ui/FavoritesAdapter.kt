@@ -43,7 +43,7 @@ class FavoritesAdapter(
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : RecyclerView.Adapter<FavoritesScreenViewHolders>() {
 
     companion object {
@@ -73,7 +73,7 @@ class FavoritesAdapter(
     }
 
     fun setItems(
-        favoriteItems: List<FavoriteItem>
+        favoriteItems: List<FavoriteItem>,
     ) {
         val generatedList = generateNewList(favoriteItems)
         val diffCallback = DiffCallback(old = this.favoriteItems, new = generatedList)
@@ -98,7 +98,7 @@ class FavoritesAdapter(
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): FavoritesScreenViewHolders {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -109,7 +109,7 @@ class FavoritesAdapter(
                     binding,
                     viewModel,
                     lifecycleOwner,
-                    faviconManager
+                    faviconManager,
                 )
             }
             FAVORITE_SECTION_TITLE_TYPE -> {
@@ -130,7 +130,7 @@ class FavoritesAdapter(
 
     override fun onBindViewHolder(
         holder: FavoritesScreenViewHolders,
-        position: Int
+        position: Int,
     ) {
         when (holder) {
             is FavoritesScreenViewHolders.FavoriteViewHolder -> {
@@ -161,7 +161,7 @@ class FavoritesAdapter(
 
     class DiffCallback(
         private val old: List<FavoriteItemTypes>,
-        private val new: List<FavoriteItemTypes>
+        private val new: List<FavoriteItemTypes>,
     ) : DiffUtil.Callback() {
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
@@ -201,7 +201,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
         private val binding: ViewSavedSiteEntryBinding,
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
-        private val faviconManager: FaviconManager
+        private val faviconManager: FaviconManager,
     ) : FavoritesScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
@@ -214,8 +214,8 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
             listItem.setLeadingIconContentDescription(
                 context.getString(
                     R.string.bookmarkOverflowContentDescription,
-                    favorite.title
-                )
+                    favorite.title,
+                ),
             )
 
             listItem.setPrimaryText(favorite.title)
@@ -246,7 +246,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
 
         private fun showOverFlowMenu(
             anchor: View,
-            favorite: Favorite
+            favorite: Favorite,
         ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView

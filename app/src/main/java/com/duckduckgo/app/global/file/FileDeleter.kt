@@ -30,7 +30,7 @@ interface FileDeleter {
      */
     suspend fun deleteContents(
         parentDirectory: File,
-        excludedFiles: List<String> = emptyList()
+        excludedFiles: List<String> = emptyList(),
     )
 
     /**
@@ -43,14 +43,14 @@ interface FileDeleter {
      */
     suspend fun deleteFilesFromDirectory(
         parentDirectory: File,
-        files: List<String>
+        files: List<String>,
     )
 }
 
 class AndroidFileDeleter : FileDeleter {
     override suspend fun deleteContents(
         parentDirectory: File,
-        excludedFiles: List<String>
+        excludedFiles: List<String>,
     ) {
         withContext(Dispatchers.IO) {
             val files = parentDirectory.listFiles() ?: return@withContext
@@ -67,7 +67,7 @@ class AndroidFileDeleter : FileDeleter {
 
     override suspend fun deleteFilesFromDirectory(
         parentDirectory: File,
-        files: List<String>
+        files: List<String>,
     ) {
         withContext(Dispatchers.IO) {
             val allFiles = parentDirectory.listFiles() ?: return@withContext

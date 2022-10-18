@@ -41,7 +41,7 @@ import retrofit2.Retrofit
 @Module
 @ContributesTo(
     scope = AppScope::class,
-    replaces = [StatisticsModule::class]
+    replaces = [StatisticsModule::class],
 )
 class StubStatisticsModule {
 
@@ -71,28 +71,28 @@ class StubStatisticsModule {
             override fun fire(
                 pixel: Pixel.PixelName,
                 parameters: Map<String, String>,
-                encodedParameters: Map<String, String>
+                encodedParameters: Map<String, String>,
             ) {
             }
 
             override fun fire(
                 pixelName: String,
                 parameters: Map<String, String>,
-                encodedParameters: Map<String, String>
+                encodedParameters: Map<String, String>,
             ) {
             }
 
             override fun enqueueFire(
                 pixel: Pixel.PixelName,
                 parameters: Map<String, String>,
-                encodedParameters: Map<String, String>
+                encodedParameters: Map<String, String>,
             ) {
             }
 
             override fun enqueueFire(
                 pixelName: String,
                 parameters: Map<String, String>,
-                encodedParameters: Map<String, String>
+                encodedParameters: Map<String, String>,
             ) {
             }
         }
@@ -108,7 +108,7 @@ class StubStatisticsModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
-        listeners: DaggerSet<AtbInitializerListener>
+        listeners: DaggerSet<AtbInitializerListener>,
     ): LifecycleObserver {
         return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
     }
@@ -119,7 +119,7 @@ class StubStatisticsModule {
             override fun sendPixel(
                 pixelName: String,
                 parameters: Map<String, String>,
-                encodedParameters: Map<String, String>
+                encodedParameters: Map<String, String>,
             ): Completable {
                 return Completable.fromAction {}
             }
@@ -127,7 +127,7 @@ class StubStatisticsModule {
             override fun enqueuePixel(
                 pixelName: String,
                 parameters: Map<String, String>,
-                encodedParameters: Map<String, String>
+                encodedParameters: Map<String, String>,
             ): Completable {
                 return Completable.fromAction {}
             }

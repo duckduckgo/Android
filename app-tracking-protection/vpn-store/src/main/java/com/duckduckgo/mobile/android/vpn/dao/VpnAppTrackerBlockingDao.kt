@@ -61,7 +61,7 @@ interface VpnAppTrackerBlockingDao {
         blocklist: List<AppTracker>,
         appPackages: List<AppTrackerPackage>,
         metadata: AppTrackerMetadata,
-        entities: List<AppTrackerEntity>
+        entities: List<AppTrackerEntity>,
     ) {
         setTrackerBlocklistMetadata(metadata)
 
@@ -99,7 +99,7 @@ interface VpnAppTrackerBlockingDao {
     @Transaction
     fun updateExclusionList(
         exclusionList: List<AppTrackerExcludedPackage>,
-        metadata: AppTrackerExclusionListMetadata
+        metadata: AppTrackerExclusionListMetadata,
     ) {
         setExclusionListMetadata(metadata)
         deleteExclusionList()
@@ -130,7 +130,7 @@ interface VpnAppTrackerBlockingDao {
     @Transaction
     fun updateTrackerExceptionRules(
         exceptionRules: List<AppTrackerExceptionRule>,
-        metadata: AppTrackerExceptionRuleMetadata
+        metadata: AppTrackerExceptionRuleMetadata,
     ) {
         setTrackerExceptionRulesMetadata(metadata)
         deleteTrackerExceptionRules()

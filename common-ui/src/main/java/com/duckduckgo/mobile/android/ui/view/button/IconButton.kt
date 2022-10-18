@@ -26,7 +26,7 @@ class IconButton
 constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.style.Widget_DuckDuckGo_IconButton
+    defStyleAttr: Int = R.style.Widget_DuckDuckGo_IconButton,
 ) : AppCompatImageButton(context, attrs, defStyleAttr) {
 
     init {
@@ -35,12 +35,12 @@ constructor(
                 attrs,
                 R.styleable.IconButton,
                 0,
-                R.style.Widget_DuckDuckGo_IconButton
+                R.style.Widget_DuckDuckGo_IconButton,
             )
 
         val resourceId = typedArray.getResourceId(
             R.styleable.IconButton_srcCompat,
-            R.drawable.ic_union
+            R.drawable.ic_union,
         )
 
         setImageResource(resourceId)

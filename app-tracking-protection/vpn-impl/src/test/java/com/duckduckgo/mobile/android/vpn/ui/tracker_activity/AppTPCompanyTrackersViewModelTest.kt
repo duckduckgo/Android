@@ -58,7 +58,7 @@ class AppTPCompanyTrackersViewModelTest {
             appsRepository,
             timeDiffFormatter,
             deviceShieldPixels,
-            CoroutineTestRule().testDispatcherProvider
+            CoroutineTestRule().testDispatcherProvider,
         )
     }
 
@@ -98,10 +98,10 @@ class AppTPCompanyTrackersViewModelTest {
                     timestamp = timestamp,
                     company = "",
                     companyDisplayName = "",
-                    trackingApp = defaultTrackingApp
+                    trackingApp = defaultTrackingApp,
                 ),
-                AppTrackerEntity(trackerCompanyId, "Google", 100, listOf("unique_identifier"))
-            )
+                AppTrackerEntity(trackerCompanyId, "Google", 100, listOf("unique_identifier")),
+            ),
         )
     }
 }

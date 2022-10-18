@@ -28,7 +28,7 @@ import okhttp3.Response
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class
+    boundType = PixelInterceptorPlugin::class,
 )
 class PixelAdClickAttributionRemovalInterceptor @Inject constructor() : Interceptor, PixelInterceptorPlugin {
 
@@ -67,12 +67,12 @@ class PixelAdClickAttributionRemovalInterceptor @Inject constructor() : Intercep
         @VisibleForTesting
         internal val PIXELS_SET_NO_ATB = setOf(
             AdClickPixelName.AD_CLICK_DETECTED.pixelName,
-            AdClickPixelName.AD_CLICK_ACTIVE.pixelName
+            AdClickPixelName.AD_CLICK_ACTIVE.pixelName,
         )
 
         @VisibleForTesting
         internal val PIXELS_SET_NO_ATB_AND_VERSION = setOf(
-            AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION.pixelName
+            AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION.pixelName,
         )
     }
 }

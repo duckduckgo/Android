@@ -274,7 +274,7 @@ class CtaTest {
         val trackers = listOf(
             TestingEntity("Facebook", "Facebook", 9.0),
             TestingEntity("Other", "Other", 9.0),
-            TestingEntity("Amazon", "Amazon", 9.0)
+            TestingEntity("Amazon", "Amazon", 9.0),
         )
 
         val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
@@ -287,7 +287,7 @@ class CtaTest {
     fun whenTwoTrackersBlockedReturnThemWithZeroString() {
         val trackers = listOf(
             TestingEntity("Facebook", "Facebook", 9.0),
-            TestingEntity("Other", "Other", 9.0)
+            TestingEntity("Other", "Other", 9.0),
         )
 
         val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
@@ -306,7 +306,7 @@ class CtaTest {
                 type = TrackerType.OTHER,
                 entity = TestingEntity("Facebook", "Facebook", 3.0),
                 categories = null,
-                surrogateId = null
+                surrogateId = null,
             ),
             TrackingEvent(
                 documentUrl = "other.com",
@@ -315,8 +315,8 @@ class CtaTest {
                 type = TrackerType.OTHER,
                 entity = TestingEntity("Other", "Other", 9.0),
                 categories = null,
-                surrogateId = null
-            )
+                surrogateId = null,
+            ),
         )
         val site = site(events = trackers)
 
@@ -337,7 +337,7 @@ class CtaTest {
                 type = TrackerType.OTHER,
                 entity = TestingEntity("Facebook", "Facebook", 3.0),
                 categories = null,
-                surrogateId = null
+                surrogateId = null,
             ),
             TrackingEvent(
                 documentUrl = "other.com",
@@ -346,8 +346,8 @@ class CtaTest {
                 type = TrackerType.OTHER,
                 entity = TestingEntity("Other", "", 9.0),
                 categories = null,
-                surrogateId = null
-            )
+                surrogateId = null,
+            ),
         )
         val site = site(events = trackers)
 
@@ -355,7 +355,7 @@ class CtaTest {
             mockOnboardingStore,
             mockAppInstallStore,
             site.orderedTrackingEntities(),
-            "http://www.trackers.com"
+            "http://www.trackers.com",
         )
         val value = testee.getDaxText(mockActivity)
 
@@ -372,7 +372,7 @@ class CtaTest {
                 type = TrackerType.OTHER,
                 entity = TestingEntity("Facebook", "Facebook", 3.0),
                 categories = null,
-                surrogateId = null
+                surrogateId = null,
             ),
             TrackingEvent(
                 documentUrl = "other.com",
@@ -381,8 +381,8 @@ class CtaTest {
                 type = TrackerType.OTHER,
                 entity = TestingEntity("Other", "Other", 9.0),
                 categories = null,
-                surrogateId = null
-            )
+                surrogateId = null,
+            ),
         )
         val site = site(events = trackers)
 
@@ -390,7 +390,7 @@ class CtaTest {
             mockOnboardingStore,
             mockAppInstallStore,
             site.orderedTrackingEntities(),
-            "http://www.trackers.com"
+            "http://www.trackers.com",
         )
         val value = testee.getDaxText(mockActivity)
 
@@ -402,7 +402,7 @@ class CtaTest {
         val trackers = listOf(
             TestingEntity("Facebook", "Facebook", 9.0),
             TestingEntity("Facebook", "Facebook", 9.0),
-            TestingEntity("Facebook", "Facebook", 9.0)
+            TestingEntity("Facebook", "Facebook", 9.0),
         )
 
         val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
@@ -435,7 +435,7 @@ class CtaTest {
         privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN,
         entity: Entity? = null,
         grade: PrivacyGrade = PrivacyGrade.UNKNOWN,
-        improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN
+        improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN,
     ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)

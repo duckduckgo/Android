@@ -63,7 +63,7 @@ class StackedAlertDialog(val builder: Builder) : DialogFragment() {
 
         val buttonParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+            LinearLayout.LayoutParams.WRAP_CONTENT,
         )
 
         builder.stackedButtonList.forEachIndexed { index, text ->
@@ -81,7 +81,7 @@ class StackedAlertDialog(val builder: Builder) : DialogFragment() {
 
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
-            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog
+            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog,
         )
             .setView(binding.root)
 
@@ -109,35 +109,35 @@ class StackedAlertDialog(val builder: Builder) : DialogFragment() {
         var stackedButtonList: MutableList<CharSequence> = mutableListOf()
 
         fun setHeaderImageResource(
-            @DrawableRes drawableId: Int
+            @DrawableRes drawableId: Int,
         ): Builder {
             headerImageDrawableId = drawableId
             return this
         }
 
         fun setTitle(
-            @StringRes textId: Int
+            @StringRes textId: Int,
         ): Builder {
             titleText = context.getText(textId)
             return this
         }
 
         fun setTitle(
-            text: CharSequence
+            text: CharSequence,
         ): Builder {
             titleText = text
             return this
         }
 
         fun setMessage(
-            @StringRes textId: Int
+            @StringRes textId: Int,
         ): Builder {
             messageText = context.getText(textId)
             return this
         }
 
         fun setMessage(
-            text: CharSequence
+            text: CharSequence,
         ): Builder {
             messageText = text
             return this

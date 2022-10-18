@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.map
 class VpnControllerViewModel @Inject constructor(
     private val appTrackerBlockedRepository: AppTrackerBlockingStatsRepository,
     private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : ViewModel() {
 
     fun getRunningTimeUpdates(startTime: () -> String): LiveData<VpnRunningStatus> {
@@ -67,7 +67,7 @@ class VpnControllerViewModel @Inject constructor(
 
     data class VpnRunningStatus(
         val runningTimeMillis: Long,
-        val isRunning: Boolean
+        val isRunning: Boolean,
     )
 
     data class AppTrackersBlocked(val trackerList: List<VpnTracker>) {

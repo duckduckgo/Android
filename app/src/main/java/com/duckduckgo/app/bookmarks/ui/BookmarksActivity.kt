@@ -112,7 +112,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -152,7 +152,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private fun observeViewModel(parentId: Long) {
         viewModel.viewState.observe(
-            this
+            this,
         ) { viewState ->
             viewState?.let { state ->
                 if (parentId == ROOT_FOLDER_ID) {
@@ -165,7 +165,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         }
 
         viewModel.command.observe(
-            this
+            this,
         ) {
             when (it) {
                 is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> confirmDeleteSavedSite(it.savedSite)
@@ -214,7 +214,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         Snackbar.make(
             binding.root,
             message,
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).show()
     }
 
@@ -233,9 +233,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 startActivityForResult(
                     Intent.createChooser(
                         intent,
-                        getString(R.string.importBookmarksFileTitle)
+                        getString(R.string.importBookmarksFileTitle),
                     ),
-                    IMPORT_BOOKMARKS_REQUEST_CODE
+                    IMPORT_BOOKMARKS_REQUEST_CODE,
                 )
             }
             R.id.bookmark_export -> {
@@ -320,7 +320,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         Snackbar.make(
             binding.root,
             message,
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.insert(savedSite)
         }.show()
@@ -328,13 +328,13 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private fun confirmDeleteBookmarkFolder(
         bookmarkFolder: BookmarkFolder,
-        folderBranch: BookmarkFolderBranch
+        folderBranch: BookmarkFolderBranch,
     ) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
         Snackbar.make(
             binding.root,
             message,
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.insertDeletedFolderBranch(folderBranch)
         }.show()
@@ -384,7 +384,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     companion object {
         fun intent(
             context: Context,
-            bookmarkFolder: BookmarkFolder? = null
+            bookmarkFolder: BookmarkFolder? = null,
         ): Intent {
             val intent = Intent(context, BookmarksActivity::class.java)
             bookmarkFolder?.let {

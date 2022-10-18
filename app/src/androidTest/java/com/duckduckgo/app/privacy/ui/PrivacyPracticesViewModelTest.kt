@@ -100,7 +100,7 @@ class PrivacyPracticesViewModelTest {
 
     private fun site(
         url: String = "",
-        privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN
+        privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN,
     ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)

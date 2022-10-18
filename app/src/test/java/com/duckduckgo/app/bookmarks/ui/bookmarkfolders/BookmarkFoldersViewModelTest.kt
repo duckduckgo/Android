@@ -61,7 +61,7 @@ class BookmarkFoldersViewModelTest {
 
     private val folderStructure = mutableListOf(
         BookmarkFolderItem(1, BookmarkFolder(1, "folder", 0), true),
-        BookmarkFolderItem(1, BookmarkFolder(2, "a folder", 0), false)
+        BookmarkFolderItem(1, BookmarkFolder(2, "a folder", 0), false),
     )
 
     private val testee: BookmarkFoldersViewModel by lazy {

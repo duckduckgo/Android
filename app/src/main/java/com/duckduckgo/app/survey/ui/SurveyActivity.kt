@@ -145,7 +145,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            survey: Survey
+            survey: Survey,
         ): Intent {
             val intent = Intent(context, SurveyActivity::class.java)
             intent.putExtra(SURVEY_EXTRA, survey)
@@ -159,7 +159,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
         override fun onPageFinished(
             view: WebView?,
-            url: String?
+            url: String?,
         ) {
             super.onPageFinished(view, url)
             viewModel.onSurveyLoaded()
@@ -167,7 +167,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
         override fun shouldInterceptRequest(
             view: WebView,
-            request: WebResourceRequest
+            request: WebResourceRequest,
         ): WebResourceResponse? {
             if (request.url.host == "duckduckgo.com") {
                 runOnUiThread {
@@ -182,7 +182,7 @@ class SurveyActivity : DuckDuckGoActivity() {
             view: WebView,
             errorCode: Int,
             description: String,
-            failingUrl: String
+            failingUrl: String,
         ) {
             viewModel.onSurveyFailedToLoad()
         }
@@ -190,7 +190,7 @@ class SurveyActivity : DuckDuckGoActivity() {
         override fun onReceivedError(
             view: WebView,
             request: WebResourceRequest,
-            error: WebResourceError
+            error: WebResourceError,
         ) {
             if (request.isForMainFrame) {
                 viewModel.onSurveyFailedToLoad()
@@ -199,7 +199,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
         override fun onRenderProcessGone(
             view: WebView?,
-            detail: RenderProcessGoneDetail?
+            detail: RenderProcessGoneDetail?,
         ): Boolean {
             viewModel.onSurveyFailedToLoad()
             return true

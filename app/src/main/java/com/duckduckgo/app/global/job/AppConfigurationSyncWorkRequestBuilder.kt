@@ -46,7 +46,7 @@ class AppConfigurationSyncWorkRequestBuilder @Inject constructor() {
 @ContributesWorker(AppScope::class)
 class AppConfigurationWorker(
     context: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : RxWorker(context, workerParams) {
 
     @Inject

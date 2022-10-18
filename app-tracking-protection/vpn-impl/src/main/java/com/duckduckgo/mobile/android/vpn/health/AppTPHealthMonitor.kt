@@ -76,7 +76,7 @@ class AppTPHealthMonitor @Inject constructor(
     private val healthMetricCounter: HealthMetricCounter,
     private val healthClassifier: HealthClassifier,
     private val callbacks: PluginPoint<AppHealthCallback>,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : AppHealthMonitor {
 
     companion object {
@@ -114,12 +114,12 @@ class AppTPHealthMonitor @Inject constructor(
     private val tunWriteExceptionAlerts = object : HealthRule("tunWriteIOExceptions") {}.also { healthRules.add(it) }
     private val tunReadExceptionAlerts = object : HealthRule(
         "tunReadIOExceptions",
-        samplesToWaitBeforeAlerting = TUN_READ_IO_SAMPLES
+        samplesToWaitBeforeAlerting = TUN_READ_IO_SAMPLES,
     ) {}.also { healthRules.add(it) }
     private val tunWriteIOMemoryExceptionsAlerts = object : HealthRule("tunWriteIOMemoryExceptions") {}.also { healthRules.add(it) }
     private val noNetworkConnectivityAlert = object : HealthRule(
         "noNetworkConnectivityAlert",
-        samplesToWaitBeforeAlerting = NO_NETWORK_CONNECTIVITY_SAMPLES
+        samplesToWaitBeforeAlerting = NO_NETWORK_CONNECTIVITY_SAMPLES,
     ) {}.also { healthRules.add(it) }
 
     // these alerts below will never trigger and are informational
@@ -176,7 +176,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private fun sampleTunReadQueueReadRate(
         timeWindow: Long,
-        healthAlerts: HealthRule
+        healthAlerts: HealthRule,
     ): HealthState {
         val tunReads = healthMetricCounter.getStat(TUN_READ(), timeWindow)
         val unknownPackets = healthMetricCounter.getStat(TUN_READ_UNKNOWN_PACKET(), timeWindow)
@@ -190,9 +190,9 @@ class AppTPHealthMonitor @Inject constructor(
                 queueReads = readFromNetworkQueue,
                 queueTCPReads = readFromTCPNetworkQueue,
                 queueUDPReads = readFromUDPNetworkQueue,
-                unknownPackets = unknownPackets
+                unknownPackets = unknownPackets,
             ),
-            healthAlerts.name
+            healthAlerts.name,
         )
         healthAlerts.updateAlert(state)
         return state
@@ -200,7 +200,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private fun sampleVpnConnectivityEvents(
         timeWindow: Long,
-        healthAlerts: HealthRule
+        healthAlerts: HealthRule,
     ): HealthState {
         val noConnectivityStats = healthMetricCounter.getStat(NO_VPN_CONNECTIVITY(), timeWindow)
         val state = healthClassifier.determineHealthVpnConnectivity(noConnectivityStats, healthAlerts.name)
@@ -210,7 +210,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private fun sampleSocketReadExceptions(
         timeWindow: Long,
-        healthAlerts: HealthRule
+        healthAlerts: HealthRule,
     ): HealthState {
         val readExceptions = healthMetricCounter.getStat(SOCKET_CHANNEL_READ_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthSocketChannelReadExceptions(readExceptions, healthAlerts.name)
@@ -220,7 +220,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private fun sampleSocketWriteExceptions(
         timeWindow: Long,
-        healthAlerts: HealthRule
+        healthAlerts: HealthRule,
     ): HealthState {
         val writeExceptions = healthMetricCounter.getStat(SOCKET_CHANNEL_WRITE_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthSocketChannelWriteExceptions(writeExceptions, healthAlerts.name)
@@ -230,7 +230,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private fun sampleSocketConnectExceptions(
         timeWindow: Long,
-        healthAlerts: HealthRule
+        healthAlerts: HealthRule,
     ): HealthState {
         val connectExceptions = healthMetricCounter.getStat(SOCKET_CHANNEL_CONNECT_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthSocketChannelConnectExceptions(connectExceptions, healthAlerts.name)
@@ -240,7 +240,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private fun sampleTunWriteExceptions(
         timeWindow: Long,
-        healthAlerts: HealthRule
+        healthAlerts: HealthRule,
     ): HealthState {
         val numberExceptions = healthMetricCounter.getStat(TUN_WRITE_IO_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthTunWriteExceptions(numberExceptions, healthAlerts.name)
@@ -250,7 +250,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private fun sampleTunReadExceptions(
         timeWindow: Long,
-        healthAlerts: HealthRule
+        healthAlerts: HealthRule,
     ): HealthState {
         val numberExceptions = healthMetricCounter.getStat(TUN_READ_IO_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthTunReadExceptions(numberExceptions, healthAlerts.name)
@@ -260,7 +260,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private fun sampleTunWriteNoMemoryExceptions(
         timeWindow: Long,
-        healthAlerts: HealthRule
+        healthAlerts: HealthRule,
     ): HealthState {
         val numberExceptions = healthMetricCounter.getStat(TUN_WRITE_IO_MEMORY_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthTunWriteMemoryExceptions(numberExceptions, healthAlerts.name)
@@ -270,7 +270,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private fun sampleBufferAllocations(
         timeWindow: Long,
-        healthAlerts: HealthRule
+        healthAlerts: HealthRule,
     ): HealthState {
         val allocations = ByteBufferPool.allocations.get()
         val state = healthClassifier.determineHealthBufferAllocations(allocations)
@@ -280,7 +280,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private fun sampleIpPackets(
         timeWindow: Long,
-        healthAlerts: HealthRule
+        healthAlerts: HealthRule,
     ): HealthState {
         val ipv4PacketCount = healthMetricCounter.getStat(TUN_READ_IPV4_PACKET(), timeWindow)
         val ipv6PacketCount = healthMetricCounter.getStat(TUN_READ_IPV6_PACKET(), timeWindow)
@@ -397,7 +397,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private abstract class HealthRule(
         open val name: String,
-        open var samplesToWaitBeforeAlerting: Int = DEFAULT_ALERT_SAMPLES
+        open var samplesToWaitBeforeAlerting: Int = DEFAULT_ALERT_SAMPLES,
     ) {
         var badHealthSampleCount: Int = 0
 

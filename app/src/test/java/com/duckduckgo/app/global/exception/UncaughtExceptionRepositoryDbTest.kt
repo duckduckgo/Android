@@ -84,18 +84,18 @@ class UncaughtExceptionRepositoryDbTest {
                 entity.copy(
                     message = "different message",
                     exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW,
-                    timestamp = 1500
-                )
-            )
+                    timestamp = 1500,
+                ),
+            ),
         )
         assertTrue(
             testee.isNotDuplicate(
                 entity.copy(
                     version = "different version",
                     exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW,
-                    timestamp = 1500
-                )
-            )
+                    timestamp = 1500,
+                ),
+            ),
         )
 
         assertTrue(
@@ -104,9 +104,9 @@ class UncaughtExceptionRepositoryDbTest {
                     message = "different message",
                     version = "different version",
                     exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW,
-                    timestamp = 1500
-                )
-            )
+                    timestamp = 1500,
+                ),
+            ),
         )
     }
 }

@@ -76,7 +76,7 @@ class GeoLocationPermissionsTest {
             InstrumentationRegistry.getInstrumentation().targetContext,
             LocationPermissionsRepository(locationPermissionsDao, lazyFaviconManager, coroutineRule.testDispatcherProvider),
             FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -159,7 +159,7 @@ class GeoLocationPermissionsTest {
 
     private fun givenLocationPermissionsDomain(
         domain: String,
-        permissionType: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS
+        permissionType: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS,
     ) {
         locationPermissionsDao.insert(LocationPermissionEntity(domain = domain, permission = permissionType))
     }

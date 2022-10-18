@@ -27,7 +27,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealVpnDetector @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : VpnDetector {
 
     override fun isVpnDetected(): Boolean {

@@ -60,7 +60,7 @@ class DeviceShieldActivityFeedViewModelTest {
         viewModel = DeviceShieldActivityFeedViewModel(
             RealAppTrackerBlockingStatsRepository(db),
             CoroutineTestRule().testDispatcherProvider,
-            RealTimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext)
+            RealTimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext),
         )
     }
 
@@ -103,25 +103,25 @@ class DeviceShieldActivityFeedViewModelTest {
                         trackingApp = dummyTrackers[0].trackingApp,
                         trackingCompanyBadges = listOf(
                             TrackerCompanyBadge.Company(dummyTrackers[0].company, dummyTrackers[0].companyDisplayName),
-                            TrackerCompanyBadge.Company(dummyTrackers[1].company, dummyTrackers[1].companyDisplayName)
+                            TrackerCompanyBadge.Company(dummyTrackers[1].company, dummyTrackers[1].companyDisplayName),
                         ),
                         timestamp = TEST_TIMESTAMP,
                         displayTimestamp = "Just Now",
-                        trackersTotalCount = 2
+                        trackersTotalCount = 2,
                     ),
                     TrackerFeedItem.TrackerFeedData(
                         id = dummyTrackers[2].id(),
                         bucket = dummyTrackers[2].bucket(),
                         trackingApp = dummyTrackers[2].trackingApp,
                         trackingCompanyBadges = listOf(
-                            TrackerCompanyBadge.Company(dummyTrackers[2].company, dummyTrackers[2].companyDisplayName)
+                            TrackerCompanyBadge.Company(dummyTrackers[2].company, dummyTrackers[2].companyDisplayName),
                         ),
                         timestamp = TEST_TIMESTAMP,
                         displayTimestamp = "Just Now",
-                        trackersTotalCount = 1
-                    )
+                        trackersTotalCount = 1,
+                    ),
                 ),
-                awaitItem()
+                awaitItem(),
             )
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
@@ -162,20 +162,20 @@ private val dummySignals = listOf(
         0,
         "Google",
         100,
-        emptyList()
+        emptyList(),
     ),
     AppTrackerEntity(
         1,
         "Segment",
         100,
-        emptyList()
+        emptyList(),
     ),
     AppTrackerEntity(
         2,
         "Facebook",
         100,
-        emptyList()
-    )
+        emptyList(),
+    ),
 )
 
 private val dummyTrackers = listOf(
@@ -187,8 +187,8 @@ private val dummyTrackers = listOf(
         companyDisplayName = "Facebook",
         trackingApp = TrackingApp(
             packageId = "foo.package.id",
-            appDisplayName = "Foo"
-        )
+            appDisplayName = "Foo",
+        ),
     ),
     VpnTracker(
         timestamp = TEST_TIMESTAMP,
@@ -198,8 +198,8 @@ private val dummyTrackers = listOf(
         companyDisplayName = "Segment",
         trackingApp = TrackingApp(
             packageId = "foo.package.id",
-            appDisplayName = "Foo"
-        )
+            appDisplayName = "Foo",
+        ),
     ),
     VpnTracker(
         timestamp = TEST_TIMESTAMP,
@@ -209,8 +209,8 @@ private val dummyTrackers = listOf(
         companyDisplayName = "Google",
         trackingApp = TrackingApp(
             packageId = "lion.package.id",
-            appDisplayName = "LION"
-        )
+            appDisplayName = "LION",
+        ),
     ),
     VpnTracker(
         timestamp = TEST_TIMESTAMP_IN_THE_PAST,
@@ -220,8 +220,8 @@ private val dummyTrackers = listOf(
         companyDisplayName = "Google",
         trackingApp = TrackingApp(
             packageId = "foo.package.id",
-            appDisplayName = "Foo"
-        )
+            appDisplayName = "Foo",
+        ),
     ),
     VpnTracker(
         timestamp = TEST_TIMESTAMP,
@@ -231,7 +231,7 @@ private val dummyTrackers = listOf(
         companyDisplayName = "Google",
         trackingApp = TrackingApp(
             packageId = "com.duckduckgo.mobile.android.vpn",
-            appDisplayName = "DuckDuckGo"
-        )
-    )
+            appDisplayName = "DuckDuckGo",
+        ),
+    ),
 )

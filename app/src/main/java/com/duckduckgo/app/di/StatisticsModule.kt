@@ -56,13 +56,13 @@ object StatisticsModule {
         statisticsDataStore: StatisticsDataStore,
         statisticsService: StatisticsService,
         variantManager: VariantManager,
-        plugins: PluginPoint<RefreshRetentionAtbPlugin>
+        plugins: PluginPoint<RefreshRetentionAtbPlugin>,
     ): StatisticsUpdater {
         return StatisticsRequester(
             statisticsDataStore,
             statisticsService,
             variantManager,
-            plugins
+            plugins,
         )
     }
 
@@ -73,7 +73,7 @@ object StatisticsModule {
 
     @Provides
     fun pixel(
-        pixelSender: PixelSender
+        pixelSender: PixelSender,
     ): Pixel =
         RxBasedPixel(pixelSender)
 
@@ -85,7 +85,7 @@ object StatisticsModule {
         variantManager: VariantManager,
         deviceInfo: DeviceInfo,
         pendingPixelDao: PendingPixelDao,
-        statisticsLibraryConfig: StatisticsLibraryConfig
+        statisticsLibraryConfig: StatisticsLibraryConfig,
     ): PixelSender {
         return RxPixelSender(pixelService, pendingPixelDao, statisticsDataStore, variantManager, deviceInfo, statisticsLibraryConfig)
     }
@@ -100,7 +100,7 @@ object StatisticsModule {
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
         pixelSender: PixelSender,
-        offlinePixels: DaggerSet<OfflinePixel>
+        offlinePixels: DaggerSet<OfflinePixel>,
     ): OfflinePixelSender = OfflinePixelSender(offlinePixelCountDataStore, uncaughtExceptionRepository, pixelSender, offlinePixels)
 
     @Provides
@@ -113,7 +113,7 @@ object StatisticsModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
-        listeners: DaggerSet<AtbInitializerListener>
+        listeners: DaggerSet<AtbInitializerListener>,
     ): LifecycleObserver {
         return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
     }

@@ -61,7 +61,7 @@ class FireDialog(
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore,
     private val userEventsStore: UserEventsStore,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
 ) : BottomSheetDialog(context, R.style.FireDialog), CoroutineScope by MainScope() {
 
     private lateinit var binding: SheetFireClearDataBinding
@@ -141,7 +141,7 @@ class FireDialog(
         pixel.enqueueFire(if (ctaVisible) FIRE_DIALOG_PROMOTED_CLEAR_PRESSED else FIRE_DIALOG_CLEAR_PRESSED)
         pixel.enqueueFire(
             pixel = FIRE_DIALOG_ANIMATION,
-            parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue())
+            parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue()),
         )
         hideClearDataOptions()
         if (animationEnabled()) {
@@ -177,7 +177,7 @@ class FireDialog(
             override fun onAnimationEnd(animation: Animator) {
                 onFireDialogClearAllEvent(AnimationFinished)
             }
-        })
+        },)
     }
 
     private fun hideClearDataOptions() {

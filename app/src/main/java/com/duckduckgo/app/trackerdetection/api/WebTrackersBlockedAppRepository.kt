@@ -32,7 +32,7 @@ class WebTrackersBlockedAppRepository @Inject constructor(appDatabase: AppDataba
 
     override fun get(
         startTime: () -> String,
-        endTime: String
+        endTime: String,
     ): Flow<List<WebTrackerBlocked>> {
         return dao.getTrackersBetween(startTime(), endTime)
             .distinctUntilChanged()

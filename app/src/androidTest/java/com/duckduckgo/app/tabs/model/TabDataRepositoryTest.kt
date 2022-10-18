@@ -299,7 +299,7 @@ class TabDataRepositoryTest {
         val tab = TabEntity(
             tabId = "tabid",
             position = 0,
-            deletable = false
+            deletable = false,
         )
 
         testee.markDeletable(tab)
@@ -313,7 +313,7 @@ class TabDataRepositoryTest {
         val tab = TabEntity(
             tabId = "tabid",
             position = 0,
-            deletable = true
+            deletable = true,
         )
 
         testee.undoDeletable(tab)
@@ -411,14 +411,14 @@ class TabDataRepositoryTest {
         privacyPractices: PrivacyPractices = mock(),
         entityLookup: EntityLookup = mock(),
         webViewPreviewPersister: WebViewPreviewPersister = mock(),
-        faviconManager: FaviconManager = mock()
+        faviconManager: FaviconManager = mock(),
     ): TabDataRepository {
         return TabDataRepository(
             dao,
             SiteFactory(privacyPractices, entityLookup),
             webViewPreviewPersister,
             faviconManager,
-            TestScope()
+            TestScope(),
         )
     }
 

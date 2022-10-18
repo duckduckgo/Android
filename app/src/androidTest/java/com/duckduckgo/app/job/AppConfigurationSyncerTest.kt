@@ -99,7 +99,7 @@ class AppConfigurationSyncerTest {
             override fun createWorker(
                 appContext: Context,
                 workerClassName: String,
-                workerParameters: WorkerParameters
+                workerParameters: WorkerParameters,
             ): ListenableWorker? {
                 return AppConfigurationWorker(appContext, workerParameters).also {
                     it.appConfigurationDownloader = mockDownloader

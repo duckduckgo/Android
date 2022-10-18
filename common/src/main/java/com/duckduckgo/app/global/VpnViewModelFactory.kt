@@ -27,7 +27,7 @@ import javax.inject.Inject
 @SingleInstanceIn(VpnScope::class)
 @ContributesBinding(VpnScope::class)
 class VpnViewModelFactory @Inject constructor(
-    private val viewModelFactoryPluginPoint: VpnViewModelFactoryPluginPoint
+    private val viewModelFactoryPluginPoint: VpnViewModelFactoryPluginPoint,
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

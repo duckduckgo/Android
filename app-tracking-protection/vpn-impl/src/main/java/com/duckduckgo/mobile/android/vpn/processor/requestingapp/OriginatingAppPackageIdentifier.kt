@@ -28,7 +28,7 @@ data class ConnectionInfo(
     val destinationPort: Int,
     val sourceAddress: InetAddress,
     val sourcePort: Int,
-    val protocolNumber: Int
+    val protocolNumber: Int,
 )
 
 interface OriginatingAppPackageIdentifier {
@@ -38,13 +38,13 @@ interface OriginatingAppPackageIdentifier {
 class OriginatingAppPackageIdentifierStrategy @Inject constructor(
     @Named("DetectOriginatingAppPackageModern") private val modern: OriginatingAppPackageIdentifier,
     @Named("DetectOriginatingAppPackageLegacy") private val legacy: OriginatingAppPackageIdentifier,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) {
 
     @SuppressLint("NewApi")
     fun resolvePackageId(
         connectionInfo: ConnectionInfo,
-        sdkVersion: Int = appBuildConfig.sdkInt
+        sdkVersion: Int = appBuildConfig.sdkInt,
     ): String {
         return if (sdkVersion >= Build.VERSION_CODES.Q) {
             modern.resolvePackageId(connectionInfo)

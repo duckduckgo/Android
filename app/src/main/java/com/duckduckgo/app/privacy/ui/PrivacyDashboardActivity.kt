@@ -153,13 +153,13 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
                 trackersRenderer.networksIcon(
                     viewState.trackerCount,
                     viewState.specialDomainsLoadedCount,
-                    viewState.toggleEnabled
-                )
+                    viewState.toggleEnabled,
+                ),
             )
             networksText.text = trackersRenderer.trackersText(context, viewState.trackerCount, viewState.specialDomainsLoadedCount)
             domainsLoadedText.text = trackersRenderer.domainsLoadedText(
                 context,
-                viewState.otherDomainsLoadedCount + viewState.specialDomainsLoadedCount
+                viewState.otherDomainsLoadedCount + viewState.specialDomainsLoadedCount,
             )
             practicesIcon.setImageResource(viewState.practices.icon())
             practicesText.text = viewState.practices.text(context)
@@ -186,7 +186,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     private fun renderHeading(
         viewState: ViewState,
-        isPrivacyOn: Boolean
+        isPrivacyOn: Boolean,
     ) {
         with(privacyDashboardHeader) {
             if (viewState.isSiteInTempAllowedList) {
@@ -232,7 +232,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     private fun renderToggle(
         enabled: Boolean,
-        isSiteIntTempAllowedList: Boolean
+        isSiteIntTempAllowedList: Boolean,
     ) {
         val backgroundColor = if (enabled && !isSiteIntTempAllowedList) CommonR.color.midGreen else CommonR.color.warmerGray
         contentPrivacyDashboard.privacyToggleContainer.setBackgroundColor(ContextCompat.getColor(this, backgroundColor))
@@ -247,7 +247,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
             is LaunchTrackerNetworksActivity -> launchTrackerNetworksActivity(
                 command.trackersBlockedCount,
                 command.specialDomainsLoadedCount,
-                command.toggleEnabled
+                command.toggleEnabled,
             )
         }
     }
@@ -274,10 +274,10 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
                     trackersBlockedCount = trackersBlockedCount,
                     specialDomainsLoadedCount = specialDomainsLoadedCount,
                     toggleEnabled = toggleEnabled,
-                    largeIcon = true
+                    largeIcon = true,
                 ),
-                protectionsDisabled = !toggleEnabled
-            )
+                protectionsDisabled = !toggleEnabled,
+            ),
         )
     }
 
@@ -295,7 +295,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            tabId: String
+            tabId: String,
         ): Intent {
             val intent = Intent(context, PrivacyDashboardActivity::class.java)
             intent.tabId = tabId

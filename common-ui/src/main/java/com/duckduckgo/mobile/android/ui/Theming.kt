@@ -35,7 +35,7 @@ import com.duckduckgo.mobile.android.ui.Theming.Constants.THEME_MAP
 enum class DuckDuckGoTheme {
     SYSTEM_DEFAULT,
     DARK,
-    LIGHT
+    LIGHT,
 }
 
 object Theming {
@@ -43,13 +43,13 @@ object Theming {
     fun getThemedDrawable(
         context: Context,
         drawableId: Int,
-        theme: DuckDuckGoTheme
+        theme: DuckDuckGoTheme,
     ): Drawable? {
         val themeId: Int = THEME_MAP[Pair(R.style.AppTheme, theme)] ?: R.style.AppTheme_Light
         return ResourcesCompat.getDrawable(
             context.resources,
             drawableId,
-            ContextThemeWrapper(context, themeId).theme
+            ContextThemeWrapper(context, themeId).theme,
         )
     }
 
@@ -60,7 +60,7 @@ object Theming {
         val THEME_MAP =
             mapOf(
                 Pair(R.style.AppTheme, DuckDuckGoTheme.LIGHT) to R.style.AppTheme_Light,
-                Pair(R.style.AppTheme, DuckDuckGoTheme.DARK) to R.style.AppTheme_Dark
+                Pair(R.style.AppTheme, DuckDuckGoTheme.DARK) to R.style.AppTheme_Dark,
             )
     }
 }
@@ -97,7 +97,7 @@ private fun AppCompatActivity.registerForThemeChangeBroadcast(): BroadcastReceiv
         object : BroadcastReceiver() {
             override fun onReceive(
                 context: Context,
-                intent: Intent
+                intent: Intent,
             ) {
                 recreate()
             }

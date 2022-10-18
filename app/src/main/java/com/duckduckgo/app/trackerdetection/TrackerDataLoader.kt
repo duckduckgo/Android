@@ -42,7 +42,7 @@ import timber.log.Timber
 @WorkerThread
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class TrackerDataLoader @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -54,7 +54,7 @@ class TrackerDataLoader @Inject constructor(
     private val tdsMetadataDao: TdsMetadataDao,
     private val context: Context,
     private val appDatabase: AppDatabase,
-    private val moshi: Moshi
+    private val moshi: Moshi,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -83,7 +83,7 @@ class TrackerDataLoader @Inject constructor(
 
     fun persistTds(
         eTag: String,
-        tdsJson: TdsJson
+        tdsJson: TdsJson,
     ) {
         appDatabase.runInTransaction {
             tdsMetadataDao.tdsDownloadSuccessful(TdsMetadata(eTag = eTag))

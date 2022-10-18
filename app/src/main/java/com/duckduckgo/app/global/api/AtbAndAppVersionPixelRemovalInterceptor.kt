@@ -29,7 +29,7 @@ import okhttp3.Response
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class
+    boundType = PixelInterceptorPlugin::class,
 )
 class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInterceptorPlugin {
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -63,7 +63,7 @@ class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor() : Intercepto
             AppPixelName.EMAIL_USE_ALIAS.pixelName,
             AppPixelName.EMAIL_USE_ADDRESS.pixelName,
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName,
-            "m_atp_unprotected_apps_bucket_"
+            "m_atp_unprotected_apps_bucket_",
         )
     }
 }

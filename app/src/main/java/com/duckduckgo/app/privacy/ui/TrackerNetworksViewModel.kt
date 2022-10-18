@@ -48,7 +48,7 @@ import okhttp3.internal.publicsuffix.PublicSuffixDatabase
 
 @ContributesViewModel(ActivityScope::class)
 class TrackerNetworksViewModel @Inject constructor(
-    private val tabRepository: TabRepository
+    private val tabRepository: TabRepository,
 ) : ViewModel(), TrackerNetworksListener {
 
     private val publicSuffixDatabase = PublicSuffixDatabase()
@@ -57,20 +57,20 @@ class TrackerNetworksViewModel @Inject constructor(
         open val allTrackersBlocked: Boolean,
         open val domain: String,
         open val count: Int,
-        open val eventsByNetwork: SortedMap<TrackerNetworksSection, SortedMap<Entity, List<TrackingEvent>>>
+        open val eventsByNetwork: SortedMap<TrackerNetworksSection, SortedMap<Entity, List<TrackingEvent>>>,
     ) {
         data class TrackersViewState(
             override val allTrackersBlocked: Boolean,
             override val eventsByNetwork: SortedMap<TrackerNetworksSection, SortedMap<Entity, List<TrackingEvent>>>,
             override val domain: String,
-            override val count: Int
+            override val count: Int,
         ) : ViewState(allTrackersBlocked, domain, count, eventsByNetwork)
 
         data class DomainsViewState(
             override val allTrackersBlocked: Boolean,
             override val eventsByNetwork: SortedMap<TrackerNetworksSection, SortedMap<Entity, List<TrackingEvent>>>,
             override val domain: String,
-            override val count: Int
+            override val count: Int,
         ) : ViewState(allTrackersBlocked, domain, count, eventsByNetwork)
     }
 
@@ -100,14 +100,14 @@ class TrackerNetworksViewModel @Inject constructor(
                 domain = site.domain ?: "",
                 count = site.otherDomainsLoadedCount + site.specialDomainsLoadedCount,
                 allTrackersBlocked = site.allTrackersBlocked,
-                eventsByNetwork = distinctByEntity(site.trackingEvents, site.baseHost) { it.status != TrackerStatus.BLOCKED }
+                eventsByNetwork = distinctByEntity(site.trackingEvents, site.baseHost) { it.status != TrackerStatus.BLOCKED },
             )
         } else {
             ViewState.TrackersViewState(
                 domain = site.domain ?: "",
                 count = site.trackerCount,
                 allTrackersBlocked = site.allTrackersBlocked,
-                eventsByNetwork = distinctByEntity(site.trackingEvents, site.baseHost) { it.status == TrackerStatus.BLOCKED }
+                eventsByNetwork = distinctByEntity(site.trackingEvents, site.baseHost) { it.status == TrackerStatus.BLOCKED },
             )
         }
     }
@@ -118,14 +118,14 @@ class TrackerNetworksViewModel @Inject constructor(
                 domain = "",
                 count = 0,
                 allTrackersBlocked = true,
-                eventsByNetwork = emptyMap<TrackerNetworksSection, SortedMap<Entity, List<TrackingEvent>>>().toSortedMap(sectionsComparator())
+                eventsByNetwork = emptyMap<TrackerNetworksSection, SortedMap<Entity, List<TrackingEvent>>>().toSortedMap(sectionsComparator()),
             )
         } else {
             ViewState.TrackersViewState(
                 domain = "",
                 count = 0,
                 allTrackersBlocked = true,
-                eventsByNetwork = emptyMap<TrackerNetworksSection, SortedMap<Entity, List<TrackingEvent>>>().toSortedMap(sectionsComparator())
+                eventsByNetwork = emptyMap<TrackerNetworksSection, SortedMap<Entity, List<TrackingEvent>>>().toSortedMap(sectionsComparator()),
             )
         }
     }
@@ -133,7 +133,7 @@ class TrackerNetworksViewModel @Inject constructor(
     private fun distinctByEntity(
         trackingEvents: List<TrackingEvent>,
         domain: String? = null,
-        filterPredicate: (TrackingEvent) -> Boolean
+        filterPredicate: (TrackingEvent) -> Boolean,
     ): SortedMap<TrackerNetworksSection, SortedMap<Entity, List<TrackingEvent>>> {
         val result = emptyMap<TrackerNetworksSection, SortedMap<Entity, List<TrackingEvent>>>().toSortedMap(sectionsComparator())
         val filteredEvents = trackingEvents.asSequence()
@@ -172,7 +172,7 @@ class TrackerNetworksViewModel @Inject constructor(
     private fun sectionInfo(status: TrackerStatus, domain: String?): TrackerNetworksSection? {
         if (status == TrackerStatus.BLOCKED) {
             return TrackerNetworksSection(
-                trackerStatus = status
+                trackerStatus = status,
             )
         }
 
@@ -182,28 +182,28 @@ class TrackerNetworksViewModel @Inject constructor(
                 linkTextRes = R.string.adLoadedSectionLinkText,
                 linkUrlRes = R.string.adLoadedSectionUrl,
                 domain = domain,
-                trackerStatus = status
+                trackerStatus = status,
             )
         }
 
         if (status == TrackerStatus.SITE_BREAKAGE_ALLOWED) {
             return TrackerNetworksSection(
                 descriptionRes = R.string.domainsLoadedBreakageSectionDescription,
-                trackerStatus = status
+                trackerStatus = status,
             )
         }
 
         if (status == TrackerStatus.ALLOWED) {
             return TrackerNetworksSection(
                 descriptionRes = R.string.domainsLoadedSectionDescription,
-                trackerStatus = status
+                trackerStatus = status,
             )
         }
 
         if (status == TrackerStatus.USER_ALLOWED) {
             return TrackerNetworksSection(
                 descriptionRes = R.string.trackersBlockedNoSectionDescription,
-                trackerStatus = status
+                trackerStatus = status,
             )
         }
 
@@ -211,7 +211,7 @@ class TrackerNetworksViewModel @Inject constructor(
             return TrackerNetworksSection(
                 descriptionRes = R.string.domainsLoadedAssociatedSectionDescription,
                 trackerStatus = status,
-                domain = domain
+                domain = domain,
             )
         }
 

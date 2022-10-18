@@ -64,7 +64,7 @@ class RealBandwidthRepositoryTest {
         val expectedBandwidthData = BandwidthData(
             timestamp = bandwidthEntity.timestamp,
             appBytes = bandwidthEntity.appBytes,
-            totalBytes = bandwidthEntity.totalBytes
+            totalBytes = bandwidthEntity.totalBytes,
         )
         assertEquals(expectedBandwidthData, storedBandwidthData)
     }
@@ -78,7 +78,7 @@ class RealBandwidthRepositoryTest {
         val bandwidthEntity = BandwidthEntity(
             timestamp = bandwidthData.timestamp,
             appBytes = bandwidthData.appBytes,
-            totalBytes = bandwidthData.totalBytes
+            totalBytes = bandwidthData.totalBytes,
         )
 
         verify(mockBandWidthDao).insert(bandwidthEntity)
@@ -94,7 +94,7 @@ class RealBandwidthRepositoryTest {
         val bandwidthBucketEntity = BandwidthBucketEntity(
             timestamp = bandwidthData.timestamp,
             appBytes = bandwidthData.appBytes,
-            totalBytes = bandwidthData.totalBytes
+            totalBytes = bandwidthData.totalBytes,
         )
 
         verify(mockBandWidthDao).insertBucket(bandwidthBucketEntity)

@@ -44,7 +44,7 @@ fun dateOfLastWeek(): String {
 data class TimePassed(
     val hours: Long,
     val minutes: Long,
-    val seconds: Long
+    val seconds: Long,
 ) {
 
     fun shortFormat(resources: Resources): String {
@@ -63,7 +63,7 @@ data class TimePassed(
         alwaysShowHours: Boolean = true,
         alwaysShowMinutes: Boolean = true,
         alwaysShowSeconds: Boolean = true,
-        resources: Resources
+        resources: Resources,
     ): String {
         val sb = StringBuilder()
 
@@ -91,7 +91,7 @@ data class TimePassed(
 
         fun between(
             currentMillis: Long,
-            oldMillis: Long
+            oldMillis: Long,
         ): TimePassed {
             return fromMilliseconds(currentMillis - oldMillis)
         }

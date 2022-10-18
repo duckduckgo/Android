@@ -37,7 +37,7 @@ class AppUsageModule {
     @IntoSet
     fun appDaysUsedRecorderObserver(
         appDaysUsedRepository: AppDaysUsedRepository,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
     ): LifecycleObserver {
         return AppDaysUsedRecorder(appDaysUsedRepository, appCoroutineScope)
     }

@@ -25,7 +25,7 @@ import androidx.appcompat.widget.AppCompatTextView
 class Chip @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : AppCompatTextView(context, attrs, defStyleAttr) {
 
     fun setChipText(@StringRes textResource: Int) {

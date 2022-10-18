@@ -38,14 +38,14 @@ class DialogsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         return inflater.inflate(R.layout.fragment_components_dialogs, container, false)
     }
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -66,7 +66,7 @@ class DialogsFragment : Fragment() {
                             override fun onNegativeButtonClicked() {
                                 Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
                             }
-                        })
+                        },)
                         .build()
                         .show(fragmentManager, TextAlertDialog.TAG_TEXT_ALERT_DIALOG)
                 }
@@ -86,7 +86,7 @@ class DialogsFragment : Fragment() {
                             override fun onRadioItemSelected(selectedItem: Int) {
                                 Snackbar.make(it, "Radio Button $selectedItem selected", Snackbar.LENGTH_SHORT).show()
                             }
-                        })
+                        },)
                         .build()
                         .show(fragmentManager, RadioListAlertDialog.TAG_RADIO_LIST_ALERT_DIALOG)
                 }
@@ -109,7 +109,7 @@ class DialogsFragment : Fragment() {
                             override fun onNegativeButtonClicked() {
                                 Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
                             }
-                        })
+                        },)
                         .build()
                         .show(fragmentManager, TextAlertDialog.TAG_TEXT_ALERT_DIALOG)
                 }
@@ -126,14 +126,14 @@ class DialogsFragment : Fragment() {
                             listOf(
                                 R.string.text_dialog_positive,
                                 R.string.text_dialog_positive,
-                                R.string.text_dialog_positive
-                            )
+                                R.string.text_dialog_positive,
+                            ),
                         )
                         .addEventListener(object : StackedAlertDialog.EventListener() {
                             override fun onButtonClicked(position: Int) {
                                 Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
                             }
-                        })
+                        },)
                         .build()
                         .show(fragmentManager, StackedAlertDialog.TAG_STACKED_ALERT_DIALOG)
                 }
@@ -150,14 +150,14 @@ class DialogsFragment : Fragment() {
                                     R.string.text_dialog_positive,
                                     R.string.text_dialog_positive,
                                     R.string.text_dialog_positive,
-                                    R.string.text_dialog_positive
-                                )
+                                    R.string.text_dialog_positive,
+                                ),
                             )
                             .addEventListener(object : StackedAlertDialog.EventListener() {
                                 override fun onButtonClicked(position: Int) {
                                     Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
                                 }
-                            })
+                            },)
                             .build()
                             .show(fragmentManager, StackedAlertDialog.TAG_STACKED_ALERT_DIALOG)
                     }
@@ -171,7 +171,7 @@ class DialogsFragment : Fragment() {
                                 primaryButtonText = "Primary CTA",
                                 secondaryButtonText = "Secondary CTA",
                                 hideButtonText = "Hide",
-                                toolbarDimmed = true
+                                toolbarDimmed = true,
                             ).show(fragmentManager, "dialog")
                         }
                     }
@@ -185,7 +185,7 @@ class DialogsFragment : Fragment() {
                                 primaryButtonText = "Primary CTA",
                                 secondaryButtonText = "Secondary CTA",
                                 hideButtonText = "Hide",
-                                toolbarDimmed = false
+                                toolbarDimmed = false,
                             ).show(fragmentManager, "dialog")
                         }
                     }
@@ -200,7 +200,7 @@ class DialogsFragment : Fragment() {
                                 secondaryButtonText = "Secondary CTA",
                                 hideButtonText = "Hide",
                                 toolbarDimmed = true,
-                                dismissible = true
+                                dismissible = true,
                             ).show(fragmentManager, "dialog")
                         }
                     }
@@ -215,7 +215,7 @@ class DialogsFragment : Fragment() {
                                 secondaryButtonText = "Secondary CTA",
                                 hideButtonText = "Hide",
                                 toolbarDimmed = true,
-                                showHideButton = false
+                                showHideButton = false,
                             ).show(fragmentManager, "dialog")
                         }
                     }
@@ -230,7 +230,7 @@ class DialogsFragment : Fragment() {
                                 secondaryButtonText = "Secondary CTA",
                                 hideButtonText = "Hide",
                                 toolbarDimmed = true,
-                                typingDelayInMs = 200L
+                                typingDelayInMs = 200L,
                             ).show(fragmentManager, "dialog")
                         }
                     }

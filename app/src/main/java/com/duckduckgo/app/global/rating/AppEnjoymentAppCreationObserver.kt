@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 class AppEnjoymentAppCreationObserver(
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val promptTypeDecider: PromptTypeDecider,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
 ) : DefaultLifecycleObserver {
 
     @UiThread

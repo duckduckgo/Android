@@ -34,7 +34,7 @@ import timber.log.Timber
 @ContributesMultibinding(VpnScope::class)
 class AppTPCPUMonitor @Inject constructor(
     private val workManager: WorkManager,
-    private val appTpFeatureConfig: AppTpFeatureConfig
+    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : VpnServiceCallbacks {
 
     companion object {
@@ -57,7 +57,7 @@ class AppTPCPUMonitor @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         Timber.v("AppTpSetting.CPUMonitoring - stopping")
         workManager.cancelUniqueWork(APP_TRACKER_CPU_MONITOR_WORKER_TAG)

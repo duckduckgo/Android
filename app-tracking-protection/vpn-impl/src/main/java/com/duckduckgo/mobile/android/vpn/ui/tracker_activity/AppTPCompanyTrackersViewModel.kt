@@ -44,7 +44,7 @@ constructor(
     private val excludedAppsRepository: TrackingProtectionAppsRepository,
     private val timeDiffFormatter: TimeDiffFormatter,
     private val deviceShieldPixels: DeviceShieldPixels,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     private val trackerCompanies = mutableMapOf<String, List<TrackingSignal>>()
@@ -59,7 +59,7 @@ constructor(
 
     suspend fun loadData(
         date: String,
-        packageName: String
+        packageName: String,
     ) {
         withContext(dispatchers.io()) {
             statsRepository
@@ -74,7 +74,7 @@ constructor(
 
     private suspend fun aggregateDataPerApp(
         trackerData: List<VpnTrackerCompanySignal>,
-        packageName: String
+        packageName: String,
     ): ViewState {
         val sourceData = mutableListOf<CompanyTrackingDetails>()
 
@@ -82,7 +82,7 @@ constructor(
             if (trackerData.isNotEmpty()) {
                 timeDiffFormatter.formatTimePassed(
                     LocalDateTime.now(),
-                    LocalDateTime.parse(trackerData[0].tracker.timestamp)
+                    LocalDateTime.parse(trackerData[0].tracker.timestamp),
                 )
             } else {
                 ""
@@ -114,8 +114,8 @@ constructor(
                     companyDisplayName = trackerCompanyDisplayName,
                     trackingAttempts = data.value.size,
                     timestamp = timestamp,
-                    trackingSignals = trackingSignals
-                )
+                    trackingSignals = trackingSignals,
+                ),
             )
         }
 
@@ -123,7 +123,7 @@ constructor(
             totalTrackingAttempts = trackerData.size,
             lastTrackerBlockedAgo = lastTrackerBlockedAgo,
             trackingCompanies = sourceData,
-            protectionEnabled = excludedAppsRepository.isAppProtectionEnabled(packageName)
+            protectionEnabled = excludedAppsRepository.isAppProtectionEnabled(packageName),
         )
     }
 
@@ -135,7 +135,7 @@ constructor(
 
     fun onAppPermissionToggled(
         checked: Boolean,
-        packageName: String
+        packageName: String,
     ) {
         viewModelScope.launch {
             withContext(dispatchers.io()) {
@@ -158,7 +158,7 @@ constructor(
         val trackingCompanies: List<CompanyTrackingDetails> = emptyList(),
         val protectionEnabled: Boolean = false,
         val userChangedState: Boolean = false,
-        val manualProtectionState: Boolean = false
+        val manualProtectionState: Boolean = false,
     )
 
     internal sealed class Command {
@@ -171,6 +171,6 @@ constructor(
         val trackingAttempts: Int,
         val timestamp: String,
         val trackingSignals: List<TrackingSignal>,
-        val expanded: Boolean = false
+        val expanded: Boolean = false,
     )
 }

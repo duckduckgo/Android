@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.health
 
 data class HealthCheckSubmission(
     val userReport: UserHealthSubmission,
-    val systemReport: SystemHealthData
+    val systemReport: SystemHealthData,
 )
 
 internal fun RawMetricsSubmission.isInBadHealth(): Boolean {
@@ -41,5 +41,5 @@ internal fun RawMetricsSubmission.badHealthReasons(): List<String> {
 
 data class UserHealthSubmission(
     val state: String,
-    val notes: String? = null
+    val notes: String? = null,
 )

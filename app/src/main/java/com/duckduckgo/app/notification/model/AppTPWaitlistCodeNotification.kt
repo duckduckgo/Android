@@ -30,7 +30,7 @@ import timber.log.Timber
 class AppTPWaitlistCodeNotification(
     private val context: Context,
     private val notificationDao: NotificationDao,
-    private val dataStore: AppTrackingProtectionWaitlistDataStore
+    private val dataStore: AppTrackingProtectionWaitlistDataStore,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.vpn.waitlist"

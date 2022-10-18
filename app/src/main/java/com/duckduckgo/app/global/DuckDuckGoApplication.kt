@@ -146,7 +146,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     // also help with memory
     override fun getDir(
         name: String?,
-        mode: Int
+        mode: Int,
     ): File {
         val dir = super.getDir(name, mode)
         runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
@@ -197,7 +197,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                 """
                 Could not find the dagger component for ${key.simpleName}.
                 You probably forgot to create the ${key.simpleName}Component
-                """.trimIndent()
+                """.trimIndent(),
             )
     }
 }

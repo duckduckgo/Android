@@ -40,7 +40,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     private val excludedApps: TrackingProtectionAppsRepository,
     private val appTrackersRepository: AppTrackerBlockingStatsRepository,
     private val pixel: DeviceShieldPixels,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -89,7 +89,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
             .flowOn(dispatcherProvider.io())
 
     private suspend fun aggregateDataPerApp(
-        trackerData: List<BucketizedVpnTracker>
+        trackerData: List<BucketizedVpnTracker>,
     ): List<TrackingApp> {
         val sourceData = mutableListOf<TrackingApp>()
         val perSessionData = trackerData.groupBy { it.bucket }
@@ -111,7 +111,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     fun onAppProtectionDisabled(
         appName: String,
         packageName: String,
-        report: Boolean
+        report: Boolean,
     ) {
         pixel.didDisableAppProtectionFromApps()
         viewModelScope.launch {
@@ -126,7 +126,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     }
 
     fun onAppProtectionEnabled(
-        packageName: String
+        packageName: String,
     ) {
         pixel.didEnableAppProtectionFromApps()
         viewModelScope.launch {
@@ -178,7 +178,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     fun onAppProtectionChanged(
         excludedAppInfo: TrackingProtectionAppInfo,
         position: Int,
-        enabled: Boolean
+        enabled: Boolean,
     ) {
         viewModelScope.launch {
             if (enabled) {
@@ -191,7 +191,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
     private suspend fun checkForAppProtectionEnabled(
         excludedAppInfo: TrackingProtectionAppInfo,
-        position: Int
+        position: Int,
     ) {
         if (!excludedAppInfo.isProblematic()) {
             onAppProtectionEnabled(excludedAppInfo.packageName)
@@ -225,7 +225,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
 private data class ManualProtectionSnapshot(
     val timestamp: Long,
-    val snapshot: List<Pair<String, Boolean>>
+    val snapshot: List<Pair<String, Boolean>>,
 )
 
 internal data class ViewState(val excludedApps: List<TrackingProtectionAppInfo>)
@@ -235,7 +235,7 @@ internal sealed class Command {
     object LaunchAllAppsProtection : Command()
     data class ShowEnableProtectionDialog(
         val excludingReason: TrackingProtectionAppInfo,
-        val position: Int
+        val position: Int,
     ) : Command()
 
     data class ShowDisableProtectionDialog(val excludingReason: TrackingProtectionAppInfo) : Command()

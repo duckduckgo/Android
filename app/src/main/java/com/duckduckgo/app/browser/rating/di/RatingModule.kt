@@ -46,7 +46,7 @@ class RatingModule {
     fun appEnjoymentManagerObserver(
         appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
         promptTypeDecider: PromptTypeDecider,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
     ): LifecycleObserver {
         return AppEnjoymentAppCreationObserver(appEnjoymentPromptEmitter, promptTypeDecider, appCoroutineScope)
     }
@@ -61,7 +61,7 @@ class RatingModule {
     @Provides
     fun appEnjoymentUserEventRecorder(
         appEnjoymentRepository: AppEnjoymentRepository,
-        appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter
+        appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     ): AppEnjoymentUserEventRecorder {
         return AppEnjoymentUserEventDatabaseRecorder(appEnjoymentRepository, appEnjoymentPromptEmitter)
     }
@@ -73,7 +73,7 @@ class RatingModule {
         @Named(INITIAL_PROMPT_DECIDER_NAME) initialPromptDecider: ShowPromptDecider,
         @Named(SECONDARY_PROMPT_DECIDER_NAME) secondaryPromptDecider: ShowPromptDecider,
         context: Context,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): PromptTypeDecider {
         return InitialPromptTypeDecider(
             playStoreUtils,
@@ -81,7 +81,7 @@ class RatingModule {
             initialPromptDecider,
             secondaryPromptDecider,
             context,
-            appBuildConfig
+            appBuildConfig,
         )
     }
 
@@ -106,7 +106,7 @@ class RatingModule {
     @Provides
     fun initialPromptDecider(
         appDaysUsedRepository: AppDaysUsedRepository,
-        appEnjoymentRepository: AppEnjoymentRepository
+        appEnjoymentRepository: AppEnjoymentRepository,
     ): ShowPromptDecider {
         return InitialPromptDecider(appDaysUsedRepository, appEnjoymentRepository)
     }
@@ -115,7 +115,7 @@ class RatingModule {
     @Provides
     fun secondaryPromptDecider(
         appDaysUsedRepository: AppDaysUsedRepository,
-        appEnjoymentRepository: AppEnjoymentRepository
+        appEnjoymentRepository: AppEnjoymentRepository,
     ): ShowPromptDecider {
         return SecondaryPromptDecider(appDaysUsedRepository, appEnjoymentRepository)
     }

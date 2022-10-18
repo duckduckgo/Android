@@ -119,7 +119,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
     data class HttpsTest(
         val name: String,
         val desc: String,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class TestCase(
@@ -128,7 +128,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         val requestURL: String,
         val requestType: String,
         val expectURL: String,
-        val exceptPlatforms: List<String>?
+        val exceptPlatforms: List<String>?,
     )
 
     @UiThreadTest
@@ -193,7 +193,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
             httpsDataPersister,
             binaryDataStore,
             httpsBloomFilterSpecDao,
-            moshi
+            moshi,
         )
 
         bloomFilterFactory = HttpsBloomFilterFactoryImpl(
@@ -202,7 +202,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
             embeddedDataPersister,
             httpsDataPersister,
             mockPixel,
-            InstrumentationRegistry.getInstrumentation().targetContext
+            InstrumentationRegistry.getInstrumentation().targetContext,
         )
     }
 
@@ -210,7 +210,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         private val httpsDataPersister: HttpsDataPersister,
         private val binaryDataStore: BinaryDataStore,
         private val httpsBloomSpecDao: HttpsBloomFilterSpecDao,
-        private val moshi: Moshi
+        private val moshi: Moshi,
     ) : HttpsEmbeddedDataPersister {
 
         override fun shouldPersistEmbeddedData(): Boolean {
@@ -222,13 +222,13 @@ class HttpsReferenceTest(private val testCase: TestCase) {
             Timber.d("Updating https data from embedded files")
             val specJson = FileUtilities.loadText(
                 javaClass.classLoader!!,
-                "reference_tests/https/https_bloomfilter_spec_reference.json"
+                "reference_tests/https/https_bloomfilter_spec_reference.json",
             )
             val specAdapter = moshi.adapter(HttpsBloomFilterSpec::class.java)
 
             val falsePositivesJson = FileUtilities.loadText(
                 javaClass.classLoader!!,
-                "reference_tests/https/https_allowlist_reference.json"
+                "reference_tests/https/https_allowlist_reference.json",
             )
             val falsePositivesType = Types.newParameterizedType(List::class.java, HttpsFalsePositiveDomain::class.java)
             val falsePositivesAdapter: JsonAdapter<List<HttpsFalsePositiveDomain>> = moshi.adapter(falsePositivesType)

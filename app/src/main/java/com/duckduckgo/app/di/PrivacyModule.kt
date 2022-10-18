@@ -61,7 +61,7 @@ object PrivacyModule {
     @SingleInstanceIn(AppScope::class)
     fun privacyPractices(
         termsOfServiceStore: TermsOfServiceStore,
-        entityLookup: EntityLookup
+        entityLookup: EntityLookup,
     ): PrivacyPractices =
         PrivacyPracticesImpl(termsOfServiceStore, entityLookup)
 
@@ -69,7 +69,7 @@ object PrivacyModule {
     @SingleInstanceIn(AppScope::class)
     fun entityLookup(
         entityDao: TdsEntityDao,
-        domainEntityDao: TdsDomainEntityDao
+        domainEntityDao: TdsDomainEntityDao,
     ): EntityLookup =
         TdsEntityLookup(entityDao, domainEntityDao)
 
@@ -86,7 +86,7 @@ object PrivacyModule {
         thirdPartyCookieManager: ThirdPartyCookieManager,
         adClickManager: AdClickManager,
         fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
-        sitePermissionsManager: SitePermissionsManager
+        sitePermissionsManager: SitePermissionsManager,
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -100,7 +100,7 @@ object PrivacyModule {
             thirdPartyCookieManager,
             adClickManager,
             fireproofWebsiteRepository,
-            sitePermissionsManager
+            sitePermissionsManager,
         )
     }
 
@@ -113,14 +113,14 @@ object PrivacyModule {
     @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun dataClearerForegroundAppRestartPixelObserver(
-        dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+        dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel,
     ): LifecycleObserver = dataClearerForegroundAppRestartPixel
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun appCacheCleaner(
         context: Context,
-        fileDeleter: FileDeleter
+        fileDeleter: FileDeleter,
     ): AppCacheClearer {
         return AndroidAppCacheClearer(context, fileDeleter)
     }
@@ -131,7 +131,7 @@ object PrivacyModule {
         context: Context,
         locationPermissionsRepository: LocationPermissionsRepository,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): GeoLocationPermissions {
         return GeoLocationPermissionsManager(context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
     }
@@ -145,7 +145,7 @@ object PrivacyModule {
     fun providesLocationPermissionsRepository(
         locationPermissionsDao: LocationPermissionsDao,
         faviconManager: Lazy<FaviconManager>,
-        dispatchers: DispatcherProvider
+        dispatchers: DispatcherProvider,
     ): LocationPermissionsRepositoryAPI {
         return LocationPermissionsRepository(locationPermissionsDao, faviconManager, dispatchers)
     }

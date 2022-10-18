@@ -24,37 +24,37 @@ import kotlinx.coroutines.withContext
 
 class ExclusionRulesRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
-    vpnDatabase: VpnDatabase
+    vpnDatabase: VpnDatabase,
 ) {
     private val blockingDao = vpnDatabase.vpnAppTrackerBlockingDao()
 
     suspend fun upsertRule(
         appPackageName: String,
-        domain: String
+        domain: String,
     ) = withContext(dispatcherProvider.io()) {
         val rule = blockingDao.getRuleByTrackerDomain(domain)
         if (rule != null) {
             val updatedRule = rule.copy(
                 rule = rule.rule,
-                packageNames = rule.packageNames.toMutableSet().apply { add(appPackageName) }.toList()
+                packageNames = rule.packageNames.toMutableSet().apply { add(appPackageName) }.toList(),
             )
             blockingDao.insertTrackerExceptionRules(listOf(updatedRule))
         } else {
             blockingDao.insertTrackerExceptionRules(
-                listOf(AppTrackerExceptionRule(rule = domain, packageNames = listOf(appPackageName)))
+                listOf(AppTrackerExceptionRule(rule = domain, packageNames = listOf(appPackageName))),
             )
         }
     }
 
     suspend fun removeRule(
         appPackageName: String,
-        domain: String
+        domain: String,
     ) = withContext(dispatcherProvider.io()) {
         val rule = blockingDao.getRuleByTrackerDomain(domain)
         rule?.let {
             val updatedRule = it.copy(
                 rule = it.rule,
-                packageNames = it.packageNames.toMutableSet().apply { remove(appPackageName) }.toList()
+                packageNames = it.packageNames.toMutableSet().apply { remove(appPackageName) }.toList(),
             )
             blockingDao.insertTrackerExceptionRules(listOf(updatedRule))
         }

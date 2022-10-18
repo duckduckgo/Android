@@ -22,7 +22,7 @@ import xyz.hexene.localvpn.Packet
 interface PayloadBytesExtractor {
     fun extract(
         packet: Packet,
-        payloadBuffer: ByteBuffer
+        payloadBuffer: ByteBuffer,
     ): ByteArray
 }
 
@@ -30,7 +30,7 @@ class ConcretePayloadBytesExtractor : PayloadBytesExtractor {
 
     override fun extract(
         packet: Packet,
-        payloadBuffer: ByteBuffer
+        payloadBuffer: ByteBuffer,
     ): ByteArray {
         val headerLength = packet.ipHeader.headerLength + packet.tcpHeader.headerLength
         val payloadSize = packet.ipHeader.totalLength - headerLength

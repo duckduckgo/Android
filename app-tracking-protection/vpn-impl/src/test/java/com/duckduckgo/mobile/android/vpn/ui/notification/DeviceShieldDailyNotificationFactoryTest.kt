@@ -183,14 +183,14 @@ class DeviceShieldDailyNotificationFactoryTest {
             trackerCompanyId = 1,
             company = "Google",
             appContainingTracker = trackingApp2(),
-            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(3))
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(3)),
         )
         trackerFound(
             trackerDomain,
             trackerCompanyId = 1,
             company = "Google",
             appContainingTracker = trackingApp3(),
-            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(4))
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(4)),
         )
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(3)
@@ -210,7 +210,7 @@ class DeviceShieldDailyNotificationFactoryTest {
         trackerCompanyId: Int = -1,
         company: String = "Tracking LLC",
         appContainingTracker: TrackingApp = defaultApp(),
-        timestamp: String = DatabaseDateFormatter.bucketByHour()
+        timestamp: String = DatabaseDateFormatter.bucketByHour(),
     ) {
         val tracker = VpnTracker(
             trackerCompanyId = trackerCompanyId,
@@ -218,7 +218,7 @@ class DeviceShieldDailyNotificationFactoryTest {
             timestamp = timestamp,
             companyDisplayName = company,
             company = company,
-            trackingApp = appContainingTracker
+            trackingApp = appContainingTracker,
         )
         vpnTrackerDao.insert(tracker)
     }
@@ -228,7 +228,7 @@ class DeviceShieldDailyNotificationFactoryTest {
         trackerCompanyName: String = "Tracking LLC",
         trackerCompanyId: Int = -1,
         appContainingTracker: TrackingApp = defaultApp(),
-        timestamp: String = DatabaseDateFormatter.bucketByHour()
+        timestamp: String = DatabaseDateFormatter.bucketByHour(),
     ): VpnTracker {
         return VpnTracker(
             trackerCompanyId = trackerCompanyId,
@@ -236,7 +236,7 @@ class DeviceShieldDailyNotificationFactoryTest {
             timestamp = timestamp,
             companyDisplayName = trackerCompanyName,
             company = trackerCompanyName,
-            trackingApp = appContainingTracker
+            trackingApp = appContainingTracker,
         )
     }
 

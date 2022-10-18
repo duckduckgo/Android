@@ -21,12 +21,12 @@ import timber.log.Timber
 class RealPacketInterceptorChain(
     private val interceptors: List<VpnPacketInterceptor>,
     private val index: Int,
-    private val request: PacketRequest
+    private val request: PacketRequest,
 ) : VpnPacketInterceptor.SocketChain {
 
     internal fun copy(
         index: Int = this.index,
-        request: PacketRequest = this.request
+        request: PacketRequest = this.request,
     ) = RealPacketInterceptorChain(interceptors, index, request)
 
     override fun proceed(packetRequest: PacketRequest): Int {

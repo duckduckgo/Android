@@ -27,5 +27,5 @@ data class TestNavigationState(
     override val canGoForward: Boolean,
     override val hasNavigationHistory: Boolean,
     override val progress: Int?,
-    override val navigationHistory: List<NavigationHistoryEntry> = emptyList()
+    override val navigationHistory: List<NavigationHistoryEntry> = emptyList(),
 ) : WebNavigationState

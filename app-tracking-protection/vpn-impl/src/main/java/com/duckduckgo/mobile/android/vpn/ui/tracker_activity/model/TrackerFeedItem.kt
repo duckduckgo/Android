@@ -26,7 +26,7 @@ sealed class TrackerFeedItem(open val id: Int) {
         val trackingCompanyBadges: List<TrackerCompanyBadge>,
         val trackersTotalCount: Int,
         val timestamp: String,
-        val displayTimestamp: String
+        val displayTimestamp: String,
     ) : TrackerFeedItem(id)
 
     object TrackerEmptyFeed : TrackerFeedItem(0)
@@ -39,9 +39,9 @@ sealed class TrackerFeedItem(open val id: Int) {
 sealed class TrackerCompanyBadge {
     data class Company(
         val companyName: String,
-        val companyDisplayName: String
+        val companyDisplayName: String,
     ) : TrackerCompanyBadge()
     data class Extra(
-        val amount: Int
+        val amount: Int,
     ) : TrackerCompanyBadge()
 }

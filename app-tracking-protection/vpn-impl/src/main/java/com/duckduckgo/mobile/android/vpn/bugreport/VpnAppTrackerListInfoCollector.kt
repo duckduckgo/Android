@@ -30,7 +30,7 @@ import org.json.JSONObject
 class VpnAppTrackerListInfoCollector @Inject constructor(
     private val vpnDatabase: VpnDatabase,
     private val appTrackerRepository: AppTrackerRepository,
-    private val appCategoryDetector: AppCategoryDetector
+    private val appCategoryDetector: AppCategoryDetector,
 ) : VpnStateCollectorPlugin {
 
     override val collectorName: String

@@ -61,7 +61,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider,
-    private val appTpFeatureConfig: AppTpFeatureConfig
+    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : TrackingProtectionAppsRepository {
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
@@ -80,7 +80,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
                             category = it.parseAppCategory(),
                             isExcluded = isExcluded,
                             knownProblem = hasKnownIssue(it, ddgExclusionList),
-                            userModified = isUserModified(it.packageName, manualList)
+                            userModified = isUserModified(it.packageName, manualList),
                         )
                     }
                     .sortedBy { it.name.lowercase() }
@@ -127,7 +127,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     private fun shouldBeExcluded(
         appInfo: ApplicationInfo,
         ddgExclusionList: List<AppTrackerExcludedPackage>,
-        userExclusionList: List<AppTrackerManualExcludedApp>
+        userExclusionList: List<AppTrackerManualExcludedApp>,
     ): Boolean {
         return VpnExclusionList.isDdgApp(appInfo.packageName) ||
             isSystemAppAndNotOverridden(appInfo) ||
@@ -137,7 +137,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     private fun isManuallyExcluded(
         appInfo: ApplicationInfo,
         ddgExclusionList: List<AppTrackerExcludedPackage>,
-        userExclusionList: List<AppTrackerManualExcludedApp>
+        userExclusionList: List<AppTrackerManualExcludedApp>,
     ): Boolean {
         val userExcludedApp = userExclusionList.find { it.packageId == appInfo.packageName }
         if (userExcludedApp != null) {
@@ -153,7 +153,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
 
     private fun hasKnownIssue(
         appInfo: ApplicationInfo,
-        ddgExclusionList: List<AppTrackerExcludedPackage>
+        ddgExclusionList: List<AppTrackerExcludedPackage>,
     ): Int {
         if (BROWSERS.contains(appInfo.packageName)) {
             return TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON
@@ -169,7 +169,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
 
     private fun isUserModified(
         packageName: String,
-        userExclusionList: List<AppTrackerManualExcludedApp>
+        userExclusionList: List<AppTrackerManualExcludedApp>,
     ): Boolean {
         val userExcludedApp = userExclusionList.find { it.packageId == packageName }
         return userExcludedApp != null
@@ -252,7 +252,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
             "com.qwantjunior.mobile",
             "com.nhn.android.search",
             "cz.seznam.sbrowser",
-            "com.coccoc.trinhduyet"
+            "com.coccoc.trinhduyet",
         )
     }
 }

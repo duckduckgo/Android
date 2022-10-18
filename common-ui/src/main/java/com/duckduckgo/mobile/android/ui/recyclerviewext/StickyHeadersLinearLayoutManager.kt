@@ -41,7 +41,7 @@ import kotlin.math.min
 class StickyHeadersLinearLayoutManager<T>(
     context: Context,
     @RecyclerView.Orientation orientation: Int = RecyclerView.VERTICAL,
-    reverseLayout: Boolean = false
+    reverseLayout: Boolean = false,
 ) : LinearLayoutManager(context, orientation, reverseLayout) where T : RecyclerView.Adapter<*>?, T : StickyHeaders? {
     private var mAdapter: T? = null
     private var mTranslationX = 0f
@@ -90,7 +90,7 @@ class StickyHeadersLinearLayoutManager<T>(
 
     override fun onAdapterChanged(
         oldAdapter: RecyclerView.Adapter<*>?,
-        newAdapter: RecyclerView.Adapter<*>?
+        newAdapter: RecyclerView.Adapter<*>?,
     ) {
         super.onAdapterChanged(oldAdapter, newAdapter)
         setAdapter(newAdapter)
@@ -132,7 +132,7 @@ class StickyHeadersLinearLayoutManager<T>(
     override fun scrollVerticallyBy(
         dy: Int,
         recycler: Recycler,
-        state: RecyclerView.State
+        state: RecyclerView.State,
     ): Int {
         detachStickyHeader()
         val scrolled = super.scrollVerticallyBy(dy, recycler, state)
@@ -146,7 +146,7 @@ class StickyHeadersLinearLayoutManager<T>(
     override fun scrollHorizontallyBy(
         dx: Int,
         recycler: Recycler,
-        state: RecyclerView.State
+        state: RecyclerView.State,
     ): Int {
         detachStickyHeader()
         val scrolled = super.scrollHorizontallyBy(dx, recycler, state)
@@ -159,7 +159,7 @@ class StickyHeadersLinearLayoutManager<T>(
 
     override fun onLayoutChildren(
         recycler: Recycler,
-        state: RecyclerView.State
+        state: RecyclerView.State,
     ) {
         detachStickyHeader()
         super.onLayoutChildren(recycler, state)
@@ -175,7 +175,7 @@ class StickyHeadersLinearLayoutManager<T>(
 
     override fun scrollToPositionWithOffset(
         position: Int,
-        offset: Int
+        offset: Int,
     ) {
         scrollToPositionWithOffset(position, offset, true)
     }
@@ -183,7 +183,7 @@ class StickyHeadersLinearLayoutManager<T>(
     private fun scrollToPositionWithOffset(
         position: Int,
         offset: Int,
-        adjustForStickyHeader: Boolean
+        adjustForStickyHeader: Boolean,
     ) {
         // Reset pending scroll.
         setPendingScroll(RecyclerView.NO_POSITION, INVALID_OFFSET)
@@ -300,7 +300,7 @@ class StickyHeadersLinearLayoutManager<T>(
         focused: View,
         focusDirection: Int,
         recycler: Recycler,
-        state: RecyclerView.State
+        state: RecyclerView.State,
     ): View? {
         detachStickyHeader()
         val view: View? = super.onFocusSearchFailed(focused, focusDirection, recycler, state)
@@ -325,7 +325,7 @@ class StickyHeadersLinearLayoutManager<T>(
      */
     private fun updateStickyHeader(
         recycler: Recycler,
-        layout: Boolean
+        layout: Boolean,
     ) {
         val headerCount = mHeaderPositions.size
         val childCount = childCount
@@ -399,7 +399,7 @@ class StickyHeadersLinearLayoutManager<T>(
      */
     private fun createStickyHeader(
         recycler: Recycler,
-        position: Int
+        position: Int,
     ) {
         val stickyHeader: View = recycler.getViewForPosition(position)
 
@@ -425,7 +425,7 @@ class StickyHeadersLinearLayoutManager<T>(
      */
     private fun bindStickyHeader(
         recycler: Recycler,
-        position: Int
+        position: Int,
     ) {
         // Bind the sticky header.
         recycler.bindViewToPosition(mStickyHeader!!, position)
@@ -443,7 +443,7 @@ class StickyHeadersLinearLayoutManager<T>(
                         setPendingScroll(RecyclerView.NO_POSITION, INVALID_OFFSET)
                     }
                 }
-            })
+            },)
         }
     }
 
@@ -492,7 +492,7 @@ class StickyHeadersLinearLayoutManager<T>(
      */
     private fun isViewValidAnchor(
         view: View,
-        params: RecyclerView.LayoutParams
+        params: RecyclerView.LayoutParams,
     ): Boolean {
         return if (!params.isItemRemoved && !params.isViewInvalid) {
             if (orientation == VERTICAL) {
@@ -538,7 +538,7 @@ class StickyHeadersLinearLayoutManager<T>(
      */
     private fun getY(
         headerView: View,
-        nextHeaderView: View?
+        nextHeaderView: View?,
     ): Float {
         return if (orientation == VERTICAL) {
             var y = mTranslationY
@@ -572,7 +572,7 @@ class StickyHeadersLinearLayoutManager<T>(
      */
     private fun getX(
         headerView: View,
-        nextHeaderView: View?
+        nextHeaderView: View?,
     ): Float {
         return if (orientation != VERTICAL) {
             var x = mTranslationX
@@ -663,7 +663,7 @@ class StickyHeadersLinearLayoutManager<T>(
 
     private fun setPendingScroll(
         position: Int,
-        offset: Int
+        offset: Int,
     ) {
         mPendingScrollPosition = position
         mPendingScrollOffset = offset
@@ -693,7 +693,7 @@ class StickyHeadersLinearLayoutManager<T>(
 
         override fun onItemRangeInserted(
             positionStart: Int,
-            itemCount: Int
+            itemCount: Int,
         ) {
             // Shift headers below down.
             val headerCount = mHeaderPositions.size
@@ -720,7 +720,7 @@ class StickyHeadersLinearLayoutManager<T>(
 
         override fun onItemRangeRemoved(
             positionStart: Int,
-            itemCount: Int
+            itemCount: Int,
         ) {
             var headerCount = mHeaderPositions.size
             if (headerCount > 0) {
@@ -750,7 +750,7 @@ class StickyHeadersLinearLayoutManager<T>(
         override fun onItemRangeMoved(
             fromPosition: Int,
             toPosition: Int,
-            itemCount: Int
+            itemCount: Int,
         ) {
             // Shift moved headers by toPosition - fromPosition.
             // Shift headers in-between by itemCount (reverse if downwards).
@@ -810,7 +810,7 @@ class StickyHeadersLinearLayoutManager<T>(
 
         override fun writeToParcel(
             dest: Parcel,
-            flags: Int
+            flags: Int,
         ) {
             dest.writeParcelable(superState, flags)
             dest.writeInt(pendingScrollPosition)

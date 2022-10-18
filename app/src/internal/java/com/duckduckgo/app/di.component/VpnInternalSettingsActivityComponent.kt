@@ -29,11 +29,11 @@ import dagger.multibindings.IntoMap
 
 @WrongScope(
     comment = "To use the right scope we first need to enable dagger component nesting",
-    correctScope = ActivityScope::class
+    correctScope = ActivityScope::class,
 )
 @SingleInstanceIn(VpnScope::class)
 @MergeSubcomponent(
-    scope = VpnScope::class
+    scope = VpnScope::class,
 )
 interface VpnInternalSettingsActivityComponent : AndroidInjector<VpnInternalSettingsActivity> {
     @Subcomponent.Factory

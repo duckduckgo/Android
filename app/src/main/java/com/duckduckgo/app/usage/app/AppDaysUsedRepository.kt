@@ -57,5 +57,5 @@ class AppDaysUsedDatabaseRepository(private val appDaysUsedDao: AppDaysUsedDao) 
 
 @Entity(tableName = "app_days_used")
 data class AppDaysUsedEntity(
-    @PrimaryKey val date: String = formatter.format((Date()))
+    @PrimaryKey val date: String = formatter.format((Date())),
 )

@@ -25,7 +25,7 @@ import timber.log.Timber
 interface UncaughtExceptionRepository {
     suspend fun recordUncaughtException(
         e: Throwable?,
-        exceptionSource: UncaughtExceptionSource
+        exceptionSource: UncaughtExceptionSource,
     )
 
     suspend fun getExceptions(): List<UncaughtExceptionEntity>
@@ -35,14 +35,14 @@ interface UncaughtExceptionRepository {
 class UncaughtExceptionRepositoryDb(
     private val uncaughtExceptionDao: UncaughtExceptionDao,
     private val rootExceptionFinder: RootExceptionFinder,
-    private val deviceInfo: DeviceInfo
+    private val deviceInfo: DeviceInfo,
 ) : UncaughtExceptionRepository {
 
     private var lastSeenException: Throwable? = null
 
     override suspend fun recordUncaughtException(
         e: Throwable?,
-        exceptionSource: UncaughtExceptionSource
+        exceptionSource: UncaughtExceptionSource,
     ) {
         return withContext(Dispatchers.IO) {
             if (e == lastSeenException) {
@@ -55,7 +55,7 @@ class UncaughtExceptionRepositoryDb(
             val exceptionEntity = UncaughtExceptionEntity(
                 message = rootCause.extractExceptionCause(),
                 exceptionSource = exceptionSource,
-                version = deviceInfo.appVersion
+                version = deviceInfo.appVersion,
             )
 
             if (isNotDuplicate(exceptionEntity)) {

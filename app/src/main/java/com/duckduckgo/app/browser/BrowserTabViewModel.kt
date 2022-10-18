@@ -183,7 +183,7 @@ class BrowserTabViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val autofillStore: AutofillStore,
     private val adClickManager: AdClickManager,
-    private val sitePermissionsManager: SitePermissionsManager
+    private val sitePermissionsManager: SitePermissionsManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     HttpAuthenticationListener,
@@ -205,12 +205,12 @@ class BrowserTabViewModel @Inject constructor(
     data class CtaViewState(
         val cta: Cta? = null,
         val message: RemoteMessage? = null,
-        val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList()
+        val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList(),
     )
 
     data class SavedSiteChangedViewState(
         val savedSite: SavedSite,
-        val bookmarkFolder: BookmarkFolder?
+        val bookmarkFolder: BookmarkFolder?,
     )
 
     data class BrowserViewState(
@@ -244,13 +244,13 @@ class BrowserTabViewModel @Inject constructor(
         val canFindInPage: Boolean = false,
         val forceRenderingTicker: Long = System.currentTimeMillis(),
         val canPrintPage: Boolean = false,
-        val showAutofill: Boolean = false
+        val showAutofill: Boolean = false,
     )
 
     sealed class HighlightableButton {
         data class Visible(
             val enabled: Boolean = true,
-            val highlighted: Boolean = false
+            val highlighted: Boolean = false,
         ) : HighlightableButton()
 
         object Gone : HighlightableButton()
@@ -274,19 +274,19 @@ class BrowserTabViewModel @Inject constructor(
         val omnibarText: String = "",
         val isEditing: Boolean = false,
         val shouldMoveCaretToEnd: Boolean = false,
-        val showVoiceSearch: Boolean = false
+        val showVoiceSearch: Boolean = false,
     )
 
     data class LoadingViewState(
         val isLoading: Boolean = false,
         val privacyOn: Boolean = true,
-        val progress: Int = 0
+        val progress: Int = 0,
     )
 
     data class AccessibilityViewState(
         val fontSize: Float = FONT_SIZE_DEFAULT,
         val forceZoom: Boolean = false,
-        val refreshWebView: Boolean = false
+        val refreshWebView: Boolean = false,
     )
 
     data class FindInPageViewState(
@@ -294,13 +294,13 @@ class BrowserTabViewModel @Inject constructor(
         val showNumberMatches: Boolean = false,
         val activeMatchIndex: Int = 0,
         val searchTerm: String = "",
-        val numberMatches: Int = 0
+        val numberMatches: Int = 0,
     )
 
     data class PrivacyGradeViewState(
         val privacyGrade: PrivacyGrade? = null,
         val shouldAnimate: Boolean = false,
-        val showEmptyGrade: Boolean = true
+        val showEmptyGrade: Boolean = true,
     ) {
         val isEnabled: Boolean = privacyGrade != PrivacyGrade.UNKNOWN
     }
@@ -309,23 +309,23 @@ class BrowserTabViewModel @Inject constructor(
         val showSuggestions: Boolean = false,
         val showFavorites: Boolean = false,
         val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList()),
-        val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList()
+        val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList(),
     )
 
     data class LocationPermission(
         val origin: String,
-        val callback: GeolocationPermissions.Callback
+        val callback: GeolocationPermissions.Callback,
     )
 
     sealed class Command {
         class OpenInNewTab(
             val query: String,
-            val sourceTabId: String? = null
+            val sourceTabId: String? = null,
         ) : Command()
 
         class OpenMessageInNewTab(
             val message: Message,
-            val sourceTabId: String? = null
+            val sourceTabId: String? = null,
         ) : Command()
 
         class OpenInNewBackgroundTab(val query: String) : Command()
@@ -339,7 +339,7 @@ class BrowserTabViewModel @Inject constructor(
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(
             val url: String,
-            val requestUserConfirmation: Boolean
+            val requestUserConfirmation: Boolean,
         ) : Command()
 
         class ShowSavedSiteAddedConfirmation(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
@@ -360,12 +360,12 @@ class BrowserTabViewModel @Inject constructor(
         object DismissFindInPage : Command()
         class ShowFileChooser(
             val filePathCallback: ValueCallback<Array<Uri>>,
-            val fileChooserParams: WebChromeClient.FileChooserParams
+            val fileChooserParams: WebChromeClient.FileChooserParams,
         ) : Command()
 
         class HandleNonHttpAppLink(
             val nonHttpAppLink: NonHttpAppLink,
-            val headers: Map<String, String>
+            val headers: Map<String, String>,
         ) : Command()
 
         class ShowAppLinkPrompt(val appLink: AppLink) : Command()
@@ -375,7 +375,7 @@ class BrowserTabViewModel @Inject constructor(
         class AddHomeShortcut(
             val title: String,
             val url: String,
-            val icon: Bitmap? = null
+            val icon: Bitmap? = null,
         ) : Command()
 
         class SubmitUrl(val url: String) : Command()
@@ -386,7 +386,7 @@ class BrowserTabViewModel @Inject constructor(
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
         class SaveCredentials(
             val request: BasicAuthenticationRequest,
-            val credentials: BasicAuthenticationCredentials
+            val credentials: BasicAuthenticationCredentials,
         ) : Command()
 
         object GenerateWebViewPreviewImage : Command()
@@ -395,32 +395,32 @@ class BrowserTabViewModel @Inject constructor(
         object ShowWebContent : Command()
         class CheckSystemLocationPermission(
             val domain: String,
-            val deniedForever: Boolean
+            val deniedForever: Boolean,
         ) : Command()
 
         class AskDomainPermission(val domain: String) : Command()
         object RequestSystemLocationPermission : Command()
         class RefreshUserAgent(
             val url: String?,
-            val isDesktop: Boolean
+            val isDesktop: Boolean,
         ) : Command()
 
         class ShowErrorWithAction(
             val textResId: Int,
-            val action: () -> Unit
+            val action: () -> Unit,
         ) : Command()
 
         class ShowDomainHasPermissionMessage(val domain: String) : Command()
         class ConvertBlobToDataUri(
             val url: String,
-            val mimeType: String
+            val mimeType: String,
         ) : Command()
 
         class RequestFileDownload(
             val url: String,
             val contentDisposition: String?,
             val mimeType: String,
-            val requestUserConfirmation: Boolean
+            val requestUserConfirmation: Boolean,
         ) : Command()
 
         object ChildTabClosed : Command()
@@ -441,11 +441,11 @@ class BrowserTabViewModel @Inject constructor(
         object EmailSignEvent : Command()
         class ShowSitePermissionsDialog(
             val permissionsToRequest: Array<String>,
-            val request: PermissionRequest
+            val request: PermissionRequest,
         ) : Command()
         class GrantSitePermissionRequest(
             val sitePermissionsToGrant: Array<String>,
-            val request: PermissionRequest
+            val request: PermissionRequest,
         ) : Command()
     }
 
@@ -454,7 +454,7 @@ class BrowserTabViewModel @Inject constructor(
         object Refresh : NavigationCommand()
         class Navigate(
             val url: String,
-            val headers: Map<String, String>
+            val headers: Map<String, String>,
         ) : NavigationCommand()
 
         class NavigateBack(val steps: Int) : NavigationCommand()
@@ -507,7 +507,7 @@ class BrowserTabViewModel @Inject constructor(
     @ExperimentalCoroutinesApi
     @FlowPreview
     private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.showFireButtonPulseAnimation.asLiveData(
-        context = viewModelScope.coroutineContext
+        context = viewModelScope.coroutineContext,
     )
 
     private var autoCompleteDisposable: Disposable? = null
@@ -637,7 +637,7 @@ class BrowserTabViewModel @Inject constructor(
                 withContext(dispatchers.main()) {
                     ctaViewState.value = currentCtaViewState().copy(
                         cta = cta,
-                        message = if (cta == null) activeMessage else null
+                        message = if (cta == null) activeMessage else null,
                     )
                 }
             }.launchIn(viewModelScope)
@@ -647,7 +647,7 @@ class BrowserTabViewModel @Inject constructor(
         tabId: String,
         initialUrl: String?,
         skipHome: Boolean,
-        favoritesOnboarding: Boolean
+        favoritesOnboarding: Boolean,
     ) {
         Timber.i("favoritesOnboarding loadData $initialUrl, $skipHome, $favoritesOnboarding")
         this.tabId = tabId
@@ -681,7 +681,7 @@ class BrowserTabViewModel @Inject constructor(
                     currentAccessibilityViewState().copy(
                         fontSize = settings.fontSize,
                         forceZoom = settings.forceZoom,
-                        refreshWebView = shouldRefreshWebview
+                        refreshWebView = shouldRefreshWebview,
                     )
             }.launchIn(viewModelScope)
     }
@@ -696,7 +696,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun buildSiteFactory(
         url: String,
-        title: String? = null
+        title: String? = null,
     ) {
         if (buildingSiteFactoryJob?.isCompleted == false) {
             Timber.i("Cancelling existing work to build SiteMonitor for $url")
@@ -730,7 +730,7 @@ class BrowserTabViewModel @Inject constructor(
                 { result ->
                     onAutoCompleteResultReceived(result)
                 },
-                { t: Throwable? -> Timber.w(t, "Failed to get search results") }
+                { t: Throwable? -> Timber.w(t, "Failed to get search results") },
             )
     }
 
@@ -754,7 +754,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun registerWebViewListener(
         browserWebViewClient: BrowserWebViewClient,
-        browserChromeClient: BrowserChromeClient
+        browserChromeClient: BrowserChromeClient,
     ) {
         browserWebViewClient.webViewClientListener = this
         browserChromeClient.webViewClientListener = this
@@ -799,7 +799,7 @@ class BrowserTabViewModel @Inject constructor(
         val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion }
         val params = mapOf(
             PixelParameter.SHOWED_BOOKMARKS to hasBookmarkResults.toString(),
-            PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString()
+            PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString(),
         )
         val pixelName = when (suggestion) {
             is AutoCompleteBookmarkSuggestion -> AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
@@ -824,7 +824,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onUserSubmittedQuery(
         query: String,
-        queryOrigin: QueryOrigin = QueryOrigin.FromUser
+        queryOrigin: QueryOrigin = QueryOrigin.FromUser,
     ) {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
@@ -885,7 +885,7 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = currentOmnibarViewState().copy(
             omnibarText = trimmedInput,
             shouldMoveCaretToEnd = false,
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = urlToNavigate)
+            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = urlToNavigate),
         )
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value =
@@ -955,7 +955,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun iconReceived(
         url: String,
-        icon: Bitmap
+        icon: Bitmap,
     ) {
         val currentTab = tabRepository.liveSelectedTab.value ?: return
         val currentUrl = currentTab.url ?: return
@@ -973,7 +973,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun iconReceived(
         visitedUrl: String,
-        iconUrl: String
+        iconUrl: String,
     ) {
         val currentTab = tabRepository.liveSelectedTab.value ?: return
         val currentUrl = currentTab.url ?: return
@@ -1077,7 +1077,7 @@ class BrowserTabViewModel @Inject constructor(
         webNavigationState = null
 
         val browserState = browserStateModifier.copyForHomeShowing(currentBrowserViewState()).copy(
-            canGoForward = currentGlobalLayoutState() !is Invalidated
+            canGoForward = currentGlobalLayoutState() !is Invalidated,
         )
         browserViewState.value = browserState
 
@@ -1085,7 +1085,7 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = currentOmnibarViewState().copy(
             omnibarText = "",
             shouldMoveCaretToEnd = false,
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch()
+            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(),
         )
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
 
@@ -1112,7 +1112,7 @@ class BrowserTabViewModel @Inject constructor(
 
         browserViewState.value = currentBrowserViewState().copy(
             canGoBack = newWebNavigationState.canGoBack || !skipHome,
-            canGoForward = newWebNavigationState.canGoForward
+            canGoForward = newWebNavigationState.canGoForward,
         )
 
         Timber.v("navigationStateChanged: $stateChange")
@@ -1150,7 +1150,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun pageChanged(
         url: String,
-        title: String?
+        title: String?,
     ) {
         Timber.v("Page changed: $url")
         hasCtaBeenShownForCurrentPage.set(false)
@@ -1162,7 +1162,7 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = currentOmnibarViewState.copy(
             omnibarText = omnibarText,
             shouldMoveCaretToEnd = false,
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url)
+            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url),
         )
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
@@ -1191,7 +1191,7 @@ class BrowserTabViewModel @Inject constructor(
             canFireproofSite = domain != null,
             isFireproofWebsite = isFireproofWebsite(),
             showDaxIcon = shouldShowDaxIcon(url, true),
-            canPrintPage = domain != null
+            canPrintPage = domain != null,
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
@@ -1245,7 +1245,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun shouldShowDaxIcon(
         currentUrl: String?,
-        showPrivacyGrade: Boolean
+        showPrivacyGrade: Boolean,
     ): Boolean {
         val url = currentUrl ?: return false
         return showPrivacyGrade && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
@@ -1277,7 +1277,7 @@ class BrowserTabViewModel @Inject constructor(
         withContext(dispatchers.main()) {
             browserViewState.value = currentBrowserViewState().copy(
                 bookmark = bookmark,
-                favorite = favorite
+                favorite = favorite,
             )
         }
     }
@@ -1338,8 +1338,8 @@ class BrowserTabViewModel @Inject constructor(
             currentOmnibarViewState.copy(
                 omnibarText = omnibarText,
                 shouldMoveCaretToEnd = false,
-                showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url)
-            )
+                showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url),
+            ),
         )
         browserViewState.postValue(currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite()))
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
@@ -1373,7 +1373,7 @@ class BrowserTabViewModel @Inject constructor(
             showClearButton = true,
             canFireproofSite = false,
             showDaxIcon = false,
-            canPrintPage = false
+            canPrintPage = false,
         )
     }
 
@@ -1402,7 +1402,7 @@ class BrowserTabViewModel @Inject constructor(
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(
             shouldAnimate = isLoading,
-            showEmptyGrade = showLoadingGrade
+            showEmptyGrade = showLoadingGrade,
         )
 
         if (newProgress == 100) {
@@ -1427,7 +1427,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onSiteLocationPermissionRequested(
         origin: String,
-        callback: GeolocationPermissions.Callback
+        callback: GeolocationPermissions.Callback,
     ) {
         locationPermission = LocationPermission(origin, callback)
 
@@ -1470,7 +1470,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onSiteLocationPermissionSelected(
         domain: String,
-        permission: LocationPermissionType
+        permission: LocationPermissionType,
     ) {
         locationPermission?.let { locationPermission ->
             when (permission) {
@@ -1695,7 +1695,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
-        fileChooserParams: WebChromeClient.FileChooserParams
+        fileChooserParams: WebChromeClient.FileChooserParams,
     ) {
         command.value = ShowFileChooser(filePathCallback, fileChooserParams)
     }
@@ -1713,7 +1713,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onOmnibarInputStateChanged(
         query: String,
         hasFocus: Boolean,
-        hasQueryChanged: Boolean
+        hasQueryChanged: Boolean,
     ) {
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank() || !hasFocus) {
@@ -1746,8 +1746,8 @@ class BrowserTabViewModel @Inject constructor(
             isEditing = hasFocus,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
                 isEditing = hasFocus,
-                urlLoaded = url ?: ""
-            )
+                urlLoaded = url ?: "",
+            ),
         )
 
         val currentBrowserViewState = currentBrowserViewState()
@@ -1766,7 +1766,7 @@ class BrowserTabViewModel @Inject constructor(
                 HighlightableButton.Gone
             },
             showClearButton = showClearButton,
-            showDaxIcon = shouldShowDaxIcon(url, showPrivacyGrade)
+            showDaxIcon = shouldShowDaxIcon(url, showPrivacyGrade),
         )
 
         Timber.d("showPrivacyGrade=$showPrivacyGrade, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
@@ -1775,7 +1775,7 @@ class BrowserTabViewModel @Inject constructor(
             .copy(
                 showSuggestions = showAutoCompleteSuggestions,
                 showFavorites = showFavoritesAsSuggestions,
-                searchResults = autoCompleteSearchResults
+                searchResults = autoCompleteSearchResults,
             )
 
         if (hasQueryChanged && hasFocus && autoCompleteSuggestionsEnabled) {
@@ -1799,7 +1799,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private suspend fun saveSiteBookmark(
         url: String,
-        title: String
+        title: String,
     ) {
         val savedBookmark = withContext(dispatchers.io()) {
             if (url.isNotBlank()) {
@@ -1823,7 +1823,7 @@ class BrowserTabViewModel @Inject constructor(
             val buttonHighlighted = currentBrowserViewState().addFavorite.isHighlighted()
             pixel.fire(
                 AppPixelName.MENU_ACTION_ADD_FAVORITE_PRESSED.pixelName,
-                mapOf(FAVORITE_MENU_ITEM_STATE to buttonHighlighted.toString())
+                mapOf(FAVORITE_MENU_ITEM_STATE to buttonHighlighted.toString()),
             )
             saveFavoriteSite(url, title ?: "")
         }
@@ -1842,7 +1842,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun saveFavoriteSite(
         url: String,
-        title: String
+        title: String,
     ) {
         viewModelScope.launch {
             val favorite = withContext(dispatchers.io()) {
@@ -1975,8 +1975,8 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = ShowEditSavedSiteDialog(
                     SavedSiteChangedViewState(
                         savedSite,
-                        bookmarkFolder
-                    )
+                        bookmarkFolder,
+                    ),
                 )
             }
         }
@@ -2062,7 +2062,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun userLongPressedInWebView(
         target: LongPressTarget,
-        menu: ContextMenu
+        menu: ContextMenu,
     ) {
         Timber.i("Long pressed on ${target.type}, (url=${target.url}), (image url = ${target.imageUrl})")
         longPressHandler.handleLongPress(target.type, target.url, menu)
@@ -2070,7 +2070,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun userSelectedItemFromLongPressMenu(
         longPressTarget: LongPressTarget,
-        item: MenuItem
+        item: MenuItem,
     ): Boolean {
         val requiredAction = longPressHandler.userSelectedMenuItem(longPressTarget, item)
         Timber.d("Required action from long press is $requiredAction")
@@ -2130,14 +2130,14 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onFindResultsReceived(
         activeMatchOrdinal: Int,
-        numberOfMatches: Int
+        numberOfMatches: Int,
     ) {
         val activeIndex = if (numberOfMatches == 0) 0 else activeMatchOrdinal + 1
         val currentViewState = currentFindInPageViewState()
         findInPageViewState.value = currentViewState.copy(
             showNumberMatches = true,
             activeMatchIndex = activeIndex,
-            numberMatches = numberOfMatches
+            numberMatches = numberOfMatches,
         )
     }
 
@@ -2158,7 +2158,7 @@ class BrowserTabViewModel @Inject constructor(
                 AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED
             } else {
                 AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED
-            }
+            },
         )
 
         if (desktopSiteRequested && uri.isMobileSite) {
@@ -2198,10 +2198,10 @@ class BrowserTabViewModel @Inject constructor(
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(
                     addToHomeVisible = addToHomeSupported,
-                    showAutofill = showAutofill
+                    showAutofill = showAutofill,
                 )
                 omnibarViewState.value = currentOmnibarViewState().copy(
-                    showVoiceSearch = showVoiceSearch
+                    showVoiceSearch = showVoiceSearch,
                 )
             }
         }
@@ -2247,14 +2247,14 @@ class BrowserTabViewModel @Inject constructor(
 
     fun saveWebViewState(
         webView: WebView?,
-        tabId: String
+        tabId: String,
     ) {
         webViewSessionStorage.saveSession(webView, tabId)
     }
 
     fun restoreWebViewState(
         webView: WebView?,
-        lastUrl: String
+        lastUrl: String,
     ) {
         val sessionRestored = webViewSessionStorage.restoreSession(webView, tabId)
         if (sessionRestored) {
@@ -2290,7 +2290,7 @@ class BrowserTabViewModel @Inject constructor(
             this.showFavoritesOnboarding = false
             browserViewState.value = currentBrowserViewState().copy(
                 showMenuButton = HighlightableButton.Visible(highlighted = false),
-                addFavorite = HighlightableButton.Visible(highlighted = true)
+                addFavorite = HighlightableButton.Visible(highlighted = true),
             )
         }
     }
@@ -2300,7 +2300,7 @@ class BrowserTabViewModel @Inject constructor(
             Timber.i("favoritesOnboarding onBrowserMenuClosed")
             if (currentBrowserViewState().addFavorite.isHighlighted()) {
                 browserViewState.value = currentBrowserViewState().copy(
-                    addFavorite = HighlightableButton.Visible(highlighted = false)
+                    addFavorite = HighlightableButton.Visible(highlighted = false),
                 )
             }
         }
@@ -2313,7 +2313,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onSurveyChanged(
         survey: Survey?,
-        locale: Locale = Locale.getDefault()
+        locale: Locale = Locale.getDefault(),
     ) {
         val surveyCleared = ctaViewModel.onSurveyChanged(survey)
         if (surveyCleared) {
@@ -2344,7 +2344,7 @@ class BrowserTabViewModel @Inject constructor(
                     isBrowserShowing,
                     siteLiveData.value,
                     showFavoritesOnboarding,
-                    locale
+                    locale,
                 )
             }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
@@ -2443,7 +2443,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun updateTabPreview(
         tabId: String,
-        fileName: String
+        fileName: String,
     ) {
         tabRepository.updateTabPreviewImage(tabId, fileName)
     }
@@ -2454,13 +2454,13 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun handleAppLink(
         appLink: AppLink,
-        isForMainFrame: Boolean
+        isForMainFrame: Boolean,
     ): Boolean {
         return appLinksHandler.handleAppLink(
             isForMainFrame,
             appLink.uriString,
             appSettingsPreferencesStore.appLinksEnabled,
-            !appSettingsPreferencesStore.showAppLinksPrompt
+            !appSettingsPreferencesStore.showAppLinksPrompt,
         ) { appLinkClicked(appLink) }
     }
 
@@ -2476,13 +2476,13 @@ class BrowserTabViewModel @Inject constructor(
 
     fun clearPreviousAppLink() {
         browserViewState.value = currentBrowserViewState().copy(
-            previousAppLink = null
+            previousAppLink = null,
         )
     }
 
     private fun updatePreviousAppLink(appLink: AppLink) {
         browserViewState.value = currentBrowserViewState().copy(
-            previousAppLink = appLink
+            previousAppLink = appLink,
         )
     }
 
@@ -2533,7 +2533,7 @@ class BrowserTabViewModel @Inject constructor(
         if (request.host != site?.uri?.host) {
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = request.site,
-                showVoiceSearch = false
+                showVoiceSearch = false,
             )
             command.value = HideWebContent
         }
@@ -2542,7 +2542,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun handleAuthentication(
         request: BasicAuthenticationRequest,
-        credentials: BasicAuthenticationCredentials
+        credentials: BasicAuthenticationCredentials,
     ) {
         request.handler.proceed(credentials.username, credentials.password)
         command.value = ShowWebContent
@@ -2576,7 +2576,7 @@ class BrowserTabViewModel @Inject constructor(
             canGoForward = false,
             canReportSite = false,
             canChangeBrowsingMode = false,
-            canFireproofSite = false
+            canFireproofSite = false,
         )
     }
 
@@ -2602,7 +2602,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         contentDisposition: String?,
         mimeType: String,
-        requestUserConfirmation: Boolean
+        requestUserConfirmation: Boolean,
     ) {
         if (url.startsWith("blob:")) {
             command.value = ConvertBlobToDataUri(url, mimeType)
@@ -2615,7 +2615,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         contentDisposition: String?,
         mimeType: String,
-        requestUserConfirmation: Boolean
+        requestUserConfirmation: Boolean,
     ) {
         command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
@@ -2633,8 +2633,8 @@ class BrowserTabViewModel @Inject constructor(
                 AppPixelName.EMAIL_COPIED_TO_CLIPBOARD,
                 mapOf(
                     PixelParameter.COHORT to emailManager.getCohort(),
-                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()
-                )
+                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate(),
+                ),
             )
             emailManager.setNewLastUsedDate()
         }
@@ -2647,8 +2647,8 @@ class BrowserTabViewModel @Inject constructor(
                 AppPixelName.EMAIL_USE_ALIAS,
                 mapOf(
                     PixelParameter.COHORT to emailManager.getCohort(),
-                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()
-                )
+                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate(),
+                ),
             )
             emailManager.setNewLastUsedDate()
         }
@@ -2661,8 +2661,8 @@ class BrowserTabViewModel @Inject constructor(
                 AppPixelName.EMAIL_USE_ADDRESS,
                 mapOf(
                     PixelParameter.COHORT to emailManager.getCohort(),
-                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()
-                )
+                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate(),
+                ),
             )
             emailManager.setNewLastUsedDate()
         }
@@ -2719,7 +2719,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onUrlExtracted(
         initialUrl: String,
-        extractedUrl: String?
+        extractedUrl: String?,
     ) {
         val destinationUrl: String = if (extractedUrl != null) {
             ampLinks.lastAmpLinkInfo = AmpLinkInfo(ampLink = initialUrl)
@@ -2754,7 +2754,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onConfigurationChanged() {
         browserViewState.value = currentBrowserViewState().copy(
-            forceRenderingTicker = System.currentTimeMillis()
+            forceRenderingTicker = System.currentTimeMillis(),
         )
     }
 

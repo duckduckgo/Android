@@ -21,5 +21,5 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "https_false_positive_domain")
 data class HttpsFalsePositiveDomain(
-    @PrimaryKey var domain: String
+    @PrimaryKey var domain: String,
 )

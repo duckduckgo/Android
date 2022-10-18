@@ -30,12 +30,12 @@ import android.content.IntentFilter
  */
 abstract class InternalFeatureReceiver(
     private val context: Context,
-    private val receiver: (Intent) -> Unit
+    private val receiver: (Intent) -> Unit,
 ) : BroadcastReceiver() {
 
     override fun onReceive(
         context: Context,
-        intent: Intent
+        intent: Intent,
     ) {
         receiver(intent)
     }

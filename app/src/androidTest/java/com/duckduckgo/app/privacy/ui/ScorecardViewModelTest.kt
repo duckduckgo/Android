@@ -300,7 +300,7 @@ class ScorecardViewModelTest {
         privacyPractices: Practices = PrivacyPractices.UNKNOWN,
         entity: Entity? = null,
         grade: PrivacyGrade = PrivacyGrade.UNKNOWN,
-        improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN
+        improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN,
     ): Site {
         val site: Site = mock()
         whenever(site.https).thenReturn(https)

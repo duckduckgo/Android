@@ -47,7 +47,7 @@ class NetworkConnectivityHealthHandler @Inject constructor(
     private val pixel: DeviceShieldPixels,
     private val healthMetricCounter: HealthMetricCounter,
     private val appTpFeatureConfig: AppTpFeatureConfig,
-    private val trackerBlockingVpnService: Provider<TrackerBlockingVpnService>
+    private val trackerBlockingVpnService: Provider<TrackerBlockingVpnService>,
 ) : VpnServiceCallbacks {
     private val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val job = ConflatedJob()

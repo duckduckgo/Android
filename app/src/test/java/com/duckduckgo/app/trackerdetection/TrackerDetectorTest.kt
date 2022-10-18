@@ -52,7 +52,7 @@ class TrackerDetectorTest {
         mockContentBlocking,
         mockTrackerAllowlist,
         mockWebTrackersBlockedDao,
-        mockAdClickManager
+        mockAdClickManager,
     )
 
     @Test
@@ -94,7 +94,7 @@ class TrackerDetectorTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
 
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
@@ -113,7 +113,7 @@ class TrackerDetectorTest {
             entity = entity,
             surrogateId = null,
             status = TrackerStatus.SAME_ENTITY_ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
 
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
@@ -132,7 +132,7 @@ class TrackerDetectorTest {
             entity = entity,
             surrogateId = null,
             status = TrackerStatus.SAME_ENTITY_ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
 
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
@@ -151,7 +151,7 @@ class TrackerDetectorTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
@@ -169,7 +169,7 @@ class TrackerDetectorTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.USER_ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
@@ -186,7 +186,7 @@ class TrackerDetectorTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
@@ -203,7 +203,7 @@ class TrackerDetectorTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.USER_ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
@@ -220,7 +220,7 @@ class TrackerDetectorTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
@@ -237,7 +237,7 @@ class TrackerDetectorTest {
             entity = null,
             surrogateId = "testId",
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
@@ -254,7 +254,7 @@ class TrackerDetectorTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.SITE_BREAKAGE_ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)
@@ -271,7 +271,7 @@ class TrackerDetectorTest {
             entity = null,
             surrogateId = null,
             status = TrackerStatus.AD_ALLOWED,
-            type = TrackerType.AD
+            type = TrackerType.AD,
         )
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
         assertEquals(expected, actual)

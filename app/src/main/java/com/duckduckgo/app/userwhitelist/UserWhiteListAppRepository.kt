@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 class UserWhiteListAppRepository @Inject constructor(
     appDatabase: AppDatabase,
     coroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider
+    dispatcherProvider: DispatcherProvider,
 ) : UserWhiteListRepository {
 
     private val dao = appDatabase.userWhitelistDao()

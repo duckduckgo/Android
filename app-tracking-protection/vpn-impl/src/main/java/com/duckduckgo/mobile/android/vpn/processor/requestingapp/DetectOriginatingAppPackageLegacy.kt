@@ -40,7 +40,7 @@ import timber.log.Timber
 class DetectOriginatingAppPackageLegacy(
     private val packageManager: PackageManager,
     private val procNetFileConnectionMatcher: NetworkFileConnectionMatcher,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope,
 ) : OriginatingAppPackageIdentifier {
 
     // using 2 threads here to match that there are two files we might want to search in parallel
@@ -48,12 +48,12 @@ class DetectOriginatingAppPackageLegacy(
 
     private val tcpSearchOrder = listOf(
         SearchFile(fileNameTcpV6, ipv6RegexPattern()),
-        SearchFile(fileNameTcpV4, ipv4RegexPattern())
+        SearchFile(fileNameTcpV4, ipv4RegexPattern()),
     )
 
     private val udpSearchOrder = listOf(
         SearchFile(fileNameUdpV6, ipv6RegexPattern()),
-        SearchFile(fileNameUdpV4, ipv4RegexPattern())
+        SearchFile(fileNameUdpV4, ipv4RegexPattern()),
     )
 
     override fun resolvePackageId(connectionInfo: ConnectionInfo): String {
@@ -132,7 +132,7 @@ class DetectOriginatingAppPackageLegacy(
 
     private data class SearchFile(
         val filename: String,
-        val pattern: Pattern
+        val pattern: Pattern,
     )
 
     companion object {

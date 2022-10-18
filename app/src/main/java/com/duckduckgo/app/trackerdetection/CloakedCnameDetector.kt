@@ -31,7 +31,7 @@ interface CloakedCnameDetector {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class CloakedCnameDetectorImpl @Inject constructor(
-    private val tdsCnameEntityDao: TdsCnameEntityDao
+    private val tdsCnameEntityDao: TdsCnameEntityDao,
 ) : CloakedCnameDetector {
 
     override fun detectCnameCloakedHost(url: Uri): String? {

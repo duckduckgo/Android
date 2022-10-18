@@ -44,7 +44,7 @@ import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
 
 class TrackerFeedAdapter @Inject constructor(
-    private val timeDiffFormatter: TimeDiffFormatter
+    private val timeDiffFormatter: TimeDiffFormatter,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), StickyHeaders {
 
     private val trackerFeedItems = mutableListOf<TrackerFeedItem>()
@@ -52,13 +52,13 @@ class TrackerFeedAdapter @Inject constructor(
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
-        position: Int
+        position: Int,
     ) {
         when (holder) {
             is TrackerFeedViewHolder -> holder.bind(
                 trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData,
                 onAppClick,
-                position == trackerFeedItems.size - 1
+                position == trackerFeedItems.size - 1,
             )
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
@@ -67,7 +67,7 @@ class TrackerFeedAdapter @Inject constructor(
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): RecyclerView.ViewHolder {
         return when (viewType) {
             LOADING_STATE_TYPE -> TrackerSkeletonViewHolder.create(parent)
@@ -94,7 +94,7 @@ class TrackerFeedAdapter @Inject constructor(
 
     suspend fun updateData(
         data: List<TrackerFeedItem>,
-        onAppClickListener: (TrackerFeedItem.TrackerFeedData) -> Unit
+        onAppClickListener: (TrackerFeedItem.TrackerFeedData) -> Unit,
     ) {
         onAppClick = onAppClickListener
         val newData = data
@@ -136,13 +136,13 @@ class TrackerFeedAdapter @Inject constructor(
 
     private class TrackerFeedHeaderViewHolder(
         val view: TextView,
-        private val timeDiffFormatter: TimeDiffFormatter
+        private val timeDiffFormatter: TimeDiffFormatter,
     ) :
         RecyclerView.ViewHolder(view) {
         companion object {
             fun create(
                 parent: ViewGroup,
-                timeDiffFormatter: TimeDiffFormatter
+                timeDiffFormatter: TimeDiffFormatter,
             ): TrackerFeedHeaderViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
                 val view = inflater.inflate(R.layout.view_device_shield_activity_entry_header, parent, false)
@@ -180,7 +180,7 @@ class TrackerFeedAdapter @Inject constructor(
         fun bind(
             tracker: TrackerFeedItem.TrackerFeedData?,
             onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit,
-            isLastPosition: Boolean
+            isLastPosition: Boolean,
         ) {
             tracker?.let { item ->
                 with(activityMessage) {
@@ -193,14 +193,14 @@ class TrackerFeedAdapter @Inject constructor(
                                 R.string.atp_ActivityTrackersCompanyBlockedOnetimeOneCompany,
                                 trackersCount,
                                 trackingCompanies,
-                                trackingAppName
+                                trackingAppName,
                             )
                         } else {
                             resources.getString(
                                 R.string.atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies,
                                 trackersCount,
                                 trackingCompanies,
-                                trackingAppName
+                                trackingAppName,
                             )
                         }
                     } else {
@@ -209,14 +209,14 @@ class TrackerFeedAdapter @Inject constructor(
                                 R.string.atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany,
                                 trackersCount,
                                 trackingCompanies,
-                                trackingAppName
+                                trackingAppName,
                             )
                         } else {
                             resources.getString(
                                 R.string.atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies,
                                 trackersCount,
                                 trackingCompanies,
-                                trackingAppName
+                                trackingAppName,
                             )
                         }
                     }
@@ -255,7 +255,7 @@ class TrackerFeedAdapter @Inject constructor(
 
     private class DiffCallback(
         private val old: List<TrackerFeedItem>,
-        private val new: List<TrackerFeedItem>
+        private val new: List<TrackerFeedItem>,
     ) :
         DiffUtil.Callback() {
         override fun getOldListSize() = old.size
@@ -264,14 +264,14 @@ class TrackerFeedAdapter @Inject constructor(
 
         override fun areItemsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return old[oldItemPosition].id == new[newItemPosition].id
         }
 
         override fun areContentsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return old == new
         }

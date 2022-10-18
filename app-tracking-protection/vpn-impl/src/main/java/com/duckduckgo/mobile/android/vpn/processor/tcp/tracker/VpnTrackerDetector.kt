@@ -42,7 +42,7 @@ interface VpnTrackerDetector {
         payloadBuffer: ByteBuffer,
         isLocalAddress: Boolean,
         requestingApp: OriginatingApp,
-        hostname: String?
+        hostname: String?,
     ): RequestTrackerType
 }
 
@@ -53,7 +53,7 @@ class DomainBasedTrackerDetector(
     private val payloadBytesExtractor: PayloadBytesExtractor,
     private val tlsContentTypeExtractor: ContentTypeExtractor,
     private val vpnDatabase: VpnDatabase,
-    private val requestInterceptors: PluginPoint<VpnTrackerDetectorInterceptor>
+    private val requestInterceptors: PluginPoint<VpnTrackerDetectorInterceptor>,
 ) : VpnTrackerDetector {
 
     override fun determinePacketType(
@@ -62,7 +62,7 @@ class DomainBasedTrackerDetector(
         payloadBuffer: ByteBuffer,
         isLocalAddress: Boolean,
         requestingApp: OriginatingApp,
-        hostname: String?
+        hostname: String?,
     ): RequestTrackerType {
         if (isLocalAddress) {
             Timber.v("%s is a local address; not looking for trackers", packet.ipHeader.destinationAddress)
@@ -88,7 +88,7 @@ class DomainBasedTrackerDetector(
                     hostname,
                     requestingApp.packageId,
                     trackerType.tracker.owner.name,
-                    tcb.ipAndPort
+                    tcb.ipAndPort,
                 )
                 tcb.trackerTypeDetermined = true
                 tcb.isTracker = false
@@ -142,21 +142,21 @@ class DomainBasedTrackerDetector(
     private fun recordTrackerBlocked(
         trackerType: ThirdParty,
         tcb: TCB,
-        requestingApp: OriginatingApp
+        requestingApp: OriginatingApp,
     ) {
         Timber.d(
             "Determined %s to be a 3rd party tracker for %s, tracker owned by %s [%s]",
             tcb.hostName,
             requestingApp.packageId,
             trackerType.tracker.owner.name,
-            tcb.ipAndPort
+            tcb.ipAndPort,
         )
         insertTracker(trackerType.tracker, requestingApp)
     }
 
     private fun isTrackerInExceptionRules(
         tracker: RequestTrackerType.Tracker,
-        originatingApp: OriginatingApp
+        originatingApp: OriginatingApp,
     ): Boolean {
         val exceptionRule = vpnDatabase.vpnAppTrackerBlockingDao().getRuleByTrackerDomain(tracker.hostName)
 
@@ -165,7 +165,7 @@ class DomainBasedTrackerDetector(
 
     private fun insertTracker(
         tracker: AppTracker,
-        requestingApp: OriginatingApp
+        requestingApp: OriginatingApp,
     ) {
         if (requestingApp.isInvalid()) {
             // FIXME exclude false positive of DDG app
@@ -180,7 +180,7 @@ class DomainBasedTrackerDetector(
             company = tracker.owner.name,
             companyDisplayName = tracker.owner.displayName,
             trackingApp = TrackingApp(requestingApp.packageId, requestingApp.appName),
-            domain = tracker.hostname
+            domain = tracker.hostname,
         )
 
         appTrackerRecorder.insertTracker(vpnTracker)

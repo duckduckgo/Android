@@ -123,7 +123,7 @@ class BrowserWebViewClientTest {
             printInjector,
             internalTestUserChecker,
             adClickManager,
-            autoconsent
+            autoconsent,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -432,8 +432,8 @@ class BrowserWebViewClientTest {
                 SpecialUrlDetector.UrlType.NonHttpAppLink(
                     EXAMPLE_URL,
                     Intent(),
-                    EXAMPLE_URL
-                )
+                    EXAMPLE_URL,
+                ),
             )
             testee.webViewClientListener = null
             assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
@@ -448,8 +448,8 @@ class BrowserWebViewClientTest {
                 SpecialUrlDetector.UrlType.NonHttpAppLink(
                     EXAMPLE_URL,
                     Intent(),
-                    EXAMPLE_URL
-                )
+                    EXAMPLE_URL,
+                ),
             )
             testee.webViewClientListener = null
             assertTrue(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))

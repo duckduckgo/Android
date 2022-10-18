@@ -30,13 +30,13 @@ interface VpnRunningStatsDao {
     @Query("UPDATE vpn_running_stats SET timeRunningMillis = timeRunningMillis + :timeRunningMillis WHERE id =:id")
     fun updateTimeRunning(
         timeRunningMillis: Long,
-        id: String
+        id: String,
     )
 
     @Transaction
     fun upsert(
         timeRunningMillis: Long,
-        id: String = bucket()
+        id: String = bucket(),
     ) {
         val runningStats = VpnRunningStats(id, timeRunningMillis)
 
@@ -49,7 +49,7 @@ interface VpnRunningStatsDao {
     @Query("SELECT * FROM vpn_running_stats WHERE id >= :startTime AND id < :endTime")
     fun getRunningStatsBetween(
         startTime: String = bucket(),
-        endTime: String
+        endTime: String,
     ): Flow<List<VpnRunningStats>>
 
     private fun bucket() = DatabaseDateFormatter.bucketByHour()

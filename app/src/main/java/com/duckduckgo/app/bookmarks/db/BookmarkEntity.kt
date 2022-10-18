@@ -31,5 +31,5 @@ data class BookmarkEntity(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
     var title: String?,
     var url: String,
-    var parentId: Long
+    var parentId: Long,
 )

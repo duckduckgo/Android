@@ -29,24 +29,24 @@ interface WebViewPreviewPersister {
 
     fun fullPathForFile(
         tabId: String,
-        previewName: String
+        previewName: String,
     ): String
 
     suspend fun save(
         bitmap: Bitmap,
-        tabId: String
+        tabId: String,
     ): String
 
     suspend fun deleteAll()
     suspend fun deletePreviewsForTab(
         tabId: String,
-        currentPreviewImage: String?
+        currentPreviewImage: String?,
     )
 }
 
 class FileBasedWebViewPreviewPersister(
     val context: Context,
-    private val fileDeleter: FileDeleter
+    private val fileDeleter: FileDeleter,
 ) : WebViewPreviewPersister {
 
     override suspend fun deleteAll() {
@@ -55,7 +55,7 @@ class FileBasedWebViewPreviewPersister(
 
     override suspend fun save(
         bitmap: Bitmap,
-        tabId: String
+        tabId: String,
     ): String {
         return withContext(Dispatchers.IO) {
             val previewFile = prepareDestinationFile(tabId)
@@ -68,7 +68,7 @@ class FileBasedWebViewPreviewPersister(
 
     override suspend fun deletePreviewsForTab(
         tabId: String,
-        currentPreviewImage: String?
+        currentPreviewImage: String?,
     ) {
         val directoryToDelete = directoryForTabPreviews(tabId)
 
@@ -86,14 +86,14 @@ class FileBasedWebViewPreviewPersister(
 
     override fun fullPathForFile(
         tabId: String,
-        previewName: String
+        previewName: String,
     ): String {
         return fileForPreview(tabId, previewName).absolutePath
     }
 
     private fun fileForPreview(
         tabId: String,
-        previewName: String
+        previewName: String,
     ): File {
         val tabPreviewDirectory = directoryForTabPreviews(tabId)
         return File(tabPreviewDirectory, previewName)
@@ -113,7 +113,7 @@ class FileBasedWebViewPreviewPersister(
 
     private fun writeBytesToFile(
         previewFile: File,
-        bitmap: Bitmap
+        bitmap: Bitmap,
     ) {
         FileOutputStream(previewFile).use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)

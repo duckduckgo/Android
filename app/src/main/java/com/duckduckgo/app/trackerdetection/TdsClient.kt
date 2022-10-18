@@ -24,12 +24,12 @@ import com.duckduckgo.app.trackerdetection.model.TdsTracker
 
 class TdsClient(
     override val name: Client.ClientName,
-    private val trackers: List<TdsTracker>
+    private val trackers: List<TdsTracker>,
 ) : Client {
 
     override fun matches(
         url: String,
-        documentUrl: String
+        documentUrl: String,
     ): Client.Result {
         val tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
         val matches = matchesTrackerEntry(tracker, url, documentUrl)
@@ -38,14 +38,14 @@ class TdsClient(
             entityName = tracker.ownerName,
             categories = tracker.categories,
             surrogate = matches.surrogate,
-            isATracker = matches.isATracker
+            isATracker = matches.isATracker,
         )
     }
 
     private fun matchesTrackerEntry(
         tracker: TdsTracker,
         url: String,
-        documentUrl: String
+        documentUrl: String,
     ): MatchedResult {
         tracker.rules.forEach { rule ->
             val regex = ".*${rule.rule}.*".toRegex()
@@ -68,7 +68,7 @@ class TdsClient(
 
     private fun matchedException(
         exceptions: RuleExceptions?,
-        documentUrl: String
+        documentUrl: String,
     ): Boolean {
         if (exceptions == null) return false
 
@@ -92,6 +92,6 @@ class TdsClient(
     private data class MatchedResult(
         val shouldBlock: Boolean,
         val isATracker: Boolean,
-        val surrogate: String? = null
+        val surrogate: String? = null,
     )
 }

@@ -32,14 +32,14 @@ import timber.log.Timber
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = AppTpFeatureConfig::class
+    boundType = AppTpFeatureConfig::class,
 )
 @SingleInstanceIn(AppScope::class)
 class AppTpFeatureConfigImpl @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
     vpnRemoteConfigDatabase: VpnRemoteConfigDatabase,
-    dispatcherProvider: DispatcherProvider
+    dispatcherProvider: DispatcherProvider,
 ) : AppTpFeatureConfig, AppTpFeatureConfig.Editor {
 
     private val togglesDao = vpnRemoteConfigDatabase.vpnConfigTogglesDao()

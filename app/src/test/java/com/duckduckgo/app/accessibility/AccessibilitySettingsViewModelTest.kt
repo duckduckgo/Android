@@ -45,7 +45,7 @@ class AccessibilitySettingsViewModelTest {
         val viewState = AccessibilitySettingsViewModel.ViewState(
             overrideSystemFontSize = false,
             appFontSize = 100f,
-            forceZoom = false
+            forceZoom = false,
         )
         testee.viewState().test {
             assertEquals(viewState, awaitItem())
@@ -58,7 +58,7 @@ class AccessibilitySettingsViewModelTest {
         val viewState = AccessibilitySettingsViewModel.ViewState(
             overrideSystemFontSize = true,
             appFontSize = 150f,
-            forceZoom = true
+            forceZoom = true,
         )
         whenever(accessibilitySettings.overrideSystemFontSize).thenReturn(true)
         whenever(accessibilitySettings.appFontSize).thenReturn(150f)

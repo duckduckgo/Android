@@ -47,8 +47,8 @@ class SurrogatesTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            "https://privacy-test-pages.glitch.me/privacy-protections/surrogates/"
-        )
+            "https://privacy-test-pages.glitch.me/privacy-protections/surrogates/",
+        ),
     )
 
     @Test @PrivacyTest

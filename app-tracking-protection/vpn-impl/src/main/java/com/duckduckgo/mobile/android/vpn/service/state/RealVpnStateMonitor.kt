@@ -41,7 +41,7 @@ import timber.log.Timber
 class RealVpnStateMonitor @Inject constructor(
     private val database: VpnDatabase,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnStateMonitor {
 
     override fun getStateFlow(vpnFeature: VpnFeature): Flow<VpnState> {
@@ -56,7 +56,7 @@ class RealVpnStateMonitor @Inject constructor(
                         delay(1000)
                         emit(vpnFeature.featureName to vpnFeaturesRegistry.isFeatureRegistered(vpnFeature))
                     }
-                    .onEach { Timber.v("feature $it") }
+                    .onEach { Timber.v("feature $it") },
             ) { vpnState, feature ->
                 val isFeatureEnabled = feature.second
                 val isVpnEnabled = vpnState.state == VpnRunningState.ENABLED

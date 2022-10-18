@@ -49,7 +49,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
     // we use the Provider to avoid a cycle dependency
     private val workManagerProvider: Provider<WorkManager>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnFeatureRemover {
 
     override fun manuallyRemoveFeature() {

@@ -22,12 +22,12 @@ import android.widget.ScrollView
 
 class LayoutScrollingTouchListener(
     private val scrollView: ScrollView,
-    private val desiredScrollPosition: Int
+    private val desiredScrollPosition: Int,
 ) : View.OnTouchListener {
 
     override fun onTouch(
         v: View?,
-        event: MotionEvent?
+        event: MotionEvent?,
     ): Boolean {
         if (event?.action == MotionEvent.ACTION_UP) {
             v?.performClick()

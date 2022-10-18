@@ -31,17 +31,17 @@ import org.threeten.bp.LocalDateTime
 interface TimeDiffFormatter {
     fun formatTimePassedInDaysWeeksMonthsYears(
         endLocalDateTime: LocalDateTime = LocalDateTime.now(),
-        startLocalDateTime: LocalDateTime
+        startLocalDateTime: LocalDateTime,
     ): String
 
     fun formatTimePassedInDays(
         endLocalDateTime: LocalDateTime = LocalDateTime.now(),
-        startLocalDateTime: LocalDateTime
+        startLocalDateTime: LocalDateTime,
     ): String
 
     fun formatTimePassed(
         endLocalDateTime: LocalDateTime = LocalDateTime.now(),
-        startLocalDateTime: LocalDateTime
+        startLocalDateTime: LocalDateTime,
     ): String
 }
 
@@ -50,7 +50,7 @@ class RealTimeDiffFormatter @Inject constructor(private val context: Context) : 
 
     override fun formatTimePassedInDaysWeeksMonthsYears(
         endLocalDateTime: LocalDateTime,
-        startLocalDateTime: LocalDateTime
+        startLocalDateTime: LocalDateTime,
     ): String {
         val startYear = startLocalDateTime.year
         val endYear = endLocalDateTime.year
@@ -79,7 +79,7 @@ class RealTimeDiffFormatter @Inject constructor(private val context: Context) : 
 
     override fun formatTimePassedInDays(
         endLocalDateTime: LocalDateTime,
-        startLocalDateTime: LocalDateTime
+        startLocalDateTime: LocalDateTime,
     ): String {
         val startDate = DatabaseDateFormatter.timestamp(startLocalDateTime).substringBefore("T")
             .run { FORMATTER_DAYS.parse(this) }
@@ -97,7 +97,7 @@ class RealTimeDiffFormatter @Inject constructor(private val context: Context) : 
 
     override fun formatTimePassed(
         endLocalDateTime: LocalDateTime,
-        startLocalDateTime: LocalDateTime
+        startLocalDateTime: LocalDateTime,
     ): String {
         val timeDifferenceMillis = Duration.between(startLocalDateTime, endLocalDateTime).toMillis()
         val startDate = DatabaseDateFormatter.timestamp(startLocalDateTime).substringBefore("T")

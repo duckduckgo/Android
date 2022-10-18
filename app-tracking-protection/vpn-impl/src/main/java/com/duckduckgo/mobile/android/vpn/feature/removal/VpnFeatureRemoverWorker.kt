@@ -27,7 +27,7 @@ import timber.log.Timber
 @ContributesWorker(AppScope::class)
 class VpnFeatureRemoverWorker(
     val context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
 
     @Inject

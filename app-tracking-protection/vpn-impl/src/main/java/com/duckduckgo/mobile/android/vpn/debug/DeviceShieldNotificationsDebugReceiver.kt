@@ -46,7 +46,7 @@ import timber.log.Timber
 class DeviceShieldNotificationsDebugReceiver(
     context: Context,
     intentAction: String = "notify",
-    private val receiver: (Intent) -> Unit
+    private val receiver: (Intent) -> Unit,
 ) : BroadcastReceiver() {
 
     init {
@@ -55,7 +55,7 @@ class DeviceShieldNotificationsDebugReceiver(
 
     override fun onReceive(
         context: Context,
-        intent: Intent
+        intent: Intent,
     ) {
         receiver(intent)
     }
@@ -63,7 +63,7 @@ class DeviceShieldNotificationsDebugReceiver(
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
     private val context: Context,
@@ -73,7 +73,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
     private val weeklyNotificationPressedHandler: WeeklyNotificationPressedHandler,
     private val dailyNotificationPressedHandler: DailyNotificationPressedHandler,
     private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
-    @VpnCoroutineScope private val vpnCoroutineScope: CoroutineScope
+    @VpnCoroutineScope private val vpnCoroutineScope: CoroutineScope,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -98,7 +98,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
                     deviceShieldAlertNotificationBuilder.buildStatusNotification(
                         context,
                         deviceShieldNotification,
-                        weeklyNotificationPressedHandler
+                        weeklyNotificationPressedHandler,
                     )
                 } else if (daily != null) {
                     Timber.v("Debug - Sending daily notification $daily")
@@ -108,7 +108,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
                     deviceShieldAlertNotificationBuilder.buildStatusNotification(
                         context,
                         deviceShieldNotification,
-                        dailyNotificationPressedHandler
+                        dailyNotificationPressedHandler,
                     )
                 } else {
                     Timber.v("Debug - invalid notification type")

@@ -215,7 +215,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         when (requestCode) {
             DEFAULT_BROWSER_REQUEST_CODE_SETTINGS -> {

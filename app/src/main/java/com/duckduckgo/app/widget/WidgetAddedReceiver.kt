@@ -34,11 +34,11 @@ import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
 class WidgetAddedReceiver @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : BroadcastReceiver(), DefaultLifecycleObserver {
 
     companion object {
@@ -57,7 +57,7 @@ class WidgetAddedReceiver @Inject constructor(
 
     override fun onReceive(
         context: Context?,
-        intent: Intent?
+        intent: Intent?,
     ) {
         if (!IGNORE_MANUFACTURERS_LIST.contains(Build.MANUFACTURER)) {
             context?.let {

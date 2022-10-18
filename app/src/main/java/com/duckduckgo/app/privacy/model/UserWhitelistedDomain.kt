@@ -21,5 +21,5 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "user_whitelist")
 data class UserWhitelistedDomain(
-    @PrimaryKey val domain: String
+    @PrimaryKey val domain: String,
 )

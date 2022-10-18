@@ -57,7 +57,7 @@ class AndroidNotificationSchedulerTest {
         testee = NotificationScheduler(
             workManager,
             clearNotification,
-            privacyNotification
+            privacyNotification,
         )
     }
 
@@ -110,12 +110,12 @@ class AndroidNotificationSchedulerTest {
 
     private fun assertNotificationScheduled(
         workerName: String?,
-        tag: String = NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG
+        tag: String = NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG,
     ) {
         assertTrue(
             getScheduledWorkers(tag).any {
                 it.tags.contains(workerName)
-            }
+            },
         )
     }
 

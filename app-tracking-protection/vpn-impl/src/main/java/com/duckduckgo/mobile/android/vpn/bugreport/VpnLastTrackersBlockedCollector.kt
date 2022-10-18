@@ -34,7 +34,7 @@ import org.threeten.bp.LocalDateTime
 class VpnLastTrackersBlockedCollector @Inject constructor(
     private val vpnDatabase: VpnDatabase,
     private val dispatcherProvider: DispatcherProvider,
-    private val moshi: Moshi
+    private val moshi: Moshi,
 ) : VpnStateCollectorPlugin {
 
     override val collectorName: String
@@ -56,8 +56,8 @@ class VpnLastTrackersBlockedCollector @Inject constructor(
                     Map::class.java,
                     String::class.java,
                     List::class.java,
-                    String::class.java
-                )
+                    String::class.java,
+                ),
             )
             return@withContext JSONObject(adapter.toJson(result))
         }

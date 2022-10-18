@@ -35,7 +35,7 @@ fun Packet.connectionInfo(): ConnectionInfo {
         destinationPort = extractDestinationPort(),
         sourceAddress = ipHeader.sourceAddress,
         sourcePort = extractSourcePort(),
-        protocolNumber = ipHeader.protocol.number
+        protocolNumber = ipHeader.protocol.number,
     )
 }
 

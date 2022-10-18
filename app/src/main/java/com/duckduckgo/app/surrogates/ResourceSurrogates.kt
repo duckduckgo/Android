@@ -46,5 +46,5 @@ data class SurrogateResponse(
     val responseAvailable: Boolean = true,
     val name: String = "",
     val jsFunction: String = "",
-    val mimeType: String = ""
+    val mimeType: String = "",
 )

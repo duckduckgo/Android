@@ -35,7 +35,7 @@ class TransparencyTrackerDetectorInterceptor @Inject constructor() : VpnTrackerD
 
     override fun interceptTrackerRequest(
         hostname: String,
-        packageId: String
+        packageId: String,
     ): RequestTrackerType? {
         return when {
             enable.get() -> {

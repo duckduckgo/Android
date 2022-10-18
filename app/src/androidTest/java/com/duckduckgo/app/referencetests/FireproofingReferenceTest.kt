@@ -81,8 +81,8 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
             val referenceTest = adapter.fromJson(
                 FileUtilities.loadText(
                     FireproofingReferenceTest::class.java.classLoader!!,
-                    "reference_tests/fireproofing/tests.json"
-                )
+                    "reference_tests/fireproofing/tests.json",
+                ),
             )
             fireproofedSites = referenceTest?.fireButtonFireproofing?.fireproofedSites.orEmpty()
             return referenceTest?.fireButtonFireproofing?.tests?.filterNot { it.exceptPlatforms.contains("android-browser") } ?: emptyList()
@@ -96,7 +96,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
             fireproofWebsiteRepository,
             mockOfflinePixelCountDataStore,
             ExceptionPixel(mockPixel, RootExceptionFinder()),
-            DefaultDispatcherProvider()
+            DefaultDispatcherProvider(),
         )
 
         val removeCookiesStrategy = RemoveCookies(CookieManagerRemover(cookieManagerProvider), sqlCookieRemover)
@@ -167,17 +167,17 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
         val cookieDomain: String,
         val cookieName: String,
         val expectCookieRemoved: Boolean,
-        val exceptPlatforms: List<String>
+        val exceptPlatforms: List<String>,
     )
 
     data class FireproofTest(
         val name: String,
         val desc: String,
         val fireproofedSites: List<String>,
-        val tests: List<TestCase>
+        val tests: List<TestCase>,
     )
 
     data class ReferenceTest(
-        val fireButtonFireproofing: FireproofTest
+        val fireButtonFireproofing: FireproofTest,
     )
 }

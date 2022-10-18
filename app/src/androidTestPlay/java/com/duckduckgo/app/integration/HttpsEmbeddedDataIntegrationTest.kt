@@ -70,7 +70,7 @@ class HttpsEmbeddedDataIntegrationTest {
             binaryDataStore,
             httpsBloomSpecDao,
             httpsFalsePositivesDao,
-            db
+            db,
         )
 
         val embeddedDataPersister = PlayHttpsEmbeddedDataPersister(persister, binaryDataStore, httpsBloomSpecDao, context, moshi)

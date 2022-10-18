@@ -420,7 +420,7 @@ class BrowserTabViewModelTest {
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
-            appTheme = mockAppTheme
+            appTheme = mockAppTheme,
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
@@ -462,7 +462,7 @@ class BrowserTabViewModelTest {
             locationPermissionsRepository = LocationPermissionsRepository(
                 locationPermissionsDao,
                 lazyFaviconManager,
-                coroutineRule.testDispatcherProvider
+                coroutineRule.testDispatcherProvider,
             ),
             geoLocationPermissions = geoLocationPermissions,
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
@@ -485,7 +485,7 @@ class BrowserTabViewModelTest {
             settingsDataStore = mockSettingsDataStore,
             autofillStore = mockAutofillStore,
             adClickManager = mockAdClickManager,
-            sitePermissionsManager = mockSitePermissionsManager
+            sitePermissionsManager = mockSitePermissionsManager,
         )
 
         testee.loadData("abc", null, false, false)
@@ -718,7 +718,7 @@ class BrowserTabViewModelTest {
             entity = networkEntity,
             surrogateId = null,
             status = TrackerStatus.ALLOWED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         testee.trackerDetected(event)
         verify(mockNetworkLeaderboardDao).incrementNetworkCount("Network1")
@@ -978,8 +978,8 @@ class BrowserTabViewModelTest {
                     entity = entity,
                     surrogateId = null,
                     status = TrackerStatus.ALLOWED,
-                    type = TrackerType.OTHER
-                )
+                    type = TrackerType.OTHER,
+                ),
             )
         }
         assertNotEquals(grade, privacyGradeState().privacyGrade)
@@ -3479,7 +3479,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ALIAS,
-            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01")
+            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
         )
     }
 
@@ -3532,7 +3532,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ALIAS,
-            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01")
+            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
         )
     }
 
@@ -3576,7 +3576,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ADDRESS,
-            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01")
+            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
         )
     }
 
@@ -3774,7 +3774,7 @@ class BrowserTabViewModelTest {
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onFavoriteMenuClicked()
         verify(mockPixel).fire(
-            AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName
+            AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName,
         )
     }
 
@@ -3883,13 +3883,13 @@ class BrowserTabViewModelTest {
     private fun buildPendingDownload(
         url: String,
         contentDisposition: String?,
-        mimeType: String?
+        mimeType: String?,
     ): PendingFileDownload {
         return PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,
-            subfolder = "folder"
+            subfolder = "folder",
         )
     }
 
@@ -4162,7 +4162,7 @@ class BrowserTabViewModelTest {
             id = 1,
             domain = url,
             username = "tester",
-            password = "test123"
+            password = "test123",
         )
         testee.shareCredentialsWithPage(url, credentials)
 
@@ -4189,7 +4189,7 @@ class BrowserTabViewModelTest {
             id = 1,
             domain = url,
             username = "tester",
-            password = "test123"
+            password = "test123",
         )
         testee.saveCredentials(url, credentials)
 
@@ -4203,7 +4203,7 @@ class BrowserTabViewModelTest {
             id = 1,
             domain = url,
             username = "tester",
-            password = "test123"
+            password = "test123",
         )
         testee.updateCredentials(url, credentials)
 
@@ -4319,7 +4319,7 @@ class BrowserTabViewModelTest {
 
     private fun givenUserAlreadySelectedPermissionForDomain(
         domain: String,
-        permission: LocationPermissionType
+        permission: LocationPermissionType,
     ) {
         locationPermissionsDao.insert(LocationPermissionEntity(domain, permission))
     }
@@ -4333,7 +4333,7 @@ class BrowserTabViewModelTest {
         override fun invoke(
             p0: String?,
             p1: Boolean,
-            p2: Boolean
+            p2: Boolean,
         ) {
             // nothing to see
         }
@@ -4367,10 +4367,10 @@ class BrowserTabViewModelTest {
 
     private fun pixelParams(
         showedBookmarks: Boolean,
-        bookmarkCapable: Boolean
+        bookmarkCapable: Boolean,
     ) = mapOf(
         Pixel.PixelParameter.SHOWED_BOOKMARKS to showedBookmarks.toString(),
-        Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString()
+        Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString(),
     )
 
     private fun givenExpectedCtaAddWidgetInstructions() {
@@ -4415,7 +4415,7 @@ class BrowserTabViewModelTest {
     private fun givenRemoteMessagingModel(
         remoteMessagingRepository: RemoteMessagingRepository,
         pixel: Pixel,
-        dispatchers: DispatcherProvider
+        dispatchers: DispatcherProvider,
     ) = RemoteMessagingModel(remoteMessagingRepository, pixel, dispatchers)
 
     private fun setBrowserShowing(isBrowsing: Boolean) {
@@ -4437,7 +4437,7 @@ class BrowserTabViewModelTest {
     private fun loadUrl(
         url: String?,
         title: String? = null,
-        isBrowserShowing: Boolean = true
+        isBrowserShowing: Boolean = true,
     ) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, title = title))
@@ -4447,7 +4447,7 @@ class BrowserTabViewModelTest {
     private fun updateUrl(
         originalUrl: String?,
         currentUrl: String?,
-        isBrowserShowing: Boolean
+        isBrowserShowing: Boolean,
     ) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
@@ -4456,14 +4456,14 @@ class BrowserTabViewModelTest {
     @Suppress("SameParameterValue")
     private fun onProgressChanged(
         url: String?,
-        newProgress: Int
+        newProgress: Int,
     ) {
         testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, progress = newProgress))
     }
 
     private fun overrideUrl(
         url: String,
-        isBrowserShowing: Boolean = true
+        isBrowserShowing: Boolean = true,
     ) {
         setBrowserShowing(isBrowserShowing)
         testee.willOverrideUrl(newUrl = url)
@@ -4474,7 +4474,7 @@ class BrowserTabViewModelTest {
         isBrowsing: Boolean,
         canGoForward: Boolean = false,
         canGoBack: Boolean = false,
-        stepsToPreviousPage: Int = 0
+        stepsToPreviousPage: Int = 0,
     ) {
         testee.skipHome = skipHome
         setBrowserShowing(isBrowsing)
@@ -4499,7 +4499,7 @@ class BrowserTabViewModelTest {
         canGoBack: Boolean = false,
         stepsToPreviousPage: Int = 0,
         progress: Int? = null,
-        navigationHistory: List<NavigationHistoryEntry> = emptyList()
+        navigationHistory: List<NavigationHistoryEntry> = emptyList(),
     ): WebNavigationState {
         val nav: WebNavigationState = mock()
         whenever(nav.originalUrl).thenReturn(originalUrl)

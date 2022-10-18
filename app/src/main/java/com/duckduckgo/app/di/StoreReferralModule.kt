@@ -32,12 +32,12 @@ object StoreReferralModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun appInstallationReferrerStateListener(
-        referrerStateListener: EmptyReferrerStateListener
+        referrerStateListener: EmptyReferrerStateListener,
     ): AppInstallationReferrerStateListener = referrerStateListener
 
     @Provides
     @IntoSet
     fun providedReferrerAtbInitializerListener(
-        referrerStateListener: EmptyReferrerStateListener
+        referrerStateListener: EmptyReferrerStateListener,
     ): AtbInitializerListener = referrerStateListener
 }

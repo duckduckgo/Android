@@ -35,7 +35,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 class SiteMonitor(
     url: String,
     override var title: String?,
-    override var upgradedHttps: Boolean = false
+    override var upgradedHttps: Boolean = false,
 ) : Site {
 
     override var url: String = url
@@ -178,12 +178,12 @@ class SiteMonitor(
             TrackerStatus.AD_ALLOWED,
             TrackerStatus.SITE_BREAKAGE_ALLOWED,
             TrackerStatus.SAME_ENTITY_ALLOWED,
-            TrackerStatus.USER_ALLOWED
+            TrackerStatus.USER_ALLOWED,
         )
 
         private val allowedDomainTypes = setOf(
             TrackerStatus.USER_ALLOWED,
-            TrackerStatus.SAME_ENTITY_ALLOWED
+            TrackerStatus.SAME_ENTITY_ALLOWED,
         )
     }
 }

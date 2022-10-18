@@ -29,19 +29,19 @@ import dagger.multibindings.IntoSet
 @Module
 @ContributesTo(
     scope = AppScope::class,
-    replaces = [StoreReferralModule::class]
+    replaces = [StoreReferralModule::class],
 )
 class PlayStoreReferralModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun appInstallationReferrerStateListener(
-        playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener
+        playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener,
     ): AppInstallationReferrerStateListener = playStoreAppReferrerStateListener
 
     @Provides
     @IntoSet
     fun providedReferrerAtbInitializerListener(
-        playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener
+        playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener,
     ): AtbInitializerListener = playStoreAppReferrerStateListener
 }

@@ -81,7 +81,7 @@ class DeviceShieldNotificationFactoryTest {
     fun createTrackersCountDeviceShieldNotificationWhenTrackersFoundInTwoApps() {
         val trackers = listOf(
             aTrackerAndCompany(appContainingTracker = trackingApp1()),
-            aTrackerAndCompany(appContainingTracker = trackingApp2())
+            aTrackerAndCompany(appContainingTracker = trackingApp2()),
         )
         val notification = factory.createNotificationNewTrackerFound(trackers)
 
@@ -95,7 +95,7 @@ class DeviceShieldNotificationFactoryTest {
             aTrackerAndCompany(appContainingTracker = trackingApp1()),
             aTrackerAndCompany(appContainingTracker = trackingApp1()),
             aTrackerAndCompany(appContainingTracker = trackingApp1()),
-            aTrackerAndCompany(appContainingTracker = trackingApp2())
+            aTrackerAndCompany(appContainingTracker = trackingApp2()),
         )
         val notification = factory.createNotificationNewTrackerFound(trackers)
         notification.assertTitleEquals("Tracking attempts blocked across 2 apps (past hour).")
@@ -112,7 +112,7 @@ class DeviceShieldNotificationFactoryTest {
         trackerCompanyName: String = "Tracking LLC",
         trackerCompanyId: Int = -1,
         appContainingTracker: TrackingApp = defaultApp(),
-        timestamp: String = DatabaseDateFormatter.bucketByHour()
+        timestamp: String = DatabaseDateFormatter.bucketByHour(),
     ): VpnTracker {
         return VpnTracker(
             trackerCompanyId = trackerCompanyId,
@@ -120,7 +120,7 @@ class DeviceShieldNotificationFactoryTest {
             timestamp = timestamp,
             company = trackerCompanyName,
             companyDisplayName = trackerCompanyName,
-            trackingApp = appContainingTracker
+            trackingApp = appContainingTracker,
         )
     }
 

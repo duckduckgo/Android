@@ -25,7 +25,7 @@ internal fun aConnectionInfo(
     destinationPort: Int = 80,
     sourceAddress: InetAddress = InetAddress.getByName(anInternalIpAddress()),
     sourcePort: Int = 40000,
-    protocol: Int = aProtocol()
+    protocol: Int = aProtocol(),
 ): ConnectionInfo = ConnectionInfo(destinationAddress, destinationPort, sourceAddress, sourcePort, protocol)
 
 internal fun anInternalIpAddress(): String = "192.168.0.1"

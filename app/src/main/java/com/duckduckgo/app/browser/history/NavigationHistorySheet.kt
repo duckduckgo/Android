@@ -33,7 +33,7 @@ class NavigationHistorySheet(
     private val faviconManager: FaviconManager,
     private val tabId: String,
     private val history: ShowBackNavigationHistory,
-    private val listener: NavigationHistorySheetListener
+    private val listener: NavigationHistorySheetListener,
 ) : BottomSheetDialog(context, R.style.NavigationHistoryDialog) {
 
     interface NavigationHistorySheetListener {
@@ -58,7 +58,7 @@ class NavigationHistorySheet(
                         dismiss()
                         listener.historicalPageSelected(stackIndex)
                     }
-                }
+                },
             ).also { adapter ->
                 recycler.adapter = adapter
                 adapter.updateNavigationHistory(history.history)

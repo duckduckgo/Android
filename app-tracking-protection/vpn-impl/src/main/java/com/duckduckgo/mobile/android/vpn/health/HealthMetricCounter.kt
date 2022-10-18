@@ -54,7 +54,7 @@ import kotlinx.coroutines.launch
 @SingleInstanceIn(AppScope::class)
 class HealthMetricCounter @Inject constructor(
     val context: Context,
-    @VpnCoroutineScope val coroutineScope: CoroutineScope
+    @VpnCoroutineScope val coroutineScope: CoroutineScope,
 ) {
 
     private val db = Room.inMemoryDatabaseBuilder(context, HealthStatsDatabase::class.java).build()
@@ -95,7 +95,7 @@ class HealthMetricCounter @Inject constructor(
         coroutineScope.launch(databaseDispatcher) {
             healthStatsDao.insertEvent(ADD_TO_DEVICE_TO_NETWORK_QUEUE())
             healthStatsDao.insertEvent(
-                if (isUdp) ADD_TO_UDP_DEVICE_TO_NETWORK_QUEUE() else ADD_TO_TCP_DEVICE_TO_NETWORK_QUEUE()
+                if (isUdp) ADD_TO_UDP_DEVICE_TO_NETWORK_QUEUE() else ADD_TO_TCP_DEVICE_TO_NETWORK_QUEUE(),
             )
         }
     }
@@ -104,7 +104,7 @@ class HealthMetricCounter @Inject constructor(
         coroutineScope.launch(databaseDispatcher) {
             healthStatsDao.insertEvent(REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE())
             healthStatsDao.insertEvent(
-                if (isUdp) REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE() else REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE()
+                if (isUdp) REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE() else REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE(),
             )
         }
     }
@@ -153,7 +153,7 @@ class HealthMetricCounter @Inject constructor(
 
     fun getStat(
         type: SimpleEvent,
-        recentTimeThresholdMillis: Long
+        recentTimeThresholdMillis: Long,
     ): Long {
         return healthStatsDao.eventCount(type.type, recentTimeThresholdMillis)
     }

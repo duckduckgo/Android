@@ -30,7 +30,7 @@ interface ReportBreakageMetadataReporter {
 @ContributesBinding(VpnScope::class)
 class RealReportBreakageMetadataReporter @Inject constructor(
     private val vpnStateCollector: VpnStateCollector,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : ReportBreakageMetadataReporter {
     override suspend fun getVpnStateMetadata(appPackageId: String?): String {
         return withContext(dispatcherProvider.io()) {

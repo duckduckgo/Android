@@ -44,11 +44,11 @@ import timber.log.Timber
 
 @ContributesBinding(
     scope = VpnScope::class,
-    boundType = VpnNetworkStack::class
+    boundType = VpnNetworkStack::class,
 )
 @ContributesBinding(
     scope = VpnScope::class,
-    boundType = VpnNetworkCallback::class
+    boundType = VpnNetworkCallback::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class NgVpnNetworkStack @Inject constructor(
@@ -59,7 +59,7 @@ class NgVpnNetworkStack @Inject constructor(
     private val appNameResolver: AppNameResolver,
     private val appTrackerRecorder: AppTrackerRecorder,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    vpnDatabase: VpnDatabase
+    vpnDatabase: VpnDatabase,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
     private val packageManager = context.packageManager
@@ -173,7 +173,7 @@ class NgVpnNetworkStack @Inject constructor(
                 company = type.tracker.owner.name,
                 companyDisplayName = type.tracker.owner.displayName,
                 domain = type.tracker.hostname,
-                trackingApp = TrackingApp(trackingApp.packageId, trackingApp.appName)
+                trackingApp = TrackingApp(trackingApp.packageId, trackingApp.appName),
             ).run {
                 appTrackerRecorder.insertTracker(this)
             }

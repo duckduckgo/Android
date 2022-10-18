@@ -83,7 +83,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
                 showOnboardingPage(position)
                 super.onPageSelected(position)
             }
-        })
+        },)
 
         binding.onboardingClose.setOnClickListener {
             close()
@@ -186,7 +186,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         if (requestCode == REQUEST_ASK_VPN_PERMISSION) {
             viewModel.onVPNPermissionResult(resultCode)
@@ -249,7 +249,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
         val dialog = AppTPVpnConflictDialog.instance(this, isAlwaysOn)
         dialog.show(
             supportFragmentManager,
-            AppTPVpnConflictDialog.TAG_VPN_CONFLICT_DIALOG
+            AppTPVpnConflictDialog.TAG_VPN_CONFLICT_DIALOG,
         )
     }
 

@@ -48,7 +48,7 @@ class TrackersDbCleanerSchedulerModule {
     @Provides
     @IntoSet
     fun provideDeviceShieldNotificationScheduler(
-        workManager: WorkManager
+        workManager: WorkManager,
     ): LifecycleObserver {
         return TrackersDbCleanerScheduler(workManager)
     }
@@ -76,7 +76,7 @@ class TrackersDbCleanerScheduler(private val workManager: WorkManager) : Default
 @ContributesWorker(AppScope::class)
 class TrackersDbCleanerWorker(
     context: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(context, workerParams), CoroutineScope {
 
     @Inject

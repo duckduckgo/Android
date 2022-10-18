@@ -65,7 +65,7 @@ class TdsJson {
 
 class TdsJsonEntity(
     val displayName: String?,
-    val prevalence: Double
+    val prevalence: Double,
 )
 
 data class TdsJsonTracker(
@@ -73,11 +73,11 @@ data class TdsJsonTracker(
     val default: Action?,
     val owner: TdsJsonOwner?,
     val categories: List<String>?,
-    val rules: List<Rule>?
+    val rules: List<Rule>?,
 )
 
 data class TdsJsonOwner(
-    val name: String
+    val name: String,
 )
 
 class ActionJsonAdapter {

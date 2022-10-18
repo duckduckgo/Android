@@ -49,7 +49,7 @@ class FavoritesWidgetService : RemoteViewsService() {
 
     class FavoritesWidgetItemFactory(
         val context: Context,
-        intent: Intent
+        intent: Intent,
     ) : RemoteViewsFactory {
 
         private val theme = WidgetTheme.getThemeFrom(intent.extras?.getString(THEME_EXTRAS))
@@ -65,7 +65,7 @@ class FavoritesWidgetService : RemoteViewsService() {
 
         private val appWidgetId = intent.getIntExtra(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
-            AppWidgetManager.INVALID_APPWIDGET_ID
+            AppWidgetManager.INVALID_APPWIDGET_ID,
         )
 
         private val faviconItemSize = context.resources.getDimension(CommonR.dimen.savedSiteGridItemFavicon).toInt()
@@ -79,7 +79,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         data class WidgetFavorite(
             val title: String,
             val url: String,
-            val bitmap: Bitmap?
+            val bitmap: Bitmap?,
         )
 
         private val domains = mutableListOf<WidgetFavorite>()
@@ -95,7 +95,7 @@ class FavoritesWidgetService : RemoteViewsService() {
                         url = it.url,
                         cornerRadius = faviconItemCornerRadius,
                         width = faviconItemSize,
-                        height = faviconItemSize
+                        height = faviconItemSize,
                     )
                         ?: generateDefaultDrawable(context, it.url.extractDomain().orEmpty()).toBitmap(faviconItemSize, faviconItemSize)
                 }
@@ -155,7 +155,7 @@ class FavoritesWidgetService : RemoteViewsService() {
 
         private fun configureClickListener(
             remoteViews: RemoteViews,
-            item: String
+            item: String,
         ) {
             val bundle = Bundle()
             bundle.putString(Intent.EXTRA_TEXT, item)

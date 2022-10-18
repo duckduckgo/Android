@@ -108,8 +108,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -119,8 +119,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.USER_ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -130,8 +130,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertEquals(1, testee.trackerCount)
     }
@@ -147,8 +147,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -158,8 +158,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -169,8 +169,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertTrue(testee.allTrackersBlocked)
     }
@@ -186,8 +186,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -197,8 +197,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.USER_ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -208,8 +208,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertFalse(testee.allTrackersBlocked)
     }
@@ -225,8 +225,8 @@ class SiteMonitorTest {
                 entity = network,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertEquals(0, testee.majorNetworkCount)
     }
@@ -242,8 +242,8 @@ class SiteMonitorTest {
                 entity = majorNetwork,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertEquals(1, testee.majorNetworkCount)
     }
@@ -259,8 +259,8 @@ class SiteMonitorTest {
                 entity = majorNetwork,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -270,8 +270,8 @@ class SiteMonitorTest {
                 entity = majorNetwork,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertEquals(1, testee.majorNetworkCount)
     }
@@ -306,8 +306,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.ALLOWED,
-                type = TrackerType.AD
-            )
+                type = TrackerType.AD,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -317,8 +317,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -328,8 +328,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertEquals(2, testee.otherDomainsLoadedCount)
     }
@@ -345,8 +345,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.AD_ALLOWED,
-                type = TrackerType.AD
-            )
+                type = TrackerType.AD,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -356,8 +356,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.SITE_BREAKAGE_ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -367,8 +367,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.SAME_ENTITY_ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -378,8 +378,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.USER_ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -389,8 +389,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -400,8 +400,8 @@ class SiteMonitorTest {
                 entity = null,
                 surrogateId = null,
                 status = TrackerStatus.ALLOWED,
-                type = TrackerType.OTHER
-            )
+                type = TrackerType.OTHER,
+            ),
         )
         assertEquals(4, testee.specialDomainsLoadedCount)
     }

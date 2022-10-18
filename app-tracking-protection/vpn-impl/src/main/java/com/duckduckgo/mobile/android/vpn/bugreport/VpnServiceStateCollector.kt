@@ -26,7 +26,7 @@ import org.json.JSONObject
 
 @ContributesMultibinding(VpnScope::class)
 class VpnServiceStateCollector @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : VpnStateCollectorPlugin {
 
     override val collectorName: String

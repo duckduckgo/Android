@@ -97,7 +97,7 @@ class ManageRecentAppsProtectionActivity :
         binding.manageRecentAppsSkeleton.startShimmer()
         binding.manageRecentAppsReportIssues.addClickableLink(
             REPORT_ISSUES_ANNOTATION,
-            getText(R.string.atp_ManageRecentAppsProtectionReportIssues)
+            getText(R.string.atp_ManageRecentAppsProtectionReportIssues),
         ) {
             launchFeedback()
         }
@@ -112,11 +112,11 @@ class ManageRecentAppsProtectionActivity :
             override fun onAppProtectionChanged(
                 excludedAppInfo: TrackingProtectionAppInfo,
                 enabled: Boolean,
-                position: Int
+                position: Int,
             ) {
                 viewModel.onAppProtectionChanged(excludedAppInfo, position, enabled)
             }
-        })
+        },)
 
         val recyclerView = binding.manageRecentAppsRecycler
         recyclerView.adapter = adapter
@@ -151,11 +151,11 @@ class ManageRecentAppsProtectionActivity :
         when (command) {
             is Command.RestartVpn -> restartVpn()
             is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(
-                command.excludingReason
+                command.excludingReason,
             )
             is Command.ShowEnableProtectionDialog -> showEnableProtectionDialog(
                 command.excludingReason,
-                command.position
+                command.position,
             )
             is Command.LaunchFeedback -> reportBreakage.launch(command.reportBreakageScreen)
             is Command.LaunchAllAppsProtection -> startActivity(TrackingProtectionExclusionListActivity.intent(this))
@@ -173,18 +173,18 @@ class ManageRecentAppsProtectionActivity :
         val dialog = ManuallyDisableAppProtectionDialog.instance(excludedAppInfo)
         dialog.show(
             supportFragmentManager,
-            ManuallyDisableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_DISABLE
+            ManuallyDisableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_DISABLE,
         )
     }
 
     private fun showEnableProtectionDialog(
         excludedAppInfo: TrackingProtectionAppInfo,
-        position: Int
+        position: Int,
     ) {
         val dialog = ManuallyEnableAppProtectionDialog.instance(excludedAppInfo, position)
         dialog.show(
             supportFragmentManager,
-            ManuallyEnableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_ENABLE
+            ManuallyEnableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_ENABLE,
         )
     }
 
@@ -208,7 +208,7 @@ class ManageRecentAppsProtectionActivity :
     override fun onAppProtectionDisabled(
         appName: String,
         packageName: String,
-        report: Boolean
+        report: Boolean,
     ) {
         viewModel.onAppProtectionDisabled(appName = appName, packageName = packageName, report = report)
     }
@@ -230,7 +230,7 @@ class ManageRecentAppsProtectionActivity :
     companion object {
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         fun intent(
-            context: Context
+            context: Context,
         ): Intent {
             return Intent(context, ManageRecentAppsProtectionActivity::class.java)
         }

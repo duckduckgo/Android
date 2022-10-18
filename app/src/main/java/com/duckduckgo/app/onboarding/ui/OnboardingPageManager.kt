@@ -34,7 +34,7 @@ interface OnboardingPageManager {
 class OnboardingPageManagerWithTrackerBlocking(
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val onboardingPageBuilder: OnboardingPageBuilder,
-    private val defaultWebBrowserCapability: DefaultBrowserDetector
+    private val defaultWebBrowserCapability: DefaultBrowserDetector,
 ) : OnboardingPageManager {
 
     private val pages = mutableListOf<OnboardingPageBlueprint>()

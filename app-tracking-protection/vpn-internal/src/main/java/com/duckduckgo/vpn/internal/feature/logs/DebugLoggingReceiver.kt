@@ -29,7 +29,7 @@ import timber.log.Timber
 
 class DebugLoggingReceiver(
     context: Context,
-    receiver: (Intent) -> Unit
+    receiver: (Intent) -> Unit,
 ) : InternalFeatureReceiver(context, receiver) {
 
     override fun intentAction(): String = ACTION
@@ -61,7 +61,7 @@ class DebugLoggingReceiver(
 
 @ContributesMultibinding(VpnScope::class)
 class DebugLoggingReceiverRegister @Inject constructor(
-    private val context: Context
+    private val context: Context,
 ) : VpnServiceCallbacks {
 
     private var receiver: DebugLoggingReceiver? = null
@@ -84,7 +84,7 @@ class DebugLoggingReceiverRegister @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         receiver?.unregister()
     }

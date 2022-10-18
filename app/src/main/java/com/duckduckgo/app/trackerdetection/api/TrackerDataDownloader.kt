@@ -33,7 +33,7 @@ class TrackerDataDownloader @Inject constructor(
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataLoader: TrackerDataLoader,
     private val appDatabase: AppDatabase,
-    private val metadataDao: TdsMetadataDao
+    private val metadataDao: TdsMetadataDao,
 ) {
 
     fun downloadTds(): Completable {

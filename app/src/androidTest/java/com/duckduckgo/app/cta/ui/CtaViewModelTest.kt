@@ -127,7 +127,7 @@ class CtaViewModelTest {
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
         CtaId.DAX_DIALOG_NETWORK,
         CtaId.DAX_FIRE_BUTTON,
-        CtaId.DAX_END
+        CtaId.DAX_END,
     )
 
     private lateinit var testee: CtaViewModel
@@ -159,7 +159,7 @@ class CtaViewModelTest {
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
-            appTheme = mockAppTheme
+            appTheme = mockAppTheme,
         )
     }
 
@@ -397,7 +397,7 @@ class CtaViewModelTest {
             R.string.daxMainNetworkCtaText,
             "Facebook",
             "facebook.com",
-            "Facebook"
+            "Facebook",
         )
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site) as DaxDialogCta
@@ -416,7 +416,7 @@ class CtaViewModelTest {
             R.string.daxMainNetworkOwnedCtaText,
             "Facebook",
             "instagram.com",
-            "Facebook"
+            "Facebook",
         )
 
         assertTrue(value is DaxDialogCta.DaxMainNetworkCta)
@@ -434,7 +434,7 @@ class CtaViewModelTest {
             entity = TestEntity("test", "test", 9.0),
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
@@ -452,7 +452,7 @@ class CtaViewModelTest {
             entity = TestEntity("test", "test", 0.123),
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER
+            type = TrackerType.OTHER,
         )
         val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
@@ -741,7 +741,7 @@ class CtaViewModelTest {
         privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN,
         entity: Entity? = null,
         grade: PrivacyGrade = PrivacyGrade.UNKNOWN,
-        improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN
+        improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN,
     ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)

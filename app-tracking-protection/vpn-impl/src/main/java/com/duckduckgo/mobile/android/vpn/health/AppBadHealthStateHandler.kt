@@ -50,7 +50,7 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = AppHealthCallback::class
+    boundType = AppHealthCallback::class,
 )
 @SingleInstanceIn(AppScope::class)
 class AppBadHealthStateHandler @Inject constructor(
@@ -60,7 +60,7 @@ class AppBadHealthStateHandler @Inject constructor(
     private val appTpConfig: AppTpFeatureConfig,
     private val deviceShieldPixels: DeviceShieldPixels,
     private val dispatcherProvider: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AppHealthCallback {
 
     private var debounceJob = ConflatedJob()
@@ -117,8 +117,8 @@ class AppBadHealthStateHandler @Inject constructor(
                         type = BAD_HEALTH,
                         alerts = appHealthData.alerts,
                         healthDataJsonString = json,
-                        restartedAtEpochSeconds = restartLocaltime
-                    ).updateBadHealthEpochSeconds()
+                        restartedAtEpochSeconds = restartLocaltime,
+                    ).updateBadHealthEpochSeconds(),
                 )
 
                 if (shouldRestartVpn) restartVpn(isCriticalBadHealth)
@@ -129,7 +129,7 @@ class AppBadHealthStateHandler @Inject constructor(
                 sendPixelIfBadHealthResolved(appHealthDatabase.appHealthDao().latestHealthState())
                 // then store
                 appHealthDatabase.appHealthDao().insert(
-                    AppHealthState(type = GOOD_HEALTH, alerts = listOf(), healthDataJsonString = "", restartedAtEpochSeconds = null)
+                    AppHealthState(type = GOOD_HEALTH, alerts = listOf(), healthDataJsonString = "", restartedAtEpochSeconds = null),
                 )
                 resetBackoff()
                 Timber.d("No alerts")
@@ -219,7 +219,7 @@ class AppBadHealthStateHandler @Inject constructor(
 
     private fun debouncedPixelBadHealth(
         badHealthJsonString: String,
-        restarted: Boolean = false
+        restarted: Boolean = false,
     ) {
         if (debounceJob.isActive) {
             Timber.v("debouncing bad health pixel firing")
@@ -230,7 +230,7 @@ class AppBadHealthStateHandler @Inject constructor(
         debounceJob += appCoroutineScope.launch(dispatcherProvider.io()) {
             val encodedData = Base64.encodeToString(
                 badHealthJsonString.toByteArray(),
-                Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE
+                Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
             )
             deviceShieldPixels.sendHealthMonitorReport(
                 mapOf(
@@ -238,8 +238,8 @@ class AppBadHealthStateHandler @Inject constructor(
                     MODEL_KEY to if (appBuildConfig.flavor.isInternal()) appBuildConfig.model else "redacted",
                     OS_KEY to appBuildConfig.sdkInt.toString(),
                     RESTARTED_KEY to restarted.toString(),
-                    BAD_HEALTH_DATA_KEY to encodedData
-                )
+                    BAD_HEALTH_DATA_KEY to encodedData,
+                ),
             )
             delay(1000)
         }
@@ -255,7 +255,7 @@ class AppBadHealthStateHandler @Inject constructor(
 
         val encodedData = Base64.encodeToString(
             lastState.healthDataJsonString.toByteArray(),
-            Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE
+            Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
         )
 
         if (resolvedByRestart) {
@@ -265,8 +265,8 @@ class AppBadHealthStateHandler @Inject constructor(
                     MODEL_KEY to if (appBuildConfig.flavor.isInternal()) appBuildConfig.model else "redacted",
                     OS_KEY to appBuildConfig.sdkInt.toString(),
                     BAD_HEALTH_DURATION_SECONDS to lastState.badHealthSustainDurationSeconds().toString(),
-                    RESOLVED_BAD_HEALTH_DATA_KEY to encodedData
-                )
+                    RESOLVED_BAD_HEALTH_DATA_KEY to encodedData,
+                ),
             )
         } else {
             deviceShieldPixels.badHealthResolvedItself(
@@ -275,8 +275,8 @@ class AppBadHealthStateHandler @Inject constructor(
                     MODEL_KEY to if (appBuildConfig.flavor.isInternal()) appBuildConfig.model else "redacted",
                     OS_KEY to appBuildConfig.sdkInt.toString(),
                     BAD_HEALTH_DURATION_SECONDS to lastState.badHealthSustainDurationSeconds().toString(),
-                    RESOLVED_BAD_HEALTH_DATA_KEY to encodedData
-                )
+                    RESOLVED_BAD_HEALTH_DATA_KEY to encodedData,
+                ),
             )
         }
     }

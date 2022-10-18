@@ -34,7 +34,7 @@ private class LegacyVpnNetworkStack constructor(
     private val tunPacketReaderFactory: TunPacketReader.Factory,
     private val tunPacketWriterFactory: TunPacketWriter.Factory,
     private val queues: VpnQueues,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope,
 ) : VpnNetworkStack {
     private lateinit var udpPacketProcessor: UdpPacketProcessor
     private lateinit var tcpPacketProcessor: TcpPacketProcessor
@@ -57,7 +57,7 @@ private class LegacyVpnNetworkStack constructor(
             tcpPacketProcessor,
             udpPacketProcessor,
             tunPacketReaderFactory.create(tunfd),
-            tunPacketWriterFactory.create(tunfd)
+            tunPacketWriterFactory.create(tunfd),
         )
         executorService = Executors.newFixedThreadPool(processors.size).also { executorService ->
             processors.forEach { executorService.submit(it) }

@@ -33,11 +33,11 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 class VpnFeatureRemoverStateListener @Inject constructor(
     private val workManager: WorkManager,
-    private val vpnDatabase: VpnDatabase
+    private val vpnDatabase: VpnDatabase,
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
@@ -57,7 +57,7 @@ class VpnFeatureRemoverStateListener @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         if (vpnStopReason == VpnStopReason.SELF_STOP) {
             coroutineScope.launch() {
@@ -77,7 +77,7 @@ class VpnFeatureRemoverStateListener @Inject constructor(
         workManager.enqueueUniqueWork(
             VpnFeatureRemoverWorker.WORKER_VPN_FEATURE_REMOVER_TAG,
             KEEP,
-            request
+            request,
         )
     }
 }

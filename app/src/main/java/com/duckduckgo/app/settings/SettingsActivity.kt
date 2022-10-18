@@ -194,8 +194,8 @@ class SettingsActivity :
                     WebViewActivity.intent(
                         this@SettingsActivity,
                         PRIVACY_POLICY_WEB_LINK,
-                        getString(R.string.settingsPrivacyPolicyDuckduckgo)
-                    )
+                        getString(R.string.settingsPrivacyPolicyDuckduckgo),
+                    ),
                 )
             }
         }
@@ -296,7 +296,7 @@ class SettingsActivity :
                 DuckDuckGoTheme.DARK -> R.string.settingsDarkTheme
                 DuckDuckGoTheme.LIGHT -> R.string.settingsLightTheme
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> R.string.settingsSystemTheme
-            }
+            },
         )
         viewsAppearance.selectedThemeSetting.setSecondaryText(subtitle)
     }
@@ -307,7 +307,7 @@ class SettingsActivity :
                 AppLinkSettingType.ASK_EVERYTIME -> R.string.settingsAppLinksAskEveryTime
                 AppLinkSettingType.ALWAYS -> R.string.settingsAppLinksAlways
                 AppLinkSettingType.NEVER -> R.string.settingsAppLinksNever
-            }
+            },
         )
         viewsCustomize.appLinksSetting.setSecondaryText(subtitle)
     }
@@ -377,7 +377,7 @@ class SettingsActivity :
 
     private fun updateDeviceShieldSettings(
         appTPEnabled: Boolean,
-        waitlistState: WaitlistState
+        waitlistState: WaitlistState,
     ) {
         with(viewsMore) {
             if (waitlistState != WaitlistState.InBeta) {
@@ -535,7 +535,7 @@ class SettingsActivity :
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         when (requestCode) {
             FEEDBACK_REQUEST_CODE -> handleFeedbackResult(resultCode)

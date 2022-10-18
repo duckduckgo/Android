@@ -117,7 +117,7 @@ class JsLoginDetectorTest {
 
     private fun aWebResourceRequest(
         httpMethod: String = "POST",
-        path: String = "login"
+        path: String = "login",
     ): WebResourceRequest {
         return object : WebResourceRequest {
             override fun getUrl(): Uri = Uri.parse("https://example.com/$path")

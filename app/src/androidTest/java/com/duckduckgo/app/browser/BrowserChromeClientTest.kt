@@ -78,7 +78,7 @@ class BrowserChromeClientTest {
             mockAppBuildConfig,
             TestScope(),
             coroutineTestRule.testDispatcherProvider,
-            mockSitePermissionsManager
+            mockSitePermissionsManager,
         )
         mockWebViewClientListener = mock()
         mockFilePathCallback = mock()

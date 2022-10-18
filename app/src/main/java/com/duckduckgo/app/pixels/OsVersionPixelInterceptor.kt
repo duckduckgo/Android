@@ -29,7 +29,7 @@ import okhttp3.Response
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class
+    boundType = PixelInterceptorPlugin::class,
 )
 class OsVersionPixelInterceptor @Inject constructor(private val appBuildConfig: AppBuildConfig) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -59,7 +59,7 @@ class OsVersionPixelInterceptor @Inject constructor(private val appBuildConfig: 
             DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED_BY_USER.pixelName,
             DownloadsPixelName.DOWNLOAD_REQUEST_RETRIED.pixelName,
             StatisticsPixelName.APPLICATION_CRASH.pixelName,
-            StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName
+            StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName,
         )
     }
 }

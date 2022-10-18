@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 class OnboardingViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val pageLayoutManager: OnboardingPageManager,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     fun initializePages() {

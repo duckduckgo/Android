@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 class RemoteMessagingModel @Inject constructor(
     private val remoteMessagingRepository: RemoteMessagingRepository,
     private val pixel: Pixel,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) {
 
     val activeMessages = remoteMessagingRepository.messageFlow()

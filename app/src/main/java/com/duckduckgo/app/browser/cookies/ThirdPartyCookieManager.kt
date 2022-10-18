@@ -29,7 +29,7 @@ import timber.log.Timber
 interface ThirdPartyCookieManager {
     suspend fun processUriForThirdPartyCookies(
         webView: WebView,
-        uri: Uri
+        uri: Uri,
     )
 
     suspend fun clearAllData()
@@ -37,12 +37,12 @@ interface ThirdPartyCookieManager {
 
 class AppThirdPartyCookieManager(
     private val cookieManagerProvider: CookieManagerProvider,
-    private val authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
+    private val authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository,
 ) : ThirdPartyCookieManager {
 
     override suspend fun processUriForThirdPartyCookies(
         webView: WebView,
-        uri: Uri
+        uri: Uri,
     ) {
         if (uri.host == GOOGLE_ACCOUNTS_HOST) {
             addHostToList(uri)
@@ -57,7 +57,7 @@ class AppThirdPartyCookieManager(
 
     private suspend fun processThirdPartyCookiesSetting(
         webView: WebView,
-        uri: Uri
+        uri: Uri,
     ) {
         val host = uri.host ?: return
         val domain = authCookiesAllowedDomainsRepository.getDomain(host)

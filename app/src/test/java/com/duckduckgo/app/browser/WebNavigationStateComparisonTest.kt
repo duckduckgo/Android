@@ -138,7 +138,7 @@ class WebNavigationStateComparisonTest {
         originalUrl: String?,
         currentUrl: String?,
         title: String? = null,
-        newProgress: Int? = null
+        newProgress: Int? = null,
     ): WebNavigationState {
         return TestNavigationState(
             originalUrl = originalUrl,
@@ -148,7 +148,7 @@ class WebNavigationStateComparisonTest {
             canGoBack = true,
             canGoForward = true,
             hasNavigationHistory = true,
-            progress = newProgress
+            progress = newProgress,
         )
     }
 }

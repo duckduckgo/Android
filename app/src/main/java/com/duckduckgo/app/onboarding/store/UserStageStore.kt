@@ -28,7 +28,7 @@ interface UserStageStore {
 
 class AppUserStageStore @Inject constructor(
     private val userStageDao: UserStageDao,
-    private val dispatcher: DispatcherProvider
+    private val dispatcher: DispatcherProvider,
 ) : UserStageStore {
 
     override suspend fun getUserAppStage(): AppStage {

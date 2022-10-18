@@ -144,7 +144,7 @@ class PrivacyReportViewModelTest {
     private fun trackerFound(
         domain: String = "example.com",
         trackerCompanyId: Int = -1,
-        timestamp: String = DatabaseDateFormatter.bucketByHour()
+        timestamp: String = DatabaseDateFormatter.bucketByHour(),
     ) {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
         val tracker = VpnTracker(
@@ -153,7 +153,7 @@ class PrivacyReportViewModelTest {
             timestamp = timestamp,
             company = "",
             companyDisplayName = "",
-            trackingApp = defaultTrackingApp
+            trackingApp = defaultTrackingApp,
         )
         vpnTrackerDao.insert(tracker)
     }

@@ -44,14 +44,14 @@ interface CohortStore {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = CohortStore::class
+    boundType = CohortStore::class,
 )
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
+    boundType = VpnServiceCallbacks::class,
 )
 class RealCohortStore @Inject constructor(
-    private val sharedPreferencesProvider: VpnSharedPreferencesProvider
+    private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : CohortStore, VpnServiceCallbacks {
 
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -78,7 +78,7 @@ class RealCohortStore @Inject constructor(
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+        vpnStopReason: VpnStopReason,
     ) {
         // noop
     }

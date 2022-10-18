@@ -137,12 +137,12 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         if (notify) {
             binding.appTPDescription.addClickableSpan(
                 getText(VpnR.string.atp_WaitlistJoinedWithNotification),
-                listOf(Pair("beta_link", readBlogSpan))
+                listOf(Pair("beta_link", readBlogSpan)),
             )
         } else {
             binding.appTPDescription.addClickableSpan(
                 getText(VpnR.string.atp_WaitlistJoinedWithoutNotification),
-                listOf(Pair("notify_me_link", getNotificationSpan), Pair("beta_link", readBlogSpan))
+                listOf(Pair("notify_me_link", getNotificationSpan), Pair("beta_link", readBlogSpan)),
             )
         }
     }

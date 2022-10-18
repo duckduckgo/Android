@@ -84,7 +84,7 @@ class SystemSearchViewModelTest {
             mockFavoritesRepository,
             mockFaviconManager,
             mockSettingsStore,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
         testee.command.observeForever(commandObserver)
     }
@@ -377,7 +377,7 @@ class SystemSearchViewModelTest {
             mockFavoritesRepository,
             mockFaviconManager,
             mockSettingsStore,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
 
         val viewState = testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems

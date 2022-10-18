@@ -31,7 +31,7 @@ import timber.log.Timber
 class ClearDataNotification(
     private val context: Context,
     private val notificationDao: NotificationDao,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacytips.autoclear"

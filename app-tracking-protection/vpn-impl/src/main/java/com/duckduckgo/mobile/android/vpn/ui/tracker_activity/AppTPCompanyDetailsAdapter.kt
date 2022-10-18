@@ -42,14 +42,14 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): CompanyDetailsViewHolder {
         return CompanyDetailsViewHolder.create(parent)
     }
 
     override fun onBindViewHolder(
         holder: CompanyDetailsViewHolder,
-        position: Int
+        position: Int,
     ) {
         val companyTrackingDetails = items[position]
         holder.bind(companyTrackingDetails) { expanded ->
@@ -87,7 +87,7 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
 
     private class DiffCallback(
         private val old: List<AppTPCompanyTrackersViewModel.CompanyTrackingDetails>,
-        private val new: List<AppTPCompanyTrackersViewModel.CompanyTrackingDetails>
+        private val new: List<AppTPCompanyTrackersViewModel.CompanyTrackingDetails>,
     ) :
         DiffUtil.Callback() {
         override fun getOldListSize() = old.size
@@ -96,14 +96,14 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
 
         override fun areItemsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return old[oldItemPosition].companyName == new[newItemPosition].companyName
         }
 
         override fun areContentsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return old[oldItemPosition] == new[newItemPosition]
         }
@@ -129,7 +129,7 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
 
         fun bind(
             companyDetails: AppTPCompanyTrackersViewModel.CompanyTrackingDetails,
-            onExpanded: (Boolean) -> Unit
+            onExpanded: (Boolean) -> Unit,
         ) {
             val badge = badgeIcon(view.context, companyDetails.companyName)
             if (badge == null) {
@@ -138,7 +138,7 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
                         .beginConfig()
                         .fontSize(50)
                         .endConfig()
-                        .buildRound(companyDetails.companyName.take(1), Color.DKGRAY)
+                        .buildRound(companyDetails.companyName.take(1), Color.DKGRAY),
                 )
             } else {
                 badgeImage.setImageResource(badge)
@@ -148,7 +148,7 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
             trackingAttempts.text = view.context.resources.getQuantityString(
                 R.plurals.atp_CompanyDetailsTrackingAttempts,
                 companyDetails.trackingAttempts,
-                companyDetails.trackingAttempts
+                companyDetails.trackingAttempts,
             )
 
             val inflater = LayoutInflater.from(view.context)
@@ -210,7 +210,7 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
         private fun badgeIcon(
             context: Context,
             networkName: String,
-            prefix: String = "tracking_network_logo_"
+            prefix: String = "tracking_network_logo_",
         ): Int? {
             val drawable = "$prefix$networkName"
                 .replace(" ", "_")

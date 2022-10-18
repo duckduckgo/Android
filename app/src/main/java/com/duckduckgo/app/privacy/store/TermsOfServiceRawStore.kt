@@ -36,7 +36,7 @@ import timber.log.Timber
 @SingleInstanceIn(AppScope::class)
 class TermsOfServiceRawStore @Inject constructor(
     private val moshi: Moshi,
-    private val context: Context
+    private val context: Context,
 ) : TermsOfServiceStore {
 
     private var data: List<TermsOfService> = ArrayList()

@@ -55,7 +55,7 @@ class VpnUncaughtExceptionHandlerTest {
             TestScope(),
             coroutineTestRule.testDispatcherProvider,
             fakeDataStore,
-            mockUncaughtExceptionRepository
+            mockUncaughtExceptionRepository,
         )
     }
 

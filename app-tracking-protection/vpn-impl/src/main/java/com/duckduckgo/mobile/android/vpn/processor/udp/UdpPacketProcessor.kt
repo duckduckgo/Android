@@ -61,7 +61,7 @@ class UdpPacketProcessor @AssistedInject constructor(
     private val channelCache: UdpChannelCache,
     private val healthMetricCounter: HealthMetricCounter,
     private val appBuildConfig: AppBuildConfig,
-    interceptorPlugins: PluginPoint<VpnPacketInterceptor>
+    interceptorPlugins: PluginPoint<VpnPacketInterceptor>,
 ) : Runnable {
 
     @AssistedFactory
@@ -79,7 +79,7 @@ class UdpPacketProcessor @AssistedInject constructor(
                 val request = chain.request()
                 Timber.v("Proceed with UDP packet request ${request.packetInfo}")
                 request.byteChannel.write(request.byteBuffer)
-            }
+            },
         )
     }.toList()
 
@@ -98,13 +98,13 @@ class UdpPacketProcessor @AssistedInject constructor(
         pollJobDeviceToNetwork.execute(
             udpRunnable {
                 deviceToNetworkProcessing()
-            }
+            },
         )
 
         pollJobNetworkToDevice.execute(
             udpRunnable {
                 networkToDeviceProcessing()
-            }
+            },
         )
     }
 
@@ -163,7 +163,7 @@ class UdpPacketProcessor @AssistedInject constructor(
 
             Timber.d(
                 "App ${channelDetails.originatingApp} attempting to send ${packet.backingBuffer?.remaining()} " +
-                    "bytes to ${connectionInfo.destinationAddress}"
+                    "bytes to ${connectionInfo.destinationAddress}",
             )
 
             while (payloadBuffer.hasRemaining()) {
@@ -174,10 +174,10 @@ class UdpPacketProcessor @AssistedInject constructor(
                         destinationAddress = connectionInfo.destinationAddress,
                         destinationPort = connectionInfo.destinationPort,
                         sourceAddress = connectionInfo.sourceAddress,
-                        sourcePort = connectionInfo.sourcePort
+                        sourcePort = connectionInfo.sourcePort,
                     ),
                     byteBuffer = payloadBuffer,
-                    byteChannel = channelDetails.datagramChannel
+                    byteChannel = channelDetails.datagramChannel,
                 )
                 val chain = RealPacketInterceptorChain(interceptors, 0, packetRequest)
                 val bytesWritten = chain.proceed(packetRequest)
@@ -259,7 +259,7 @@ class UdpPacketProcessor @AssistedInject constructor(
 
     data class ChannelDetails(
         val datagramChannel: DatagramChannel,
-        val originatingApp: OriginatingApp
+        val originatingApp: OriginatingApp,
     )
 }
 

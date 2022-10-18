@@ -45,13 +45,13 @@ interface RequestInterceptor {
         request: WebResourceRequest,
         webView: WebView,
         documentUrl: String?,
-        webViewClientListener: WebViewClientListener?
+        webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse?
 
     @WorkerThread
     suspend fun shouldInterceptFromServiceWorker(
         request: WebResourceRequest?,
-        documentUrl: String?
+        documentUrl: String?,
     ): WebResourceResponse?
 }
 
@@ -63,7 +63,7 @@ class WebViewRequestInterceptor(
     private val gpc: Gpc,
     private val userAgentProvider: UserAgentProvider,
     private val adClickManager: AdClickManager,
-    private val cloakedCnameDetector: CloakedCnameDetector
+    private val cloakedCnameDetector: CloakedCnameDetector,
 ) : RequestInterceptor {
 
     /**
@@ -80,7 +80,7 @@ class WebViewRequestInterceptor(
         request: WebResourceRequest,
         webView: WebView,
         documentUrl: String?,
-        webViewClientListener: WebViewClientListener?
+        webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
         val url = request.url
 
@@ -131,7 +131,7 @@ class WebViewRequestInterceptor(
 
     override suspend fun shouldInterceptFromServiceWorker(
         request: WebResourceRequest?,
-        documentUrl: String?
+        documentUrl: String?,
     ): WebResourceResponse? {
         if (documentUrl == null) return null
         if (request == null) return null
@@ -146,7 +146,7 @@ class WebViewRequestInterceptor(
     private fun getWebResourceResponse(
         request: WebResourceRequest,
         documentUrl: String?,
-        webViewClientListener: WebViewClientListener?
+        webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
         val trackingEvent = trackingEvent(request, documentUrl, webViewClientListener)
         if (trackingEvent?.status == TrackerStatus.BLOCKED) {
@@ -169,7 +169,7 @@ class WebViewRequestInterceptor(
     private fun blockRequest(
         trackingEvent: TrackingEvent,
         request: WebResourceRequest,
-        webViewClientListener: WebViewClientListener?
+        webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse {
         trackingEvent.surrogateId?.let { surrogateId ->
             val surrogate = resourceSurrogates.get(surrogateId)
@@ -198,7 +198,7 @@ class WebViewRequestInterceptor(
 
     private suspend fun requestWasInTheStack(
         url: Uri,
-        webView: WebView
+        webView: WebView,
     ): Boolean {
         return withContext(Dispatchers.Main) {
             val webBackForwardList = webView.copyBackForwardList()
@@ -209,7 +209,7 @@ class WebViewRequestInterceptor(
     private suspend fun newUserAgent(
         request: WebResourceRequest,
         webView: WebView,
-        webViewClientListener: WebViewClientListener?
+        webViewClientListener: WebViewClientListener?,
     ): String? {
         return if (request.isForMainFrame && request.method == "GET") {
             val url = request.url ?: return null
@@ -235,7 +235,7 @@ class WebViewRequestInterceptor(
         documentUrl: String?,
         webViewClientListener: WebViewClientListener?,
         checkFirstParty: Boolean = true,
-        url: String = request.url.toString()
+        url: String = request.url.toString(),
     ): TrackingEvent? {
         if (request.isForMainFrame || documentUrl == null) {
             return null

@@ -27,7 +27,7 @@ import javax.inject.Inject
 @SingleInstanceIn(FragmentScope::class)
 @ContributesBinding(FragmentScope::class)
 class FragmentViewModelFactory @Inject constructor(
-    private val viewModelFactoryPluginPoint: FragmentViewModelFactoryPluginPoint
+    private val viewModelFactoryPluginPoint: FragmentViewModelFactoryPluginPoint,
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

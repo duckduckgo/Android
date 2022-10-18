@@ -32,11 +32,11 @@ import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class FlipperInitializer @Inject constructor(
     private val context: Context,
-    private val flipperPluginPoint: PluginPoint<FlipperPlugin>
+    private val flipperPluginPoint: PluginPoint<FlipperPlugin>,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {

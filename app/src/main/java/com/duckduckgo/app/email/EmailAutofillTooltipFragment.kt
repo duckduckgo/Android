@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.content_autofill_tooltip.*
 
 class EmailAutofillTooltipFragment(
     context: Context,
-    val address: String
+    val address: String,
 ) : BottomSheetDialog(context, R.style.EmailTooltip) {
 
     var useAddress: (() -> Unit) = {}

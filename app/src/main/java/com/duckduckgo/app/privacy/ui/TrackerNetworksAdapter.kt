@@ -42,7 +42,7 @@ import com.duckduckgo.mobile.android.ui.view.show
 import java.util.*
 
 class TrackerNetworksAdapter(
-    private val listener: TrackerNetworksListener
+    private val listener: TrackerNetworksListener,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -64,20 +64,20 @@ class TrackerNetworksAdapter(
             @StringRes val descriptionRes: Int? = null,
             @StringRes val linkTextRes: Int? = null,
             @StringRes val linkUrlRes: Int? = null,
-            val domain: String? = null
+            val domain: String? = null,
         ) : ViewData()
     }
 
     class HeaderViewHolder(
-        val binding: ItemTrackerNetworkHeaderBinding
+        val binding: ItemTrackerNetworkHeaderBinding,
     ) : RecyclerView.ViewHolder(binding.root)
 
     class RowViewHolder(
-        val binding: ItemTrackerNetworkElementBinding
+        val binding: ItemTrackerNetworkElementBinding,
     ) : RecyclerView.ViewHolder(binding.root)
 
     class SectionTitleViewHolder(
-        val binding: ItemTrackerNetworkSectionTitleBinding
+        val binding: ItemTrackerNetworkSectionTitleBinding,
     ) : RecyclerView.ViewHolder(binding.root)
 
     private var viewData: List<ViewData> = ArrayList()
@@ -85,7 +85,7 @@ class TrackerNetworksAdapter(
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -98,7 +98,7 @@ class TrackerNetworksAdapter(
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
-        position: Int
+        position: Int,
     ) {
         val viewElement = viewData[position]
         if (holder is HeaderViewHolder && viewElement is Header) {
@@ -112,7 +112,7 @@ class TrackerNetworksAdapter(
 
     private fun onBindSectionTitle(
         holder: SectionTitleViewHolder,
-        viewElement: SectionTitle
+        viewElement: SectionTitle,
     ) {
         val context = holder.binding.root.context
 
@@ -127,7 +127,7 @@ class TrackerNetworksAdapter(
         if (viewElement.linkTextRes != null && viewElement.linkUrlRes != null) {
             holder.binding.trackersSectionLink.addClickableLink(
                 annotation = "learn_more_link",
-                textSequence = context.getText(R.string.adLoadedSectionLinkText)
+                textSequence = context.getText(R.string.adLoadedSectionLinkText),
             ) {
                 listener.onClicked(context.getString(R.string.adLoadedSectionUrl))
             }
@@ -139,7 +139,7 @@ class TrackerNetworksAdapter(
 
     private fun onBindRow(
         holder: RowViewHolder,
-        viewElement: Row
+        viewElement: Row,
     ) {
         holder.binding.host.text = viewElement.tracker.trackerUrl.toUri().baseHost
         viewElement.tracker.categories?.let { categories ->
@@ -155,7 +155,7 @@ class TrackerNetworksAdapter(
 
     private fun onBindHeader(
         holder: HeaderViewHolder,
-        viewElement: Header
+        viewElement: Header,
     ) {
         holder.apply {
             val context = binding.root.context
@@ -164,7 +164,7 @@ class TrackerNetworksAdapter(
                 val drawable = Theming.getThemedDrawable(
                     context,
                     iconResource,
-                    DuckDuckGoTheme.LIGHT
+                    DuckDuckGoTheme.LIGHT,
                 )
                 binding.icon.setImageDrawable(drawable)
                 binding.icon.show()
@@ -173,7 +173,7 @@ class TrackerNetworksAdapter(
                 val drawable = Theming.getThemedDrawable(
                     context,
                     R.drawable.other_tracker_privacy_dashboard_bg,
-                    DuckDuckGoTheme.LIGHT
+                    DuckDuckGoTheme.LIGHT,
                 )
                 binding.unknownIcon.text = viewElement.networkDisplayName.take(1)
                 binding.unknownIcon.background = drawable
@@ -218,8 +218,8 @@ class TrackerNetworksAdapter(
                         descriptionRes = getSectionDescription(data.size, section),
                         linkTextRes = section.linkTextRes,
                         linkUrlRes = section.linkUrlRes,
-                        domain = section.domain
-                    )
+                        domain = section.domain,
+                    ),
                 )
             }
             entry.value.forEach { trackingMap ->
@@ -246,12 +246,12 @@ class TrackerNetworksAdapter(
 
     class DiffCallback(
         private val old: List<ViewData>,
-        private val new: List<ViewData>
+        private val new: List<ViewData>,
     ) : DiffUtil.Callback() {
 
         override fun areItemsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return old[oldItemPosition] == new[newItemPosition]
         }
@@ -266,7 +266,7 @@ class TrackerNetworksAdapter(
 
         override fun areContentsTheSame(
             oldItemPosition: Int,
-            newItemPosition: Int
+            newItemPosition: Int,
         ): Boolean {
             return old[oldItemPosition] == new[newItemPosition]
         }

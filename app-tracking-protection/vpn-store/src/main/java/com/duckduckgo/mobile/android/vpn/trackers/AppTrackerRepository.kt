@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.Flow
 interface AppTrackerRepository {
     fun findTracker(
         hostname: String,
-        packageName: String
+        packageName: String,
     ): AppTrackerType
 
     fun getAppExclusionList(): List<AppTrackerExcludedPackage>
@@ -47,12 +47,12 @@ interface AppTrackerRepository {
 
 class RealAppTrackerRepository(
     private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao,
-    private val vpnSystemAppsOverrides: VpnAppTrackerSystemAppsOverridesDao
+    private val vpnSystemAppsOverrides: VpnAppTrackerSystemAppsOverridesDao,
 ) : AppTrackerRepository {
 
     override fun findTracker(
         hostname: String,
-        packageName: String
+        packageName: String,
     ): AppTrackerType {
         val tracker = vpnAppTrackerBlockingDao.getTrackerBySubdomain(hostname) ?: return AppTrackerType.NotTracker
         val entityName = vpnAppTrackerBlockingDao.getEntityByAppPackageId(packageName)
@@ -65,7 +65,7 @@ class RealAppTrackerRepository(
 
     private fun firstPartyTracker(
         tracker: AppTracker,
-        entityName: AppTrackerPackage?
+        entityName: AppTrackerPackage?,
     ): Boolean {
         if (entityName == null) return false
         return tracker.owner.name == entityName.entityName

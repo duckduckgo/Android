@@ -88,13 +88,13 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
 
     private fun showRemovedAllSnackbar(
         removedSitePermissions: List<SitePermissionsEntity>,
-        removedLocationPermissions: List<LocationPermissionEntity>
+        removedLocationPermissions: List<LocationPermissionEntity>,
     ) {
         val message = HtmlCompat.fromHtml(getString(R.string.sitePermissionsRemoveAllWebsitesSnackbarText), HtmlCompat.FROM_HTML_MODE_LEGACY)
         Snackbar.make(
             binding.root,
             message,
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.onSnackBarUndoRemoveAllWebsites(removedSitePermissions, removedLocationPermissions)
         }.show()
@@ -104,7 +104,7 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
         sitesAllowed: List<String>,
         askLocationEnabled: Boolean,
         askCameraEnabled: Boolean,
-        askMicEnabled: Boolean
+        askMicEnabled: Boolean,
     ) {
         adapter.updateItems(sitesAllowed, askLocationEnabled, askCameraEnabled, askMicEnabled)
     }

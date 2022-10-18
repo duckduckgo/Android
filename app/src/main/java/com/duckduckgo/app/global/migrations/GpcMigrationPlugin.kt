@@ -29,7 +29,7 @@ import timber.log.Timber
 @SingleInstanceIn(AppScope::class)
 class GpcMigrationPlugin @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
-    private val gpc: Gpc
+    private val gpc: Gpc,
 ) : MigrationPlugin {
 
     override val version: Int = 1

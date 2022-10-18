@@ -85,7 +85,7 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
                         blocklist.blocklist,
                         blocklist.appPackages,
                         AppTrackerMetadata(eTag = blocklist.etag.value),
-                        blocklist.entities
+                        blocklist.entities,
                     )
 
                 return Result.success()
@@ -116,7 +116,7 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
                     .vpnAppTrackerBlockingDao()
                     .updateTrackerExceptionRules(
                         exceptionRules.trackerExceptionRules,
-                        AppTrackerExceptionRuleMetadata(eTag = exceptionRules.etag.value)
+                        AppTrackerExceptionRuleMetadata(eTag = exceptionRules.etag.value),
                     )
 
                 return Result.success()
@@ -131,10 +131,10 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 class AppTrackerListUpdateWorkerScheduler @Inject constructor(
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -147,7 +147,7 @@ class AppTrackerListUpdateWorkerScheduler @Inject constructor(
         workManager.enqueueUniquePeriodicWork(
             APP_TRACKER_LIST_UPDATE_WORKER_TAG,
             ExistingPeriodicWorkPolicy.KEEP,
-            workerRequest
+            workerRequest,
         )
     }
 

@@ -28,7 +28,7 @@ inline fun <reified T : ViewBinding> AppCompatActivity.viewBinding() =
 
 class ActivityViewBindingDelegate<T : ViewBinding>(
     bindingClass: Class<T>,
-    val activity: AppCompatActivity
+    val activity: AppCompatActivity,
 ) : ReadOnlyProperty<AppCompatActivity, T> {
 
     private var binding: T? = null
@@ -36,7 +36,7 @@ class ActivityViewBindingDelegate<T : ViewBinding>(
 
     override fun getValue(
         thisRef: AppCompatActivity,
-        property: KProperty<*>
+        property: KProperty<*>,
     ): T {
         binding?.let {
             return it

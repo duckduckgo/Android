@@ -43,7 +43,7 @@ object DeviceShieldAlertNotificationBuilderModule {
 
     @Provides
     fun providesDeviceShieldAlertNotificationBuilder(
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
     ): DeviceShieldAlertNotificationBuilder {
         return AndroidDeviceShieldAlertNotificationBuilder(appBuildConfig)
     }
@@ -53,22 +53,22 @@ interface DeviceShieldAlertNotificationBuilder {
 
     fun buildReminderNotification(
         context: Context,
-        silent: Boolean
+        silent: Boolean,
     ): Notification
 
     fun buildRevokedNotification(
-        context: Context
+        context: Context,
     ): Notification
 
     fun buildStatusNotification(
         context: Context,
         deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-        onNotificationPressedCallback: ResultReceiver
+        onNotificationPressedCallback: ResultReceiver,
     ): Notification
 }
 
 class AndroidDeviceShieldAlertNotificationBuilder constructor(
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
 ) : DeviceShieldAlertNotificationBuilder {
 
     @Suppress("NewApi") // we use appBuildConfig
@@ -86,7 +86,7 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
 
     override fun buildReminderNotification(
         context: Context,
-        silent: Boolean
+        silent: Boolean,
     ): Notification {
         registerAlertChannel(context)
 
@@ -96,8 +96,8 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
             addNextIntentWithParentStack(
                 Intent(
                     context,
-                    Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity")
-                )
+                    Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"),
+                ),
             )
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
@@ -119,8 +119,8 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
                 NotificationCompat.Action(
                     R.drawable.ic_vpn_notification_24,
                     context.getString(R.string.atp_EnableCTA),
-                    restartVpnIntent
-                )
+                    restartVpnIntent,
+                ),
             )
             .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
             .setChannelId(VPN_ALERTS_CHANNEL_ID)
@@ -136,8 +136,8 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
             addNextIntentWithParentStack(
                 Intent(
                     context,
-                    Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity")
-                )
+                    Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"),
+                ),
             )
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
@@ -159,8 +159,8 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
                 NotificationCompat.Action(
                     R.drawable.ic_vpn_notification_24,
                     context.getString(R.string.atp_EnableCTA),
-                    restartVpnIntent
-                )
+                    restartVpnIntent,
+                ),
             )
             .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
             .build()
@@ -169,7 +169,7 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
     override fun buildStatusNotification(
         context: Context,
         deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-        onNotificationPressedCallback: ResultReceiver
+        onNotificationPressedCallback: ResultReceiver,
     ): Notification {
         registerAlertChannel(context)
 
@@ -201,7 +201,7 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
     private fun buildNotification(
         context: Context,
         content: RemoteViews,
-        resultReceiver: ResultReceiver? = null
+        resultReceiver: ResultReceiver? = null,
     ): Notification {
         registerAlertChannel(context)
 

@@ -29,7 +29,7 @@ import kotlinx.coroutines.*
 class TypeAnimationTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : AppCompatTextView(context, attrs, defStyleAttr), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -45,7 +45,7 @@ class TypeAnimationTextView @JvmOverloads constructor(
     fun startTypingAnimation(
         textDialog: String,
         isCancellable: Boolean = true,
-        afterAnimation: () -> Unit = {}
+        afterAnimation: () -> Unit = {},
     ) {
         textInDialog = textDialog.html(context)
         if (isCancellable) {

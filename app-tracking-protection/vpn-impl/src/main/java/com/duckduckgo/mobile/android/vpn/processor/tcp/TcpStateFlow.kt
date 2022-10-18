@@ -32,7 +32,7 @@ class TcpStateFlow {
             connectionKey: String,
             currentState: TcbState,
             packetType: PacketType,
-            sequenceNumberToClientInitial: Long
+            sequenceNumberToClientInitial: Long,
         ): TcpStateAction {
             val newActions = when (currentState.serverState) {
                 LISTEN -> handlePacketInStateListen(connectionKey, currentState, packetType)
@@ -53,7 +53,7 @@ class TcpStateFlow {
 
         private fun handlePacketInTimeWait(
             connectionKey: String,
-            packetType: PacketType
+            packetType: PacketType,
         ): List<Event> {
             val events = when {
                 packetType.isRst -> {
@@ -67,7 +67,7 @@ class TcpStateFlow {
 
         private fun handlePacketInClosed(
             connectionKey: String,
-            packetType: PacketType
+            packetType: PacketType,
         ): List<Event> {
             val events = when {
                 packetType.isRst -> {
@@ -82,7 +82,7 @@ class TcpStateFlow {
         private fun handlePacketInLastAck(
             packetType: PacketType,
             connectionKey: String,
-            currentState: TcbState
+            currentState: TcbState,
         ): List<Event> {
             val events = when {
                 packetType.isRst -> {
@@ -104,7 +104,7 @@ class TcpStateFlow {
         private fun isAckForOurFin(
             packetType: PacketType,
             connectionKey: String,
-            currentState: TcbState
+            currentState: TcbState,
         ): Boolean {
             if (!packetType.isAck && !packetType.isFin) {
                 return false
@@ -119,7 +119,7 @@ class TcpStateFlow {
                     packetType.isFin,
                     packetType.isAck,
                     packetType.finSequenceNumberToClient,
-                    packetType.ackNum
+                    packetType.ackNum,
                 )
             } else {
                 Timber.v(
@@ -129,7 +129,7 @@ class TcpStateFlow {
                     packetType.isFin,
                     packetType.isAck,
                     packetType.finSequenceNumberToClient,
-                    packetType.ackNum
+                    packetType.ackNum,
                 )
             }
             return match
@@ -144,7 +144,7 @@ class TcpStateFlow {
         private fun handlePacketInFinWait1(
             connectionKey: String,
             currentState: TcbState,
-            packetType: PacketType
+            packetType: PacketType,
         ): List<Event> {
             val eventList = mutableListOf<Event>()
 
@@ -167,7 +167,7 @@ class TcpStateFlow {
                         }
                     }
                     else -> listOf(SendReset)
-                }
+                },
             )
 
             return eventList
@@ -176,7 +176,7 @@ class TcpStateFlow {
         private fun handlePacketInFinWait2(
             connectionKey: String,
             currentState: TcbState,
-            packetType: PacketType
+            packetType: PacketType,
         ): List<Event> {
             val eventList = mutableListOf<Event>()
 
@@ -197,7 +197,7 @@ class TcpStateFlow {
                         Timber.w("Received packet while in $currentState - ignoring $connectionKey")
                         emptyList()
                     }
-                }
+                },
             )
 
             return eventList
@@ -206,7 +206,7 @@ class TcpStateFlow {
         private fun handlePacketInClosing(
             connectionKey: String,
             currentState: TcbState,
-            packetType: PacketType
+            packetType: PacketType,
         ): List<Event> {
             val eventList = mutableListOf<Event>()
 
@@ -225,7 +225,7 @@ class TcpStateFlow {
                         listOf(MoveServerToState(TIME_WAIT), DelayedCloseConnection)
                     }
                     else -> listOf(SendReset)
-                }
+                },
             )
 
             return eventList
@@ -234,7 +234,7 @@ class TcpStateFlow {
         private fun handlePacketInStateListen(
             connectionKey: String,
             currentState: TcbState,
-            packetType: PacketType
+            packetType: PacketType,
         ): List<Event> {
             val events = when {
                 packetType.isRst -> {
@@ -266,7 +266,7 @@ class TcpStateFlow {
             connectionKey: String,
             currentState: TcbState,
             packetType: PacketType,
-            initialSequenceNumberToClient: Long
+            initialSequenceNumberToClient: Long,
         ): List<Event> {
             val events = when {
                 packetType.isRst -> {
@@ -289,7 +289,7 @@ class TcpStateFlow {
         private fun handlePacketInEstablished(
             connectionKey: String,
             currentState: TcbState,
-            packetType: PacketType
+            packetType: PacketType,
         ): List<Event> {
             val events = when {
                 packetType.isFin -> {
@@ -335,7 +335,7 @@ class TcpStateFlow {
         private fun unhandledEvent(
             connectionKey: String,
             currentState: TcbState,
-            packetType: PacketType
+            packetType: PacketType,
         ): List<Event> {
             Timber.e("Unhandled event in %s: %s for %s", currentState, packetType, connectionKey)
             return emptyList()
@@ -384,7 +384,7 @@ class TcpStateFlow {
         val isRst: Boolean = false,
         val hasData: Boolean = false,
         val ackNum: Long = 0,
-        val finSequenceNumberToClient: Long = -1
+        val finSequenceNumberToClient: Long = -1,
     )
 }
 
@@ -399,6 +399,6 @@ fun Packet.asPacketType(finSequenceNumberToClient: Long = -1): TcpStateFlow.Pack
         isRst = tcpHeader.isRST,
         hasData = hasData,
         ackNum = tcpHeader.acknowledgementNumber,
-        finSequenceNumberToClient = finSequenceNumberToClient
+        finSequenceNumberToClient = finSequenceNumberToClient,
     )
 }

@@ -34,7 +34,7 @@ object WorkerModule {
     @SingleInstanceIn(AppScope::class)
     fun workManager(
         context: Context,
-        workerFactory: WorkerFactory
+        workerFactory: WorkerFactory,
     ): WorkManager {
         val config = Configuration.Builder()
             .setWorkerFactory(workerFactory)
@@ -46,7 +46,7 @@ object WorkerModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun workerFactory(
-        workerInjectorPluginPoint: PluginPoint<WorkerInjectorPlugin>
+        workerInjectorPluginPoint: PluginPoint<WorkerInjectorPlugin>,
     ): WorkerFactory {
         return DaggerWorkerFactory(workerInjectorPluginPoint)
     }

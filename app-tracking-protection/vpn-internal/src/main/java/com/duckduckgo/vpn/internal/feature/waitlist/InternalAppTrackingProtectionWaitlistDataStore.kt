@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 @ContributesBinding(
     scope = AppScope::class,
-    priority = ContributesBinding.Priority.HIGHEST
+    priority = ContributesBinding.Priority.HIGHEST,
 )
 class InternalAppTrackingProtectionWaitlistDataStore @Inject constructor() : AppTrackingProtectionWaitlistDataStore {
 

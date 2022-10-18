@@ -28,7 +28,7 @@ object PerformanceConstants {
 inline fun <T> measureExecution(
     logMessage: String,
     logLevel: Int = Log.DEBUG,
-    function: () -> T
+    function: () -> T,
 ): T {
     val startTime = System.nanoTime()
     return function.invoke().also {

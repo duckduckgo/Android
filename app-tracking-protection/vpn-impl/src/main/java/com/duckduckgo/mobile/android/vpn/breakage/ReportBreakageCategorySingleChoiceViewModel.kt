@@ -43,7 +43,7 @@ class ReportBreakageCategorySingleChoiceViewModel @Inject constructor() : ViewMo
     data class ViewState(
         val indexSelected: Int = -1,
         val categorySelected: ReportBreakageCategory? = null,
-        val submitAllowed: Boolean = false
+        val submitAllowed: Boolean = false,
     )
 
     sealed class Command {
@@ -63,7 +63,7 @@ class ReportBreakageCategorySingleChoiceViewModel @Inject constructor() : ViewMo
             CrashesCategory,
             UploadsCategory,
             ContentCategory,
-            OtherCategory
+            OtherCategory,
         )
 
     var shuffledCategories: MutableList<ReportBreakageCategory>
@@ -100,7 +100,7 @@ class ReportBreakageCategorySingleChoiceViewModel @Inject constructor() : ViewMo
             viewState.value.copy(
                 indexSelected = indexSelected,
                 categorySelected = shuffledCategories.elementAtOrNull(indexSelected),
-                submitAllowed = canSubmit()
+                submitAllowed = canSubmit(),
             )
     }
 

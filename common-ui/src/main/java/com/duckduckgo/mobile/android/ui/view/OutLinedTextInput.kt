@@ -57,7 +57,7 @@ interface OutlinedTextInput {
 class OutLinedTextInputView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr), OutlinedTextInput {
     private val binding: ViewOutlinedTextInputBinding by viewBinding()
     private val transformationMethod by lazy {
@@ -71,7 +71,7 @@ class OutLinedTextInputView @JvmOverloads constructor(
             attrs,
             R.styleable.OutLinedTextInputView,
             0,
-            com.google.android.material.R.style.Widget_MaterialComponents_TextInputEditText_OutlinedBox
+            com.google.android.material.R.style.Widget_MaterialComponents_TextInputEditText_OutlinedBox,
         ).apply {
             text = getString(R.styleable.OutLinedTextInputView_android_text) ?: ""
             getDrawable(R.styleable.OutLinedTextInputView_endIcon)?.let {
@@ -141,7 +141,7 @@ class OutLinedTextInputView @JvmOverloads constructor(
 
     private fun setupEndIcon(
         drawable: Drawable,
-        contentDescription: String
+        contentDescription: String,
     ) {
         binding.internalInputLayout.apply {
             endIconMode = END_ICON_CUSTOM
@@ -226,14 +226,14 @@ class OutLinedTextInputView @JvmOverloads constructor(
         constructor(superState: Parcelable?) : super(superState)
         private constructor(
             parcel: Parcel,
-            classLoader: ClassLoader?
+            classLoader: ClassLoader?,
         ) : super(parcel) {
             childrenStates = parcel.readSparseArray(classLoader)
         }
 
         override fun writeToParcel(
             out: Parcel,
-            flags: Int
+            flags: Int,
         ) {
             super.writeToParcel(out, flags)
             out.writeSparseArray(childrenStates)
@@ -244,7 +244,7 @@ class OutLinedTextInputView @JvmOverloads constructor(
             val CREATOR: ClassLoaderCreator<SavedState> = object : ClassLoaderCreator<SavedState> {
                 override fun createFromParcel(
                     source: Parcel,
-                    loader: ClassLoader?
+                    loader: ClassLoader?,
                 ): SavedState {
                     return SavedState(source, loader)
                 }

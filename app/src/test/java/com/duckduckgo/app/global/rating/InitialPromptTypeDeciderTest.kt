@@ -48,7 +48,7 @@ class InitialPromptTypeDeciderTest {
             initialPromptDecider = mockInitialPromptDecider,
             secondaryPromptDecider = mockSecondaryPromptDecider,
             context = mock(),
-            appBuildConfig = mockAppBuildConfig
+            appBuildConfig = mockAppBuildConfig,
         )
 
         whenever(mockPlayStoreUtils.isPlayStoreInstalled()).thenReturn(true)

@@ -50,7 +50,7 @@ import timber.log.Timber
 
 data class SystemSearchResult(
     val autocomplete: AutoCompleteResult,
-    val deviceApps: List<DeviceApp>
+    val deviceApps: List<DeviceApp>,
 )
 
 @ContributesViewModel(ActivityScope::class)
@@ -62,18 +62,18 @@ class SystemSearchViewModel @Inject constructor(
     private val favoritesRepository: FavoritesRepository,
     private val faviconManager: FaviconManager,
     private val appSettingsPreferencesStore: SettingsDataStore,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel(), EditSavedSiteDialogFragment.EditSavedSiteListener {
 
     data class OnboardingViewState(
         val visible: Boolean,
-        val expanded: Boolean = false
+        val expanded: Boolean = false,
     )
 
     sealed class Suggestions {
         data class SystemSearchResultsViewState(
             val autocompleteResults: AutoCompleteResult = AutoCompleteResult("", emptyList()),
-            val appResults: List<DeviceApp> = emptyList()
+            val appResults: List<DeviceApp> = emptyList(),
         ) : Suggestions()
 
         data class QuickAccessItems(val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) : Suggestions()
@@ -149,14 +149,14 @@ class SystemSearchViewModel @Inject constructor(
                 { result ->
                     updateResults(result)
                 },
-                { t: Throwable? -> Timber.w(t, "Failed to get search results") }
+                { t: Throwable? -> Timber.w(t, "Failed to get search results") },
             )
     }
 
     private fun buildResultsObservable(query: String): Observable<SystemSearchResult>? {
         return Observable.zip(
             autoComplete.autoComplete(query),
-            Observable.just(deviceAppLookup.query(query))
+            Observable.just(deviceAppLookup.query(query)),
         ) { autocompleteResult: AutoCompleteResult, appsResult: List<DeviceApp> ->
             SystemSearchResult(autocompleteResult, appsResult)
         }
@@ -212,14 +212,14 @@ class SystemSearchViewModel @Inject constructor(
                 is Suggestions.SystemSearchResultsViewState -> {
                     currentResultsState.copy(
                         autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
-                        appResults = updatedApps
+                        appResults = updatedApps,
                     )
                 }
                 is Suggestions.QuickAccessItems -> Suggestions.SystemSearchResultsViewState(
                     autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
-                    appResults = updatedApps
+                    appResults = updatedApps,
                 )
-            }
+            },
         )
     }
 

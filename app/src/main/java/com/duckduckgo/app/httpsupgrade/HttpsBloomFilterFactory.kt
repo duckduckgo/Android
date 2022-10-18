@@ -41,7 +41,7 @@ class HttpsBloomFilterFactoryImpl @Inject constructor(
     private val httpsEmbeddedDataPersister: HttpsEmbeddedDataPersister,
     private val httpsDataPersister: HttpsDataPersister,
     private val pixel: Pixel,
-    private val context: Context
+    private val context: Context,
 ) : HttpsBloomFilterFactory {
 
     @WorkerThread

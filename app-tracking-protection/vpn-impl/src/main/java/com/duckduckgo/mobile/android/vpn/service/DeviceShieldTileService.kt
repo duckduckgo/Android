@@ -48,7 +48,7 @@ import timber.log.Timber
 // at startup when Java class loader tries to resolve the TileService::class upon Dagger setup
 @InjectWith(
     scope = QuickSettingsScope::class,
-    bindingKey = TileServiceBingingKey::class
+    bindingKey = TileServiceBingingKey::class,
 )
 class DeviceShieldTileService : TileService() {
 
@@ -169,7 +169,7 @@ class VpnPermissionRequesterActivity : AppCompatActivity() {
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         when (requestCode) {
             RC_REQUEST_VPN_PERMISSION -> handleVpnPermissionResult(resultCode)
