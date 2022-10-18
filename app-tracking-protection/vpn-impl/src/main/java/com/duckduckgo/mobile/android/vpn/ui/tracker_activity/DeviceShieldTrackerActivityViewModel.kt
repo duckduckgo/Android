@@ -44,7 +44,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.threeten.bp.Instant
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -140,7 +139,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     fun showAppTpEnabledCtaIfNeeded() {
         if (!vpnStore.didShowAppTpEnabledCta()) {
             vpnStore.appTpEnabledCtaDidShow()
-            vpnStore.setAppTPOnboardingBannerExpiryTimestamp()
+            vpnStore.onOnboardingSessionSet()
             sendCommand(Command.ShowAppTpEnabledCta)
         }
     }
@@ -210,7 +209,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     }
 
     fun bannerState(): BannerState {
-        return if (Instant.now().toEpochMilli() < vpnStore.getAppTPOnboardingBannerExpiryTimestamp()) {
+        return if (vpnStore.isOnboardingSession()) {
             BannerState.OnboardingBanner
         } else {
             BannerState.NextSessionBanner

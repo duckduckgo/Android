@@ -41,8 +41,8 @@ interface VpnStore {
     fun isAlwaysOnEnabled(): Boolean
     fun didShowAppTpEnabledCta(): Boolean
     fun appTpEnabledCtaDidShow()
-    fun setAppTPOnboardingBannerExpiryTimestamp()
-    fun getAppTPOnboardingBannerExpiryTimestamp(): Long
+    fun onOnboardingSessionSet()
+    fun isOnboardingSession(): Boolean
 
     companion object {
         const val ALWAYS_ON_PROMOTION_DELTA = 3
@@ -107,14 +107,15 @@ class SharedPreferencesVpnStore @Inject constructor(
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_APPTP_ENABLED_CTA_SHOWN, true) }
     }
 
-    override fun setAppTPOnboardingBannerExpiryTimestamp() {
+    override fun onOnboardingSessionSet() {
         val now = Instant.now().toEpochMilli()
         val expiryTimestamp = now.plus(TimeUnit.HOURS.toMillis(WINDOW_INTERVAL_HOURS))
         preferences.edit { putLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, expiryTimestamp) }
     }
 
-    override fun getAppTPOnboardingBannerExpiryTimestamp(): Long {
-        return preferences.getLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, -1)
+    override fun isOnboardingSession(): Boolean {
+        val expiryTimestamp = preferences.getLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, -1)
+        return Instant.now().toEpochMilli() < expiryTimestamp
     }
 
     companion object {

@@ -47,8 +47,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.threeten.bp.Instant
-import java.util.concurrent.TimeUnit
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -377,9 +375,8 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenBannerStateCalledAfterMoreThanOneDayThenReturnNextSessionBanner() {
-        val expiredTimestamp = Instant.now().toEpochMilli().minus(TimeUnit.HOURS.toMillis(1))
-        whenever(vpnStore.getAppTPOnboardingBannerExpiryTimestamp()).thenReturn(expiredTimestamp)
+    fun whenBannerStateCalledOutsideOnboardingSessionThenReturnNextSessionBanner() {
+        whenever(vpnStore.isOnboardingSession()).thenReturn(false)
 
         val bannerState = viewModel.bannerState()
 
@@ -387,9 +384,8 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenBannerStateCalledAfterLessThanOneDayThenReturnOnboardingBanner() {
-        val notExpiredTimestamp = Instant.now().toEpochMilli().plus(TimeUnit.HOURS.toMillis(1))
-        whenever(vpnStore.getAppTPOnboardingBannerExpiryTimestamp()).thenReturn(notExpiredTimestamp)
+    fun whenBannerStateCalledDuringOnboardingSessionThenReturnOnboardingBanner() {
+        whenever(vpnStore.isOnboardingSession()).thenReturn(true)
 
         val bannerState = viewModel.bannerState()
 

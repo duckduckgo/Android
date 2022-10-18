@@ -21,7 +21,9 @@ import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -125,16 +127,16 @@ class SharedPreferencesVpnStoreTest {
     }
 
     @Test
-    fun whenGetAppTPOnboardingBannerExpiryTimestampCalledWithoutBeingSetThenReturnDefaultValue() {
-        assertEquals(-1, sharedPreferencesVpnStore.getAppTPOnboardingBannerExpiryTimestamp())
+    fun whenIsOnboardingSessionCalledWithoutBeingSetThenReturnFalse() {
+        assertFalse(sharedPreferencesVpnStore.isOnboardingSession())
     }
 
     @Test
-    fun whenSetAppTPOnboardingBannerExpiryTimestampCalledThenSetValueAndReturnCorrectValueWhenAsked() {
-        assertEquals(-1, sharedPreferencesVpnStore.getAppTPOnboardingBannerExpiryTimestamp())
+    fun whenOnOnboardingSessionSetCalledThenSetValueAndReturnTrueWhenAsked() {
+        assertFalse(sharedPreferencesVpnStore.isOnboardingSession())
 
-        sharedPreferencesVpnStore.setAppTPOnboardingBannerExpiryTimestamp()
+        sharedPreferencesVpnStore.onOnboardingSessionSet()
 
-        assertTrue(sharedPreferencesVpnStore.getAppTPOnboardingBannerExpiryTimestamp() > -1)
+        assertTrue(sharedPreferencesVpnStore.isOnboardingSession())
     }
 }
