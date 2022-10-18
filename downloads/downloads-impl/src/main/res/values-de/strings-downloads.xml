@@ -25,7 +25,7 @@
 
     <string name="downloadInProgress">Wird heruntergeladen</string>
 
-    <string name="downloadsDownloadStartedMessage">Download von %@ gestartet</string>
+    <string name="downloadsDownloadStartedMessage">Download von %s gestartet</string>
     <string name="downloadsDownloadFinishedMessage">Download für %s abgeschlossen</string>
     <string name="downloadsDownloadGenericErrorMessage">Download fehlgeschlagen.</string>
     <string name="downloadsCancel">Abbrechen</string>
