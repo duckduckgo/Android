@@ -69,7 +69,7 @@
         <item quantity="other"><![CDATA[Der App-Tracking-Schutz hat die meisten Tracking-Versuche in <b>%1$s</b> und <b>%2$s</b> (letzter Tag) blockiert.]]></item>
     </plurals>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Der App-Tracking-Schutz <b>hat %d %d Mal in %s</b> (letzter Tag) blockiert.]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Der App-Tracking-Schutz <b>hat %s %d Mal in %s</b> (letzter Tag) blockiert.]]></string>
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Der App-Tracking-Schutz blockierte <b>%s %d Zeit in %s und 1 weitere App</b> (letzter Tag).]]></string>
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[App Tracking Protection <b>hat %s %d-mal in %s und %d anderen Apps</b> blockiert (vergangener Tag).]]></string>
 

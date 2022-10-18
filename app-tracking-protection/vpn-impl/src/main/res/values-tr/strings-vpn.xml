@@ -70,20 +70,20 @@
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Uygulama İzleme Koruması, <b>%s için %d kez %s</b> (son 1 gün) engelleme yaptı.]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Uygulama İzleme Koruması, <b>%s ve 1 diğer uygulama için %s %d kez</b> engelleme yaptı (son 1 gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Uygulama İzleme Koruması, <b>%1$s ve 1 diğer uygulama için %3$s %2$d kez</b> engelleme yaptı (son 1 gün).]]></string>
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%s ve %d diğer uygulama için %s %d kez</b> engelleme yaptı. (son 1 gün).]]></string>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%s %s için %d kez</b> engelleme yaptı (son 1 gün).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%s %s ve 1 diğer uygulama için %d kez</b> engelleme yaptı (son 1 gün).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Uygulama İzleme Koruması, <b>%s %s ve %d diğer uygulama için %d kez</b> engelleme yaptı (son 1 gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%1$s %3$s için %2$d kez</b> engelleme yaptı (son 1 gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%1$s %3$s ve 1 diğer uygulama için %2$d kez</b> engelleme yaptı (son 1 gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Uygulama İzleme Koruması, <b>%1$s %3$s ve %4$d diğer uygulama için %2$d kez</b> engelleme yaptı (son 1 gün).]]></string>
 
     <!-- App Tracking Protection Weekly Notification -->
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%s için %d izleme girişimini</b> engelledi (geçen hafta).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%s ve 1 diğer uygulama için %d izleme girişimini</b> engelledi (geçen hafta).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%s ve %d diğer uygulama için %d izleme girişimini</b> engelledi (geçen hafta).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%s için %d izleme girişimini</b> engelledi (geçen hafta).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Uygulama İzleme Koruması, <b>%s ve 1 diğer uygulama için %d izleme girişimini</b> engelledi (geçen hafta).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%s ve %d diğer uygulama için %d izleme girişimini</b> engelledi (geçen hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s için %1$d izleme girişimini</b> engelledi (geçen hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve 1 diğer uygulama için %1$d izleme girişimini</b> engelledi (geçen hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve %1$d diğer uygulama için %d izleme girişimini</b> engelledi (geçen hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s için %1$d izleme girişimini</b> engelledi (geçen hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Uygulama İzleme Koruması, <b>%2$s ve 1 diğer uygulama için %1$d izleme girişimini</b> engelledi (geçen hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve %1$d diğer uygulama için %d izleme girişimini</b> engelledi (geçen hafta).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
         <item quantity="one"><![CDATA[Uygulama İzleme Koruması, <b>%s için (%s dahil) %d uygulamayı engelledi </b> (geçen hafta).]]></item>
@@ -92,12 +92,12 @@
 
     <string name="atp_EnableCTA">Uygulama İzleme Korumasını Etkinleştir</string>
 
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%s için %d izleme girişimini</b> (son 1 saat) engelledi.]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%s ve 1 diğer uygulama için %d izleme girişimini</b> (son 1 saat) engelledi.]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%s ve %d diğer uygulama için %d izleme girişimini</b> (son 1 saat) engelledi.]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%s için %d izleme girişimini</b> (son 1 saat) engelledi.]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%s ve 1 diğer uygulama için %d izleme girişimini</b> (son 1 saat) engelledi.]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%s ve %d diğer uygulama için %d izleme girişimini</b> (son 1 saat) engelledi.]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s için %1$d izleme girişimini</b> (son 1 saat) engelledi.]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve 1 diğer uygulama için %1$d izleme girişimini</b> (son 1 saat) engelledi.]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve %3$d diğer uygulama için %1$d izleme girişimini</b> (son 1 saat) engelledi.]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s için %1$d izleme girişimini</b> (son 1 saat) engelledi.]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve 1 diğer uygulama için %1$d izleme girişimini</b> (son 1 saat) engelledi.]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve %3$d diğer uygulama için %1$d izleme girişimini</b> (son 1 saat) engelledi.]]></string>
 
     <!-- App Tracking Protection Privacy Report -->
     <string name="atp_PrivacyReportEnabledTooltip">Uygulama İzleme Koruması etkin ve cihazınızın tamamında izleyicileri engelliyor</string>

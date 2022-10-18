@@ -33,8 +33,8 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning">Tid aktiv: %s</string>
-    <string name="vpnTrackerCompaniesBlockedToday">Sporingsselskaper blokkert i dag: %s</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek">Sporingsselskaper blokkert denne uken: %s</string>
+    <string name="vpnTrackerCompaniesBlockedToday">Sporingsselskaper blokkert i dag: %d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek">Sporingsselskaper blokkert denne uken: %d</string>
     <string name="vpnTrackerCompaniesNone">"Ingen sporingsselskaper er blokkert ennå"</string>
     <string name="vpnTrackersBlockedToday">Sporere blokkert i dag: %d</string>
     <string name="vpnTrackersBlockedThisWeek">Sporere blokkert denne uken: %d</string>

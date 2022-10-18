@@ -33,8 +33,8 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning">Tempo em execução: %s</string>
-    <string name="vpnTrackerCompaniesBlockedToday">Empresas rastreadoras bloqueadas hoje: %s</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek">Empresas rastreadoras bloqueadas esta semana: %s</string>
+    <string name="vpnTrackerCompaniesBlockedToday">Empresas rastreadoras bloqueadas hoje: %d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek">Empresas rastreadoras bloqueadas esta semana: %d</string>
     <string name="vpnTrackerCompaniesNone">"Nenhuma empresa rastreadora bloqueada"</string>
     <string name="vpnTrackersBlockedToday">Rastreadores bloqueados hoje: %d</string>
     <string name="vpnTrackersBlockedThisWeek">Rastreadores bloqueados esta semana: %d</string>

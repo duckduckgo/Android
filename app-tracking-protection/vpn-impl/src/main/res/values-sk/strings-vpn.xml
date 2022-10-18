@@ -59,7 +59,7 @@
     <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Ochrana pred sledovaním aplikácií zablokovala <b>%1$d pokus o sledovanie</b> (za uplynulý deň).]]></string>
     <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Ochrana pred sledovaním aplikácií zablokovala <b>%1$d pokus o sledovanie v 1 aplikácii, %2$s</b> (za uplynulý deň).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Ochrana pred sledovaním aplikácií zablokovala <b>%1$d pokusov o sledovanie</b> (za uplynulý deň).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Ochrana pred sledovaním aplikácií zablokovala <b>pokusy o sledovanie %1$ d v aplikáciách %2$ d vrátane %3$ s</b> (za uplynulý deň).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Ochrana pred sledovaním aplikácií zablokovala <b>pokusy o sledovanie %1$d v aplikáciách %2$d vrátane %3$s</b> (za uplynulý deň).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
         <item quantity="one"><![CDATA[%1$s sa vás pokúsil sledovať <b>v %2$d aplikácii</b> (za uplynulý deň). <b>Pozri viac</b>]]></item>
@@ -69,10 +69,10 @@
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[Aplikácia na ochranu pred sledovaním zablokovala najviac pokusov o sledovanie v <b>%1$ s</b> (za uplynulý deň).]]></item>
-        <item quantity="few"><![CDATA[Aplikácia na ochranu pred sledovaním zablokovala najviac pokusov o sledovanie v <b>%1$ s</b> a <b>%2$ s</b> (za uplynulý deň).]]></item>
-        <item quantity="many"><![CDATA[Aplikácia na ochranu pred sledovaním zablokovala najviac pokusov o sledovanie v <b>%1$ s</b> a <b>%2$ s</b> (za uplynulý deň).]]></item>
-        <item quantity="other"><![CDATA[Aplikácia na ochranu pred sledovaním zablokovala najviac pokusov o sledovanie v <b>%1$ s</b> a <b>%2$ s</b> (za uplynulý deň).]]></item>
+        <item quantity="one"><![CDATA[Aplikácia na ochranu pred sledovaním zablokovala najviac pokusov o sledovanie v <b>%1$s</b> (za uplynulý deň).]]></item>
+        <item quantity="few"><![CDATA[Aplikácia na ochranu pred sledovaním zablokovala najviac pokusov o sledovanie v <b>%1$s</b> a <b>%2$s</b> (za uplynulý deň).]]></item>
+        <item quantity="many"><![CDATA[Aplikácia na ochranu pred sledovaním zablokovala najviac pokusov o sledovanie v <b>%1$s</b> a <b>%2$s</b> (za uplynulý deň).]]></item>
+        <item quantity="other"><![CDATA[Aplikácia na ochranu pred sledovaním zablokovala najviac pokusov o sledovanie v <b>%1$s</b> a <b>%2$s</b> (za uplynulý deň).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Aplikácia na ochranu pred sledovaním zablokovala <b>%s %d času v %s</b> (za uplynulý deň).]]></string>

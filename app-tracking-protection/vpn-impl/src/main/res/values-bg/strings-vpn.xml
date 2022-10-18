@@ -33,8 +33,8 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning">Време на работа: %s</string>
-    <string name="vpnTrackerCompaniesBlockedToday">Компании с тракери, блокирани днес: %s</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek">Компании с тракери, блокирани тази седмица: %s</string>
+    <string name="vpnTrackerCompaniesBlockedToday">Компании с тракери, блокирани днес: %d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek">Компании с тракери, блокирани тази седмица: %d</string>
     <string name="vpnTrackerCompaniesNone">"Все още няма блокирани компании с тракери"</string>
     <string name="vpnTrackersBlockedToday">Блокирани тракери днес: %d</string>
     <string name="vpnTrackersBlockedThisWeek">Блокирани тракери тази седмица: %d</string>

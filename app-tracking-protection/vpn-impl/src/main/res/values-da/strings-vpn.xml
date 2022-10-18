@@ -55,7 +55,7 @@
 
     <!-- App Tracking Protection Daily Notification -->
     <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ App Tracking Protection blokerede <b>%1$d sporingsforsøg</b> (seneste døgn).]]></string>
-    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ App Tracking Protection blokerede <b>%1$d sporingsforsøg i 1 app, %1$d</b> (seneste døgn).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ App Tracking Protection blokerede <b>%1$d sporingsforsøg i 1 app, %2$s</b> (seneste døgn).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ App Tracking Protection blokerede <b>%1$d sporingsforsøg</b> (seneste døgn).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ App Tracking Protection blokerede <b>%1$d sporingsforsøg i %2$d apps, inkl. %3$s</b> (seneste døgn).]]></string>
 

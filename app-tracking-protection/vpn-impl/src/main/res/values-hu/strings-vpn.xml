@@ -55,9 +55,9 @@
 
     <!-- App Tracking Protection Daily Notification -->
     <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d nyomkövetési kísérletet</b> blokkolt (az elmúlt egy napban).]]></string>
-    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt 1 alkalmazásban, %2$d</b> (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt 1 alkalmazásban, %2$s</b> (az elmúlt egy napban).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet</b> blokkolt (az elmúlt egy napban).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt %2$d alkalmazásban, beleértve a(z) %3$d alkalmazást is</b> (az elmúlt egy napban).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Az alkalmazáskövetés elleni védelem <b>%1$d követési kísérletet blokkolt %2$d alkalmazásban, beleértve a(z) %3$s alkalmazást is</b> (az elmúlt egy napban).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
         <item quantity="one"><![CDATA[A(z) %1$d megpróbált követni téged <b>%2$d alkalmazásban</b> (az elmúlt egy napban). <b>Továbbiak megjelenítése</b>]]></item>

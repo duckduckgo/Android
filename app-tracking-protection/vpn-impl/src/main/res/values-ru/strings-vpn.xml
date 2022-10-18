@@ -223,7 +223,7 @@
         <![CDATA[В приложении <b>%2$s</b> пресечены попытки отслеживания (%1$d) 1 компанией]]>
     </string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
-        <![CDATA[В приложении <b>%3$</b> пресечены попытки отслеживания (%1$d) %2$d компаниями]]>
+        <![CDATA[В приложении <b>%3$s</b> пресечены попытки отслеживания (%1$d) %2$d компаниями]]>
     </string>
 
     <string name="atp_ActivityEmptyListTitle">Новой активности нет</string>
