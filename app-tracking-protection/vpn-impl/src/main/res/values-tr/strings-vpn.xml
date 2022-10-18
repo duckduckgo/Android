@@ -26,7 +26,7 @@
     <string name="atp_DataMenuLabel">Veri İstatistikleri</string>
     <string name="atp_MeteredConnection">"Ölçülen: %s"</string>
     <string name="atp_ConnectionStatus">"VPN bağlandı: %s"</string>
-    <string name="atp_NetworkAvailable">"İnternete bağlandı: %d"</string>
+    <string name="atp_NetworkAvailable">"İnternete bağlandı: %s"</string>
     <string name="atp_DnsServers">"Etkin ağ DNS'si: %s"</string>
     <string name="atp_AppExitsReasonsTitle">Uygulama çıkış nedenleri</string>
     <string name="atp_AppRestartsTitle">Uygulama yeniden başlatmaları</string>
