@@ -148,13 +148,17 @@
     <string name="atp_ExcludeAppsManuallyEnableAppLabel">This app is known to experience issues when tracking attempts fail.</string>
     <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Site content in this app may not appear properly when protection is enabled.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Enabling protection sends the app\'s name to DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Privacy Protection Disabled</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">If you disabled protection to fix an issue, please check that the app now works before reporting the problem to DuckDuckGo.</string>
+    <!-- TODO [ANA] Modified, double check if new key is needed -->
+    <string name="atp_ExcludeAppsManuallyDisableAppName">Report an issue?</string>
+    <!-- TODO [ANA] Modified, double check if new key is needed -->
+    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Please let us know if you disabled App Tracking Protection for %s because you experienced app issues.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">It stopped working as expected</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">I\'m OK being tracked in this app</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">For other reason</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Report</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Skip</string>
+    <!-- TODO [ANA] Modified, double check if new key is needed -->
+    <string name="atp_ExcludeAppsManuallyCTAReport">Report Issue</string>
+    <!-- TODO [ANA] Modified, double check if new key is needed -->
+    <string name="atp_ExcludeAppsManuallyCTASkip">Not Now</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Restore Default Protected Apps</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Report an Issue With an App</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Restore default protection?</string>
