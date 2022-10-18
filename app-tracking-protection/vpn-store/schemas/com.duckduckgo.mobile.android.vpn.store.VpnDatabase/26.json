@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 26,
-    "identityHash": "2ddbf9427e62472f01c2940821e67efa",
+    "identityHash": "2a58bdb505a789fcefe2bc24fb9ead16",
     "entities": [
       {
         "tableName": "vpn_state",
@@ -384,11 +384,11 @@
       },
       {
         "tableName": "vpn_app_tracker_exclusion_list",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`packageName` TEXT NOT NULL, `reason` TEXT NOT NULL, PRIMARY KEY(`packageName`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`packageId` TEXT NOT NULL, `reason` TEXT NOT NULL, PRIMARY KEY(`packageId`))",
         "fields": [
           {
-            "fieldPath": "packageName",
-            "columnName": "packageName",
+            "fieldPath": "packageId",
+            "columnName": "packageId",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -401,7 +401,7 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "packageName"
+            "packageId"
           ],
           "autoGenerate": false
         },
@@ -678,7 +678,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2ddbf9427e62472f01c2940821e67efa')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2a58bdb505a789fcefe2bc24fb9ead16')"
     ]
   }
 }

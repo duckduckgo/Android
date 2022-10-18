@@ -139,14 +139,7 @@ abstract class VpnDatabase : RoomDatabase() {
 
         private val MIGRATION_25_TO_26: Migration = object : Migration(25, 26) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                // Older Android versions do not support column renaming, so we must delete and re-create the table
-                database.execSQL("DROP TABLE IF EXISTS `vpn_app_tracker_exclusion_list`")
-
-                database.execSQL(
-                    "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_exclusion_list` " +
-                        "(`packageName` TEXT PRIMARY KEY NOT NULL, " +
-                        "`reason` TEXT NOT NULL DEFAULT 'UNKNOWN')"
-                )
+                database.execSQL("ALTER TABLE `vpn_app_tracker_exclusion_list` ADD COLUMN `reason` TEXT NOT NULL DEFAULT 'UNKNOWN'")
             }
         }
 

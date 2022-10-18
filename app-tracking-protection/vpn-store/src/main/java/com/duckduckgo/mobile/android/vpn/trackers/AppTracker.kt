@@ -45,7 +45,8 @@ data class AppTrackerPackage(
 
 @Entity(tableName = "vpn_app_tracker_exclusion_list")
 data class AppTrackerExcludedPackage(
-    @PrimaryKey val packageName: String,
+    @field:Json(name = "packageName")
+    @PrimaryKey val packageId: String,
     val reason: String
 )
 
