@@ -37,6 +37,8 @@ interface VpnStore {
     fun didShowOnboarding(): Boolean
     suspend fun isAlwaysOnEnabled(): Boolean
     suspend fun vpnLastDisabledByAndroid(): Boolean
+    suspend fun increaseAlwaysOnPromotionDialogCancelCount()
+    suspend fun alwaysOnPromotionDialogCancelCount(): Int
 }
 
 @ContributesBinding(AppScope::class)
@@ -87,9 +89,19 @@ class SharedPreferencesVpnStore @Inject constructor(
         return vpnUnexpectedlyDisabled() || vpnKilledBySystem()
     }
 
+    override suspend fun increaseAlwaysOnPromotionDialogCancelCount() {
+        val count = preferences.getInt(KEY_ALWAYS_ON_PROMOTION_DIALOG_CANCEL_COUNT, 0)
+        preferences.edit(commit = true) { putInt(KEY_ALWAYS_ON_PROMOTION_DIALOG_CANCEL_COUNT, count + 1) }
+    }
+
+    override suspend fun alwaysOnPromotionDialogCancelCount(): Int {
+        return preferences.getInt(KEY_ALWAYS_ON_PROMOTION_DIALOG_CANCEL_COUNT, 0)
+    }
+
     companion object {
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
 
         private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
+        private const val KEY_ALWAYS_ON_PROMOTION_DIALOG_CANCEL_COUNT = "KEY_ALWAYS_ON_PROMOTION_DIALOG_CANCEL_COUNT"
     }
 }
