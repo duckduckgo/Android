@@ -230,6 +230,5 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_REPORT_UNPROTECTED_APPS_BUCKET("m_atp_unprotected_apps_bucket_%d_c"),
     ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY("m_atp_unprotected_apps_bucket_%d_d"),
 
-    
     ;
 }

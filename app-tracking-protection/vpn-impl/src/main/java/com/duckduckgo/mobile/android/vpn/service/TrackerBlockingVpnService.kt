@@ -49,11 +49,11 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNoti
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import dagger.android.AndroidInjection
-import kotlinx.coroutines.*
-import timber.log.Timber
 import java.net.Inet4Address
 import java.net.InetAddress
 import javax.inject.Inject
+import kotlinx.coroutines.*
+import timber.log.Timber
 @InjectWith(VpnScope::class)
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
@@ -109,7 +109,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
             name: ComponentName?,
-            service: IBinder?
+            service: IBinder?,
         ) {
             Timber.d("Connected to state monitor service")
             vpnStateServiceReference = service
@@ -127,7 +127,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             code: Int,
             data: Parcel,
             reply: Parcel?,
-            flags: Int
+            flags: Int,
         ): Boolean {
             if (code == LAST_CALL_TRANSACTION) {
                 onRevoke()
@@ -168,7 +168,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     override fun onStartCommand(
         intent: Intent?,
         flags: Int,
-        startId: Int
+        startId: Int,
     ): Int {
         Timber.d("VPN log onStartCommand: ${intent?.action}")
 
@@ -219,7 +219,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         Intent(applicationContext, VpnStateMonitorService::class.java).also {
             bindService(it, vpnStateServiceConnection, Context.BIND_AUTO_CREATE)
         }
-
     }
 
     private suspend fun establishVpnInterface() {
@@ -290,7 +289,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 Timber.w("Limiting VPN to test apps only:\n${INCLUDED_APPS_FOR_TESTING.joinToString(separator = "\n") { it }}")
             } else {
                 safelyAddDisallowedApps(
-                    deviceShieldExcludedApps.getExclusionAppsList()
+                    deviceShieldExcludedApps.getExclusionAppsList(),
                 )
             }
 
@@ -473,7 +472,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         startForeground(
             VPN_FOREGROUND_SERVICE_ID,
             DeviceShieldEnabledNotificationBuilder
-                .buildDeviceShieldEnabledNotification(applicationContext, deviceShieldNotification, ongoingNotificationPressedHandler)
+                .buildDeviceShieldEnabledNotification(applicationContext, deviceShieldNotification, ongoingNotificationPressedHandler),
         )
     }
 
@@ -565,7 +564,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         internal suspend fun restartVpnService(
             context: Context,
-            forceGc: Boolean = false
+            forceGc: Boolean = false,
         ) = withContext(Dispatchers.Default) {
             val applicationContext = context.applicationContext
             if (isServiceRunning(applicationContext)) {
@@ -608,6 +607,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         "eu.vspeed.android",
         "net.fireprobe.android",
         "com.philips.lighting.hue2",
-        "com.duckduckgo.mobile.android.debug"
+        "com.duckduckgo.mobile.android.debug",
     )
 }

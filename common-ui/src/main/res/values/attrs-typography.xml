@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <declare-styleable name="DaxTextView">
+        <attr name="typography" format="enum" >
+            <enum name="title" value="0"/>
+            <enum name="h1" value="1"/>
+            <enum name="h2" value="2"/>
+            <enum name="h3" value="3"/>
+            <enum name="h4" value="4"/>
+            <enum name="h5" value="5"/>
+            <enum name="body1" value="6"/>
+            <enum name="body2" value="7"/>
+            <enum name="button" value="8"/>
+            <enum name="caption" value="9"/>
+        </attr>
+
+    </declare-styleable>
+
+    <!-- Attributes for all Design System Text Appearances -->
+    <attr name="textAppearanceTitle" format="reference"/>
+    <attr name="textAppearanceH1" format="reference"/>
+    <attr name="textAppearanceH2" format="reference"/>
+    <attr name="textAppearanceH3" format="reference"/>
+    <attr name="textAppearanceH4" format="reference"/>
+    <attr name="textAppearanceH5" format="reference"/>
+
+</resources>

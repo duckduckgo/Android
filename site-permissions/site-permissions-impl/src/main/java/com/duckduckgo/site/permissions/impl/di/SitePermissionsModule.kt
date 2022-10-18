@@ -17,11 +17,17 @@
 package com.duckduckgo.site.permissions.impl.di
 
 import android.content.Context
+import android.content.pm.PackageManager
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.impl.SitePermissionsManagerImpl
+import com.duckduckgo.site.permissions.impl.SitePermissionsRepositoryImpl
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.SitePermissionsDatabase
+import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
+import com.duckduckgo.site.permissions.store.SitePermissionsPreferencesImp
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -29,7 +35,7 @@ import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-class SitePermissionsModule {
+object SitePermissionsModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -50,5 +56,18 @@ class SitePermissionsModule {
     @SingleInstanceIn(AppScope::class)
     fun providesSitePermissionsAllowedDao(sitePermissionsDatabase: SitePermissionsDatabase): SitePermissionsAllowedDao {
         return sitePermissionsDatabase.sitePermissionsAllowedDao()
+    }
+
+    @Provides
+    fun providesSitePermissionsManager(
+        sitePermissionsRepository: SitePermissionsRepositoryImpl,
+        packageManager: PackageManager
+    ): SitePermissionsManager {
+        return SitePermissionsManagerImpl(packageManager, sitePermissionsRepository)
+    }
+
+    @Provides
+    fun providesSitePermissionsPreferences(context: Context): SitePermissionsPreferences {
+        return SitePermissionsPreferencesImp(context)
     }
 }

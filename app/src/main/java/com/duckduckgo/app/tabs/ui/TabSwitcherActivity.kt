@@ -251,7 +251,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                         }
                     }
                 }
-            },)
+            },
+            )
             .apply { view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text).maxLines = 1 }
             .show()
     }

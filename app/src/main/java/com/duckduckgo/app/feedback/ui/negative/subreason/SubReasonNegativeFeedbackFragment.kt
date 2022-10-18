@@ -87,7 +87,8 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feed
                     }
                 }
             }
-        },)
+        },
+        )
 
         activity?.let {
             binding.recyclerView.layoutManager = LinearLayoutManager(it)

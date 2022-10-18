@@ -226,7 +226,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
 
     private fun verifyCredentialsSharedWithPage(
         url: String,
-        credentials: LoginCredentials
+        credentials: LoginCredentials,
     ) {
         verify(credentialsInjector).shareCredentialsWithPage(url, credentials)
     }
@@ -252,7 +252,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
 
     private fun bundleForSaveDialog(
         url: String?,
-        credentials: LoginCredentials?
+        credentials: LoginCredentials?,
     ): Bundle {
         return Bundle().also {
             if (url != null) it.putString(CredentialSavePickerDialog.KEY_URL, url)
@@ -262,7 +262,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
 
     private fun bundleForUpdateDialog(
         url: String?,
-        credentials: LoginCredentials?
+        credentials: LoginCredentials?,
     ): Bundle {
         return Bundle().also {
             if (url != null) it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, url)
@@ -273,7 +273,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
     private fun bundleForSelectionDialog(
         url: String?,
         cancelled: Boolean?,
-        credentials: LoginCredentials?
+        credentials: LoginCredentials?,
     ): Bundle {
         return Bundle().also {
             if (url != null) it.putString(CredentialAutofillPickerDialog.KEY_URL, url)
@@ -303,7 +303,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
             declineCounter = declineCounter,
             autofillStore = autofillStore,
             appCoroutineScope = this,
-            pixel = pixel
+            pixel = pixel,
         )
     }
 
@@ -324,7 +324,6 @@ class AutofillCredentialsSelectionResultHandlerTest {
                 is Result.Success -> onResult(Success)
                 is Result.Cancelled -> onResult(AuthResult.UserCancelled)
                 is Result.Failure -> onResult(AuthResult.Error("Authentication failed"))
-
             }
         }
 
@@ -333,7 +332,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
         override fun authenticate(
             featureToAuth: DeviceAuthenticator.Features,
             fragment: Fragment,
-            onResult: (DeviceAuthenticator.AuthResult) -> Unit
+            onResult: (DeviceAuthenticator.AuthResult) -> Unit,
         ) {
             authenticationCalled(onResult)
         }
@@ -341,7 +340,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
         override fun authenticate(
             featureToAuth: DeviceAuthenticator.Features,
             fragmentActivity: FragmentActivity,
-            onResult: (DeviceAuthenticator.AuthResult) -> Unit
+            onResult: (DeviceAuthenticator.AuthResult) -> Unit,
         ) {
             authenticationCalled(onResult)
         }

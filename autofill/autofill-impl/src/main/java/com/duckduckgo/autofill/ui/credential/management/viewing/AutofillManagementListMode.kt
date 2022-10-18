@@ -65,11 +65,9 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private val binding: FragmentAutofillManagementListModeBinding by viewBinding()
     private lateinit var adapter: AutofillManagementRecyclerAdapter
 
-    private val globalAutofillToggleListener = object : CompoundButton.OnCheckedChangeListener {
-
-        override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-            if (isChecked) viewModel.onEnableAutofill() else viewModel.onDisableAutofill()
-        }
+    private val globalAutofillToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@OnCheckedChangeListener
+        if (isChecked) viewModel.onEnableAutofill() else viewModel.onDisableAutofill()
     }
 
     private fun configureToggle() {

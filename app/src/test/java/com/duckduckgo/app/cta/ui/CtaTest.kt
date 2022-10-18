@@ -217,6 +217,13 @@ class CtaTest {
     }
 
     @Test
+    fun whenCanSendPixelAndCtaNotPartOfHistoryButIsASubstringThenReturnTrue() {
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0-te:0")
+        val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
+        assertTrue(testee.canSendShownPixel())
+    }
+
+    @Test
     fun whenCanSendPixelAndCtaIsPartOfHistoryThenReturnFalse() {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("i:0-e:0-s:0")
 

@@ -42,7 +42,8 @@
                 "requestType": "main_frame",
                 "expectURL": "http://negativetest.com/path/file.html?search=query&another=one#fragment",
                 "exceptPlatforms": [
-                    "android-browser"
+                    "android-browser",
+                    "ios-browser"
                 ]
             },
             {
@@ -52,7 +53,8 @@
                 "requestType": "main_frame",
                 "expectURL": "https://s.secondnegative.com/path/file.html?search=query&another=one#fragment",
                 "exceptPlatforms": [
-                    "android-browser"
+                    "android-browser",
+                    "ios-browser"
                 ]
             },
             {
@@ -131,7 +133,10 @@
                 "requestURL": "http://firsttest.com/image.png",
                 "requestType": "image",
                 "expectURL": "https://firsttest.com/image.png",
-                "exceptPlatforms": []
+                "exceptPlatforms": [
+                    "android-browser",
+                    "ios-browser"
+                ]
             },
             {
                 "name": "insecure web socket - should be upgraded",
@@ -139,7 +144,11 @@
                 "requestURL": "ws://fifth-test.com/path/socket?search=query&another=one#fragment",
                 "requestType": "websocket",
                 "expectURL": "wss://fifth-test.com/path/socket?search=query&another=one#fragment",
-                "exceptPlatforms": []
+                "exceptPlatforms": [
+                    "android-browser",
+                    "ios-browser",
+                    "web-extension-mv3"
+                ]
             },
             {
                 "name": "Private IPv4 - should not be upgraded",
@@ -147,7 +156,10 @@
                 "requestURL": "http://169.254.1.1/image.png",
                 "requestType": "image",
                 "expectURL": "http://169.254.1.1/image.png",
-                "exceptPlatforms": []
+                "exceptPlatforms": [
+                    "android-browser",
+                    "ios-browser"
+                ]
             },
             {
                 "name": "remote config - site matches local exception - should not be upgraded",
@@ -155,7 +167,10 @@
                 "requestURL": "http://firsttest.com/script.js",
                 "requestType": "script",
                 "expectURL": "http://firsttest.com/script.js",
-                "exceptPlatforms": []
+                "exceptPlatforms": [
+                    "android-browser",
+                    "ios-browser"
+                ]
             }
         ]
     }

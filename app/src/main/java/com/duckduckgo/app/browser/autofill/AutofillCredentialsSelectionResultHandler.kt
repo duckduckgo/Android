@@ -42,11 +42,11 @@ import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.UserCancelled
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 class AutofillCredentialsSelectionResultHandler @Inject constructor(
     private val deviceAuthenticator: DeviceAuthenticator,
@@ -54,13 +54,13 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val autofillStore: AutofillStore,
-    private val pixel: Pixel
+    private val pixel: Pixel,
 ) {
 
     fun processAutofillCredentialSelectionResult(
         result: Bundle,
         browserTabFragment: Fragment,
-        credentialInjector: CredentialInjector
+        credentialInjector: CredentialInjector,
     ) {
         val originalUrl = result.getString(CredentialAutofillPickerDialog.KEY_URL) ?: return
 
@@ -74,7 +74,6 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
 
         pixel.fire(AUTOFILL_AUTHENTICATION_TO_AUTOFILL_SHOWN)
         deviceAuthenticator.authenticate(AUTOFILL, browserTabFragment) {
-
             when (it) {
                 Success -> {
                     Timber.v("Autofill: user selected credential to use, and successfully authenticated")
@@ -97,7 +96,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
 
     suspend fun processPromptToDisableAutofill(
         context: Context,
-        viewModel: BrowserTabViewModel
+        viewModel: BrowserTabViewModel,
     ) {
         pixel.fire(AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SHOWN)
         withContext(dispatchers.main()) {
@@ -135,7 +134,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
 
     suspend fun processSaveCredentialsResult(
         result: Bundle,
-        credentialSaver: AutofillCredentialSaver
+        credentialSaver: AutofillCredentialSaver,
     ): LoginCredentials? {
         val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialSavePickerDialog.KEY_CREDENTIALS) ?: return null
         val originalUrl = result.getString(CredentialSavePickerDialog.KEY_URL) ?: return null
@@ -148,7 +147,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
 
     suspend fun processUpdateCredentialsResult(
         result: Bundle,
-        credentialSaver: AutofillCredentialSaver
+        credentialSaver: AutofillCredentialSaver,
     ): LoginCredentials? {
         val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS) ?: return null
         val originalUrl = result.getString(CredentialUpdateExistingCredentialsDialog.KEY_URL) ?: return null
@@ -164,7 +163,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
     interface CredentialInjector {
         fun shareCredentialsWithPage(
             originalUrl: String,
-            credentials: LoginCredentials
+            credentials: LoginCredentials,
         )
 
         fun returnNoCredentialsWithPage(originalUrl: String)
@@ -173,12 +172,12 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
     interface AutofillCredentialSaver {
         suspend fun saveCredentials(
             url: String,
-            credentials: LoginCredentials
+            credentials: LoginCredentials,
         ): LoginCredentials?
 
         suspend fun updateCredentials(
             url: String,
-            credentials: LoginCredentials
+            credentials: LoginCredentials,
         ): LoginCredentials?
     }
 }

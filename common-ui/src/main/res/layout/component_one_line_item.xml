@@ -18,10 +18,9 @@
                                                    android:layout_width="match_parent"
                                                    android:layout_height="wrap_content"
                                                    android:clipToPadding="false"
-                                                   android:paddingTop="@dimen/keyline_5"
-                                                   android:paddingBottom="@dimen/keyline_5">
+                                                   android:paddingTop="@dimen/keyline_5">
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:id="@+id/label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -38,7 +37,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label"
-        app:primaryText="This is a One Line List Item"/>
+        app:primaryText="This is a simple item "/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithImage"
@@ -49,7 +48,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItem"
         app:leadingIcon="@drawable/list_item_circular_background_sample"
-        app:primaryText="This is a One Line List Item with Leading Image"/>
+        app:primaryText="Item with Leading Image"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithTrailingIcon"
@@ -59,8 +58,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithImage"
-        app:leadingIcon="@drawable/list_item_circular_background_sample"
-        app:primaryText="This is a One Line List Item With Trailing Icon"
+        app:primaryText="Item With Trailing Icon"
         app:trailingIcon="@drawable/ic_overflow"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -72,7 +70,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithTrailingIcon"
         app:leadingIcon="@drawable/list_item_circular_background_sample"
-        app:primaryText="This is a One Line List Item With Leading and Trailing Icons"
+        app:primaryText="Item With Leading and Trailing Icons"
         app:trailingIcon="@drawable/ic_overflow"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -83,7 +81,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLeadingAndTrailingIcons"
-        app:primaryText="This is a One Line List Switch Item"
+        app:primaryText="Item with Switch Item"
         app:showSwitch="true"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -95,7 +93,29 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemSwitch"
         app:leadingIcon="@drawable/list_item_circular_background_sample"
-        app:primaryText="This is a One Line List Item Switch With Leading Icon"
+        app:primaryText="Item With Switch and Leading Icon"
         app:showSwitch="true"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemDisabled"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListSwitchItemWithLeadingIcon"
+        app:primaryText="Item disabled"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemCustomTextColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemDisabled"
+        app:primaryText="Item with custom text color"
+        app:primaryTextColorOverlay="@color/red_text_color_selector"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

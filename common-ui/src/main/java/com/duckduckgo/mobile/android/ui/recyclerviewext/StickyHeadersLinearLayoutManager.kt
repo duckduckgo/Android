@@ -443,7 +443,8 @@ class StickyHeadersLinearLayoutManager<T>(
                         setPendingScroll(RecyclerView.NO_POSITION, INVALID_OFFSET)
                     }
                 }
-            },)
+            },
+            )
         }
     }
 

@@ -147,7 +147,8 @@ class TrackingProtectionExclusionListActivity :
             ) {
                 viewModel.onAppProtectionChanged(excludedAppInfo, position, enabled)
             }
-        },)
+        },
+        )
 
         val recyclerView = binding.excludedAppsRecycler
         val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)

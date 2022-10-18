@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.store.features.gpc
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
+import com.duckduckgo.privacy.config.store.GpcContentScopeConfigEntity
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 import com.duckduckgo.privacy.config.store.GpcHeaderEnabledSiteEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
@@ -31,7 +32,8 @@ import kotlinx.coroutines.launch
 interface GpcRepository {
     fun updateAll(
         exceptions: List<GpcExceptionEntity>,
-        headerEnabledSites: List<GpcHeaderEnabledSiteEntity>
+        headerEnabledSites: List<GpcHeaderEnabledSiteEntity>,
+        gpcContentScopeConfig: GpcContentScopeConfigEntity
     )
 
     fun enableGpc()
@@ -39,6 +41,7 @@ interface GpcRepository {
     fun isGpcEnabled(): Boolean
     val exceptions: CopyOnWriteArrayList<GpcException>
     val headerEnabledSites: CopyOnWriteArrayList<GpcHeaderEnabledSite>
+    val gpcContentScopeConfig: String
 }
 
 class RealGpcRepository(
@@ -50,8 +53,10 @@ class RealGpcRepository(
 
     private val gpcExceptionsDao: GpcExceptionsDao = database.gpcExceptionsDao()
     private val gpcHeadersDao: GpcHeadersDao = database.gpcHeadersDao()
+    private val gpcContentScopeConfigDao: GpcContentScopeConfigDao = database.gpcContentScopeConfigDao()
     override val exceptions = CopyOnWriteArrayList<GpcException>()
     override val headerEnabledSites = CopyOnWriteArrayList<GpcHeaderEnabledSite>()
+    override var gpcContentScopeConfig: String = emptyJson
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
@@ -59,10 +64,12 @@ class RealGpcRepository(
 
     override fun updateAll(
         exceptions: List<GpcExceptionEntity>,
-        headerEnabledSites: List<GpcHeaderEnabledSiteEntity>
+        headerEnabledSites: List<GpcHeaderEnabledSiteEntity>,
+        gpcContentScopeConfig: GpcContentScopeConfigEntity
     ) {
         gpcExceptionsDao.updateAll(exceptions)
         gpcHeadersDao.updateAll(headerEnabledSites)
+        gpcContentScopeConfigDao.insert(gpcContentScopeConfig)
         loadToMemory()
     }
 
@@ -81,5 +88,12 @@ class RealGpcRepository(
         headerEnabledSites.clear()
         gpcExceptionsDao.getAll().map { exceptions.add(it.toGpcException()) }
         gpcHeadersDao.getAll().map { headerEnabledSites.add(it.toGpcHeaderEnabledSite()) }
+        gpcContentScopeConfigDao.getConfig()?.let { entity ->
+            gpcContentScopeConfig = entity.config
+        }
+    }
+
+    companion object {
+        const val emptyJson = "{}"
     }
 }

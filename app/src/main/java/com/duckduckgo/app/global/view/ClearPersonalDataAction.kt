@@ -47,7 +47,7 @@ interface ClearDataAction {
 
     suspend fun clearTabsAndAllDataAsync(
         appInForeground: Boolean,
-        shouldFireDataClearPixel: Boolean
+        shouldFireDataClearPixel: Boolean,
     ): Unit?
 
     suspend fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
@@ -69,7 +69,7 @@ class ClearPersonalDataAction(
     private val fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
     private val sitePermissionsManager: SitePermissionsManager,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val clearDataPixel: ClearDataPixel
+    private val clearDataPixel: ClearDataPixel,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean) {
@@ -84,7 +84,7 @@ class ClearPersonalDataAction(
 
     override suspend fun clearTabsAndAllDataAsync(
         appInForeground: Boolean,
-        shouldFireDataClearPixel: Boolean
+        shouldFireDataClearPixel: Boolean,
     ) {
         withContext(Dispatchers.IO) {
             clearDataPixel.onDataCleared()

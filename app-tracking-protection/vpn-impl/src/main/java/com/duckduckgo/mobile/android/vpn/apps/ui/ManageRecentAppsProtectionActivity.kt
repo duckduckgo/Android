@@ -116,7 +116,8 @@ class ManageRecentAppsProtectionActivity :
             ) {
                 viewModel.onAppProtectionChanged(excludedAppInfo, position, enabled)
             }
-        },)
+        },
+        )
 
         val recyclerView = binding.manageRecentAppsRecycler
         recyclerView.adapter = adapter

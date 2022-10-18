@@ -20,6 +20,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.VpnService
+import com.duckduckgo.mobile.android.vpn.service.Route
+import java.net.Inet4Address
 import java.net.InetAddress
 
 fun Context.getSystemActiveNetworkDefaultDns(): List<String> {
@@ -41,6 +43,17 @@ fun Context.getSystemActiveNetworkDefaultDns(): List<String> {
 
 fun InetAddress.isLocal(): Boolean {
     return isLoopbackAddress
+}
+
+fun Inet4Address.asRoute(): Route? {
+    return hostAddress?.let {
+        Route(
+            address = it,
+            maskWidth = 32,
+            lowAddress = it,
+            highAddress = it,
+        )
+    }
 }
 
 fun Context.getActiveNetwork(): Network? {

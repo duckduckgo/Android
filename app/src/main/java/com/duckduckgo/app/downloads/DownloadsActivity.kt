@@ -164,7 +164,8 @@ class DownloadsActivity : DuckDuckGoActivity() {
                     BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE -> { /* noop */ }
                 }
             }
-        },).show()
+        },
+        ).show()
     }
 
     private fun handleDeleteAll(items: List<DownloadItem>) {

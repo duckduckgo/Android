@@ -144,7 +144,8 @@ class BrowserTrackersAnimatorHelper(
             override fun onTransitionCancel(transition: Transition) {}
             override fun onTransitionPause(transition: Transition) {}
             override fun onTransitionResume(transition: Transition) {}
-        },)
+        },
+        )
 
         // After slide out finished, hide view and fade in omnibar views
         slideOutCookiesTransition.addListener(object : TransitionListener {
@@ -164,7 +165,8 @@ class BrowserTrackersAnimatorHelper(
             override fun onTransitionCancel(transition: Transition) {}
             override fun onTransitionPause(transition: Transition) {}
             override fun onTransitionResume(transition: Transition) {}
-        },)
+        },
+        )
 
         // When lottie animation begins, begin the transition to slide in the text
         cookieView.addAnimatorListener(object : AnimatorListener {
@@ -174,7 +176,8 @@ class BrowserTrackersAnimatorHelper(
             override fun onAnimationEnd(p0: Animator) {}
             override fun onAnimationCancel(p0: Animator) {}
             override fun onAnimationRepeat(p0: Animator) {}
-        },)
+        },
+        )
 
         // Here the animations begins. Fade out omnibar, fade in dummy view and after that start lottie animation
         AnimatorSet().apply {

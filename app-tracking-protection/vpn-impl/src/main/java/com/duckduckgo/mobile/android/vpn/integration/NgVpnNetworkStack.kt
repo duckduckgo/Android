@@ -40,23 +40,23 @@ import com.duckduckgo.vpn.network.api.*
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import javax.inject.Inject
+import kotlin.random.Random
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.random.Random
 
 private const val LRU_CACHE_SIZE = 2048
 
 @ContributesBinding(
     scope = VpnScope::class,
-    boundType = VpnNetworkStack::class
+    boundType = VpnNetworkStack::class,
 )
 @ContributesBinding(
     scope = VpnScope::class,
-    boundType = VpnNetworkCallback::class
+    boundType = VpnNetworkCallback::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class NgVpnNetworkStack @Inject constructor(
@@ -80,6 +80,7 @@ class NgVpnNetworkStack @Inject constructor(
     private var jniContext = 0L
     private val jniLock = Any()
     private val addressLookupLruCache = LruCache<String, String>(LRU_CACHE_SIZE)
+
     // cache packageId -> app name
     private val appNamesCache = LruCache<String, AppNameResolver.OriginatingApp>(100)
     private val periodicCachePersisterJob = ConflatedJob()
@@ -97,7 +98,6 @@ class NgVpnNetworkStack @Inject constructor(
                 vpnNetwork.destroy(jniContext)
                 jniContext = 0
             }
-
         }
         jniContext = vpnNetwork.create()
 
@@ -136,7 +136,6 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     override fun onStopVpn(): Result<Unit> {
-
         periodicCachePersisterJob.cancel()
         persistCacheToDisk()
         return stopNative()
@@ -215,7 +214,7 @@ class NgVpnNetworkStack @Inject constructor(
                 company = type.tracker.owner.name,
                 companyDisplayName = type.tracker.owner.displayName,
                 domain = type.tracker.hostname,
-                trackingApp = TrackingApp(trackingApp.packageId, trackingApp.appName)
+                trackingApp = TrackingApp(trackingApp.packageId, trackingApp.appName),
             ).run {
                 appTrackerRecorder.insertTracker(this)
             }

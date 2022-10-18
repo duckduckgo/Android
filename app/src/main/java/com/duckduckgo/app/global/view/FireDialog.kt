@@ -177,7 +177,8 @@ class FireDialog(
             override fun onAnimationEnd(animation: Animator) {
                 onFireDialogClearAllEvent(AnimationFinished)
             }
-        },)
+        },
+        )
     }
 
     private fun hideClearDataOptions() {

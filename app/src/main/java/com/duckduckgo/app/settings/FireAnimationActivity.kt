@@ -69,7 +69,8 @@ class FireAnimationActivity : DuckDuckGoActivity() {
                 finish()
                 overridePendingTransition(0, R.anim.tab_anim_fade_out)
             }
-        },)
+        },
+        )
     }
 
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {

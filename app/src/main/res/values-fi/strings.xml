@@ -684,8 +684,6 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Selaa yksityisesti Mac-sovelluksellamme</string>
-    <string name="macos_settings_description_list">Olet listalla!</string>
-    <string name="macos_settings_description_ready">Ladattavissa Macille</string>
     <string name="macos_settings_title">DuckDuckGo-työpöytäsovellus</string>
 
     <!-- Downloads -->

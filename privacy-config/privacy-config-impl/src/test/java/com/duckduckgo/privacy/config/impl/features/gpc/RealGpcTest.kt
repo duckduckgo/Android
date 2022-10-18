@@ -16,23 +16,18 @@
 
 package com.duckduckgo.privacy.config.impl.features.gpc
 
-import android.content.Context
-import android.content.res.Resources
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.impl.R
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.io.ByteArrayInputStream
 import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
 import org.junit.Before
@@ -44,8 +39,6 @@ class RealGpcTest {
     private val mockGpcRepository: GpcRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
-    private val mockContext: Context = mock()
-    private val mockResources: Resources = mock()
     lateinit var testee: RealGpc
 
     @Before
@@ -54,20 +47,11 @@ class RealGpcTest {
             CopyOnWriteArrayList<GpcException>().apply { add(GpcException(EXCEPTION_URL)) }
         val headers =
             CopyOnWriteArrayList<GpcHeaderEnabledSite>().apply { add(GpcHeaderEnabledSite(VALID_CONSUMER_URL)) }
-        whenever(mockContext.resources).thenReturn(mockResources)
-        whenever(mockResources.openRawResource(any()))
-            .thenReturn(ByteArrayInputStream("".toByteArray()))
         whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
         whenever(mockGpcRepository.headerEnabledSites).thenReturn(headers)
 
         testee =
-            RealGpc(mockContext, mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary)
-    }
-
-    @Test
-    fun whenGetGpcJsThenOpenRawResourceCalled() {
-        testee.getGpcJs()
-        verify(mockResources).openRawResource(R.raw.gpc)
+            RealGpc(mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary)
     }
 
     @Test

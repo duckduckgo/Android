@@ -51,7 +51,8 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_fee
             override fun invoke(reason: FeedbackTypeMainReasonDisplay) {
                 listener?.userSelectedNegativeFeedbackMainReason(reason.mainReason)
             }
-        },)
+        },
+        )
 
         activity?.let {
             binding.recyclerView.layoutManager = LinearLayoutManager(it)
