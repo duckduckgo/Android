@@ -78,8 +78,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
     }
 
     private fun populateAppName(appLabel: TextView) {
-        val appName = getAppName()
-        appLabel.text = getString(R.string.atp_ExcludeAppsManuallyDisableAppLabel, appName)
+        appLabel.text = getString(R.string.atp_ExcludeAppsManuallyDisableAppLabel, getAppName())
     }
 
     private fun getPackageName(): String {

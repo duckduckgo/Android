@@ -142,10 +142,13 @@
     <string name="atp_ExcludedReasonManuallyDisabled">Manually disabled</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manually enabled</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Cancel</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Enable</string>
+    <!-- TODO [ANA] Modified, double check if new key is needed -->
+    <string name="atp_ExcludeAppsManuallyCTAEnable">Enable Anyway</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Restore</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Manually enable protection for %s app?</string>
+    <!-- TODO [ANA] Modified, double check if new key is needed -->
+    <string name="atp_ExcludeAppsManuallyEnableAppName">%s may experience issues if App Tracking Protection is enabled</string>
     <string name="atp_ExcludeAppsManuallyEnableAppLabel">This app is known to experience issues when tracking attempts fail.</string>
+    <!-- TODO [ANA] To be removed -->
     <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Site content in this app may not appear properly when protection is enabled.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Enabling protection sends the app\'s name to DuckDuckGo.</string>
     <!-- TODO [ANA] Modified, double check if new key is needed -->

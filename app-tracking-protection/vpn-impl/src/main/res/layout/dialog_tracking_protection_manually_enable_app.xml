@@ -36,7 +36,7 @@
             app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
-            android:id="@+id/trackingProtectionAppName"
+            android:id="@+id/trackingProtectionTitle"
             style="@style/TextAppearance.AppCompat.Title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -50,23 +50,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppIcon"
-            tools:text="Facebook"/>
-
-    <TextView
-            android:id="@+id/trackingProtectionAppLabel"
-            style="@style/TextAppearance.DuckDuckGo.Body2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_4"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="@dimen/keyline_4"
-            android:orientation="vertical"
-            android:text="@string/atp_ExcludeAppsManuallyEnableAppLabel"
-            android:textAlignment="center"
-            android:textColor="?attr/settingsMinorTextColor"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppName"/>
+            tools:text="Facebook may experience issues if App Tracking Protection is enabled"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/trackingProtectionExcludeAppDialogGuideline"
@@ -84,7 +68,7 @@
         android:gravity="center|center_horizontal"
         android:text="@string/atp_ExcludeAppsManuallyCTAEnable"
         app:layout_constraintStart_toStartOf="@+id/trackingProtectionExcludeAppDialogGuideline"
-        app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppLabel"/>
+        app:layout_constraintTop_toBottomOf="@id/trackingProtectionTitle"/>
 
     <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
         android:id="@+id/trackingProtectionExcludeAppDialogSkip"
@@ -95,7 +79,7 @@
         android:text="@string/atp_ExcludeAppsManuallyCTACancel"
         android:textColor="@color/cornflowerBlue"
         app:layout_constraintEnd_toStartOf="@+id/trackingProtectionExcludeAppDialogGuideline"
-        app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppLabel"/>
+        app:layout_constraintTop_toBottomOf="@id/trackingProtectionTitle"/>
 
     <ImageView
             android:id="@+id/imageView"
