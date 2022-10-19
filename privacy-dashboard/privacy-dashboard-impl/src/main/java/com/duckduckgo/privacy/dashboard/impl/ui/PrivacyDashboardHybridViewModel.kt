@@ -92,6 +92,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     )
 
     sealed class RequestState {
+        // Using Any as placeholde value. We shouldn't pass any value to blocked. This is just to honour expected json.
+        // refer to docs in: https://duckduckgo.github.io/privacy-dashboard/example/docs/interfaces/Generated_Schema_Definitions.StateBlocked.html#blocked
         data class Blocked(val blocked: Any = Any()) : RequestState()
         data class Allowed(val allowed: Reason) : RequestState()
     }
