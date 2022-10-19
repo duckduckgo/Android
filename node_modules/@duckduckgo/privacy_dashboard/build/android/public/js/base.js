@@ -32870,7 +32870,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "Защитата на поверителността не е налична за специални или локални страници.",
+    "title" : "Защитите на поверителността не са налични за специални или локални страници.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -32890,7 +32890,7 @@ module.exports={
     "note" : "Title text for 'Email Protection' CTA"
   },
   "emailText" : {
-    "title" : "Регистрирайте се за разширението DuckDuckGo Email Protection сега!",
+    "title" : "Регистрирайте се за защита на имейли на DuckDuckGo за Вашето разширение сега!",
     "note" : "Extension here means browser extension or addon"
   }
 }
@@ -33053,11 +33053,11 @@ module.exports={
     "note" : "Headline when privacy protections are disabled by user"
   },
   "protectionsDisabledRemote" : {
-    "title" : "Изключихме временно защитата на поверителността, защото изглежда, че пречи на зареждането на този сайт.",
+    "title" : "Изключихме временно защитите на поверителността, защото изглежда, че пречат на зареждането на този сайт.",
     "note" : "Headline when privacy protections are disabled by DDG"
   },
   "protectionsDisabledRemoteOverride" : {
-    "title" : "Препоръчваме да деактивирате защитата на поверителността за този сайт, за да предотвратите срив на сайта.",
+    "title" : "Препоръчваме да деактивирате защитите на поверителността за този сайт, за да предотвратите срив на сайта.",
     "note" : "Headline when privacy protections are disabled by user"
   },
   "connectionDescriptionUnencrypted" : {
@@ -33089,7 +33089,7 @@ module.exports={
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Създаване на нов Duck адрес",
+    "title" : "Генериране на личен Duck Address",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -33109,7 +33109,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Блокирахме зареждането на заявки за проследяване на тази страница.} =2 {Блокирахме зареждането на заявки за проследяване на тази страница от <b>{firstCompany}</b> и <b>{secondCompany}</b>.} =3 {Блокирахме зареждането на заявки за проследяване на тази страница от <b>{firstCompany}</b>, <b>{secondCompany}</b> и <b>{thirdCompany}</b>.} =4 {Блокирахме зареждането на заявки за проследяване на тази страница от <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> и <b>{fourthCompany}</b> .} =5 {Блокирахме зареждането на заявки за проследяване на тази страница от <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> и <b>още 1 друга компания</b>.} one {Блокирахме зареждането на заявки за проследяване на тази страница от <b>{firstCompany}</b>.} other {Блокирахме зареждането на заявки за проследяване на тази страница от <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> и още <b>{othersCount} други компании</b>.}}",
+    "title" : "{companyCount, plural, =0 {Блокирахме зареждането на заявки за проследяване на тази страница от няколко компании.} =2 {Блокирахме зареждането на заявки за проследяване на тази страница от <b>{firstCompany}</b> и <b>{secondCompany}</b>.} =3 {Блокирахме зареждането на заявки за проследяване на тази страница от <b>{firstCompany}</b>, <b>{secondCompany}</b> и <b>{thirdCompany}</b>.} =4 {Блокирахме зареждането на заявки за проследяване на тази страница от <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> и <b>{fourthCompany}</b> .} =5 {Блокирахме зареждането на заявки за проследяване на тази страница от <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> и <b>още 1 друга компания</b>.} one {Блокирахме зареждането на заявки за проследяване на тази страница от <b>{firstCompany}</b>.} other {Блокирахме зареждането на заявки за проследяване на тази страница от <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> и още <b>{othersCount} други компании</b>.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -33126,7 +33126,7 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Блокирано зареждане на заявки",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
     "title" : "Няма блокирани заявки за проследяване",
@@ -33134,9 +33134,6 @@ module.exports={
   },
   "trackerNetworksNotFound" : {
     "title" : "Няма открити заявки за проследяване",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -33572,31 +33569,31 @@ module.exports={
     "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
   },
   "trackerNetworksSummaryBlocked" : {
-    "title" : "Následující požadavky na domény třetích stran byly zablokovány, protože byly identifikovány jako požadavky na sledování. Pokud se načtou požadavky služby, může jim to umožnit vytvořit si tvůj profil.",
+    "title" : "Následující požadavky na domény třetích stran byly zablokovány, protože byly identifikovány jako požadavky se sledováním. Pokud se načtou požadavky služby, může jim to umožnit vytvořit si tvůj profil.",
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "Žádné požadavky na sledování nebyly na téhle stránce zablokované. Pokud se načtou požadavky služby načtou, mohou mít možnost vytvořit si tvůj profil.",
+    "title" : "Žádné požadavky se sledováním nebyly na téhle stránce zablokované. Pokud se načtou požadavky služby načtou, mohou mít možnost vytvořit si tvůj profil.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "Na téhle stránce jsme nezjistili žádné požadavky na sledování.",
+    "title" : "Na téhle stránce jsme nezjistili žádné požadavky se sledováním.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
-    "title" : "Na téhle stránce jsme nenašli žádné služby, které by se snažily načíst požadavky na sledování.",
+    "title" : "Na téhle stránce jsme nenašli žádné služby, které by se snažily načíst požadavky se sledováním.",
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
-    "title" : "Abychom zabránili chybám při načítání webu, nezablokovali jsme na téhle stránce žádné požadavky na sledování.",
+    "title" : "Abychom zabránili chybám při načítání webu, nezablokovali jsme na téhle stránce žádné požadavky se sledováním.",
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
-    "title" : "Žádné požadavky na sledování nebyly zablokovány, protože ochrana je pro tento web vypnutá. Pokud se načtou požadavky služby, může jim to umožnit vytvořit si tvůj profil.",
+    "title" : "Žádné požadavky se sledováním nebyly zablokovány, protože ochrana je pro tento web vypnutá. Pokud se načtou požadavky služby, může jim to umožnit vytvořit si tvůj profil.",
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Vytvořit novou adresu Duck",
+    "title" : "Vygenerovat soukromou adresu Duck",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -33616,7 +33613,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Na této stránce jsme zablokovali požadavky na sledování od některých služeb.} =2 {Na této stránce jsme zablokovali požadavky na sledování od služby <b>{firstCompany}</b> a <b>{secondCompany}</b>.} =3 {Na této stránce jsme zablokovali požadavky na sledování od služby <b>{firstCompany}</b>, <b>{secondCompany}</b> a <b>{thirdCompany}</b>.} =4 {Na této stránce jsme zablokovali požadavky na sledování od služby <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> a <b>{fourthCompany}</b>.} =5 {Na této stránce jsme zablokovali požadavky na sledování od služby <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> a <b>1 další</b>.} one {Na téhle stránce jsme zablokovali požadavky na sledování od služby <b>{firstCompany}</b>.} few {Na téhle stránce jsme zablokovali požadavky na sledování od služby <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> a dalších (<b>{othersCount}</b>).} many {Na téhle stránce jsme zablokovali požadavky na sledování od služby <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> a dalších (<b>{othersCount}</b>).} other {Na téhle stránce jsme zablokovali požadavky na sledování od služby <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> a dalších (<b>{othersCount}</b>).}}",
+    "title" : "{companyCount, plural, =0 {Některým společnostem jsme zablokovali načítání požadavků na sledování na této stránce.} =2 {Na této stránce jsme zablokovali požadavky se sledováním od služby <b>{firstCompany}</b> a <b>{secondCompany}</b>.} =3 {Na této stránce jsme zablokovali požadavky se sledováním od služby <b>{firstCompany}</b>, <b>{secondCompany}</b> a <b>{thirdCompany}</b>.} =4 {Na této stránce jsme zablokovali požadavky se sledováním od služby <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> a <b>{fourthCompany}</b>.} =5 {Na této stránce jsme zablokovali požadavky se sledováním od služby <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> a <b>1 další</b>.} one {Na téhle stránce jsme zablokovali požadavky se sledováním od služby <b>{firstCompany}</b>.} few {Na téhle stránce jsme zablokovali požadavky se sledováním od služby <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> a dalších (<b>{othersCount}</b>).} many {Na téhle stránce jsme zablokovali požadavky se sledováním od služby <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> a dalších (<b>{othersCount}</b>).} other {Na téhle stránce jsme zablokovali požadavky se sledováním od služby <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> a dalších (<b>{othersCount}</b>).}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -33633,17 +33630,14 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Načítání požadavků bylo zablokováno",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
-    "title" : "Nejsou blokovány žádné požadavky na sledování",
+    "title" : "Nejsou blokovány žádné požadavky se sledováním",
     "note" : "This indicates that no trackers were blocked."
   },
   "trackerNetworksNotFound" : {
-    "title" : "Nebyly nalezeny žádné požadavky na sledování",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
+    "title" : "Nebyly nalezeny žádné požadavky se sledováním",
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -33659,7 +33653,7 @@ module.exports={
     "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
   },
   "noTrackersFound" : {
-    "title" : "Na téhle stránce jsme nenašli žádné služby, které by se snažily načíst požadavky na sledování.",
+    "title" : "Na téhle stránce jsme nenašli žádné služby, které by se snažily načíst požadavky se sledováním.",
     "note" : "We did not find any trackers on this page"
   },
   "trackersFoundForAllowlisted" : {
@@ -33884,7 +33878,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "Beskyttelse af personlige oplysninger er ikke tilgængelig for særlige sider eller lokale sider.",
+    "title" : "Beskyttelse af privatlivet er ikke tilgængelig for særlige sider eller lokale sider.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -34103,7 +34097,7 @@ module.exports={
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Opret en ny Duck-adresse",
+    "title" : "Opret privat Duck-adresse",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -34123,7 +34117,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Vi blokerede visse virksomheders indlæsning af sporingsanmodninger på denne side.} =2 {Vi blokerede <b>{firstCompany}</b> og <b>{secondCompany}</b> fra at indlæse sporingsanmodninger på denne side.} =3 {Vi har blokeret <b>{firstCompany}</b>, <b>{secondCompany}</b> og <b>{thirdCompany}</b> fra at indlæse sporingsanmodninger på denne side.} =4 {Vi har blokeret <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> og <b>{fourthCompany}</b> fra at indlæse sporingsanmodninger på denne side.} =5 {Vi har blokeret <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> og <b>1 anden</b> fra at indlæse sporingsanmodninger på denne side.} one {Vi har blokeret <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> og <b>{othersCount} andre</b> fra at indlæse sporingsanmodninger på denne side.} other {Vi har blokeret <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> og <b>{othersCount} andre</b> fra at indlæse sporingsanmodninger på denne side.}}",
+    "title" : "{companyCount, plural, =0 {Vi har blokeret nogle virksomheder fra at indlæse sporingsanmodninger på denne side.} =2 {Vi blokerede <b>{firstCompany}</b> og <b>{secondCompany}</b> fra at indlæse sporingsanmodninger på denne side.} =3 {Vi har blokeret <b>{firstCompany}</b>, <b>{secondCompany}</b> og <b>{thirdCompany}</b> fra at indlæse sporingsanmodninger på denne side.} =4 {Vi har blokeret <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> og <b>{fourthCompany}</b> fra at indlæse sporingsanmodninger på denne side.} =5 {Vi har blokeret <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> og <b>1 anden</b> fra at indlæse sporingsanmodninger på denne side.} one {Vi har blokeret <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> og <b>{othersCount} andre</b> fra at indlæse sporingsanmodninger på denne side.} other {Vi har blokeret <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> og <b>{othersCount} andre</b> fra at indlæse sporingsanmodninger på denne side.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -34140,7 +34134,7 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Anmodninger blokeret fra indlæsning",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
     "title" : "Ingen sporingsanmodninger blokeret",
@@ -34148,9 +34142,6 @@ module.exports={
   },
   "trackerNetworksNotFound" : {
     "title" : "Ingen sporingsanmodninger fundet",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -34574,7 +34565,7 @@ module.exports={
     "note" : "Headline when privacy protections are disabled by user"
   },
   "protectionsDisabledRemote" : {
-    "title" : "Wir haben den Datenschutz vorübergehend deaktiviert, da es den Anschein hat, dass er diese Website beschädigt.",
+    "title" : "Wir haben den Datenschutz vorübergehend deaktiviert, da es den Anschein hat, dass die Seite dadurch gestört wird.",
     "note" : "Headline when privacy protections are disabled by DDG"
   },
   "protectionsDisabledRemoteOverride" : {
@@ -34610,7 +34601,7 @@ module.exports={
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Neue Duck-Adresse erstellen",
+    "title" : "Private Duck-Adresse generieren",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -34630,7 +34621,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Wir haben das Laden von Tracking-Anfragen auf dieser Seite blockiert.} =2 {Wir haben <b>{firstCompany}</b> und <b>{secondCompany}</b> daran gehindert, Tracking-Anfragen auf dieser Seite zu laden.} =3 {Wir haben <b>{firstCompany}</b>, <b>{secondCompany}</b> und <b>{thirdCompany}</b> daran gehindert, Tracking-Anfragen auf dieser Seite zu laden.} =4 {Wir haben <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> und <b>{fourthCompany}</b> daran gehindert, Tracking-Anfragen auf dieser Seite zu laden.} =5 {Wir haben <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> und <b>1 andere</b> daran gehindert, Tracking-Anfragen auf dieser Seite zu laden.} one {Wir haben das Laden <b>{firstCompany}</b>von Tracking-Anfragen auf dieser Seite blockiert.} other {Wir haben <b>{firstCompany}</b>, <b>{secondCompany}<b>{thirdCompany}</b></b>, <b>{fourthCompany}</b>und <b>{othersCount}andere</b> daran gehindert, Tracking-Anfragen auf diese Seite zu laden.}}",
+    "title" : "{companyCount, plural, =0 {Wir haben einige Unternehmen daran gehindert, Tracking-Anfragen auf dieser Seite zu laden.} =2 {Wir haben <b>{firstCompany}</b> und <b>{secondCompany}</b> daran gehindert, Tracking-Anfragen auf dieser Seite zu laden.} =3 {Wir haben <b>{firstCompany}</b>, <b>{secondCompany}</b> und <b>{thirdCompany}</b> daran gehindert, Tracking-Anfragen auf dieser Seite zu laden.} =4 {Wir haben <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> und <b>{fourthCompany}</b> daran gehindert, Tracking-Anfragen auf dieser Seite zu laden.} =5 {Wir haben <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> und <b>1 andere</b> daran gehindert, Tracking-Anfragen auf dieser Seite zu laden.} one {Wir haben das Laden <b>{firstCompany}</b>von Tracking-Anfragen auf dieser Seite blockiert.} other {Wir haben <b>{firstCompany}</b>, <b>{secondCompany}<b>{thirdCompany}</b></b>, <b>{fourthCompany}</b>und <b>{othersCount}andere</b> daran gehindert, Tracking-Anfragen auf diese Seite zu laden.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -34647,7 +34638,7 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Blockierte Anfragen",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
     "title" : "Keine Tracking-Anfragen blockiert",
@@ -34655,9 +34646,6 @@ module.exports={
   },
   "trackerNetworksNotFound" : {
     "title" : "Keine Tracking-Anfragen gefunden",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -34898,7 +34886,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "Η Προστασία προσωπικών δεδομένων δεν είναι διαθέσιμη για ειδικές σελίδες ή τοπικές σελίδες.",
+    "title" : "Οι Προστασίες προσωπικών δεδομένων δεν είναι διαθέσιμες για ειδικές σελίδες ή τοπικές σελίδες.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -35081,11 +35069,11 @@ module.exports={
     "note" : "Headline when privacy protections are disabled by user"
   },
   "protectionsDisabledRemote" : {
-    "title" : "Απενεργοποιήσαμε προσωρινά την Προστασία προσωπικών δεδομένων καθώς φαίνεται ότι διακόπτει τη λειτουργία του ιστότοπου.",
+    "title" : "Απενεργοποιήσαμε προσωρινά τις Προστασίες προσωπικών δεδομένων καθώς φαίνεται ότι διακόπτουν τη λειτουργία του ιστότοπου.",
     "note" : "Headline when privacy protections are disabled by DDG"
   },
   "protectionsDisabledRemoteOverride" : {
-    "title" : "Προτείνουμε να απενεργοποιήσετε την Προστασία προσωπικών δεδομένων γι' αυτόν τον ιστότοπο ώστε να αποτρέψετε τη διακοπή λειτουργίας του ιστότοπου.",
+    "title" : "Προτείνουμε να απενεργοποιήσετε τις Προστασίες προσωπικών δεδομένων γι' αυτόν τον ιστότοπο ώστε να αποτρέψετε τη διακοπή λειτουργίας του ιστότοπου.",
     "note" : "Headline when privacy protections are disabled by user"
   },
   "connectionDescriptionUnencrypted" : {
@@ -35093,31 +35081,31 @@ module.exports={
     "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
   },
   "trackerNetworksSummaryBlocked" : {
-    "title" : "Τα αιτήματα των ακόλουθων τομέων τρίτων μερών αποκλείστηκαν από τη φόρτωση επειδή αναγνωρίστηκαν ως αιτήματα παρακολούθησης. Εάν τα αιτήματα μιας εταιρείας έχουν φορτωθεί, ίσως τους επιτρέπουν να σκιαγραφήσουν το προφίλ σας.",
+    "title" : "Τα αιτήματα των ακόλουθων τομέων τρίτων μερών αποκλείστηκαν από τη φόρτωση επειδή αναγνωρίστηκαν ως αιτήματα με παρακολούθηση. Εάν τα αιτήματα μιας εταιρείας έχουν φορτωθεί, ίσως τους επιτρέπουν να σκιαγραφήσουν το προφίλ σας.",
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "Δεν αποκλείστηκε η φόρτωση αιτημάτων παρακολούθησης στη σελίδα αυτή. Εάν τα αιτήματα μιας εταιρείας έχουν φορτωθεί, ίσως τους επιτρέπουν να σκιαγραφήσουν το προφίλ σας.",
+    "title" : "Δεν αποκλείστηκε η φόρτωση αιτημάτων με παρακολούθηση στη σελίδα αυτή. Εάν τα αιτήματα μιας εταιρείας έχουν φορτωθεί, ίσως τους επιτρέπουν να σκιαγραφήσουν το προφίλ σας.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "Δεν αναγνωρίσαμε αιτήματα παρακολούθησης στη σελίδα αυτή.",
+    "title" : "Δεν αναγνωρίσαμε αιτήματα με παρακολούθηση στη σελίδα αυτή.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
-    "title" : "Δεν βρήκαμε εταιρείες που να προσπαθούν να φορτώσουν αιτήματα παρακολούθησης στη σελίδα αυτή.",
+    "title" : "Δεν βρήκαμε εταιρείες που να προσπαθούν να φορτώσουν αιτήματα με παρακολούθηση στη σελίδα αυτή.",
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
-    "title" : "Για να αποφύγουμε διακοπή της λειτουργίας του ιστότοπου, δεν εμποδίσαμε καμία εταιρεία να φορτώσει αιτήματα παρακολούθησης στη σελίδα αυτή.",
+    "title" : "Για να αποφύγουμε διακοπή της λειτουργίας του ιστότοπου, δεν εμποδίσαμε καμία εταιρεία να φορτώσει αιτήματα με παρακολούθηση στη σελίδα αυτή.",
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
-    "title" : "Δεν αποκλείστηκαν αιτήματα παρακολούθησης από τη φόρτωση, καθώς οι Προστασίες είναι απενεργοποιημένες γι' αυτόν τον ιστότοπο. Εάν τα αιτήματα μιας εταιρείας έχουν φορτωθεί, ίσως τους επιτρέπουν να σκιαγραφήσουν το προφίλ σας.",
+    "title" : "Δεν αποκλείστηκαν αιτήματα με παρακολούθηση από τη φόρτωση, καθώς οι Προστασίες είναι απενεργοποιημένες γι' αυτόν τον ιστότοπο. Εάν τα αιτήματα μιας εταιρείας έχουν φορτωθεί, ίσως τους επιτρέπουν να σκιαγραφήσουν το προφίλ σας.",
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Δημιουργήστε μια νέα Διεύθυνση Duck",
+    "title" : "Δημιουργήστε ιδιωτική Duck Address",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -35137,7 +35125,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Αποκλείσαμε τη φόρτωση αιτημάτων παρακολούθησης στη σελίδα αυτή.} =2 {Αποκλείσαμε τις εταιρείες <b>{firstCompany}</b> και <b>{secondCompany}</b> από τη φόρτωση αιτημάτων παρακολούθησης στη σελίδα αυτή.} =3 {Αποκλείσαμε τις εταιρείες <b>{firstCompany}</b>, <b>{secondCompany}</b> και <b>{thirdCompany}</b> από τη φόρτωση αιτημάτων παρακολούθησης στη σελίδα αυτή.} =4 {Αποκλείσαμε τις εταιρείες <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> και <b>{fourthCompany}</b> από τη φόρτωση αιτημάτων παρακολούθησης στη σελίδα αυτή.} =5 {Αποκλείσαμε τις εταιρείες <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> και <b>1 ακόμη</b> από τη φόρτωση αιτημάτων παρακολούθησης στη σελίδα αυτή.} one {Αποκλείσαμε την εταιρεία <b>{firstCompany}</b> από τη φόρτωση αιτημάτων παρακολούθησης στη σελίδα αυτή.} other {Αποκλείσαμε τις εταιρείες <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> και <b>{othersCount} ακόμη</b> από τη φόρτωση αιτημάτων παρακολούθησης στη σελίδα αυτή.}}",
+    "title" : "{companyCount, plural, =0 {Αποκλείσαμε ορισμένες εταιρείες από τη φόρτωση αιτημάτων για παρακολούθηση σε αυτή τη σελίδα.} =2 {Αποκλείσαμε τις εταιρείες <b>{firstCompany}</b> και <b>{secondCompany}</b> από τη φόρτωση αιτημάτων με παρακολούθηση στη σελίδα αυτή.} =3 {Αποκλείσαμε τις εταιρείες <b>{firstCompany}</b>, <b>{secondCompany}</b> και <b>{thirdCompany}</b> από τη φόρτωση αιτημάτων με παρακολούθηση στη σελίδα αυτή.} =4 {Αποκλείσαμε τις εταιρείες <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> και <b>{fourthCompany}</b> από τη φόρτωση αιτημάτων με παρακολούθηση στη σελίδα αυτή.} =5 {Αποκλείσαμε τις εταιρείες <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> και <b>1 ακόμη</b> από τη φόρτωση αιτημάτων με παρακολούθηση στη σελίδα αυτή.} one {Αποκλείσαμε την εταιρεία <b>{firstCompany}</b> από τη φόρτωση αιτημάτων με παρακολούθηση στη σελίδα αυτή.} other {Αποκλείσαμε τις εταιρείες <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> και <b>{othersCount} ακόμη</b> από τη φόρτωση αιτημάτων με παρακολούθηση στη σελίδα αυτή.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -35154,17 +35142,14 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Αιτήματα που αποκλείστηκαν από τη φόρτωση",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
-    "title" : "Δεν αποκλείστηκαν αιτήματα παρακολούθησης",
+    "title" : "Δεν αποκλείστηκαν αιτήματα με παρακολούθηση",
     "note" : "This indicates that no trackers were blocked."
   },
   "trackerNetworksNotFound" : {
-    "title" : "Δεν βρέθηκαν αιτήματα παρακολούθησης",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
+    "title" : "Δεν βρέθηκαν αιτήματα με παρακολούθηση",
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -35180,7 +35165,7 @@ module.exports={
     "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
   },
   "noTrackersFound" : {
-    "title" : "Δεν βρήκαμε εταιρείες που να προσπαθούν να φορτώσουν αιτήματα παρακολούθησης στη σελίδα αυτή.",
+    "title" : "Δεν βρήκαμε εταιρείες που να προσπαθούν να φορτώσουν αιτήματα με παρακολούθηση στη σελίδα αυτή.",
     "note" : "We did not find any trackers on this page"
   },
   "trackersFoundForAllowlisted" : {
@@ -35614,7 +35599,7 @@ module.exports={
         "note": "We found trackers, but protections were disabled"
     },
     "createNewDuckAddress": {
-        "title": "Create new Duck Address",
+        "title": "Generate Private Duck Address",
         "note": "Create a new private email alias"
     },
     "createNewDuckAddressCopied": {
@@ -35899,7 +35884,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "La protección de privacidad no está disponible para páginas especiales o locales.",
+    "title" : "Las protecciones de privacidad no están disponibles para páginas especiales o locales.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -35919,7 +35904,7 @@ module.exports={
     "note" : "Title text for 'Email Protection' CTA"
   },
   "emailText" : {
-    "title" : "¡Suscríbete a DuckDuckGo Email Protection para obtener la extensión!",
+    "title" : "¡Suscríbete y recibirás DuckDuckGo Email Protection para tu extensión!",
     "note" : "Extension here means browser extension or addon"
   }
 }
@@ -36082,11 +36067,11 @@ module.exports={
     "note" : "Headline when privacy protections are disabled by user"
   },
   "protectionsDisabledRemote" : {
-    "title" : "Hemos desactivado temporalmente la protección de privacidad, ya que parece que está causando errores en este sitio.",
+    "title" : "Hemos desactivado temporalmente las protecciones de privacidad, ya que parece que están causando errores en este sitio.",
     "note" : "Headline when privacy protections are disabled by DDG"
   },
   "protectionsDisabledRemoteOverride" : {
-    "title" : "Recomendamos desactivar la protección de privacidad para evitar errores en el sitio.",
+    "title" : "Recomendamos desactivar las protecciones de privacidad para evitar errores en el sitio.",
     "note" : "Headline when privacy protections are disabled by user"
   },
   "connectionDescriptionUnencrypted" : {
@@ -36094,31 +36079,31 @@ module.exports={
     "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
   },
   "trackerNetworksSummaryBlocked" : {
-    "title" : "Se ha bloqueado la carga de las siguientes solicitudes de dominios de terceros porque se han identificado como solicitudes de seguimiento. Si se cargan las solicitudes de una empresa, se les permite elaborar un perfil tuyo.",
+    "title" : "Se ha bloqueado la carga de las siguientes solicitudes de dominios de terceros porque se han identificado como solicitudes con rastreo. Si se cargan las solicitudes de una empresa, se les permite elaborar un perfil tuyo.",
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "No se ha bloqueado la carga de solicitudes de rastreo en esta página. Si se cargan las solicitudes de una empresa, se les permite elaborar un perfil tuyo.",
+    "title" : "No se ha bloqueado la carga de solicitudes con rastreo en esta página. Si se cargan las solicitudes de una empresa, se les permite elaborar un perfil tuyo.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "No hemos identificado ninguna solicitud de rastreo en esta página.",
+    "title" : "No hemos identificado ninguna solicitud con rastreo en esta página.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
-    "title" : "No hemos encontrado ninguna empresa que haya intentado cargar solicitudes de rastreo en esta página.",
+    "title" : "No hemos encontrado ninguna empresa que haya intentado cargar solicitudes con rastreo en esta página.",
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
-    "title" : "Para evitar interrupciones en el sitio, no bloqueamos la carga de ninguna empresa de solicitudes de rastreo en esta página.",
+    "title" : "Para evitar interrupciones en el sitio, no bloqueamos la carga de ninguna empresa de solicitudes con rastreo en esta página.",
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
-    "title" : "No se ha bloqueado la carga de solicitudes de rastreo porque las protecciones están desactivadas para este sitio. Si se cargan las solicitudes de una empresa, se les permite elaborar un perfil tuyo.",
+    "title" : "No se ha bloqueado la carga de solicitudes con rastreo porque las protecciones están desactivadas para este sitio. Si se cargan las solicitudes de una empresa, se les permite elaborar un perfil tuyo.",
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Crear nueva dirección Duck",
+    "title" : "Generar Duck Address privada",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -36138,7 +36123,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Hemos bloqueado la carga de solicitudes de rastreo en esta página.} =2 {Hemos bloqueado la carga de solicitudes de rastreo de <b>{firstCompany}</b> y <b>{secondCompany}</b> en esta página.} =3 {Hemos bloqueado la carga de solicitudes de rastreo de <b>{firstCompany}</b>, <b>{secondCompany}</b> y <b>{thirdCompany}</b> en esta página.} =4 {Hemos bloqueado la carga de solicitudes de rastreo de <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> y <b>{fourthCompany}</b> en esta página.} =5 {Hemos bloqueado la carga de solicitudes de rastreo de <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> y <b>una empresa más</b> en esta página.} one {Hemos bloqueado la carga de solicitudes de rastreo de <b>{firstCompany}</b>.} other {Hemos bloqueado <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> y <b>{othersCount} personas más</b> para que no carguen solicitudes de seguimiento en esta página.}}",
+    "title" : "{companyCount, plural, =0 {Hemos bloqueado la carga de solicitudes con rastreo de algunas empresas en esta página.} =2 {Hemos bloqueado la carga de solicitudes con rastreo de <b>{firstCompany}</b> y <b>{secondCompany}</b> en esta página.} =3 {Hemos bloqueado la carga de solicitudes con rastreo de <b>{firstCompany}</b>, <b>{secondCompany}</b> y <b>{thirdCompany}</b> en esta página.} =4 {Hemos bloqueado la carga de solicitudes con rastreo de <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> y <b>{fourthCompany}</b> en esta página.} =5 {Hemos bloqueado la carga de solicitudes con rastreo de <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> y <b>una empresa más</b> en esta página.} one {Hemos bloqueado la carga de solicitudes con rastreo de <b>{firstCompany}</b> en esta página.} other {Hemos bloqueado la carga de solicitudes con rastreo de <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> y <b>{othersCount} más</b> en esta página.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -36155,17 +36140,14 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Solicitudes cuya carga se ha bloqueado",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
-    "title" : "No se han bloqueado solicitudes de rastreo",
+    "title" : "No se han bloqueado solicitudes con rastreo",
     "note" : "This indicates that no trackers were blocked."
   },
   "trackerNetworksNotFound" : {
-    "title" : "No se han encontrado solicitudes de rastreo",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
+    "title" : "No se han encontrado solicitudes con rastreo",
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -36181,7 +36163,7 @@ module.exports={
     "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
   },
   "noTrackersFound" : {
-    "title" : "No hemos encontrado ninguna empresa que haya intentado cargar solicitudes de rastreo en esta página.",
+    "title" : "No hemos encontrado ninguna empresa que haya intentado cargar solicitudes con rastreo en esta página.",
     "note" : "We did not find any trackers on this page"
   },
   "trackersFoundForAllowlisted" : {
@@ -36406,7 +36388,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "Privaatsuskaitse ei ole spetsiaalsete lehtede ega arvutis asuvate lehtede puhul saadaval.",
+    "title" : "Privaatsuskaitse ei ole spetsiaalsete lehtede ega arvutis asuvate lehtede jaoks saadaval.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -36601,31 +36583,31 @@ module.exports={
     "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
   },
   "trackerNetworksSummaryBlocked" : {
-    "title" : "Järgmiste kolmanda poole domeenide päringute laadimine blokeeriti, sest need tuvastati jälgimispäringutena. Kui ettevõtte päringud laaditakse, võib see võimaldada neil sind profileerida.",
+    "title" : "Järgmiste kolmanda poole domeenide taotluste laadimine blokeeriti, sest need tuvastati jälgimistaotlustena. Kui ettevõtte taotlused laaditakse, võib see võimaldada neil sind profileerida.",
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "Sellel lehel ei blokeritud ühtegi jälgimispäringute laadimist. Kui ettevõtte päringud laaditakse, võib see võimaldada neil sind profileerida.",
+    "title" : "Sellel lehel ei blokeeritud ühtegi jälgimistaotluste laadimist. Kui ettevõtte taotlused laaditakse, võib see võimaldada neil sind profileerida.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "Me ei tuvastanud sellel lehel ühtegi jälgimispäringut.",
+    "title" : "Me ei tuvastanud sellel lehel ühtegi jälgimistaotlust.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
-    "title" : "Me ei leidnud ühtegi ettevõtet, kes oleks üritanud sellel lehel jälgimispäringuid laadida.",
+    "title" : "Me ei leidnud ühtegi ettevõtet, kes oleks üritanud sellel lehel jälgimistaotlusi laadida.",
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
-    "title" : "Saidi häirete vältimiseks ei blokeerinud me sellel lehel ühtegi ettevõtte jälgimispäringute laadimist.",
+    "title" : "Saidi häirete vältimiseks ei blokeerinud me sellel lehel ühtegi ettevõtte jälgimistaotluste laadimist.",
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
-    "title" : "Jälgimispäringute laadimist ei blokeeritud, sest selle saidi jaoks on kaitsed välja lülitatud. Kui ettevõtte päringud laaditakse, võib see võimaldada neil sind profileerida.",
+    "title" : "Jälgimistaotluste laadimist ei blokeeritud, sest selle saidi jaoks on kaitsed välja lülitatud. Kui ettevõtte taotlused laaditakse, võib see võimaldada neil sind profileerida.",
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Loo uus Ducki aadress",
+    "title" : "Loo privaatne Duck Address",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -36645,7 +36627,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Blokeerisime sellel lehel jälgimispäringute laadimise.} =2 {Blokeerisime sellel lehel ettevõtete <b>{firstCompany}</b> ja <b>{secondCompany}</b> jälgimispäringute laadimise.} =3 {Blokeerisime sellel lehel ettevõtete <b>{firstCompany}</b>, <b>{secondCompany}</b> ja <b>{thirdCompany}</b> jälgimispäringute laadimise.} =4 {Blokeerisime sellel lehel ettevõtete <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> ja <b>{fourthCompany}</b> jälgimispäringute laadimise.} =5 {Blokeerisime sellel lehel ettevõtete <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ja <b>veel ühe</b> ettevõtte jälgimispäringute laadimise.} one {Blokeerisime sellel lehel ettevõtte <b>{firstCompany}</b> jälgimispäringute laadimise.} other {Me blokeerisime <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ja <b>{othersCount} teised</b> jälgimispäringute laadimise sellel lehel.}}",
+    "title" : "{companyCount, plural, =0 {Me blokeerisime sellel lehel mõne ettevõtte jälgimistaotluste laadimise.} =2 {Blokeerisime sellel lehel ettevõtete <b>{firstCompany}</b> ja <b>{secondCompany}</b> jälgimistaotluste laadimise.} =3 {Blokeerisime sellel lehel ettevõtete <b>{firstCompany}</b>, <b>{secondCompany}</b> ja <b>{thirdCompany}</b> jälgimistaotluste laadimise.} =4 {Blokeerisime sellel lehel ettevõtete <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> ja <b>{fourthCompany}</b> jälgimistaotluste laadimise.} =5 {Blokeerisime sellel lehel ettevõtete <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ja <b>veel ühe</b> ettevõtte jälgimistaotluste laadimise.} one {Blokeerisime sellel lehel ettevõtte <b>{firstCompany}</b> jälgimistaotluste laadimise.} other {Blokeerisime sellele lehel ettevõtete <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ja <b>{othersCount} teiste</b> jälgimistaotluste laadimise.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -36662,17 +36644,14 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Päringute laadimine on blokeeritud",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
-    "title" : "Ühtegi jälgimispäringut pole blokeeritud",
+    "title" : "Ühtegi jälgimistaotlust pole blokeeritud",
     "note" : "This indicates that no trackers were blocked."
   },
   "trackerNetworksNotFound" : {
-    "title" : "Jälgimispäringuid ei leitud",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
+    "title" : "Jälgimistaotlusi ei leitud",
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -36688,7 +36667,7 @@ module.exports={
     "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
   },
   "noTrackersFound" : {
-    "title" : "Me ei leidnud ühtegi ettevõtet, kes oleks üritanud sellel lehel jälgimispäringuid laadida.",
+    "title" : "Me ei leidnud ühtegi ettevõtet, kes oleks üritanud sellel lehel jälgimistaotlusi laadida.",
     "note" : "We did not find any trackers on this page"
   },
   "trackersFoundForAllowlisted" : {
@@ -36913,7 +36892,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "Yksityisyyden suojaus ei ole käytettävissä erikoissivuilla tai paikallisilla sivuilla.",
+    "title" : "Yksityisyyden suojaukset ei ole käytettävissä erikoissivuilla tai paikallisilla sivuilla.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -37096,11 +37075,11 @@ module.exports={
     "note" : "Headline when privacy protections are disabled by user"
   },
   "protectionsDisabledRemote" : {
-    "title" : "Yksityisyyden suoja on väliaikaisesti poistettu käytöstä, koska se näyttäisi rikkovan tämän sivun.",
+    "title" : "Yksityisyyden suojaukset on väliaikaisesti poistettu käytöstä, koska ne näyttäisivät rikkovan tämän sivun.",
     "note" : "Headline when privacy protections are disabled by DDG"
   },
   "protectionsDisabledRemoteOverride" : {
-    "title" : "Suosittelemme poistamaan käytöstä tämän sivuston yksityisyyden suojan, jotta sivusto ei mene epäkuntoon.",
+    "title" : "Suosittelemme poistamaan käytöstä tämän sivuston yksityisyyden suojaukset, jotta sivusto ei mene epäkuntoon.",
     "note" : "Headline when privacy protections are disabled by user"
   },
   "connectionDescriptionUnencrypted" : {
@@ -37132,7 +37111,7 @@ module.exports={
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Luo uusi Duck-osoite",
+    "title" : "Luo yksityinen Duck Address",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -37152,7 +37131,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Estimme seurantapyyntöjen lataamisen tällä sivulla.} =2 {Estimme yrityksiä <b>{firstCompany}</b> ja <b>{secondCompany}</b> lataamasta seurantapyyntöjä tällä sivulla.} =3 {Estimme yrityksiä <b>{firstCompany}</b>, <b>{secondCompany}</b> ja <b>{thirdCompany}</b> lataamasta seurantapyyntöjä tällä sivulla.} =4 {Estimme yritykset <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> ja <b>{fourthCompany}</b> lataamasta jäljittämispyyntöjä tällä sivulla.} =5 {Estimme yrityksiä <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ja <b>1 muu</b> lataamasta seurantapyyntöjä tällä sivulla.} one {Estimme yrityksen <b>{firstCompany}</b> lataamasta jäljittämispyyntöjä tällä sivulla.} other {Estimme yritykset <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ja <b>{othersCount} muuta</b> lataamasta jäljittämispyyntöjä tällä sivulla.}}",
+    "title" : "{companyCount, plural, =0 {Estimme joitakin yrityksiä lataamasta seurantapyyntöjä tälle sivulle.} =2 {Estimme yrityksiä <b>{firstCompany}</b> ja <b>{secondCompany}</b> lataamasta seurantapyyntöjä tällä sivulla.} =3 {Estimme yrityksiä <b>{firstCompany}</b>, <b>{secondCompany}</b> ja <b>{thirdCompany}</b> lataamasta seurantapyyntöjä tällä sivulla.} =4 {Estimme yritykset <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> ja <b>{fourthCompany}</b> lataamasta jäljittämispyyntöjä tällä sivulla.} =5 {Estimme yrityksiä <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ja <b>1 muu</b> lataamasta seurantapyyntöjä tällä sivulla.} one {Estimme yrityksen <b>{firstCompany}</b> lataamasta jäljittämispyyntöjä tällä sivulla.} other {Estimme yritykset <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ja <b>{othersCount} muuta</b> lataamasta jäljittämispyyntöjä tällä sivulla.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -37169,7 +37148,7 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Pyynnöt, joiden lataaminen estetty",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
     "title" : "Ei estettyjä seurantapyyntöjä",
@@ -37177,9 +37156,6 @@ module.exports={
   },
   "trackerNetworksNotFound" : {
     "title" : "Seurantapyyntöjä ei löytynyt",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -37420,7 +37396,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "La protection de la confidentialité n'est pas disponible pour les pages spéciales ou locales.",
+    "title" : "Les protections de confidentialité ne sont pas disponibles pour les pages spéciales ou locales.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -37440,7 +37416,7 @@ module.exports={
     "note" : "Title text for 'Email Protection' CTA"
   },
   "emailText" : {
-    "title" : "Inscrivez-vous à DuckDuckGo Email Protection pour obtenir dès maintenant votre extension !",
+    "title" : "Ajoutez DuckDuckGo Email Protection à votre extension en vous inscrivant dès maintenant !",
     "note" : "Extension here means browser extension or addon"
   }
 }
@@ -37603,11 +37579,11 @@ module.exports={
     "note" : "Headline when privacy protections are disabled by user"
   },
   "protectionsDisabledRemote" : {
-    "title" : "Nous avons temporairement désactivé la protection de la confidentialité car elle semble perturber ce site.",
+    "title" : "Nous avons temporairement désactivé les protections de confidentialité car elles semblent perturber ce site.",
     "note" : "Headline when privacy protections are disabled by DDG"
   },
   "protectionsDisabledRemoteOverride" : {
-    "title" : "Nous vous recommandons de désactiver la protection de la confidentialité sur ce site afin d'empêcher toute perturbation.",
+    "title" : "Nous vous recommandons de désactiver les protections de confidentialité sur ce site afin d'empêcher toute perturbation.",
     "note" : "Headline when privacy protections are disabled by user"
   },
   "connectionDescriptionUnencrypted" : {
@@ -37615,31 +37591,31 @@ module.exports={
     "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
   },
   "trackerNetworksSummaryBlocked" : {
-    "title" : "Les demandes des domaines tiers suivants ont vu leur chargement bloqué, car elles ont été identifiées comme des demandes de suivi. Si les demandes d'une entreprise sont chargées, cela peut lui permettre d'établir votre profil.",
+    "title" : "Les demandes des domaines tiers suivants ont vu leur chargement bloqué, car elles ont été identifiées comme des demandes de pistage. Si les demandes d'une entreprise sont chargées, cela peut lui permettre d'établir votre profil.",
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "Aucune demande de suivi n'a vu son chargement bloqué sur cette page. Si les demandes d'une entreprise sont chargées, cela peut lui permettre d'établir votre profil.",
+    "title" : "Aucune demande de pistage n'a vu son chargement bloqué sur cette page. Si les demandes d'une entreprise sont chargées, cela peut lui permettre d'établir votre profil.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "Nous n'avons identifié aucune demande de suivi sur cette page.",
+    "title" : "Nous n'avons identifié aucune demande de pistage sur cette page.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
-    "title" : "Nous n'avons trouvé aucune entreprise tentant de charger des demandes de suivi sur cette page.",
+    "title" : "Nous n'avons trouvé aucune entreprise tentant de charger des demandes de pistage sur cette page.",
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
-    "title" : "Pour éviter toute coupure du site, nous n'avons empêché aucune entreprise de charger des demandes de suivi sur cette page.",
+    "title" : "Pour éviter toute coupure du site, nous n'avons empêché aucune entreprise de charger des demandes de pistage sur cette page.",
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
-    "title" : "Aucune demande de suivi n'a vu son chargement bloqué car les protections sont désactivées pour ce site. Si les demandes d'une entreprise sont chargées, cela peut lui permettre d'établir votre profil.",
+    "title" : "Aucune demande de pistage n'a vu son chargement bloqué car les protections sont désactivées pour ce site. Si les demandes d'une entreprise sont chargées, cela peut lui permettre d'établir votre profil.",
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Créer une nouvelle adresse Duck",
+    "title" : "Générer une Duck Address privée",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -37659,7 +37635,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Nous avons bloqué le chargement des demandes de suivi sur cette page.} =2 {Nous avons empêché <b>{firstCompany}</b> et <b>{secondCompany}</b> de charger des demandes de suivi sur cette page.} =3 {Nous avons empêché <b>{firstCompany}</b>, <b>{secondCompany}</b> et <b>{thirdCompany}</b> de charger des demandes de suivi sur cette page.} =4 {Nous avons empêché <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> et <b>{fourthCompany}</b> de charger des demandes de suivi sur cette page.} =5 {Nous avons empêché <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> et <b>1 autre entreprise</b> de charger des demandes de suivi sur cette page.} one {Nous avons empêché <b>{firstCompany}</b> de charger des demandes de suivi sur cette page.} other {Nous avons empêché <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> et <b>{othersCount} autres entreprises</b> de charger des demandes de suivi sur cette page.}}",
+    "title" : "{companyCount, plural, =0 {Nous avons empêché certaines entreprises de charger des demandes de pistage sur cette page.} =2 {Nous avons empêché <b>{firstCompany}</b> et <b>{secondCompany}</b> de charger des demandes de pistage sur cette page.} =3 {Nous avons empêché <b>{firstCompany}</b>, <b>{secondCompany}</b> et <b>{thirdCompany}</b> de charger des demandes de pistage sur cette page.} =4 {Nous avons empêché <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> et <b>{fourthCompany}</b> de charger des demandes de pistage sur cette page.} =5 {Nous avons empêché <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> et <b>1 autre entreprise</b> de charger des demandes de pistage sur cette page.} one {Nous avons empêché <b>{firstCompany}</b> de charger des demandes de pistage sur cette page.} other {Nous avons empêché <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> et <b>{othersCount} autres entreprises</b> de charger des demandes de pistage sur cette page.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -37676,17 +37652,14 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Demandes dont le chargement a été bloqué",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
-    "title" : "Aucune demande de suivi bloquée",
+    "title" : "Aucune demande de pistage bloquée",
     "note" : "This indicates that no trackers were blocked."
   },
   "trackerNetworksNotFound" : {
-    "title" : "Aucune demande de suivi trouvée",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
+    "title" : "Aucune demande de pistage trouvée",
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -37702,7 +37675,7 @@ module.exports={
     "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
   },
   "noTrackersFound" : {
-    "title" : "Nous n'avons trouvé aucune entreprise tentant de charger des demandes de suivi sur cette page.",
+    "title" : "Nous n'avons trouvé aucune entreprise tentant de charger des demandes de pistage sur cette page.",
     "note" : "We did not find any trackers on this page"
   },
   "trackersFoundForAllowlisted" : {
@@ -38122,31 +38095,31 @@ module.exports={
     "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
   },
   "trackerNetworksSummaryBlocked" : {
-    "title" : "Sljedećim zahtjevima domena trećih strana blokirano je učitavanje jer su identificirani kao zahtjevi za praćenje. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju.",
+    "title" : "Sljedećim zahtjevima domena trećih strana blokirano je učitavanje jer su identificirani kao zahtjevi s praćenjem. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju.",
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "Nijedan zahtjev za praćenje nije blokiran za učitavanje na ovoj stranici. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju.",
+    "title" : "Nijedan zahtjev s praćenjem nije blokiran za učitavanje na ovoj stranici. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "Na ovoj stranici nismo identificirali nikakve zahtjeve za praćenje.",
+    "title" : "Na ovoj stranici nismo identificirali nikakve zahtjeve s praćenjem.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
-    "title" : "Nismo pronašli nijednu tvrtku koja pokušava učitati zahtjeve za praćenje na ovoj stranici.",
+    "title" : "Nismo pronašli nijednu tvrtku koja pokušava učitati zahtjeve s praćenjem na ovoj stranici.",
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
-    "title" : "Kako bismo spriječili pad stranice, nismo blokirali nijednu tvrtku da učitava zahtjeve za praćenje na ovoj stranici.",
+    "title" : "Kako bismo spriječili pad stranice, nismo blokirali nijednu tvrtku da učitava zahtjeve s praćenjem na ovoj stranici.",
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
-    "title" : "Učitavanje zahtjeva za praćenje nije blokirano jer su zaštite isključene za ovo web-mjesto. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju.",
+    "title" : "Učitavanje zahtjeva s praćenjem nije blokirano jer su zaštite isključene za ovo web-mjesto. Ako su zahtjevi tvrtke učitani, to im može omogućiti da te profiliraju.",
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Izradi novu Duck adresu",
+    "title" : "Generiraj privatnu adresu Duck Address",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -38166,7 +38139,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Blokirali smo učitavanje zahtjeva za praćenje na ovoj stranici.} =2 {Blokirali smo tvrtke <b>{firstCompany}</b> i <b>{secondCompany}</b> u učitavanju zahtjeva za praćenje na ovoj stranici.} =3 {Blokirali smo <b>{firstCompany}</b> , <b>{secondCompany}</b> i <b>{thirdCompany}</b> u učitavanju zahtjeva za praćenje na ovoj stranici.} =4 {Blokirali smo sljedeće tvrtke u učitavanje zahtjeva za praćenje na ovoj stranici: <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> i <b>{fourthCompany}</b>.} =5 {Blokirali smo <b>{firstCompany}</b> , <b>{secondCompany}</b> , <b>{thirdCompany}</b> , <b>{fourthCompany}</b> i <b>još 1 osobu</b> u učitavanju zahtjeva za praćenje na ovoj stranici.} one {Blokirali smo sljedeće tvrtke u učitavanje zahtjeva za praćenje na ovoj stranici: <b>{firstCompany}</b>.} few {Blokirali smo sljedeće tvrtke u učitavanju zahtjeva za praćenje na ovoj stranici: <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> i <b>{fourthCompany}</b> i još njih <b>{othersCount}</b>.} many {Blokirali smo sljedeće tvrtke u učitavanju zahtjeva za praćenje na ovoj stranici: <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> i <b>{fourthCompany}</b> i još njih <b>{othersCount}</b>.} other {Blokirali smo sljedeće tvrtke u učitavanju zahtjeva za praćenje na ovoj stranici: <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> i <b>{fourthCompany}</b> i još njih <b>{othersCount}</b>.}}",
+    "title" : "{companyCount, plural, =0 {Blokirali smo neke tvrtke u učitavanju zahtjeva s praćenjem na ovoj stranici.} =2 {Blokirali smo tvrtke <b>{firstCompany}</b> i <b>{secondCompany}</b> u učitavanju zahtjeva s praćenjem na ovoj stranici.} =3 {Blokirali smo <b>{firstCompany}</b> , <b>{secondCompany}</b> i <b>{thirdCompany}</b> u učitavanju zahtjeva s praćenjem na ovoj stranici.} =4 {Blokirali smo sljedeće tvrtke u učitavanju zahtjeva s praćenjem na ovoj stranici: <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> i <b>{fourthCompany}</b>.} =5 {Blokirali smo <b>{firstCompany}</b> , <b>{secondCompany}</b> , <b>{thirdCompany}</b> , <b>{fourthCompany}</b> i <b>još 1 osobu</b> u učitavanju zahtjeva s praćenjem na ovoj stranici.} one {Blokirali smo sljedeće tvrtke u učitavanju zahtjeva s praćenjem na ovoj stranici: <b>{firstCompany}</b>.} few {Blokirali smo sljedeće tvrtke u učitavanju zahtjeva s praćenjem na ovoj stranici: <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> i <b>{fourthCompany}</b> i još njih <b>{othersCount}</b>.} many {Blokirali smo sljedeće tvrtke u učitavanju zahtjeva s praćenjem na ovoj stranici: <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> i <b>{fourthCompany}</b> i još njih <b>{othersCount}</b>.} other {Blokirali smo sljedeće tvrtke u učitavanju zahtjeva s praćenjem na ovoj stranici: <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> i <b>{fourthCompany}</b> i još njih <b>{othersCount}</b>.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -38183,17 +38156,14 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Zahtjevi blokirani od učitavanja",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
-    "title" : "Nema blokiranih zahtjeva za praćenje",
+    "title" : "Nema blokiranih zahtjeva s praćenjem",
     "note" : "This indicates that no trackers were blocked."
   },
   "trackerNetworksNotFound" : {
-    "title" : "Nije pronađen nijedan zahtjev za praćenje",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
+    "title" : "Nije pronađen nijedan zahtjev s praćenjem",
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -38209,7 +38179,7 @@ module.exports={
     "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
   },
   "noTrackersFound" : {
-    "title" : "Nismo pronašli nijednu tvrtku koja pokušava učitati zahtjeve za praćenje na ovoj stranici.",
+    "title" : "Nismo pronašli nijednu tvrtku koja pokušava učitati zahtjeve s praćenjem na ovoj stranici.",
     "note" : "We did not find any trackers on this page"
   },
   "trackersFoundForAllowlisted" : {
@@ -38434,7 +38404,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "Az adatvédelem a speciális vagy helyi oldalakon nem érhető el.",
+    "title" : "Az adatvédelmi funkciók a speciális vagy helyi oldalakon nem érhetők el.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -38454,7 +38424,7 @@ module.exports={
     "note" : "Title text for 'Email Protection' CTA"
   },
   "emailText" : {
-    "title" : "Regisztrálj most, hogy használd a DuckDuckGo e-mail-védelmi bővítményét!",
+    "title" : "Regisztrálj most, hogy a DuckDuckGo Email Protection a bővítményedhez legyen adva!",
     "note" : "Extension here means browser extension or addon"
   }
 }
@@ -38617,11 +38587,11 @@ module.exports={
     "note" : "Headline when privacy protections are disabled by user"
   },
   "protectionsDisabledRemote" : {
-    "title" : "Ideiglenesen kikapcsoltuk az Adatvédelem funkciót, mert úgy tűnik, hogy a webhely helytelen működését eredményezi.",
+    "title" : "Ideiglenesen kikapcsoltuk az adatvédelmi funkciókat, mert úgy tűnik, hogy a webhely helytelen működését eredményezik.",
     "note" : "Headline when privacy protections are disabled by DDG"
   },
   "protectionsDisabledRemoteOverride" : {
-    "title" : "Javasoljuk, hogy kapcsold ki az Adatvédelem funkciót ezen a webhelyen, hogy kiküszöböld a webhely helytelen működését.",
+    "title" : "Javasoljuk, hogy kapcsold ki az adatvédelmi funkciókat ezen a webhelyen, hogy kiküszöböld a webhely helytelen működését.",
     "note" : "Headline when privacy protections are disabled by user"
   },
   "connectionDescriptionUnencrypted" : {
@@ -38633,11 +38603,11 @@ module.exports={
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "Ezen az oldalon nyomkövetési kérés betöltése nem lett blokkolva. Ha egy cég kérései betöltődnek, az lehetővé teheti számukra, hogy profilokat készítsenek rólad.",
+    "title" : "Ezen az oldalon nyomkövető kérés betöltése nem lett blokkolva. Ha egy cég kérései betöltődnek, az lehetővé teheti számukra, hogy profilokat készítsenek rólad.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "Ezen az oldalon nem észleltünk nyomkövetési kérést.",
+    "title" : "Ezen az oldalon nem észleltünk nyomkövető kérést.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
@@ -38645,7 +38615,7 @@ module.exports={
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
-    "title" : "A webhely helytelen működésének kiküszöböléséhez nem blokkoltuk egyetlen cég nyomkövetési kérésének betöltését sem ezen az oldalon.",
+    "title" : "A webhely helytelen működésének kiküszöböléséhez nem blokkoltuk egyetlen cég nyomkövető kérésének betöltését sem ezen az oldalon.",
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
@@ -38653,7 +38623,7 @@ module.exports={
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Új Duck-cím létrehozása",
+    "title" : "Privát Duck-cím létrehozása",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -38673,7 +38643,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Blokkoltuk a nyomkövetési kérések betöltését ezen az oldalon.} =2 {Blokkoltuk a(z) <b>{firstCompany}</b> és a(z) <b>{secondCompany}</b> nyomkövetési kéréseinek betöltését ezen az oldalon.} =3 {Blokkoltuk a(z) <b>{firstCompany}</b>, a(z) <b>{secondCompany}</b> és a(z) <b>{thirdCompany}</b> nyomkövetési kéréseinek betöltését ezen az oldalon.} =4 {Blokkoltuk a(z) <b>{firstCompany}</b>, a(z) <b>{secondCompany}</b>, a(z) <b>{thirdCompany}</b> és a(z) <b>{fourthCompany}</b> nyomkövetési kéréseinek betöltését ezen az oldalon.} =5 {Blokkoltuk a(z) <b>{firstCompany}</b>, a(z) <b>{secondCompany}</b>, a(z) <b>{thirdCompany}</b>, a(z) <b>{fourthCompany}</b> és <b>1 másik</b> cég nyomkövetési kéréseinek betöltését ezen az oldalon.} one {Blokkoltuk a(z) <b>{firstCompany}</b> nyomkövetési kérésének betöltését ezen az oldalon.} other {Blokkoltuk a(z) <b>{firstCompany}</b>, a(z) <b>{secondCompany}</b>, a(z) <b>{thirdCompany}</b>, a(z) <b>{fourthCompany}</b> és <b>{othersCount} másik</b> cég nyomkövetési kéréseinek betöltését ezen az oldalon.}}",
+    "title" : "{companyCount, plural, =0 {Blokkoltuk néhány cég nyomkövető kéréseinek betöltését ezen az oldalon.} =2 {Blokkoltuk a(z) <b>{firstCompany}</b> és a(z) <b>{secondCompany}</b> nyomkövető kéréseinek betöltését ezen az oldalon.} =3 {Blokkoltuk a(z) <b>{firstCompany}</b>, a(z) <b>{secondCompany}</b> és a(z) <b>{thirdCompany}</b> nyomkövető kéréseinek betöltését ezen az oldalon.} =4 {Blokkoltuk a(z) <b>{firstCompany}</b>, a(z) <b>{secondCompany}</b>, a(z) <b>{thirdCompany}</b> és a(z) <b>{fourthCompany}</b> nyomkövető kéréseinek betöltését ezen az oldalon.} =5 {Blokkoltuk a(z) <b>{firstCompany}</b>, a(z) <b>{secondCompany}</b>, a(z) <b>{thirdCompany}</b>, a(z) <b>{fourthCompany}</b> és <b>1 másik</b> cég nyomkövető kéréseinek betöltését ezen az oldalon.} one {Blokkoltuk a(z) <b>{firstCompany}</b> nyomkövető kérésének betöltését ezen az oldalon.} other {Blokkoltuk a(z) <b>{firstCompany}</b>, a(z) <b>{secondCompany}</b>, a(z) <b>{thirdCompany}</b>, a(z) <b>{fourthCompany}</b> és <b>{othersCount} másik</b> cég nyomkövető kéréseinek betöltését ezen az oldalon.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -38690,17 +38660,14 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Kérések betöltése blokkolva",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
-    "title" : "Nincsenek nyomkövetési kérések blokkolva",
+    "title" : "Nincsenek nyomkövető kérések blokkolva",
     "note" : "This indicates that no trackers were blocked."
   },
   "trackerNetworksNotFound" : {
-    "title" : "Nem találhatók nyomkövetési kérések",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
+    "title" : "Nem találhatók nyomkövető kérések",
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -38941,7 +38908,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "La Tutela della privacy non è disponibile per le pagine speciali, come quella delle impostazioni del browser, o per le pagine aperte dall'utente.",
+    "title" : "Le Protezioni della Privacy non sono disponibili per le pagine speciali o per le pagine locali.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -39124,11 +39091,11 @@ module.exports={
     "note" : "Headline when privacy protections are disabled by user"
   },
   "protectionsDisabledRemote" : {
-    "title" : "Abbiamo temporaneamente disabilitato la Tutela della privacy poiché sembra che stia interrompendo il funzionamento del sito.",
+    "title" : "Abbiamo temporaneamente disabilitato le Protezioni della Privacy perché sembra che stiano interrompendo il funzionamento del sito.",
     "note" : "Headline when privacy protections are disabled by DDG"
   },
   "protectionsDisabledRemoteOverride" : {
-    "title" : "Ti consigliamo di disabilitare la Tutela della privacy per questo sito per evitare malfunzionamenti.",
+    "title" : "Per evitare malfunzionamenti, ti consigliamo di disabilitare le Protezioni della Privacy per questo sito.",
     "note" : "Headline when privacy protections are disabled by user"
   },
   "connectionDescriptionUnencrypted" : {
@@ -39136,31 +39103,31 @@ module.exports={
     "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
   },
   "trackerNetworksSummaryBlocked" : {
-    "title" : "Il caricamento delle richieste da parte dei seguenti domini di terze parti è stato bloccato perché si trattava di richieste di tracciamento. Il caricamento delle richieste da parte delle aziende può consentire loro di tracciare un profilo dell'utente.",
+    "title" : "Il caricamento delle richieste da parte dei seguenti domini di terze parti è stato bloccato perché si trattava di richieste con tracciamento. Il caricamento delle richieste da parte delle aziende può consentire loro di tracciare un profilo dell'utente.",
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "Nessun caricamento delle richieste di tracciamento è stato bloccato su questa pagina. Il caricamento delle richieste da parte delle aziende può consentire loro di tracciare un profilo dell'utente.",
+    "title" : "Nessun caricamento di richieste con tracciamento è stato bloccato su questa pagina. Il caricamento delle richieste da parte delle aziende può consentire loro di tracciare un profilo dell'utente.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "Non abbiamo individuato richieste di tracciamento su questa pagina.",
+    "title" : "Non abbiamo individuato richieste con tracciamento su questa pagina.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
-    "title" : "Non abbiamo trovato aziende che tentano di caricare richieste di tracciamento su questa pagina.",
+    "title" : "Non abbiamo trovato aziende che tentano di caricare richieste con tracciamento su questa pagina.",
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
-    "title" : "Per evitare malfunzionamenti sul sito, non abbiamo bloccato il caricamento delle richieste di tracciamento da parte delle aziende su questa pagina.",
+    "title" : "Per evitare malfunzionamenti sul sito, non abbiamo bloccato il caricamento delle richieste con tracciamento da parte delle aziende su questa pagina.",
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
-    "title" : "Il caricamento delle richieste di tracciamento non è stato bloccato perché le protezioni per questo sito sono disattivate. Il caricamento delle richieste da parte delle aziende può consentire loro di tracciare un profilo dell'utente.",
+    "title" : "Il caricamento delle richieste con tracciamento non è stato bloccato perché le protezioni per questo sito sono disattivate. Il caricamento delle richieste da parte delle aziende può consentire loro di tracciare un profilo dell'utente.",
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Crea un nuovo indirizzo Duck",
+    "title" : "Genera Duck Address privato",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -39180,7 +39147,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Abbiamo bloccato il caricamento delle richieste di tracciamento su questa pagina.} =2 {Abbiamo bloccato il caricamento delle richieste di tracciamento di <b>{firstCompany}</b> e <b>{secondCompany}</b> su questa pagina.} =3 {Abbiamo bloccato il caricamento delle richieste di tracciamento di <b>{firstCompany}</b>, <b>{secondCompany}</b> e <b>{thirdCompany}</b> su questa pagina.} =4 {Abbiamo bloccato il caricamento delle richieste di tracciamento di <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> e <b>{fourthCompany}</b> su questa pagina.} =5 {Abbiamo bloccato il caricamento delle richieste di tracciamento di <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> e di <b>1 altra</b> su questa pagina.} one {Abbiamo bloccato il caricamento delle richieste di tracciamento di <b>{firstCompany}</b> su questa pagina.} other {Abbiamo bloccato il caricamento delle richieste di tracciamento di <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> e di <b>{othersCount} altre</b> su questa pagina.}}",
+    "title" : "{companyCount, plural, =0 {Abbiamo impedito ad alcune aziende di caricare richieste di tracciamento su questa pagina.} =2 {Abbiamo bloccato il caricamento delle richieste con tracciamento di <b>{firstCompany}</b> e <b>{secondCompany}</b> su questa pagina.} =3 {Abbiamo bloccato il caricamento delle richieste con tracciamento di <b>{firstCompany}</b>, <b>{secondCompany}</b> e <b>{thirdCompany}</b> su questa pagina.} =4 {Abbiamo bloccato il caricamento delle richieste con tracciamento di <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> e <b>{fourthCompany}</b> su questa pagina.} =5 {Abbiamo bloccato il caricamento delle richieste con tracciamento di <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> e di <b>1 altra</b> su questa pagina.} one {Abbiamo bloccato il caricamento della richiesta con tracciamento di <b>{firstCompany}</b> su questa pagina.} other {Abbiamo bloccato il caricamento delle richieste con tracciamento di <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> e di <b>{othersCount} altre</b> su questa pagina.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -39197,17 +39164,14 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Caricamento delle richieste bloccato",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
-    "title" : "Nessuna richiesta di tracciamento bloccata",
+    "title" : "Nessuna richiesta con tracciamento bloccata",
     "note" : "This indicates that no trackers were blocked."
   },
   "trackerNetworksNotFound" : {
-    "title" : "Nessuna richiesta di tracciamento trovata",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
+    "title" : "Nessuna richiesta con tracciamento trovata",
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -39223,7 +39187,7 @@ module.exports={
     "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
   },
   "noTrackersFound" : {
-    "title" : "Non abbiamo trovato aziende che tentano di caricare richieste di tracciamento su questa pagina.",
+    "title" : "Non abbiamo trovato aziende che tentano di caricare richieste con tracciamento su questa pagina.",
     "note" : "We did not find any trackers on this page"
   },
   "trackersFoundForAllowlisted" : {
@@ -39667,7 +39631,7 @@ module.exports={
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Susikurkite naują „Duck“ adresą",
+    "title" : "Generuoti privatų „Duck“ adresą",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -39687,7 +39651,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Užblokavome sekimo užklausų įkėlimą šiame puslapyje.} =2 {Užblokavome <b>{firstCompany}</b> ir <b>{secondCompany}</b> sekimo užklausų įkėlimą šiame puslapyje.} =3 {Užblokavome <b>{firstCompany}</b>, <b>{secondCompany}</b> ir <b>{thirdCompany}</b> sekimo užklausų įkėlimą šiame puslapyje.} =4 {Užblokavome <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> ir <b>{fourthCompany}</b> sekimo užklausų įkėlimą šiame puslapyje.} =5 {Užblokavome <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ir <b>dar 1</b> sekimo užklausų įkėlimą šiame puslapyje.} one {Užblokavome <b>{firstCompany}</b> sekimo užklausų įkėlimą šiame puslapyje.} few {Užblokavome <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ir <b>dar {othersCount}</b> sekimo užklausų įkėlimą šiame puslapyje..} many {Užblokavome <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ir <b>dar {othersCount}</b> sekimo užklausų įkėlimą šiame puslapyje..} other {Užblokavome <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ir <b>dar {othersCount}</b> sekimo užklausų įkėlimą šiame puslapyje..}}",
+    "title" : "{companyCount, plural, =0 {Užblokavome kai kurių bendrovių galimybę šiame puslapyje įkelti sekimo užklausas.} =2 {Užblokavome <b>{firstCompany}</b> ir <b>{secondCompany}</b> sekimo užklausų įkėlimą šiame puslapyje.} =3 {Užblokavome <b>{firstCompany}</b>, <b>{secondCompany}</b> ir <b>{thirdCompany}</b> sekimo užklausų įkėlimą šiame puslapyje.} =4 {Užblokavome <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> ir <b>{fourthCompany}</b> sekimo užklausų įkėlimą šiame puslapyje.} =5 {Užblokavome <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ir <b>dar 1</b> sekimo užklausų įkėlimą šiame puslapyje.} one {Užblokavome <b>{firstCompany}</b> sekimo užklausų įkėlimą šiame puslapyje.} few {Užblokavome <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ir <b>dar {othersCount}</b> sekimo užklausų įkėlimą šiame puslapyje..} many {Užblokavome <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ir <b>dar {othersCount}</b> sekimo užklausų įkėlimą šiame puslapyje..} other {Užblokavome <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ir <b>dar {othersCount}</b> sekimo užklausų įkėlimą šiame puslapyje..}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -39704,7 +39668,7 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Užklausos užblokuotos įkelti",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
     "title" : "Neužblokuota jokių sekimo užklausų",
@@ -39712,9 +39676,6 @@ module.exports={
   },
   "trackerNetworksNotFound" : {
     "title" : "Sekimo užklausų nerasta",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -40150,7 +40111,7 @@ module.exports={
     "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
   },
   "trackerNetworksSummaryBlocked" : {
-    "title" : "Turpmāk norādīto trešo pušu domēnu pieprasījumu ielāde tika bloķēta, jo tie tika identificēti kā izsekošanas pieprasījumi. Ja uzņēmuma pieprasījumi tiek ielādēti, tas var ļaut uzņēmumam veidot tavu profilu.",
+    "title" : "Šo trešo pušu domēnu pieprasījumu ielāde tika bloķēta, jo tie tika identificēti kā izsekošanas pieprasījumi. Ja uzņēmuma pieprasījumi tiek ielādēti, tas var ļaut uzņēmumam veidot tavu profilu.",
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
@@ -40158,7 +40119,7 @@ module.exports={
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "Mēs neatradām nevienu izsekošanas pieprasījumu šajā lapā.",
+    "title" : "Mēs šajā lapā neatradām nevienu izsekošanas pieprasījumu.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
@@ -40170,11 +40131,11 @@ module.exports={
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
-    "title" : "Netika bloķēta neviena izsekošanas pieprasījuma ielāde, jo šai vietnei ir izslēgta aizsardzība. Ja uzņēmuma pieprasījumi tiek ielādēti, tas var ļaut uzņēmumam veidot tavu profilu.",
+    "title" : "Netika bloķēta neviena izsekošanas pieprasījuma ielāde, jo šai vietnei ir izslēgta aizsardzība. Uzņēmuma pieprasījumu ielādes gadījumā uzņēmums var veidot tavu profilu.",
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Izveidot jaunu Duck adresi",
+    "title" : "Ģenerēt privātu Duck adresi",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -40194,7 +40155,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Mēs bloķējām izsekošanas pieprasījumu ielādēšanu šajā lapā.} =2 {Mēs bloķējām <b>{firstCompany}</b> un <b>{secondCompany}</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.} =3 {Mēs bloķējām <b>{firstCompany}</b>, <b>{secondCompany}</b> un <b>{thirdCompany}</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.} =4 {Mēs bloķējām <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> un <b>{fourthCompany}</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.} =5 {Mēs bloķējām <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> un <b>1 cita uzņēmuma</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.} zero {Mēs bloķējām <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> un <b>{othersCount} citu uzņēmumu</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.} one {Mēs bloķējām <b>{firstCompany}</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.} other {Mēs bloķējām <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> un <b>{othersCount} citu uzņēmumu</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.}}",
+    "title" : "{companyCount, plural, =0 {Mēs bloķējām dažu uzņēmumu izsekošanas pieprasījumu ielādēšanu šajā lapā.} =2 {Mēs bloķējām <b>{firstCompany}</b> un <b>{secondCompany}</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.} =3 {Mēs bloķējām <b>{firstCompany}</b>, <b>{secondCompany}</b> un <b>{thirdCompany}</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.} =4 {Mēs bloķējām <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> un <b>{fourthCompany}</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.} =5 {Mēs bloķējām <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> un <b>1 cita uzņēmuma</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.} zero {Mēs bloķējām <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> un <b>{othersCount} citu uzņēmumu</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.} one {Mēs bloķējām <b>{firstCompany}</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.} other {Mēs bloķējām <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> un <b>{othersCount} citu uzņēmumu</b> izsekošanas pieprasījumu ielādēšanu šajā lapā.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -40211,7 +40172,7 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Pieprasījumi, kuru ielādēšana ir bloķēta",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
     "title" : "Nav bloķēts neviens izsekošanas pieprasījums",
@@ -40219,9 +40180,6 @@ module.exports={
   },
   "trackerNetworksNotFound" : {
     "title" : "Nav atrasts neviens izsekošanas pieprasījums",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -40462,7 +40420,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "Personvernbeskyttelse er ikke tilgjengelig for spesialsider eller lokale sider.",
+    "title" : "Personvernbeskyttelser er ikke tilgjengelige for spesialsider eller lokale sider.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -40645,11 +40603,11 @@ module.exports={
     "note" : "Headline when privacy protections are disabled by user"
   },
   "protectionsDisabledRemote" : {
-    "title" : "Vi har midlertidig deaktivert personvernbeskyttelse, da det ser ut til å få nettstedet til å slutte å fungere.",
+    "title" : "Vi har midlertidig deaktivert personvernbeskyttelsene, da de ser ut til å få nettstedet til å slutte å fungere.",
     "note" : "Headline when privacy protections are disabled by DDG"
   },
   "protectionsDisabledRemoteOverride" : {
-    "title" : "Vi anbefaler å deaktivere personvernbeskyttelse for dette nettstedet for å forhindre at det slutter å fungere som det skal.",
+    "title" : "Vi anbefaler å deaktivere personvernbeskyttelsene for dette nettstedet for å forhindre at det slutter å fungere som det skal.",
     "note" : "Headline when privacy protections are disabled by user"
   },
   "connectionDescriptionUnencrypted" : {
@@ -40657,31 +40615,31 @@ module.exports={
     "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
   },
   "trackerNetworksSummaryBlocked" : {
-    "title" : "Forespørslene fra følgende tredjepartsdomener ble blokkert fra lasting, fordi de ble identifisert som sporingsforespørsler. Hvis forespørslene fra et selskap blir lastet, har selskapet mulighet til å profilere deg.",
+    "title" : "Forespørslene fra følgende tredjepartsdomener ble blokkert fra lasting, fordi de ble identifisert som sporende forespørsler. Hvis forespørslene fra et selskap blir lastet, har selskapet mulighet til å profilere deg.",
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "Ingen sporingsforespørsler ble blokkert fra å bli lastet på denne siden. Hvis forespørslene fra et firma lastes, kan de profilere deg.",
+    "title" : "Ingen sporende forespørsler ble blokkert fra å bli lastet på denne siden. Hvis forespørslene fra et firma lastes, kan de profilere deg.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "Vi har ikke identifisert noen sporingsforespørsler på denne siden.",
+    "title" : "Vi har ikke identifisert noen sporende forespørsler på denne siden.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
-    "title" : "Vi fant ingen firmaer som prøvde å laste sporingsforespørsler på denne siden.",
+    "title" : "Vi fant ingen firmaer som prøvde å laste sporende forespørsler på denne siden.",
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
-    "title" : "For at nettstedet skal fungere, har vi unnlatt å blokkere sporingsforespørsler fra firmaer på denne siden.",
+    "title" : "For at nettstedet skal fungere, har vi unnlatt å blokkere sporende forespørsler fra firmaer på denne siden.",
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
-    "title" : "Ingen sporingsforespørsler ble blokkert fra lasting, fordi beskyttelse er slått av for dette nettstedet. Hvis forespørslene fra et selskap blir lastet, har selskapet mulighet til å profilere deg.",
+    "title" : "Ingen sporende forespørsler ble blokkert fra lasting, fordi beskyttelse er slått av for dette nettstedet. Hvis forespørslene fra et selskap blir lastet, har selskapet mulighet til å profilere deg.",
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Opprett ny Duck-adresse",
+    "title" : "Generer privat Duck Address",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -40701,7 +40659,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Vi blokkerte Vi blokkerte fra å laste sporingsforespørsler på denne siden.} =2 {Vi har blokkert <b>{firstCompany}</b> og <b>{secondCompany}</b> fra å laste sporingsforespørsler på denne siden.} =3 {Vi har blokkert <b>{firstCompany}</b>, <b>{secondCompany}</b> og <b>{thirdCompany}</b> fra å laste sporingsforespørsler på denne siden.} =4 {Vi har blokkert <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> og <b>{fourthCompany}</b> fra å laste sporingsforespørsler på denne siden.} =5 {Vi har blokkert <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> og <b>1 til</b> fra å laste sporingsforespørsler på denne siden.} one {Vi har blokkert <b>{firstCompany}</b> fra å laste sporingsforespørsler på denne siden.} other {Vi har blokkert <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> og <b>{othersCount} andre</b> fra å laste sporingsforespørsler på denne siden.}}",
+    "title" : "{companyCount, plural, =0 {Vi blokkerte noen selskaper fra å laste inn sporende forespørsler på denne siden.} =2 {Vi har blokkert <b>{firstCompany}</b> og <b>{secondCompany}</b> fra å laste sporende forespørsler på denne siden.} =3 {Vi har blokkert <b>{firstCompany}</b>, <b>{secondCompany}</b> og <b>{thirdCompany}</b> fra å laste sporende forespørsler på denne siden.} =4 {Vi har blokkert <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> og <b>{fourthCompany}</b> fra å laste sporende forespørsler på denne siden.} =5 {Vi har blokkert <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> og <b>1 til</b> fra å laste sporende forespørsler på denne siden.} one {Vi har blokkert <b>{firstCompany}</b> fra å laste sporende forespørsler på denne siden.} other {Vi har blokkert <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> og <b>{othersCount} andre</b> fra å laste sporende forespørsler på denne siden.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -40718,17 +40676,14 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Forespørsler blokkert fra lasting",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
-    "title" : "Ingen sporingsforespørsler blokkert",
+    "title" : "Ingen sporende forespørsler blokkert",
     "note" : "This indicates that no trackers were blocked."
   },
   "trackerNetworksNotFound" : {
-    "title" : "Ingen sporingsforespørsler funnet",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
+    "title" : "Ingen sporende forespørsler funnet",
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -40744,7 +40699,7 @@ module.exports={
     "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
   },
   "noTrackersFound" : {
-    "title" : "Vi fant ingen firmaer som prøvde å laste sporingsforespørsler på denne siden.",
+    "title" : "Vi fant ingen firmaer som prøvde å laste sporende forespørsler på denne siden.",
     "note" : "We did not find any trackers on this page"
   },
   "trackersFoundForAllowlisted" : {
@@ -41164,31 +41119,31 @@ module.exports={
     "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
   },
   "trackerNetworksSummaryBlocked" : {
-    "title" : "De volgende verzoeken van domeinen van derden werden geblokkeerd omdat ze werden geïdentificeerd als trackingverzoeken. Als de verzoeken van een bedrijf worden geladen, kunnen ze een profiel van je maken.",
+    "title" : "De volgende verzoeken van domeinen van derden werden geblokkeerd omdat ze werden geïdentificeerd als verzoeken met tracking. Als de verzoeken van een bedrijf worden geladen, kunnen ze een profiel van je maken.",
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "Er zijn geen trackingverzoeken geblokkeerd die op deze pagina worden geladen. Als de verzoeken van een bedrijf worden geladen, kunnen deze bedrijven een profiel van je maken.",
+    "title" : "Er zijn geen verzoeken met tracking geblokkeerd die op deze pagina worden geladen. Als de verzoeken van een bedrijf worden geladen, kunnen deze bedrijven een profiel van je maken.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "We hebben geen trackingverzoeken op deze pagina gevonden.",
+    "title" : "We hebben geen verzoeken met tracking op deze pagina gevonden.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
-    "title" : "We hebben geen bedrijven gevonden die trackingverzoeken op deze pagina proberen te laden.",
+    "title" : "We hebben geen bedrijven gevonden die verzoeken met tracking op deze pagina proberen te laden.",
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
-    "title" : "Om te voorkomen dat deze site niet meer goed werkt, hebben we geen enkel trackingverzoek van bedrijven op deze pagina geblokkeerd.",
+    "title" : "Om te voorkomen dat deze site niet meer goed werkt, hebben we geen enkel verzoek met tracking van bedrijven op deze pagina geblokkeerd.",
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
-    "title" : "Trackingverzoeken werden niet verhinderd om te laden omdat beschermingen zijn uitgeschakeld voor deze site. Als de verzoeken van een bedrijf worden geladen, kunnen ze een profiel van je maken. Als de verzoeken van een bedrijf worden geladen, kunnen ze een profiel van je maken.",
+    "title" : "Verzoeken met tracking werden niet verhinderd om te laden omdat beschermingen zijn uitgeschakeld voor deze site. Als de verzoeken van een bedrijf worden geladen, kunnen ze een profiel van je maken. Als de verzoeken van een bedrijf worden geladen, kunnen ze een profiel van je maken.",
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Nieuw Duck-adres aanmaken",
+    "title" : "Privé-Duck Address genereren",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -41208,7 +41163,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {We hebben het laden van trackingverzoeken op deze pagina geblokkeerd.} =2 {We hebben voorkomen dat <b>{firstCompany}</b> en <b>{secondCompany}</b> trackingverzoeken op deze pagina laden.} =3 {We hebben voorkomen dat <b>{firstCompany}</b>, <b>{secondCompany}</b> en <b>{thirdCompany}</b> trackingverzoeken op deze pagina laden.} =4 {We hebben voorkomen dat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> en <b>{fourthCompany}</b> trackingverzoeken op deze pagina laden.} =5 {We hebben voorkomen dat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> en <b>1 ander bedrijf</b> trackingverzoeken op deze pagina laden.} one {We hebben voorkomen dat <b>{firstCompany}</b> trackingverzoeken op deze pagina laadt.} other {We hebben voorkomen dat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> en <b>{othersCount} andere bedrijven</b> trackingverzoeken op deze pagina laden.}}",
+    "title" : "{companyCount, plural, =0 {We hebben het laden van trackingverzoeken van bepaalde bedrijven op deze pagina geblokkeerd.} =2 {We hebben voorkomen dat <b>{firstCompany}</b> en <b>{secondCompany}</b> verzoeken met tracking op deze pagina laden.} =3 {We hebben voorkomen dat <b>{firstCompany}</b>, <b>{secondCompany}</b> en <b>{thirdCompany}</b> verzoeken met tracking op deze pagina laden.} =4 {We hebben voorkomen dat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> en <b>{fourthCompany}</b> verzoeken met tracking op deze pagina laden.} =5 {We hebben voorkomen dat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> en <b>1 ander bedrijf</b> verzoeken met tracking op deze pagina laden.} one {We hebben voorkomen dat <b>{firstCompany}</b> verzoeken met tracking op deze pagina laadt.} other {We hebben voorkomen dat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> en <b>{othersCount} andere bedrijven</b> verzoeken met tracking op deze pagina laden.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -41225,17 +41180,14 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Verzoeken geblokkeerd bij laden",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
-    "title" : "Geen trackingverzoeken geblokkeerd",
+    "title" : "Geen verzoeken met tracking geblokkeerd",
     "note" : "This indicates that no trackers were blocked."
   },
   "trackerNetworksNotFound" : {
-    "title" : "Geen trackingverzoeken gevonden",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
+    "title" : "Geen verzoeken met tracking gevonden",
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -41251,7 +41203,7 @@ module.exports={
     "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
   },
   "noTrackersFound" : {
-    "title" : "We hebben geen bedrijven gevonden die trackingverzoeken op deze pagina proberen te laden.",
+    "title" : "We hebben geen bedrijven gevonden die verzoeken met tracking op deze pagina proberen te laden.",
     "note" : "We did not find any trackers on this page"
   },
   "trackersFoundForAllowlisted" : {
@@ -41675,11 +41627,11 @@ module.exports={
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "Na tej stronie nie zablokowano ładowania żadnych zapytań o śledzenie. Załadowanie żądań firmy może umożliwić jej profilowanie użytkownika.",
+    "title" : "Na tej stronie nie zablokowano ładowania żadnych żądań śledzenia. Załadowanie żądań firmy może umożliwić jej profilowanie użytkownika.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "Nie wykryliśmy żadnych zapytań o śledzenie na tej stronie.",
+    "title" : "Nie wykryliśmy żadnych żądań śledzenia na tej stronie.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
@@ -41695,7 +41647,7 @@ module.exports={
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Utwórz nowy adres Duck",
+    "title" : "Wygeneruj prywatny adres Duck Address",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -41715,7 +41667,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Zablokowaliśmy ładowanie żądań śledzenia na tej stronie.} =2 {Zablokowaliśmy firmom <b>{firstCompany}</b> oraz <b>{secondCompany}</b> możliwość umieszczania na tej stronie żądań śledzenia.} =3 {Zablokowaliśmy firmom <b>{firstCompany}</b>, <b>{secondCompany}</b> oraz <b>{thirdCompany}</b> możliwość umieszczania na tej stronie żądań śledzenia.} =4 {Zablokowaliśmy firmom <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> oraz <b>{fourthCompany}</b> możliwość umieszczania na tej stronie żądań śledzenia.} =5 {Zablokowaliśmy firmom <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> oraz <b>1 innej firmie</b> możliwość umieszczania na tej stronie żądań śledzenia.} one {Zablokowaliśmy firmie <b>{firstCompany}</b> możliwość umieszczania na tej stronie żądań śledzenia.} few {Zablokowaliśmy firmom <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> i<b> {othersCount} innym firmom</b> możliwość umieszczania na tej stronie żądań śledzenia.} many {Zablokowaliśmy firmom <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> i <b>{othersCount} innym firmom</b> możliwość umieszczania na tej stronie żądań śledzenia.} other {Zablokowaliśmy firmom <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> i <b>{othersCount} innym firmom</b> możliwość umieszczania na tej stronie żądań śledzenia.}}",
+    "title" : "{companyCount, plural, =0 {Zablokowaliśmy ładowanie żądań śledzenia wysyłanych przez niektóre firmy na tej stronie.} =2 {Zablokowaliśmy firmom <b>{firstCompany}</b> oraz <b>{secondCompany}</b> możliwość umieszczania na tej stronie żądań śledzenia.} =3 {Zablokowaliśmy firmom <b>{firstCompany}</b>, <b>{secondCompany}</b> oraz <b>{thirdCompany}</b> możliwość umieszczania na tej stronie żądań śledzenia.} =4 {Zablokowaliśmy firmom <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> oraz <b>{fourthCompany}</b> możliwość umieszczania na tej stronie żądań śledzenia.} =5 {Zablokowaliśmy firmom <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> oraz <b>1 innej firmie</b> możliwość umieszczania na tej stronie żądań śledzenia.} one {Zablokowaliśmy firmie <b>{firstCompany}</b> możliwość umieszczania na tej stronie żądań śledzenia.} few {Zablokowaliśmy firmom <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> i<b> {othersCount} innym firmom</b> możliwość umieszczania na tej stronie żądań śledzenia.} many {Zablokowaliśmy firmom <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> i <b>{othersCount} innym firmom</b> możliwość umieszczania na tej stronie żądań śledzenia.} other {Zablokowaliśmy firmom <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> i <b>{othersCount} innym firmom</b> możliwość umieszczania na tej stronie żądań śledzenia.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -41732,7 +41684,7 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Żądania zablokowane przed załadowaniem",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
     "title" : "Brak zablokowanych żądań śledzenia",
@@ -41740,9 +41692,6 @@ module.exports={
   },
   "trackerNetworksNotFound" : {
     "title" : "Nie znaleziono żądań śledzenia",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -41983,7 +41932,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "A Proteção de Privacidade não está disponível para páginas especiais nem páginas locais.",
+    "title" : "As Proteções de Privacidade não estão disponível para páginas especiais nem páginas locais.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -42151,11 +42100,11 @@ module.exports={
     "note" : "Headline when privacy protections are disabled by user"
   },
   "protectionsDisabledRemote" : {
-    "title" : "Desativámos temporariamente a Proteção de Privacidade, pois parece impedir que o site funcione corretamente.",
+    "title" : "Desativámos temporariamente as Proteções de Privacidade, pois parecem estar a impedir que o site funcione corretamente.",
     "note" : "Headline when privacy protections are disabled by DDG"
   },
   "protectionsDisabledRemoteOverride" : {
-    "title" : "Recomendamos a desativação da Proteção de Privacidade para que este site funcione corretamente.",
+    "title" : "Recomendamos a desativação das Proteções de Privacidade para que este site funcione corretamente.",
     "note" : "Headline when privacy protections are disabled by user"
   },
   "connectionDescriptionUnencrypted" : {
@@ -42187,7 +42136,7 @@ module.exports={
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Criar novo endereço Duck",
+    "title" : "Gerar um Duck Address Privado",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -42207,7 +42156,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Bloqueámos Bloqueámos o carregamento dos pedidos de rastreamento nesta página.} =2 {Bloqueámos o carregamento de pedidos de rastreamento da <b>{firstCompany}</b> e da <b>{secondCompany}</b> nesta página.} =3 {Bloqueámos o carregamento de pedidos de rastreamento da <b>{firstCompany}</b>, da <b>{secondCompany}</b> e da <b>{thirdCompany}</b> nesta página.} =4 {Bloqueámos o carregamento de pedidos de rastreamento da <b>{firstCompany}</b>, da <b>{secondCompany}</b>, da <b>{thirdCompany}</b> e da <b>{fourthCompany}</b> nesta página.} =5 {Bloqueámos o carregamento de pedidos de rastreamento da <b>{firstCompany}</b>, da <b>{secondCompany}</b>, da <b>{thirdCompany}</b>, da <b>{fourthCompany}</b> e de <b>mais 1 empresa</b> nesta página.} one {Bloqueámos o carregamento de pedidos de rastreamento da <b>{firstCompany}</b> nesta página.} other {Bloqueámos o carregamento de pedidos de rastreamento da <b>{firstCompany}</b>, da <b>{secondCompany}</b>, da <b>{thirdCompany}</b>, da <b>{fourthCompany}</b> e de <b>mais {othersCount} empresas</b> nesta página.}}",
+    "title" : "{companyCount, plural, =0 {Bloqueámos algumas empresas de carregarem solicitações de rastreamento nesta página.} =2 {Bloqueámos o carregamento de pedidos de rastreamento da <b>{firstCompany}</b> e da <b>{secondCompany}</b> nesta página.} =3 {Bloqueámos o carregamento de pedidos de rastreamento da <b>{firstCompany}</b>, da <b>{secondCompany}</b> e da <b>{thirdCompany}</b> nesta página.} =4 {Bloqueámos o carregamento de pedidos de rastreamento da <b>{firstCompany}</b>, da <b>{secondCompany}</b>, da <b>{thirdCompany}</b> e da <b>{fourthCompany}</b> nesta página.} =5 {Bloqueámos o carregamento de pedidos de rastreamento da <b>{firstCompany}</b>, da <b>{secondCompany}</b>, da <b>{thirdCompany}</b>, da <b>{fourthCompany}</b> e de <b>mais 1 empresa</b> nesta página.} one {Bloqueámos o carregamento de pedidos de rastreamento da <b>{firstCompany}</b> nesta página.} other {Bloqueámos o carregamento de pedidos de rastreamento da <b>{firstCompany}</b>, da <b>{secondCompany}</b>, da <b>{thirdCompany}</b>, da <b>{fourthCompany}</b> e de <b>mais {othersCount} empresas</b> nesta página.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -42224,7 +42173,7 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Pedidos com carregamento bloqueado",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
     "title" : "Nenhum pedido de rastreamento bloqueado",
@@ -42232,9 +42181,6 @@ module.exports={
   },
   "trackerNetworksNotFound" : {
     "title" : "Nenhum pedido de rastreamento encontrado",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -42475,7 +42421,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "Protecția confidențialității nu este disponibilă pentru paginile speciale sau pentru paginile locale.",
+    "title" : "Elementele de protecție a confidențialității nu sunt disponibile pentru paginile speciale sau pentru paginile locale.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -42658,11 +42604,11 @@ module.exports={
     "note" : "Headline when privacy protections are disabled by user"
   },
   "protectionsDisabledRemote" : {
-    "title" : "Am dezactivat temporar protecția confidențialității, deoarece pare să creeze disfuncții pe acest site.",
+    "title" : "Am dezactivat temporar Elementele de protecție a confidențialității, deoarece par să creeze disfuncții pe acest site.",
     "note" : "Headline when privacy protections are disabled by DDG"
   },
   "protectionsDisabledRemoteOverride" : {
-    "title" : "Îți recomandăm să dezactivezi protecția confidențialității pentru acest site pentru a preveni disfuncțiile pe site.",
+    "title" : "Îți recomandăm să dezactivezi Elementele de protecție a confidențialității pentru acest site pentru a preveni disfuncțiile pe site.",
     "note" : "Headline when privacy protections are disabled by user"
   },
   "connectionDescriptionUnencrypted" : {
@@ -42670,31 +42616,31 @@ module.exports={
     "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
   },
   "trackerNetworksSummaryBlocked" : {
-    "title" : "Încărcarea cererilor următoarelor domenii terțe a fost blocată, deoarece au fost identificate ca fiind cereri de urmărire. În cazul în care cererile unei societăți sunt încărcate, aceasta îi poate permite să îți creeze un profil.",
+    "title" : "Încărcarea solicitărilor următoarelor domenii terțe a fost blocată, deoarece au fost identificate ca fiind solicitări de urmărire. În cazul în care solicitările unei societăți sunt încărcate, aceasta îi poate permite să îți creeze un profil.",
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "Nu a fost blocată încărcarea niciunei cereri de urmărire pe această pagină. În cazul în care cererile unei companii sunt încărcate, aceasta îi poate permite să îți creeze un profil.",
+    "title" : "Nu a fost blocată încărcarea niciunei solicitări de urmărire pe această pagină. În cazul în care solicitările unei companii sunt încărcate, aceasta îi poate permite să îți creeze un profil.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "Nu am identificat nicio cerere de urmărire pe această pagină.",
+    "title" : "Nu am identificat nicio solicitare de urmărire pe această pagină.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
-    "title" : "Nu am găsit nicio companie care să încerce să încarce cereri de urmărire pe această pagină.",
+    "title" : "Nu am găsit nicio companie care să încerce să încarce solicitări de urmărire pe această pagină.",
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
-    "title" : "Pentru a preveni apariția unor disfuncții pe site, nu am blocat încărcarea cererilor de urmărire ale companiilor pe această pagină.",
+    "title" : "Pentru a preveni apariția unor disfuncții pe site, nu am blocat încărcarea solicitărilor de urmărire ale companiilor pe această pagină.",
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
-    "title" : "Nu a fost blocată încărcarea niciunei cereri de urmărire, deoarece protecțiile sunt dezactivate pentru acest site. În cazul în care cererile unei societăți sunt încărcate, aceasta îi poate permite să îți creeze un profil.",
+    "title" : "Nu a fost blocată încărcarea niciunei solicitări de urmărire, deoarece protecțiile sunt dezactivate pentru acest site. În cazul în care solicitările unei societăți sunt încărcate, aceasta îi poate permite să îți creeze un profil.",
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Creează o nouă adresă Duck",
+    "title" : "Generează o Duck Address privată",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -42714,7 +42660,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Am blocat încărcarea cererilor de urmărire pe această pagină.} =2 {Am blocat <b>{firstCompany}</b> și <b>{secondCompany}</b> să încarce cereri de urmărire pe această pagină.} =3 {Am blocat <b>{firstCompany}</b>, <b>{secondCompany}</b> și <b>{thirdCompany}</b> să încarce cereri de urmărire pe această pagină.} =4 {Am blocat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>și <b>{fourthCompany}</b>să încarce cereri de urmărire pe această pagină.} =5 {Am blocat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> și <b>încă o companie</b> să încarce cereri de urmărire pe această pagină.} one {Am blocat <b>{firstCompany}</b> să încarce cereri de urmărire pe această pagină.} few {Am blocat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> și <b>{othersCount} altele</b> de la încărcarea cererilor de urmărire pe această pagină.} other {Am blocat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> și încă <b>{othersCount} companii</b> să încarce cereri de urmărire pe această pagină.}}",
+    "title" : "{companyCount, plural, =0 {Am blocat unele companii pentru a nu încărca solicitări de urmărire pe această pagină.} =2 {Am blocat <b>{firstCompany}</b> și <b>{secondCompany}</b> să încarce solicitări de urmărire pe această pagină.} =3 {Am blocat <b>{firstCompany}</b>, <b>{secondCompany}</b> și <b>{thirdCompany}</b> să încarce cereri de urmărire pe această pagină.} =4 {Am blocat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>și <b>{fourthCompany}</b>să încarce solicitări de urmărire pe această pagină.} =5 {Am blocat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> și <b>încă o companie</b> să încarce solicitări de urmărire pe această pagină.} one {Am blocat <b>{firstCompany}</b> să încarce solicitări de urmărire pe această pagină.} few {Am blocat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> și <b>{othersCount} altele</b> de la încărcarea cererilor de urmărire pe această pagină.} other {Am blocat <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> și încă <b>{othersCount} companii</b> să încarce solicitări de urmărire pe această pagină.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -42731,7 +42677,7 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Solicitări a căror încărcare a fost blocată",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
     "title" : "Nu a fost blocată nicio solicitare de urmărire",
@@ -42739,9 +42685,6 @@ module.exports={
   },
   "trackerNetworksNotFound" : {
     "title" : "Nu au fost găsite solicitări de urmărire",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -42757,7 +42700,7 @@ module.exports={
     "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
   },
   "noTrackersFound" : {
-    "title" : "Nu am găsit nicio companie care să încerce să încarce cereri de urmărire pe această pagină.",
+    "title" : "Nu am găsit nicio companie care să încerce să încarce solicitări de urmărire pe această pagină.",
     "note" : "We did not find any trackers on this page"
   },
   "trackersFoundForAllowlisted" : {
@@ -42982,7 +42925,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "Защита конфиденциальности недоступна для особых и локальных страниц.",
+    "title" : "Защита конфиденциальности не работает на специальных и локальных страницах.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -43177,11 +43120,11 @@ module.exports={
     "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
   },
   "trackerNetworksSummaryBlocked" : {
-    "title" : "Мы заблокировали загрузку следующих запросов сторонних доменов, так как распознали в них трекинг-запросы. Загруженные запросы позволяют компаниям вас профилировать.",
+    "title" : "Мы заблокировали загрузку следующих запросов сторонних доменов, так как распознали в них попытки отслеживания. Загруженные запросы позволяют компаниям вас профилировать.",
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "Мы не заблокировали ни одного запроса на отслеживание на этой странице. В случае загрузки их запросов, компании имеют возможность создавать ваш профиль.",
+    "title" : "Мы не заблокировали ни одного запроса отслеживания на этой странице. В случае загрузки их запросов, компании имеют возможность создавать ваш профиль.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
@@ -43193,7 +43136,7 @@ module.exports={
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
-    "title" : "Чтобы не нарушить работу сайта, мы не стали блокировать запросы компаний на отслеживание.",
+    "title" : "Чтобы не нарушить работу сайта, мы не стали блокировать на этой странице запросы компаний на отслеживание.",
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
@@ -43201,7 +43144,7 @@ module.exports={
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Создать новый адрес Duck",
+    "title" : "Создать адрес на Duck",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -43221,7 +43164,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Мы заблокировали на этой странице несколько запросов на отслеживание.} =2 {Мы заблокировали на этой странице запросы на отслеживание <b>{firstCompany}</b> и <b>{secondCompany}</b>.} =3 {Мы заблокировали на этой странице запросы на отслеживание <b>{firstCompany}</b>, <b>{secondCompany}</b> и <b>{thirdCompany}</b>.} =4 {Мы заблокировали на этой странице запросы на отслеживание <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> и <b>{fourthCompany}</b>.} =5 {Мы заблокировали на этой странице запросы на отслеживание <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> и <b>еще одной</b> компании.} one {Мы предотвратили загрузку трекинг-запросов от <b>{firstCompany}</b> на этом сайте.} few {Мы предотвратили загрузку трекинг-запросов от <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> и <b>{fourthCompany}</b> и еще <b>{othersCount}</b> на этом сайте.} many {Мы предотвратили загрузку трекинг-запросов от <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> и <b>еще {othersCount}</b> на этом сайте.} other {Мы предотвратили загрузку трекинг-запросов от <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> и <b>еще {othersCount}</b> на этом сайте.}}",
+    "title" : "{companyCount, plural, =0 {Мы остановили загрузку трекинг-запросов некоторых компаний на этой странице.} =2 {Мы заблокировали на этой странице запросы на отслеживание <b>{firstCompany}</b> и <b>{secondCompany}</b>.} =3 {Мы заблокировали на этой странице запросы на отслеживание <b>{firstCompany}</b>, <b>{secondCompany}</b> и <b>{thirdCompany}</b>.} =4 {Мы заблокировали на этой странице запросы на отслеживание <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> и <b>{fourthCompany}</b>.} =5 {Мы заблокировали на этой странице запросы на отслеживание <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> и <b>еще одной</b> компании.} one {Мы предотвратили загрузку трекинг-запросов от <b>{firstCompany}</b> на этом сайте.} few {Мы предотвратили загрузку трекинг-запросов от <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> и <b>{fourthCompany}</b> и еще <b>{othersCount}</b> на этом сайте.} many {Мы предотвратили загрузку трекинг-запросов от <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> и <b>еще {othersCount}</b> на этом сайте.} other {Мы предотвратили загрузку трекинг-запросов от <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> и <b>еще {othersCount}</b> на этом сайте.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -43238,7 +43181,7 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Заблокирована загрузка запросов",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
     "title" : "Трекинг-запросы не заблокированы",
@@ -43246,9 +43189,6 @@ module.exports={
   },
   "trackerNetworksNotFound" : {
     "title" : "Трекинг-запросы не обнаружены",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -43684,31 +43624,31 @@ module.exports={
     "note" : "Shown when the connection is not encrypted (HTTP instead of HTTPS)"
   },
   "trackerNetworksSummaryBlocked" : {
-    "title" : "Načítanie požiadaviek nasledujúcich domén tretích strán bolo zablokované, pretože boli identifikované ako požiadavky na sledovanie. Ak sú načítané požiadavky spoločnosti, môže im umožniť profilovať vás.",
+    "title" : "Načítanie požiadaviek nasledujúcich domén tretích strán bolo zablokované, pretože boli identifikované ako požiadavky so sledovaním. Ak sú načítané požiadavky spoločnosti, môže im umožniť profilovať vás.",
     "note" : "The summary immediately shown on the 'trackers blocked' screen"
   },
   "trackerNetworksSummaryNoneBlocked" : {
-    "title" : "Na tejto stránke nebolo zablokované načítanie žiadnych požiadaviek na sledovanie. Ak sú požiadavky spoločnosti načítané, môže im to umožniť profilovať vás.",
+    "title" : "Na tejto stránke nebolo zablokované načítanie žiadnych požiadaviek so sledovaním. Ak sú požiadavky spoločnosti načítané, môže im to umožniť profilovať vás.",
     "note" : "The message shown when we detected trackers, but none were blocked"
   },
   "trackerNetworksSummaryNoneFound" : {
-    "title" : "Na tejto stránke sme nezistili žiadne požiadavky na sledovanie.",
+    "title" : "Na tejto stránke sme nezistili žiadne požiadavky so sledovaním.",
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
-    "title" : "Na tejto stránke sme nenašli žiadne spoločnosti, ktoré by sa pokúšali načítať požiadavky na sledovanie.",
+    "title" : "Na tejto stránke sme nenašli žiadne spoločnosti, ktoré by sa pokúšali načítať požiadavky so sledovaním.",
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
-    "title" : "Aby sme zabránili narušeniu lokality, neblokovali sme žiadnym spoločnostiam načítanie žiadostí o sledovanie na tejto stránke.",
+    "title" : "Aby sme zabránili narušeniu lokality, neblokovali sme žiadnym spoločnostiam načítanie žiadostí so sledovaním na tejto stránke.",
     "note" : "The message shown when we allowed some trackers to load."
   },
   "trackerNetworksSummaryProtectionsOff" : {
-    "title" : "Nebolo zablokované žiadne načítavanie požiadaviek na sledovanie, pretože ochrana je pre túto stránku vypnutá. Ak sú požiadavky spoločnosti načítané, môže im to umožniť profilovať vás.",
+    "title" : "Nebolo zablokované žiadne načítavanie požiadaviek so sledovaním, pretože ochrana je pre túto stránku vypnutá. Ak sú požiadavky spoločnosti načítané, môže im to umožniť profilovať vás.",
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Vytvoriť novú adresu Duck",
+    "title" : "Generovať súkromnú adresu Duck",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -43728,7 +43668,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Zablokovali sme Zablokovali sme načítanie požiadaviek na sledovanie na tejto stránke.} =2 {Zablokovali sme <b>{firstCompany}</b> a <b>{secondCompany}</b>, z načítania požiadaviek na sledovanie na tejto stránke.} =3 {Zablokovali sme <b>{firstCompany}</b>, <b>{secondCompany}</b> a <b>{thirdCompany}</b> z načítania požiadaviek na sledovanie na tejto stránke.} =4 {Zablokovali sme <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> a <b>{fourthCompany}</b> z načítania požiadaviek na sledovanie na tejto stránke.} =5 {Zablokovali sme <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> a <b>1 ďalšie</b> z načítania sledovacích požiadaviek na tejto stránke.} one {Zablokovali sme <b>{firstCompany}</b> pred načítaním požiadaviek na sledovanie na tejto stránke.} few {Zablokovali sme <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b>a <b>{othersCount} ďalšie</b>pred načítaním požiadaviek na sledovanie na tejto stránke.} many {Zablokovali sme <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b>a <b>{othersCount} ďalšie</b>pred načítaním požiadaviek na sledovanie na tejto stránke.} other {Zablokovali sme <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b>a <b>{othersCount} ďalšie</b>pred načítaním požiadaviek na sledovanie na tejto stránke.}}",
+    "title" : "{companyCount, plural, =0 {Niektorým spoločnostiam sme na tejto stránke zablokovali načítanie požiadaviek so sledovaním.} =2 {Zablokovali sme <b>{firstCompany}</b> a <b>{secondCompany}</b>, z načítania požiadaviek so sledovaním na tejto stránke.} =3 {Zablokovali sme <b>{firstCompany}</b>, <b>{secondCompany}</b> a <b>{thirdCompany}</b> z načítania požiadaviek so sledovaním.} =4 {Zablokovali sme <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> a <b>{fourthCompany}</b> z načítania požiadaviek so sledovaním na tejto stránke.} =5 {Zablokovali sme <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> a <b>1 ďalšie</b> z načítania požiadaviek so sledovaním na tejto stránke.} one {Zablokovali sme <b>{firstCompany}</b> pred načítaním požiadaviek so sledovaním na tejto stránke.} few {Zablokovali sme <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b>a <b>{othersCount} ďalšie</b>pred načítaním požiadaviek so sledovaním na tejto stránke.} many {Zablokovali sme <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b>a <b>{othersCount} ďalšie</b>pred načítaním požiadaviek so sledovaním na tejto stránke.} other {Zablokovali sme <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b>a <b>{othersCount} ďalšie</b>pred načítaním požiadaviek so sledovaním na tejto stránke.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -43745,17 +43685,14 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Načítavanie žiadostí je zablokované",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
-    "title" : "Nie sú blokované žiadne žiadosti o sledovanie",
+    "title" : "Nie sú blokované žiadne požiadavky so sledovaním",
     "note" : "This indicates that no trackers were blocked."
   },
   "trackerNetworksNotFound" : {
-    "title" : "Nenašli sa žiadne požiadavky na sledovanie",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
+    "title" : "Nenašli sa žiadne požiadavky so sledovaním",
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -43771,7 +43708,7 @@ module.exports={
     "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
   },
   "noTrackersFound" : {
-    "title" : "Na tejto stránke sme nenašli žiadne spoločnosti, ktoré by sa pokúšali načítať požiadavky na sledovanie.",
+    "title" : "Na tejto stránke sme nenašli žiadne spoločnosti, ktoré by sa pokúšali načítať požiadavky so sledovaním.",
     "note" : "We did not find any trackers on this page"
   },
   "trackersFoundForAllowlisted" : {
@@ -44179,11 +44116,11 @@ module.exports={
     "note" : "Headline when privacy protections are disabled by user"
   },
   "protectionsDisabledRemote" : {
-    "title" : "Zaščito zasebnosti smo začasno onemogočili, saj se zdi, da zato prihaja do napak na tem spletnem mestu.",
+    "title" : "Zaščito zasebnosti smo začasno onemogočili, ker je videti, da zato prihaja do napak na tem spletnem mestu.",
     "note" : "Headline when privacy protections are disabled by DDG"
   },
   "protectionsDisabledRemoteOverride" : {
-    "title" : "Priporočamo, da za to spletno mesto onemogočite zaščito zasebnosti, da preprečite prekinitev delovanja spletnega mesta.",
+    "title" : "Priporočamo, da za to spletno mesto onemogočite zaščite zasebnosti, da preprečite prekinitev delovanja spletnega mesta.",
     "note" : "Headline when privacy protections are disabled by user"
   },
   "connectionDescriptionUnencrypted" : {
@@ -44203,7 +44140,7 @@ module.exports={
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
-    "title" : "Na tej strani nismo našli nobenega podjetja, ki bi poskušalo naložiti zahteve za sledenje.",
+    "title" : "Na tej strani nismo našli nobenega podjetja, ki bi poskušalo naložiti zahtevke za sledenje.",
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
@@ -44215,7 +44152,7 @@ module.exports={
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Ustvari nov naslov Duck",
+    "title" : "Ustvarjanje zasebnega naslova Duck",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -44235,7 +44172,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Blokirali smo Blokirali smo nalaganje zahtevkov za sledenje na tej strani.} =2 {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjema <b>{firstCompany}</b> in <b>{secondCompany}</b>.} =3 {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjem <b>{firstCompany}</b>, <b>{secondCompany}</b> in <b>{thirdCompany}</b>.} =4 {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjem <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> in <b>{fourthCompany}</b>.} =5 {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjem <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> in <b>1 drugim</b>.} one {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjem <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> in {othersCount} drugim.} two {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjem <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> in <b>{othersCount} drugim</b>.} few {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjem<b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> in <b>{othersCount} drugim</b>.} other {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjem <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> in <b>{othersCount} drugim</b>.}}",
+    "title" : "{companyCount, plural, =0 {Nekaterim podjetjem smo preprečili nalaganje zahtevkov za sledenje na tej strani.} =2 {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjema <b>{firstCompany}</b> in <b>{secondCompany}</b>.} =3 {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjem <b>{firstCompany}</b>, <b>{secondCompany}</b> in <b>{thirdCompany}</b>.} =4 {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjem <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> in <b>{fourthCompany}</b>.} =5 {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjem <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> in <b>1 drugemu podjetju</b>.} one {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetju <b>{firstCompany}</b>.} two {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjem <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> in <b>{othersCount} drugima podjetjema</b>.} few {Na tej strani smo blokirali nalaganje zahtevkov za sledenje podjetjem <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> in <b>{othersCount} drugim podjetjem</b>.} other {Na tej strani smo blokirali nalaganje zahtevkov za sledenje <b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> in <b>{othersCount} drugim podjetjem</b>.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -44252,17 +44189,14 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Zahtevki, katerih nalaganje je blokirano",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
-    "title" : "Noben zahtevek za sledenje ni blokiran",
+    "title" : "Noben zahtevek za sledenje ni bil blokiran",
     "note" : "This indicates that no trackers were blocked."
   },
   "trackerNetworksNotFound" : {
-    "title" : "Ni najdenih zahtevkov za sledenje",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
+    "title" : "Nobenega zahtevka za sledenje ni bilo mogoče najti",
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -44278,7 +44212,7 @@ module.exports={
     "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
   },
   "noTrackersFound" : {
-    "title" : "Na tej strani nismo našli nobenega podjetja, ki bi poskušalo naložiti zahteve za sledenje.",
+    "title" : "Na tej strani nismo našli nobenega podjetja, ki bi poskušalo naložiti zahtevke za sledenje.",
     "note" : "We did not find any trackers on this page"
   },
   "trackersFoundForAllowlisted" : {
@@ -44722,7 +44656,7 @@ module.exports={
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Skapa en ny Duck-adress",
+    "title" : "Generera privat Duck Address",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -44759,7 +44693,7 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Förfrågningar blockerades från att läsas in",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
     "title" : "Inga spårningsförfrågningar blockerades",
@@ -44767,9 +44701,6 @@ module.exports={
   },
   "trackerNetworksNotFound" : {
     "title" : "Inga spårningsförfrågningar hittades",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -45010,7 +44941,7 @@ module.exports={
     }]
   },
   "protectionsUnavailableNote" : {
-    "title" : "Gizlilik Koruması özel sayfalar veya bilgisayarınızda lokal olarak açtığınız sayfalar için kullanılamaz.",
+    "title" : "Gizlilik Korumaları özel sayfalar veya bilgisayarınızda yerel olarak açtığınız sayfalar için kullanılamaz.",
     "note" : "'Special pages' here means things like the browser settings page, whereas 'local pages' means files opened from the user's computer rather than the internet"
   },
   "spreadTitle" : {
@@ -45193,11 +45124,11 @@ module.exports={
     "note" : "Headline when privacy protections are disabled by user"
   },
   "protectionsDisabledRemote" : {
-    "title" : "Bu sitede hatalara neden olduğu için Gizlilik Korumasını geçici olarak kapattık.",
+    "title" : "Bu sitede hatalara neden olduğu için Gizlilik Korumalarını geçici olarak kapattık.",
     "note" : "Headline when privacy protections are disabled by DDG"
   },
   "protectionsDisabledRemoteOverride" : {
-    "title" : "Sitede hataları önlemek için bu sitede Gizlilik Koruması'nı devre dışı bırakmanızı öneririz.",
+    "title" : "Sitede hataları önlemek için bu sitede Gizlilik Korumaları'nı devre dışı bırakmanızı öneririz.",
     "note" : "Headline when privacy protections are disabled by user"
   },
   "connectionDescriptionUnencrypted" : {
@@ -45217,7 +45148,7 @@ module.exports={
     "note" : "The message shown when we didn't detect any trackers"
   },
   "trackerNetworksSummaryNone" : {
-    "title" : "Bu sayfada izleme taleplerini yüklemeye çalışan herhangi bir şirket bulamadık.",
+    "title" : "Bu sayfada izleme isteklerini yüklemeye çalışan herhangi bir şirket bulamadık.",
     "note" : "We did not find any trackers on this page"
   },
   "trackerNetworksSummaryAllowedOnly" : {
@@ -45229,7 +45160,7 @@ module.exports={
     "note" : "We found trackers, but protections were disabled"
   },
   "createNewDuckAddress" : {
-    "title" : "Yeni Duck Adresi oluştur",
+    "title" : "Özel Duck Address Oluştur",
     "note" : "Create a new private email alias"
   },
   "createNewDuckAddressCopied" : {
@@ -45249,7 +45180,7 @@ module.exports={
     "note" : "When visiting a site that is owned by a major tracking company, we cannot block their trackers so we warn the user.  Ex. Google (owner of news.google.com) tracks you across 79% of top sites.... etc"
   },
   "trackersBlockedDesc" : {
-    "title" : "{companyCount, plural, =0 {Bu sayfada izleme isteklerinin yüklenmesini engelledik.} =2 {<b>{firstCompany}</b> ve <b>{secondCompany}</b> şirketlerinin bu sayfadaki izleme isteklerini yüklemesini engelledik.} =3 {<b>{firstCompany}</b>, <b>{secondCompany}</b> ve <b>{thirdCompany}</b> şirketlerinin bu sayfadaki izleme isteklerini yüklemesini engelledik.} =4 {<b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> ve <b>{fourthCompany}</b> şirketlerinin bu sayfadaki izleme isteklerini yüklemesini engelledik.} =5 {<b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ve <b>1 diğer</b> şirketin bu sayfadaki izleme isteklerini yüklemesini engelledik.} one {<b>{firstCompany}</b> şirketinin bu sayfadaki izleme isteklerini yüklemesini engelledik.} other {<b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ve <b>{othersCount} diğerlerinin</b> bu sayfadaki izleme isteklerini yüklemesini engelledik.}}",
+    "title" : "{companyCount, plural, =0 {Bazı şirketlerin bu sayfaya izleme istekleri yüklemesini engelledik.} =2 {<b>{firstCompany}</b> ve <b>{secondCompany}</b> şirketlerinin bu sayfadaki izleme isteklerini yüklemesini engelledik.} =3 {<b>{firstCompany}</b>, <b>{secondCompany}</b> ve <b>{thirdCompany}</b> şirketlerinin bu sayfadaki izleme isteklerini yüklemesini engelledik.} =4 {<b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b> ve <b>{fourthCompany}</b> şirketlerinin bu sayfadaki izleme isteklerini yüklemesini engelledik.} =5 {<b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ve <b>1 diğer</b> şirketin bu sayfadaki izleme isteklerini yüklemesini engelledik.} one {<b>{firstCompany}</b> şirketinin bu sayfadaki izleme isteklerini yüklemesini engelledik.} other {<b>{firstCompany}</b>, <b>{secondCompany}</b>, <b>{thirdCompany}</b>, <b>{fourthCompany}</b> ve <b>{othersCount} diğerlerinin</b> bu sayfadaki izleme isteklerini yüklemesini engelledik.}}",
     "note" : "Returns a string in the form of 'We blocked CompanyA and CompanyB from trying to track you.'"
   },
   "cookiesMinimized" : {
@@ -45266,7 +45197,7 @@ module.exports={
   },
   "trackerNetworksDesc" : {
     "title" : "Yüklenmesi Engellenen İstekler",
-    "note" : "This describes how many trackers (or major tracking networks) were blocked (or found if protections are disabled).  Ex: 9 Trackers Blocked"
+    "note" : "This indicates that 1 or more trackers were blocked."
   },
   "trackerNetworksNotBlocked" : {
     "title" : "Hiçbir İzleme İsteği Engellenmedi",
@@ -45274,9 +45205,6 @@ module.exports={
   },
   "trackerNetworksNotFound" : {
     "title" : "İzleme İsteği Bulunamadı",
-    "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
-  },
-  "trackerNetworksProtectionsDisabled" : {
     "note" : "This is an alternative heading for when there were no Trackers but there WAS at least 1 non-special request loaded"
   },
   "thirdPartiesLoaded" : {
@@ -45292,7 +45220,7 @@ module.exports={
     "note" : "When trackers detected belong to companyName, we can't block them on a site that company owns"
   },
   "noTrackersFound" : {
-    "title" : "Bu sayfada izleme taleplerini yüklemeye çalışan herhangi bir şirket bulamadık.",
+    "title" : "Bu sayfada izleme isteklerini yüklemeye çalışan herhangi bir şirket bulamadık.",
     "note" : "We did not find any trackers on this page"
   },
   "trackersFoundForAllowlisted" : {
