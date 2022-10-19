@@ -16,14 +16,15 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-<!--    <style name="AppTheme.Dark" parent="AppTheme.BaseDark">-->
-<!--        <item name="android:windowLightStatusBar">false</item>-->
-<!--    </style>-->
+    <style name="Platform.V23.Theme.DuckDuckGo" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Controls whether status bar icons are light/dark - `minSdkVersion 23`-->
+        <item name="android:windowLightStatusBar">?attr/preferDarkStatusBarIcons</item>
+        <item name="preferDarkNavigationBarIcons">false</item>
+        <item name="preferredNavigationBarColor">@color/black</item>
+    </style>
 
-<!--    <style name="AppTheme.Light" parent="AppTheme.BaseLight">-->
-<!--        <item name="android:windowLightStatusBar">true</item>-->
-<!--    </style>-->
+    <style name="Platform.Theme.DuckDuckGo" parent="Platform.V23.Theme.DuckDuckGo"/>
 
 </resources>

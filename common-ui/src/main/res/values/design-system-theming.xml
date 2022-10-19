@@ -16,11 +16,21 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Attributes to control how status and navigation bar are displayed across OS versions. -->
+    <attr name="preferDarkStatusBarIcons" format="boolean" />
+    <attr name="preferDarkNavigationBarIcons" format="boolean" />
+    <attr name="preferredStatusBarColor" format="color" />
+    <attr name="preferredNavigationBarColor" format="color" />
+
     <!-- The platform theme is where OS version specific flags are used. -->
-    <style name="Platform.Theme.DuckDuckGo" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Platform.V23.Theme.DuckDuckGo" parent="Theme.MaterialComponents.Light.NoActionBar"/>
+
+    <style name="Platform.Theme.DuckDuckGo" parent="Platform.V23.Theme.DuckDuckGo">
         <item name="android:windowActivityTransitions" tools:ignore="NewApi">true</item>
-        <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
-        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
+        <item name="android:windowLightStatusBar" tools:ignore="NewApi">?attr/preferDarkStatusBarIcons</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">?attr/preferDarkNavigationBarIcons</item>
+        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/preferredStatusBarColor</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">?attr/preferredNavigationBarColor</item>
     </style>
 
     <!--  Our base theme, Base.Theme.DuckDuckGo,
@@ -99,16 +109,15 @@
         <!--colorBackground appears behind scrollable content and is used for the default window background -->
         <item name="android:colorBackground">?attr/daxColorBackground</item>
         <item name="android:windowBackground">?attr/daxColorBackground</item>
-        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/toolbarBgColor</item>
-        <item name="android:navigationBarColor" tools:ignore="NewApi">?attr/toolbarBgColor</item>
-
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
     <style name="Theme.DuckDuckGo.Dark" parent="Theme.DuckDuckGo">
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">false</item>
-        <item name="android:navigationBarColor">?toolbarBgColor</item>
+
+        <item name="preferDarkStatusBarIcons">false</item>
+        <item name="preferredStatusBarColor">?attr/toolbarBgColor</item>
+        <item name="preferDarkNavigationBarIcons">false</item>
+        <item name="preferredNavigationBarColor">@color/black</item>
 
         <!-- Legacy colors to remove-->
         <item name="colorPrimary">@color/darkThemePrimary</item>
@@ -225,9 +234,10 @@
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
-        <item name="android:navigationBarColor">@color/white</item>
+        <item name="preferDarkStatusBarIcons">true</item>
+        <item name="preferredStatusBarColor">@color/white</item>
+        <item name="preferDarkNavigationBarIcons">true</item>
+        <item name="preferredNavigationBarColor">@color/white</item>
 
         <!-- Legacy colors to remove-->
         <item name="colorPrimary">@color/lightThemePrimary</item>
@@ -341,9 +351,8 @@
         <item name="daxColorAccentYellow">@color/yellow50</item>
     </style>
 
-    <style name="Theme.DuckDuckGo.Transparent" parent="Theme.DuckDuckGo.Dark">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    <style name="Theme.DuckDuckGo.Transparent" parent="Theme.DuckDuckGo.Light">
+
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">

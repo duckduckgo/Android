@@ -70,7 +70,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
         if (isVisibleToUser) {
-            applyStyle()
+            // applyStyle()
             viewModel.pageBecameVisible()
         }
     }
@@ -81,6 +81,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
             addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
             decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             statusBarColor = Color.WHITE
+            navigationBarColor = Color.BLACK
         }
         ViewCompat.requestApplyInsets(longDescriptionContainer)
     }
