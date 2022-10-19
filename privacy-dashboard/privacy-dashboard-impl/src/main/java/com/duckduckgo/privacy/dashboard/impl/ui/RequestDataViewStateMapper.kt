@@ -62,8 +62,8 @@ class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewS
 
         val uniqueEntityDomainState = mutableMapOf<String, List<TrackerStatus>>()
         val requests: List<DetectedRequest> = site.trackingEvents.map {
-            val withSchemeTrackeUrl = kotlin.runCatching { it.trackerUrl.toUri().withScheme().toString() }.getOrNull() ?: return@map null
-            val trackerEvent = it.copy(trackerUrl = withSchemeTrackeUrl)
+            val withSchemeTrackerUrl = kotlin.runCatching { it.trackerUrl.toUri().withScheme().toString() }.getOrNull() ?: return@map null
+            val trackerEvent = it.copy(trackerUrl = withSchemeTrackerUrl)
             val entity: Entity = if (trackerEvent.entity == null) return@map null else trackerEvent.entity!!
 
             if (trackerEvent.surrogateId?.isNotEmpty() == true) {
