@@ -30,8 +30,9 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.Companion.MIN_VISIBLE_ITEMS
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -351,11 +352,38 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenAppTpEnabledCtaNotAlreadyShownThenCommandIsSentAndFlagSetToTrue() = runBlocking {
+    fun whenAppTpEnabledCtaNotAlreadyShownAndLastItemPosIsLowerThanMinimumDesiredThenThenNoCommandSent() = runBlocking {
         whenever(vpnStore.didShowAppTpEnabledCta()).thenReturn(false)
+        val lastItemPos = MIN_VISIBLE_ITEMS - 1
 
         viewModel.commands().test {
-            viewModel.showAppTpEnabledCtaIfNeeded()
+            viewModel.showAppTpEnabledCtaIfNeeded(lastItemPos)
+
+            expectNoEvents()
+            verify(vpnStore, never()).appTpEnabledCtaDidShow()
+        }
+    }
+
+    @Test
+    fun whenAppTpEnabledCtaNotAlreadyShownAndLastItemPosIsEqualToMinimumDesiredThenThenNoCommandSent() = runBlocking {
+        whenever(vpnStore.didShowAppTpEnabledCta()).thenReturn(false)
+        val lastItemPos = MIN_VISIBLE_ITEMS
+
+        viewModel.commands().test {
+            viewModel.showAppTpEnabledCtaIfNeeded(lastItemPos)
+
+            expectNoEvents()
+            verify(vpnStore, never()).appTpEnabledCtaDidShow()
+        }
+    }
+
+    @Test
+    fun whenAppTpEnabledCtaNotAlreadyShownAndLastItemPosIsGreaterThanMinimumDesiredThenCommandIsSentAndFlagSetToTrue() = runBlocking {
+        whenever(vpnStore.didShowAppTpEnabledCta()).thenReturn(false)
+        val lastItemPos = MIN_VISIBLE_ITEMS + 1
+
+        viewModel.commands().test {
+            viewModel.showAppTpEnabledCtaIfNeeded(lastItemPos)
 
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowAppTpEnabledCta, awaitItem())
             verify(vpnStore).appTpEnabledCtaDidShow()
@@ -365,11 +393,12 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenAppTpEnabledCtaAlreadyShownThenNoCommandSent() = runBlocking {
+    fun whenAppTpEnabledCtaAlreadyShownAndLastItemPosHasAnyValueThenNoCommandSent() = runBlocking {
         whenever(vpnStore.didShowAppTpEnabledCta()).thenReturn(true)
+        val lastItemPos = 0
 
         viewModel.commands().test {
-            viewModel.showAppTpEnabledCtaIfNeeded()
+            viewModel.showAppTpEnabledCtaIfNeeded(lastItemPos)
 
             expectNoEvents()
             verify(vpnStore, never()).appTpEnabledCtaDidShow()

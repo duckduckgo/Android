@@ -22,15 +22,12 @@ import android.content.Intent
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.os.ResultReceiver
 import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.CompoundButton
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.os.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -92,14 +89,12 @@ class DeviceShieldTrackerActivity :
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
-    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Inject
+    lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
     private lateinit var deviceShieldSwitch: SwitchView
-
-    // TODO [ANA] Remove this handler once the trackers recyclerview implementation is finished.
-    private val handler = Handler(Looper.getMainLooper())
 
     // we might get an update before options menu has been populated; temporarily cache value to use when menu populated
     private var vpnCachedState: VpnState? = null
@@ -183,13 +178,10 @@ class DeviceShieldTrackerActivity :
         } else {
             binding.ctaShowAll.gone()
         }
-
-        viewModel.showAppTpEnabledCtaIfNeeded()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        handler.removeCallbacksAndMessages(null)
+    override fun onLastItemShown(position: Int) {
+        viewModel.showAppTpEnabledCtaIfNeeded(position)
     }
 
     private fun showDeviceShieldActivity() {
@@ -568,9 +560,7 @@ class DeviceShieldTrackerActivity :
             }
         })
 
-        handler.postDelayed(delayInMillis = APPTP_ENABLED_CTA_DIALOG_DELAY_MS) {
-            dialog.show(supportFragmentManager, TAG_APPTP_ENABLED_CTA_DIALOG)
-        }
+        dialog.show(supportFragmentManager, TAG_APPTP_ENABLED_CTA_DIALOG)
     }
 
     private fun launchKonfetti() {
@@ -599,7 +589,6 @@ class DeviceShieldTrackerActivity :
         private const val ON_LAUNCHED_CALLED_SUCCESS = 0
         private const val MIN_ROWS_FOR_ALL_ACTIVITY = 5
         private const val TAG_APPTP_ENABLED_CTA_DIALOG = "AppTpEnabledCta"
-        private const val APPTP_ENABLED_CTA_DIALOG_DELAY_MS = 1000L
 
         private const val REQUEST_ASK_VPN_PERMISSION = 101
 
