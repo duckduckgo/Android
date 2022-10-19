@@ -87,13 +87,13 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val ownerName: String?,
         val pageUrl: String,
         val prevalence: Double,
-        val state: State,
+        val state: RequestState,
         val url: String
     )
 
-    sealed class State {
-        data class Blocked(val blocked: Any = Any()) : State()
-        data class Allowed(val allowed: Reason) : State()
+    sealed class RequestState {
+        data class Blocked(val blocked: Any = Any()) : RequestState()
+        data class Allowed(val allowed: Reason) : RequestState()
     }
 
     data class Reason(val reason: String)

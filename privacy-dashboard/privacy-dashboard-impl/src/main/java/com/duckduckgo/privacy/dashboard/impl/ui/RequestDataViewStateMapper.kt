@@ -35,8 +35,8 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Reason
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestDataViewState
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.Allowed
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.Blocked
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Allowed
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Blocked
 import com.squareup.anvil.annotations.ContributesBinding
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
 import javax.inject.Inject
@@ -109,7 +109,7 @@ class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewS
         return false
     }
 
-    private fun TrackerStatus.mapToViewState(): PrivacyDashboardHybridViewModel.State {
+    private fun TrackerStatus.mapToViewState(): PrivacyDashboardHybridViewModel.RequestState {
         return when (this) {
             BLOCKED -> Blocked()
             USER_ALLOWED -> Allowed(allowed = Reason(reason = AllowedReasons.PROTECTIONS_DISABLED.value))
