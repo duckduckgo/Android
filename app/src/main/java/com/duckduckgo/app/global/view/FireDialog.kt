@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.view
 
 import android.animation.Animator
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.provider.Settings
@@ -54,6 +55,7 @@ import kotlinx.coroutines.launch
 private const val ANIMATION_MAX_SPEED = 1.4f
 private const val ANIMATION_SPEED_INCREMENT = 0.15f
 
+@SuppressLint("NoBottomSheetDialog")
 class FireDialog(
     context: Context,
     private val ctaViewModel: CtaViewModel,
