@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Girişleri Otomatik Doldur</string>
 
     <string name="managementLockedModeText">Otomatik Doldurmayı Aç</string>
@@ -36,7 +35,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Diğer Seçenekler</string>
 
     <string name="useSavedLoginDialogTitle">Kayıtlı Giriş kullanılsın mı?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">%s için giriş yapın</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">%1$s için giriş yapın</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Site için giriş yapın</string>
 
     <string name="updateLoginDialogTitle">Şifre Güncellensin mi?</string>
@@ -55,7 +54,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Değişiklikleri Kaydet</string>
     <string name="credentialManagementEditButtonCopyUsername">Kullanıcı Adını Kopyala</string>
     <string name="credentialManagementEditButtonCopyPassword">Şifreyi Kopyala</string>
-    <string name="credentialManagementEditLastUpdated">Giriş en son %s olarak güncellendi</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Son giriş güncelleme: %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Girişleri Kaydet ve Otomatik Doldur</string>
     <string name="credentialManagementViewMenuEdit">Düzenle</string>

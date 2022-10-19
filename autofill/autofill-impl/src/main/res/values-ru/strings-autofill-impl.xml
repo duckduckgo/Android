@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Логины для автозаполнения</string>
 
     <string name="managementLockedModeText">Разблокировать автозаполнение</string>
@@ -36,7 +35,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 
     <string name="useSavedLoginDialogTitle">Использовать сохраненный логин?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Логин для %s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Логин для %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Логин для сайта</string>
 
     <string name="updateLoginDialogTitle">Обновить пароль?</string>
@@ -55,7 +54,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Сохранить изменения</string>
     <string name="credentialManagementEditButtonCopyUsername">Копировать имя пользователя</string>
     <string name="credentialManagementEditButtonCopyPassword">Копировать пароль</string>
-    <string name="credentialManagementEditLastUpdated">Последнее обновление логина: %s</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последнее обновление логина: %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Сохранить и заполнять автоматически</string>
     <string name="credentialManagementViewMenuEdit">Редактировать</string>

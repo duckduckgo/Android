@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Fyll inn pålogginger automatisk</string>
 
     <string name="managementLockedModeText">Lås opp Autofyll</string>
@@ -36,7 +35,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere alternativer</string>
 
     <string name="useSavedLoginDialogTitle">Vil du bruke lagret pålogging?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Pålogging for %s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Pålogging for %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Pålogging for nettsted</string>
 
     <string name="updateLoginDialogTitle">Vil du oppdatere passordet?</string>
@@ -55,7 +54,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Lagre endringer</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopier brukernavn</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopier passord</string>
-    <string name="credentialManagementEditLastUpdated">Pålogging sist oppdatert %s</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Pålogging sist oppdatert %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Lagre og fyll inn pålogginger automatisk</string>
     <string name="credentialManagementViewMenuEdit">Rediger</string>

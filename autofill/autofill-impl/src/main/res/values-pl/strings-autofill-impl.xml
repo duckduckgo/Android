@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Autouzupełnianie logowania</string>
 
     <string name="managementLockedModeText">Odblokuj autouzupełnianie</string>
@@ -36,7 +35,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Więcej opcji</string>
 
     <string name="useSavedLoginDialogTitle">Czy chcesz użyć zapisanego loginu?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Dane logowania dla %s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Zaloguj się do: %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Zaloguj się do witryny</string>
 
     <string name="updateLoginDialogTitle">Zaktualizować hasło?</string>
@@ -55,7 +54,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Zapisz zmiany</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopiuj nazwę użytkownika</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopiuj hasło</string>
-    <string name="credentialManagementEditLastUpdated">Ostatnia aktualizacja danych logowania %s</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ostatnia aktualizacja loginu: %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Zapisz i autouzupełniaj loginy</string>
     <string name="credentialManagementViewMenuEdit">Edytuj</string>

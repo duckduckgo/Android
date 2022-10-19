@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="managementScreenTitle">Autocompletar inicios de sesión</string>
 
     <string name="managementLockedModeText">Desbloquear Autocompletar</string>
@@ -36,7 +35,7 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Más opciones</string>
 
     <string name="useSavedLoginDialogTitle">¿Usar inicio de sesión guardado?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Inicio de sesión para %s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Iniciar sesión para %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Iniciar sesión en el sitio</string>
 
     <string name="updateLoginDialogTitle">¿Actualizar contraseña?</string>
@@ -55,7 +54,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Guardar cambios</string>
     <string name="credentialManagementEditButtonCopyUsername">Copiar nombre de usuario</string>
     <string name="credentialManagementEditButtonCopyPassword">Copiar contraseña</string>
-    <string name="credentialManagementEditLastUpdated">Última actualización del inicio de sesión el %s</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Última actualización de inicio de sesión %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Guardar y autocompletar inicios de sesión</string>
     <string name="credentialManagementViewMenuEdit">Editar</string>
