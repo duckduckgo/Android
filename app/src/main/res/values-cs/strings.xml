@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- smartling.placeholder_format = NONE -->
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
@@ -62,8 +61,8 @@
     <string name="printMenuTitle">Vytisknout stránku</string>
     <string name="favoriteDeleteConfirmationMessage">Oblíbená položka odstraněna</string>
     <string name="fireproofDeleteConfirmationMessage">Ochrana odstraněna</string>
-    <string name="privacyProtectionEnabledConfirmationMessage">Ochrana soukromí je pro aplikaci %s zapnutá</string>
-    <string name="privacyProtectionDisabledConfirmationMessage">Ochrana soukromí je pro aplikaci %s vypnutá</string>
+    <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Ochrana soukromí zapnutá pro %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Ochrana soukromí vypnutá pro %1$s</string>
     <string name="undoSnackbarAction">Vrátit</string>
 
     <!-- Downloading files -->
@@ -115,7 +114,7 @@
     <string name="privacyProtectionEnabled">OCHRANA STRÁNKY ZAPNUTÁ</string>
     <string name="privacyProtectionDisabled">OCHRANA STRÁNKY VYPNUTA</string>
     <string name="privacyDashboardActivityTitle">Deska ochrany soukromí</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VYLEPŠENO Z <img src="%d"></img> NA <img src="%d"></img></string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VYLEPŠENO Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Hodnocení ochrany soukromí</string>
     <string name="privacyProtectionTemporarilyDisabled">Dočasně jsme zakázali ochranu osobních údajů, protože se zdá, že porušuje podmínky této stránky.</string>
 
@@ -158,7 +157,7 @@
 
     <string name="trackersBlockedNoSectionDescription">Načetly se požadavky následujících domén.</string>
 
-    <string name="adLoadedSectionDescription">Protože nedávno došlo ke kliknutí na reklamu %@ na DuckDuckGo, byly načteny požadavky následujících domén. Tyhle požadavky pomáhají vyhodnocovat účinnost reklam. Žádná reklama na DuckDuckGo nevytváří tvůj profil.</string>
+    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Načetly se následující požadavky domény, protože se nedávno kliknulo na reklamu %1$s na DuckDuckGo. Tyto požadavky pomáhají vyhodnotit účinnost reklamy. Žádná reklama na DuckDuckGo nevytváří tvůj profil.</string>
     <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Jak naše reklamy ve vyhledávání ovlivňují naši ochranu</annotation></string>
     <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
 
@@ -167,7 +166,7 @@
     <string name="domainsLoadedSectionEmptyListDescription">Neodhalili jsme žádné požadavky domén třetích stran.</string>
 
     <string name="domainsLoadedBreakageSectionDescription">Následující požadavky domény byly načteny, aby se zabránilo narušení funkčnosti webové stránky.</string>
-    <string name="domainsLoadedAssociatedSectionDescription">Následující požadavky domény byly načteny, protože jsou spojeny s %@.</string>
+    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Následující požadavky domény se načetly, protože souvisí se společností %1$s.</string>
 
     <string name="trackersBlockedText">Načítání požadavků bylo zablokováno</string>
     <string name="trackersNotBlockedText">Nejsou blokovány žádné požadavky na sledování</string>
@@ -258,8 +257,8 @@
     <string name="bookmarksMenuTitle">Záložky</string>
     <string name="bookmarksActivityTitle">Záložky</string>
     <string name="noBookmarks">Zatím nebyly přidány žádné záložky.</string>
-    <string name="bookmarkOverflowContentDescription">Další možnosti záložky %s</string>
-    <string name="bookmarkDeleteConfirmationMessage">Smazáno: <b>%s</b></string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Další možnosti záložky %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Odstraněno &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Exportovat</string>
     <string name="exportBookmarksEmpty">Nemáte záložky, nic nebude exportováno</string>
     <string name="exportBookmarksError">Nepodařilo se exportovat žádné záložky, něco se pokazilo</string>
@@ -268,7 +267,7 @@
     <string name="importBookmarksFileTitle">Vyberte soubor se záložkami, který chcete importovat</string>
     <string name="importBookmarksError">Nepodařilo se importovat žádné záložky, něco se pokazilo</string>
     <string name="importBookmarksEmpty">Soubor nemá žádné záložky k importování</string>
-    <string name="importBookmarksSuccess">Záložky (%1$d) byly úspěšně importované</string>
+    <string name="importBookmarksSuccess">Úspěšně importovaných %1$d záložek</string>
     <string name="savedSiteDialogTitleHint">Název</string>
     <string name="savedSiteDialogUrlHint">URL adresa</string>
     <string name="savedSiteDialogTitleEdit">Upravit</string>
@@ -305,7 +304,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Přidat na domovskou obrazovku</string>
-    <string name="shortcutAddedText">A je to! Aplikaci %s jsme ti přidali na plochu.</string>
+    <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Podařilo se! %1$s byla přidána na vaši domovskou obrazovku.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Pomozte nám vylepšit aplikaci!</string>
@@ -363,14 +362,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Chráníme vaše soukromí.</string>
     <string name="privacyProtectionNotificationReportTitle">Vaše zpráva o ochraně soukromí</string>
     <string name="privacyProtectionNotificationDefaultDescription">Použití aplikace DuckDuckGo chrání vaše data blokováním sledovacích zařízení a šifrováním připojení.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Při používání DuckDuckGo se ti povedlo ochránit tvoje data zabezpečením %d nešifrovaných připojení.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Při používání DuckDuckGo se ti povedlo ochránit tvoje data zablokováním %d trackerů.</string>
-    <string name="privacyProtectionNotificationBothDescription">Používáním DuckDuckGo se ti povedlo ochránit tvoje data zablokováním %d trackerů a zabezpečením %d nešifrovaných připojení.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Chránili jste svá data zabezpečením %1$d nešifrovaných připojení při používání DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Chránili jste svá data blokováním %1$d sledovacích zařízení při používání DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Chránili jste svá data blokováním %1$d sledovacích zařízení a zabezpečením %2$d nešifrovaných připojení při používání DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Znovu začít prohlížení</string>
 
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Přihlásit</string>
-    <string name="authenticationDialogMessage">%s vyžaduje uživatelské jméno a heslo.</string>
+    <string name="authenticationDialogMessage" instruction="Placeholder is the name of a website">%1$s vyžaduje uživatelské jméno a heslo.</string>
     <string name="authenticationDialogPositiveButton">Přihlásit</string>
     <string name="authenticationDialogNegativeButton">Zrušit</string>
     <string name="authenticationDialogUsernameHint">Uživatelské jméno</string>
@@ -486,10 +485,10 @@
     <string name="daxEndCtaText"><![CDATA[Máte to!<br/><br/>Pamatujte: Pokaždé, když internet procházíte s námi, příšerným reklamám přistřihneme křídla. 👍]]></string>
     <string name="daxSerpCtaText">Tvoje vyhledávání v DuckDuckGo je anonymní. Vždycky. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ a <b>ještě %d</b> společnost se tě tu snažily vystopovat. <br/><br/>Jenže já jim v tom bráním!<br/><br/> ☝️Až navštívíš další stránku, můžeš se podívat do adresního řádku a zjistit, kdo se tě snaží sledovat.️]]></item>
-        <item quantity="few"><![CDATA[ a <b>ještě %d</b> společnosti se tě tu snažily vystopovat. <br/><br/>Jenže já jim v tom bráním!<br/><br/> ☝️Až navštívíš další stránku, můžeš se podívat do adresního řádku a zjistit, kdo se tě snaží sledovat.️]]></item>
-        <item quantity="many"><![CDATA[ a <b>ještě %d</b> společností se tě tu snažilo vystopovat. <br/><br/>Jenže já jim v tom bráním!<br/><br/> ☝️Až navštívíš další stránku, můžeš se podívat do adresního řádku a zjistit, kdo se tě snaží sledovat.️]]></item>
-        <item quantity="other"><![CDATA[ a <b>ještě %d</b> společností se tě tu snažilo vystopovat. <br/><br/>Jenže já jim v tom bráním!<br/><br/> ☝️Až navštívíš další stránku, můžeš se podívat do adresního řádku a zjistit, kdo se tě snaží sledovat.️]]></item>
+        <item quantity="one"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="few"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="many"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web.]]></item>
+        <item quantity="other"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme ho!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
@@ -498,12 +497,12 @@
         <item quantity="other"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Zatímco Vy budete klepat a přejíždět, já budu blokovat zlovolné sledovače. <br/><br/>Nenechejte se rušit — pokračujte v prohlížení!]]></string>
-    <string name="daxMainNetworkCtaText">Pozor! Nemůžu zabránit tomu, aby služba %s viděla tvou aktivitu na stránce %s.<br></br><br></br>Ale když budeš surfovat se mnou, zablokuji její trackery na mnoha dalších stránkách a omezím tak to, co %s dokáže zjistit o tvé aktivitě.</string>
-    <string name="daxMainNetworkOwnedCtaText">Pozor! Protože %s vlastní %s, nemůžu téhle službě zamezit v přístupu ke tvé aktivitě na tomhle webu.<br></br><br></br>Ale když budeš surfovat se mnou, zablokuji její trackery na mnoha dalších stránkách a omezím tak to, co %s dokáže zjistit o tvé aktivitě.</string>
+    <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Upozornění! Nemůžeme zabránit, aby %1$s viděli vaši aktivitu na stránkách %2$s &lt;br/&gt;&lt;br/&gt;Ale procházejte s námi a budete moci omezit, co o vás %3$s celkově ví zablokováním jejich trackerů na mnoha jiných stránkách.</string>
+    <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Upozornění! Vzhledem k tomu, že %2$s vlastní %1$s, nemůžeme jim zabránit, aby viděli vaši aktivitu tady.&lt;br/&gt;&lt;br/&gt;Ale procházejte s námi a budeme moci redukovat, co o vás celkově %3$s ví zablokováním jejich trackerů na mnoha jiných stránkách.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Uložit do Stahování</string>
-    <string name="downloadConfirmationSaveFileTitle">Uložit %1$s</string>
+    <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Uložit %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Nechat si oba</string>
     <string name="downloadConfirmationReplaceOldFileText">Nahradit</string>
     <string name="downloadConfirmationOpenFileText">Otevřít</string>
@@ -531,8 +530,8 @@
     <string name="whitelistActivityTitle">Nechráněné stránky</string>
     <string name="enablePrivacyProtection">Povolit ochranu soukromí</string>
     <string name="disablePrivacyProtection">Zakázat ochranu soukromí</string>
-    <string name="whitelistEntryOverflowContentDescription">Další možnosti pro nechráněný web %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Opravdu chceš smazat <b>%s</b> z nechráněných stránek?</string>
+    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Další možnosti pro nechráněný web %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Opravdu chcete odstranit &lt;b&gt;%1$s&lt;/b&gt; z nechráněných stránek?</string>
     <string name="whitelistExplanation">Tyto stránky nebudou vylepšeny ochranou soukromí.</string>
     <string name="whitelistNoEntries">Ochrana osobních údajů povolena pro všechny weby</string>
     <string name="whitelistDomainHint">www.example.com</string>
@@ -545,12 +544,12 @@
     <string name="fireproofWebsitesActivityTitle">Weby s ochranou</string>
     <string name="settingsFireproofWebsites">Weby s ochranou</string>
     <string name="fireproofWebsiteMenuTitleAdd">Ochránit tento web</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">Web <b>%s</b> je teď chráněný</string>
+    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt;je nyní chráněný</string>
     <string name="fireproofWebsiteSnackbarAction">Vrátit</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Opravdu chceš smazat <b>%s</b>?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage" instruction="Placeholder is a website">Opravdu chcete smazat &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Webové stránky spoléhají na soubory cookie, aby vás udržely přihlášené. Když na webu zapnete ochranu, soubory cookie se nevymažou a zůstanete přihlášeni, a to i po použití tlačítka pro mazání. Stále přitom blokujeme sledovací programy třetích stran nalezené na webových stránkách s ochranou.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Další možnosti pro chráněné webové stránky %s</string>
-    <string name="fireproofWebsiteLoginDialogTitle">Chceš ochranu pro %s?</string>
+    <string name="fireproofWebsiteOverflowContentDescription" instruction="Placeholder is a website">Další možnosti pro chráněné webové stránky %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">Chtěli byste u %1$s ochranu?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Když na těchto stránkách zapnete ochranu, zůstanete přihlášeni i po použití tlačítka pro mazání.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Ochrana</string>
     <string name="fireproofWebsiteLoginDialogNegative">Teď ne</string>
@@ -558,7 +557,7 @@
     <string name="fireproofWebsiteEmptyListHint">Žádné dostupné stránky s ochranou</string>
     <string name="fireproofWebsiteSettingSelectionTitle">Chránit webové stránky při přihlášení</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Ochrana všech stránek odebrána</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Ochrana pro <b>%s</b> odstraněna</string>
+    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Ochrana odstraněna pro &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Vždycky se ptát</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Vždy</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nikdy</string>
@@ -587,11 +586,11 @@
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Povolit polohu zařízení pro prohlížeč DuckDuckGo Privacy?</string>
-    <string name="preciseLocationSystemDialogSubtitle">%s žádá o polohu tvého zařízení. Nejdřív musíš aplikaci povolit, aby odesílala polohu tvého zařízení, a pak může %s požádat o povolení.</string>
+    <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s požaduje polohu vašeho zařízení. Nejprve musíte aplikaci povolit, aby odesílala polohu vašeho zařízení, a pak %2$s může požádat o povolení.</string>
     <string name="preciseLocationSystemDialogAllow">Povolit</string>
     <string name="preciseLocationSystemDialogDeny">Možná později</string>
     <string name="preciseLocationSystemDialogNeverAllow">Neptat se znovu u těchto stránek</string>
-    <string name="preciseLocationSiteDialogTitle">Udělit %s povolení k přístupu k poloze?</string>
+    <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Udělit %1$s povolení k přístupu k poloze?</string>
     <string name="preciseLocationDDGDialogSubtitle">Vaši anonymní polohu využíváme pouze k dosažení lepších výsledků, blíže k vám. Vždycky si to můžete později rozmyslet.</string>
     <string name="preciseLocationSiteDialogSubtitle">Oprávnění k přístupu k poloze, která jste udělili jednotlivým webovým stránkám, můžete spravovat v Nastavení.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Vždy</string>
@@ -603,11 +602,11 @@
     <string name="preciseLocationEmptyListHint">Žádným webovým stránkám nebylo uděleno oprávnění k přístupu k poloze</string>
     <string name="preciseLocationNoSystemPermission">Chcete-li spravovat oprávnění k přístupu k poloze, která jste udělili jednotlivým webovým stránkám, povolte v Nastavení systému Android polohu pro tuto aplikaci.</string>
     <string name="preciseLocationActivityTitle">Poloha</string>
-    <string name="preciseLocationDeleteConfirmMessage">Opravdu chceš smazat <b>%s</b>?</string>
-    <string name="preciseLocationDeleteContentDescription">Další možnosti pro oprávnění k informacím o poloze v doméně %s</string>
+    <string name="preciseLocationDeleteConfirmMessage" instruction="Placeholder is the name of a website">Opravdu chcete smazat &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription" instruction="Placeholder is the domain of a website">Další možnosti pro oprávnění k informacím o poloze v doméně %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Uděleno</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Zamítnuto</string>
-    <string name="preciseLocationSnackbarMessage">Dřív jsi udělil/a %s oprávnění k přístupu k poloze zařízení.</string>
+    <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Dříve jste udělili %1$s oprávnění k přístupu k poloze vašeho zařízení.</string>
 
     <!--Fire button education-->
     <string name="daxClearDataCtaText">Osobní údaje se mohou vytvářet ve vašem prohlížeči. Fuj. Použijte tlačítko pro mazání a všechno smažte. Vyzkoušejte to hned teď! 👇</string>
@@ -628,14 +627,14 @@
     <string name="appLinkDialogTitle">Otevřít v jiné aplikaci?</string>
     <string name="appLinkSnackBarAction">Otevřít v aplikaci</string>
     <string name="appLinkMultipleSnackBarAction">Vyber aplikaci</string>
-    <string name="appLinkSnackBarMessage">Tenhle odkaz můžeš otevřít v aplikaci %s.</string>
+    <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Tenhle odkaz můžeš otevřít v aplikaci %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Tenhle odkaz můžeš otevřít v jiných aplikacích.</string>
     <string name="appLinkIntentChooserTitle">Otevřít v aplikaci</string>
     <string name="appLinkMenuItemTitle">Otevřít v aplikaci</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nová adresa zkopírovaná do vaší schránky</string>
-    <string name="autofillTooltipUseYourAlias">Použij %1$s</string>
+    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Použít %1$s</string>
     <string name="autofillTooltipUseYourAliasDescription">Blokuje sledování e-mailů</string>
     <string name="autofillTooltipGenerateAddress">Vygenerovat soukromou adresu Duck</string>
     <string name="autofillTooltipGenerateAddressDescription">Blokuje sledování e-mailů a skryje vaši adresu</string>
@@ -662,17 +661,17 @@
     <string name="bookmarkFolderEmpty">Prázdné</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%s%s a %d položka?</item>
-        <item quantity="few">%s%s a %d položky?</item>
-        <item quantity="many">%s%s a %d položky?</item>
-        <item quantity="other">%s%s a %d položek?</item>
+        <item quantity="one">%1$s%2$s a %1$d položka?</item>
+        <item quantity="few">%1$s%2$s a %1$d položky?</item>
+        <item quantity="many">%1$s%2$s a %1$d položek?</item>
+        <item quantity="other">%1$s%2$s a %1$d položek?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%d položka</item>
-        <item quantity="few">%d položky</item>
-        <item quantity="many">%d položky</item>
-        <item quantity="other">%d položek</item>
+        <item quantity="one">%1$d položka</item>
+        <item quantity="few">%1$d položky</item>
+        <item quantity="many">%1$d položek</item>
+        <item quantity="other">%1$d položek</item>
     </plurals>
 
     <!-- Accessibility-->
@@ -689,7 +688,7 @@
     <string name="settingsPrivacyPolicyDuckduckgo">Zásady ochrany osobních údajů</string>
 
     <!-- Home Screen Widget -->
-    <string name="homeScreenWidgetAdded">Na plochu se přidal widget %s</string>
+    <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Na plochu se přidal widget %1$s</string>
     <string name="settingsAddHomeScreenWidget">Widget na plochu</string>
 
     <!-- MacOs Settings -->
@@ -708,9 +707,9 @@
     <string name="downloadsItemMenuDelete">Smazat</string>
     <string name="downloadsItemMenuCancel">Zrušit</string>
     <string name="downloadsActivityMenuDeleteAll">Smazat vše</string>
-    <string name="downloadsFileDeletedMessage">Smazáno: %s</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Odstraněno %1$s</string>
     <string name="downloadsAllFilesDeletedMessage">Všechny soubory smazány</string>
-    <string name="downloadsMoreOptionsContentDescription">Další možnosti pro %s</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Další volby pro %1$s</string>
     <string name="downloadsUndoActionName">Vrátit</string>
     <string name="downloadsStateInProgress">Probíhá...</string>
 
@@ -742,13 +741,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Správa webů</string>
     <string name="sitePermissionsSettingsEmptyText">Zatím žádné weby</string>
-    <string name="permissionPerWebsiteText">Oprávnění pro %s </string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Oprávnění „%1$s“ </string>
     <string name="permissionsPerWebsiteAskSetting">Zeptat se</string>
     <string name="permissionsPerWebsiteDenySetting">Odmítnout</string>
     <string name="permissionsPerWebsiteAllowSetting">Povolit</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle">%s oprávnění pro %s</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – povolení pro web %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automaticky vyplnit</string>
-
 </resources>
