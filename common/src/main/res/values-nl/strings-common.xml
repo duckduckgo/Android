@@ -17,14 +17,13 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="common_Today">Vandaag</string>
     <string name="common_Yesterday">Gisteren</string>
-    <string name="common_DaysAgo">%d dagen geleden</string>
+    <string name="common_DaysAgo" instruction="Placeholder is the number of days">%1$d dagen geleden</string>
     <string name="common_PastWeek">Afgelopen week</string>
     <string name="common_PastMonth">Afgelopen maand</string>
-    <string name="common_MinutesAgo">%dm geleden</string>
-    <string name="common_HoursAgo">%dh geleden</string>
+    <string name="common_MinutesAgo" instruction="Placeholder is the number of minutes">%1$d m geleden</string>
+    <string name="common_HoursAgo" instruction="Placeholder is the number of hours">%1$d u geleden</string>
     <string name="common_JustNow">Zojuist</string>
     <string name="common_hour_abbreviation">uur</string>
     <string name="common_min_abbreviation">min</string>

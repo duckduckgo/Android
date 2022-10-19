@@ -17,14 +17,13 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="common_Today">Šiandien</string>
     <string name="common_Yesterday">Vakar</string>
-    <string name="common_DaysAgo">prieš %d d.</string>
+    <string name="common_DaysAgo" instruction="Placeholder is the number of days">prieš %1$d d.</string>
     <string name="common_PastWeek">Praėjusi savaitė</string>
     <string name="common_PastMonth">Praėjęs mėnuo</string>
-    <string name="common_MinutesAgo">prieš %dm</string>
-    <string name="common_HoursAgo">prieš %dh</string>
+    <string name="common_MinutesAgo" instruction="Placeholder is the number of minutes">prieš %1$d min</string>
+    <string name="common_HoursAgo" instruction="Placeholder is the number of hours">prieš %1$d val.</string>
     <string name="common_JustNow">Ką tik</string>
     <string name="common_hour_abbreviation">val.</string>
     <string name="common_min_abbreviation">min</string>

@@ -17,14 +17,13 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="common_Today">Heute</string>
     <string name="common_Yesterday">Gestern</string>
-    <string name="common_DaysAgo">Vor %d Tagen</string>
+    <string name="common_DaysAgo" instruction="Placeholder is the number of days">vor %1$d Tagen</string>
     <string name="common_PastWeek">Letzte Woche</string>
     <string name="common_PastMonth">Letzter Monat</string>
-    <string name="common_MinutesAgo">%dm vor</string>
-    <string name="common_HoursAgo">%dh vor</string>
+    <string name="common_MinutesAgo" instruction="Placeholder is the number of minutes">vor %1$d m</string>
+    <string name="common_HoursAgo" instruction="Placeholder is the number of hours">vor %1$d h</string>
     <string name="common_JustNow">Gerade jetzt</string>
     <string name="common_hour_abbreviation">Std.</string>
     <string name="common_min_abbreviation">Min.</string>
