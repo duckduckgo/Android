@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="autoconsentTitle">Cookie-Pop-ups verwalten</string>
     <string name="autoconsentDescription">Wenn DuckDuckGo Pop-ups zur Cookie-Zustimmung auf den von dir besuchten Websites erkennt, können wir deine Cookie-Einstellungen automatisch so festlegen, dass Cookies minimiert werden und der Datenschutz maximiert wird, und dann die Pop-ups schließen.</string>
     <string name="autoconsentToggle">Lasse Cookie-Zustimmungs-Popups von DuckDuckGo verwalten</string>

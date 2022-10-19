@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="autoconsentTitle">Felugró sütiablakok kezelése</string>
     <string name="autoconsentDescription">Amikor a DuckDuckGo a meglátogatott webhelyeken sütik elfogadására szolgáló felugró ablakokat észlel, a sütik minimalizálása és az adatvédelem maximalizálása érdekében automatikusan megpróbálhatjuk megadni a sütikre vonatkozó beállításaidat, és bezárhatjuk a felugró ablakokat.</string>
     <string name="autoconsentToggle">A DuckDuckGo kezelheti a sütik elfogadására szolgáló felugró ablakokat</string>
