@@ -180,7 +180,7 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
     ): String {
         return when (excludingReason) {
             TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON, TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON ->
-                context.getString(R.string.atp_ExcludedReasonKnownIssues)
+                context.getString(R.string.atp_ExcludedReasonIssuesMayOccur)
             else -> ""
         }
     }

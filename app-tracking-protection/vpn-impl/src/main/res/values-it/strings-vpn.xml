@@ -129,29 +129,18 @@
     <string name="atp_NewTabEnabled"><b>App Tracking Protection è attivata</b> e blocca i tentativi di tracciamento nelle app.</string>
 
     <!-- Exclusion List -->
-    <string name="atp_ExclusionListActivityTitle">Tutte le app</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection rileva e blocca i sistemi di tracciamento di app di altre aziende, ad esempio quando Facebook tenta di rintracciarti in un\'app per la salute. Le aziende possono comunque tracciarti nelle app di loro proprietà.\n\nSe un\'applicazione non funziona come previsto, prova a disabilitare la protezione per quell\'applicazione.</string>
     <string name="atp_ExcludedAppsEnabledLabel">In versione beta, DuckDuckGo potrebbe disattivare la protezione di alcune app per risolvere i problemi di caricamento dei contenuti noti. Le impostazioni personalizzate non saranno modificate a meno che non si ripristinino le impostazioni predefinite.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection è disattivata</b>App Tracking Protection ha causato un problema con le tue app? <annotation type="report_issues_link">Segnala problemi</annotation></string>
     <string name="atp_ExcludedAppsReport">Segnala un problema con un\'altra app</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Carica siti web</string>
-    <string name="atp_ExcludedReasonKnownIssues">Problemi noti</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Disattivata manualmente</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Attivata manualmente</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Annulla</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Attiva</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Ripristina</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Attivare manualmente la protezione per l\'app %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">È noto che questa app presenta problemi quando i tentativi di tracciamento falliscono.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Il contenuto del sito in questa app potrebbe non essere visualizzato correttamente quando la protezione è attivata.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">L\'attivazione della protezione invia il nome dell\'app a DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Tutela della privacy disattivata</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Se hai disattivato la protezione per risolvere un problema, controlla che l\'app ora funzioni prima di segnalare il problema a DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Ha smesso di funzionare come previsto</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Acconsento al tracciamento in questa app</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Per un altro motivo</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Rapporto</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Salta</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Ripristina app protette predefinite</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Segnala un problema con un\'app</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Ripristinare la protezione predefinita?</string>
@@ -195,20 +184,16 @@
     <string name="atp_ActivityPastWeek">Ultimi 7 giorni</string>
     <string name="atp_ActivityTitle">Protezione dal tracciamento delle app</string>
     <string name="atp_MostRecentActivityTitle">Tutte le attività recenti</string>
-    <string name="atp_ActivityRecentActivity">Attività recente</string>
     <string name="atp_ActivityCtaShowAll">Visualizza tutte le attività recenti</string>
     <string name="atp_ActivityAppTrackersFAQ">Cosa sono i sistemi di tracciamento delle app?</string>
     <string name="atp_ActivityReportProblem">Segnala un problema con un\'app</string>
     <string name="atp_ActivityBetaInstructions">Istruzioni beta</string>
-    <string name="atp_ActivityManageProtection">Problemi con un\'app?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d tentativo di tracciamento bloccato dell\'azienda %2$d nell\'app <b>%3$s</b>]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d tentativo di tracciamento bloccato delle aziende %2$d nell\'app <b>%3$s</b>]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d tentativi di tracciamento bloccati dell\'azienda %2$d nell\'app <b>%3$s</b>]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d tentativi di tracciamento bloccati delle aziende %2$d nell\'app <b>%3$s</b>]]></string>
 
-    <string name="atp_ActivityEmptyListTitle">Nessuna nuova attività</string>
-    <string name="atp_ActivityEmptyListMessage">Continua a utilizzare il tuo dispositivo. I tentativi di tracciamento che App Tracking Protection blocca si visualizzano qui.</string>
     <string name="atp_ActivityPastWeekBlocked">Bloccati</string>
     <string name="atp_ActivityPastWeekAcross">In</string>
 
@@ -220,7 +205,6 @@
         <item quantity="one">App</item>
         <item quantity="other">App</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Questa funzione è in versione beta. <annotation type="app_settings_link">Problemi con un\'app?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection è disattivata</b>\nApp Tracking Protection ha causato un problema con le tue app? <annotation type="report_issues_link">Segnala problemi</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Un\'app VPN sul tuo dispositivo ha disattivato App Tracking Protection.</b>\nApp Tracking Protection ha causato un problema con le tue app? <annotation type="report_issues_link">Segnala problemi</annotation></string>
     <string name="atp_ActivityAbout">Informazioni</string>

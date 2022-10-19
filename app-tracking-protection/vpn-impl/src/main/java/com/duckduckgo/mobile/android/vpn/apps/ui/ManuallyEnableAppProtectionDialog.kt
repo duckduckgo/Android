@@ -75,7 +75,7 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
     }
 
     private fun populateTitle(appName: TextView) {
-        appName.text = getString(R.string.atp_ExcludeAppsManuallyEnableAppName, getAppName())
+        appName.text = getString(R.string.atp_ExcludeAppsManuallyEnableAnywayLabel, getAppName())
     }
 
     private fun getPackageName(): String {

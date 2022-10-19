@@ -66,7 +66,7 @@
         android:layout_height="@dimen/dialogButtonHeight"
         android:layout_marginTop="20dp"
         android:gravity="center|center_horizontal"
-        android:text="@string/atp_ExcludeAppsManuallyCTAEnable"
+        android:text="@string/atp_ExcludeAppsManuallyCTAEnableAnyway"
         app:layout_constraintStart_toStartOf="@+id/trackingProtectionExcludeAppDialogGuideline"
         app:layout_constraintTop_toBottomOf="@id/trackingProtectionTitle"/>
 

@@ -129,29 +129,18 @@
     <string name="atp_NewTabEnabled"><b>App Tracking Protection е активирана</b> и блокира опитите за проследяване във Вашите приложения.</string>
 
     <!-- Exclusion List -->
-    <string name="atp_ExclusionListActivityTitle">Всички приложения</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection открива и блокира тракери на други компании в приложенията, например когато Facebook се опитва да Ви следи в приложение за здраве. Въпреки това компаниите могат да Ви следят в приложения, които притежават.\n\nАко дадено приложение не работи според очакванията, опитайте да деактивирате защитата за това приложение.</string>
     <string name="atp_ExcludedAppsEnabledLabel">Бета версията на DuckDuckGo може да деактивира защитата за някои приложения с цел разрешаване на известни проблеми със зареждането на съдържание. Вашите персонализирани настройки няма да се променят, освен ако не възстановите настройките по подразбиране.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection е деактивирана</b> App Tracking Protection предизвиква ли проблеми с Вашите приложения <annotation type="report_issues_link">Докладване на проблеми</annotation></string>
     <string name="atp_ExcludedAppsReport">Докладване на проблем с друго приложение</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Зарежда уебсайтове</string>
-    <string name="atp_ExcludedReasonKnownIssues">Известни проблеми</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Деактивирана ръчно</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Активирана ръчно</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Отмени</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Активиране</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Възстановяване</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Да се активира ли ръчно защитата за приложението %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Известно е, че в това приложение възникват проблеми при неуспешни опити за проследяване.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Възможно е съдържанието на сайта в това приложение да не се показва правилно, когато защитата е активирана.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">При активиране на защитата името на приложението се изпраща на DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Защитата на поверителността е деактивирана</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Ако сте деактивирали защитата, за да отстраните проблем, проверете дали приложението вече работи, преди да докладвате за проблема на DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Спря да работи според очакванията</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Нямам нищо против да ме следят в това приложение</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">По друга причина</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Докладване</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Пропускане</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Възстановяване на защитени приложения по подразбиране</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Докладване на проблем с приложение</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Възстановяване на защитата по подразбиране?</string>
@@ -195,20 +184,16 @@
     <string name="atp_ActivityPastWeek">През последните 7 дни</string>
     <string name="atp_ActivityTitle">Защита от проследяване в приложения</string>
     <string name="atp_MostRecentActivityTitle">Всички скорошни дейности</string>
-    <string name="atp_ActivityRecentActivity">Скорошни дейности</string>
     <string name="atp_ActivityCtaShowAll">Преглед на всички скорошни дейности</string>
     <string name="atp_ActivityAppTrackersFAQ">Какво представляват тракерите в приложенията?</string>
     <string name="atp_ActivityReportProblem">Докладвайте за проблем с приложение</string>
     <string name="atp_ActivityBetaInstructions">Инструкции за бета версията</string>
-    <string name="atp_ActivityManageProtection">Имате ли проблеми с някое приложение?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d блокиран опит за проследяване от %2$d компания в приложението <b>%3$s</b>]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d блокиран опит за проследяване от %2$d компании в приложението <b>%3$s</b>]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d блокирани опита за проследяване от %2$d компания в приложението <b>%3$s</b>]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d блокирани опита за проследяване от %2$d компании в приложението <b>%3$s</b>]]></string>
 
-    <string name="atp_ActivityEmptyListTitle">Няма нови дейности</string>
-    <string name="atp_ActivityEmptyListMessage">Продължете да използвате устройството си. Опитите за проследяване, които App Tracking Protection блокира, се появяват тук.</string>
     <string name="atp_ActivityPastWeekBlocked">Блокиран/и</string>
     <string name="atp_ActivityPastWeekAcross">В</string>
 
@@ -220,7 +205,6 @@
         <item quantity="one">Приложение</item>
         <item quantity="other">Приложения</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Тази функция е в бета версия. <annotation type="app_settings_link">Имате ли проблеми с някое приложение?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection е деактивирана</b>\nApp Tracking Protection предизвиква ли проблеми с Вашите приложения? <annotation type="report_issues_link">Докладване на проблеми</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPN приложение на Вашето устройство деактивира App Tracking Protection.</b>\nApp Tracking Protection предизвиква ли проблеми с Вашите приложения? <annotation type="report_issues_link">Докладване на проблеми</annotation></string>
     <string name="atp_ActivityAbout">За нас</string>

@@ -47,7 +47,7 @@
                 style="@style/Widget.DuckDuckGo.InfoPanel"
                 app:panelBackground="@drawable/info_panel_tooltip_background"
                 app:panelDrawable="@drawable/ic_link_color_24"
-                app:panelText="@string/atp_ActivityEnabledLabel"
+                app:panelText="@string/atp_ActivityEnabledBannerLabel"
                 android:visibility="gone"
                 android:layout_margin="16dp"/>
 
@@ -107,7 +107,7 @@
                 android:id="@+id/most_recent_activity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/atp_ActivityRecentActivity"
+                android:text="@string/atp_ActivityRecentActivityHeader"
                 android:paddingStart="@dimen/keyline_4"
                 android:paddingBottom="@dimen/keyline_2"/>
 
@@ -166,7 +166,7 @@
                 android:id="@+id/cta_manage_protection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/atp_ActivityManageProtection"/>
+                app:primaryText="@string/atp_ActivityManageProtectionLabel"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/cta_manage_view_all_apps"

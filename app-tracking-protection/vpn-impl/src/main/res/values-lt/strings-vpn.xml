@@ -137,29 +137,18 @@
     <string name="atp_NewTabEnabled"><b>Apsauga nuo programėlių sekimo įjungta</b> ir blokuoja sekimo bandymus visose programėlėse.</string>
 
     <!-- Exclusion List -->
-    <string name="atp_ExclusionListActivityTitle">Visos programėlės</string>
     <string name="atp_ExcludedAppsFeature">Apsauga nuo programėlių sekimo aptinka ir blokuoja kitų įmonių programų stebėjimo priemones, pvz., kai „Facebook“ bando jus sekti sveikatos programoje. Įmonės vis tiek gali jus sekti joms priklausančiose programose.\n\nJei programa neveikia taip, kaip tikėtasi, pabandykite išjungti tos programos apsaugą.</string>
     <string name="atp_ExcludedAppsEnabledLabel">Beta versijos metu „DuckDuckGo“ gali išjungti kai kurių programų apsaugą, kad išspręstų žinomas turinio įkėlimo problemas. Jūsų pasirinkti nustatymai nepasikeis, nebent atkursite numatytuosius nustatymus.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Apsauga nuo programėlių sekimo išjungta</b> Ar apsauga nuo programėlių sekimo sukėlė problemų su jūsų programėlėmis <annotation type="report_issues_link">Pranešti apie problemas</annotation></string>
     <string name="atp_ExcludedAppsReport">Praneškite apie problemą su kita programa</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Įkrovos svetainės</string>
-    <string name="atp_ExcludedReasonKnownIssues">Žinomos problemos</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Rankiniu būdu išjungta</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Rankiniu būdu įjungta</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Atšaukti</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Įjungti</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Atkurti</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Rankiniu būdu įjungti %1$s programos apsaugą?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Yra žinoma, kad šios programos veikimas sutrinka, kai bandymai sekti nepavyksta.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Svetainės turinys šioje programėlėje gali būti rodomas netinkamai, kai įjungta apsauga.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Įjungus apsaugą, programos pavadinimas siunčiamas „DuckDuckGo“.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Išjungta privatumo apsauga</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Jei išjungėte apsaugą, kad išspręstumėte problemą, prieš pranešdami apie problemą „DuckDuckGo“, patikrinkite, ar programėlė dabar veikia.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Nebeveikia, kaip tikėtasi</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Aš nieko prieš, kad būčiau stebimas šioje programoje</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Dėl kitos priežasties</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Pranešti</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Praleisti</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Atkurti numatytąsias apsaugotas programas</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Pranešti apie problemą su programėle</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Atkurti numatytąją apsaugą?</string>
@@ -203,20 +192,16 @@
     <string name="atp_ActivityPastWeek">Praėjusios 7 dienos</string>
     <string name="atp_ActivityTitle">Programų sekimo apsauga</string>
     <string name="atp_MostRecentActivityTitle">Visa pastarojo meto veikla</string>
-    <string name="atp_ActivityRecentActivity">Naujausia veikla</string>
     <string name="atp_ActivityCtaShowAll">Peržiūrėti visą naujausią veiklą</string>
     <string name="atp_ActivityAppTrackersFAQ">Kas yra programų sekimo įrenginiai?</string>
     <string name="atp_ActivityReportProblem">Praneškite apie problemą, susijusią su programa</string>
     <string name="atp_ActivityBetaInstructions">Beta instrukcijos</string>
-    <string name="atp_ActivityManageProtection">Turite problemų su programėle?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d sekimo bandymas užblokuotas %2$d įmonėje <b>%3$s</b> programoje]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d sekimo bandymas užblokuotas iš %2$d įmonių <b>%3$s</b> programoje]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d sekimo bandymai užblokuoti iš %2$d įmonės <b>%3$s</b> programoje]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d sekimo bandymai užblokuoti iš %2$d įmonių <b>%3$s</b> programoje]]></string>
 
-    <string name="atp_ActivityEmptyListTitle">Naujos veiklos nėra</string>
-    <string name="atp_ActivityEmptyListMessage">Toliau naudokite savo prietaisą. Čia rodomi sekimo bandymai, kuriuos blokuoja apsauga nuo programėlių sekimo.</string>
     <string name="atp_ActivityPastWeekBlocked">Užblokuota</string>
     <string name="atp_ActivityPastWeekAcross">Per</string>
 
@@ -232,7 +217,6 @@
         <item quantity="many">Programų</item>
         <item quantity="other">Programų</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Ši funkcija yra beta versijoje. <annotation type="app_settings_link"> Kyla problemų dėl programos? </annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Apsauga nuo programėlių sekimo yra išjungta</b>\nAr apsauga nuo programėlių sekimo sukėlė problemų su jūsų programėlėmis? <annotation type="report_issues_link">Pranešti apie problemas</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPV programa jūsų įrenginyje išjungė apsaugą nuo programėlių sekimo.</b>\nAr apsauga nuo programėlių sekimo sukėlė problemų su jūsų programėlėmis? <annotation type="report_issues_link">Pranešti apie problemas</annotation></string>
     <string name="atp_ActivityAbout">Apie</string>

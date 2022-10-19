@@ -446,7 +446,7 @@ class DeviceShieldTrackerActivity :
                 if (bannerState is BannerState.OnboardingBanner) {
                     setClickableLink(
                         APPTP_SETTINGS_ANNOTATION,
-                        getText(R.string.atp_ActivityEnabledLabel)
+                        getText(R.string.atp_ActivityEnabledBannerLabel)
                     ) { launchTrackingProtectionExclusionListActivity() }
                 } else {
                     setClickableLink(

@@ -129,39 +129,18 @@
     <string name="atp_NewTabEnabled"><b>App Tracking Protection is enabled</b> and blocking tracking attempts across your apps.</string>
 
     <!-- Exclusion List -->
-    <!-- TODO [ANA] Modified, double check if new key is needed -->
-    <string name="atp_ExclusionListActivityTitle">My Apps</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection detects and blocks app trackers from other companies, like when Facebook tries to track you in a health app. Companies may still track you in apps they own.\n\nIf an app isn\'t working as expected, try disabling protection for that app.</string>
     <string name="atp_ExcludedAppsEnabledLabel">During beta, DuckDuckGo may disable protection for some apps to resolve known content loading issues. Your custom settings won’t change unless you restore to default settings.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection is disabled</b> Did App Tracking Protection cause a problem with your apps <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ExcludedAppsReport">Report Problem With Another App</string>
-    <!-- TODO [ANA] To be removed -->
-    <string name="atp_ExcludedReasonLoadsWebsites">Loads websites</string>
-    <!-- TODO [ANA] Modified, double check if new key is needed -->
-    <string name="atp_ExcludedReasonKnownIssues">App issues may occur if enabled</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manually disabled</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manually enabled</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Cancel</string>
-    <!-- TODO [ANA] Modified, double check if new key is needed -->
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Enable Anyway</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Restore</string>
-    <!-- TODO [ANA] Modified, double check if new key is needed -->
-    <string name="atp_ExcludeAppsManuallyEnableAppName">%s may experience issues if App Tracking Protection is enabled</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">This app is known to experience issues when tracking attempts fail.</string>
-    <!-- TODO [ANA] To be removed -->
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Site content in this app may not appear properly when protection is enabled.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Enabling protection sends the app\'s name to DuckDuckGo.</string>
-    <!-- TODO [ANA] Modified, double check if new key is needed -->
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Report an issue?</string>
-    <!-- TODO [ANA] Modified, double check if new key is needed -->
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Please let us know if you disabled App Tracking Protection for %s because you experienced app issues.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">It stopped working as expected</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">I\'m OK being tracked in this app</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">For other reason</string>
-    <!-- TODO [ANA] Modified, double check if new key is needed -->
-    <string name="atp_ExcludeAppsManuallyCTAReport">Report Issue</string>
-    <!-- TODO [ANA] Modified, double check if new key is needed -->
-    <string name="atp_ExcludeAppsManuallyCTASkip">Not Now</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Restore Default Protected Apps</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Report an Issue With an App</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Restore default protection?</string>
@@ -205,46 +184,16 @@
     <string name="atp_ActivityPastWeek">Past 7 Days</string>
     <string name="atp_ActivityTitle">App Tracking Protection</string>
     <string name="atp_MostRecentActivityTitle">All Recent Activity</string>
-    <!-- TODO [ANA] Modified, double check if new key is needed -->
-    <string name="atp_ActivityRecentActivity">Activity</string>
     <string name="atp_ActivityCtaShowAll">View All Recent Activity</string>
     <string name="atp_ActivityAppTrackersFAQ">What Are App Trackers?</string>
     <string name="atp_ActivityReportProblem">Report a problem With an App</string>
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
-    <!-- TODO [ANA] Modified, double check if new key is needed -->
-    <string name="atp_ActivityManageProtection">Report Issue with an App</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d tracking attempt blocked from %2$d company in <b>%3$s</b> app]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d tracking attempt blocked from %2$d companies in <b>%3$s</b> app]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d tracking attempts blocked from %2$d company in <b>%3$s</b> app]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d tracking attempts blocked from %2$d companies in <b>%3$s</b> app]]></string>
 
-    <!-- TODO [ANA] New strings added, need translation -->
-    <string name="atp_ActivityDescription" translatable="false">Blocked tracking attempts will appear here</string>
-    <plurals name="atp_ActivityProtectedApps" translatable="false">
-        <item quantity="one">%s of your apps is protected from hidden trackers we find trying to access your personal info</item>
-        <item quantity="other">%s of your apps are protected from hidden trackers we find trying to access your personal info</item>
-    </plurals>
-    <plurals name="atp_ActivityUnprotectedApps" translatable="false">
-        <item quantity="one">%s of your apps has protection automatically disabled</item>
-        <item quantity="other">%s of your apps have protection automatically disabled</item>
-    </plurals>
-    <string name="atp_ActivityAppTpEnabledCtaText" translatable="false"><![CDATA[Good news! App Tracking Protection is now enabled.<br/><br/>👌I’ll show you a real-time list of apps on your device that I catch trying to track you.]]></string>
-    <string name="atp_ActivityAppTpEnabledCtaButtonLabel" translatable="false">Got It!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel" translatable="false">Protection Enabled (%s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel" translatable="false">Protection Disabled (%s)</string>
-    <string name="atp_ExcludedAppsFilterAllLabel" translatable="false">All</string>
-    <string name="atp_ExcludedAppsFilterMenuProtectedLabel" translatable="false">Protection Enabled</string>
-    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel" translatable="false">Protection Disabled</string>
-    <string name="atp_ExcludedAppsFilterMenuAllLabel" translatable="false">All</string>
-    <string name="atp_ActivityViewAppsLabel" translatable="false">View Apps</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel" translatable="false">This feature is in beta. Having issues with an app? <annotation type="app_settings_link">Help Us Improve</annotation></string>
-    <string name="atp_ExcludedAppsEnabledLearnWhyLabel" translatable="false">Some apps may experience issues when App Tracking Protection is enabled.\n<annotation type="learn_why_link">Learn Why</annotation></string>
-
-    <!-- TODO [ANA] Remove this -->
-    <string name="atp_ActivityEmptyListTitle">No new activity</string>
-    <!-- TODO [ANA] Remove this -->
-    <string name="atp_ActivityEmptyListMessage">Keep using your device. Tracking attempts that App Tracking Protection blocks appear here.</string>
     <string name="atp_ActivityPastWeekBlocked">Blocked</string>
     <string name="atp_ActivityPastWeekAcross">Across</string>
 
@@ -256,8 +205,6 @@
         <item quantity="one">App</item>
         <item quantity="other">Apps</item>
     </plurals>
-    <!-- TODO [ANA] Modified, double check if new key is needed -->
-    <string name="atp_ActivityEnabledLabel">During beta, protection for some apps is automatically disabled. <annotation type="app_settings_link">View Apps</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is disabled</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>A VPN app on your device disabled App Tracking Protection.</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityAbout">About</string>

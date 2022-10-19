@@ -129,29 +129,18 @@
     <string name="atp_NewTabEnabled"><b>App Tracking Protection on käytössä</b> ja estää seurantayritykset kaikissa sovelluksissasi.</string>
 
     <!-- Exclusion List -->
-    <string name="atp_ExclusionListActivityTitle">Kaikki sovellukset</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection havaitsee ja estää muiden yritysten seurantalaitteet, esimerkiksi kun Facebook yrittää seurata sinua terveyssovelluksessa. Yritykset voivat silti seurata sinua omistamissaan sovelluksissa.\n\nJos jokin sovellus ei toimi odotetulla tavalla, yritä poistaa kyseisen sovelluksen suojaus käytöstä.</string>
     <string name="atp_ExcludedAppsEnabledLabel">Beetaversion aikana DuckDuckGo voi poistaa suojauksen käytöstä joistakin sovelluksista ratkaistakseen tunnettuja sisällön latausongelmia. Mukautetut asetukset eivät muutu, ellet palauta oletusasetuksia.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection on poistettu käytöstä</b> Aiheuttiko App Tracking Protection ongelmia sovelluksissasi <annotation type="report_issues_link">Ilmoita ongelmista</annotation></string>
     <string name="atp_ExcludedAppsReport">Ilmoita ongelmasta toisessa sovelluksessa</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Lataa verkkosivustoja</string>
-    <string name="atp_ExcludedReasonKnownIssues">Tunnetut ongelmat</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Poistettu käytöstä manuaalisesti</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Otettu käyttöön manuaalisesti</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Peruuta</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Ota käyttöön</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Palauta</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Ota suojaus käyttöön manuaalisesti sovellukselle %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Tässä sovelluksessa tiedetään olevan ongelmia, kun seurantayritykset epäonnistuvat.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Sivuston sisältö tässä sovelluksessa ei ehkä näy oikein, kun suojaus on käytössä.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Suojauksen ottaminen käyttöön lähettää sovelluksen nimen DuckDuckGolle.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Yksityisyyden suoja poistettu käytöstä</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Jos poistit suojauksen käytöstä ongelman ratkaisemiseksi, tarkista, että sovellus toimii, ennen kuin ilmoitat ongelmasta DuckDuckGolle.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Se lakkasi toimimasta odotetusti</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Seuranta ei haittaa minua tässä sovelluksessa</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Muu syy</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Ilmoita</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Ohita</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Palauta oletuksena suojatut sovellukset</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Ilmoita ongelmasta sovelluksessa</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Palauta oletussuojaus?</string>
@@ -195,20 +184,16 @@
     <string name="atp_ActivityPastWeek">Viimeiset 7 päivää</string>
     <string name="atp_ActivityTitle">Sovellusten seurantasuojaus</string>
     <string name="atp_MostRecentActivityTitle">Kaikki viimeaikainen toiminta</string>
-    <string name="atp_ActivityRecentActivity">Viimeaikainen toiminta</string>
     <string name="atp_ActivityCtaShowAll">Näytä kaikki viimeaikaiset toiminnat</string>
     <string name="atp_ActivityAppTrackersFAQ">Mitä ovat sovellusten seurantalaitteet?</string>
     <string name="atp_ActivityReportProblem">Ilmoita ongelmasta sovelluksessa</string>
     <string name="atp_ActivityBetaInstructions">Beetaohjeet</string>
-    <string name="atp_ActivityManageProtection">Ongelmia jonkin sovelluksen kanssa?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d seurantayritys estetty %2$d yritykseltä <b>%3$s</b> sovelluksessa]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d seurantayritys estetty %2$d yritykseltä <b>%3$s</b> sovelluksessa]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d seurantayritystä estetty %2$d yritykseltä <b>%3$s</b> sovelluksessa]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d seurantayritystä estetty %2$d yritykseltä <b>%3$s</b> sovelluksessa]]></string>
 
-    <string name="atp_ActivityEmptyListTitle">Ei uutta toimintaa</string>
-    <string name="atp_ActivityEmptyListMessage">Jatka laitteen käyttöä. Seurantayritykset, jotka App Tracking Protection estää, näkyvät tässä.</string>
     <string name="atp_ActivityPastWeekBlocked">Estetty</string>
     <string name="atp_ActivityPastWeekAcross">Kaikkiaan</string>
 
@@ -220,7 +205,6 @@
         <item quantity="one">Sovellus</item>
         <item quantity="other">Sovellukset</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Tämä ominaisuus on beetavaiheessa. <annotation type="app_settings_link">Ongelmia sovelluksen kanssa?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection on poistettu käytöstä</b>\nAiheuttiko App Tracking Protection ongelmia sovelluksissasi? <annotation type="report_issues_link">Ilmoita ongelmista</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Laitteesi VPN poisti App Tracking Protectionin käytöstä.</b>\nAiheuttiko App Tracking Protection ongelman sovelluksissasi? <annotation type="report_issues_link">Ilmoita ongelmista</annotation></string>
     <string name="atp_ActivityAbout">Tietoa meistä</string>

@@ -76,7 +76,7 @@
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity"
             android:exported="false"
-            android:label="@string/atp_ExclusionListActivityTitle"
+            android:label="@string/atp_TrackingProtectionExclusionListActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActivity"
             android:screenOrientation="portrait" />
 
