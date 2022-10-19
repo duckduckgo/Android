@@ -14,10 +14,12 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">\"%1$s\" quiere acceder a la cámara y al micrófono</string>
-    <string name="sitePermissionsMicDialogTitle">\"%1$s\" quiere acceder al micrófono</string>
-    <string name="sitePermissionsCameraDialogTitle">\"%1$s\" quiere acceder a la cámara</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" quiere acceder a la cámara y al micrófono</string>
+    <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">\"%1$s\" quiere acceder al micrófono</string>
+    <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" quiere acceder a la cámara</string>
     <string name="sitePermissionsDialogContent">Administrar permisos concedidos en la configuración</string>
     <string name="sitePermissionsDialogDenyButton">Rechazar</string>
     <string name="sitePermissionsDialogAllowButton">Permitir</string>

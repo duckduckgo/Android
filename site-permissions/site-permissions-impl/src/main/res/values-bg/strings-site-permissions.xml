@@ -14,10 +14,12 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">„%1$s“ иска достъп до камерата и микрофона</string>
-    <string name="sitePermissionsMicDialogTitle">„%1$s“ иска достъп до микрофона</string>
-    <string name="sitePermissionsCameraDialogTitle">„%1$s“ иска достъп до камерата</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">„%1$s“ иска достъп до камерата и микрофона</string>
+    <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">„%1$s“ иска достъп до микрофона</string>
+    <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">„%1$s“ иска достъп до камерата</string>
     <string name="sitePermissionsDialogContent">Управлявайте предоставените разрешения в настройките</string>
     <string name="sitePermissionsDialogDenyButton">Отказвам</string>
     <string name="sitePermissionsDialogAllowButton">Разрешавам</string>
