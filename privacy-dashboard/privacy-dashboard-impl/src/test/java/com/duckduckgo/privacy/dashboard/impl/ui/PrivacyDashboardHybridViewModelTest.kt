@@ -31,7 +31,6 @@ import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -67,7 +66,6 @@ class PrivacyDashboardHybridViewModelTest {
         userWhitelistDao = userWhitelistDao,
         pixel = pixel,
         dispatcher = coroutineRule.testDispatcherProvider,
-        appCoroutineScope = TestScope(),
         siteViewStateMapper = AppSiteViewStateMapper(PublicKeyInfoMapper(androidQAppBuildConfig)),
         requestDataViewStateMapper = AppSiteRequestDataViewStateMapper(),
         protectionStatusViewStateMapper = AppProtectionStatusViewStateMapper(contentBlocking, unprotectedTemporary),
