@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- smartling.placeholder_format = NONE -->
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">„DuckDuckGo“ logotipas</string>
@@ -62,8 +61,8 @@
     <string name="printMenuTitle">Spausdinti puslapį</string>
     <string name="favoriteDeleteConfirmationMessage">Mėgstamas pašalintas</string>
     <string name="fireproofDeleteConfirmationMessage">Apsauga pašalinta</string>
-    <string name="privacyProtectionEnabledConfirmationMessage">Privatumo apsauga įjungta %s</string>
-    <string name="privacyProtectionDisabledConfirmationMessage">Privatumo apsauga išjungta %s</string>
+    <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privatumo apsauga įjungta dėl %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Privatumo apsauga išjungta dėl %1$s</string>
     <string name="undoSnackbarAction">Anuliuoti</string>
 
     <!-- Downloading files -->
@@ -115,7 +114,7 @@
     <string name="privacyProtectionEnabled">SVETAINĖS APSAUGA ĮJUNGTA</string>
     <string name="privacyProtectionDisabled">SVETAINĖS APSAUGA IŠJUNGTA</string>
     <string name="privacyDashboardActivityTitle">Privatumo valdymo skydelis</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">PATOBULINTA IŠ <img src="%d"></img> Į <img src="%d"></img></string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">PATOBULINTA NUO &lt;img src=\"%1$d\" /&gt; IKI &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privatumo laipsnis</string>
     <string name="privacyProtectionTemporarilyDisabled">Laikinai išjungiame privatumo apsaugą, kadangi atrodo, kad ji trukdo šios svetainės veikimui.</string>
 
@@ -158,7 +157,7 @@
 
     <string name="trackersBlockedNoSectionDescription">Buvo įkeltos šios domenų užklausos.</string>
 
-    <string name="adLoadedSectionDescription">Šio domeno užklausos buvo įkeltos, nes neseniai buvo spustelėta %s reklama „DuckDuckGo“. Šios užklausos padeda įvertinti reklamų efektyvumą. Nė viena „DuckDuckGo“ reklama nerenka informacijos apie naudotoją.</string>
+    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Šio domeno užklausos buvo įkeltos, nes neseniai buvo spustelėta %1$s „DuckDuckGo“ reklama. Šios užklausos padeda įvertinti reklamų efektyvumą. Visos „DuckDuckGo“ reklamos nerenka informacijos apie naudotoją.</string>
     <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Kaip paieškos skelbimai veikia mūsų apsaugą</annotation></string>
     <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
 
@@ -167,7 +166,7 @@
     <string name="domainsLoadedSectionEmptyListDescription">Užklausų iš trečiųjų šalių domenų neaptikome.</string>
 
     <string name="domainsLoadedBreakageSectionDescription">Siekiant išvengti svetainės sutrikimų, buvo įkeltos šios domeno užklausos.</string>
-    <string name="domainsLoadedAssociatedSectionDescription">Šios domeno užklausos buvo įkeltos, nes jos susijusios su %s.</string>
+    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Šios domeno užklausos buvo įkeltos, nes jos susijusios su %1$s.</string>
 
     <string name="trackersBlockedText">Užklausos užblokuotos įkelti</string>
     <string name="trackersNotBlockedText">Neužblokuota jokių sekimo užklausų</string>
@@ -258,8 +257,8 @@
     <string name="bookmarksMenuTitle">Žymės</string>
     <string name="bookmarksActivityTitle">Žymės</string>
     <string name="noBookmarks">Žymių dar nepridėta</string>
-    <string name="bookmarkOverflowContentDescription">Daugiau parinkčių žymelei %s</string>
-    <string name="bookmarkDeleteConfirmationMessage">Ištrinta <b>%s</b></string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Daugiau parinkčių žymei %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Ištrinta &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Eksportuoti</string>
     <string name="exportBookmarksEmpty">Neturite žymelių, niekas nebus eksportuota</string>
     <string name="exportBookmarksError">Nepavyko eksportuoti jokių žymelių, įvyko klaida</string>
@@ -268,7 +267,7 @@
     <string name="importBookmarksFileTitle">Pasirinkti importuotiną žymelės failą</string>
     <string name="importBookmarksError">Nepavyko importuoti jokių žymelių, įvyko klaida</string>
     <string name="importBookmarksEmpty">Faile nėra jokių importuotinų žymelių</string>
-    <string name="importBookmarksSuccess">Sėkmingai importuotos %1$d žymelės</string>
+    <string name="importBookmarksSuccess">Sėkmingos importuotos %1$d žymelės</string>
     <string name="savedSiteDialogTitleHint">Pavadinimas</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Redaguoti</string>
@@ -305,7 +304,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Pridėti prie pagrindinio ekrano</string>
-    <string name="shortcutAddedText">Pavyko! %s pridėtas prie jūsų pagrindinio ekrano.</string>
+    <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Pavyko! %1$s pridėtas prie jūsų pagrindinio ekrano.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Padėkite mums tobulinti programą!</string>
@@ -363,14 +362,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Mes saugome jūsų privatumą</string>
     <string name="privacyProtectionNotificationReportTitle">Jūsų privatumo ataskaita</string>
     <string name="privacyProtectionNotificationDefaultDescription">Naudodamiesi „DuckDuckGo“ saugote savo duomenų privatumą blokuodami sekiklius ir šifruodami ryšius.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Su „DuckDuckGo“ apsaugojote duomenis apsaugodami %d neužšifruotus ryšius.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Su „DuckDuckGo“ apsaugojote duomenis užblokuodami %d sekimo priemones.</string>
-    <string name="privacyProtectionNotificationBothDescription">Su „DuckDuckGo“ apsaugojote duomenis užblokuodami %d sekimo priemones ir apsaugodami %d nešifruotus ryšius.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Apsaugokite duomenis naudojant „DuckDuckGo“, apsaugodami %1$d nešifruotus ryšius „DuckDuckGo“.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Naudojant „DuckDuckGo“ apsaugojote duomenis blokuodami %1$d sekiklius (-ių).</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Naudojant „DuckDuckGo“ apsaugojote duomenis blokuodami %1$d sekiklius (-ių) ir apsaugodami %2$d nešifruotus (-ų) ryšius (-ių).</string>
     <string name="privacyProtectionNotificationLaunchButton">Tęsti naršymą</string>
 
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Prisijungti</string>
-    <string name="authenticationDialogMessage">%s reikia naudotojo vardo ir slaptažodžio.</string>
+    <string name="authenticationDialogMessage" instruction="Placeholder is the name of a website">%1$s reikia naudotojo vardo ir slaptažodžio.</string>
     <string name="authenticationDialogPositiveButton">Prisijungti</string>
     <string name="authenticationDialogNegativeButton">Atšaukti</string>
     <string name="authenticationDialogUsernameHint">Naudotojo vardas</string>
@@ -486,10 +485,10 @@
     <string name="daxEndCtaText"><![CDATA[Atlikta!<br/><br/>Įsidėmėkite: kiekvieną kartą, kai naršote su manimi, bauginantis skelbimas praranda galią. 👍]]></string>
     <string name="daxSerpCtaText">Jūsų „DuckDuckGo“ paieškos yra anoniminės. Visada. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[  ir <b>dar %d</b> bandė jus čia sekti. <br/><br/>Aš juos užblokavau!<br/><br/> ☝️Apsilankę naujoje svetainėje, galite patikrinti adreso juostą ir sužinoti, kas bando jus sekti.️]]></item>
-        <item quantity="few"><![CDATA[  ir dar <b>%d</b> bandė jus čia sekti. <br/><br/>Aš juos užblokavau!<br/><br/> ☝️Apsilankę naujoje svetainėje, galite patikrinti adreso juostą ir sužinoti, kas bando jus sekti.️]]></item>
-        <item quantity="many"><![CDATA[  ir dar <b>%d</b> bandė jus čia sekti. <br/><br/>Aš juos užblokavau!<br/><br/> ☝️Apsilankę naujoje svetainėje, galite patikrinti adreso juostą ir sužinoti, kas bando jus sekti.️]]></item>
-        <item quantity="other"><![CDATA[  ir dar <b>%d</b> bandė jus čia sekti. <br/><br/>Aš juos užblokavau!<br/><br/> ☝️Apsilankę naujoje svetainėje, galite patikrinti adreso juostą ir sužinoti, kas bando jus sekti.️]]></item>
+        <item quantity="one"><![CDATA[ ir <b>%1$d kitas</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
+        <item quantity="few"><![CDATA[ ir <b>%1$d kiti</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
+        <item quantity="many"><![CDATA[ ir <b>%1$d kitų</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
+        <item quantity="other"><![CDATA[ ir <b>%1$d kitų</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
@@ -498,12 +497,12 @@
         <item quantity="other"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Bakstelėjus ir slenkant, bus blokuojami įkyrūs sekimo įrenginiai. <br/><br/>Pirmyn – naršykite toliau!]]></string>
-    <string name="daxMainNetworkCtaText">Būk atidus! Aš negaliu neleisti %s matyti jūsų veiklos %s <br></br><br></br>Tačiau naršykite su manimi – aš galiu sumažinti informaciją, kurią %s žino apie jus, užblokuodamas jų sekimo priemones daugelyje kitų svetainių.</string>
-    <string name="daxMainNetworkOwnedCtaText">Būk atidus! Kadangi %s priklauso %s, negaliu jiems neleisti matyti jūsų veiklos.<br></br><br></br>Tačiau naršykite su manimi – aš galiu sumažinti informaciją, kurią %s žino apie jus, užblokuodamas jų sekimo priemones daugelyje kitų svetainių.</string>
+    <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Būk atidus! Negaliu neleisti %1$s matyti tavo veiklos %2$s &lt;br/&gt;&lt;br/&gt;Tačiau naršyk kartu su manimi ir aš sumažinsiu informacijos, kurią %3$s žino apie tave, kiekį užblokuodamas stebėjimo priemones kitose svetainėse.</string>
+    <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Įspėjimas! Kadangi %1$s priklauso %2$s, negaliu neleisti jiems matyti tavo veiklos.&lt;br/&gt;&lt;br/&gt;Tačiau naršyk kartu su manimi ir aš sumažinsiu informacijos, kurią %3$s žino apie tave, kiekį užblokuodamas stebėjimo priemones kitose svetainėse.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Išsaugoti Atsisiuntimuose</string>
-    <string name="downloadConfirmationSaveFileTitle">Išsaugoti %1$s</string>
+    <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Išsaugoti %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Palikti abu</string>
     <string name="downloadConfirmationReplaceOldFileText">Pakeisti</string>
     <string name="downloadConfirmationOpenFileText">Atviras</string>
@@ -531,8 +530,8 @@
     <string name="whitelistActivityTitle">Neapsaugotos svetainės</string>
     <string name="enablePrivacyProtection">Įjungti privatumo apsaugą</string>
     <string name="disablePrivacyProtection">Išjungti privatumo apsaugą</string>
-    <string name="whitelistEntryOverflowContentDescription">Daugiau neapsaugotos svetainės %s parinkčių</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Ar tikrai norite pašalinti <b>%s</b> iš neapsaugotų svetainių sąrašo?</string>
+    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Daugiau neapsaugotos svetainės %1$s parinkčių</string>
+    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ar tikrai norite pašalinti &lt;b&gt;%1$s&lt;/b&gt; iš neapsaugotų svetainių sąrašo?</string>
     <string name="whitelistExplanation">Šių svetainių nepatobulins privatumo apsauga.</string>
     <string name="whitelistNoEntries">Privatumo apsauga įjungta visose svetainėse</string>
     <string name="whitelistDomainHint">www.example.com</string>
@@ -545,12 +544,12 @@
     <string name="fireproofWebsitesActivityTitle">Apsaugoti svetaines</string>
     <string name="settingsFireproofWebsites">Apsaugoti svetaines</string>
     <string name="fireproofWebsiteMenuTitleAdd">Apsaugoti šią svetainę</string>
-    <string name="fireproofWebsiteSnackbarConfirmation"><b>%s</b> dabar yra apsaugota</string>
+    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; dabar yra apsaugota</string>
     <string name="fireproofWebsiteSnackbarAction">Anuliuoti</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Ar tikrai norite ištrinti <b>%s</b>?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage" instruction="Placeholder is a website">Ar tikrai norite ištrinti &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Svetainės pagrįstos slapukais, kad liktumėte prisijungę. Pasirinkus parinktį „Fireproof“, slapukai nėra ištrinami ir liksite prisijungę net panaudoję mygtuką „Fire“. Vis tiek blokuosime trečiųjų šalių stebėjimo priemones, randamas svetainėse, kuriose pasinaudosite parinktimi „Fireproof“.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Daugiau apsaugotos svetainės %s parinkčių</string>
-    <string name="fireproofWebsiteLoginDialogTitle">Ar norite apsaugoti %s?</string>
+    <string name="fireproofWebsiteOverflowContentDescription" instruction="Placeholder is a website">Daugiau svetainės patikrinimo parinkčių %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">Ar nori pasinaudoti parinktimi „Fireproof“ %1$s?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Pasirinkę parinktį „Fireproof“ šioje svetainėje, liksite prisijungę net panaudoję mygtuką „Fire“.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Parinktis „Fireproof“</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne dabar</string>
@@ -558,7 +557,7 @@
     <string name="fireproofWebsiteEmptyListHint">Apsaugotų svetainių dar nėra</string>
     <string name="fireproofWebsiteSettingSelectionTitle">Apsaugokite svetaines prisijungdami</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Visų svetainių apsauga pašalinta</string>
-    <string name="fireproofWebsiteRemovalConfirmation"><b>%s</b> apsauga pašalinta</string>
+    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; apsauga pašalinta</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Klausti kiekvieną kartą</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Visada</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Niekada</string>
@@ -587,11 +586,11 @@
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Įgalinti įrenginio vietą „DuckDuckGo“ privatumo naršyklėje?</string>
-    <string name="preciseLocationSystemDialogSubtitle">%s prašo įrenginio vietos. Pirmiausia turėsite leisti programėlei siųsti jūsų įrenginio vietą, tuomet %s gali prašyti leidimo.</string>
+    <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s prašo jūsų įrenginio vietos. Pirmiausia turėsite leisti programai siųsti jūsų įrenginio vietą, tuomet %2$s gali prašyti leidimo.</string>
     <string name="preciseLocationSystemDialogAllow">Įjungti</string>
     <string name="preciseLocationSystemDialogDeny">Galbūt vėliau</string>
     <string name="preciseLocationSystemDialogNeverAllow">Nebeprašykite šioje svetainėje</string>
-    <string name="preciseLocationSiteDialogTitle">Suteikti %s leidimą pasiekti vietą?</string>
+    <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Suteikti %1$s leidimą pasiekti vietą?</string>
     <string name="preciseLocationDDGDialogSubtitle">Jūsų anoniminę vietą naudojame tik norėdami pateikti geresnius rezultatus, esančius arčiau jūsų. Vėliau visada galite tai pakeisti.</string>
     <string name="preciseLocationSiteDialogSubtitle">Galite tvarkyti vietos prieigos leidimus, kuriuos nustatymuose suteikėte pavienėms svetainėms.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Visada</string>
@@ -603,11 +602,11 @@
     <string name="preciseLocationEmptyListHint">Jokios svetainės nesuteikė leidimo pasiekti vietą</string>
     <string name="preciseLocationNoSystemPermission">Norėdami tvarkyti vietos prieigos leidimus, kuriuos suteikėte atskiroms svetainėms, „Android“ nustatymuose šiai programai įjunkite vietą.</string>
     <string name="preciseLocationActivityTitle">Vieta</string>
-    <string name="preciseLocationDeleteConfirmMessage">Ar tikrai norite ištrinti <b>%s</b>?</string>
-    <string name="preciseLocationDeleteContentDescription">Daugiau vietos leidimų %s domene parinkčių</string>
+    <string name="preciseLocationDeleteConfirmMessage" instruction="Placeholder is the name of a website">Ar tikrai norite ištrinti &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription" instruction="Placeholder is the domain of a website">Daugiau vietos leidimų %1$s domene parinkčių</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Suteiktas</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Atmestas</string>
-    <string name="preciseLocationSnackbarMessage">Anksčiau suteikėte %s leidimą pasiekti jūsų įrenginio vietą.</string>
+    <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Anksčiau %1$s suteikėte leidimą pasiekti jūsų įrenginio vietą.</string>
 
     <!--Fire button education-->
     <string name="daxClearDataCtaText">Asmeniniai duomenys gali kauptis jūsų naršyklėje. Fui. Naudokite mygtuką „Fire“, kad juos panaikintumėte. Išbandykite dabar! 👇</string>
@@ -628,14 +627,14 @@
     <string name="appLinkDialogTitle">Atidaryti kitoje programoje?</string>
     <string name="appLinkSnackBarAction">Atidaryti programėlėje</string>
     <string name="appLinkMultipleSnackBarAction">Pasirinkti programėlę</string>
-    <string name="appLinkSnackBarMessage">Šią nuorodą galite atidaryti %s.</string>
+    <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Galite atverti šią nuorodą %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Galite atidaryti šią nuorodą kitose programėlėse.</string>
     <string name="appLinkIntentChooserTitle">Atidaryti</string>
     <string name="appLinkMenuItemTitle">Atidaryti programėlėje</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Naujas adresas nukopijuotas į jūsų iškarpinę</string>
-    <string name="autofillTooltipUseYourAlias">Naudokite %1$s</string>
+    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Naudoti %1$s</string>
     <string name="autofillTooltipUseYourAliasDescription">Blokuoja el. pašto sekimo priemones</string>
     <string name="autofillTooltipGenerateAddress">Generuoti privatų „Duck“ adresą</string>
     <string name="autofillTooltipGenerateAddressDescription">Blokuoja el. pašto sekimo priemones ir slepia jūsų adresą</string>
@@ -662,17 +661,17 @@
     <string name="bookmarkFolderEmpty">Tuščia</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%s%s ir %d elementas?</item>
-        <item quantity="few">%s%s ir %d elementai?</item>
-        <item quantity="many">%s%s ir %d elemento?</item>
-        <item quantity="other">%s%s ir %d elementų?</item>
+        <item quantity="one">%1$s%2$s ir %1$d prekė?</item>
+        <item quantity="few">%1$s%2$s ir %1$d prekės?</item>
+        <item quantity="many">%1$s%2$s ir %1$d prekės?</item>
+        <item quantity="other">%1$s%2$s ir %1$d prekės?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%d elementas</item>
-        <item quantity="few">%d elementai</item>
-        <item quantity="many">%d elemento</item>
-        <item quantity="other">%d elementų</item>
+        <item quantity="one">%1$d prekė</item>
+        <item quantity="few">%1$d prekės</item>
+        <item quantity="many">%1$d prekės</item>
+        <item quantity="other">%1$d prekės</item>
     </plurals>
 
     <!-- Accessibility-->
@@ -689,7 +688,7 @@
     <string name="settingsPrivacyPolicyDuckduckgo">Privatumo politika</string>
 
     <!-- Home Screen Widget -->
-    <string name="homeScreenWidgetAdded">%s valdiklis pridėtas prie pagrindinio ekrano</string>
+    <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s valdiklis pridėtas prie pagrindinio ekrano</string>
     <string name="settingsAddHomeScreenWidget">Pagrindinio ekrano valdiklis</string>
 
     <!-- MacOs Settings -->
@@ -708,9 +707,9 @@
     <string name="downloadsItemMenuDelete">Trinti</string>
     <string name="downloadsItemMenuCancel">Atšaukti</string>
     <string name="downloadsActivityMenuDeleteAll">Ištrinti viską</string>
-    <string name="downloadsFileDeletedMessage">Ištrinta %s</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Ištrinta %1$s</string>
     <string name="downloadsAllFilesDeletedMessage">Visi failai ištrinti</string>
-    <string name="downloadsMoreOptionsContentDescription">Daugiau %s parinkčių</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Daugiau parinkčių, skirtų %1$s</string>
     <string name="downloadsUndoActionName">Anuliuoti</string>
     <string name="downloadsStateInProgress">Vykdoma...</string>
 
@@ -742,13 +741,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofonas</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Tvarkyti svetaines</string>
     <string name="sitePermissionsSettingsEmptyText">Svetainių dar nėra</string>
-    <string name="permissionPerWebsiteText">Leidimai „%s“ </string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Leidimai „%1$s“ </string>
     <string name="permissionsPerWebsiteAskSetting">Klausti</string>
     <string name="permissionsPerWebsiteDenySetting">Atsisakyti</string>
     <string name="permissionsPerWebsiteAllowSetting">Leisti</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle">%s leidimas %s</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s leidimas %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatinis pildymas</string>
-
 </resources>
