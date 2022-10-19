@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Allalaadimine ebaõnnestus. Kontrolli internetiühendust.</string>
 
     <string name="notificationChannelFileDownloading">Failide allalaadimine</string>
@@ -25,8 +24,8 @@
 
     <string name="downloadInProgress">Allalaadimine</string>
 
-    <string name="downloadsDownloadStartedMessage">%s: allalaadimine algas</string>
-    <string name="downloadsDownloadFinishedMessage">%s: allalaadimine on lõpule viidud</string>
+    <string name="downloadsDownloadStartedMessage" instruction="Placeholder is the name of a file">Algas faili %1$s allalaadimine</string>
+    <string name="downloadsDownloadFinishedMessage" instruction="Placeholder is the name of a file">Faili %1$s allalaadimine jõudis lõpule</string>
     <string name="downloadsDownloadGenericErrorMessage">Allalaadimine nurjus.</string>
     <string name="downloadsCancel">Tühista</string>
     <string name="downloadsRetry">Proovi uuesti</string>

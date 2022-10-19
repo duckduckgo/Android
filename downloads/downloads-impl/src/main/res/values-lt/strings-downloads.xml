@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Nepavyko atsisiųsti. Patikrinkite interneto ryšį.</string>
 
     <string name="notificationChannelFileDownloading">Failas atsisiunčiamas</string>
@@ -25,8 +24,8 @@
 
     <string name="downloadInProgress">Atsisiunčiama</string>
 
-    <string name="downloadsDownloadStartedMessage">%s atsisiuntimas prasidėjo</string>
-    <string name="downloadsDownloadFinishedMessage">%s atsisiuntimas baigtas</string>
+    <string name="downloadsDownloadStartedMessage" instruction="Placeholder is the name of a file">%1$s atsisiuntimas prasidėjo</string>
+    <string name="downloadsDownloadFinishedMessage" instruction="Placeholder is the name of a file">%1$s atsisiuntimas baigtas</string>
     <string name="downloadsDownloadGenericErrorMessage">Nepavyko atsisiųsti.</string>
     <string name="downloadsCancel">Atšaukti</string>
     <string name="downloadsRetry">Pakartoti</string>
