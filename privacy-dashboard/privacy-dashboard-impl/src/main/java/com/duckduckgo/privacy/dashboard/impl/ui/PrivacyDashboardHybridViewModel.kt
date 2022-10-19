@@ -19,7 +19,6 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
@@ -31,7 +30,6 @@ import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVA
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -50,7 +48,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val userWhitelistDao: UserWhitelistDao,
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val siteViewStateMapper: SiteViewStateMapper,
     private val requestDataViewStateMapper: RequestDataViewStateMapper,
     private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
