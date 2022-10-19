@@ -10,25 +10,6 @@
         android:theme="@style/Theme.DuckDuckGo.Light">
 
         <activity
-            android:name="dummy.ui.VpnDiagnosticsGetUserHealthReportActivity"
-            android:exported="false"
-            android:parentActivityName="dummy.ui.VpnDiagnosticsActivity"
-            android:process=":vpn" />
-
-        <activity
-            android:name="dummy.ui.VpnControllerActivity"
-            android:exported="true"
-            android:label="@string/atp_name"
-            android:parentActivityName=".ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:process=":vpn"/>
-
-        <activity
-            android:name="dummy.ui.VpnDiagnosticsActivity"
-            android:exported="false"
-            android:parentActivityName=".ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:process=":vpn"/>
-
-        <activity
             android:name=".service.VpnPermissionRequesterActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

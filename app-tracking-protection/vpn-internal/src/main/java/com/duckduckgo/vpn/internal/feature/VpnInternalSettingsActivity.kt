@@ -42,7 +42,6 @@ import com.duckduckgo.vpn.internal.feature.logs.TimberExtensions
 import com.duckduckgo.vpn.internal.feature.remote.VpnRemoteFeatureReceiver
 import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.duckduckgo.vpn.internal.feature.trackers.DeleteTrackersDebugReceiver
-import com.duckduckgo.vpn.internal.feature.transparency.TransparencyModeDebugReceiver
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -71,16 +70,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var workManager: WorkManager
 
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
-    private var transparencyModeDebugReceiver: TransparencyModeDebugReceiver? = null
     private var debugLoggingReceiver: DebugLoggingReceiver? = null
-
-    private val transparencyToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
-        if (toggleState) {
-            TransparencyModeDebugReceiver.turnOnIntent()
-        } else {
-            TransparencyModeDebugReceiver.turnOffIntent()
-        }.also { sendBroadcast(it) }
-    }
 
     private val badHealthMonitoringToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
         if (toggleState) {
@@ -111,22 +101,15 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
 
-        setupTransparencyMode()
         setupAppTrackerExceptionRules()
         setupDebugLogging()
         setupBugReport()
         setupDeleteTrackingHistory()
         setupForceUpdateBlocklist()
-        setupViewDiagnosticsView()
         setupBadHealthMonitoring()
         setupConfigSection()
         setupUiElementsState()
         setupAppProtectionSection()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        transparencyModeDebugReceiver?.unregister()
     }
 
     private fun setupAppProtectionSection() {
@@ -183,7 +166,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
                 binding.vpnConnectivityChecksToggle.isEnabled = isEnabled
                 binding.debugLoggingToggle.isEnabled = isEnabled
-                binding.transparencyModeToggle.isEnabled = isEnabled
                 binding.settingsInfo.isVisible = !isEnabled
             }
             .launchIn(lifecycleScope)
@@ -202,13 +184,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 OneTimeWorkRequestBuilder<AppTrackerListUpdateWorker>().build()
             workManager.enqueue(workerRequest)
             Snackbar.make(binding.root, "Blocklist downloading...", Snackbar.LENGTH_LONG).show()
-        }
-    }
-
-    private fun setupViewDiagnosticsView() {
-        binding.viewDiagnostics.setOnClickListener {
-            val i = Intent().also { it.setClassName(packageName, "dummy.ui.VpnDiagnosticsActivity") }
-            startActivity(i)
         }
     }
 
@@ -237,21 +212,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         binding.exceptionRules.setOnClickListener {
             startActivity(ExceptionRulesDebugActivity.intent(this))
         }
-    }
-
-    private fun setupTransparencyMode() {
-
-        // we use the same receiver as it makes IPC much easier
-        transparencyModeDebugReceiver = TransparencyModeDebugReceiver(this) {
-            // avoid duplicating broadcast intent when toggle changes state
-            if (TransparencyModeDebugReceiver.isTurnOnIntent(it)) {
-                binding.transparencyModeToggle.quietlySetIsChecked(true, transparencyToggleListener)
-            } else if (TransparencyModeDebugReceiver.isTurnOffIntent(it)) {
-                binding.transparencyModeToggle.quietlySetIsChecked(false, transparencyToggleListener)
-            }
-        }.apply { register() }
-
-        binding.transparencyModeToggle.setOnCheckedChangeListener(transparencyToggleListener)
     }
 
     private fun setupBadHealthMonitoring() {

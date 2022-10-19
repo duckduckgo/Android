@@ -125,14 +125,6 @@
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                android:id="@+id/transparencyModeToggle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="Transparency Mode"
-                app:showSwitch="true"
-            />
-
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/exceptionRules"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -230,16 +222,6 @@
                 android:layout_height="wrap_content"
                 app:primaryText="Generate AppTP bugreport"
             />
-
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                android:id="@+id/viewDiagnostics"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:primaryText="View Diagnostics Data"
-            />
-
 
             <!-- Section Health -->
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider

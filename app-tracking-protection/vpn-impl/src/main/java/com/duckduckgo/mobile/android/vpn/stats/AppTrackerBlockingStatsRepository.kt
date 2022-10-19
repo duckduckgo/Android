@@ -48,8 +48,6 @@ interface AppTrackerBlockingStatsRepository {
         return DatabaseDateFormatter.timestamp(LocalDateTime.of(9999, 1, 1, 0, 0))
     }
 
-    fun getVpnState(): Flow<VpnState>
-
     fun getVpnTrackers(
         startTime: () -> String,
         endTime: String = noEndDate()
@@ -72,11 +70,6 @@ interface AppTrackerBlockingStatsRepository {
         endTime: String = noEndDate()
     ): Flow<Long>
 
-    fun getVpnDataStats(
-        startTime: () -> String,
-        endTime: String = noEndDate()
-    ): Flow<DataStats>
-
     fun getVpnRestartHistory(): List<VpnPhoenixEntity>
     fun deleteVpnRestartHistory()
     fun getBlockedTrackersCountBetween(
@@ -90,30 +83,14 @@ interface AppTrackerBlockingStatsRepository {
     ): Flow<Int>
 }
 
-data class DataStats(
-    val sent: DataTransfer = DataTransfer(),
-    val received: DataTransfer = DataTransfer()
-)
-
-data class DataTransfer(
-    val dataSize: Long = 0,
-    val numberPackets: Long = 0
-)
-
 @ContributesBinding(AppScope::class)
 class RealAppTrackerBlockingStatsRepository @Inject constructor(
     val vpnDatabase: VpnDatabase
 ) : AppTrackerBlockingStatsRepository {
 
     private val trackerDao = vpnDatabase.vpnTrackerDao()
-    private val statsDao = vpnDatabase.vpnDataStatsDao()
-    private val stateDao = vpnDatabase.vpnStateDao()
     private val runningTimeDao = vpnDatabase.vpnRunningStatsDao()
     private val phoenixDao = vpnDatabase.vpnPhoenixDao()
-
-    override fun getVpnState(): Flow<VpnState> {
-        return stateDao.get().distinctUntilChanged()
-    }
 
     override fun getVpnTrackers(
         startTime: () -> String,
@@ -166,19 +143,6 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
             .flowOn(Dispatchers.Default)
     }
 
-    override fun getVpnDataStats(
-        startTime: () -> String,
-        endTime: String
-    ): Flow<DataStats> {
-        return statsDao.getDataStatsBetween(startTime(), endTime)
-            .conflate()
-            .distinctUntilChanged()
-            .map { list -> list.filter { it.id >= startTime() } }
-            .transform {
-                emit(calculateDataTotals(it))
-            }.flowOn(Dispatchers.Default)
-    }
-
     @WorkerThread
     override fun getVpnRestartHistory(): List<VpnPhoenixEntity> {
         return phoenixDao.restarts()
@@ -208,25 +172,5 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
         return trackerDao.getTrackingAppsCountBetween(startTime(), endTime)
             .conflate()
             .distinctUntilChanged()
-    }
-
-    private fun calculateDataTotals(dataStats: List<VpnDataStats>): DataStats {
-
-        var dataSent = 0L
-        var packetsSent = 0L
-        var dataReceived = 0L
-        var packetsReceived = 0L
-
-        dataStats.forEach {
-            dataReceived += it.dataReceived
-            dataSent += it.dataSent
-            packetsReceived += it.packetsReceived
-            packetsSent += it.packetsSent
-        }
-
-        return DataStats(
-            sent = DataTransfer(dataSent, packetsSent),
-            received = DataTransfer(dataReceived, packetsReceived)
-        )
     }
 }
