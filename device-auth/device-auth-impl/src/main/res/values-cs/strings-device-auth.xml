@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="autofill_auth_text">Jestli chceš použít uložená přihlášení, zařízení odemkni</string>
     <string name="biometric_prompt_title">Ověř, že jsi to ty</string>
 </resources>

@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="autofill_auth_text">Разблокируйте, чтобы использовать сохраненные логины</string>
     <string name="biometric_prompt_title">Подтвердите свою личность</string>
 </resources>

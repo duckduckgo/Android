@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="autofill_auth_text">Odklenite za uporabo shranjenih prijav</string>
     <string name="biometric_prompt_title">Potrdite, da ste to vi</string>
 </resources>
