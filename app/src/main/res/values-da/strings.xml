@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- smartling.placeholder_format = NONE -->
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
@@ -62,8 +61,8 @@
     <string name="printMenuTitle">Udskriv side</string>
     <string name="favoriteDeleteConfirmationMessage">Favorit fjernet</string>
     <string name="fireproofDeleteConfirmationMessage">Brandsikring fjernet</string>
-    <string name="privacyProtectionEnabledConfirmationMessage">Beskyttelse af privatlivet aktiveret for %s</string>
-    <string name="privacyProtectionDisabledConfirmationMessage">Beskyttelse af privatlivet deaktiveret for %s</string>
+    <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Beskyttelse af privatlivet aktiveret for %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Beskyttelse af privatlivet deaktiveret for %1$s</string>
     <string name="undoSnackbarAction">Fortryd</string>
 
     <!-- Downloading files -->
@@ -115,7 +114,7 @@
     <string name="privacyProtectionEnabled">BESKYTTELSE AF WEBSTEDET ER AKTIVERET</string>
     <string name="privacyProtectionDisabled">BESKYTTELSE AF WEBSTEDET ER DEAKTIVERET</string>
     <string name="privacyDashboardActivityTitle">Privatlivspanel</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FORSTÆRKET FRA <img src="%d"></img> TIL <img src="%d"></img></string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FORSTÆRKET FRA &lt;img src=\"%1$d\" /&gt; TIL &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Grad af privatliv</string>
     <string name="privacyProtectionTemporarilyDisabled">Vi har midlertidigt deaktiveret beskyttelse af privatlivets fred, da det ser ud til at ødelægge dette websted.</string>
 
@@ -158,7 +157,7 @@
 
     <string name="trackersBlockedNoSectionDescription">Følgende domæners anmodninger blev indlæst.</string>
 
-    <string name="adLoadedSectionDescription">Følgende domænes anmodninger blev indlæst, fordi der for nylig blev klikket på en annonce på %@ på DuckDuckGo. Disse anmodninger hjælper med at evaluere annoncernes effektivitet. Alle annoncer på DuckDuckGo er ikke-profilerende.</string>
+    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Følgende domænes anmodninger blev indlæst, fordi der for nylig blev klikket på en %1$s-annonce på DuckDuckGo Disse anmodninger hjælper med at evaluere annoncernes effektivitet. Alle annoncer på DuckDuckGo er ikke-profilerende.</string>
     <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Sådan påvirker vores søgningsannoncer vores beskyttelse</annotation></string>
     <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
 
@@ -167,7 +166,7 @@
     <string name="domainsLoadedSectionEmptyListDescription">Vi har ikke registreret anmodninger fra tredjepartsdomæner.</string>
 
     <string name="domainsLoadedBreakageSectionDescription">Følgende domænes anmodninger blev indlæst for at forhindre brud på webstedet.</string>
-    <string name="domainsLoadedAssociatedSectionDescription">Følgende domænes anmodninger blev indlæst, fordi de er tilknyttet %s.</string>
+    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Følgende domænes anmodninger blev indlæst, fordi de er tilknyttet %1$s.</string>
 
     <string name="trackersBlockedText">Anmodninger blokeret fra indlæsning</string>
     <string name="trackersNotBlockedText">Ingen sporingsanmodninger blokeret</string>
@@ -258,8 +257,8 @@
     <string name="bookmarksMenuTitle">Bogmærker</string>
     <string name="bookmarksActivityTitle">Bogmærker</string>
     <string name="noBookmarks">Ingen bogmærker tilføjet endnu</string>
-    <string name="bookmarkOverflowContentDescription">Flere muligheder for bogmærke %s</string>
-    <string name="bookmarkDeleteConfirmationMessage">Slettede <b>%s</b></string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Flere muligheder for bogmærke %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Slettet &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Eksportér</string>
     <string name="exportBookmarksEmpty">Du har ingen bogmærker, intet eksporteres</string>
     <string name="exportBookmarksError">Kunne ikke eksportere nogen bogmærker, noget gik galt</string>
@@ -305,7 +304,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Tilføj til startskærm</string>
-    <string name="shortcutAddedText">Det lykkedes! %s er blevet føjet til din startskærm.</string>
+    <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Det lykkedes! %1$s er blevet føjet til din startskærm.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Hjælp os med at forbedre appen!</string>
@@ -363,14 +362,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Vi beskytter dit privatliv</string>
     <string name="privacyProtectionNotificationReportTitle">Din privatlivsrapport</string>
     <string name="privacyProtectionNotificationDefaultDescription">Brug af DuckDuckGo-appen beskytter dine data ved at blokere trackere og kryptere forbindelser.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Du beskyttede dine data ved at sikre %d ukrypterede forbindelser, mens du bruger DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Du beskyttede dine data ved at blokere %d trackere, mens du bruger DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription">Du beskyttede dine data ved at blokere %d trackere og sikre %d ukrypterede forbindelser, mens du bruger DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Du beskyttede dine data ved at sikre %1$d ukrypterede forbindelser, mens du bruger DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Du beskyttede dine data ved at blokere %1$d trackere, mens du bruger DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Du beskyttede dine data ved at blokere %1$d trackere og sikre %2$d ukrypterede forbindelser, mens du bruger DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Genoptag surfing</string>
 
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Log ind</string>
-    <string name="authenticationDialogMessage">%s kræver et brugernavn og adgangskode.</string>
+    <string name="authenticationDialogMessage" instruction="Placeholder is the name of a website">%1$s kræver et brugernavn og adgangskode.</string>
     <string name="authenticationDialogPositiveButton">Log ind</string>
     <string name="authenticationDialogNegativeButton">Annuller</string>
     <string name="authenticationDialogUsernameHint">Brugernavn</string>
@@ -486,20 +485,20 @@
     <string name="daxEndCtaText"><![CDATA[Du har den!<br/><br/>Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👍]]></string>
     <string name="daxSerpCtaText">Dine DuckDuckGo-søgninger er anonyme. Altid. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ og <b>%d anden</b> forsøgte at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere adresselinjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
-        <item quantity="other"><![CDATA[ og <b>%d andre</b> forsøgte at spore dig her. <br/><br/>Jeg har blokeret dem!<br/><br/> ☝️Du kan tjekke adresselinjen for at se, hvem der forsøger at spore dig, når du besøger et nyt websted.️]]></item>
+        <item quantity="one"><![CDATA[ og <b>%1$d anden</b> forsøgte at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere adresselinjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
+        <item quantity="other"><![CDATA[ og <b>%1$d andre</b> forsøgte at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere adresselinjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ prøvede at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
         <item quantity="other"><![CDATA[ prøvede at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Når du trykker og ruller, blokerer jeg irriterende trackere. <br/><br/>Gå videre - fortsæt med at browse!]]></string>
-    <string name="daxMainNetworkCtaText">Bemærk! Jeg kan ikke forhindre %s i at se din aktivitet på <br></br><br></br>Men browse sammen med mig, så kan jeg reducere det, som %s ved om dig samlet set, ved at blokere vedkommendes trackere på mange andre sider.</string>
-    <string name="daxMainNetworkOwnedCtaText">Bemærk! Da %s ejer %s, kan jeg ikke forhindre dem i at se din aktivitet her.<br></br><br></br>Men browse sammen med mig, så kan jeg reducere det, som %s ved om dig samlet set, ved at blokere vedkommendes trackere på mange andre sider.</string>
+    <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Bemærk! Jeg kan ikke forhindre %1$s i at se din aktivitet på %2$s.&lt;br/&gt;&lt;br/&gt;Men gennemsøg sammen med mig, så kan jeg reducere det, som %3$s kender til dig samlet set ved at blokere vedkommendes trackere på mange andre sider.</string>
+    <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Bemærk! Da %1$s ejer %2$s, kan jeg ikke forhindre dem i at se din aktivitet her. &lt;br/&gt;&lt;br/&gt;Men gennemsøg sammen med mig, så kan jeg reducere det, som %3$s kender til dig samlet set ved at blokere deres trackere på mange andre sider.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Gem i downloads</string>
-    <string name="downloadConfirmationSaveFileTitle">Gem %1$s</string>
+    <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Gem %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Behold begge</string>
     <string name="downloadConfirmationReplaceOldFileText">Erstat</string>
     <string name="downloadConfirmationOpenFileText">Åbn</string>
@@ -527,8 +526,8 @@
     <string name="whitelistActivityTitle">Ubeskyttede websteder</string>
     <string name="enablePrivacyProtection">Aktiver Beskyttelse af privatlivet</string>
     <string name="disablePrivacyProtection">Deaktiver Beskyttelse af privatlivet</string>
-    <string name="whitelistEntryOverflowContentDescription">Flere indstillinger for ubeskyttet websted %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Er du sikker på, at du vil fjerne <b>%s</b> fra ubeskyttede websteder?</string>
+    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Flere indstillinger for ubeskyttet websted %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Er du sikker på, at du vil fjerne &lt;b&gt;%1$s&lt;/b&gt; fra ubeskyttede websteder?</string>
     <string name="whitelistExplanation">Disse websteder vil ikke blive forbedret ved Beskyttelse af privatlivet.</string>
     <string name="whitelistNoEntries">Databeskyttelse aktiveret for alle websteder</string>
     <string name="whitelistDomainHint">www.example.com</string>
@@ -541,12 +540,12 @@
     <string name="fireproofWebsitesActivityTitle">Brandsikre websteder</string>
     <string name="settingsFireproofWebsites">Brandsikre websteder</string>
     <string name="fireproofWebsiteMenuTitleAdd">Gør dette websted brandsikkert</string>
-    <string name="fireproofWebsiteSnackbarConfirmation"><b>%s</b> er nu brandsikker</string>
+    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; er nu brandsikker</string>
     <string name="fireproofWebsiteSnackbarAction">Fortryd</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Er du sikker på, at du vil slette <b>%s</b>?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage" instruction="Placeholder is a website">Er du sikker på, at du vil slette &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Websider er afhængige af cookies for at bevare dig logget ind. Når du Brandsikrer et websted, slettes cookies ikke, og du forbliver logget ind, selv efter, at du har brugt Brand-knappen. Vi blokerer stadig tredjeparts-trackere, der findes på Brandsikre-websteder.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Flere muligheder for at brandsikre webstedet %s</string>
-    <string name="fireproofWebsiteLoginDialogTitle">Ønsker du Brandsikre %s?</string>
+    <string name="fireproofWebsiteOverflowContentDescription" instruction="Placeholder is a website">Flere muligheder for at brandsikre websted %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">Ønsker du Brandsikre %1$s?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Brandsikring af dette websted holder dig logget ind efter brug af Brand-knappen.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Brandsikker</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ikke nu</string>
@@ -554,7 +553,7 @@
     <string name="fireproofWebsiteEmptyListHint">Ingen brandsikre websteder endnu</string>
     <string name="fireproofWebsiteSettingSelectionTitle">Brandsikre websteder ved login</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Brandsikring fjernet for alle websteder</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Brandsikring fjernet for <b>%s</b></string>
+    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Brandsikring fjernet for &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Spørg hver gang</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Altid</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Aldrig</string>
@@ -583,11 +582,11 @@
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vil du aktivere enhedsplacering for DuckDuckGo-databeskyttelsesbrowser?</string>
-    <string name="preciseLocationSystemDialogSubtitle">%s anmoder om din enheds placering. Du skal først give appen tilladelse til at sende din enheds placering, hvorefter %s kan bede om tilladelse.</string>
+    <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s anmoder om din enhedsplacering. Du skal først give tilladelse til, at appen kan sende din enhedsplacering, hvorefter %2$s kan bede om tilladelse.</string>
     <string name="preciseLocationSystemDialogAllow">Aktiver</string>
     <string name="preciseLocationSystemDialogDeny">Måske senere</string>
     <string name="preciseLocationSystemDialogNeverAllow">Spørg ikke igen for dette websted</string>
-    <string name="preciseLocationSiteDialogTitle">Vil du give %s tilladelse til at få adgang til placering?</string>
+    <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Vil du give %1$s tilladelse til at få adgang til placering?</string>
     <string name="preciseLocationDDGDialogSubtitle">Vi bruger kun din anonyme placering til at levere bedre resultater tættere på dig. Du kan altid skifte mening senere.</string>
     <string name="preciseLocationSiteDialogSubtitle">Du kan administrere de tilladelser til placeringsadgang, du har givet til individuelle websteder under Indstillinger.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Altid</string>
@@ -599,11 +598,11 @@
     <string name="preciseLocationEmptyListHint">Ingen websteder har tilladelse til at få adgang til placering</string>
     <string name="preciseLocationNoSystemPermission">For at administrere de tilladelser til placeringsadgang, du har givet til individuelle websteder, skal du aktivere placering for denne app under Android-indstillinger.</string>
     <string name="preciseLocationActivityTitle">Placering</string>
-    <string name="preciseLocationDeleteConfirmMessage">Er du sikker på, at du vil slette <b>%s</b>?</string>
-    <string name="preciseLocationDeleteContentDescription">Flere indstillinger for placeringstilladelser i domænet %s</string>
+    <string name="preciseLocationDeleteConfirmMessage" instruction="Placeholder is the name of a website">Er du sikker på, at du vil slette &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription" instruction="Placeholder is the domain of a website">Flere valgmuligheder for placeringstilladelser i domæne %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Tilladt</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Afvist</string>
-    <string name="preciseLocationSnackbarMessage">Du har tidligere givet %s tilladelse til at få adgang til din enheds placering.</string>
+    <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Du har tidligere givet %1$s tilladelse til at få adgang til din enhedsplacering.</string>
 
     <!--Fire button education-->
     <string name="daxClearDataCtaText">Personoplysninger kan opbygges i din browser. Adr. Brug Ildknappen til at brænde det hele væk. Prøv det nu! 👇</string>
@@ -624,14 +623,14 @@
     <string name="appLinkDialogTitle">Åbn i en anden app?</string>
     <string name="appLinkSnackBarAction">Åbn i app</string>
     <string name="appLinkMultipleSnackBarAction">Vælg app</string>
-    <string name="appLinkSnackBarMessage">Du kan åbne dette link i %s.</string>
+    <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Du kan åbne dette link i %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Du kan åbne dette link i andre apps.</string>
     <string name="appLinkIntentChooserTitle">Åben med</string>
     <string name="appLinkMenuItemTitle">Åbn i app</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Ny adresse kopieret til din udklipsholder</string>
-    <string name="autofillTooltipUseYourAlias">Brug %1$s</string>
+    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Brug %1$s</string>
     <string name="autofillTooltipUseYourAliasDescription">Blokerer e-mailtrackere</string>
     <string name="autofillTooltipGenerateAddress">Opret privat Duck-adresse</string>
     <string name="autofillTooltipGenerateAddressDescription">Blokerer e-mailtrackere og skjuler din adresse</string>
@@ -658,13 +657,13 @@
     <string name="bookmarkFolderEmpty">Tom</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%s%s og %d element?</item>
-        <item quantity="other">%s%s og %d elementer?</item>
+        <item quantity="one">%1$s%2$s og %1$d element?</item>
+        <item quantity="other">%1$s%2$s og %1$d elementer?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%d element</item>
-        <item quantity="other">%d elementer</item>
+        <item quantity="one">%1$d element</item>
+        <item quantity="other">%1$d elementer</item>
     </plurals>
 
     <!-- Accessibility-->
@@ -681,7 +680,7 @@
     <string name="settingsPrivacyPolicyDuckduckgo">Privatlivspolitik</string>
 
     <!-- Home Screen Widget -->
-    <string name="homeScreenWidgetAdded">%s widget tilføjet til startskærmen</string>
+    <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s widget tilføjet til startskærmen</string>
     <string name="settingsAddHomeScreenWidget">Startskærmswidget</string>
 
     <!-- MacOs Settings -->
@@ -700,9 +699,9 @@
     <string name="downloadsItemMenuDelete">Slet</string>
     <string name="downloadsItemMenuCancel">Afbestil</string>
     <string name="downloadsActivityMenuDeleteAll">Slet alle</string>
-    <string name="downloadsFileDeletedMessage">Slettede %s</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Slettet &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="downloadsAllFilesDeletedMessage">Alle filer er slettet</string>
-    <string name="downloadsMoreOptionsContentDescription">Flere muligheder for %s</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Flere muligheder for %1$s</string>
     <string name="downloadsUndoActionName">Fortryd</string>
     <string name="downloadsStateInProgress">I gang ...</string>
 
@@ -734,13 +733,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Administrer websteder</string>
     <string name="sitePermissionsSettingsEmptyText">Ingen websteder endnu</string>
-    <string name="permissionPerWebsiteText">Tilladelser for \"%s\" </string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Tilladelser til \"%1$s\" </string>
     <string name="permissionsPerWebsiteAskSetting">Spørg</string>
     <string name="permissionsPerWebsiteDenySetting">Afvis</string>
     <string name="permissionsPerWebsiteAllowSetting">Tillad</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle">%s tilladelse for %s</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s tilladelse til %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automatisk udfyldning</string>
-
 </resources>
