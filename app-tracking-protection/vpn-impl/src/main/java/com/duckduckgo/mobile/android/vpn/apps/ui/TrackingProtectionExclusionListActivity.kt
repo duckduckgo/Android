@@ -159,7 +159,6 @@ class TrackingProtectionExclusionListActivity :
         val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
 
         if (isListEnabled) {
-            // TODO [ANA] Do we want to hide this banner until we know its content so it doesn't jump?
             binding.excludedAppsEnabledVPNLabel.show()
             binding.excludedAppsDisabledVPNLabel.gone()
         } else {
