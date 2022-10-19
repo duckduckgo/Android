@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- smartling.placeholder_format = NONE -->
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
@@ -62,8 +61,8 @@
     <string name="printMenuTitle">Imprimer la page</string>
     <string name="favoriteDeleteConfirmationMessage">Favori supprimé</string>
     <string name="fireproofDeleteConfirmationMessage">Mode coupe-feu désactivé</string>
-    <string name="privacyProtectionEnabledConfirmationMessage">Protection de la confidentialité activée pour %s</string>
-    <string name="privacyProtectionDisabledConfirmationMessage">Protection de la confidentialité désactivée pour %s</string>
+    <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Protection de la confidentialité activée pour %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Protection de la confidentialité désactivée pour %1$s</string>
     <string name="undoSnackbarAction">Annuler</string>
 
     <!-- Downloading files -->
@@ -115,7 +114,7 @@
     <string name="privacyProtectionEnabled">PROTECTION DU SITE ACTIVÉE</string>
     <string name="privacyProtectionDisabled">PROTECTION DU SITE DÉSACTIVÉE</string>
     <string name="privacyDashboardActivityTitle">Tableau de bord de confidentialité</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">AMÉLIORÉ DE <img src="%d"></img> À <img src="%d"></img></string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">AMÉLIORÉ DE &lt;img src=\"%1$d\" /&gt; À &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Degré de confidentialité</string>
     <string name="privacyProtectionTemporarilyDisabled">Nous avons temporairement désactivé la protection de la confidentialité car elle semble perturber ce site.</string>
 
@@ -158,7 +157,7 @@
 
     <string name="trackersBlockedNoSectionDescription">Les demandes du domaine suivant ont également été chargées.</string>
 
-    <string name="adLoadedSectionDescription">Les demandes du domaine suivant ont été chargées car une publicité %s sur DuckDuckGo a récemment fait l\'objet d\'un clic. Ces demandes permettent d\'évaluer l\'efficacité des publicités. Toutes les publicités sur DuckDuckGo sont sans profilage.</string>
+    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Les demandes du domaine suivant ont été chargées car une publicité %1$s sur DuckDuckGo a récemment fait l\'objet d\'un clic. Ces demandes permettent d\'évaluer l\'efficacité des publicités. Toutes les publicités sur DuckDuckGo sont sans profilage.</string>
     <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Impact de nos publicités de recherche sur nos protections </annotation></string>
     <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
 
@@ -167,7 +166,7 @@
     <string name="domainsLoadedSectionEmptyListDescription">Nous n\'avons détecté aucune demande provenant de domaines tiers.</string>
 
     <string name="domainsLoadedBreakageSectionDescription">Les demandes du domaine suivant ont été chargées pour éviter toute coupure du site.</string>
-    <string name="domainsLoadedAssociatedSectionDescription">Les demandes du domaine suivant ont été chargées car elles sont associées à %s.</string>
+    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Les demandes du domaine suivant ont été chargées car elles sont associées à %1$s.</string>
 
     <string name="trackersBlockedText">Demandes dont le chargement a été bloqué</string>
     <string name="trackersNotBlockedText">Aucune demande de suivi bloquée</string>
@@ -258,8 +257,8 @@
     <string name="bookmarksMenuTitle">Signets</string>
     <string name="bookmarksActivityTitle">Signets</string>
     <string name="noBookmarks">Aucun signet ajouté pour le moment</string>
-    <string name="bookmarkOverflowContentDescription">Plus d\'options pour le signet %s</string>
-    <string name="bookmarkDeleteConfirmationMessage"><b>%s</b> supprimé</string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Plus d\'options pour le signet %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; supprimé</string>
     <string name="exportBookmarksMenu">Exporter</string>
     <string name="exportBookmarksEmpty">Rien ne sera exporté car vous n\'avez pas de signet.</string>
     <string name="exportBookmarksError">Impossible d\'exporter les signets. Un problème est survenu.</string>
@@ -268,7 +267,7 @@
     <string name="importBookmarksFileTitle">Sélectionnez un fichier de signets à importer.</string>
     <string name="importBookmarksError">Impossible d\'importer les signets. Un problème est survenu.</string>
     <string name="importBookmarksEmpty">Le fichier ne contient aucun signet à importer.</string>
-    <string name="importBookmarksSuccess">Importation réussie de %1$d signets</string>
+    <string name="importBookmarksSuccess">Importation réussie de %1$d signets.</string>
     <string name="savedSiteDialogTitleHint">Titre</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Modifier</string>
@@ -305,7 +304,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Ajouter à la page d\'accueil</string>
-    <string name="shortcutAddedText">%s a bien été ajouté à votre écran d\'accueil.</string>
+    <string name="shortcutAddedText" instruction="Placeholder is the name of a website">%1$s a bien été ajouté à votre écran d\'accueil.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Aidez-nous à améliorer l\'application !</string>
@@ -363,14 +362,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Nous protégeons votre vie privée</string>
     <string name="privacyProtectionNotificationReportTitle">Votre rapport de confidentialité</string>
     <string name="privacyProtectionNotificationDefaultDescription">L\'utilisation de l\'application DuckDuckGo protège vos données en bloquant les traqueurs et en chiffrant les connexions.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Vous avez protégé vos données en sécurisant %d connexions non chiffrées lors de l\'utilisation de DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Vous avez protégé vos données en bloquant %d traqueurs lors de l\'utilisation de DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription">Vous avez protégé vos données en bloquant %d traqueurs et en sécurisant %d connexions non chiffrées lors de l\'utilisation de DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Vous avez protégé vos données en sécurisant %1$d connexions non chiffrées lors de l\'utilisation de DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Vous avez protégé vos données en bloquant %1$d traqueurs lors de l\'utilisation de DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Vous avez protégé vos données en bloquant %1$d traqueurs et en sécurisant %2$d connexions non chiffrées lors de l\'utilisation de DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Reprendre la navigation</string>
 
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Se connecter</string>
-    <string name="authenticationDialogMessage">%s nécessite un nom d\'utilisateur et un mot de passe.</string>
+    <string name="authenticationDialogMessage" instruction="Placeholder is the name of a website">%1$s nécessite un nom d\'utilisateur et un mot de passe.</string>
     <string name="authenticationDialogPositiveButton">Se connecter</string>
     <string name="authenticationDialogNegativeButton">Annuler</string>
     <string name="authenticationDialogUsernameHint">Nom d\'utilisateur</string>
@@ -486,20 +485,20 @@
     <string name="daxEndCtaText"><![CDATA[Bien joué !<br/><br/>Souvenez-vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent. 👍]]></string>
     <string name="daxSerpCtaText">Vos recherches sur DuckDuckGo sont anonymes. Toujours. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ et <b>%d autre</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
-        <item quantity="other"><![CDATA[ et <b>%d autres</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
+        <item quantity="one"><![CDATA[ et <b>%1$d autre</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
+        <item quantity="other"><![CDATA[ et <b>%1$d autres</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ essayait de vous traquer ici. <br/><br/>Je l\'ai bloqué !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
         <item quantity="other"><![CDATA[ essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Lors de votre navigation, je bloque les traqueurs indésirables.<br/><br/>Continuez à naviguer en toute tranquillité !]]></string>
-    <string name="daxMainNetworkCtaText">Attention ! Je ne peux pas empêcher %s de voir votre activité sur %s <br></br><br></br>Mais si vous naviguez avec moi, je peux réduire les données recueillies par %s en bloquant ses traqueurs sur de nombreux autres sites.</string>
-    <string name="daxMainNetworkOwnedCtaText">Attention ! Comme %s est propriétaire de %s, je ne peux pas l\'empêcher d\'y suivre votre activité.<br></br><br></br>Mais si vous naviguez avec moi, je peux réduire les données recueillies par %s en bloquant ses traqueurs sur de nombreux autres sites.</string>
+    <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Attention ! Je ne peux pas empêcher %1$s de voir votre activité sur %2$s.&lt;br/&gt;&lt;br/&gt;Si vous naviguez avec moi, je peux réduire les données récoltées par %3$s en bloquant ses traqueurs sur de nombreux autres sites.</string>
+    <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Attention ! Comme %1$s est propriétaire de %2$s, je ne peux pas l\'empêcher d\'y suivre votre activité.&lt;br/&gt;&lt;br/&gt;Si vous naviguez avec moi, je peux réduire les données récoltées par %3$s en bloquant ses traqueurs sur de nombreux autres sites.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Enregistrer dans les téléchargements</string>
-    <string name="downloadConfirmationSaveFileTitle">Enregistrer %1$s</string>
+    <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Enregistrer %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Garder les deux</string>
     <string name="downloadConfirmationReplaceOldFileText">Remplacer</string>
     <string name="downloadConfirmationOpenFileText">Ouvrir</string>
@@ -527,8 +526,8 @@
     <string name="whitelistActivityTitle">Sites non protégés</string>
     <string name="enablePrivacyProtection">Activer la protection de la confidentialité</string>
     <string name="disablePrivacyProtection">Désactiver la protection de la confidentialité</string>
-    <string name="whitelistEntryOverflowContentDescription">Plus d\'options pour le site non protégé %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Voulez-vous vraiment retirer <b>%s</b> des sites non protégés ?</string>
+    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Plus d\'options pour le site non protégé %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Voulez-vous vraiment retirer &lt;b&gt;%1$s&lt;/b&gt; des sites non protégés ?</string>
     <string name="whitelistExplanation">Les sites suivants ne bénéficient pas de la protection de la confidentialité.</string>
     <string name="whitelistNoEntries">La protection de la confidentialité est activée pour tous les sites</string>
     <string name="whitelistDomainHint">www.exemple.com</string>
@@ -541,12 +540,12 @@
     <string name="fireproofWebsitesActivityTitle">Sites coupe-feu</string>
     <string name="settingsFireproofWebsites">Sites coupe-feu</string>
     <string name="fireproofWebsiteMenuTitleAdd">Activer le mode coupe-feu pour ce site</string>
-    <string name="fireproofWebsiteSnackbarConfirmation"><b>%s</b> est maintenant en mode coupe-feu</string>
+    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; est maintenant en mode coupe-feu</string>
     <string name="fireproofWebsiteSnackbarAction">Annuler</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Voulez-vous vraiment supprimer <b>%s</b> ?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage" instruction="Placeholder is a website">Voulez-vous vraiment supprimer &lt;b&gt;%1$s&lt;/b&gt; ?</string>
     <string name="fireproofWebsiteFeatureDescription">Les sites Web utilisent des cookies pour maintenir votre connexion. Quand vous placez un site en mode coupe-feu, les cookies sont conservés et vous restez connecté(e), même après avoir utilisé le bouton en forme de flamme. Ceci dit, les traqueurs tiers sont bloqués sur les sites coupe-feu.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Plus d\'options pour le site Web coupe-feu %s</string>
-    <string name="fireproofWebsiteLoginDialogTitle">Souhaitez-vous placer %s en mode coupe-feu ?</string>
+    <string name="fireproofWebsiteOverflowContentDescription" instruction="Placeholder is a website">Plus d\'options pour le site Web coupe-feu %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">Souhaitez-vous placer %1$s en mode coupe-feu ?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Placer ce site en mode coupe-feu et utiliser le bouton en forme de flamme ne vous déconnectera pas.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Mode coupe-feu</string>
     <string name="fireproofWebsiteLoginDialogNegative">Pas maintenant</string>
@@ -554,7 +553,7 @@
     <string name="fireproofWebsiteEmptyListHint">Pas encore de sites en mode coupe-feu</string>
     <string name="fireproofWebsiteSettingSelectionTitle">Sites Web en mode coupe-feu lors de la connexion</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Suppression du mode coupe-feu pour tous les sites</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Mode coupe-feu désactivé pour <b>%s</b></string>
+    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Mode coupe-feu désactivé pour &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Toujours demander</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Toujours</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Jamais</string>
@@ -583,11 +582,11 @@
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Voulez-vous activer la localisation de l\'appareil pour le navigateur confidentiel DuckDuckGo ?</string>
-    <string name="preciseLocationSystemDialogSubtitle">%s souhaite accéder à la localisation de votre appareil. Vous devez d\'abord autoriser l\'application à envoyer la localisation de votre appareil avant que %s puisse demander l\'autorisation.</string>
+    <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s souhaite accéder à la localisation de votre appareil. Vous devez d\'abord autoriser l\'application à envoyer la localisation de votre appareil avant que %2$s puisse demander l\'autorisation.</string>
     <string name="preciseLocationSystemDialogAllow">Activer</string>
     <string name="preciseLocationSystemDialogDeny">Peut-être plus tard</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ne plus demander pour ce site</string>
-    <string name="preciseLocationSiteDialogTitle">Autoriser %s à accéder à la localisation ?</string>
+    <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Autoriser %1$s à accéder à la localisation ?</string>
     <string name="preciseLocationDDGDialogSubtitle">Nous n\'utilisons votre localisation anonyme que pour vous fournir de meilleurs résultats, plus proches de vous. Vous pouvez modifier ce réglage plus tard.</string>
     <string name="preciseLocationSiteDialogSubtitle">Vous pouvez gérer les autorisations d\'accès à la localisation accordées aux différents sites depuis les paramètres.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Toujours</string>
@@ -599,11 +598,11 @@
     <string name="preciseLocationEmptyListHint">L\'autorisation d\'accès à la localisation n\'a été accordée à aucun site Web</string>
     <string name="preciseLocationNoSystemPermission">Pour gérer les autorisations d\'accès à la localisation accordées aux différents sites, activez la localisation pour cette application dans les paramètres Android.</string>
     <string name="preciseLocationActivityTitle">Localisation</string>
-    <string name="preciseLocationDeleteConfirmMessage">Voulez-vous vraiment supprimer <b>%s</b> ?</string>
-    <string name="preciseLocationDeleteContentDescription">Plus d\'options pour les autorisations de localisation dans le domaine %s</string>
+    <string name="preciseLocationDeleteConfirmMessage" instruction="Placeholder is the name of a website">Voulez-vous vraiment supprimer &lt;b&gt;%1$s&lt;/b&gt; ?</string>
+    <string name="preciseLocationDeleteContentDescription" instruction="Placeholder is the domain of a website">Plus d\'options pour les autorisations de localisation dans le domaine %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Accordées</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Refusées</string>
-    <string name="preciseLocationSnackbarMessage">Vous avez déjà autorisé %s à accéder à la localisation de votre appareil.</string>
+    <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Vous avez déjà autorisé %1$s à accéder à la localisation de votre appareil.</string>
 
     <!--Fire button education-->
     <string name="daxClearDataCtaText">Les données personnelles peuvent s\'accumuler dans votre navigateur. Oh non ! Utilisez le bouton en forme de flamme pour les supprimer. Essayez par vous-même !👇</string>
@@ -624,14 +623,14 @@
     <string name="appLinkDialogTitle">Ouvrir dans une autre application ?</string>
     <string name="appLinkSnackBarAction">Ouvrir dans l\'application</string>
     <string name="appLinkMultipleSnackBarAction">Choisir une application</string>
-    <string name="appLinkSnackBarMessage">Vous pouvez ouvrir ce lien dans %s.</string>
+    <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Vous pouvez ouvrir ce lien dans %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Vous pouvez ouvrir ce lien dans d\'autres applications.</string>
     <string name="appLinkIntentChooserTitle">Ouvrir avec</string>
     <string name="appLinkMenuItemTitle">Ouvrir dans l\'application</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nouvelle adresse copiée dans le presse-papiers</string>
-    <string name="autofillTooltipUseYourAlias">Utiliser %1$s</string>
+    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Utiliser %1$s</string>
     <string name="autofillTooltipUseYourAliasDescription">Bloque les traqueurs d\'e-mails</string>
     <string name="autofillTooltipGenerateAddress">Générer une Duck Address privée</string>
     <string name="autofillTooltipGenerateAddressDescription">Bloque les traqueurs d\'e-mails et masque votre adresse</string>
@@ -658,13 +657,13 @@
     <string name="bookmarkFolderEmpty">Vide</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%s%s et %d élément ?</item>
-        <item quantity="other">%s%s et %d éléments ?</item>
+        <item quantity="one">%1$s%2$s et %1$d élément ?</item>
+        <item quantity="other">%1$s%2$s et %1$d éléments ?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%d élément</item>
-        <item quantity="other">%d éléments</item>
+        <item quantity="one">%1$d élément</item>
+        <item quantity="other">%1$d éléments</item>
     </plurals>
 
     <!-- Accessibility-->
@@ -681,7 +680,7 @@
     <string name="settingsPrivacyPolicyDuckduckgo">Politique de confidentialité</string>
 
     <!-- Home Screen Widget -->
-    <string name="homeScreenWidgetAdded">Widget %s ajouté à l\'écran d\'accueil</string>
+    <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s widget ajouté à l\'écran d\'accueil</string>
     <string name="settingsAddHomeScreenWidget">Widget écran d\'accueil</string>
 
     <!-- MacOs Settings -->
@@ -700,9 +699,9 @@
     <string name="downloadsItemMenuDelete">Supprimer</string>
     <string name="downloadsItemMenuCancel">Annuler</string>
     <string name="downloadsActivityMenuDeleteAll">Tout supprimer</string>
-    <string name="downloadsFileDeletedMessage">%s supprimé</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">&lt;b&gt;%1$s&lt;/b&gt; supprimé</string>
     <string name="downloadsAllFilesDeletedMessage">Tous les fichiers sont supprimés.</string>
-    <string name="downloadsMoreOptionsContentDescription">Plus d\'options pour %s</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Plus d\'options pour %1$s</string>
     <string name="downloadsUndoActionName">Annuler</string>
     <string name="downloadsStateInProgress">En cours...</string>
 
@@ -734,13 +733,12 @@
     <string name="sitePermissionsSettingsMicrophone">Micro</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Gérer les sites</string>
     <string name="sitePermissionsSettingsEmptyText">Pas encore de sites</string>
-    <string name="permissionPerWebsiteText">Autorisations pour « %s » </string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Autorisations pour « %1$s » </string>
     <string name="permissionsPerWebsiteAskSetting">Demander</string>
     <string name="permissionsPerWebsiteDenySetting">Refuser</string>
     <string name="permissionsPerWebsiteAllowSetting">Autoriser</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle">Autorisation %s pour %s</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Autorisation de %1$s pour %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Saisie automatique</string>
-
 </resources>
