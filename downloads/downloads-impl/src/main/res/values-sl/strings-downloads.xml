@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Prenos ni uspel. Preverite internetno povezavo.</string>
 
     <string name="notificationChannelFileDownloading">Prenašanje datoteke</string>
@@ -25,8 +24,8 @@
 
     <string name="downloadInProgress">Prenašanje</string>
 
-    <string name="downloadsDownloadStartedMessage">Prenos za %s se je začel</string>
-    <string name="downloadsDownloadFinishedMessage">Prenos končan za %s</string>
+    <string name="downloadsDownloadStartedMessage" instruction="Placeholder is the name of a file">Prenos za %1$s se je začel</string>
+    <string name="downloadsDownloadFinishedMessage" instruction="Placeholder is the name of a file">Prenos za %1$s je končan</string>
     <string name="downloadsDownloadGenericErrorMessage">Prenos ni uspel.</string>
     <string name="downloadsCancel">Preklic</string>
     <string name="downloadsRetry">Ponovi</string>
