@@ -23,7 +23,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/default_selectable_bg">
 
-    <ImageView
+    <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.MultiAppsIcon
         android:id="@+id/activity_apps_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,7 +31,6 @@
         android:paddingTop="@dimen/keyline_4"
         android:paddingEnd="@dimen/keyline_1"
         android:paddingBottom="@dimen/keyline_1"
-        android:src="@drawable/ic_temp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

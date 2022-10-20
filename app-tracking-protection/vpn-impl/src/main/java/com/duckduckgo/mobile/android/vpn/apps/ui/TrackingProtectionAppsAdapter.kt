@@ -17,14 +17,13 @@
 package com.duckduckgo.mobile.android.vpn.apps.ui
 
 import android.content.Context
-import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
@@ -192,10 +191,4 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
             else -> 0
         }
     }
-}
-
-fun PackageManager.safeGetApplicationIcon(packageName: String): Drawable? {
-    return runCatching {
-        getApplicationIcon(packageName)
-    }.getOrNull()
 }
