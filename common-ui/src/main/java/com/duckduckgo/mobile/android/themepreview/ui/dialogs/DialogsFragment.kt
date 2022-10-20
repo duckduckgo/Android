@@ -29,6 +29,7 @@ import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.PromoBottomSheetDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialog
+import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog.EventListener
 import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog
@@ -78,21 +79,18 @@ class DialogsFragment : Fragment() {
 
         view.findViewById<Button>(R.id.radioButtonAlertDialog)?.let {
             it.setOnClickListener {
-                activity?.supportFragmentManager?.let { fragmentManager ->
-                    RadioListAlertDialog.Builder(requireContext())
-                        .setTitle(R.string.text_dialog_title)
-                        .setMessage(R.string.text_dialog_message)
-                        .setPositiveButton(R.string.text_dialog_positive)
-                        .setNegativeButton(R.string.text_dialog_negative)
-                        .setOptions(listOf(R.string.text_dialog_option, R.string.text_dialog_option, R.string.text_dialog_option))
-                        .addEventListener(object : RadioListAlertDialog.EventListener() {
-                            override fun onRadioItemSelected(selectedItem: Int) {
-                                Snackbar.make(it, "Radio Button $selectedItem selected", Snackbar.LENGTH_SHORT).show()
-                            }
-                        })
-                        .build()
-                        .show(fragmentManager, RadioListAlertDialog.TAG_RADIO_LIST_ALERT_DIALOG)
-                }
+                RadioListAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.text_dialog_title)
+                    .setMessage(R.string.text_dialog_message)
+                    .setPositiveButton(R.string.text_dialog_positive)
+                    .setNegativeButton(R.string.text_dialog_negative)
+                    .setOptions(listOf(R.string.text_dialog_option, R.string.text_dialog_option, R.string.text_dialog_option))
+                    .addEventListener(object : RadioListAlertDialog.EventListener() {
+                        override fun onRadioItemSelected(selectedItem: Int) {
+                            Snackbar.make(it, "Radio Button $selectedItem selected", Snackbar.LENGTH_SHORT).show()
+                        }
+                    })
+                    .show()
             }
         }
 

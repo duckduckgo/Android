@@ -16,20 +16,17 @@
 
 package com.duckduckgo.mobile.android.ui.view.dialog
 
-import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
-import android.os.Bundle
+import android.view.LayoutInflater
 import androidx.annotation.StringRes
-import androidx.fragment.app.DialogFragment
+import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.mobile.android.databinding.DialogSingleChoiceAlertBinding
 import com.duckduckgo.mobile.android.ui.view.button.RadioButton
-import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog.Builder
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.toDp
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class RadioListAlertDialog(val builder: Builder) : DialogFragment() {
+class RadioListAlertDialog {
 
     abstract class EventListener {
         open fun onDialogShown() {}
@@ -41,106 +38,38 @@ class RadioListAlertDialog(val builder: Builder) : DialogFragment() {
 
     internal class DefaultEventListener : EventListener()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        isCancelable = false
-        builder.listener.onDialogShown()
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val binding: DialogSingleChoiceAlertBinding = DialogSingleChoiceAlertBinding.inflate(layoutInflater)
-
-        binding.radioListDialogTitle.text = builder.titleText
-
-        if (builder.messageText.isEmpty()) {
-            binding.radioListDialogMessage.gone()
-        } else {
-            binding.radioListDialogMessage.text = builder.messageText
-        }
-
-        builder.optionList.forEach {
-            val radioButton = RadioButton(requireContext(), null)
-            radioButton.setPadding(30.toDp(), 0, 0, 0)
-            radioButton.text = it
-            binding.radioListDialogRadioGroup.addView(radioButton)
-        }
-
-        with(binding.radioListDialogRadioGroup) {
-            check(builder.selectedOption)
-            setOnCheckedChangeListener { group, checkedId ->
-                builder.listener.onRadioItemSelected(checkedId)
-            }
-        }
-
-        binding.radioListDialogPositiveButton.text = builder.positiveButtonText
-        binding.radioListDialogPositiveButton.setOnClickListener {
-            builder.listener.onPositiveButtonClicked(binding.radioListDialogRadioGroup.checkedRadioButtonId)
-            dismiss()
-        }
-
-        binding.radioListDialogNegativeButton.text = builder.negativeButtonText
-        binding.radioListDialogNegativeButton.setOnClickListener {
-            builder.listener.onNegativeButtonClicked()
-            dismiss()
-        }
-
-        val alertDialog = MaterialAlertDialogBuilder(
-            requireActivity(),
-            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog
-        )
-            .setView(binding.root)
-
-        isCancelable = false
-
-        return alertDialog.create()
-    }
-
-    override fun onDismiss(dialog: DialogInterface) {
-        builder.listener.onDialogDismissed()
-        super.onDismiss(dialog)
-    }
-
-    companion object {
-        const val TAG_RADIO_LIST_ALERT_DIALOG = "RadioListAlertDialog"
-    }
-
-    class Builder(val context: Context) {
-
+    class RadioListAlertDialogBuilder(val context: Context) {
         var listener: EventListener = DefaultEventListener()
-
+            private set
         var titleText: CharSequence = ""
+            private set
         var messageText: CharSequence = ""
-
+            private set
         var positiveButtonText: CharSequence = ""
+            private set
         var negativeButtonText: CharSequence = ""
-
+            private set
         var optionList: MutableList<CharSequence> = mutableListOf()
+            private set
         var selectedOption = 0
+            private set
 
-        fun setTitle(
-            @StringRes textId: Int,
-        ): Builder {
+        fun setTitle(@StringRes textId: Int): RadioListAlertDialogBuilder {
             titleText = context.getText(textId)
             return this
         }
 
-        fun setMessage(
-            @StringRes textId: Int,
-        ): Builder {
+        fun setMessage(@StringRes textId: Int): RadioListAlertDialogBuilder {
             messageText = context.getText(textId)
             return this
         }
 
-        fun setTitle(
-            text: CharSequence,
-        ): Builder {
+        fun setTitle(text: CharSequence): RadioListAlertDialogBuilder {
             titleText = text
             return this
         }
 
-        fun setMessage(
-            text: CharSequence,
-        ): Builder {
+        fun setMessage(text: CharSequence): RadioListAlertDialogBuilder {
             messageText = text
             return this
         }
@@ -148,7 +77,7 @@ class RadioListAlertDialog(val builder: Builder) : DialogFragment() {
         fun setOptions(
             @StringRes stackedButtonTextId: List<Int>,
             selectedItem: Int = 0
-        ): Builder {
+        ): RadioListAlertDialogBuilder {
             stackedButtonTextId.forEach {
                 optionList.add(context.getText(it))
             }
@@ -156,38 +85,91 @@ class RadioListAlertDialog(val builder: Builder) : DialogFragment() {
             return this
         }
 
-        fun setPositiveButton(@StringRes textId: Int): Builder {
+        fun setPositiveButton(@StringRes textId: Int): RadioListAlertDialogBuilder {
             positiveButtonText = context.getText(textId)
             return this
         }
 
-        fun setNegativeButton(
-            @StringRes textId: Int
-        ): Builder {
+        fun setNegativeButton(@StringRes textId: Int): RadioListAlertDialogBuilder {
             negativeButtonText = context.getText(textId)
             return this
         }
 
-        fun addEventListener(eventListener: EventListener): Builder {
+        fun addEventListener(eventListener: EventListener): RadioListAlertDialogBuilder {
             listener = eventListener
             return this
         }
 
-        fun build(): RadioListAlertDialog {
-            val builder = this
-            if (builder.positiveButtonText.isEmpty()) {
-                throw Exception("TextAlertDialog: You must always provide a Positive Button")
+        fun show() {
+            val binding: DialogSingleChoiceAlertBinding = DialogSingleChoiceAlertBinding.inflate(LayoutInflater.from(context))
+
+            val dialogBuilder = MaterialAlertDialogBuilder(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
+                .setView(binding.root)
+                .apply {
+                    setCancelable(false)
+                    setOnDismissListener { listener.onDialogDismissed() }
+                }
+            val dialog = dialogBuilder.create()
+
+            setViews(binding, dialog)
+            checkRequiredFieldsSet()
+
+            dialog.show()
+            listener.onDialogShown()
+        }
+
+        private fun setViews(
+            binding: DialogSingleChoiceAlertBinding,
+            dialog: AlertDialog
+        ) {
+            binding.radioListDialogTitle.text = titleText
+
+            if (messageText.isEmpty()) {
+                binding.radioListDialogMessage.gone()
+            } else {
+                binding.radioListDialogMessage.text = messageText
             }
-            if (builder.negativeButtonText.isEmpty()) {
-                throw Exception("TextAlertDialog: You must always provide a Negative Button")
+
+            optionList.forEach {
+                val radioButton = RadioButton(context, null)
+                radioButton.setPadding(30.toDp(), 0, 0, 0)
+                radioButton.text = it
+                binding.radioListDialogRadioGroup.addView(radioButton)
             }
-            if (builder.titleText.isEmpty()) {
-                throw Exception("TextAlertDialog: You must always provide a Title")
+
+            with(binding.radioListDialogRadioGroup) {
+                check(selectedOption)
+                setOnCheckedChangeListener { group, checkedId ->
+                    listener.onRadioItemSelected(checkedId)
+                }
             }
-            if (builder.optionList.isEmpty()) {
-                throw Exception("TextAlertDialog: You must always provide a list of options")
+
+            binding.radioListDialogPositiveButton.text = positiveButtonText
+            binding.radioListDialogPositiveButton.setOnClickListener {
+                listener.onPositiveButtonClicked(binding.radioListDialogRadioGroup.checkedRadioButtonId)
+                dialog.dismiss()
             }
-            return RadioListAlertDialog(this)
+
+            binding.radioListDialogNegativeButton.text = negativeButtonText
+            binding.radioListDialogNegativeButton.setOnClickListener {
+                listener.onNegativeButtonClicked()
+                dialog.dismiss()
+            }
+        }
+
+        private fun checkRequiredFieldsSet() {
+            if (positiveButtonText.isEmpty()) {
+                throw Exception("RadioListAlertDialog: You must always provide a Positive Button")
+            }
+            if (negativeButtonText.isEmpty()) {
+                throw Exception("RadioListAlertDialog: You must always provide a Negative Button")
+            }
+            if (titleText.isEmpty()) {
+                throw Exception("RadioListAlertDialog: You must always provide a Title")
+            }
+            if (optionList.isEmpty()) {
+                throw Exception("RadioListAlertDialog: You must always provide a list of options")
+            }
         }
     }
 }
