@@ -29,13 +29,21 @@ import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.BannerState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -131,6 +139,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     fun showAppTpEnabledCtaIfNeeded() {
         if (!vpnStore.didShowAppTpEnabledCta()) {
             vpnStore.appTpEnabledCtaDidShow()
+            vpnStore.onOnboardingSessionSet()
             sendCommand(Command.ShowAppTpEnabledCta)
         }
     }
@@ -162,6 +171,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             ViewEvent.PromoteAlwaysOnForget -> onForgetPromoteAlwaysOnDialog()
             ViewEvent.PromoteAlwaysOnRemindLater -> onRemindLaterPromoteAlwaysOnDialog()
             ViewEvent.PromoteAlwaysOnOpenSettings -> onOpenSettingsPromoteAlwaysOnDialog()
+            ViewEvent.LaunchTrackingProtectionExclusionListActivity -> sendCommand(Command.LaunchTrackingProtectionExclusionListActivity)
         }
 
     }
@@ -198,9 +208,18 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         sendCommand(Command.OpenVpnSettings)
     }
 
+    fun bannerState(): BannerState {
+        return if (vpnStore.isOnboardingSession()) {
+            BannerState.OnboardingBanner
+        } else {
+            BannerState.NextSessionBanner
+        }
+    }
+
     internal data class TrackerActivityViewState(
         val trackerCountInfo: TrackerCountInfo,
-        val runningState: VpnState
+        val runningState: VpnState,
+        val bannerState: BannerState
     )
 
     internal data class TrackerCountInfo(
@@ -222,6 +241,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchAppTrackersFAQ : ViewEvent()
         object LaunchBetaInstructions : ViewEvent()
         object LaunchMostRecentActivity : ViewEvent()
+        object LaunchTrackingProtectionExclusionListActivity : ViewEvent()
         object RemoveFeature : ViewEvent()
         object StartVpn : ViewEvent()
         object AskToRemoveFeature : ViewEvent()
@@ -243,6 +263,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchAppTrackersFAQ : Command()
         object LaunchBetaInstructions : Command()
         object LaunchMostRecentActivity : Command()
+        object LaunchTrackingProtectionExclusionListActivity : Command()
         object ShowDisableVpnConfirmationDialog : Command()
         object ShowVpnConflictDialog : Command()
         object ShowVpnAlwaysOnConflictDialog : Command()

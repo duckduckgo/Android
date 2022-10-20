@@ -44,4 +44,9 @@ interface VpnStateMonitor {
         REVOKED,
         UNKNOWN
     }
+
+    sealed class BannerState {
+        object OnboardingBanner : BannerState()
+        object NextSessionBanner : BannerState()
+    }
 }

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/default_selectable_bg">
+
+    <ImageView
+        android:id="@+id/activity_apps_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingTop="@dimen/keyline_4"
+        android:paddingEnd="@dimen/keyline_1"
+        android:paddingBottom="@dimen/keyline_1"
+        android:src="@drawable/ic_temp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/activity_apps_warning_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_alert_yellow"
+        app:layout_constraintBottom_toBottomOf="@id/activity_apps_image"
+        app:layout_constraintEnd_toEndOf="@id/activity_apps_image" />
+
+    <TextView
+        android:id="@+id/activity_apps"
+        style="@style/DeviceShield.PrivacyReport.TrackerEntry"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:drawablePadding="@dimen/keyline_4"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/keyline_3"
+        android:paddingTop="@dimen/keyline_4"
+        android:paddingEnd="@dimen/keyline_4"
+        android:paddingBottom="@dimen/keyline_4"
+        app:drawableEndCompat="@drawable/ic_chevron_forward_small_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/activity_apps_image"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="11 of your apps are protected from hidden trackers we find trying to access your personal info" />
+
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        android:id="@+id/activity_apps_splitter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="72dp"
+        app:defaultPadding="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activity_apps" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -51,10 +51,12 @@ import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActivity
+import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldActivityBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.BannerState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
@@ -103,7 +105,7 @@ class DeviceShieldTrackerActivity :
     private var vpnCachedState: VpnState? = null
 
     private val feedConfig = DeviceShieldActivityFeedFragment.ActivityFeedConfig(
-        maxRows = 6,
+        maxRows = 5,
         timeWindow = 5,
         timeWindowUnits = TimeUnit.DAYS,
         showTimeWindowHeadings = false
@@ -149,6 +151,10 @@ class DeviceShieldTrackerActivity :
 
         binding.ctaManageProtection.setClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
+        }
+
+        binding.ctaManageViewAllApps.setClickListener {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchTrackingProtectionExclusionListActivity)
         }
 
         binding.ctaRemoveFeature.setClickListener {
@@ -202,7 +208,7 @@ class DeviceShieldTrackerActivity :
                     DeviceShieldTrackerActivityViewModel.TrackerCountInfo(trackers, apps)
                 }
                 .combine(viewModel.getRunningState()) { trackerCountInfo, runningState ->
-                    DeviceShieldTrackerActivityViewModel.TrackerActivityViewState(trackerCountInfo, runningState)
+                    DeviceShieldTrackerActivityViewModel.TrackerActivityViewState(trackerCountInfo, runningState, viewModel.bannerState())
                 }
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { renderViewState(it) }
@@ -251,6 +257,8 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.CloseScreen -> finish()
             is DeviceShieldTrackerActivityViewModel.Command.OpenVpnSettings -> openVPNSettings()
             is DeviceShieldTrackerActivityViewModel.Command.ShowAppTpEnabledCta -> showAppTpEnabledCta()
+            is DeviceShieldTrackerActivityViewModel.Command.LaunchTrackingProtectionExclusionListActivity ->
+                launchTrackingProtectionExclusionListActivity()
         }
     }
 
@@ -397,6 +405,10 @@ class DeviceShieldTrackerActivity :
         startActivity(DeviceShieldMostRecentActivity.intent(this))
     }
 
+    private fun launchTrackingProtectionExclusionListActivity() {
+        startActivity(TrackingProtectionExclusionListActivity.intent(this))
+    }
+
     private fun startVPN() {
         quietlyToggleAppTpSwitch(true)
         vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
@@ -420,7 +432,7 @@ class DeviceShieldTrackerActivity :
         }
 
         updateCounts(state.trackerCountInfo)
-        updateRunningState(state.runningState)
+        updateRunningState(state.runningState, state.bannerState)
     }
 
     private fun updateCounts(trackerCountInfo: DeviceShieldTrackerActivityViewModel.TrackerCountInfo) {
@@ -433,16 +445,23 @@ class DeviceShieldTrackerActivity :
             resources.getQuantityString(R.plurals.atp_ActivityPastWeekAppCount, trackerCountInfo.apps.value)
     }
 
-    private fun updateRunningState(runningState: VpnState) {
+    private fun updateRunningState(runningState: VpnState, bannerState: BannerState) {
         if (runningState.state == VpnRunningState.ENABLED) {
             Timber.d("updateRunningState enabled")
             binding.deviceShieldTrackerLabelDisabled.gone()
 
             binding.deviceShieldTrackerLabelEnabled.apply {
-                setClickableLink(
-                    APPTP_SETTINGS_ANNOTATION,
-                    getText(R.string.atp_ActivityEnabledLabel)
-                ) { launchManageAppsProtection() }
+                if (bannerState is BannerState.OnboardingBanner) {
+                    setClickableLink(
+                        APPTP_SETTINGS_ANNOTATION,
+                        getText(R.string.atp_ActivityEnabledLabel)
+                    ) { launchTrackingProtectionExclusionListActivity() }
+                } else {
+                    setClickableLink(
+                        APPTP_SETTINGS_ANNOTATION,
+                        getText(R.string.atp_ActivityEnabledMoreThanADayLabel)
+                    ) { launchManageAppsProtection() }
+                }
                 show()
             }
         } else {

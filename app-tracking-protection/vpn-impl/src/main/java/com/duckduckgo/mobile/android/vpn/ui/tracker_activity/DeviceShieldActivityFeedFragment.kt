@@ -21,14 +21,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoFragment
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayoutManager
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter.*
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -79,16 +84,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
                 .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
                 .collect {
                     feedListener?.onTrackerListShowed(it.size)
-                    trackerFeedAdapter.updateData(if (config.unboundedRows()) it else it.take(config.maxRows)) { trackerFeedData ->
-                        startActivity(
-                            AppTPCompanyTrackersActivity.intent(
-                                requireContext(),
-                                trackerFeedData.trackingApp.packageId,
-                                trackerFeedData.trackingApp.appDisplayName,
-                                trackerFeedData.bucket
-                            )
-                        )
-                    }
+                    trackerFeedAdapter.updateData(if (config.unboundedRows()) it else it.take(config.maxRows))
                 }
         }
     }

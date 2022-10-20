@@ -15,16 +15,13 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-  <group>
-    <clip-path
-        android:pathData="M0,0h24v24h-24z"/>
+    android:width="8dp"
+    android:height="14dp"
+    android:viewportWidth="8"
+    android:viewportHeight="14">
     <path
-        android:pathData="M17.2929,6.2929C17.6834,5.9024 18.3166,5.9024 18.7071,6.2929L23.7071,11.2929C24.0976,11.6834 24.0976,12.3166 23.7071,12.7071L18.7071,17.7071C18.3166,18.0976 17.6834,18.0976 17.2929,17.7071C16.9024,17.3166 16.9024,16.6834 17.2929,16.2929L21.5858,12L17.2929,7.7071C16.9024,7.3166 16.9024,6.6834 17.2929,6.2929Z"
-        android:fillColor="?secondaryIconColor"
-        android:fillType="evenOdd"/>
-  </group>
+        android:fillAlpha="0.12"
+        android:fillColor="?attr/primaryIconColor"
+        android:fillType="evenOdd"
+        android:pathData="M0.293,0.293C0.683,-0.098 1.317,-0.098 1.707,0.293L7.707,6.293C8.098,6.683 8.098,7.317 7.707,7.707L1.707,13.707C1.317,14.098 0.683,14.098 0.293,13.707C-0.098,13.317 -0.098,12.683 0.293,12.293L5.586,7L0.293,1.707C-0.098,1.317 -0.098,0.683 0.293,0.293Z" />
 </vector>
