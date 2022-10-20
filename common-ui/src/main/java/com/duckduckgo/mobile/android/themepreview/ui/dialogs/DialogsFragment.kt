@@ -32,8 +32,8 @@ import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog.StackedAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog.EventListener
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog.TextAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 
 /** Fragment to display a list of dialogs. */
@@ -56,25 +56,21 @@ class DialogsFragment : Fragment() {
 
         view.findViewById<Button>(R.id.textAlertDialogWithImageButton)?.let {
             it.setOnClickListener {
-                activity?.supportFragmentManager?.let { fragmentManager ->
-                    TextAlertDialog.Builder(requireContext())
-                        .setHeaderImageResource(R.drawable.ic_dax_icon)
-                        .setTitle(R.string.text_dialog_title)
-                        .setMessage(R.string.text_dialog_message)
-                        .setPositiveButton(R.string.text_dialog_positive)
-                        .setNegativeButton(R.string.text_dialog_negative)
-                        .addEventListener(object : EventListener() {
-                            override fun onPositiveButtonClicked() {
-                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
-                            }
-
-                            override fun onNegativeButtonClicked() {
-                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
-                            }
-                        })
-                        .build()
-                        .show(fragmentManager, TextAlertDialog.TAG_TEXT_ALERT_DIALOG)
-                }
+                TextAlertDialogBuilder(requireContext())
+                    .setHeaderImageResource(R.drawable.ic_dax_icon)
+                    .setTitle(R.string.text_dialog_title)
+                    .setMessage(R.string.text_dialog_message)
+                    .setPositiveButton(R.string.text_dialog_positive)
+                    .setNegativeButton(R.string.text_dialog_negative)
+                    .addEventListener(object : EventListener() {
+                        override fun onPositiveButtonClicked() {
+                            Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                        }
+                        override fun onNegativeButtonClicked() {
+                            Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                        }
+                    })
+                    .show()
             }
         }
 
@@ -97,24 +93,20 @@ class DialogsFragment : Fragment() {
 
         view.findViewById<Button>(R.id.textAlertDialogButton)?.let {
             it.setOnClickListener {
-                activity?.supportFragmentManager?.let { fragmentManager ->
-                    TextAlertDialog.Builder(requireContext())
-                        .setTitle(R.string.text_dialog_title)
-                        .setMessage(R.string.text_dialog_message)
-                        .setPositiveButton(R.string.text_dialog_positive)
-                        .setNegativeButton(R.string.text_dialog_negative)
-                        .addEventListener(object : EventListener() {
-                            override fun onPositiveButtonClicked() {
-                                Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
-                            }
-
-                            override fun onNegativeButtonClicked() {
-                                Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
-                            }
-                        })
-                        .build()
-                        .show(fragmentManager, TextAlertDialog.TAG_TEXT_ALERT_DIALOG)
-                }
+                TextAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.text_dialog_title)
+                    .setMessage(R.string.text_dialog_message)
+                    .setPositiveButton(R.string.text_dialog_positive)
+                    .setNegativeButton(R.string.text_dialog_negative)
+                    .addEventListener(object : EventListener() {
+                        override fun onPositiveButtonClicked() {
+                            Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
+                        }
+                        override fun onNegativeButtonClicked() {
+                            Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
+                        }
+                    })
+                    .show()
             }
         }
         view.findViewById<Button>(R.id.stackedAlertDialogWithImageButton)?.let {

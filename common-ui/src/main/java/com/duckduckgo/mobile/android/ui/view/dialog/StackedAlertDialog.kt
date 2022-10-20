@@ -37,15 +37,16 @@ class StackedAlertDialog {
     internal class DefaultEventListener : EventListener()
 
     class StackedAlertDialogBuilder(val context: Context) {
-
         var listener: EventListener = DefaultEventListener()
-
+            private set
         var titleText: CharSequence = ""
+            private set
         var messageText: CharSequence = ""
-
+            private set
         var headerImageDrawableId = 0
-
+            private set
         var stackedButtonList: MutableList<CharSequence> = mutableListOf()
+            private set
 
         fun setHeaderImageResource(@DrawableRes drawableId: Int): StackedAlertDialogBuilder {
             headerImageDrawableId = drawableId

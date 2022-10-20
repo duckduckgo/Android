@@ -16,18 +16,16 @@
 
 package com.duckduckgo.mobile.android.ui.view.dialog
 
-import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
-import android.os.Bundle
+import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.fragment.app.DialogFragment
+import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class TextAlertDialog(val builder: Builder) : DialogFragment() {
+class TextAlertDialog {
 
     abstract class EventListener {
         open fun onDialogShown() {}
@@ -38,137 +36,119 @@ class TextAlertDialog(val builder: Builder) : DialogFragment() {
 
     internal class DefaultEventListener : EventListener()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        isCancelable = false
-        builder.listener.onDialogShown()
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val binding: DialogTextAlertBinding = DialogTextAlertBinding.inflate(layoutInflater)
-
-        if (builder.headerImageDrawableId > 0) {
-            binding.textAlertDialogImage.setImageResource(builder.headerImageDrawableId)
-        } else {
-            binding.textAlertDialogImage.gone()
-        }
-
-        binding.textAlertDialogTitle.text = builder.titleText
-
-        if (builder.messageText.isEmpty()) {
-            binding.textAlertDialogMessage.gone()
-        } else {
-            binding.textAlertDialogMessage.text = builder.messageText
-        }
-
-        binding.textAlertDialogPositiveButton.text = builder.positiveButtonText
-        binding.textAlertDialogPositiveButton.setOnClickListener {
-            builder.listener.onPositiveButtonClicked()
-            dismiss()
-        }
-
-        binding.textAlertDialogCancelButton.text = builder.negativeButtonText
-        binding.textAlertDialogCancelButton.setOnClickListener {
-            builder.listener.onNegativeButtonClicked()
-            dismiss()
-        }
-
-        val alertDialog = MaterialAlertDialogBuilder(
-            requireActivity(),
-            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog
-        )
-            .setView(binding.root)
-
-        isCancelable = false
-
-        return alertDialog.create()
-    }
-
-    override fun onDismiss(dialog: DialogInterface) {
-        builder.listener.onDialogDismissed()
-        super.onDismiss(dialog)
-    }
-
-    companion object {
-        const val TAG_TEXT_ALERT_DIALOG = "TextAlertDialog"
-    }
-
-    class Builder(val context: Context) {
-
+    class TextAlertDialogBuilder(val context: Context) {
         var listener: EventListener = DefaultEventListener()
-
+            private set
         var titleText: CharSequence = ""
+            private set
         var messageText: CharSequence = ""
-
+            private set
         var headerImageDrawableId = 0
-
+            private set
         var positiveButtonText: CharSequence = ""
+            private set
         var negativeButtonText: CharSequence = ""
+            private set
 
-        fun setHeaderImageResource(
-            @DrawableRes drawableId: Int
-        ): Builder {
+        fun setHeaderImageResource(@DrawableRes drawableId: Int): TextAlertDialogBuilder {
             headerImageDrawableId = drawableId
             return this
         }
 
-        fun setTitle(
-            @StringRes textId: Int,
-        ): Builder {
+        fun setTitle(@StringRes textId: Int): TextAlertDialogBuilder {
             titleText = context.getText(textId)
             return this
         }
 
-        fun setMessage(
-            @StringRes textId: Int,
-        ): Builder {
+        fun setMessage(@StringRes textId: Int): TextAlertDialogBuilder {
             messageText = context.getText(textId)
             return this
         }
 
-        fun setTitle(
-            text: CharSequence,
-        ): Builder {
+        fun setTitle(text: CharSequence,): TextAlertDialogBuilder {
             titleText = text
             return this
         }
 
-        fun setMessage(
-            text: CharSequence,
-        ): Builder {
+        fun setMessage(text: CharSequence,): TextAlertDialogBuilder {
             messageText = text
             return this
         }
 
-        fun setPositiveButton(@StringRes textId: Int): Builder {
+        fun setPositiveButton(@StringRes textId: Int): TextAlertDialogBuilder {
             positiveButtonText = context.getText(textId)
             return this
         }
 
-        fun setNegativeButton(
-            @StringRes textId: Int
-        ): Builder {
+        fun setNegativeButton(@StringRes textId: Int): TextAlertDialogBuilder {
             negativeButtonText = context.getText(textId)
             return this
         }
 
-        fun addEventListener(eventListener: EventListener): Builder {
+        fun addEventListener(eventListener: EventListener): TextAlertDialogBuilder {
             listener = eventListener
             return this
         }
 
-        fun build(): TextAlertDialog {
-            val builder = this
-            if (builder.positiveButtonText.isEmpty()) {
+        fun show() {
+            val binding: DialogTextAlertBinding = DialogTextAlertBinding.inflate(LayoutInflater.from(context))
+
+            val dialogBuilder = MaterialAlertDialogBuilder(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
+                .setView(binding.root)
+                .apply {
+                    setCancelable(false)
+                    setOnDismissListener { listener.onDialogDismissed() }
+                }
+            val dialog = dialogBuilder.create()
+
+            setViews(binding, dialog)
+            checkRequiredFieldsSet()
+
+            dialog.show()
+            listener.onDialogShown()
+        }
+
+        private fun setViews(
+            binding: DialogTextAlertBinding,
+            dialog: AlertDialog
+        ) {
+            if (headerImageDrawableId > 0) {
+                binding.textAlertDialogImage.setImageResource(headerImageDrawableId)
+            } else {
+                binding.textAlertDialogImage.gone()
+            }
+
+            binding.textAlertDialogTitle.text = titleText
+
+            if (messageText.isEmpty()) {
+                binding.textAlertDialogMessage.gone()
+            } else {
+                binding.textAlertDialogMessage.text = messageText
+            }
+
+            binding.textAlertDialogPositiveButton.text = positiveButtonText
+            binding.textAlertDialogPositiveButton.setOnClickListener {
+                listener.onPositiveButtonClicked()
+                dialog.dismiss()
+            }
+
+            binding.textAlertDialogCancelButton.text = negativeButtonText
+            binding.textAlertDialogCancelButton.setOnClickListener {
+                listener.onNegativeButtonClicked()
+                dialog.dismiss()
+            }
+        }
+
+        private fun checkRequiredFieldsSet() {
+            if (positiveButtonText.isEmpty()) {
                 throw Exception("TextAlertDialog: You must always provide a Positive Button")
             }
-            if (builder.negativeButtonText.isEmpty()) {
+            if (negativeButtonText.isEmpty()) {
                 throw Exception("TextAlertDialog: You must always provide a Negative Button")
             }
-            if (builder.titleText.isEmpty()) {
+            if (titleText.isEmpty()) {
                 throw Exception("TextAlertDialog: You must always provide a Title")
             }
-            return TextAlertDialog(this)
         }
     }
 }
