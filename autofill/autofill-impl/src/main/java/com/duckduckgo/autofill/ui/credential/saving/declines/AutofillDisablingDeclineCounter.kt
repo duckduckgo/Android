@@ -47,13 +47,6 @@ class AutofillDisablingDeclineCounter @Inject constructor(
     @VisibleForTesting
     var currentSessionPreviousDeclinedDomain: String? = null
 
-    /**
-     * The count of domains for which we have recorded a decline in the current session, held in-memory only.
-     * Only incremented if decline is on a new domain.
-     */
-    @VisibleForTesting
-    var currentSessionDomainDeclineCount = 0
-
     init {
         appCoroutineScope.launch(dispatchers.io()) {
             isActive = determineIfDeclineCounterIsActive().also {
@@ -75,7 +68,6 @@ class AutofillDisablingDeclineCounter @Inject constructor(
 
     private fun recordDeclineForDomain(domain: String) {
         Timber.d("User declined to save credentials for a new domain; recording the decline")
-        currentSessionDomainDeclineCount++
         autofillStore.autofillDeclineCount++
         currentSessionPreviousDeclinedDomain = domain
     }
@@ -85,7 +77,6 @@ class AutofillDisablingDeclineCounter @Inject constructor(
     override suspend fun disableDeclineCounter() {
         isActive = false
         currentSessionPreviousDeclinedDomain = null
-        currentSessionDomainDeclineCount = 0
 
         withContext(dispatchers.io()) {
             autofillStore.monitorDeclineCounts = false
@@ -97,14 +88,11 @@ class AutofillDisablingDeclineCounter @Inject constructor(
 
         return withContext(dispatchers.io()) {
 
-            val shouldOffer = currentSessionDomainDeclineCount >= CURRENT_SESSION_DECLINE_COUNT_THRESHOLD &&
-                autofillStore.autofillDeclineCount >= GLOBAL_DECLINE_COUNT_THRESHOLD
+            val shouldOffer = autofillStore.autofillDeclineCount >= GLOBAL_DECLINE_COUNT_THRESHOLD
 
             Timber.v(
-                "User declined to save credentials %d times globally from all sessions, " +
-                    "across at least %d domains this current session. Should prompt to disable: %s",
+                "User declined to save credentials %d times globally from all sessions. Should prompt to disable: %s",
                 autofillStore.autofillDeclineCount,
-                currentSessionDomainDeclineCount,
                 shouldOffer
             )
 
@@ -120,6 +108,5 @@ class AutofillDisablingDeclineCounter @Inject constructor(
 
     companion object {
         private const val GLOBAL_DECLINE_COUNT_THRESHOLD = 3
-        private const val CURRENT_SESSION_DECLINE_COUNT_THRESHOLD = 2
     }
 }

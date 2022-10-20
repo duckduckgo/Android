@@ -17,6 +17,7 @@
 package com.duckduckgo.site.permissions.impl.di
 
 import android.content.Context
+import android.content.pm.PackageManager
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -58,8 +59,11 @@ object SitePermissionsModule {
     }
 
     @Provides
-    fun providesSitePermissionsManager(sitePermissionsRepository: SitePermissionsRepositoryImpl): SitePermissionsManager {
-        return SitePermissionsManagerImpl(sitePermissionsRepository)
+    fun providesSitePermissionsManager(
+        sitePermissionsRepository: SitePermissionsRepositoryImpl,
+        packageManager: PackageManager
+    ): SitePermissionsManager {
+        return SitePermissionsManagerImpl(packageManager, sitePermissionsRepository)
     }
 
     @Provides
