@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Neizdevās lejupielādēt. Pārbaudi interneta savienojumu.</string>
 
     <string name="notificationChannelFileDownloading">Failu lejupielāde</string>
@@ -25,8 +24,8 @@
 
     <string name="downloadInProgress">Lejupielāde</string>
 
-    <string name="downloadsDownloadStartedMessage">%@ lejupielāde sākta</string>
-    <string name="downloadsDownloadFinishedMessage">%@ lejupielāde pabeigta</string>
+    <string name="downloadsDownloadStartedMessage" instruction="Placeholder is the name of a file">%1$s lejupielāde sākta</string>
+    <string name="downloadsDownloadFinishedMessage" instruction="Placeholder is the name of a file">%1$s lejupielāde pabeigta</string>
     <string name="downloadsDownloadGenericErrorMessage">Neizdevās lejupielādēt.</string>
     <string name="downloadsCancel">Atcelt</string>
     <string name="downloadsRetry">Mēģināt vēlreiz</string>
