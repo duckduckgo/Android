@@ -49,11 +49,6 @@ open class DaxButton @JvmOverloads constructor(
         typedArray.recycle()
 
         minHeight = resources.getDimensionPixelSize(Size.dimension(buttonSize))
-        iconSize = if (buttonSize == Small){
-            resources.getDimensionPixelSize(R.dimen.buttonSmallIconSize)
-        } else {
-            resources.getDimensionPixelSize(R.dimen.buttonSmallIconSize)
-        }
     }
 
 }
