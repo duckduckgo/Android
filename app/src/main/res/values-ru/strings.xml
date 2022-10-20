@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- smartling.placeholder_format = NONE -->
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Логотип DuckDuckGo</string>
@@ -62,8 +61,8 @@
     <string name="printMenuTitle">Печать страницы</string>
     <string name="favoriteDeleteConfirmationMessage">Страница удалена из избранного</string>
     <string name="fireproofDeleteConfirmationMessage">Огнеупорность снята</string>
-    <string name="privacyProtectionEnabledConfirmationMessage">На %s включена защита конфиденциальности</string>
-    <string name="privacyProtectionDisabledConfirmationMessage">На %s отключена защита конфиденциальности</string>
+    <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Защита конфиденциальности на сайте %1$s включена</string>
+    <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Защита конфиденциальности на сайте %1$s выключена</string>
     <string name="undoSnackbarAction">Отменить</string>
 
     <!-- Downloading files -->
@@ -115,7 +114,7 @@
     <string name="privacyProtectionEnabled">ЗАЩИТА САЙТА ВКЛЮЧЕНА</string>
     <string name="privacyProtectionDisabled">ЗАЩИТА САЙТА ОТКЛЮЧЕНА</string>
     <string name="privacyDashboardActivityTitle">Панель конфиденциальности</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">УРОВЕНЬ ЗАЩИТЫ ПОВЫШЕН С <img src="%d"></img> ДО <img src="%d"></img></string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">УРОВЕНЬ ЗАЩИТЫ ПОВЫШЕН С &lt;img src=\"%1$d\" /&gt; ДО &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Рейтинг конфиденциальности</string>
     <string name="privacyProtectionTemporarilyDisabled">Мы временно отключили функцию защиты конфиденциальности, так как она мешала работе сайта.</string>
 
@@ -158,7 +157,7 @@
 
     <string name="trackersBlockedNoSectionDescription">Загружены запросы следующих доменов.</string>
 
-    <string name="adLoadedSectionDescription">Запросы этого домена были загружены в результате недавнего нажатия на рекламу %s в DuckDuckGo. Такие запросы помогают оценить эффективность рекламы. Рекламные объявления в DuckDuckGo не профилируют пользователей.</string>
+    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Запросы этого домена были загружены в результате недавнего нажатия на рекламу %1$s в DuckDuckGo. Такие запросы помогают оценить эффективность рекламы. Рекламные объявления в DuckDuckGo не профилируют пользователей.</string>
     <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Как реклама при поиске влияет на защиту</annotation></string>
     <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
 
@@ -167,7 +166,7 @@
     <string name="domainsLoadedSectionEmptyListDescription">Запросов от сторонних доменов не обнаружено.</string>
 
     <string name="domainsLoadedBreakageSectionDescription">Запросы этого домена были загружены для предотвращения неполадок в работе сайта.</string>
-    <string name="domainsLoadedAssociatedSectionDescription">Запросы этого домена были загружены, так как они связаны с %s.</string>
+    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Мы загрузили запросы этого домена, так как они связаны с %1$s.</string>
 
     <string name="trackersBlockedText">Заблокирована загрузка запросов</string>
     <string name="trackersNotBlockedText">Трекинг-запросы не заблокированы</string>
@@ -258,8 +257,8 @@
     <string name="bookmarksMenuTitle">Закладки</string>
     <string name="bookmarksActivityTitle">Закладки</string>
     <string name="noBookmarks">Закладок пока нет</string>
-    <string name="bookmarkOverflowContentDescription">Другие опции закладки %s</string>
-    <string name="bookmarkDeleteConfirmationMessage">Закладка <b>%s</b> удалена</string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Другие параметры закладки %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Закладка &lt;b&gt;%1$s&lt;/b&gt; удалена</string>
     <string name="exportBookmarksMenu">Экспорт</string>
     <string name="exportBookmarksEmpty">Если у вас нет закладок, то и экспортировать будет нечего</string>
     <string name="exportBookmarksError">Что-то пошло не так, и экспортировать закладки не удалось</string>
@@ -268,7 +267,7 @@
     <string name="importBookmarksFileTitle">Выберите файл с закладками для импортирования</string>
     <string name="importBookmarksError">Что-то пошло не так, и импортировать закладки не удалось</string>
     <string name="importBookmarksEmpty">В указанном файле нет закладок</string>
-    <string name="importBookmarksSuccess">Закладки (%1$d) импортированы</string>
+    <string name="importBookmarksSuccess">Закладки (%1$d) успешно импортированы</string>
     <string name="savedSiteDialogTitleHint">Название</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Редактировать</string>
@@ -305,7 +304,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Добавить на домашнюю страницу</string>
-    <string name="shortcutAddedText">Готово! Мы добавили %s на ваш домашний экран.</string>
+    <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Готово! Мы добавили %1$s на ваш домашний экран.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Помогите нам улучшить приложение!</string>
@@ -363,14 +362,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Мы защищаем вашу конфиденциальность</string>
     <string name="privacyProtectionNotificationReportTitle">Ваш отчёт о конфиденциальности</string>
     <string name="privacyProtectionNotificationDefaultDescription">Приложение DuckDuckGo защищает ваши данные, блокируя трекеры и шифруя соединения.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Вы обезопасили свои данные, защитив незашифрованные соединения (%d) в DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Вы обезопасили свои данные, заблокировав трекеры (%d) в DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription">Вы обезопасили свои данные, заблокировав трекеры (%d) и защитив незашифрованные соединения (%d) в DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Вы обезопасили свои данные, защитив %1$d незашифрованных соединений при использовании DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Вы обезопасили свои данные, заблокировав %1$d трекеров при использовании DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Вы обезопасили свои данные, заблокировав %1$d трекеров и защитив %2$d незашифрованных соединений при использовании DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Продолжить</string>
 
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Войти</string>
-    <string name="authenticationDialogMessage">Для входа в %s требуются имя пользователя и пароль.</string>
+    <string name="authenticationDialogMessage" instruction="Placeholder is the name of a website">Для входа на %1$s требуются имя пользователя и пароль.</string>
     <string name="authenticationDialogPositiveButton">Войти</string>
     <string name="authenticationDialogNegativeButton">Отменить</string>
     <string name="authenticationDialogUsernameHint">Имя пользователя</string>
@@ -486,10 +485,10 @@
     <string name="daxEndCtaText"><![CDATA[Проще некуда!<br/><br/>Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе. 👍]]></string>
     <string name="daxSerpCtaText">Ваши поисковые запросы в DuckDuckGo анонимны. Все и всегда. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ и <b>еще %d сервис</b> пытались вести за вами слежку. <br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
-        <item quantity="few"><![CDATA[ и <b>еще %d сервиса</b> пытались вести за вами слежку. <br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
-        <item quantity="many"><![CDATA[ и <b>еще %d сервисов</b> пытались вести за вами слежку. <br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
-        <item quantity="other"><![CDATA[ и <b>еще %d сервиса</b> пытались вести за вами слежку. <br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
+        <item quantity="one"><![CDATA[ и <b>еще %1$d сервис</b> пытались вести за вами слежку.<br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
+        <item quantity="few"><![CDATA[ и <b>еще %1$d сервиса</b> пытались вести за вами слежку.<br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
+        <item quantity="many"><![CDATA[ и <b>еще %1$d сервисов</b> пытались вести за вами слежку.<br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
+        <item quantity="other"><![CDATA[ и <b>еще %1$d сервиса</b> пытались вести за вами слежку.<br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ пытался вести за вами слежку. <br/><br/>Но мы его заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
@@ -498,12 +497,12 @@
         <item quantity="other"><![CDATA[ пытались вести за вами слежку. <br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Вы жмете на кнопки и листаете страницы — мы блокируем трекеры. <br/><br/>Пользуйтесь сайтами без страха!]]></string>
-    <string name="daxMainNetworkCtaText">Внимание! Мы не можем скрыть от %s вашу активность на %s <br></br><br></br>Переходите на наш браузер, чтобы мы заблокировали трекеры %s на других сайтах и свели к минимуму собираемые о вас данные.</string>
-    <string name="daxMainNetworkOwnedCtaText">Внимание! Поскольку %s владеет %s, мы не можем скрыть вашу активность на этом ресурсе.<br></br><br></br> Переходите на наш браузер, чтобы мы заблокировали трекеры %s на других сайтах и свели к минимуму собираемые о вас данные.</string>
+    <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Внимание! Мы не можем скрыть от %1$s вашу активность на %2$s.&lt;br/&gt;&lt;br/&gt;Используйте наш браузер, и мы сократим объем собираемой о вас информации, заблокировав трекеры %3$s на других сайтах.</string>
+    <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Внимание! Так как %2$s принадлежит сети %1$s, мы не можем скрыть вашу активность на этом ресурсе.&lt;br/&gt;&lt;br/&gt;Используйте наш браузер, и мы сократим объем собираемой о вас информации, заблокировав трекеры %3$s на других сайтах.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Сохранить в «Загрузки»</string>
-    <string name="downloadConfirmationSaveFileTitle">Сохранение %1$s</string>
+    <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Сохранить %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Оставить оба</string>
     <string name="downloadConfirmationReplaceOldFileText">Заменить</string>
     <string name="downloadConfirmationOpenFileText">Открыть</string>
@@ -531,8 +530,8 @@
     <string name="whitelistActivityTitle">Незащищенные сайты</string>
     <string name="enablePrivacyProtection">Включить защиту конфиденциальности</string>
     <string name="disablePrivacyProtection">Отключить защиту конфиденциальности</string>
-    <string name="whitelistEntryOverflowContentDescription">Дополнительные опции для незащищенного сайта %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Действительно удалить <b>%s</b> из списка незащищенных сайтов?</string>
+    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Дополнительные параметры для незащищенного сайта %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Вы точно хотите удалить &lt;b&gt;%1$s&lt;/b&gt; из списка незащищенных сайтов?</string>
     <string name="whitelistExplanation">Сайты без защиты конфиденциальности.</string>
     <string name="whitelistNoEntries">Защита конфиденциальности включена на всех сайтах</string>
     <string name="whitelistDomainHint">www.example.com</string>
@@ -545,12 +544,12 @@
     <string name="fireproofWebsitesActivityTitle">Огнеупорные сайты</string>
     <string name="settingsFireproofWebsites">Огнеупорные сайты</string>
     <string name="fireproofWebsiteMenuTitleAdd">Сделать огнеупорным</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">Сайт <b>%s</b> теперь огнеупорный</string>
+    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; теперь огнеупорный</string>
     <string name="fireproofWebsiteSnackbarAction">Отменить</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Действительно удалить <b>%s</b>?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage" instruction="Placeholder is a website">Вы уверены, что хотите удалить &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Чтобы вам не приходилось каждый раз входить в свою учетную запись, сайты используют куки-файлы. Если сделать сайт огнеупорным, мы не будем стирать его куки-файлы, даже если вы воспользуетесь кнопкой «Пожар». Но мы по-прежнему будем блокировать сторонние трекеры, в том числе на огнеупорных сайтах.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Дополнительные опции огнеупорности сайта %s</string>
-    <string name="fireproofWebsiteLoginDialogTitle">Сделать сайт %s огнеупорным?</string>
+    <string name="fireproofWebsiteOverflowContentDescription" instruction="Placeholder is a website">Дополнительные параметры для огнеупорного сайта %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">Сделать сайт %1$s огнеупорным?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Вам не придется заново входить в свою учетную запись даже после применения кнопки «Пожар».</string>
     <string name="fireproofWebsiteLoginDialogPositive">Сделать</string>
     <string name="fireproofWebsiteLoginDialogNegative">Не сейчас</string>
@@ -558,7 +557,7 @@
     <string name="fireproofWebsiteEmptyListHint">Огнеупорных сайтов нет</string>
     <string name="fireproofWebsiteSettingSelectionTitle">Огнеупорность при входе</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Огнеупорность отменена в отношении всех сайтов</string>
-    <string name="fireproofWebsiteRemovalConfirmation">С сайта <b>%s</b> снята огнеупорность</string>
+    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">С сайта &lt;b&gt;%1$s&lt;/b&gt; снята огнеупорность</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Спрашивать каждый раз</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Всегда</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Никогда</string>
@@ -587,11 +586,11 @@
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Включить определение геопозиции устройства для браузера DuckDuckGo с защитой данных?</string>
-    <string name="preciseLocationSystemDialogSubtitle">%s запрашивает геопозицию вашего устройства. Сначала нужно позволить приложению передавать координаты устройства, после чего %s сможет запросить разрешение.</string>
+    <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s запрашивает геопозицию вашего устройства. Сначала вам нужно разрешить приложению отправлять геопозицию устройства, затем %2$s сможет запрашивать разрешение.</string>
     <string name="preciseLocationSystemDialogAllow">Включить</string>
     <string name="preciseLocationSystemDialogDeny">Позже</string>
     <string name="preciseLocationSystemDialogNeverAllow">Больше не спрашивать для этого сайта</string>
-    <string name="preciseLocationSiteDialogTitle">Открыть %s доступ к местоположению?</string>
+    <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Дать %1$s доступ к геопозиции?</string>
     <string name="preciseLocationDDGDialogSubtitle">Анонимная геопозиция позволяет подобрать более точные результаты поблизости. Вы всегда можете изменить эту настройку позже.</string>
     <string name="preciseLocationSiteDialogSubtitle">Вы можете управлять разрешениями на доступ к геопозиции, которые вы предоставили отдельным сайтам, в настройках.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Всегда</string>
@@ -603,11 +602,11 @@
     <string name="preciseLocationEmptyListHint">Ни одному сайту не предоставлено разрешение на доступ к геопозиции</string>
     <string name="preciseLocationNoSystemPermission">Чтобы управлять доступом к геопозиции, который вы предоставили отдельным сайтам, включите определение геопозиции для этого приложения в настройках Android.</string>
     <string name="preciseLocationActivityTitle">Геопозиция</string>
-    <string name="preciseLocationDeleteConfirmMessage">Действительно удалить <b>%s</b>?</string>
-    <string name="preciseLocationDeleteContentDescription">Дополнительные опции доступа к местоположению на домене %s</string>
+    <string name="preciseLocationDeleteConfirmMessage" instruction="Placeholder is the name of a website">Вы уверены, что хотите удалить &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription" instruction="Placeholder is the domain of a website">Дополнительные параметры доступа к геопозиции в домене %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Предоставлено</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Отказано</string>
-    <string name="preciseLocationSnackbarMessage">Вы выдали %s право доступа к геопозиции вашего устройства ранее.</string>
+    <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Ранее вы предоставили %1$s разрешение на доступ к геопозиции вашего устройства.</string>
 
     <!--Fire button education-->
     <string name="daxClearDataCtaText">В браузере могут скапливаться личные данные. Фу! Пользуйтесь кнопкой «Огонь», чтобы сжечь весь лишний мусор. Попробуйте сами! 👇</string>
@@ -628,14 +627,14 @@
     <string name="appLinkDialogTitle">Открыть в другом приложении?</string>
     <string name="appLinkSnackBarAction">Открыть в приложении</string>
     <string name="appLinkMultipleSnackBarAction">Выберите приложение</string>
-    <string name="appLinkSnackBarMessage">Эту ссылку можно открыть в %s.</string>
+    <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Эту ссылку можно открыть в %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Эту ссылку можно открыть в других приложениях.</string>
     <string name="appLinkIntentChooserTitle">Открыть в</string>
     <string name="appLinkMenuItemTitle">Открыть в приложении</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Новый адрес скопирован в буфер обмена</string>
-    <string name="autofillTooltipUseYourAlias">Использовать %1$s</string>
+    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Использовать %1$s</string>
     <string name="autofillTooltipUseYourAliasDescription">Блокирует почтовые трекеры</string>
     <string name="autofillTooltipGenerateAddress">Создать адрес на Duck</string>
     <string name="autofillTooltipGenerateAddressDescription">Блокирует почтовые трекеры и скрывает ваш адрес</string>
@@ -662,17 +661,17 @@
     <string name="bookmarkFolderEmpty">Пусто</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%s%s и еще %d закладку?</item>
-        <item quantity="few">%s%s и еще %d закладки?</item>
-        <item quantity="many">%s%s и еще %d закладок?</item>
-        <item quantity="other">%s%s и другие закладки (еще %d)?</item>
+        <item quantity="one">%1$s%2$s и еще %1$d объект?</item>
+        <item quantity="few">%1$s%2$s и еще %1$d объекта?</item>
+        <item quantity="many">%1$s%2$s и еще %1$d объектов?</item>
+        <item quantity="other">%1$s%2$s и еще объекты (%1$d)?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%d закладка</item>
-        <item quantity="few">%d закладки</item>
-        <item quantity="many">%d закладок</item>
-        <item quantity="other">%d закладки</item>
+        <item quantity="one">%1$d объект</item>
+        <item quantity="few">%1$d объекта</item>
+        <item quantity="many">%1$d объектов</item>
+        <item quantity="other">%1$d объекта</item>
     </plurals>
 
     <!-- Accessibility-->
@@ -689,7 +688,7 @@
     <string name="settingsPrivacyPolicyDuckduckgo">Политика конфиденциальности</string>
 
     <!-- Home Screen Widget -->
-    <string name="homeScreenWidgetAdded">Виджет %s добавлен на главный экран</string>
+    <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Виджет %1$s добавлен на главный экран</string>
     <string name="settingsAddHomeScreenWidget">Виджет для главного экрана</string>
 
     <!-- MacOs Settings -->
@@ -708,9 +707,9 @@
     <string name="downloadsItemMenuDelete">Удалить</string>
     <string name="downloadsItemMenuCancel">Отменить</string>
     <string name="downloadsActivityMenuDeleteAll">Удалить все</string>
-    <string name="downloadsFileDeletedMessage">Файл %s удален</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Удален %1$s</string>
     <string name="downloadsAllFilesDeletedMessage">Все файлы удалены</string>
-    <string name="downloadsMoreOptionsContentDescription">Другие опции для %s</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Другие опции для %1$s</string>
     <string name="downloadsUndoActionName">Отменить</string>
     <string name="downloadsStateInProgress">Выполняется…</string>
 
@@ -742,13 +741,12 @@
     <string name="sitePermissionsSettingsMicrophone">Микрофон</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Управление сайтами</string>
     <string name="sitePermissionsSettingsEmptyText">Пока нет сайтов</string>
-    <string name="permissionPerWebsiteText">Разрешения для «%s» </string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Разрешения для «%1$s» </string>
     <string name="permissionsPerWebsiteAskSetting">Запрашивать</string>
     <string name="permissionsPerWebsiteDenySetting">Отказать</string>
     <string name="permissionsPerWebsiteAllowSetting">Разрешить</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle">Разрешение доступа (%s) для %s</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Разрешение на доступ %2$s к %1$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Автозаполнение</string>
-
 </resources>
