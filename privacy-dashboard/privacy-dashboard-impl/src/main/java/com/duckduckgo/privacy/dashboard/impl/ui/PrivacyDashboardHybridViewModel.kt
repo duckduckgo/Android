@@ -19,19 +19,17 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
-import kotlinx.coroutines.CoroutineScope
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -48,37 +46,73 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class PrivacyDashboardHybridViewModel @Inject constructor(
     private val userWhitelistDao: UserWhitelistDao,
-    private val contentBlocking: ContentBlocking,
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val siteProtectionsViewStateMapper: SiteProtectionsViewStateMapper
+    private val siteViewStateMapper: SiteViewStateMapper,
+    private val requestDataViewStateMapper: RequestDataViewStateMapper,
+    private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
+    private val privacyDashboardPayloadAdapter: PrivacyDashboardPayloadAdapter
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
 
     sealed class Command {
         class LaunchReportBrokenSite(val data: BrokenSiteData) : Command()
+        class OpenURL(val url: String) : Command()
     }
 
     data class ViewState(
-        val userSettingsViewState: UserSettingsViewState,
-        val siteProtectionsViewState: SiteProtectionsViewState,
-        val userChangedValues: Boolean = false
+        val siteViewState: SiteViewState,
+        val userChangedValues: Boolean = false,
+        val requestData: RequestDataViewState,
+        val protectionStatus: ProtectionStatusViewState
     )
 
-    data class UserSettingsViewState(
-        val privacyProtectionEnabled: Boolean
+    data class ProtectionStatusViewState(
+        val allowlisted: Boolean,
+        val denylisted: Boolean,
+        val enabledFeatures: List<String>,
+        val unprotectedTemporary: Boolean
     )
 
-    data class SiteProtectionsViewState(
+    data class RequestDataViewState(
+        val installedSurrogates: List<String>? = null,
+        val requests: List<DetectedRequest>
+    )
+
+    data class DetectedRequest(
+        val category: String?,
+        val eTLDplus1: String?,
+        val entityName: String,
+        val ownerName: String?,
+        val pageUrl: String,
+        val prevalence: Double,
+        val state: RequestState,
+        val url: String
+    )
+
+    sealed class RequestState {
+        // Using Any as placeholde value. We shouldn't pass any value to blocked. This is just to honour expected json.
+        // refer to docs in: https://duckduckgo.github.io/privacy-dashboard/example/docs/interfaces/Generated_Schema_Definitions.StateBlocked.html#blocked
+        data class Blocked(val blocked: Any = Any()) : RequestState()
+        data class Allowed(val allowed: Reason) : RequestState()
+    }
+
+    data class Reason(val reason: String)
+
+    enum class AllowedReasons(val value: String) {
+        PROTECTIONS_DISABLED("protectionDisabled"),
+        OWNED_BY_FIRST_PARTY("ownedByFirstParty"),
+        RULE_EXCEPTION("ruleException"),
+        AD_CLICK_ATTRIBUTION("adClickAttribution"),
+        OTHER_THIRD_PARTY_REQUEST("otherThirdPartyRequest"),
+    }
+
+    data class SiteViewState(
         val url: String,
-        val status: String = "complete",
+        val domain: String,
         val upgradedHttps: Boolean,
         val parentEntity: EntityViewState?,
-        val site: SiteViewState,
-        val trackers: Map<String, TrackerViewState>,
-        val trackerBlocked: Map<String, TrackerViewState>,
         val secCertificateViewModels: List<CertificateViewState?> = emptyList(),
         val locale: String = Locale.getDefault().language
     )
@@ -112,27 +146,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val prevalence: Double
     )
 
-    data class SiteViewState(
-        val url: String,
-        val domain: String,
-        val trackersUrls: Set<String>,
-        val allowlisted: Boolean,
-    )
-
-    data class TrackerViewState(
-        val displayName: String,
-        val prevalence: Double,
-        val urls: Map<String, TrackerEventViewState>,
-        val count: Int,
-        val type: String = ""
-    )
-
-    data class TrackerEventViewState(
-        val isBlocked: Boolean,
-        val reason: String,
-        val categories: Set<String> = emptySet()
-    )
-
     val viewState = MutableStateFlow<ViewState?>(null)
 
     private var site: Site? = null
@@ -163,15 +176,12 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     private suspend fun updateSite(site: Site) {
-
         withContext(dispatcher.main()) {
-
             viewState.emit(
                 ViewState(
-                    siteProtectionsViewState = siteProtectionsViewStateMapper.mapFromSite(site),
-                    userSettingsViewState = UserSettingsViewState(
-                        privacyProtectionEnabled = !site.userAllowList
-                    )
+                    siteViewState = siteViewStateMapper.mapFromSite(site),
+                    requestData = requestDataViewStateMapper.mapFromSite(site),
+                    protectionStatus = protectionStatusViewStateMapper.mapFromSite(site)
                 )
             )
         }
@@ -182,16 +192,16 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
         viewModelScope.launch(dispatcher.io()) {
             if (enabled) {
-                userWhitelistDao.delete(currentViewState().siteProtectionsViewState.site.domain)
+                userWhitelistDao.delete(currentViewState().siteViewState.domain)
                 pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
             } else {
-                userWhitelistDao.insert(currentViewState().siteProtectionsViewState.site.domain)
+                userWhitelistDao.insert(currentViewState().siteViewState.domain)
                 pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
             }
             delay(CLOSE_DASHBOARD_ON_INTERACTION_DELAY)
             withContext(dispatcher.main()) {
                 viewState.value = currentViewState().copy(
-                    userSettingsViewState = currentViewState().userSettingsViewState.copy(privacyProtectionEnabled = enabled),
+                    protectionStatus = currentViewState().protectionStatus.copy(allowlisted = enabled),
                     userChangedValues = true
                 )
             }
@@ -204,5 +214,13 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     private fun currentViewState(): ViewState {
         return viewState.value!!
+    }
+
+    fun onUrlClicked(payload: String) {
+        viewModelScope.launch(dispatcher.io()) {
+            privacyDashboardPayloadAdapter.onUrlClicked(payload).takeIf { it.isNotEmpty() }?.let {
+                command.send(OpenURL(it))
+            }
+        }
     }
 }
