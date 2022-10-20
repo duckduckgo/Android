@@ -374,6 +374,24 @@ class DeviceShieldTrackerActivityViewModelTest {
         }
     }
 
+    @Test
+    fun whenBannerStateCalledOutsideOnboardingSessionThenReturnNextSessionBanner() {
+        whenever(vpnStore.isOnboardingSession()).thenReturn(false)
+
+        val bannerState = viewModel.bannerState()
+
+        assertEquals(VpnStateMonitor.BannerState.NextSessionBanner, bannerState)
+    }
+
+    @Test
+    fun whenBannerStateCalledDuringOnboardingSessionThenReturnOnboardingBanner() {
+        whenever(vpnStore.isOnboardingSession()).thenReturn(true)
+
+        val bannerState = viewModel.bannerState()
+
+        assertEquals(VpnStateMonitor.BannerState.OnboardingBanner, bannerState)
+    }
+
     private fun createInMemoryDb(): VpnDatabase {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
         return Room.inMemoryDatabaseBuilder(
