@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- smartling.placeholder_format = NONE -->
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logotips</string>
@@ -62,8 +61,8 @@
     <string name="printMenuTitle">Drukāt lapu</string>
     <string name="favoriteDeleteConfirmationMessage">Izlase ir noņemta</string>
     <string name="fireproofDeleteConfirmationMessage">Ugunsdrošība noņemta</string>
-    <string name="privacyProtectionEnabledConfirmationMessage">Privātuma aizsardzība ir iespējota vietnei %s</string>
-    <string name="privacyProtectionDisabledConfirmationMessage">Privātuma aizsardzība ir atspējota vietnei %s</string>
+    <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Iespējota %1$s privātuma aizsardzība</string>
+    <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Atspējota %1$s privātuma aizsardzība</string>
     <string name="undoSnackbarAction">Atsaukt</string>
 
     <!-- Downloading files -->
@@ -115,7 +114,7 @@
     <string name="privacyProtectionEnabled">VIETNES AIZSARDZĪBA IR IESPĒJOTA</string>
     <string name="privacyProtectionDisabled">VIETAS AIZSARDZĪBA IR ATSPĒJOTA</string>
     <string name="privacyDashboardActivityTitle">Privātuma informācijas panelis</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">UZLABOTS NO <img src="%d"></img> UZ <img src="%d"></img></string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">UZLABOTS NO &lt;img src=\"%1$d\" /&gt; UZ &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privātuma līmenis</string>
     <string name="privacyProtectionTemporarilyDisabled">Mēs īslaicīgi atspējojām privātuma aizsardzību, jo šķiet, ka tā traucē šīs vietnes darbību.</string>
 
@@ -158,7 +157,7 @@
 
     <string name="trackersBlockedNoSectionDescription">Tika ielādēti šādu domēnu pieprasījumi.</string>
 
-    <string name="adLoadedSectionDescription">Šā domēna pieprasījumi tika ielādēti, jo nesen tika noklikšķināts uz %s reklāmas DuckDuckGo. Šie pieprasījumi palīdz novērtēt reklāmu efektivitāti. Neviena reklāma pakalpojumā DuckDuckGo nav profilējoša.</string>
+    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Šā domēna pieprasījumi tika ielādēti, jo nesen tika nospiests uz %1$s reklāmas DuckDuckGo. Šie pieprasījumi palīdz novērtēt reklāmu efektivitāti. Neviena reklāma DuckDuckGo nav profilējoša.</string>
     <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Kā mūsu meklēšanas reklāmas ietekmē mūsu aizsardzību</annotation></string>
     <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
 
@@ -167,7 +166,7 @@
     <string name="domainsLoadedSectionEmptyListDescription">Mēs neatradām pieprasījumus no neviena trešās puses domēna.</string>
 
     <string name="domainsLoadedBreakageSectionDescription">Šī domēna pieprasījumi tika ielādēti, lai novērstu vietnes darbības traucējumus.</string>
-    <string name="domainsLoadedAssociatedSectionDescription">Šī domēna pieprasījumi tika ielādēti, jo tie ir saistīti ar %s.</string>
+    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Tika ielādēti šā domēna pieprasījumi, jo tie ir saistīti ar %1$s.</string>
 
     <string name="trackersBlockedText">Pieprasījumu ielādēšana bloķēta</string>
     <string name="trackersNotBlockedText">Neviens izsekošanas pieprasījums nav bloķēts</string>
@@ -258,8 +257,8 @@
     <string name="bookmarksMenuTitle">Grāmatzīmes</string>
     <string name="bookmarksActivityTitle">Grāmatzīmes</string>
     <string name="noBookmarks">Vēl nav pievienota neviena grāmatzīme</string>
-    <string name="bookmarkOverflowContentDescription">Vairāk opciju grāmatzīmei %s</string>
-    <string name="bookmarkDeleteConfirmationMessage">Dzēsts <b>%s</b></string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Vairāk opciju grāmatzīmei %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Dzēsts: &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Eksportēt</string>
     <string name="exportBookmarksEmpty">Tev nav grāmatzīmju, nekas netiks eksportēts</string>
     <string name="exportBookmarksError">Nevar eksportēt nevienu grāmatzīmi, kaut kas nav pareizi</string>
@@ -305,7 +304,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Pievienot sākuma ekrānam</string>
-    <string name="shortcutAddedText">Izdevās! %s ir pievienots tavam sākuma ekrānam.</string>
+    <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Izdevās! %1$s ir pievienots tavam sākuma ekrānam.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Palīdzi mums uzlabot lietotni!</string>
@@ -363,14 +362,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Mēs aizsargājam tavu privātumu</string>
     <string name="privacyProtectionNotificationReportTitle">Tavs privātuma ziņojums</string>
     <string name="privacyProtectionNotificationDefaultDescription">Izmantojot lietotni DuckDuckGo, tavi dati tiek aizsargāti, bloķējot izsekotājus un šifrējot savienojumus.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">DuckDuckGo izmantošanas laikā tu aizsargāji savus datus, nodrošinot %d nešifrētus savienojumus.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">DuckDuckGo izmantošanas laikā tu aizsargāji savus datus, bloķējot %d izsekotājus.</string>
-    <string name="privacyProtectionNotificationBothDescription">DuckDuckGo izmantošanas laikā tu aizsargāji savus datus, bloķējot %d izsekotājus un nodrošinot %d nešifrētus savienojumus.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">DuckDuckGo izmantošanas laikā tu aizsargāji savus datus, nodrošinot %1$d nešifrētos savienojumus.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">DuckDuckGo izmantošanas laikā tu aizsargāji savus datus, bloķējot %1$d izsekotājus.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">DuckDuckGo izmantošanas laikā tu aizsargāji savus datus, bloķējot %1$d izsekotājus un nodrošinot %2$d nešifrētos savienojumus.</string>
     <string name="privacyProtectionNotificationLaunchButton">Atsākt pārlūkošanu</string>
 
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Pierakstīties</string>
-    <string name="authenticationDialogMessage">Lai izmantotu %s, ir nepieciešams lietotājvārds un parole.</string>
+    <string name="authenticationDialogMessage" instruction="Placeholder is the name of a website">Lai izmantotu %1$s, ir nepieciešams lietotājvārds un parole.</string>
     <string name="authenticationDialogPositiveButton">Pierakstīties</string>
     <string name="authenticationDialogNegativeButton">Atcelt</string>
     <string name="authenticationDialogUsernameHint">Lietotājvārds</string>
@@ -486,9 +485,9 @@
     <string name="daxEndCtaText"><![CDATA[Izdevās!<br/><br/>Atceries: katru reizi, kad pārlūkosi kopā ar mani, kaitinošās reklāmas zaudēs savu spēku! 👍]]></string>
     <string name="daxSerpCtaText">Tavi DuckDuckGo meklējumi ir anonīmi. Vienmēr. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="zero"><![CDATA[ un <b>%d citi</b> centās tevi šeit izsekot. <br/><br/>Es tos bloķēju!<br/><br/> ☝️Tu vari apskatīt adreses joslu, lai redzētu, kas mēģina tevi izsekot, kad tu apmeklē jaunu vietni.️]]></item>
-        <item quantity="one"><![CDATA[ un <b>%d cits</b> centās tevi šeit izsekot. <br/><br/>Es tos bloķēju!<br/><br/> ☝Tu vari apskatīt adreses joslu, lai redzētu, kas mēģina tevi izsekot, kad tu apmeklē jaunu vietni.️]]></item>
-        <item quantity="other"><![CDATA[ un <b>%d citi</b> centās tevi šeit izsekot. <br/><br/>Es tos bloķēju!<br/><br/> ☝️Tu vari apskatīt adreses joslu, lai redzētu, kas mēģina tevi izsekot, kad tu apmeklē jaunu vietni.]]></item>
+        <item quantity="zero"><![CDATA[ un <b>%1$d citas vietnes</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="one"><![CDATA[ un <b>%1$d cita vietne</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="other"><![CDATA[ un <b>%1$d citas vietnes</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="zero"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
@@ -496,12 +495,12 @@
         <item quantity="other"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Tev pieskaroties un ritinot, es bloķēšu uzmācīgos izsekotājus. <br/><br/>Aiziet! Turpini pārlūkot!]]></string>
-    <string name="daxMainNetworkCtaText">Ņem vērā! Es nevaru liegt %s skatīt tavas darbības vietnē %s <br></br><br></br>Taču pārlūko ar mani, jo es varu ierobežot to, ko %s zina par tevi kopumā, bloķējot viņu izsekotājus daudzās citās vietnēs.</string>
-    <string name="daxMainNetworkOwnedCtaText">Ņem vērā! Tā kā %s pieder %s, es nevaru liegt viņiem skatīt tavas darbības šeit.<br></br><br></br>Taču pārlūko ar mani, un es varu ierobežot to, ko %s zina par tevi kopumā, bloķējot viņu izsekotājus daudzās citās vietnēs.</string>
+    <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Mazs brīdinājums! Es nevaru liegt %1$s skatīt tavas darbības domēnā %2$s &lt;br/&gt;&lt;br/&gt;Taču pārlūko kopā ar mani, jo es varu ierobežot to, ko %3$s zina par tevi kopumā, bloķējot viņu izsekotājus daudzās citās vietnēs.</string>
+    <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Mazs brīdinājums! Tā kā %1$s pieder %2$s, es nevaru viņiem liegt šeit skatīt tavas darbības.&lt;br/&gt;&lt;br/&gt;Taču pārlūko kopā ar mani, jo es varu samazināt to, ko %3$s zina par tevi kopumā, bloķējot viņu izsekotājus daudzās citās vietnēs.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Lejupielādēt</string>
-    <string name="downloadConfirmationSaveFileTitle">Saglabāt %1$s</string>
+    <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Saglabāt %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Paturēt abus</string>
     <string name="downloadConfirmationReplaceOldFileText">Aizstāt</string>
     <string name="downloadConfirmationOpenFileText">Atvērt</string>
@@ -529,8 +528,8 @@
     <string name="whitelistActivityTitle">Neaizsargātas vietnes</string>
     <string name="enablePrivacyProtection">Iespējot privātuma aizsardzību</string>
     <string name="disablePrivacyProtection">Atspējot privātuma aizsardzību</string>
-    <string name="whitelistEntryOverflowContentDescription">Citas iespējas neaizsargātai vietnei %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Vai tiešām vēlies noņemt <b>%s</b> no neaizsargātajām vietnēm?</string>
+    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Citas opcijas neaizsargātai vietnei %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Vai tiešām vēlies noņemt &lt;b&gt;%1$s&lt;/b&gt; no neaizsargātām vietnēm?</string>
     <string name="whitelistExplanation">Šīs vietnes netiks uzlabotas ar privātuma aizsardzību.</string>
     <string name="whitelistNoEntries">Privātuma aizsardzība ir iespējota visām vietnēm</string>
     <string name="whitelistDomainHint">www.piemērs.com</string>
@@ -543,12 +542,12 @@
     <string name="fireproofWebsitesActivityTitle">Ugunsdrošas vietnes</string>
     <string name="settingsFireproofWebsites">Ugunsdrošas vietnes</string>
     <string name="fireproofWebsiteMenuTitleAdd">Padarīt šo vietni ugunsdrošu</string>
-    <string name="fireproofWebsiteSnackbarConfirmation"><b>%s</b> tagad ir ugunsdrošs</string>
+    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; tagad ir ugunsdrošs</string>
     <string name="fireproofWebsiteSnackbarAction">Atsaukt</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Vai tiešām vēlies dzēst <b>%s</b>?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage" instruction="Placeholder is a website">Vai tiešām vēlies dzēst &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Vietnes lieto sīkfailus, lai tu varētu turpināt būt pierakstījies(-usies). Padarot vietni ugunsdrošu, sīkfaili netiek dzēsti, bet tu vari turpināt būt pierakstījies(-usies) arī pēc Uguns pogas lietošanas. Mēs joprojām bloķēsim trešo pušu izsekotājus, kas atrodami ugunsdrošās vietnēs.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Citas opcijas ugunsdrošai vietnei %s</string>
-    <string name="fireproofWebsiteLoginDialogTitle">Vai vēlies padarīt %s ugunsdrošu?</string>
+    <string name="fireproofWebsiteOverflowContentDescription" instruction="Placeholder is a website">Citas opcijas ugunsdrošai vietnei %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">Vai vēlies padarīt %1$s ugunsdrošu?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Padarot šo vietni ugunsdrošu, varēsi turpināt būt pierakstījies(-usies) arī pēc Uguns pogas lietošanas.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Padarīt ugunsdrošu</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne tagad</string>
@@ -556,7 +555,7 @@
     <string name="fireproofWebsiteEmptyListHint">Vēl nav ugunsdrošu vietņu</string>
     <string name="fireproofWebsiteSettingSelectionTitle">Padarīt vietnes ugunsdrošas pierakstoties</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Visām vietnēm noņemta ugunsdrošība</string>
-    <string name="fireproofWebsiteRemovalConfirmation"><b>%s</b> ir noņemta ugunsdrošība</string>
+    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; ir noņemta ugunsdrošība</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Jautāt katru reizi</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Vienmēr</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nekad</string>
@@ -585,11 +584,11 @@
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vai iespējot ierīces atrašanās vietu DuckDuckGo privātuma pārlūkprogrammai?</string>
-    <string name="preciseLocationSystemDialogSubtitle">%s pieprasa tavas ierīces atrašanās vietu. Vispirms tev ir jāatļauj lietotnei nosūtīt tavas ierīces atrašanās vietu, pēc tam %s var pieprasīt atļauju.</string>
+    <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s pieprasa tavas ierīces atrašanās vietu. Vispirms tev ir jāatļauj lietotnei nosūtīt tavas ierīces atrašanās vietu, pēc tam %2$s var pieprasīt atļauju.</string>
     <string name="preciseLocationSystemDialogAllow">Iespējot</string>
     <string name="preciseLocationSystemDialogDeny">Varbūt vēlāk</string>
     <string name="preciseLocationSystemDialogNeverAllow">Vairs nejautāt par šo vietni</string>
-    <string name="preciseLocationSiteDialogTitle">Piešķirt %s atļauju piekļūt atrašanās vietai?</string>
+    <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Vai piešķirt %1$s atļauju piekļūt atrašanās vietai?</string>
     <string name="preciseLocationDDGDialogSubtitle">Mēs izmantojam tavu anonīmo atrašanās vietu tikai tāpēc, lai sniegtu labākus rezultātus tev tuvāk. Vēlāk vienmēr varēsi pārdomāt.</string>
     <string name="preciseLocationSiteDialogSubtitle">Iestatījumu sadaļā vari pārvaldīt atrašanās vietas piekļuves atļaujas, ko piešķīri atsevišķām vietnēm.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Vienmēr</string>
@@ -601,11 +600,11 @@
     <string name="preciseLocationEmptyListHint">Nevienai vietnei nav piešķirta atļauja piekļūt atrašanās vietai</string>
     <string name="preciseLocationNoSystemPermission">Lai pārvaldītu savas atsevišķām vietnēm piešķirtās atrašanās vietas piekļuves atļaujas, šai lietotnei iespējo atrašanās vietu Android iestatījumos.</string>
     <string name="preciseLocationActivityTitle">Atrašanās vieta</string>
-    <string name="preciseLocationDeleteConfirmMessage">Vai tiešām vēlies dzēst <b>%s</b>?</string>
-    <string name="preciseLocationDeleteContentDescription">Vairāk opciju atrašanās vietas atļaujām domēnā %s</string>
+    <string name="preciseLocationDeleteConfirmMessage" instruction="Placeholder is the name of a website">Vai tiešām vēlies dzēst &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription" instruction="Placeholder is the domain of a website">Vairāk opciju atrašanās vietas atļaujām domēnā %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Piešķirts</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Aizliegts</string>
-    <string name="preciseLocationSnackbarMessage">Tu iepriekš piešķīri %s atļauju piekļūt tavas ierīces atrašanās vietai.</string>
+    <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Tu iepriekš piešķīri %1$s atļauju piekļūt savas ierīces atrašanās vietai.</string>
 
     <!--Fire button education-->
     <string name="daxClearDataCtaText">Personas dati var uzkrāties tavā pārlūkā. Pē! Izmanto Uguns pogu, lai tos visus nodedzinātu. Pamēģini tagad! 👇</string>
@@ -626,14 +625,14 @@
     <string name="appLinkDialogTitle">Vai atvērt citā lietotnē?</string>
     <string name="appLinkSnackBarAction">Atvērt lietotnē</string>
     <string name="appLinkMultipleSnackBarAction">Lietotnes izvēle</string>
-    <string name="appLinkSnackBarMessage">Tu vari atvērt šo saiti ar %s.</string>
+    <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Tu vari atvērt šo saiti ar %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Tu vari atvērt šo saiti citās lietotnēs.</string>
     <string name="appLinkIntentChooserTitle">Atvērt ar</string>
     <string name="appLinkMenuItemTitle">Atvērt lietotnē</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Jaunā adrese tika iekopēta tavā starpliktuvē</string>
-    <string name="autofillTooltipUseYourAlias">Izmantot %1$s</string>
+    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Izmantot %1$s</string>
     <string name="autofillTooltipUseYourAliasDescription">Bloķēt e-pasta izsekotājus</string>
     <string name="autofillTooltipGenerateAddress">Ģenerēt privātu Duck adresi</string>
     <string name="autofillTooltipGenerateAddressDescription">Bloķē e-pasta izsekotājus un paslēpj tavu adresi</string>
@@ -660,15 +659,15 @@
     <string name="bookmarkFolderEmpty">Tukšs</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="zero">%s%s un %d vienumus?</item>
-        <item quantity="one">%s%s un %d vienumu?</item>
-        <item quantity="other">%s%s un %d vienumus?</item>
+        <item quantity="zero">%1$s%2$s un %1$d vienumus?</item>
+        <item quantity="one">%1$s%2$s un %1$d vienumu?</item>
+        <item quantity="other">%1$s%2$s un %1$d vienumus?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
-        <item quantity="zero">%d vienumi</item>
-        <item quantity="one">%d vienums</item>
-        <item quantity="other">%d vienumi</item>
+        <item quantity="zero">%1$d vienumus</item>
+        <item quantity="one">%1$d vienumu</item>
+        <item quantity="other">%1$d vienumus</item>
     </plurals>
 
     <!-- Accessibility-->
@@ -685,7 +684,7 @@
     <string name="settingsPrivacyPolicyDuckduckgo">Privātuma politika</string>
 
     <!-- Home Screen Widget -->
-    <string name="homeScreenWidgetAdded">Logrīks \"%s\" pievienots sākuma ekrānam</string>
+    <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Sākuma ekrānam pievienots logrīks %1$s</string>
     <string name="settingsAddHomeScreenWidget">Sākuma ekrāna logrīks</string>
 
     <!-- MacOs Settings -->
@@ -704,9 +703,9 @@
     <string name="downloadsItemMenuDelete">Dzēst</string>
     <string name="downloadsItemMenuCancel">Atcelt</string>
     <string name="downloadsActivityMenuDeleteAll">Dzēst visus</string>
-    <string name="downloadsFileDeletedMessage">%s izdzēsts</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Izdzēsts %1$s</string>
     <string name="downloadsAllFilesDeletedMessage">Visi faili izdzēsti</string>
-    <string name="downloadsMoreOptionsContentDescription">Vairāk opciju failam %s</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Citas iespējas %1$s</string>
     <string name="downloadsUndoActionName">Atsaukt</string>
     <string name="downloadsStateInProgress">Notiek...</string>
 
@@ -738,13 +737,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofons</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Pārvaldīt vietnes</string>
     <string name="sitePermissionsSettingsEmptyText">Vēl nav nevienas vietnes</string>
-    <string name="permissionPerWebsiteText">Atļaujas vietnei \"%s\" </string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Atļaujas vietnei \"%1$s\" </string>
     <string name="permissionsPerWebsiteAskSetting">Jautāt</string>
     <string name="permissionsPerWebsiteDenySetting">Liegt</string>
     <string name="permissionsPerWebsiteAllowSetting">Atļaut</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle">Atļauja \"%s\" vietnei %s</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – atļauja vietnei %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Automātiska aizpilde</string>
-
 </resources>

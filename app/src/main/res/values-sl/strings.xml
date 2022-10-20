@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- smartling.placeholder_format = NONE -->
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
@@ -62,8 +61,8 @@
     <string name="printMenuTitle">Natisni stran</string>
     <string name="favoriteDeleteConfirmationMessage">Priljubljeni odstranjeni</string>
     <string name="fireproofDeleteConfirmationMessage">Požarna zaščita je odstranjena</string>
-    <string name="privacyProtectionEnabledConfirmationMessage">Zaščita zasebnosti je omogočena za %s</string>
-    <string name="privacyProtectionDisabledConfirmationMessage">Zaščita zasebnosti je onemogočena za %s</string>
+    <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Zaščita zasebnosti je omogočena za spletno mesto %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Zaščita zasebnosti je onemogočena za spletno mesto %1$s</string>
     <string name="undoSnackbarAction">Prekliči spremembe</string>
 
     <!-- Downloading files -->
@@ -115,7 +114,7 @@
     <string name="privacyProtectionEnabled">OMOGOČI ZAŠČITO NA STRANI</string>
     <string name="privacyProtectionDisabled">ONEMOGOČI ZAŠČITO NA STRANI</string>
     <string name="privacyDashboardActivityTitle">Nadzorna plošča zasebnosti</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">POVEČANO Z <img src="%d"></img> NA <img src="%d"></img></string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">IZBOLJŠANO OD &lt;img src=\"%1$d\" /&gt; DO &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Ocena zasebnosti</string>
     <string name="privacyProtectionTemporarilyDisabled">Začasno smo onemogočili zaščito zasebnosti, saj se zdi, da zato pride do napak na tem spletnem mestu.</string>
 
@@ -158,7 +157,7 @@
 
     <string name="trackersBlockedNoSectionDescription">Naloženi so bili naslednji zahtevki domen.</string>
 
-    <string name="adLoadedSectionDescription">Zahtevki naslednjih domen so bili naloženi, ker ste pred kratkim kliknili oglas %s na portalu DuckDuckGo. Ti zahtevki pomagajo oceniti učinkovitost oglasa. Vsi oglasi na DuckDuckGo so neprofilirani.</string>
+    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Naslednji zahtevki domen so bili naloženi, ker ste pred kratkim kliknili oglas %1$s na portalu DuckDuckGo. Ti zahtevki pomagajo oceniti učinkovitost oglasa. Vsi oglasi na DuckDuckGo so neprofilirani.</string>
     <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Kako naši oglasi v iskalnem omrežju vplivajo na našo zaščito</annotation></string>
     <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
 
@@ -167,7 +166,7 @@
     <string name="domainsLoadedSectionEmptyListDescription">Nismo zaznali zahtevkov iz domen tretjih oseb.</string>
 
     <string name="domainsLoadedBreakageSectionDescription">Naloženi so bili naslednji zahtevki domen, da se prepreči prekinitev spletnega mesta.</string>
-    <string name="domainsLoadedAssociatedSectionDescription">Naložene so bile naslednje zahteve za domene, ker so povezane z %s.</string>
+    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Naloženi so bili naslednji zahtevki domen, ker so povezani z [%1$s].</string>
 
     <string name="trackersBlockedText">Zahtevki, katerih nalaganje je blokirano</string>
     <string name="trackersNotBlockedText">Noben zahtevek za sledenje ni blokiran</string>
@@ -258,8 +257,8 @@
     <string name="bookmarksMenuTitle">Zaznamki</string>
     <string name="bookmarksActivityTitle">Zaznamki</string>
     <string name="noBookmarks">Zaznamki še niso dodani</string>
-    <string name="bookmarkOverflowContentDescription">Več možnosti za zaznamek %s</string>
-    <string name="bookmarkDeleteConfirmationMessage">Izbrisano <b>%s</b></string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Več možnosti za zaznamek %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Izbrisano &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Izvozi</string>
     <string name="exportBookmarksEmpty">Nimate zaznamkov, nič ne bo izvoženo</string>
     <string name="exportBookmarksError">Zaznamkov ni bilo mogoče izvoziti, nekaj je šlo narobe</string>
@@ -305,7 +304,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Dodaj na Domači Zaslon</string>
-    <string name="shortcutAddedText">Uspeh! %s je bil dodan na vaš začetni zaslon.</string>
+    <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Uspeh! %1$s je dodan na vaš začetni zaslon.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Pomagajte nam izboljšati aplikacijo!</string>
@@ -363,14 +362,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Varujemo vašo zasebnost</string>
     <string name="privacyProtectionNotificationReportTitle">Poročilo o vaši zasebnosti</string>
     <string name="privacyProtectionNotificationDefaultDescription">Uporaba aplikacije DuckDuckGo ščiti vaše podatke z blokiranjem sledilnikov in šifriranjem povezav.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Svoje podatke ste med uporabo DuckDuckGo zaščitili z zavarovanjem %d nešifriranih povezav.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Svoje podatke ste med uporabo DuckDuckGo zaščitili z blokiranjem %d sledilnikov.</string>
-    <string name="privacyProtectionNotificationBothDescription">Svoje podatke ste med uporabo DuckDuckGo zaščitili z blokiranjem %d sledilnikov in zavarovanjem %d nešifriranih povezav.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Svoje podatke ste med uporabo DuckDuckGo zaščitili z zavarovanjem %1$d nešifriranih povezav.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Svoje podatke ste med uporabo DuckDuckGo zaščitili z blokiranjem %1$d sledilnikov.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Svoje podatke ste med uporabo DuckDuckGo zaščitili z blokiranjem %1$d sledilnikov in zavarovanjem %2$d nešifriranih povezav.</string>
     <string name="privacyProtectionNotificationLaunchButton">Nadaljuj brskanje</string>
 
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Prijavite se</string>
-    <string name="authenticationDialogMessage">%s zahteva uporabniško ime in geslo.</string>
+    <string name="authenticationDialogMessage" instruction="Placeholder is the name of a website">%1$s zahteva uporabniško ime in geslo.</string>
     <string name="authenticationDialogPositiveButton">Prijavite se</string>
     <string name="authenticationDialogNegativeButton">Preklic</string>
     <string name="authenticationDialogUsernameHint">Uporabniško ime</string>
@@ -486,10 +485,10 @@
     <string name="daxEndCtaText"><![CDATA[Uspelo vam bo!<br/><br/>Ne pozabite: vsakič, ko brskate z mano, grozljiv oglas izgubi krila. 👍]]></string>
     <string name="daxSerpCtaText">Vaša iskanja v DuckDuckGo so anonimna. Vselej. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ in <b>%d drug</b> so vas skušali izslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️V naslovni vrstici lahko preverite, kdo vam poskuša slediti, ko obiščete novo spletno mesto.️]]></item>
-        <item quantity="two"><![CDATA[ in <b>%d druga</b> so vas skušali izslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️V naslovni vrstici lahko preverite, kdo vam poskuša slediti, ko obiščete novo spletno mesto.️]]></item>
-        <item quantity="few"><![CDATA[ in <b>%d drugi</b> so vas skušali izslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️V naslovni vrstici lahko preverite, kdo vam poskuša slediti, ko obiščete novo spletno mesto.️]]></item>
-        <item quantity="other"><![CDATA[ in <b>%d drugih</b> so vas skušali izslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️V naslovni vrstici lahko preverite, kdo vam poskuša slediti, ko obiščete novo spletno mesto.️]]></item>
+        <item quantity="one"><![CDATA[ in <b>%1$d drugi</b> so vas skušali zaslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️Preverite lahko naslovno vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️]]></item>
+        <item quantity="two"><![CDATA[ in <b>%1$d drugi</b> so vas skušali zaslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️Preverite lahko naslovno vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️]]></item>
+        <item quantity="few"><![CDATA[ in <b>%1$d drugi</b> so vas skušali zaslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️Preverite lahko naslovno vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️]]></item>
+        <item quantity="other"><![CDATA[ in <b>%1$d drugi</b> so vas skušali zaslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️Preverite lahko naslovno vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ vas je poskušal izslediti tukaj. <br/><br/>Blokiral sem ga!<br/><br/> ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.]]></item>
@@ -498,12 +497,12 @@
         <item quantity="other"><![CDATA[ vas je poskušal izslediti tukaj. <br/><br/>Blokiral sem ga!<br/><br/> ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Ko tapkate in se pomikate, bom blokiral nadležne sledilce. <br/><br/>Brskaj naprej!]]></string>
-    <string name="daxMainNetworkCtaText">Pozor! Ne morem preprečiti, da bi %s videl vašo aktivnost na %s <br></br><br></br>Toda brskajte z mano in lahko zmanjšam, kar %s ve o vas na splošno, tako da blokiram njihove sledilce na mnogih drugih spletnih mestih.</string>
-    <string name="daxMainNetworkOwnedCtaText">Pozor! Ker ima %s v lasti %s, jim ne morem preprečiti, da bi videli vašo dejavnost tukaj.<br></br><br></br> Toda brskajte z mano in lahko zmanjšam količino tistega, kar %s ve o vas na splošno, tako da blokiram njihove sledilce na mnogih drugih spletnih mestih.</string>
+    <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Opozorilo! Ne morem preprečiti, da bi %1$s videl vašo aktivnost na %2$s &lt;br/&gt;&lt;br/&gt;Toda brskajte z nami in lahko zmanjšamo količina tistega, kar %3$s ve o vas na splošno, tako da blokiramo njihove sledilce na mnogih drugih spletnih mestih.</string>
+    <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Glavo gor! Ker je %1$s lastnik %2$s, mu ne moremo preprečiti, da bi videl vašo aktivnost tukaj.&lt;br/&gt;&lt;br/&gt;Toda brskaj z nami in lahko zmanjšamo količina tistega, kar %3$s ve o tebi na splošno, tako da blokiramo njihove sledilce na mnogih drugih spletnih mestih.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Shrani med prenose</string>
-    <string name="downloadConfirmationSaveFileTitle">Shrani %1$s</string>
+    <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Shrani %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Ohrani oba</string>
     <string name="downloadConfirmationReplaceOldFileText">Zamenjaj</string>
     <string name="downloadConfirmationOpenFileText">Odpri</string>
@@ -531,8 +530,8 @@
     <string name="whitelistActivityTitle">Nezaščitene strani</string>
     <string name="enablePrivacyProtection">Omogoči zaščito zasebnosti</string>
     <string name="disablePrivacyProtection">Onemogoči zaščito zasebnosti</string>
-    <string name="whitelistEntryOverflowContentDescription">Več možnosti za nezaščiteno stran %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Ali ste prepričani, da želite odstraniti <b>%s</b> z nezaščitenih spletnih strani?</string>
+    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Več možnosti za nezaščiteno stran %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ali ste prepričani​, da želite odstraniti &lt;b&gt;%1$s&lt;/b&gt; z nezaščitenih spletnih strani?</string>
     <string name="whitelistExplanation">Varnost teh strani se z zaščito zasebnosti ne bo izboljšala.</string>
     <string name="whitelistNoEntries">Zaščita zasebnosti omogočena za vsa spletna mesta</string>
     <string name="whitelistDomainHint">www.example.com</string>
@@ -545,12 +544,12 @@
     <string name="fireproofWebsitesActivityTitle">Spletne strani s požarno zaščito</string>
     <string name="settingsFireproofWebsites">Spletne strani s požarno zaščito</string>
     <string name="fireproofWebsiteMenuTitleAdd">Ta stran je požarno zaščitena</string>
-    <string name="fireproofWebsiteSnackbarConfirmation"><b>%s</b> ima zdaj požarno zaščito</string>
+    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; ima odslej požarno zaščito</string>
     <string name="fireproofWebsiteSnackbarAction">Prekliči spremembe</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Ste prepričani, da želite izbrisati <b>%s</b>?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage" instruction="Placeholder is a website">Si prepričan, da želiš izbrisati &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Spletne strani se zanašajo na piškotke, da boš vedno prijavljen. Ko spletno mesto požarno zaščitiš, piškotki ne bodo izbrisani in ostal boš prijavljen, tudi po uporabi gumba Fire. Še vedno blokiramo zunanje sledilce, ki jih najdemo na požarno izoliranih spletnih mestih.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Več možnosti za požarno zaščito spletnega mesta %s</string>
-    <string name="fireproofWebsiteLoginDialogTitle">Želite zaščito %s s programom Fireproof?</string>
+    <string name="fireproofWebsiteOverflowContentDescription" instruction="Placeholder is a website">Več možnosti za stran s požarno zaščito %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">Želiš požarno zaščito %1$s?</string>
     <string name="fireproofWebsiteLoginDialogDescription">S požarno zaščito tega spletnega mesta se boste prijavili po uporabi gumba Fire.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Požarna zaščita</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne zdaj</string>
@@ -558,7 +557,7 @@
     <string name="fireproofWebsiteEmptyListHint">Ni spletnih mest s požarno zaščito</string>
     <string name="fireproofWebsiteSettingSelectionTitle">Požarno zaščitite spletne strani pri prijavi</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Požarna zaščita je odstranjena za vsa spletna mesta</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Požarna zaščita za <b>%s</b> je bila odstranjena</string>
+    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Požarna zaščita odstranjena za &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Vprašaj vsakič</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Vedno</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nikoli</string>
@@ -587,11 +586,11 @@
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Želite omogočiti lokacijo naprave za zasebnost brskalnika DuckDuckGo?</string>
-    <string name="preciseLocationSystemDialogSubtitle">%s zahteva lokacijo vaše naprave. Najprej boste morali aplikaciji dovoliti, da pošlje lokacijo vaše naprave, nato lahko %s zahteva dovoljenje.</string>
+    <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s zahteva lokacijo vaše naprave. Najprej boste morali aplikaciji dovoliti, da pošlje lokacijo vaše naprave, nato lahko %2$s zahteva dovoljenje.</string>
     <string name="preciseLocationSystemDialogAllow">Omogoči</string>
     <string name="preciseLocationSystemDialogDeny">Mogoče kasneje</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ne vprašaj znova za to spletno mesto</string>
-    <string name="preciseLocationSiteDialogTitle">Želite %s dovoliti dostop do lokacije?</string>
+    <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Dovoli %1$s dostop do lokacije?</string>
     <string name="preciseLocationDDGDialogSubtitle">Vašo anonimno lokacijo uporabljamo samo, da vam zagotovimo boljše rezultate v vaši bližini. Pozneje si lahko vedno premislite.</string>
     <string name="preciseLocationSiteDialogSubtitle">Dovoljenja za dostop do lokacije, ki ste jih podelili posameznim spletnim mestom, lahko upravljate v nastavitvah.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Vedno</string>
@@ -603,11 +602,11 @@
     <string name="preciseLocationEmptyListHint">Nobeno spletno mesto nima dovoljenja za dostop do lokacije</string>
     <string name="preciseLocationNoSystemPermission">Če želite upravljati dovoljenja za dostop do lokacije, ki ste jih podelili posameznim spletnim mestom, omogočite lokacijo za to aplikacijo v nastavitvah za Android.</string>
     <string name="preciseLocationActivityTitle">Lokacija</string>
-    <string name="preciseLocationDeleteConfirmMessage">Ste prepričani, da želite izbrisati <b>%s</b>?</string>
-    <string name="preciseLocationDeleteContentDescription">Več možnosti za dovoljenja za lokacijo v domeni %s</string>
+    <string name="preciseLocationDeleteConfirmMessage" instruction="Placeholder is the name of a website">Si prepričan, da želiš izbrisati &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription" instruction="Placeholder is the domain of a website">Več možnosti za dovoljenja za lokacijo v domeni %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Odobreno</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Zavrnjeno</string>
-    <string name="preciseLocationSnackbarMessage">Predhodno ste podelili dovoljenje %s za dostop do lokacije vaše naprave.</string>
+    <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Predhodno ste podelili dovoljenje %1$s za dostop do lokacije vaše naprave.</string>
 
     <!--Fire button education-->
     <string name="daxClearDataCtaText">Osebni podatki se lahko naberejo v vašem brskalniku. Fuj. Uporabite gumb ogenj, da jih zažgete. Poskusite sedaj! 👇</string>
@@ -628,14 +627,14 @@
     <string name="appLinkDialogTitle">Želite odpreti v drugi aplikaciji?</string>
     <string name="appLinkSnackBarAction">Odpri v aplikaciji</string>
     <string name="appLinkMultipleSnackBarAction">Izberi aplikacijo</string>
-    <string name="appLinkSnackBarMessage">To povezavo lahko odprete v %s.</string>
+    <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">To povezavo lahko odprete v %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">To povezavo lahko odprete v drugih aplikacijah.</string>
     <string name="appLinkIntentChooserTitle">Odpri z</string>
     <string name="appLinkMenuItemTitle">Odpri v aplikaciji</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nov naslov je kopiran v odložišče</string>
-    <string name="autofillTooltipUseYourAlias">Uporabi %1$s</string>
+    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Uporabite %1$s</string>
     <string name="autofillTooltipUseYourAliasDescription">Blokira sledilce e-pošte</string>
     <string name="autofillTooltipGenerateAddress">Ustvarjanje zasebnega naslova Duck</string>
     <string name="autofillTooltipGenerateAddressDescription">Blokira sledilce e-pošte in skrije vaš naslov</string>
@@ -662,17 +661,17 @@
     <string name="bookmarkFolderEmpty">Prazno</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%s%s in %d predmet?</item>
-        <item quantity="two">%s%s in %d predmeta?</item>
-        <item quantity="few">%s%s in %d predmete?</item>
-        <item quantity="other">%s%s in %d predmetov?</item>
+        <item quantity="one">%1$s%2$s in %1$d element?</item>
+        <item quantity="two">%1$s%2$s in %1$d elementa?</item>
+        <item quantity="few">%1$s%2$s in %1$d elementi?</item>
+        <item quantity="other">%1$s%2$s in %1$d elementov?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%d element</item>
-        <item quantity="two">%d elementa</item>
-        <item quantity="few">%d elementi</item>
-        <item quantity="other">%d elementov</item>
+        <item quantity="one">%1$d element</item>
+        <item quantity="two">%1$d elementa</item>
+        <item quantity="few">%1$d elementi</item>
+        <item quantity="other">%1$d elementov</item>
     </plurals>
 
     <!-- Accessibility-->
@@ -689,7 +688,7 @@
     <string name="settingsPrivacyPolicyDuckduckgo">Pravilnik o zasebnosti</string>
 
     <!-- Home Screen Widget -->
-    <string name="homeScreenWidgetAdded">Pripomoček %s je bil dodan na domači zaslon</string>
+    <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Pripomoček %1$s je bil dodan na domači zaslon</string>
     <string name="settingsAddHomeScreenWidget">Pripomoček na domačem zaslonu</string>
 
     <!-- MacOs Settings -->
@@ -708,9 +707,9 @@
     <string name="downloadsItemMenuDelete">Izbriši</string>
     <string name="downloadsItemMenuCancel">Preklic</string>
     <string name="downloadsActivityMenuDeleteAll">Izbriši vse</string>
-    <string name="downloadsFileDeletedMessage">Izbrisano %s</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Izbrisano: %1$s</string>
     <string name="downloadsAllFilesDeletedMessage">Vse datoteke so bile izbrisane</string>
-    <string name="downloadsMoreOptionsContentDescription">Več možnosti za %s</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Več možnosti za: %1$s</string>
     <string name="downloadsUndoActionName">Prekliči spremembe</string>
     <string name="downloadsStateInProgress">Poteka …</string>
 
@@ -742,13 +741,12 @@
     <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Upravljanje spletnih mest</string>
     <string name="sitePermissionsSettingsEmptyText">Spletnih mest še ni</string>
-    <string name="permissionPerWebsiteText">Dovoljenja za »%s« </string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Dovoljenja za »%1$s« </string>
     <string name="permissionsPerWebsiteAskSetting">Vprašaj</string>
     <string name="permissionsPerWebsiteDenySetting">Zavrni</string>
     <string name="permissionsPerWebsiteAllowSetting">Dovoli</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle">%s dovoljenje za %s</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s dovoljenje za %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Samodejno izpolnjevanje</string>
-
 </resources>
