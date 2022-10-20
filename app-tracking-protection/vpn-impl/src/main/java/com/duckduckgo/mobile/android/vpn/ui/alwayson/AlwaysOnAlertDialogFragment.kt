@@ -32,15 +32,21 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import java.lang.ref.WeakReference
+import timber.log.Timber
 import javax.inject.Inject
+
+private enum class FragmentType {
+    ALWAYS_ON,
+    ALWAYS_ON_LOCKDOWN,
+}
 
 @InjectWith(FragmentScope::class)
 class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragment() {
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
     @Inject lateinit var appTheme: AppTheme
-    private var listener: WeakReference<Listener> = WeakReference(null)
+    private lateinit var listener: Listener
+    private lateinit var fragmentType: FragmentType
 
     override fun getTheme(): Int = R.style.AlwaysOnBottomSheetDialogTheme
 
@@ -62,19 +68,38 @@ class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragm
 
         fun configureCloseButtons(binding: ContentVpnAlwaysOnAlertBinding) {
             binding.closeButton.setOnClickListener { animatedClosed() }
-            binding.notNowButton.setOnClickListener { animatedClosed() }
+            binding.notNowButton.setOnClickListener {
+                animatedClosed()
+                if (this::listener.isInitialized) {
+                    listener.onCanceled()
+                } else {
+                    Timber.e("Listener not initialized")
+                }
+            }
             binding.goToSettingsButton.setOnClickListener {
                 animatedClosed()
-                listener.get()?.onGoToSettingsClicked()
+                if (this::listener.isInitialized) {
+                    listener.onGoToSettingsClicked()
+                } else {
+                    Timber.e("Listener not initialized")
+                }
             }
         }
 
         fun configurePromotionIllustration(binding: ContentVpnAlwaysOnAlertBinding) {
             binding.alwaysOnIllustration.setAnimation(
                 if (appTheme.isLightModeEnabled()) {
-                    R.raw.always_on
+                    if (fragmentType == FragmentType.ALWAYS_ON) {
+                        R.raw.always_on
+                    } else {
+                        R.raw.always_on_lockdown
+                    }
                 } else {
-                    R.raw.always_on_dark
+                    if (fragmentType == FragmentType.ALWAYS_ON) {
+                        R.raw.always_on_dark
+                    } else {
+                        R.raw.always_on_lockdown_dark
+                    }
                 }
             )
         }
@@ -84,7 +109,13 @@ class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragm
         }
 
         fun bindViewElements() {
-            binding.alwaysOnModalDescription.text = HtmlCompat.fromHtml(getString(R.string.atp_AlwaysOnModalBody), 0)
+            if (fragmentType == FragmentType.ALWAYS_ON) {
+                binding.alwaysOnModalHeading.text = HtmlCompat.fromHtml(getString(R.string.atp_AlwaysOnModalHeading), 0)
+                binding.alwaysOnModalDescription.text = HtmlCompat.fromHtml(getString(R.string.atp_AlwaysOnModalBody), 0)
+            } else {
+                binding.alwaysOnModalHeading.text = HtmlCompat.fromHtml(getString(R.string.atp_AlwaysOnLockdownModalHeading), 0)
+                binding.alwaysOnModalDescription.text = HtmlCompat.fromHtml(getString(R.string.atp_AlwaysOnLockdownModalBody), 0)
+            }
         }
 
         configureBehavior()
@@ -93,17 +124,27 @@ class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragm
         bindViewElements()
     }
 
-    fun interface Listener {
+    interface Listener {
         /**
          * Called when the user clicks on the "Go to settings" button.
          */
         fun onGoToSettingsClicked()
+
+        /** Called when the user clicks on the "Not now" button. */
+        fun onCanceled()
     }
 
     companion object {
-        fun newInstance(listener: Listener? = null): AlwaysOnAlertDialogFragment {
+        fun newAlwaysOnDialog(listener: Listener): AlwaysOnAlertDialogFragment {
             return AlwaysOnAlertDialogFragment().apply {
-                this.listener = WeakReference(listener)
+                this.listener = listener
+                this.fragmentType = FragmentType.ALWAYS_ON
+            }
+        }
+        fun newAlwaysOnLockdownDialog(listener: Listener): AlwaysOnAlertDialogFragment {
+            return AlwaysOnAlertDialogFragment().apply {
+                this.listener = listener
+                this.fragmentType = FragmentType.ALWAYS_ON_LOCKDOWN
             }
         }
     }

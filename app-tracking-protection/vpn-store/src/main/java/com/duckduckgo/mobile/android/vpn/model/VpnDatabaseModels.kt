@@ -84,11 +84,6 @@ data class VpnServiceStateStats(
     @Embedded val alwaysOnState: AlwaysOnState = AlwaysOnState.ALWAYS_ON_DISABLED
 )
 
-data class BucketizedVpnServiceStateStats(
-    val day: String,
-    @Embedded val vpnServiceStateStats: VpnServiceStateStats
-)
-
 data class TrackingApp(
     val packageId: String,
     val appDisplayName: String

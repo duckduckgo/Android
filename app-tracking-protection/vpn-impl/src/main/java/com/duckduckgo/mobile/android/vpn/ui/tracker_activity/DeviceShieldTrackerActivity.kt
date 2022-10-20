@@ -61,6 +61,8 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -175,6 +177,7 @@ class DeviceShieldTrackerActivity :
             .commitNow()
     }
 
+    @OptIn(FlowPreview::class)
     private fun observeViewModel() {
         lifecycleScope.launch {
             viewModel.getBlockedTrackersCount()
@@ -186,6 +189,18 @@ class DeviceShieldTrackerActivity :
                 }
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { renderViewState(it) }
+        }
+
+        lifecycleScope.launch {
+            // This is a one-shot check as soon as the screen is shown
+            viewModel.getRunningState()
+                .map { it.alwaysOnState }
+                .debounce(500) // give a bit of time so that pop doesn't just suddenly pops up
+                .take(1)
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect {
+                    viewModel.onViewEvent(ViewEvent.AlwaysOnInitialState(it))
+                }
         }
 
         viewModel.commands()
@@ -226,6 +241,7 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog -> launchVPNConflictDialog(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnAlwaysOnConflictDialog -> launchVPNConflictDialog(true)
             is DeviceShieldTrackerActivityViewModel.Command.ShowAlwaysOnPromotionDialog -> launchAlwaysOnPromotionDialog()
+            is DeviceShieldTrackerActivityViewModel.Command.ShowAlwaysOnLockdownWarningDialog -> launchAlwaysOnLockdownEnabledDialog()
             is DeviceShieldTrackerActivityViewModel.Command.VPNPermissionNotGranted -> quietlyToggleAppTpSwitch(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowRemoveFeatureConfirmationDialog -> launchRemoveFeatureConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.CloseScreen -> finish()
@@ -272,11 +288,39 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchAlwaysOnPromotionDialog() {
-        val dialog = AlwaysOnAlertDialogFragment.newInstance { viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings) }
-        dialog.show(
-            supportFragmentManager,
-            TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG
-        )
+        val dialog = supportFragmentManager.findFragmentByTag(TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG) as? AlwaysOnAlertDialogFragment
+        dialog?.dismiss()
+
+        AlwaysOnAlertDialogFragment.newAlwaysOnDialog(
+            object : AlwaysOnAlertDialogFragment.Listener {
+                override fun onGoToSettingsClicked() {
+                    viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings)
+                }
+
+                override fun onCanceled() {
+                    viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnCancelled)
+                }
+            }
+        ).show(supportFragmentManager, TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG)
+    }
+
+    private fun launchAlwaysOnLockdownEnabledDialog() {
+        val dialog = supportFragmentManager.findFragmentByTag(TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG) as? AlwaysOnAlertDialogFragment
+        dialog?.dismiss()
+
+        AlwaysOnAlertDialogFragment.newAlwaysOnLockdownDialog(
+            object : AlwaysOnAlertDialogFragment.Listener {
+                override fun onGoToSettingsClicked() {
+                    Timber.d("aitor: onGoToSettingsClicked")
+                    viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings)
+                }
+
+                override fun onCanceled() {
+                    Timber.d("aitor: onCanceled")
+                    viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnCancelled)
+                }
+            }
+        ).show(supportFragmentManager, TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG)
     }
 
     override fun onOpenAppProtection() {

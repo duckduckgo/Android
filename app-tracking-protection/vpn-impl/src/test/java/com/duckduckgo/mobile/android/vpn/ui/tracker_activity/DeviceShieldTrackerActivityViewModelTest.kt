@@ -43,7 +43,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.time.ExperimentalTime
@@ -190,8 +189,6 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenVpnLaunchedAlwaysOnDisabledAndSystemKilledAppTpThenShowAlwaysOnPromotion() = runBlocking {
-        whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(6)
-        whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(true)
         whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
         whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(true)
 
@@ -206,8 +203,6 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenVpnLaunchedAlwaysOnDisabledAndSystemDidNotKilledAppTpThenDoNotShowAlwaysOnPromotion() = runBlocking {
-        whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(1)
-        whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(true)
         whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
         whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(false)
 
@@ -220,15 +215,12 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenVPNInAlwaysOnModeThenShowPromoteAlwaysOnDialogCommandIsNotSent() = runBlocking {
-        whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(6)
-        whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(true)
         whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(true)
         whenever(vpnStore.vpnLastDisabledByAndroid()).thenReturn(true)
 
         viewModel.commands().test {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, expectMostRecentItem())
-            verify(vpnStore, times(0)).resetAppTPManuallyEnablesCounter()
             cancelAndConsumeRemainingEvents()
         }
     }

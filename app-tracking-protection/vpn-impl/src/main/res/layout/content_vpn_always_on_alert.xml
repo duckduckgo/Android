@@ -54,6 +54,7 @@
     >
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/alwaysOnModalHeading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="24dp"

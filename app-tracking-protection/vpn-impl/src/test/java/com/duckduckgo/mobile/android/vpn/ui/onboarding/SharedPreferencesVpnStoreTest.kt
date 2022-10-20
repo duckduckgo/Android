@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
@@ -32,17 +31,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class SharedPreferencesVpnStoreTest {
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
 
     private val sharedPreferencesProvider = mock<VpnSharedPreferencesProvider>()
     private val vpnHeartBeatDao = mock<VpnHeartBeatDao>()
@@ -60,7 +54,6 @@ class SharedPreferencesVpnStoreTest {
 
         sharedPreferencesVpnStore = SharedPreferencesVpnStore(
             sharedPreferencesProvider,
-            coroutineRule.testDispatcherProvider,
             vpnHeartBeatDao,
             vpnFeaturesRegistry,
             vpnServiceStateDao,
@@ -88,41 +81,8 @@ class SharedPreferencesVpnStoreTest {
     }
 
     @Test
-    fun whenOnAppTpManuallyEnabledThenSetToTrueAndIncrementCounter() {
-        sharedPreferencesVpnStore.onAppTPManuallyEnabled()
-        sharedPreferencesVpnStore.onAppTPManuallyEnabled()
-
-        assertEquals(2, sharedPreferencesVpnStore.getAppTPManuallyEnables())
-    }
-
-    @Test
-    fun whenResetAppTpManuallyEnablesCounterThenResetCounter() {
-        sharedPreferencesVpnStore.onAppTPManuallyEnabled()
-
-        sharedPreferencesVpnStore.resetAppTPManuallyEnablesCounter()
-
-        assertEquals(0, sharedPreferencesVpnStore.getAppTPManuallyEnables())
-    }
-
-    @Test
-    fun whenUserAllowsShowPromoteAlwaysOnThenReturnDefaultValueTrue() {
-        assertTrue(sharedPreferencesVpnStore.userAllowsShowPromoteAlwaysOn())
-    }
-
-    @Test
-    fun whenIsAllaysOnEnabledThenReturnDefaultValueFalse() {
-        assertFalse(sharedPreferencesVpnStore.isAlwaysOnEnabled())
-    }
-
-    @Test
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun whenSetAlwaysOnThenSetAlwaysOnValue() = runTest {
-        sharedPreferencesVpnStore.setAlwaysOn(true)
-
-        assertTrue(sharedPreferencesVpnStore.isAlwaysOnEnabled())
-
-        sharedPreferencesVpnStore.setAlwaysOn(false)
-
+    fun whenIsAllaysOnEnabledThenReturnDefaultValueFalse() = runTest {
         assertFalse(sharedPreferencesVpnStore.isAlwaysOnEnabled())
     }
 

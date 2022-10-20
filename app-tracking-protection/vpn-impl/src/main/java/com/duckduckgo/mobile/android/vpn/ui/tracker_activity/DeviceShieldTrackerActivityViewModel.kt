@@ -87,7 +87,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         }
     }
 
-    private suspend fun shouldPromoteAlwaysOn(): Boolean {
+    private suspend fun shouldPromoteAlwaysOnOnAppTPEnable(): Boolean {
         return !vpnStore.isAlwaysOnEnabled() && vpnStore.vpnLastDisabledByAndroid()
     }
 
@@ -144,6 +144,8 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             ViewEvent.AskToRemoveFeature -> sendCommand(Command.ShowRemoveFeatureConfirmationDialog)
             ViewEvent.StartVpn -> launchVpn()
             ViewEvent.PromoteAlwaysOnOpenSettings -> onOpenSettingsPromoteAlwaysOnDialog()
+            ViewEvent.PromoteAlwaysOnCancelled -> onAlwaysOnPromotionDialogCancelled()
+            is ViewEvent.AlwaysOnInitialState -> onAlwaysOnInitialState(viewEvent.alwaysOnState)
         }
 
     }
@@ -151,7 +153,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private fun launchVpn() {
         sendCommand(Command.LaunchVPN)
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (shouldPromoteAlwaysOn()) {
+            if (shouldPromoteAlwaysOnOnAppTPEnable()) {
                 deviceShieldPixels.didShowPromoteAlwaysOnDialog()
                 sendCommand(Command.ShowAlwaysOnPromotionDialog)
             }
@@ -170,6 +172,20 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private fun onOpenSettingsPromoteAlwaysOnDialog() {
         deviceShieldPixels.didChooseToOpenSettingsFromPromoteAlwaysOnDialog()
         sendCommand(Command.OpenVpnSettings)
+    }
+
+    private fun onAlwaysOnPromotionDialogCancelled() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            vpnStore.increaseAlwaysOnPromotionDialogCancelCount()
+        }
+    }
+
+    private fun onAlwaysOnInitialState(alwaysOnState: VpnStateMonitor.AlwaysOnState) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (alwaysOnState.enabled && alwaysOnState.lockedDown && vpnStore.alwaysOnPromotionDialogCancelCount() <= 2) {
+                sendCommand(Command.ShowAlwaysOnLockdownWarningDialog)
+            }
+        }
     }
 
     internal data class TrackerActivityViewState(
@@ -201,6 +217,8 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object AskToRemoveFeature : ViewEvent()
 
         object PromoteAlwaysOnOpenSettings : ViewEvent()
+        object PromoteAlwaysOnCancelled : ViewEvent()
+        data class AlwaysOnInitialState(val alwaysOnState: VpnStateMonitor.AlwaysOnState) : ViewEvent()
     }
 
     sealed class Command {
@@ -218,6 +236,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object ShowVpnConflictDialog : Command()
         object ShowVpnAlwaysOnConflictDialog : Command()
         object ShowAlwaysOnPromotionDialog : Command()
+        object ShowAlwaysOnLockdownWarningDialog : Command()
         object ShowRemoveFeatureConfirmationDialog : Command()
         object CloseScreen : Command()
         object OpenVpnSettings : Command()
