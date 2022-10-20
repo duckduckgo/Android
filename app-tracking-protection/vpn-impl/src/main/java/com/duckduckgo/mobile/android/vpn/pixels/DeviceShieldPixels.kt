@@ -60,12 +60,6 @@ interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
     fun reportDisabled()
 
-    /** This pixel will be unique on a given day, no matter how many times we call this fun */
-    fun reportLastDayEnableCount(count: Int)
-
-    /** This pixel will be unique on a given day, no matter how many times we call this fun */
-    fun reportLastDayDisableCount(count: Int)
-
     /**
      * This fun will fire three pixels
      * unique -> fire only once ever no matter how many times we call this fun
@@ -81,14 +75,6 @@ interface DeviceShieldPixels {
      * count -> fire a pixel on every call
      */
     fun enableFromOnboarding()
-
-    /**
-     * This fun will fire three pixels
-     * unique -> fire only once ever no matter how many times we call this fun
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
-    fun enableFromDaxOnboarding()
 
     /**
      * This fun will fire three pixels
@@ -255,8 +241,6 @@ interface DeviceShieldPixels {
 
     fun didShowReportBreakageAppList()
 
-    fun didShowReportBreakageTextForm()
-
     fun didShowReportBreakageSingleChoiceForm()
 
     /**
@@ -280,11 +264,6 @@ interface DeviceShieldPixels {
     fun didChooseToOpenSettingsFromVpnConflictDialog()
 
     fun didChooseToContinueFromVpnConflictDialog()
-
-    /**
-     * Will fire when the waitlist dialog is showed to the user
-     */
-    fun didShowWaitlistDialog()
 
     /**
      * Will fire when the user presses "notify me" CTA in the waitlist dialog
@@ -398,10 +377,10 @@ interface DeviceShieldPixels {
     fun reportVpnUptime(uptime: Long)
 
     /** Will fire when the user has VPN always-on setting enabled */
-    fun reportAlwaysOnEnabled()
+    fun reportAlwaysOnEnabledDaily()
 
     /** Will fire when the user has VPN always-on lockdown setting enabled */
-    fun reportAlwaysOnLockdownEnabled()
+    fun reportAlwaysOnLockdownEnabledDaily()
 
     fun reportUnprotectedAppsBucket(bucketSize: Int)
 }
@@ -443,14 +422,6 @@ class RealDeviceShieldPixels @Inject constructor(
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DISABLE_DAILY)
     }
 
-    override fun reportLastDayEnableCount(count: Int) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_LAST_DAY_ENABLE_COUNT_DAILY, mapOf("count" to count.toString()))
-    }
-
-    override fun reportLastDayDisableCount(count: Int) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_LAST_DAY_DISABLE_COUNT_DAILY, mapOf("count" to count.toString()))
-    }
-
     override fun enableFromReminderNotification() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION_UNIQUE,
@@ -461,15 +432,6 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun enableFromOnboarding() {
-        tryToFireUniquePixel(
-            DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_UNIQUE,
-            tag = FIRST_ENABLE_ENTRY_POINT_TAG
-        )
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_DAILY)
-        firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING)
-    }
-
-    override fun enableFromDaxOnboarding() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_UNIQUE,
             tag = FIRST_ENABLE_ENTRY_POINT_TAG
@@ -664,11 +626,6 @@ class RealDeviceShieldPixels @Inject constructor(
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_APP_LIST_DAILY)
     }
 
-    override fun didShowReportBreakageTextForm() {
-        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_TEXT_FORM)
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_TEXT_FORM_DAILY)
-    }
-
     override fun didShowReportBreakageSingleChoiceForm() {
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM)
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM_DAILY)
@@ -708,10 +665,6 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun didChooseToContinueFromVpnConflictDialog() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG)
-    }
-
-    override fun didShowWaitlistDialog() {
-        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_WAITLIST_DIALOG)
     }
 
     override fun didPressWaitlistDialogNotifyMe() {
@@ -869,11 +822,11 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_UPTIME, mapOf("uptime" to uptime.toString()))
     }
 
-    override fun reportAlwaysOnEnabled() {
+    override fun reportAlwaysOnEnabledDaily() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_ALWAYS_ON_ENABLED_DAILY)
     }
 
-    override fun reportAlwaysOnLockdownEnabled() {
+    override fun reportAlwaysOnLockdownEnabledDaily() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_ALWAYS_ON_LOCKDOWN_ENABLED_DAILY)
     }
 
