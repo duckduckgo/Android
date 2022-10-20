@@ -16,13 +16,13 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="@dimen/listItemImageContainerSize"
-    android:layout_height="@dimen/listItemImageContainerSize">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/threeOrFourIconsContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
         android:background="@drawable/ic_oval_background"
         android:padding="6dp"
         android:visibility="gone"
@@ -74,8 +74,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/twoIconsContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
         android:background="@drawable/ic_oval_background"
         android:padding="6dp"
         android:visibility="gone">
@@ -107,8 +107,8 @@
 
     <ImageView
         android:id="@+id/oneIconContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
         android:importantForAccessibility="no"
         android:visibility="gone"
         tools:src="@drawable/tracking_network_logo_adjust" />
