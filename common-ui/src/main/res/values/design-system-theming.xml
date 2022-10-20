@@ -45,7 +45,6 @@
         <item name="textAppearanceHeadline5">@style/TextAppearance.DuckDuckGo.Headline5</item>
         <item name="textAppearanceBody1">@style/TextAppearance.DuckDuckGo.Body1</item>
         <item name="textAppearanceBody2">@style/TextAppearance.DuckDuckGo.Body2</item>
-        <item name="textAppearanceButton">@style/TextAppearance.DuckDuckGo.Button1</item>
         <item name="textAppearanceButton1">@style/TextAppearance.DuckDuckGo.Button1</item>
         <item name="textAppearanceButton2">@style/TextAppearance.DuckDuckGo.Button2</item>
         <item name="textAppearanceCaption">@style/TextAppearance.DuckDuckGo.Caption</item>
@@ -56,6 +55,7 @@
         <item name="textAppearanceH3">@style/Typography.DuckDuckGo.H3</item>
         <item name="textAppearanceH4">@style/Typography.DuckDuckGo.H4</item>
         <item name="textAppearanceH5">@style/Typography.DuckDuckGo.H5</item>
+        <item name="textAppearanceButton">@style/Typography.DuckDuckGo.Button</item>
 
         <!-- Shape -->
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.DuckDuckGo.SmallComponent</item>

@@ -39,8 +39,10 @@
     <dimen name="toolbarOverflowPadding">10dp</dimen>
 
     <!-- Buttons -->
-    <dimen name="buttonLargeHeight">56dp</dimen>
+    <dimen name="buttonLargeHeight">62dp</dimen>
+    <dimen name="buttonLargeIconSize">24dp</dimen>
     <dimen name="buttonSmallHeight">48dp</dimen>
+    <dimen name="buttonSmallIconSize">16dp</dimen>
 
     <!-- List Items -->
     <dimen name="listItemImageContainerSize">40dp</dimen>
@@ -51,7 +53,6 @@
     <dimen name="twoLineItemPadding">14dp</dimen>
 
     <!-- PopupMenu -->
-
     <dimen name="popupMenuWidth">280dp</dimen>
     <dimen name="popupMenuNavigationItemHeight">24dp</dimen>
     <dimen name="popupMenuItemHeight">48dp</dimen>
