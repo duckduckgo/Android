@@ -46,7 +46,5 @@
     <string name="atp_ActivityViewAppsLabel" translatable="false">View Apps</string>
     <string name="atp_ActivityEnabledMoreThanADayLabel" translatable="false">This feature is in beta. Having issues with an app? <annotation type="app_settings_link">Help Us Improve</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel" translatable="false">Some apps may experience issues when App Tracking Protection is enabled.\n<annotation type="learn_why_link">Learn Why</annotation></string>
-
-    <!-- TODO [ANA] This is unused yet  -->
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel" translatable="false">Protection is disabled for apps with known issues. You can enable these apps, but they may not work as expected. <annotation type="learn_why_link">Learn Why</annotation></string>
 </resources>

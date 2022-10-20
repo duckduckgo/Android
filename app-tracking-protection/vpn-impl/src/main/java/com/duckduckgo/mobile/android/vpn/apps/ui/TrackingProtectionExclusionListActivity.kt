@@ -36,6 +36,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.apps.BannerContent
 import com.duckduckgo.mobile.android.vpn.apps.Command
 import com.duckduckgo.mobile.android.vpn.apps.ManageAppsProtectionViewModel
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
@@ -67,7 +68,8 @@ class TrackingProtectionExclusionListActivity :
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
-    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Inject
+    lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     private val binding: ActivityTrackingProtectionExclusionListBinding by viewBinding()
 
@@ -188,21 +190,27 @@ class TrackingProtectionExclusionListActivity :
         binding.excludedAppsFilterText.text = getString(viewState.filterResId!!, viewState.excludedApps.size)
         binding.excludedAppsFilterText.show()
         adapter.update(viewState.excludedApps, isListEnabled)
-        renderBanner(viewState.showDefaultBanner)
+        renderBanner(viewState.bannerContent)
         shimmerLayout.gone()
     }
 
-    private fun renderBanner(showLearnWhyBanner: Boolean) {
-        if (showLearnWhyBanner) {
-            binding.excludedAppsEnabledVPNLabel.setText(getString(R.string.atp_ExcludedAppsEnabledLabel))
-        } else {
-            binding.excludedAppsEnabledVPNLabel.apply {
+    private fun renderBanner(bannerContent: BannerContent) {
+        when (bannerContent) {
+            BannerContent.ALL_OR_PROTECTED_APPS -> binding.excludedAppsEnabledVPNLabel.apply {
                 setClickableLink(
                     LEARN_WHY_ANNOTATION,
                     getText(R.string.atp_ExcludedAppsEnabledLearnWhyLabel)
                 ) { launchFaq() }
             }
+            BannerContent.UNPROTECTED_APPS -> binding.excludedAppsEnabledVPNLabel.apply {
+                setClickableLink(
+                    LEARN_WHY_ANNOTATION,
+                    getText(R.string.atp_ExcludedAppsDisabledLearnWhyLabel)
+                ) { launchFaq() }
+            }
+            BannerContent.CUSTOMISED_PROTECTION -> binding.excludedAppsEnabledVPNLabel.setText(getString(R.string.atp_ExcludedAppsEnabledLabel))
         }
+        binding.excludedAppsEnabledVPNLabel.minimumHeight = 0
     }
 
     private fun processCommand(command: Command) {

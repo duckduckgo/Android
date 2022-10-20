@@ -84,20 +84,24 @@ class ManageAppsProtectionViewModel @Inject constructor(
             .combine(filterState.asStateFlow()) { list, filter ->
                 val protectedApps = list.filter { !it.isExcluded }
                 val unprotectedApps = list.filter { it.isExcluded }
-                val showDefaultBanner = list.any { it.isProblematic() && !it.isExcluded }
+                val customProtection = list.any { it.isProblematic() && !it.isExcluded }
 
                 when (filter) {
                     AppsFilter.PROTECTED_ONLY -> return@combine ViewState(
                         protectedApps,
                         R.string.atp_ExcludedAppsFilterProtectedLabel,
-                        showDefaultBanner
+                        if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.ALL_OR_PROTECTED_APPS
                     )
                     AppsFilter.UNPROTECTED_ONLY -> return@combine ViewState(
                         unprotectedApps,
                         R.string.atp_ExcludedAppsFilterUnprotectedLabel,
-                        showDefaultBanner
+                        if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.UNPROTECTED_APPS
                     )
-                    else -> return@combine ViewState(list, R.string.atp_ExcludedAppsFilterAllLabel, showDefaultBanner)
+                    else -> return@combine ViewState(
+                        list,
+                        R.string.atp_ExcludedAppsFilterAllLabel,
+                        if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.ALL_OR_PROTECTED_APPS
+                    )
                 }
             }
     }
@@ -263,8 +267,14 @@ private data class ManualProtectionSnapshot(
 internal data class ViewState(
     val excludedApps: List<TrackingProtectionAppInfo>,
     @StringRes val filterResId: Int? = null,
-    val showDefaultBanner: Boolean = false
+    val bannerContent: BannerContent = BannerContent.ALL_OR_PROTECTED_APPS
 )
+
+enum class BannerContent {
+    ALL_OR_PROTECTED_APPS,
+    UNPROTECTED_APPS,
+    CUSTOMISED_PROTECTION
+}
 
 internal sealed class Command {
     object RestartVpn : Command()
