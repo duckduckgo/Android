@@ -1,4 +1,4 @@
-name: Update Reference Tests
+name: Update Internal Libraries
 
 on:
   schedule:
@@ -51,6 +51,7 @@ jobs:
           title: "Update reference tests to latest version"
           author: daxmobile <daxmobile@users.noreply.github.com>
           token: ${{ secrets.GT_DAXMOBILE }}
+          reviewers: marcosholgado
           commit-message: "Update reference tests to latest version"
           labels: reference tests, automated pr
           branch: automated/update-ref-tests-dependencies
@@ -59,3 +60,55 @@ jobs:
             
             This PR updates the reference tests dependency to the latest available version and copies the necessary files.
             - [ ] All tests must pass
+
+  autofill:
+    name: Update Autofill
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install npm-check-updates
+        run: npm install -g npm-check-updates
+
+      - name: Install copy-files-from-to
+        run: npm install -g copy-files-from-to
+
+      - name: Check for updates
+        id: update-check
+        continue-on-error: true
+        run: ncu @duckduckgo/autofill --errorLevel 2
+
+      - name: Update Autofill
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        run: ncu @duckduckgo/autofill -u
+
+      - name: Install package
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        run: npm update
+
+      - name: Copy files
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        run: copy-files-from-to
+
+      - name: Create PR
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        uses: peter-evans/create-pull-request@v4
+        with:
+          base: "develop"
+          title: "Update autofill to latest version"
+          author: daxmobile <daxmobile@users.noreply.github.com>
+          token: ${{ secrets.GT_DAXMOBILE }}
+          reviewers: shakyShane
+          commit-message: "Update autofill to latest version"
+          labels: autofill, automated pr
+          branch: automated/update-autofill-dependency
+          body: |
+            - Automated autofill dependency update
+            
+            This PR updates the autofill dependency to the latest available version. 
+            You have to manually create a task for this PR before merging it. 
+            This PR only updates to the latest version and installs it, no code changes in the client are done in this PR.
