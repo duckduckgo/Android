@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser
 
-import com.duckduckgo.privacy.dashboard.api.animations.TrackersAnimatorListener
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
@@ -174,6 +173,7 @@ import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu
+import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.cta.ui.DaxDialogCta.DaxAutoconsentCta
@@ -207,8 +207,8 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
-import com.duckduckgo.privacy.dashboard.api.animations.BrowserTrackersAnimatorHelper
-import com.duckduckgo.privacy.dashboard.api.animations.PrivacyShieldAnimationHelper
+import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
+import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.coroutines.flow.cancellable
 import javax.inject.Provider
@@ -463,7 +463,7 @@ class BrowserTabFragment :
 
         override fun onPopUpHandled() {
             launch {
-                context?.let { animatorHelper.createCookiesAnimation(it) }
+                context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation, scene_root) }
             }
         }
 
@@ -2634,6 +2634,7 @@ class BrowserTabFragment :
 
                     activity?.let { activity ->
                         animatorHelper.startTrackersAnimation(
+                            context = activity,
                             shouldRunPartialAnimation = lastSeenCtaViewState?.cta is DaxTrackersBlockedCta,
                             shieldAnimationView = shieldIcon,
                             trackersAnimationView = trackerAnimationView,

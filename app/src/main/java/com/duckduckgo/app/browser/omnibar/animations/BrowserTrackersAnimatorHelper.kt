@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.dashboard.api.animations
+package com.duckduckgo.app.browser.omnibar.animations
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.trackerdetection.model.Entity
 
@@ -36,6 +37,7 @@ interface BrowserTrackersAnimatorHelper {
      * @param entities are the tracker entities detected on the current site
      */
     fun startTrackersAnimation(
+        context: Context,
         shouldRunPartialAnimation: Boolean,
         shieldAnimationView: LottieAnimationView,
         trackersAnimationView: LottieAnimationView,
@@ -43,7 +45,21 @@ interface BrowserTrackersAnimatorHelper {
         entities: List<Entity>?
     )
 
-    fun createCookiesAnimation(context: Context)
+    /**
+     * This method creates or enqueues cookie consent animation.
+     *
+     * @param omnibarViews are the views that should be hidden while the animation is running.
+     * @param cookieBackground holder of the cookie consent animation background.
+     * @param cookieAnimationView holder of the cookie consent animation.
+     * @param cookieScene holder of cookie consent text animation.
+     */
+    fun createCookiesAnimation(
+        context: Context,
+        omnibarViews: List<View>,
+        cookieBackground: View,
+        cookieAnimationView: LottieAnimationView,
+        cookieScene: ViewGroup
+    )
 
     /**
      * Cancel a running animation.

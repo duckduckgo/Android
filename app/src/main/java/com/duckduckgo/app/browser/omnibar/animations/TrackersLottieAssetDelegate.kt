@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.dashboard.impl.animations
+package com.duckduckgo.app.browser.omnibar.animations
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -28,12 +28,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.airbnb.lottie.ImageAssetDelegate
 import com.airbnb.lottie.LottieImageAsset
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.toPx
-import com.duckduckgo.privacy.dashboard.impl.R
-import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.ImageLogo
-import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.LetterLogo
-import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.StackedLogo
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.ImageLogo
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.LetterLogo
+import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.StackedLogo
 
 internal class TrackersLottieAssetDelegate(
     val context: Context,
@@ -41,7 +41,6 @@ internal class TrackersLottieAssetDelegate(
 ) : ImageAssetDelegate {
 
     override fun fetchBitmap(asset: LottieImageAsset?): Bitmap? {
-
         return when (asset?.id) {
             "image_0" -> {
                 kotlin.runCatching { logos[0].asDrawable(context) }
@@ -49,21 +48,25 @@ internal class TrackersLottieAssetDelegate(
                         ContextCompat.getDrawable(context, R.drawable.network_logo_blank)!!.toBitmap()
                     )
             }
+
             "image_1" -> {
                 kotlin.runCatching { logos[1].asDrawable(context) }
                     .getOrDefault(
                         ContextCompat.getDrawable(context, R.drawable.network_logo_blank)!!.toBitmap()
                     )
             }
+
             "image_2" -> {
                 kotlin.runCatching { logos[2].asDrawable(context) }
                     .getOrDefault(
                         ContextCompat.getDrawable(context, R.drawable.network_logo_blank)!!.toBitmap()
                     )
             }
+
             "image_3" ->
                 kotlin.runCatching { logos[3].asDrawable(context) }
                     .getOrNull()
+
             else -> null
         }
     }
@@ -102,7 +105,6 @@ internal class TrackersLottieAssetDelegate(
                 val textBaseLineHeight = textPaint.fontMetrics.ascent * -0.4f
                 canvas.drawCircle(centerX, centerY, centerX, backgroundPaint)
                 canvas.drawText(letter, centerX - textWidth, centerY + textBaseLineHeight, textPaint)
-
             }
 
             override fun setAlpha(alpha: Int) {
