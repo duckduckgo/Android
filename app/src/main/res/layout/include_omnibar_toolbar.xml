@@ -128,8 +128,8 @@
 
                     <View
                         android:id="@+id/cookieDummyView"
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
+                        android:layout_width="@dimen/omnibarCookieAnimationBannerHeight"
+                        android:layout_height="@dimen/omnibarCookieAnimationBannerHeight"
                         android:alpha="0"
                         android:layout_marginStart="2dp"
                         app:layout_constraintBottom_toBottomOf="parent"

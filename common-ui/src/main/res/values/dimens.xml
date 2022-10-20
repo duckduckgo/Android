@@ -28,6 +28,8 @@
     <dimen name="feedbackCardHorizontalMargin">16dp</dimen>
     <dimen name="feedbackTitleMarginTop">30dp</dimen>
 
+    <dimen name="omnibarCookieAnimationBannerHeight">38dp</dimen>
+
     <dimen name="systemSearchResultsElevation">4dp</dimen>
 
     <dimen name="changeAppIconPadding">16dp</dimen>
