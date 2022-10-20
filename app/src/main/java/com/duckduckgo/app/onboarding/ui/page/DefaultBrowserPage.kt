@@ -19,16 +19,13 @@ package com.duckduckgo.app.onboarding.ui.page
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
 import android.widget.Toast
-import androidx.core.view.ViewCompat
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
