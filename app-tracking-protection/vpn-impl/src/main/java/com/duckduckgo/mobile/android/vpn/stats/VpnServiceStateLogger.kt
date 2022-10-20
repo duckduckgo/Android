@@ -125,7 +125,7 @@ class VpnServiceStateLogger @Inject constructor(
         times: Int = Int.MAX_VALUE,
         initialDelay: Long = 500, // 0.5 second
         maxDelay: Long = 300_000, // 5 minutes
-        factor: Double = 1.1,
+        factor: Double = 1.05, // 5% increase
         block: suspend () -> Unit
     ) {
         var currentDelay = initialDelay
