@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.email
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
@@ -24,6 +25,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.content_autofill_tooltip.*
 
+@SuppressLint("NoBottomSheetDialog")
 class EmailAutofillTooltipFragment(
     context: Context,
     val address: String
