@@ -37,7 +37,7 @@ jobs:
 
       - name: Install package
         if: ${{ steps.update-check.outcome == 'failure' }}
-        run: npm install
+        run: npm update
 
       - name: Copy files
         if: ${{ steps.update-check.outcome == 'failure' }}
