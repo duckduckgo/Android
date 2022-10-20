@@ -122,7 +122,7 @@ class DeviceShieldActivityFeedViewModelTest {
                     listOf(
                         trackerFeedDataWithTwoTrackers,
                         trackerFeedDataWithOneTracker,
-                        TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = true),
+                        TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = true, packageNames = listOf("package1", "package2")),
                     ),
                     awaitItem()
                 )
@@ -146,7 +146,7 @@ class DeviceShieldActivityFeedViewModelTest {
                     listOf(
                         trackerFeedDataWithTwoTrackers,
                         trackerFeedDataWithOneTracker,
-                        TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = false),
+                        TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = false, packageNames = listOf("package1", "package2")),
                     ),
                     awaitItem()
                 )
@@ -170,8 +170,8 @@ class DeviceShieldActivityFeedViewModelTest {
                     listOf(
                         trackerFeedDataWithTwoTrackers,
                         trackerFeedDataWithOneTracker,
-                        TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = true),
-                        TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = false),
+                        TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = true, packageNames = listOf("package1")),
+                        TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = false, packageNames = listOf("package2")),
                     ),
                     awaitItem()
                 )
@@ -189,79 +189,6 @@ class DeviceShieldActivityFeedViewModelTest {
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
-    }
-
-    private suspend fun getAppsAndProtectionInfoReturnsTwoAppsOneWithIsExcludedTrueAndOtherWithIsExcludedFalse() {
-        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
-            flowOf(
-                listOf(
-                    TrackingProtectionAppInfo(
-                        packageName = "package1",
-                        name = "One app",
-                        isExcluded = false,
-                        knownProblem = 0,
-                        userModified = false
-                    ),
-                    TrackingProtectionAppInfo(
-                        packageName = "package2",
-                        name = "Other app",
-                        isExcluded = true,
-                        knownProblem = 0,
-                        userModified = false
-                    ),
-                )
-            )
-        )
-    }
-
-    private suspend fun getAppsAndProtectionInfoReturnsTwoAppsWithIsExcludedTrue() {
-        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
-            flowOf(
-                listOf(
-                    TrackingProtectionAppInfo(
-                        packageName = "package1",
-                        name = "One app",
-                        isExcluded = true,
-                        knownProblem = 0,
-                        userModified = false
-                    ),
-                    TrackingProtectionAppInfo(
-                        packageName = "package2",
-                        name = "Other app",
-                        isExcluded = true,
-                        knownProblem = 0,
-                        userModified = false
-                    ),
-                )
-            )
-        )
-    }
-
-    private suspend fun getAppsAndProtectionInfoReturnsTwoAppsWithIsExcludedFalse() {
-        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(
-            flowOf(
-                listOf(
-                    TrackingProtectionAppInfo(
-                        packageName = "package1",
-                        name = "One app",
-                        isExcluded = false,
-                        knownProblem = 0,
-                        userModified = false
-                    ),
-                    TrackingProtectionAppInfo(
-                        packageName = "package2",
-                        name = "Other app",
-                        isExcluded = false,
-                        knownProblem = 0,
-                        userModified = false
-                    ),
-                )
-            )
-        )
-    }
-
-    private suspend fun getAppsAndProtectionInfoReturnsEmptyList() {
-        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(flowOf(emptyList()))
     }
 
     private suspend fun getAppsAndProtectionInfoReturnsTwoAppsOneWithIsExcludedTrueAndOtherWithIsExcludedFalse() {
