@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -28,6 +29,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -90,6 +92,8 @@ class TrackingProtectionExclusionListActivity :
         bindViews()
         observeViewModel()
 
+        viewModel.applyAppsFilter(getAppsFilterOrDefault())
+
         deviceShieldPixels.didShowExclusionListActivity()
 
         lifecycle.addObserver(viewModel)
@@ -135,6 +139,7 @@ class TrackingProtectionExclusionListActivity :
                 getText(R.string.atp_ActivityDisabledLabel)
             ) { launchFeedback() }
         }
+        binding.excludedAppsFilterText.setOnClickListener { showFilterPopupMenu(it) }
         setupRecycler()
     }
 
@@ -179,6 +184,7 @@ class TrackingProtectionExclusionListActivity :
     private fun renderViewState(viewState: ViewState) {
         shimmerLayout.stopShimmer()
         val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
+        binding.excludedAppsFilterText.text = getString(viewState.filterResId!!, viewState.excludedApps.size)
         adapter.update(viewState.excludedApps, isListEnabled)
         shimmerLayout.gone()
     }
@@ -224,6 +230,21 @@ class TrackingProtectionExclusionListActivity :
         )
     }
 
+    private fun showFilterPopupMenu(anchor: View) {
+        val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_exclusion_list_filter_item_menu)
+        val view = popupMenu.contentView
+        val allItemView = view.findViewById<View>(R.id.allApps)
+        val protectedItemView = view.findViewById<View>(R.id.protectedApps)
+        val unprotectedItemView = view.findViewById<View>(R.id.unprotectedApps)
+
+        popupMenu.apply {
+            onMenuItemClicked(allItemView) { viewModel.applyAppsFilter(AppsFilter.ALL) }
+            onMenuItemClicked(protectedItemView) { viewModel.applyAppsFilter(AppsFilter.PROTECTED_ONLY) }
+            onMenuItemClicked(unprotectedItemView) { viewModel.applyAppsFilter(AppsFilter.UNPROTECTED_ONLY) }
+        }
+        popupMenu.showAnchoredToView(binding.root, anchor)
+    }
+
     override fun onBackPressed() {
         onSupportNavigateUp()
     }
@@ -249,15 +270,29 @@ class TrackingProtectionExclusionListActivity :
         viewModel.launchFeedback()
     }
 
+    private fun getAppsFilterOrDefault(): AppsFilter {
+        return intent.getSerializableExtra(KEY_FILTER_LIST) as AppsFilter? ?: AppsFilter.ALL
+    }
+
     companion object {
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         private const val KEY_LIST_ENABLED = "KEY_LIST_ENABLED"
+        private const val KEY_FILTER_LIST = "KEY_FILTER_LIST"
+
+        enum class AppsFilter {
+            ALL,
+            PROTECTED_ONLY,
+            UNPROTECTED_ONLY
+        }
+
         fun intent(
             context: Context,
-            isRunning: Boolean = true
+            isRunning: Boolean = true,
+            filter: AppsFilter = AppsFilter.ALL
         ): Intent {
             val intent = Intent(context, TrackingProtectionExclusionListActivity::class.java)
             intent.putExtra(KEY_LIST_ENABLED, isRunning)
+            intent.putExtra(KEY_FILTER_LIST, filter)
             return intent
         }
     }
