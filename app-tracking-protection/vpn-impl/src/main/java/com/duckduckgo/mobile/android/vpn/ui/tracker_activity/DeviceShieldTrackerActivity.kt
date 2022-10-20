@@ -83,7 +83,6 @@ class DeviceShieldTrackerActivity :
     lateinit var appBuildConfig: AppBuildConfig
 
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
-
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
     private lateinit var deviceShieldSwitch: SwitchView
