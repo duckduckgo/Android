@@ -31,6 +31,7 @@ import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillUpdateExistingCredentialsBinding
@@ -80,7 +81,11 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         super.onAttach(context)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         pixelNameDialogEvent(Shown)?.let { pixel.fire(it) }
 
         val binding = ContentAutofillUpdateExistingCredentialsBinding.inflate(inflater, container, false)
@@ -92,20 +97,45 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         val credentials = getCredentialsToSave()
         val originalUrl = getOriginalUrl()
+        val updateType = getUpdateType()
+        Timber.v("Update type is $updateType")
 
+        configureDialogTitle(binding, updateType)
         configureSiteDetails(binding, originalUrl)
         configureCloseButtons(binding)
-        configurePasswordOutline(binding, credentials)
-        configureUpdateButton(binding, originalUrl, credentials)
+        configureUpdatedFieldPreview(binding, credentials, updateType)
+        configureUpdateButton(binding, originalUrl, credentials, updateType)
     }
 
-    private fun configureUpdateButton(binding: ContentAutofillUpdateExistingCredentialsBinding, originalUrl: String, credentials: LoginCredentials) {
-        binding.updatePasswordButton.setOnClickListener {
+    private fun configureDialogTitle(
+        binding: ContentAutofillUpdateExistingCredentialsBinding,
+        updateType: CredentialUpdateType
+    ) {
+        binding.dialogTitle.text = when (updateType) {
+            CredentialUpdateType.Username -> getString(R.string.updateLoginDialogTitleUpdateUsername)
+            CredentialUpdateType.Password -> getString(R.string.updateLoginDialogTitle)
+        }
+    }
+
+    private fun configureUpdateButton(
+        binding: ContentAutofillUpdateExistingCredentialsBinding,
+        originalUrl: String,
+        credentials: LoginCredentials,
+        updateType: CredentialUpdateType
+    ) {
+
+        binding.updateCredentialsButton.text = when (updateType) {
+            CredentialUpdateType.Username -> getString(R.string.updateLoginDialogButtonUpdateUsername)
+            CredentialUpdateType.Password -> getString(R.string.updateLoginDialogButtonUpdatePassword)
+        }
+
+        binding.updateCredentialsButton.setOnClickListener {
             pixelNameDialogEvent(Updated)?.let { pixel.fire(it) }
 
             val result = Bundle().also {
                 it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, originalUrl)
                 it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
+                it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE, getUpdateType())
             }
             parentFragment?.setFragmentResult(CredentialUpdateExistingCredentialsDialog.resultKey(getTabId()), result)
 
@@ -114,9 +144,15 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         }
     }
 
-    private fun configurePasswordOutline(binding: ContentAutofillUpdateExistingCredentialsBinding, credentials: LoginCredentials) {
-        val maskedPassword = viewModel.convertPasswordToMaskedView(credentials)
-        binding.passwordOutline.text = maskedPassword
+    private fun configureUpdatedFieldPreview(
+        binding: ContentAutofillUpdateExistingCredentialsBinding,
+        credentials: LoginCredentials,
+        updateType: CredentialUpdateType
+    ) {
+        binding.updatedFieldPreview.text = when (updateType) {
+            CredentialUpdateType.Username -> credentials.username
+            CredentialUpdateType.Password -> viewModel.convertPasswordToMaskedView(credentials)
+        }
     }
 
     private fun configureCloseButtons(binding: ContentAutofillUpdateExistingCredentialsBinding) {
@@ -139,7 +175,10 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         pixelNameDialogEvent(Dismissed)?.let { pixel.fire(it) }
     }
 
-    private fun configureSiteDetails(binding: ContentAutofillUpdateExistingCredentialsBinding, originalUrl: String) {
+    private fun configureSiteDetails(
+        binding: ContentAutofillUpdateExistingCredentialsBinding,
+        originalUrl: String
+    ) {
         val url = originalUrl.extractDomain() ?: originalUrl
 
         binding.siteName.text = url
@@ -167,10 +206,17 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
     private fun getCredentialsToSave() = arguments?.getParcelable<LoginCredentials>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS)!!
     private fun getTabId() = arguments?.getString(CredentialUpdateExistingCredentialsDialog.KEY_TAB_ID)!!
     private fun getOriginalUrl() = arguments?.getString(CredentialUpdateExistingCredentialsDialog.KEY_URL)!!
+    private fun getUpdateType() =
+        arguments?.getParcelable<CredentialUpdateType>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE)!!
 
     companion object {
 
-        fun instance(url: String, credentials: LoginCredentials, tabId: String): AutofillUpdatingExistingCredentialsDialogFragment {
+        fun instance(
+            url: String,
+            credentials: LoginCredentials,
+            tabId: String,
+            credentialUpdateType: CredentialUpdateType
+        ): AutofillUpdatingExistingCredentialsDialogFragment {
 
             val fragment = AutofillUpdatingExistingCredentialsDialogFragment()
             fragment.arguments =
@@ -178,6 +224,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
                     it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, url)
                     it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
                     it.putString(CredentialUpdateExistingCredentialsDialog.KEY_TAB_ID, tabId)
+                    it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE, credentialUpdateType)
                 }
             return fragment
         }

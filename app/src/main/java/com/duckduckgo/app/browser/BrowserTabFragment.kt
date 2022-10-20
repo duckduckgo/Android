@@ -487,7 +487,8 @@ class BrowserTabFragment :
 
             when (existingCredentialMatchDetector.determine(currentUrl, username, password)) {
                 ExactMatch -> Timber.w("Credentials already exist for %s", currentUrl)
-                UsernameMatch -> showAutofillDialogUpdateCredentials(currentUrl, credentials)
+                UsernameMatch -> showAutofillDialogUpdatePassword(currentUrl, credentials)
+                UsernameMissing -> showAutofillDialogUpdateUsername(currentUrl, credentials)
                 NoMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
                 UrlOnlyMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
             }
@@ -1684,11 +1685,19 @@ class BrowserTabFragment :
         showDialogHidingPrevious(dialog, CredentialSavePickerDialog.TAG)
     }
 
-    private fun showAutofillDialogUpdateCredentials(currentUrl: String, credentials: LoginCredentials) {
+    private fun showAutofillDialogUpdatePassword(currentUrl: String, credentials: LoginCredentials) {
         val url = webView?.url ?: return
         if (url != currentUrl) return
 
-        val dialog = credentialAutofillDialogFactory.autofillSavingUpdateCredentialsDialog(url, credentials, tabId)
+        val dialog = credentialAutofillDialogFactory.autofillSavingUpdatePasswordDialog(url, credentials, tabId)
+        showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
+    }
+
+    private fun showAutofillDialogUpdateUsername(currentUrl: String, credentials: LoginCredentials) {
+        val url = webView?.url ?: return
+        if (url != currentUrl) return
+
+        val dialog = credentialAutofillDialogFactory.autofillSavingUpdateUsernameDialog(url, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
     }
 
