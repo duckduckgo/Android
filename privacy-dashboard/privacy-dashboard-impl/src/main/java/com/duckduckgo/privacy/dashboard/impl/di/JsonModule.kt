@@ -17,9 +17,9 @@
 package com.duckduckgo.privacy.dashboard.impl.di
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.Allowed
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.State.Blocked
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Allowed
+import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Blocked
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
@@ -38,7 +38,7 @@ object JsonModule {
     fun moshi(moshi: Moshi): Moshi {
         return moshi.newBuilder()
             .add(
-                PolymorphicJsonAdapterFactory.of(State::class.java, "state")
+                PolymorphicJsonAdapterFactory.of(RequestState::class.java, "state")
                     .withSubtype(Blocked::class.java, "blocked")
                     .withSubtype(Allowed::class.java, "allowed")
             )

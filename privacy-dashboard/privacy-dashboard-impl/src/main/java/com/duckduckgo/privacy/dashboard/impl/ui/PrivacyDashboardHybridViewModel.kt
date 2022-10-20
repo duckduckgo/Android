@@ -19,7 +19,6 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
@@ -31,7 +30,6 @@ import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVA
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -50,7 +48,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val userWhitelistDao: UserWhitelistDao,
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val siteViewStateMapper: SiteViewStateMapper,
     private val requestDataViewStateMapper: RequestDataViewStateMapper,
     private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
@@ -90,13 +87,15 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val ownerName: String?,
         val pageUrl: String,
         val prevalence: Double,
-        val state: State,
+        val state: RequestState,
         val url: String
     )
 
-    sealed class State {
-        data class Blocked(val blocked: Any = Any()) : State()
-        data class Allowed(val allowed: Reason) : State()
+    sealed class RequestState {
+        // Using Any as placeholde value. We shouldn't pass any value to blocked. This is just to honour expected json.
+        // refer to docs in: https://duckduckgo.github.io/privacy-dashboard/example/docs/interfaces/Generated_Schema_Definitions.StateBlocked.html#blocked
+        data class Blocked(val blocked: Any = Any()) : RequestState()
+        data class Allowed(val allowed: Reason) : RequestState()
     }
 
     data class Reason(val reason: String)

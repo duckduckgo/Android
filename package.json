@@ -18,6 +18,6 @@
     "@duckduckgo/autoconsent": "github:duckduckgo/autoconsent#v3.0.0",
     "@duckduckgo/content-scope-scripts": "github:duckduckgo/content-scope-scripts#2.6.0",
     "@duckduckgo/privacy-reference-tests": "github:duckduckgo/privacy-reference-tests#1.0.0",
-    "@duckduckgo/privacy_dashboard": "github:duckduckgo/privacy-dashboard#main"
+    "@duckduckgo/privacy_dashboard": "github:duckduckgo/privacy-dashboard#931574136d3df9d49bc1066418f748e9c9b1b76d"
   }
 }
