@@ -30,9 +30,10 @@ import com.duckduckgo.mobile.android.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.PromoBottomSheetDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialog.RadioListAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog
+import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog.StackedAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog.EventListener
-import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog
 import com.google.android.material.snackbar.Snackbar
 
 /** Fragment to display a list of dialogs. */
@@ -118,13 +119,33 @@ class DialogsFragment : Fragment() {
         }
         view.findViewById<Button>(R.id.stackedAlertDialogWithImageButton)?.let {
             it.setOnClickListener {
-                activity?.supportFragmentManager?.let { fragmentManager ->
-                    StackedAlertDialog.Builder(requireContext())
-                        .setHeaderImageResource(R.drawable.ic_dax_icon)
+                StackedAlertDialogBuilder(requireContext())
+                    .setHeaderImageResource(R.drawable.ic_dax_icon)
+                    .setTitle(R.string.text_dialog_title)
+                    .setMessage(R.string.text_dialog_message)
+                    .setStackedButtons(
+                        listOf(
+                            R.string.text_dialog_positive,
+                            R.string.text_dialog_positive,
+                            R.string.text_dialog_positive
+                        )
+                    )
+                    .addEventListener(object : StackedAlertDialog.EventListener() {
+                        override fun onButtonClicked(position: Int) {
+                            Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
+                        }
+                    })
+                    .show()
+            }
+
+            view.findViewById<Button>(R.id.stackedAlertDialogWithButtons)?.let {
+                it.setOnClickListener {
+                    StackedAlertDialogBuilder(requireContext())
                         .setTitle(R.string.text_dialog_title)
                         .setMessage(R.string.text_dialog_message)
                         .setStackedButtons(
                             listOf(
+                                R.string.text_dialog_positive,
                                 R.string.text_dialog_positive,
                                 R.string.text_dialog_positive,
                                 R.string.text_dialog_positive
@@ -135,33 +156,7 @@ class DialogsFragment : Fragment() {
                                 Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
                             }
                         })
-                        .build()
-                        .show(fragmentManager, StackedAlertDialog.TAG_STACKED_ALERT_DIALOG)
-                }
-            }
-
-            view.findViewById<Button>(R.id.stackedAlertDialogWithButtons)?.let {
-                it.setOnClickListener {
-                    activity?.supportFragmentManager?.let { fragmentManager ->
-                        StackedAlertDialog.Builder(requireContext())
-                            .setTitle(R.string.text_dialog_title)
-                            .setMessage(R.string.text_dialog_message)
-                            .setStackedButtons(
-                                listOf(
-                                    R.string.text_dialog_positive,
-                                    R.string.text_dialog_positive,
-                                    R.string.text_dialog_positive,
-                                    R.string.text_dialog_positive
-                                )
-                            )
-                            .addEventListener(object : StackedAlertDialog.EventListener() {
-                                override fun onButtonClicked(position: Int) {
-                                    Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
-                                }
-                            })
-                            .build()
-                            .show(fragmentManager, StackedAlertDialog.TAG_STACKED_ALERT_DIALOG)
-                    }
+                        .show()
                 }
 
                 view.findViewById<Button>(R.id.actionBottomSheetButton)?.let { button ->

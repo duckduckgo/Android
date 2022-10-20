@@ -16,20 +16,18 @@
 
 package com.duckduckgo.mobile.android.ui.view.dialog
 
-import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
-import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.fragment.app.DialogFragment
+import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.mobile.android.databinding.DialogStackedAlertBinding
 import com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class StackedAlertDialog(val builder: Builder) : DialogFragment() {
+class StackedAlertDialog {
 
     abstract class EventListener {
         open fun onDialogShown() {}
@@ -38,67 +36,7 @@ class StackedAlertDialog(val builder: Builder) : DialogFragment() {
     }
     internal class DefaultEventListener : EventListener()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        isCancelable = false
-        builder.listener.onDialogShown()
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
-        val binding: DialogStackedAlertBinding = DialogStackedAlertBinding.inflate(layoutInflater)
-
-        if (builder.headerImageDrawableId > 0) {
-            binding.stackedAlertDialogImage.setImageResource(builder.headerImageDrawableId)
-        } else {
-            binding.stackedAlertDialogImage.gone()
-        }
-
-        binding.stackedAlertDialogTitle.text = builder.titleText
-
-        if (builder.messageText.isEmpty()) {
-            binding.stackedlertDialogMessage.gone()
-        } else {
-            binding.stackedlertDialogMessage.text = builder.messageText
-        }
-
-        val buttonParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-
-        builder.stackedButtonList.forEachIndexed { index, text ->
-            val button = ButtonGhostLarge(builder.context, null)
-            button.text = text
-            button.layoutParams = buttonParams
-
-            button.setOnClickListener {
-                builder.listener.onButtonClicked(index)
-                dismiss()
-            }
-
-            binding.stackedAlertDialogButtonLayout.addView(button)
-        }
-
-        val alertDialog = MaterialAlertDialogBuilder(
-            requireActivity(),
-            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog
-        )
-            .setView(binding.root)
-
-        return alertDialog.create()
-    }
-
-    override fun onDismiss(dialog: DialogInterface) {
-        builder.listener.onDialogDismissed()
-        super.onDismiss(dialog)
-    }
-
-    companion object {
-        const val TAG_STACKED_ALERT_DIALOG = "VerticallyStackedAlertDialog"
-    }
-
-    class Builder(val context: Context) {
+    class StackedAlertDialogBuilder(val context: Context) {
 
         var listener: EventListener = DefaultEventListener()
 
@@ -109,62 +47,105 @@ class StackedAlertDialog(val builder: Builder) : DialogFragment() {
 
         var stackedButtonList: MutableList<CharSequence> = mutableListOf()
 
-        fun setHeaderImageResource(
-            @DrawableRes drawableId: Int
-        ): Builder {
+        fun setHeaderImageResource(@DrawableRes drawableId: Int): StackedAlertDialogBuilder {
             headerImageDrawableId = drawableId
             return this
         }
 
-        fun setTitle(
-            @StringRes textId: Int,
-        ): Builder {
+        fun setTitle(@StringRes textId: Int): StackedAlertDialogBuilder {
             titleText = context.getText(textId)
             return this
         }
 
-        fun setTitle(
-            text: CharSequence,
-        ): Builder {
+        fun setTitle(text: CharSequence): StackedAlertDialogBuilder {
             titleText = text
             return this
         }
 
-        fun setMessage(
-            @StringRes textId: Int,
-        ): Builder {
+        fun setMessage(@StringRes textId: Int): StackedAlertDialogBuilder {
             messageText = context.getText(textId)
             return this
         }
 
-        fun setMessage(
-            text: CharSequence,
-        ): Builder {
+        fun setMessage(text: CharSequence): StackedAlertDialogBuilder {
             messageText = text
             return this
         }
 
-        fun setStackedButtons(@StringRes stackedButtonTextId: List<Int>): Builder {
+        fun setStackedButtons(@StringRes stackedButtonTextId: List<Int>): StackedAlertDialogBuilder {
             stackedButtonTextId.forEach {
                 stackedButtonList.add(context.getText(it))
             }
             return this
         }
 
-        fun addEventListener(eventListener: EventListener): Builder {
+        fun addEventListener(eventListener: EventListener): StackedAlertDialogBuilder {
             listener = eventListener
             return this
         }
 
-        fun build(): StackedAlertDialog {
-            val builder = this
-            if (builder.stackedButtonList.isEmpty()) {
+        fun show() {
+            val binding: DialogStackedAlertBinding = DialogStackedAlertBinding.inflate(LayoutInflater.from(context))
+
+            val dialogBuilder = MaterialAlertDialogBuilder(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
+                .setView(binding.root)
+                .apply {
+                    setCancelable(false)
+                    setOnDismissListener { listener.onDialogDismissed() }
+                }
+            val dialog = dialogBuilder.create()
+
+            setViews(binding, dialog)
+            checkRequiredFieldsSet()
+
+            dialog.show()
+            listener.onDialogShown()
+        }
+
+        private fun setViews(
+            binding: DialogStackedAlertBinding,
+            dialog: AlertDialog
+        ) {
+            if (headerImageDrawableId > 0) {
+                binding.stackedAlertDialogImage.setImageResource(headerImageDrawableId)
+            } else {
+                binding.stackedAlertDialogImage.gone()
+            }
+
+            binding.stackedAlertDialogTitle.text = titleText
+
+            if (messageText.isEmpty()) {
+                binding.stackedlertDialogMessage.gone()
+            } else {
+                binding.stackedlertDialogMessage.text = messageText
+            }
+
+            val buttonParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+
+            stackedButtonList.forEachIndexed { index, text ->
+                val button = ButtonGhostLarge(context, null)
+                button.text = text
+                button.layoutParams = buttonParams
+
+                button.setOnClickListener {
+                    listener.onButtonClicked(index)
+                    dialog.dismiss()
+                }
+
+                binding.stackedAlertDialogButtonLayout.addView(button)
+            }
+        }
+
+        private fun checkRequiredFieldsSet() {
+            if (stackedButtonList.isEmpty()) {
                 throw Exception("VerticallyStackedAlertDialog: You must always provide a list of buttons")
             }
-            if (builder.titleText.isEmpty()) {
+            if (titleText.isEmpty()) {
                 throw Exception("TextAlertDialog: You must always provide a Title")
             }
-            return StackedAlertDialog(this)
         }
     }
 }

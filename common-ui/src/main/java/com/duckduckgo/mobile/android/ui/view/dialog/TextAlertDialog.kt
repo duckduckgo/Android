@@ -24,7 +24,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
-import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog.Builder
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
