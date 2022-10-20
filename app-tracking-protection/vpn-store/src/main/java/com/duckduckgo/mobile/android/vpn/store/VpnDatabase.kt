@@ -29,7 +29,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 @Database(
-    exportSchema = true, version = 24,
+    exportSchema = true, version = 25,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -51,6 +51,7 @@ import org.threeten.bp.format.DateTimeFormatter
         AppTrackerSystemAppOverrideListMetadata::class,
         AppTrackerEntity::class,
         VpnFeatureRemoverState::class,
+        VpnAddressLookup::class,
     ]
 )
 
@@ -68,6 +69,7 @@ abstract class VpnDatabase : RoomDatabase() {
     abstract fun vpnServiceStateDao(): VpnServiceStateStatsDao
     abstract fun vpnSystemAppsOverridesDao(): VpnAppTrackerSystemAppsOverridesDao
     abstract fun vpnFeatureRemoverDao(): VpnFeatureRemoverDao
+    abstract fun vpnAddressLookupDao(): VpnAddressLookupDao
     companion object {
 
         private val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
@@ -125,6 +127,16 @@ abstract class VpnDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_24_TO_25: Migration = object : Migration(24, 25) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `vpn_address_lookup`" +
+                        " (`address` TEXT PRIMARY KEY NOT NULL, " +
+                        "`domain` TEXT NOT NULL)"
+                )
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_18_TO_19,
@@ -133,6 +145,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_21_TO_22,
                 MIGRATION_22_TO_23,
                 MIGRATION_23_TO_24,
+                MIGRATION_24_TO_25,
             )
     }
 }

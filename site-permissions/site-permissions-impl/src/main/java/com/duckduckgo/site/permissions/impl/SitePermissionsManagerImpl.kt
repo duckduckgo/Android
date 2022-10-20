@@ -16,22 +16,31 @@
 
 package com.duckduckgo.site.permissions.impl
 
+import android.content.pm.PackageManager
 import android.webkit.PermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import javax.inject.Inject
 
 class SitePermissionsManagerImpl @Inject constructor(
+    private val packageManager: PackageManager,
     private val sitePermissionsRepository: SitePermissionsRepository
 ) : SitePermissionsManager {
 
-    override suspend fun getSitePermissionsGranted(url: String, tabId: String, resources: Array<String>): Array<String> =
+    override suspend fun getSitePermissionsGranted(
+        url: String,
+        tabId: String,
+        resources: Array<String>
+    ): Array<String> =
         resources
             .filter { sitePermissionsRepository.isDomainGranted(url, tabId, it) }
             .toTypedArray()
 
-    override suspend fun getSitePermissionsAllowedToAsk(url: String, resources: Array<String>): Array<String> =
+    override suspend fun getSitePermissionsAllowedToAsk(
+        url: String,
+        resources: Array<String>
+    ): Array<String> =
         resources
-            .filter { isPermissionSupported(it) }
+            .filter { isPermissionSupported(it) && isHardwareSupported(it) }
             .filter { sitePermissionsRepository.isDomainAllowedToAsk(url, it) }
             .toTypedArray()
 
@@ -49,4 +58,12 @@ class SitePermissionsManagerImpl @Inject constructor(
     private fun isPermissionSupported(permission: String): Boolean =
         permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE || permission == PermissionRequest.RESOURCE_VIDEO_CAPTURE
 
+    private fun isHardwareSupported(permission: String): Boolean = when (permission) {
+        PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
+            kotlin.runCatching { packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) }.getOrDefault(false)
+        }
+        else -> {
+            true
+        }
+    }
 }

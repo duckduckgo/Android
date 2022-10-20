@@ -59,6 +59,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
             disableNotificationReminders()
             removeNotificationChannels()
             deleteAllVpnTrackers()
+            deleteCaches()
         }
     }
 
@@ -93,6 +94,10 @@ class DefaultVpnFeatureRemover @Inject constructor(
 
     private fun deleteAllVpnTrackers() {
         vpnDatabase.vpnTrackerDao().deleteAllTrackers()
+    }
+
+    private fun deleteCaches() {
+        vpnDatabase.vpnAddressLookupDao().deleteAll()
     }
 
     private suspend fun removeVpnFeature() {
