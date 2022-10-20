@@ -217,7 +217,7 @@
             android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
             android:exported="false"
             android:label="@string/appName"
-            android:theme="@style/Theme.DuckDuckGo.Transparent" />
+            android:theme="@style/Theme.DuckDuckGo.Light" />
 
         <activity
             android:name=".BrowserActivity"
@@ -424,7 +424,7 @@
             android:name="com.duckduckgo.app.WidgetThemeConfiguration"
             android:exported="false"
             android:label="@string/widgetConfigurationActivityTitle"
-            android:theme="@style/Theme.DuckDuckGo.Transparent">
+            android:theme="@style/Theme.DuckDuckGo.Light">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>

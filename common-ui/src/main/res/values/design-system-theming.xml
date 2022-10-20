@@ -16,11 +16,21 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Attributes to control how status and navigation bar are displayed across OS versions. -->
+    <attr name="preferDarkStatusBarIcons" format="boolean" />
+    <attr name="preferDarkNavigationBarIcons" format="boolean" />
+    <attr name="preferredStatusBarColor" format="color" />
+    <attr name="preferredNavigationBarColor" format="color" />
+
     <!-- The platform theme is where OS version specific flags are used. -->
-    <style name="Platform.Theme.DuckDuckGo" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Platform.V23.Theme.DuckDuckGo" parent="Theme.MaterialComponents.Light.NoActionBar"/>
+
+    <style name="Platform.Theme.DuckDuckGo" parent="Platform.V23.Theme.DuckDuckGo">
         <item name="android:windowActivityTransitions" tools:ignore="NewApi">true</item>
-        <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
-        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
+        <item name="android:windowLightStatusBar" tools:ignore="NewApi">?attr/preferDarkStatusBarIcons</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">?attr/preferDarkNavigationBarIcons</item>
+        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/preferredStatusBarColor</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">?attr/preferredNavigationBarColor</item>
     </style>
 
     <!--  Our base theme, Base.Theme.DuckDuckGo,
@@ -60,14 +70,13 @@
         <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
         <item name="sliderStyle">@style/Widget.DuckDuckGo.Slider</item>
         <item name="switchStyle">@style/Widget.DuckDuckGo.Switch</item>
-        <item name="snackbarButtonStyle">@style/Widget.DuckDuckGo.Snackbar</item>
+        <item name="snackbarStyle">@style/Widget.DuckDuckGo.Snackbar</item>
+        <item name="snackbarButtonStyle">@style/Widget.DuckDuckGo.SnackbarButton</item>
+        <item name="snackbarTextViewStyle">@style/Widget.DuckDuckGo.SnackbarText</item>
         <item name="autoCompleteTextViewStyle">@style/Widget.DuckDuckGo.AutoCompleteTextView</item>
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialComponents.Dialog.Alert</item>
-        <item name="materialButtonStyle">@style/Widget.DuckDuckGo.DaxButton.Contained.Primary</item>
-        <item name="materialButtonOutlinedStyle">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
-        <item name="borderlessButtonStyle">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
 
         <!-- Design System Components -->
         <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.Contained.Primary</item>
@@ -79,7 +88,7 @@
         <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
         <item name="primaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Primary.Small</item>
         <item name="secondaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
-        <item name="secondaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
+        <item name="secondaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Secondary.Small</item>
         <item name="ghostButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Borderless</item>
         <item name="ghostButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Borderless.Small</item>
         <item name="primaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Rounded</item>
@@ -113,16 +122,15 @@
         <!--colorBackground appears behind scrollable content and is used for the default window background -->
         <item name="android:colorBackground">?attr/daxColorBackground</item>
         <item name="android:windowBackground">?attr/daxColorBackground</item>
-        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/toolbarBgColor</item>
-        <item name="android:navigationBarColor" tools:ignore="NewApi">?attr/toolbarBgColor</item>
-
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
     <style name="Theme.DuckDuckGo.Dark" parent="Theme.DuckDuckGo">
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">false</item>
-        <item name="android:navigationBarColor">?toolbarBgColor</item>
+
+        <item name="preferDarkStatusBarIcons">false</item>
+        <item name="preferredStatusBarColor">?attr/toolbarBgColor</item>
+        <item name="preferDarkNavigationBarIcons">false</item>
+        <item name="preferredNavigationBarColor">@color/black</item>
 
         <!-- Legacy colors to remove-->
         <item name="colorPrimary">@color/darkThemePrimary</item>
@@ -226,6 +234,7 @@
 
         <!-- Design System Reference Colors Dark -->
         <item name="daxColorBackground">@color/gray100</item>
+        <item name="daxColorBackgroundInverted">@color/gray0</item>
         <item name="daxColorSurface">@color/gray90</item>
         <item name="daxColorContainer">@color/black12</item>
         <item name="daxColorPrimaryText">@color/white84</item>
@@ -258,9 +267,10 @@
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
-        <item name="android:navigationBarColor">@color/white</item>
+        <item name="preferDarkStatusBarIcons">true</item>
+        <item name="preferredStatusBarColor">@color/white</item>
+        <item name="preferDarkNavigationBarIcons">true</item>
+        <item name="preferredNavigationBarColor">@color/white</item>
 
         <!-- Legacy colors to remove-->
         <item name="colorPrimary">@color/lightThemePrimary</item>
@@ -362,6 +372,7 @@
 
         <!-- Design System Reference Colors Light -->
         <item name="daxColorBackground">@color/gray0</item>
+        <item name="daxColorBackgroundInverted">@color/gray100</item>
         <item name="daxColorSurface">@color/white</item>
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorPrimaryText">@color/black84</item>
@@ -390,11 +401,6 @@
         <item name="daxColorButtonSecondaryTextPressed">@color/blue70</item>
         <item name="daxColorButtonDestructiveGhostText">@color/red50</item>
         <item name="daxColorButtonDestructiveGhostTextPressed">@color/red70</item>
-    </style>
-
-    <style name="Theme.DuckDuckGo.Transparent" parent="Theme.DuckDuckGo.Dark">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">
