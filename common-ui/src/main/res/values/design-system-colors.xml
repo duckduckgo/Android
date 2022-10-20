@@ -30,6 +30,7 @@
         daxColorDisabled - Disabled color applied to all elements (text, buttons, etc...)
     -->
     <attr name="daxColorBackground" format="color"/>
+    <attr name="daxColorBackgroundInverted" format="color"/>
     <attr name="daxColorSurface" format="color"/>
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>

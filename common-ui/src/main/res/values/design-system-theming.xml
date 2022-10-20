@@ -65,17 +65,19 @@
         <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
         <item name="sliderStyle">@style/Widget.DuckDuckGo.Slider</item>
         <item name="switchStyle">@style/Widget.DuckDuckGo.Switch</item>
-        <item name="snackbarButtonStyle">@style/Widget.DuckDuckGo.Snackbar</item>
+        <item name="snackbarStyle">@style/Widget.DuckDuckGo.Snackbar</item>
+        <item name="snackbarButtonStyle">@style/Widget.DuckDuckGo.SnackbarButton</item>
+        <item name="snackbarTextViewStyle">@style/Widget.DuckDuckGo.SnackbarText</item>
         <item name="autoCompleteTextViewStyle">@style/Widget.DuckDuckGo.AutoCompleteTextView</item>
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
-        <item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialComponents.Dialog.Alert</item>
+        <item name="materialAlertDialogTheme">@style/Widget.DuckDuckGo.Dialog</item>
 
         <!-- Design System Components -->
         <item name="primaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Primary</item>
         <item name="primaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Primary.Small</item>
         <item name="secondaryButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
-        <item name="secondaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Secondary</item>
+        <item name="secondaryButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Secondary.Small</item>
         <item name="ghostButtonLargeStyle">@style/Widget.DuckDuckGo.Button.Borderless</item>
         <item name="ghostButtonSmallStyle">@style/Widget.DuckDuckGo.Button.Borderless.Small</item>
         <item name="primaryButtonRoundedStyle">@style/Widget.DuckDuckGo.Button.Rounded</item>
@@ -221,6 +223,7 @@
 
         <!-- Design System Colors Dark -->
         <item name="daxColorBackground">@color/gray100</item>
+        <item name="daxColorBackgroundInverted">@color/gray0</item>
         <item name="daxColorSurface">@color/gray90</item>
         <item name="daxColorContainer">@color/black12</item>
         <item name="daxColorPrimaryText">@color/white84</item>
@@ -337,8 +340,10 @@
         <item name="autofillCredentialListSubtitleColor">@color/brownishGrayTwo</item>
         <item name="appTPHeaderBackground">@color/light_blue</item>
 
+
         <!-- Design System Colors Light -->
         <item name="daxColorBackground">@color/gray0</item>
+        <item name="daxColorBackgroundInverted">@color/gray100</item>
         <item name="daxColorSurface">@color/white</item>
         <item name="daxColorContainer">@color/black6</item>
         <item name="daxColorPrimaryText">@color/black84</item>
@@ -349,10 +354,6 @@
         <item name="daxColorLines">@color/black18</item>
         <item name="daxColorAccentBlue">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
-    </style>
-
-    <style name="Theme.DuckDuckGo.Transparent" parent="Theme.DuckDuckGo.Light">
-
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">
