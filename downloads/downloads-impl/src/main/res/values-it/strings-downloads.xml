@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Download non riuscito. Controlla la connessione a Internet.</string>
 
     <string name="notificationChannelFileDownloading">Download del file in corso</string>
@@ -25,8 +24,8 @@
 
     <string name="downloadInProgress">Download in corso</string>
 
-    <string name="downloadsDownloadStartedMessage">Download di %s avviato</string>
-    <string name="downloadsDownloadFinishedMessage">Download di %s completato</string>
+    <string name="downloadsDownloadStartedMessage" instruction="Placeholder is the name of a file">Download di %1$s avviato</string>
+    <string name="downloadsDownloadFinishedMessage" instruction="Placeholder is the name of a file">Download di %1$s completato</string>
     <string name="downloadsDownloadGenericErrorMessage">Download non riuscito.</string>
     <string name="downloadsCancel">Annulla</string>
     <string name="downloadsRetry">Riprova</string>
