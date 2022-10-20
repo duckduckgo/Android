@@ -25,6 +25,7 @@ import com.duckduckgo.lint.ui.DeprecatedSwitchUsedInXmlDetector.Companion.DEPREC
 import com.duckduckgo.lint.ui.MissingDividerDetector.Companion.MISSING_HORIZONTAL_DIVIDER
 import com.duckduckgo.lint.ui.MissingDividerDetector.Companion.MISSING_VERTICAL_DIVIDER
 import com.duckduckgo.lint.ui.NoAlertDialogDetector.Companion.NO_DESIGN_SYSTEM_DIALOG
+import com.duckduckgo.lint.ui.NoBottomSheetDialogDetector.Companion.NO_BOTTOM_SHEET
 import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Companion.STYLE_IN_DESIGN_SYSTEM_COMPONENT
 
 @Suppress("UnstableApiUsage")
@@ -36,7 +37,8 @@ class DuckDuckGoDesignSystemRegistry : IssueRegistry() {
             NO_DESIGN_SYSTEM_DIALOG,
             DEPRECATED_SWITCH_IN_XML,
             MISSING_VERTICAL_DIVIDER,
-            MISSING_HORIZONTAL_DIVIDER
+            MISSING_HORIZONTAL_DIVIDER,
+            NO_BOTTOM_SHEET
         )
 
     override val api: Int

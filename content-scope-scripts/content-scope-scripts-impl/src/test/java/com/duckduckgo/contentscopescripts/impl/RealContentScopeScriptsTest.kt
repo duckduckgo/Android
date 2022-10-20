@@ -88,7 +88,7 @@ class RealContentScopeScriptsTest {
                 "\"config1\":{\"state\":\"enabled\"}," +
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
-                " [\"foo.com\"], {\"versionNumber\":1234})",
+                " [\"foo.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}})",
             js
         )
 
@@ -113,7 +113,7 @@ class RealContentScopeScriptsTest {
                 "\"config1\":{\"state\":\"enabled\"}," +
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
-                " [\"example.com\"], {\"globalPrivacyControlValue\":false,\"versionNumber\":1234})",
+                " [\"example.com\"], {\"globalPrivacyControlValue\":false,\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}})",
             js
         )
 
@@ -139,7 +139,7 @@ class RealContentScopeScriptsTest {
                 "{\"features\":{" +
                 "\"config1\":{\"state\":\"enabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
-                " [\"example.com\"], {\"globalPrivacyControlValue\":true,\"versionNumber\":1234})",
+                " [\"example.com\"], {\"globalPrivacyControlValue\":true,\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}})",
             js
         )
 
@@ -164,7 +164,7 @@ class RealContentScopeScriptsTest {
                 "\"config1\":{\"state\":\"enabled\"}," +
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"}]}," +
-                " [\"example.com\"], {\"versionNumber\":1234})",
+                " [\"example.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}})",
             js
         )
 
@@ -184,7 +184,7 @@ class RealContentScopeScriptsTest {
             "\"config1\":{\"state\":\"enabled\"}," +
             "\"config2\":{\"state\":\"disabled\"}}," +
             "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}, " +
-            "[\"example.com\"], {\"versionNumber\":1234})"
+            "[\"example.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}})"
         const val versionCode = 1234
         val unprotectedTemporaryException = UnprotectedTemporaryException(domain = "example.com", reason = "reason")
         val unprotectedTemporaryException2 = UnprotectedTemporaryException(domain = "foo.com", reason = "reason2")
