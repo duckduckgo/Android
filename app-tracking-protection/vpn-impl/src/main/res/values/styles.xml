@@ -24,10 +24,4 @@
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="behavior_skipCollapsed">true</item>
     </style>
-
-    <style name="AlwaysOnDialogRootViewStyle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:background">@drawable/rounded_top_corners_bottom_sheet_background</item>
-    </style>
 </resources>

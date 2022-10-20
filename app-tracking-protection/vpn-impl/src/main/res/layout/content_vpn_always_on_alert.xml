@@ -20,7 +20,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    style="@style/AlwaysOnDialogRootViewStyle"
+    android:background="@drawable/rounded_top_corners_bottom_sheet_background"
 >
 
     <ImageView
