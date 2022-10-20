@@ -1,114 +1,408 @@
 {
   "rules": [
-    "com.android.vending",
-    "com.google.android.gsf.login",
-    "com.google.android.googlequicksearchbox",
-    "com.google.android.gms",
-    "com.google.android.backuptransport",
-    "com.facebook.talk",
-    "com.facebook.bishop",
-    "com.facebook.games",
-    "com.whatsapp",
-    "com.facebook.katana",
-    "com.facebook.lite",
-    "com.facebook.orca",
-    "com.facebook.mlite",
-    "com.instagram.android",
-    "com.facebook.pages.app",
-    "com.facebook.work",
-    "com.facebook.workchat",
-    "com.facebook.creatorstudio",
-    "com.facebook.Socal",
-    "com.facebook.arstudio.player",
-    "com.facebook.adsmanager",
-    "com.facebook.analytics",
-    "com.facebook.Origami",
-    "com.shopify.arrive",
-    "com.discord",
-    "com.lasoo.android.target",
-    "com.myklarnamobile",
-    "com.reddit.frontpage",
-    "com.mbam.poshtips",
-    "com.nasscript.fetch",
-    "com.gotv.nflgamecenter.us.lite",
-    "com.google.android.youtube",
-    "com.duckduckgo.mobile.android",
-    "com.duckduckgo.mobile.android.debug",
-    "com.duckduckgo.mobile.android.vpn",
-    "com.duckduckgo.mobile.android.vpn.debug",
-    "com.android.chrome",
-    "org.mozilla.firefox",
-    "org.mozilla.focus",
-    "com.opera.browser",
-    "com.microsoft.emmx",
-    "com.brave.browser",
-    "com.UCMobile.intl",
-    "com.android.browser",
-    "com.android.captiveportallogin",
-    "com.sec.android.app.sbrowser",
-    "info.guardianproject.orfo",
-    "org.torproject.torbrowser_alpha",
-    "mobi.mgeek.TunnyBrowser",
-    "com.linkbubble.playstore",
-    "org.adblockplus.browser",
-    "arun.com.chromer",
-    "com.flynx",
-    "com.ghostery.android.ghostery",
-    "com.cliqz.browser",
-    "com.opera.mini.native",
-    "com.uc.browser.en",
-    "com.chrome.beta",
-    "org.mozilla.firefox_beta",
-    "com.opera.browser.beta",
-    "com.opera.mini.native.beta",
-    "com.sec.android.app.sbrowser.beta",
-    "org.mozilla.fennec_fdroid",
-    "org.mozilla.rocket",
-    "com.chrome.dev",
-    "com.chrome.canary",
-    "org.mozilla.fennec_aurora",
-    "org.mozilla.fennec",
-    "com.google.android.apps.chrome",
-    "org.chromium.chrome",
-    "com.microsoft.bing",
-    "com.yahoo.mobile.client.android.search",
-    "com.google.android.apps.searchlite",
-    "com.baidu.searchbox",
-    "ru.yandex.searchplugin",
-    "com.ecosia.android",
-    "com.qwant.liberty",
-    "com.qwantjunior.mobile",
-    "com.nhn.android.search",
-    "cz.seznam.sbrowser",
-    "com.coccoc.trinhduyet",
-    "com.domobile.applockwatcher",
-    "com.alpha.applock",
-    "com.rubenmayayo.reddit",
-    "com.canva.editor",
-    "sp0n.citizen",
-    "com.sanhe.clipclaps",
-    "com.cocoon.mdr",
-    "com.cvs.launchers.cvs",
-    "com.dd.doordash",
-    "com.wealthsimple",
-    "com.chipotle.ordering",
-    "com.treemolabs.apps.cbsnews",
-    "com.main.gopuff",
-    "com.rogers.sportsnet.sportsnet",
-    "com.simplygood.ct",
-    "co.ritual.app",
-    "com.wayfair.wayfair",
-    "com.jwaala.mobile.justice",
-    "org.dayup.stocks",
-    "com.usaa.mobile.android.usaa",
-    "com.usbank.mobilebanking",
-    "com.robinhood.android",
-    "com.discoverfinancial.mobile",
-    "com.weightwatchers.mobile",
-    "com.soundcloud.android",
-    "com.blueshellgames.luckyslots",
-    "com.google.android.projection.gearhead",
-    "com.gm.chevrolet.nomad.ownership",
-    "com.onelouder.baconreader"
+    {
+      "packageName": "com.TWCableTV",
+      "reason": "Does not run over any VPN"
+    },
+    {
+      "packageName": "com.cbq.CBMobile",
+      "reason": "Does not run over any VPN"
+    },
+    {
+      "packageName": "sa.gov.nic.tawakkalna",
+      "reason": "Does not run over any VPN"
+    },
+    {
+      "packageName": "com.duckduckgo.mobile.android",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.duckduckgo.mobile.android.debug",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.duckduckgo.mobile.android.vpn",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.duckduckgo.mobile.android.vpn.debug",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.aloha.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.alohamobile.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.alohamobile.browser.lite",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.android.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.android.chrome",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.avast.android.secure.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.avg.android.secure.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.brave.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.brave.browser_beta",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.brave.browser_nightly",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.cake.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.chrome.beta",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.chrome.canary",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.chrome.dev",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.cliqz.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.cloudmosa.puffinFree",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.dolphin.browser.zero",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.ecosia.android",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.google.android.apps.chrome",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.google.android.apps.searchlite",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.google.android.googlequicksearchbox",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.hsv.freeadblockerbrowser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.kiwibrowser.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.mi.globalbrowser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.mx.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.nationaledtech.spinbrowser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.naver.whale",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.opera.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.opera.browser.beta",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.opera.mini.native",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.opera.mini.native.beta",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.opera.touch",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.qwant.liberty",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.qwantjunior.mobile",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.sec.android.app.sbrowser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.sec.android.app.sbrowser.beta",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.transsion.phoenix",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.uc.browser.en",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.ucturbo",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.vivaldi.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.vivaldi.browser.snapshot",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.yahoo.mobile.client.android.search",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "cz.seznam.sbrowser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "eddy.browser.lionpro",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "fast.private.secure.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "jp.hazuki.yuzubrowser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "mobi.mgeek.TunnyBrowser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "net.fast.web.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.adblockplus.browser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.adblockplus.browser.beta",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.chromium.chrome",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.mozilla.fenix",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.mozilla.fennec",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.mozilla.fennec_aurora",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.mozilla.fennec_fdroid",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.mozilla.firefox",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.mozilla.firefox_beta",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.mozilla.focus",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.mozilla.klar",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.mozilla.rocket",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.torproject.torbrowser",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "org.torproject.torbrowser_alpha",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "ru.yandex.searchplugin",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.coccoc.trinhduyet",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.flynx",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.nhn.android.search",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "arun.com.chromer",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.microsoft.emmx",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.UCMobile.intl",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.baidu.searchbox",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.ghostery.android.ghostery",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.microsoft.bing",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.linkbubble.playstore",
+      "reason": "Browser"
+    },
+    {
+      "packageName": "com.google.android.backuptransport",
+      "reason": "Google backups"
+    },
+    {
+      "packageName": "com.google.android.gsf.login",
+      "reason": "Google login service"
+    },
+    {
+      "packageName": "android.service.ims",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "android.telephony.ims.RcsFeature",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.android.carrierconfig",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.android.ims.rcsmanager",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.android.mms.service",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.android.service.ims.RcsServiceApp",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.android.service.ims.presence",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.android.service.ims.rcsservice",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "org.codeaurora.ims",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.google.android.apps.carrier.carrierwifi",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.google.android.carrier",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.google.android.carriersetup",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.google.android.gms",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.google.android.ims",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.google.android.wfcactivation",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.google.ims",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.gsm.service.rcs",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.qualcomm.qti.uceShimService",
+      "reason": "IMS/RCS messaging support"
+    },
+    {
+      "packageName": "com.android.captiveportallogin",
+      "reason": "Public wifi login pages blocked"
+    }
   ]
 }
