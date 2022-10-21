@@ -18,6 +18,6 @@
     android:shape="oval">
     <solid android:color="?attr/listItemImageBackground" />
     <size
-        android:width="40dp"
-        android:height="40dp" />
+        android:width="@dimen/listItemImageContainerSize"
+        android:height="@dimen/listItemImageContainerSize" />
 </shape>
