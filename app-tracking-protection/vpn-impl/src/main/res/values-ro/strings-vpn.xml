@@ -17,53 +17,52 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="atp_name">Protecția la urmărirea aplicațiilor</string>
     <string name="refresh">Reîncărcare</string>
 
     <!-- Debug Screens -->
     <string name="atp_DiagnosticsMenuLabel">Diagnosticare</string>
     <string name="atp_DataMenuLabel">Statistici de date</string>
-    <string name="atp_MeteredConnection">"Măsurat: %s"</string>
-    <string name="atp_ConnectionStatus">"VPN conectat: %s"</string>
-    <string name="atp_NetworkAvailable">"Conectat la internet: %s"</string>
-    <string name="atp_DnsServers">"Rețea DNS activă: %s"</string>
+    <string name="atp_MeteredConnection" instruction="Placeholder is true or false">"Măsurat: %1$s"</string>
+    <string name="atp_ConnectionStatus" instruction="Placeholder is true or false">"VPN conectat: %1$s"</string>
+    <string name="atp_NetworkAvailable" instruction="Placeholder is true or false">"Conectat la internet: %1$s"</string>
+    <string name="atp_DnsServers" instruction="Placeholder is a list of dns addresses">"Rețea activă DNS: %1$s"</string>
     <string name="atp_AppExitsReasonsTitle">Motive de ieșire din aplicație</string>
     <string name="atp_AppRestartsTitle">Reporniri ale aplicației</string>
 
     <!-- Diagnostics -->
-    <string name="vpnTimeRunning">Timp de funcționare: %s</string>
-    <string name="vpnTrackerCompaniesBlockedToday">Firme de urmărire blocate astăzi: %d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek">Firme de urmărire blocate în această săptămână: %d</string>
+    <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Timp de funcționare: %1$s</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Firme de urmărire blocate astăzi: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Firme de urmărire blocate în această săptămână: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Nicio firmă de urmărire nu a fost blocată încă"</string>
-    <string name="vpnTrackersBlockedToday">Tehnologii de urmărire blocate astăzi: %d</string>
-    <string name="vpnTrackersBlockedThisWeek">Tehnologii de urmărire blocate săptămâna aceasta: %d</string>
+    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Tehnologii de urmărire blocate astăzi: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Tehnologii de urmărire blocate în această săptămână: %1$d</string>
     <string name="vpnTrackersNone">"Nicio tehnologie de urmărire nu a fost blocată încă"</string>
     <string name="vpnNotRunYet">"VPN nu a fost încă executat"</string>
-    <string name="vpnDataTransferred">"%1s\n%2s pachete"</string>
+    <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s pachete"</string>
 
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Ai probleme cu o aplicație?</string>
     <string name="atp_OnInitialNotification">"Protecția împotriva monitorizării de către aplicații este activată și blochează încercările de urmărire în aplicațiile tale"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Se scanează activitatea de urmărire... bip... pac"</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ Încercări de urmărire blocate <b>în aplicația %d</b> (ultima oră).]]></item>
-        <item quantity="few"><![CDATA[ Încercări de urmărire blocate <b>în aplicațiile %d</b> (ultima oră).]]></item>
-        <item quantity="other"><![CDATA[ Încercări de urmărire blocate <b>în aplicațiile %d</b> (ultima oră).]]></item>
+        <item quantity="one"><![CDATA[ Încercările de urmărire blocate <b>în %1$d aplicație</b> (ultima oră).]]></item>
+        <item quantity="few"><![CDATA[ Încercările de urmărire blocate <b>în %1$d aplicații</b> (ultima oră).]]></item>
+        <item quantity="other"><![CDATA[ Încercările de urmărire blocate <b>în %1$d aplicații</b> (ultima oră).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">Protecția împotriva urmăririi de către aplicație este dezactivată. Atinge pentru a continua blocarea încercărilor de urmărire.</string>
     <string name="atp_RevokedNotification">O aplicație VPN de pe dispozitivul tău a dezactivat Protecția împotriva urmăririi de către aplicație. Atinge pentru a reactiva.</string>
 
     <!-- App Tracking Protection Daily Notification -->
-    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercare de urmărire</b> (ziua trecută).]]></string>
-    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în 1 aplicație, %2$s</b> (ziua trecută).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire</b> (ziua trecută).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b> %1$d încercări de urmărire în %2$d aplicații, inclusiv %3$s</b> (ziua trecută).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercarea de urmărire</b> (ziua trecută).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps" instruction="%1$d is the number of tracking attempts and %2$s is the name of the app where it happened"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercare de urmărire în 1 aplicație, %2$s</b> (ziua trecută).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire</b> (ziua trecută).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Protecția împotriva urmăririi de către aplicație a blocat <b> %1$d tentative de urmărire din %2$d aplicații, inclusiv %3$s</b> (ziua trecută).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[%1$s a încercat să te urmărească <b>prin %2$d aplicație </b> (ziua trecută). <b>Vezi mai multe</b>]]></item>
-        <item quantity="few"><![CDATA[%1$s a încercat să te urmărească <b>prin %2$d aplicații </b> (ziua trecută). <b>Vezi mai multe</b>]]></item>
-        <item quantity="other"><![CDATA[%1$s a încercat să te urmărească <b>prin %2$d aplicații</b> (ziua trecută). <b>Vezi mai multe</b>]]></item>
+        <item quantity="one"><![CDATA[%1$s a încercat să te urmărească <b>în %2$d aplicație</b> (ziua trecută). <b>Vezi mai mult</b>]]></item>
+        <item quantity="few"><![CDATA[%1$s a încercat să te urmărească <b>în %2$d aplicații</b> (ziua trecută). <b>Vezi mai mult</b>]]></item>
+        <item quantity="other"><![CDATA[%1$s a încercat să te urmărească <b>în %2$d aplicații</b> (ziua trecută). <b>Vezi mai mult</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
@@ -72,36 +71,36 @@
         <item quantity="other"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat cele mai multe încercări de urmărire în <b>%1$s</b> și <b>%2$s</b> (ziua trecută).]]></item>
     </plurals>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%s %d dată în %s</b> (ziua trecută).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%s %d dată în %s și 1 altă aplicație</b> (ziua trecută).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%s %d dată în %s și alte %d aplicații</b> (ziua trecută).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s %2$d dată în %3$s</b> (ultima zi).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s %2$d dată în %3$s și 1 altă aplicație</b> (ziua trecută).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s %2$d dată în %3$s și alte %4$d aplicații</b> (ziua trecută).]]></string>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat de <b>%s %d ori în %s</b> (ziua trecută).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat de <b>%s %d ori în %s și 1 altă aplicație</b> (ziua trecută).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat de <b>%s %d ori în %s și alte %d aplicații</b> (ziua trecută).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s de %2$d ori în %3$s</b> (ziua trecută).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s de %2$d ori în %3$s și 1 altă aplicație</b> (ziua trecută).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s de %2$d ori în %3$s și alte %4$d aplicații</b> (ziua trecută).]]></string>
 
     <!-- App Tracking Protection Weekly Notification -->
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%d încercare de urmărire în %s</b> (săptămâna trecută).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%d încercare de urmărire în %s</b> și 1 altă aplicație (săptămâna trecută).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%d încercare de urmărire în %s</b> și în alte %d aplicații (săptămâna trecută).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%d încercări de urmărire în %s</b> (săptămâna trecută).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%d încercări de urmărire în %s</b> și 1 altă aplicație (săptămâna trecută).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%d încercări de urmărire în %s</b> și alte %d aplicații (săptămâna trecută).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s</b> (săptămâna trecută).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercare de urmărire în %2$s</b> și 1 altă aplicație (săptămâna trecută).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercare de urmărire în %2$s</b> și alte %3$d aplicații (săptămâna trecută).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s</b> (săptămâna trecută).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s</b> și 1 altă aplicație (săptămâna trecută).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s</b> și alte %3$d aplicații (săptămâna trecută).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%s în %d aplicație, %s</b> (săptămâna trecută).]]></item>
-        <item quantity="few"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%s în %d aplicații, inclusiv %s</b> (săptămâna trecută).]]></item>
-        <item quantity="other"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%s în %d aplicații, inclusiv %s</b> (săptămâna trecută).]]></item>
+        <item quantity="one"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b> %1$s în %2$d aplicație, %3$s</b> (săptămâna trecută).]]></item>
+        <item quantity="few"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s în %2$d aplicații, inclusiv %3$s</b> (săptămâna trecută).]]></item>
+        <item quantity="other"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$s în %2$d aplicații, inclusiv %3$s</b> (săptămâna trecută).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Activează Protecția împotriva urmăririi de către aplicație</string>
 
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%d încercare de urmărire în %s</b> (ultima oră).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%d încercare de urmărire în %s și încă 1 aplicație</b> (ultima oră).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%d încercare de urmărire în %s și alte %d aplicații</b> (ultima oră).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%d încercări de urmărire în %s</b> (ultima oră).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%d încercări de urmărire în %s și 1 altă aplicație</b> (ultima oră).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%d încercări de urmărire în %s și alte %d aplicații</b> (ultima oră).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercare de urmărire în %2$s</b> (ultima oră).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b> %1$d încercare de urmărire în %2$s și 1 altă aplicație </b>(ultima oră).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercare de urmărire în %2$s și alte %3$d aplicații</b> (ultima oră).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s</b> (ora trecută).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b> %1$d încercări de urmărire în %2$s și 1 altă aplicație </b>(ultima oră).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[Protecția împotriva urmăririi de către aplicație a blocat <b>%1$d încercări de urmărire în %2$s și alte %3$d aplicații</b> (ultima oră).]]></string>
 
     <!-- App Tracking Protection Privacy Report -->
     <string name="atp_PrivacyReportEnabledTooltip">Protecția împotriva urmăririi de către aplicație este activată și blochează tehnologiile de urmărire pe întregul dispozitiv</string>
@@ -109,7 +108,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Activează Protecția împotriva urmăririi de către aplicație</string>
     <string name="atp_OnboardingLastPageOneTitle">Un pas ușor pentru o mai bună confidențialitate a aplicațiilor!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Am descoperit că <b>peste 96% dintre aplicațiile gratuite populare</b> permit altor companii să îți urmărească informațiile personale, chiar și atunci când dormi.\n\nVezi ce aplicații <b>depistăm, care permit altor companii să te urmărească</b>, și preia controlul!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle" formatted="false">Am descoperit că <b>peste 96% dintre aplicațiile gratuite populare</b> permit altor companii să îți urmărească informațiile personale, chiar și atunci când dormi.\n\nVezi ce aplicații <b>depistăm, care permit altor companii să te urmărească</b>, și preia controlul!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Cum funcționează?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Protecția împotriva urmăririi de către aplicație <b>detectează și blochează tehnologiile de urmărire din aplicațiile altor companii</b>, cum ar fi atunci când Facebook încearcă să te urmărească într-o aplicație de sănătate.\n\n<b> Este gratuit</b> și te poți bucura de aplicațiile tale ca de obicei. Lucrând în fundal, te ajută <b> să te protejezi zi și noapte. </b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Cine îți vede datele?</string>
@@ -120,7 +119,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Protecția la urmărirea aplicațiilor</string>
-    <string name="atp_daxOnboardingIntroMessage">Peste 96% dintre aplicațiile gratuite populare permit altor companii să te urmărească, chiar și atunci când nu îți folosești telefonul. Protecția împotriva urmăririi de către aplicație detectează și blochează aceste încercări de urmărire.</string>
+    <string name="atp_daxOnboardingIntroMessage" formatted="false">Peste 96% dintre aplicațiile gratuite populare permit altor companii să te urmărească, chiar și atunci când nu îți folosești telefonul. Protecția împotriva urmăririi de către aplicație detectează și blochează aceste încercări de urmărire.</string>
     <string name="atp_daxOnboardingPermissionTitle">Cum funcționează?</string>
     <string name="atp_daxOnboardingPermissionMessage">Protecția împotriva urmăririi de către aplicație nu este un VPN. Cu toate acestea, dispozitivul tău îl va recunoaște ca atare. Acest lucru se datorează faptului că utilizează o conexiune VPN locală pentru a funcționa. Nu direcționează niciodată datele aplicației prin intermediul unui server extern. <annotation type="learn_more_link">Află mai multe</annotation></string>
 
@@ -148,7 +147,7 @@
     <string name="atp_ExcludeAppsManuallyCTACancel">Anulează</string>
     <string name="atp_ExcludeAppsManuallyCTAEnable">Activare</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Restaurează</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Activezi manual protecția pentru aplicația %s?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Activezi manual protecția pentru aplicația %1$s?</string>
     <string name="atp_ExcludeAppsManuallyEnableAppLabel">Această aplicație este cunoscută pentru faptul că întâmpină probleme atunci când încercările de urmărire nu reușesc.</string>
     <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Este posibil să nu apară corect conținutul site-ului din această aplicație atunci când protecția este activată.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Activarea protecției trimite numele aplicației către DuckDuckGo.</string>
@@ -169,7 +168,7 @@
     <!--  Breakage report app list  -->
     <string name="atp_ReportBreakageAppListActivityTitle">Raportează o problemă</string>
     <string name="atp_ReportBreakageAppFeature"><b> Selectează aplicația care se confruntă cu problema </b> . Feedbackul tău ne ajută cu adevărat să ne îmbunătățim!\n\nAi un feedback general despre Protecția împotriva urmăririi de către aplicație? Folosește în schimb <annotation type="use_this_form_link"> acest formular </annotation>.</string>
-    <string name="atp_ReportBreakageAppEntry">Aplicația %s</string>
+    <string name="atp_ReportBreakageAppEntry" instruction="Placeholder is the name of an app">%1$s aplicație</string>
     <string name="atp_ReportBreakageAppSubmitCta">Trimite</string>
     <string name="atp_ReportBreakageAppNextCta">Următorul</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Te rugăm să descrii ce se întâmplă, ce te așteptai să se întâmple și pașii care au dus la apariția problemei.</string>
@@ -196,7 +195,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Despre tehnologiile de urmărire ale aplicațiilor</string>
     <string name="atp_ProfilingInfoTitle">Ce sunt tehnologiile de urmărire ale aplicațiilor?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Ai auzit, probabil, despre faptul că unele companii, precum Google și Facebook, te urmăresc în fundal pe site-uri terțe. Dar știai că îți urmăresc și informațiile personale prin intermediul aplicațiilor de pe dispozitivul tău?\n\n<b>Peste 96% dintre cele mai populare 100 de aplicații gratuite pentru Android pe care</b> le-am testat conțineau tehnologii de urmărire terțe ascunse. Dintre acestea, 87% au trimis date către Google și 68% au trimis date către Facebook. Acest lucru se întâmplă chiar și atunci când nu îți utilizai dispozitivul.\n\n<b>Tehnologiile de urmărire din aplicații pot avea acces la mult mai multe informații</b> decât verișorii lor de urmărire a site-urilor, cum ar fi locația ta, până la etajul unei clădiri în care te afli, cât de des joci jocuri în timp ce lucrezi și când și cât timp dormi în fiecare zi. <b>Chiar dacă nu ai un cont Google sau Facebook, de exemplu, aceste companii pot colecta în continuare date despre tine din aplicațiile tale.</b>\n\nRețelele de urmărire precum Facebook și Google folosesc aceste mici informații <b>pentru a construi un profil digital despre tine.</b> Cu ajutorul acestuia, rețelele de urmărire pot manipula ceea ce vezi online și pot permite agențiilor de publicitate să liciteze pentru a avea acces la tine, pe baza datelor tale.\n\nTehnologiile de urmărire din aplicații reprezintă o MARE problemă pentru confidențialitate. <b>Însă DuckDuckGo are o soluție care te poate ajuta. </b>\n\nCând este activată în aplicația Privacy Browser a DuckDuckGo, Protecția împotriva urmăririi de către aplicație blochează multe tehnologii de urmărire din alte aplicații de pe dispozitiv, în același timp în care aplicația DuckDuckGo blochează tehnologiile de urmărire pe care le găsim pe site-uri atunci când navighezi. <b>Aceste niveluri duble de protecție reduc ceea ce află companiile de urmărire despre tine, în general</b>, astfel încât să poți utiliza aplicațiile cu mai multă liniște sufletească, știind că ești mai protejat.</string>
+    <string name="atp_ProfilingInfoFirstParagraph" formatted="false">Ai auzit, probabil, despre faptul că unele companii, precum Google și Facebook, te urmăresc în fundal pe site-uri terțe. Dar știai că îți urmăresc și informațiile personale prin intermediul aplicațiilor de pe dispozitivul tău?\n\n<b>Peste 96% dintre cele mai populare 100 de aplicații gratuite pentru Android pe care</b> le-am testat conțineau tehnologii de urmărire terțe ascunse. Dintre acestea, 87% au trimis date către Google și 68% au trimis date către Facebook. Acest lucru se întâmplă chiar și atunci când nu îți utilizai dispozitivul.\n\n<b>Tehnologiile de urmărire din aplicații pot avea acces la mult mai multe informații</b> decât verișorii lor de urmărire a site-urilor, cum ar fi locația ta, până la etajul unei clădiri în care te afli, cât de des joci jocuri în timp ce lucrezi și când și cât timp dormi în fiecare zi. <b>Chiar dacă nu ai un cont Google sau Facebook, de exemplu, aceste companii pot colecta în continuare date despre tine din aplicațiile tale.</b>\n\nRețelele de urmărire precum Facebook și Google folosesc aceste mici informații <b>pentru a construi un profil digital despre tine.</b> Cu ajutorul acestuia, rețelele de urmărire pot manipula ceea ce vezi online și pot permite agențiilor de publicitate să liciteze pentru a avea acces la tine, pe baza datelor tale.\n\nTehnologiile de urmărire din aplicații reprezintă o MARE problemă pentru confidențialitate. <b>Însă DuckDuckGo are o soluție care te poate ajuta. </b>\n\nCând este activată în aplicația Privacy Browser a DuckDuckGo, Protecția împotriva urmăririi de către aplicație blochează multe tehnologii de urmărire din alte aplicații de pe dispozitiv, în același timp în care aplicația DuckDuckGo blochează tehnologiile de urmărire pe care le găsim pe site-uri atunci când navighezi. <b>Aceste niveluri duble de protecție reduc ceea ce află companiile de urmărire despre tine, în general</b>, astfel încât să poți utiliza aplicațiile cu mai multă liniște sufletească, știind că ești mai protejat.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Ultimele 7 zile</string>
@@ -210,16 +209,16 @@
     <string name="atp_ActivityManageProtection">Aveți probleme cu o aplicație?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
-        <![CDATA[1 încercare de urmărire blocată de la 1 firmă în aplicația <b>%1$s</b>]]>
+        <![CDATA[O încercare de urmărire blocată de la o societate în aplicația <b>%1$s</b>]]>
     </string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies" instruction="Placeholder %1$d is the number of companies doing the tracking. Placeholder %2$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 5 companies in Venmo app.">
-        <![CDATA[1 încercare de urmărire blocată de la %1$d firme în aplicația <b>%2$s</b>]]>
+        <![CDATA[O încercare de urmărire blocată de la %1$d societăți din aplicația <b>%2$s</b>]]>
     </string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$s is the name of the app doing the tracking. Example: 5 tracking attempts blocked from 1 company in Venmo app.">
-        <![CDATA[%1$d încercări de urmărire blocate de la 1 firmă în aplicația <b>%2$s</b>]]>
+        <![CDATA[%1$d încercări de urmărire blocate de la o societate în aplicația <b>%2$s</b>]]>
     </string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
-        <![CDATA[%1$d încercări de urmărire blocate de la %2$d firme în aplicația <b>%3$s</b>]]>
+        <![CDATA[%1$d încercări de urmărire blocate de la %2$d companii în aplicația <b>%3$s</b>]]>
     </string>
 
     <string name="atp_ActivityEmptyListTitle">Nicio activitate nouă</string>
@@ -286,17 +285,17 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%d încercare. Cunoscută pentru faptul că colectează:</item>
-        <item quantity="few">%d încercări. Cunoscut pentru a colecta:</item>
-        <item quantity="other">%d încercări. Cunoscut pentru a colecta:</item>
+        <item quantity="one">%1$d încercare. Cunoscut pentru a colecta:</item>
+        <item quantity="few">%1$d încercări. Cunoscute pentru a colecta:</item>
+        <item quantity="other">%1$d încercări. Cunoscute pentru a colecta:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">%d încercare de urmărire blocată</item>
-        <item quantity="few">%d încercări de urmărire blocate</item>
-        <item quantity="other">%d încercări de urmărire blocate</item>
+        <item quantity="one">A fost blocată %1$d încercare de urmărire</item>
+        <item quantity="few">Au fost blocate %1$d încercări de urmărire</item>
+        <item quantity="other">Au fost blocate %1$d încercări de urmărire</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Raportează o problemă cu această aplicație</string>
-    <string name="atp_CompanyDetailsTrackingShowMore">Arată încă %d</string>
+    <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Arată încă %1$d</string>
     <string name="atp_CompanyDetailsTrackingLearnMore">Aplicațiile pot include dispozitive de urmărire de la alte companii, de exemplu pentru analiză și marketing. Dacă nu le blocăm, aceste dispozitive de urmărire ar putea crea profiluri digitale și mai detaliate despre tine. <annotation type="learn_more_link">Află mai multe</annotation></string>
     <string name="atp_CompanyDetailsTrackingShowLess">Arată mai Puțin</string>
     <string name="atp_CompanyDetailsAppInfoPanel">Protecția este în prezent dezactivată pentru această aplicație. Dacă Protecția împotriva urmăririi de către aplicație a cauzat o problemă, te rugăm să <annotation type="report_issues_link">raportezi problema</annotation></string>
