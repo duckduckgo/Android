@@ -17,95 +17,94 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="atp_name">Zaštita od praćenja aplikacija</string>
     <string name="refresh">Osvježi</string>
 
     <!-- Debug Screens -->
     <string name="atp_DiagnosticsMenuLabel">Dijagnostika</string>
     <string name="atp_DataMenuLabel">Statistika podataka</string>
-    <string name="atp_MeteredConnection">"Odmjereno: %s"</string>
-    <string name="atp_ConnectionStatus">"Povezani VPN: %s"</string>
-    <string name="atp_NetworkAvailable">"Povezano s internetom: %s"</string>
-    <string name="atp_DnsServers">"Aktivni mrežni DNS: %s"</string>
+    <string name="atp_MeteredConnection" instruction="Placeholder is true or false">"Odmjereno: %1$s"</string>
+    <string name="atp_ConnectionStatus" instruction="Placeholder is true or false">"VPN povezan: %1$s"</string>
+    <string name="atp_NetworkAvailable" instruction="Placeholder is true or false">"Povezano s internetom: %1$s"</string>
+    <string name="atp_DnsServers" instruction="Placeholder is a list of dns addresses">"Aktivni mrežni DNS: %1$s"</string>
     <string name="atp_AppExitsReasonsTitle">Razlozi za izlaz iz aplikacije</string>
     <string name="atp_AppRestartsTitle">Ponovno pokretanje aplikacije</string>
 
     <!-- Diagnostics -->
-    <string name="vpnTimeRunning">Trajanje izvođenja: %s</string>
-    <string name="vpnTrackerCompaniesBlockedToday">Danas blokirano tvrtki praćenja: %d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek">Tvrtki praćenja blokirano ovaj tjedan: %d</string>
+    <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Aktivno vrijeme: %1$s</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Tvrtke za praćenje blokirane danas: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Tvrtke za praćenje blokirane ovaj tjedan: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Nije blokirana još nijedna tvrtka za praćenje"</string>
-    <string name="vpnTrackersBlockedToday">Danas blokirano alata za praćenje: %d</string>
-    <string name="vpnTrackersBlockedThisWeek">Alata za praćenje blokirano ovaj tjedan: %d</string>
+    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Alati za praćenje blokirani danas : %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Alati za praćenje blokirani ovaj tjedan: %1$d</string>
     <string name="vpnTrackersNone">"Još nema blokiranih alata za praćenje"</string>
     <string name="vpnNotRunYet">"VPN još nije pokrenut"</string>
-    <string name="vpnDataTransferred">"%1s\n%2s paketa"</string>
+    <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s paketa"</string>
 
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Imate problema s aplikacijom?</string>
     <string name="atp_OnInitialNotification">"Zaštita od praćenja aplikacija App Tracking Protection omogućena je i blokira pokušaje praćenja u tvojim aplikacijama"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Skeniranje praćenja aktivnosti… bip… bop"</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ Blokirano pokušaja praćenja <b>u %d aplikaciji</b> (u proteklih sat vremena).]]></item>
-        <item quantity="few"><![CDATA[ Blokirano pokušaja praćenja <b>u %d aplikacija</b> (u proteklih sat vremena).]]></item>
-        <item quantity="many"><![CDATA[ Blokirano pokušaja praćenja <b>u %d aplikacija</b> (u proteklih sat vremena).]]></item>
-        <item quantity="other"><![CDATA[ Blokiranih pokušaja praćenja <b>u %d aplikacija</b> (u proteklih sat vremena).]]></item>
+        <item quantity="one"><![CDATA[ Blokiranih pokušaja praćenja <b>u %1$d aplikaciji</b> (u proteklih sat vremena).]]></item>
+        <item quantity="few"><![CDATA[ Blokiranih pokušaja praćenja <b>u %1$d aplikacije</b> (u proteklih sat vremena).]]></item>
+        <item quantity="many"><![CDATA[ Blokiranih pokušaja praćenja <b>u %1$d aplikacija</b> (u proteklih sat vremena).]]></item>
+        <item quantity="other"><![CDATA[ Blokiranih pokušaja praćenja <b>u %1$d aplikacija</b> (u proteklih sat vremena).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">Zaštita od praćenja aplikacija App Tracking Protection onemogućena je. Dodirni za nastavak blokiranja pokušaja praćenja.</string>
     <string name="atp_RevokedNotification">VPN aplikacija na tvom uređaju onemogućila je App Tracking Protection. Dodirni za ponovno uključivanje.</string>
 
     <!-- App Tracking Protection Daily Notification -->
-    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaj praćenja</b> (u protekla 24 sata).]]></string>
-    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaj praćenja u 1 aplikaciji, %2$s</b> (u protekla 24 sata).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaja praćenja</b> (u protekla 24 sata).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaja praćenja u %2$d aplikacije, uključujući %3$s</b> (u protekla 24 sata).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaj praćenja</b> (u protekla 24 sata).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps" instruction="%1$d is the number of tracking attempts and %2$s is the name of the app where it happened"><![CDATA[ Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaj praćenja u 1 aplikaciji, %2$s</b> (u protekla 24 sata).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaja praćenja</b> (u protekla 24 sata).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaja praćenja u %2$d aplikacija, uključujući %3$s</b> (u protekla 24 sata).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[Pokušaj praćenja od strane %1$s <b>u %2$d aplikaciji</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
-        <item quantity="few"><![CDATA[Pokušaj praćenja od strane %1$s <b>u %2$d aplikacije</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
-        <item quantity="many"><![CDATA[Pokušaj praćenja od strane %1$s <b>u %2$d aplikacija</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
-        <item quantity="other"><![CDATA[Pokušaj praćenja od strane %1$s <b>u %2$d aplikacija</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
+        <item quantity="one"><![CDATA[%1$s vas je pokušao pratiti <b>u %2$d aplikaciji</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
+        <item quantity="few"><![CDATA[%1$s vas je pokušao pratiti <b>u %2$d aplikacije</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
+        <item quantity="many"><![CDATA[%1$s vas je pokušao pratiti <b>u %2$d aplikacija</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
+        <item quantity="other"><![CDATA[%1$s vas je pokušao pratiti <b>u %2$d aplikaciji</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u <b>%1$s</b> (u posljednja 24 sata).]]></item>
-        <item quantity="few"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u <b>%1$s</b> i <b>%2$s</b> (u posljednja 24 sata).]]></item>
-        <item quantity="many"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u <b>%1$s</b> i <b>%2$s</b> (u posljednja 24 sata).]]></item>
-        <item quantity="other"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u <b>%1$s</b> and <b>%2$s</b> (u posljednja 24 sata).]]></item>
+        <item quantity="one"><![CDATA[Zaštita od praćenja putem aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u aplikaciji <b>%1$s</b> (u protekla 24 sata).]]></item>
+        <item quantity="few"><![CDATA[Zaštita od praćenja putem aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u aplikacijama <b>%1$s</b> i <b>%2$s</b> (u protekla 24 sata).]]></item>
+        <item quantity="many"><![CDATA[Zaštita od praćenja putem aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u aplikacijama <b>%1$s</b> i <b>%2$s</b> (u protekla 24 sata).]]></item>
+        <item quantity="other"><![CDATA[Zaštita od praćenja putem aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u aplikacijama <b>%1$s</b> i <b>%2$s</b> (u protekla 24 sata).]]></item>
     </plurals>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%s %d puta u aplikaciji %s</b> (u protekla 24 sata).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%s %d puta u aplikaciji %s i još 1 aplikaciji</b> (u protekla 24 sata).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%s %d puta u aplikaciji %s i još %d aplikacija/e</b> (u protekla 24 sata).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$s %2$d puta u %3$s</b> (u protekla 24 sata).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$s %2$d puta u %3$s i još 1 aplikaciji</b> (u protekla 24 sata).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$s %2$d puta u %3$s i %4$d drugih aplikacija</b> (u protekla 24 sata).]]></string>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%s %d puta u aplikaciji %s</b> (u protekla 24 sata).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%s %d puta u aplikaciji %s i još 1 aplikaciji</b> (u protekla 24 sata).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%s %d puta u aplikaciji %s i još %d aplikacije/a</b> (u protekla 24 sata).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$s %2$d puta u %3$s</b> (u protekla 24 sata).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>j%1$s %2$d puta u %3$s i još 1 aplikaciji</b> (u protekla 24 sata).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$s %2$d puta u %3$s i %4$d drugih aplikacija</b> (u protekla 24 sata).]]></string>
 
     <!-- App Tracking Protection Weekly Notification -->
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%d pokušaj praćenja u aplikaciji %s</b> (u proteklih tjedan dana).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%d pokušaj praćenja u aplikaciji %s</b> i još 1 aplikaciji (u proteklih tjedan dana).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%d pokušaj praćenja u aplikaciji %s</b> i još %d aplikacije/a (u proteklih tjedan dana).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%d pokušaja praćenja u aplikaciji %s</b> (u proteklih tjedan dana).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%d pokušaja praćenja u aplikaciji %s</b> i još 1 aplikaciji (u proteklih tjedan dana).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%d pokušaja praćenja u aplikaciji %s</b> i još %d aplikacije/a (u proteklih tjedan dana).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaj praćenja u %2$s</b> (prošli tjedan).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaj praćenja u aplikaciji %2$s</b> i 1 drugoj aplikaciji (prošli tjedan).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaj praćenja u %2$s</b> i %3$d drugih aplikacija (prošli tjedan).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaja praćenja u %2$s</b> (prošli tjedan).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaja praćenja u %2$s</b> i još 1 aplikaciji (prošli tjedan).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaja praćenja u %2$s</b> i %3$d drugih aplikacija (prošli tjedan).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%s u %d aplikaciji, uključujući %s</b> (u proteklih tjedan dana).]]></item>
-        <item quantity="few"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%s u %d aplikacije, uključujući %s1</b> (u proteklih tjedan dana).]]></item>
-        <item quantity="many"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%s u %d aplikacija, uključujući %s</b> (u proteklih tjedan dana).]]></item>
-        <item quantity="other"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%s u %d aplikacija, uključujući %s</b> (u proteklih tjedan dana).]]></item>
+        <item quantity="one"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$s u %2$d aplikaciji, %3$s</b> (prošli tjedan).]]></item>
+        <item quantity="few"><![CDATA[Zaštita od praćenja aplikacije App Tracking Protection blokirala je <b>%1$s u %2$d aplikacija/e, uključujući %3$s</b> (prošli tjedan).]]></item>
+        <item quantity="many"><![CDATA[Zaštita od praćenja aplikacije App Tracking Protection blokirala je <b>%1$s u %2$d aplikacija, uključujući %3$s</b> (prošli tjedan).]]></item>
+        <item quantity="other"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$s u %2$d aplikacija, uključujući %3$s</b> (prošli tjedan).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Omogući zaštitu od praćenja aplikacija App Tracking Protection</string>
 
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%d pokušaj praćenja u aplikaciji %s</b> (u proteklih sat vremena).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%d pokušaj praćenja u aplikaciji %s i još 1 aplikaciji</b> (u proteklih sat vremena).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Zaštita od praćenja aplikacije App Tracking Protection blokirala je <b>%d pokušaj praćenja u aplikaciji %s i %d drugih aplikacija</b> (u proteklih sat vremena).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%d pokušaja praćenja u aplikaciji %s</b> (u proteklih sat vremena).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%d pokušaj praćenja u aplikaciji %s i još 1 aplikaciji</b> (u proteklih sat vremena).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%d pokušaja praćenja u aplikaciji %s i %d drugih aplikacija</b> (u proteklih sat vremena).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaj praćenja u %2$s</b> (u proteklih sat vremena).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[Zaštita od praćenja aplikacije App Tracking Protection blokirala je <b>%1$d pokušaj praćenja u aplikaciji %2$s i 1 drugoj aplikaciji</b> (u proteklih sat vremena).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaj praćenja u %2$s i %3$d drugih aplikacija</b> (u proteklih sat vremena).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaja praćenja u %2$s</b> (u proteklih sat vremena).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$d pokušaja praćenja u %2$s i još 1 aplikaciji</b> (u proteklih sat vremena).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[Zaštita od praćenja aplikacija blokirala je <b>%1$d pokušaja praćenja u %2$s i %3$d drugih aplikacija</b> (u proteklih sat vremena).]]></string>
 
     <!-- App Tracking Protection Privacy Report -->
     <string name="atp_PrivacyReportEnabledTooltip">Zaštita od praćenja aplikacija App Tracking Protection omogućena je i blokira programe za praćenje na cijelom vašem uređaju</string>
@@ -113,7 +112,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Omogući zaštitu od praćenja aplikacija App Tracking Protection</string>
     <string name="atp_OnboardingLastPageOneTitle">Jedan jednostavan korak za bolju privatnost aplikacija!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Otkrili smo da <b>više od 96% popularnih besplatnih aplikacija</b> drugim tvrtkama omogućava praćenje vaših osobnih podataka, čak i kad spavate.\n\nPogledajte koje otkrivene aplikacije <b>dopuštaju drugim tvrtkama da vas prate</b> i preuzmite kontrolu nad njima!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle" formatted="false">Otkrili smo da <b>više od 96% popularnih besplatnih aplikacija</b> drugim tvrtkama omogućava praćenje vaših osobnih podataka, čak i kad spavate.\n\nPogledajte koje otkrivene aplikacije <b>dopuštaju drugim tvrtkama da vas prate</b> i preuzmite kontrolu nad njima!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Na koji način sve funkcionira?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>otkriva i blokira aplikacije za praćenje drugih tvrtki</b>, primjerice kad vas Facebook pokuša pratiti u zdravstvenoj aplikaciji.\n\n<b>Besplatna je</b> i možeš uživati u svojim aplikacijama kao i inače. Radeći u pozadini pomaže <b>te štititi i noću i danju.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Tko vidi tvoje podatke?</string>
@@ -124,7 +123,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Zaštita od praćenja aplikacija</string>
-    <string name="atp_daxOnboardingIntroMessage">Preko 96% popularnih besplatnih aplikacija omogućuje drugim tvrtkama da te prate, čak i kad ne koristiš svoj telefon. App Tracking Protection otkriva i blokira te pokušaje praćenja.</string>
+    <string name="atp_daxOnboardingIntroMessage" formatted="false">Preko 96% popularnih besplatnih aplikacija omogućuje drugim tvrtkama da te prate, čak i kad ne koristiš svoj telefon. App Tracking Protection otkriva i blokira te pokušaje praćenja.</string>
     <string name="atp_daxOnboardingPermissionTitle">Na koji način sve funkcionira?</string>
     <string name="atp_daxOnboardingPermissionMessage">App Tracking Protection nije VPN. Međutim, tvoj će ga uređaj prepoznati kao takvog. To je zato što za rad koristi lokalnu VPN vezu. Nikada ne usmjerava podatke aplikacija preko vanjskog poslužitelja. <annotation type="learn_more_link">Saznaj više</annotation></string>
 
@@ -152,7 +151,7 @@
     <string name="atp_ExcludeAppsManuallyCTACancel">Otkaži</string>
     <string name="atp_ExcludeAppsManuallyCTAEnable">Omogući</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Vrati</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Ručno omogućiti zaštitu za aplikaciju %s?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Ručno omogućiti zaštitu za aplikaciju %1$s?</string>
     <string name="atp_ExcludeAppsManuallyEnableAppLabel">Poznato je da ova aplikacija ima problema kad pokušaji praćenja ne uspiju.</string>
     <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Sadržaj web-mjesta u ovoj aplikaciji možda se neće ispravno prikazati kada je zaštita omogućena.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Omogućavanje zaštite šalje naziv aplikacije DuckDuckGou.</string>
@@ -173,7 +172,7 @@
     <!--  Breakage report app list  -->
     <string name="atp_ReportBreakageAppListActivityTitle">Prijava problema</string>
     <string name="atp_ReportBreakageAppFeature"><b>Odaberi aplikaciju koja ima ovaj problem</b>. Tvoje povratne informacije stvarno nam pomažu da budemo bolji!\n\nImaš li općenite povratne informacije o zaštiti od praćenja aplikacija? Umjesto toga upotrijebi <annotation type="use_this_form_link">ovaj obrazac</annotation>.</string>
-    <string name="atp_ReportBreakageAppEntry">Aplikacija %s</string>
+    <string name="atp_ReportBreakageAppEntry" instruction="Placeholder is the name of an app">aplikacija %1$s</string>
     <string name="atp_ReportBreakageAppSubmitCta">Pošalji</string>
     <string name="atp_ReportBreakageAppNextCta">Dalje</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Opiši što se događa, što si očekivao da će se dogoditi i korake koji su doveli do problema.</string>
@@ -200,7 +199,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">O alatima za praćenje aplikacija</string>
     <string name="atp_ProfilingInfoTitle">Što su alati za praćenje aplikacija?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Vjerojatno si čuo za tvrtke poput Googlea i Facebooka koje te potajno prate na web stranicama trećih strana. Ali jesi li znao da oni također prate tvoje osobne podatke putem aplikacija na tvom uređaju?\n\n<b>Preko 96\\% od 100 popularnih besplatnih Android aplikacija</b> koje smo testirali sadržavalo je skrivene vanjske alate za praćenje. Od toga je 87\\% poslalo podatke Googleu, a 68\\% Facebooku. To se događa čak i kada ne koristiš svoj uređaj.\n\n<b>Alati za praćenje u aplikacijama mogu imati pristup do puno više informacija</b> od njihovih \'rođaka\' za praćenje na web stranicama, kao što su tvoja lokacija (čak i detaljno to toga na kojem se katu zgrade nalaziš), koliko često igraš igre dok si na poslu te kada i koliko dugo spavaš svaki dan. <b>Čak i ako nemaš Google ili Facebook račun, oni i dalje (primjerice) mogu prikupljati podatke o tebi iz tvojih aplikacija.</b>\n\nMreže za praćenje kao što su Facebook i Google koriste ove male komadiće informacija <b>za izradu digitalnog profila o tebi.</b> Uz to, mreže za praćenje mogu manipulirati onim što vidiš na mreži i omogućiti oglašivačima da doslovno licitiraju za pristup tebi na temelju tvojih podataka.\n\nAlati za praćenje u aplikacijama VELIKI su problem za privatnost. <b>Ali DuckDuckGo ima rješenje koje može pomoći.</b>\n\nKada je omogućena u aplikaciji DuckDuckGo Privacy Browser, App Tracking Protection (zaštita od praćenja aplikacija) blokira mnoge alate za praćenje u drugim aplikacijama na tvom uređaju, a istovremeno aplikacija DuckDuckGo blokira alate za praćenje koje nalazimo na web stranicama prilikom njihovog pregledavanja. <b>Ovi dvostruki slojevi zaštite smanjuju ono što tvrtke za praćenje znaju o tebi općenito</b>, tako da s više sigurnosti možeš koristiti svoje aplikacije, znajući da si zaštićen.</string>
+    <string name="atp_ProfilingInfoFirstParagraph" formatted="false">Vjerojatno si čuo za tvrtke poput Googlea i Facebooka koje te potajno prate na web stranicama trećih strana. Ali jesi li znao da oni također prate tvoje osobne podatke putem aplikacija na tvom uređaju?\n\n<b>Preko 96\\% od 100 popularnih besplatnih Android aplikacija</b> koje smo testirali sadržavalo je skrivene vanjske alate za praćenje. Od toga je 87\\% poslalo podatke Googleu, a 68\\% Facebooku. To se događa čak i kada ne koristiš svoj uređaj.\n\n<b>Alati za praćenje u aplikacijama mogu imati pristup do puno više informacija</b> od njihovih \'rođaka\' za praćenje na web stranicama, kao što su tvoja lokacija (čak i detaljno to toga na kojem se katu zgrade nalaziš), koliko često igraš igre dok si na poslu te kada i koliko dugo spavaš svaki dan. <b>Čak i ako nemaš Google ili Facebook račun, oni i dalje (primjerice) mogu prikupljati podatke o tebi iz tvojih aplikacija.</b>\n\nMreže za praćenje kao što su Facebook i Google koriste ove male komadiće informacija <b>za izradu digitalnog profila o tebi.</b> Uz to, mreže za praćenje mogu manipulirati onim što vidiš na mreži i omogućiti oglašivačima da doslovno licitiraju za pristup tebi na temelju tvojih podataka.\n\nAlati za praćenje u aplikacijama VELIKI su problem za privatnost. <b>Ali DuckDuckGo ima rješenje koje može pomoći.</b>\n\nKada je omogućena u aplikaciji DuckDuckGo Privacy Browser, App Tracking Protection (zaštita od praćenja aplikacija) blokira mnoge alate za praćenje u drugim aplikacijama na tvom uređaju, a istovremeno aplikacija DuckDuckGo blokira alate za praćenje koje nalazimo na web stranicama prilikom njihovog pregledavanja. <b>Ovi dvostruki slojevi zaštite smanjuju ono što tvrtke za praćenje znaju o tebi općenito</b>, tako da s više sigurnosti možeš koristiti svoje aplikacije, znajući da si zaštićen.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Proteklih 7 dana</string>
@@ -214,16 +213,16 @@
     <string name="atp_ActivityManageProtection">Imaš problema s aplikacijom?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
-        <![CDATA[1 pokušaj praćenja od 1 tvrtke blokiran je u aplikaciji <b>%1$s</b>]]>
+        <![CDATA[1 pokušaj praćenja blokiran je od 1 tvrtke u aplikaciji <b>%1$s</b>]]>
     </string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies" instruction="Placeholder %1$d is the number of companies doing the tracking. Placeholder %2$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 5 companies in Venmo app.">
-        <![CDATA[1 pokušaj praćenja od %1$d tvrtke/i blokiran je u aplikaciji <b>%2$s</b>]]>
+        <![CDATA[1 pokušaj praćenja blokiran od %1$d tvrtki u aplikaciji <b>%2$s</b>]]>
     </string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$s is the name of the app doing the tracking. Example: 5 tracking attempts blocked from 1 company in Venmo app.">
-        <![CDATA[%1$d pokušaja praćenja od 1 tvrtke blokirano je u aplikaciji <b>%2$s</b>]]>
+        <![CDATA[%1$d pokušaja praćenja blokirano je od 1 tvrtke u aplikaciji <b>%2$s</b>]]>
     </string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
-        <![CDATA[%1&d pokušaja praćenja od %2$d tvrtke/i blokirano je u aplikaciji <b>%3$s</b>]]>
+        <![CDATA[%1$d pokušaja praćenja blokiranih iz %2$d tvrtki u aplikacijama <b>%3$s</b>]]>
     </string>
 
     <string name="atp_ActivityEmptyListTitle">Nema nove aktivnosti</string>
@@ -292,19 +291,19 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%d pokušaj. Poznato je da prikuplja:</item>
-        <item quantity="few">%d pokušaja. Poznato je da prikuplja:</item>
-        <item quantity="many">%d pokušaja. Poznato je da prikuplja:</item>
-        <item quantity="other">%d pokušaja. Poznato je da prikuplja:</item>
+        <item quantity="one">%1$d pokušaj. Poznato je da prikuplja:</item>
+        <item quantity="few">%1$d pokušaja. Poznato je da prikuplja:</item>
+        <item quantity="many">%1$d pokušaja. Poznato je da prikuplja:</item>
+        <item quantity="other">%1$d pokušaja. Poznato je da prikuplja:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">Blokirano pokušaja praćenja: %d</item>
-        <item quantity="few">Blokirano pokušaja praćenja: %d</item>
-        <item quantity="many">Blokirano pokušaja praćenja: %d</item>
-        <item quantity="other">Blokirano pokušaja praćenja: %d</item>
+        <item quantity="one">Blokiran %1$d pokušaj praćenja</item>
+        <item quantity="few">Blokirano %1$d pokušaja praćenja</item>
+        <item quantity="many">Blokirano %1$d pokušaja praćenja</item>
+        <item quantity="other">Blokirano %1$d pokušaja praćenja</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Prijavi problem s ovom aplikacijom</string>
-    <string name="atp_CompanyDetailsTrackingShowMore">Prikaži još %d</string>
+    <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Prikaži još %1$d</string>
     <string name="atp_CompanyDetailsTrackingLearnMore">Aplikacije mogu uključivati alate za praćenje drugih tvrtki u svrhe poput analitike i marketinga. Da ih ne blokiramo, ovi bi alati za treće strane mogli stvoriti još detaljnije digitalne profile o vama. <annotation type="learn_more_link">Saznaj više.</annotation></string>
     <string name="atp_CompanyDetailsTrackingShowLess">Smanji</string>
     <string name="atp_CompanyDetailsAppInfoPanel">Zaštita je trenutačno onemogućena za ovu aplikaciju. Ako je značajka za zaštitu od praćenja aplikacija App Tracking Protection uzrokovala problem, <annotation type="report_issues_link">prijavite problem</annotation></string>

@@ -17,87 +17,86 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="atp_name">Bescherming tegen app-tracking</string>
     <string name="refresh">Vernieuwen</string>
 
     <!-- Debug Screens -->
     <string name="atp_DiagnosticsMenuLabel">Diagnostiek</string>
     <string name="atp_DataMenuLabel">Statistieken</string>
-    <string name="atp_MeteredConnection">"Datalimiet: %s"</string>
-    <string name="atp_ConnectionStatus">"Verbonden met VPN: %s"</string>
-    <string name="atp_NetworkAvailable">"Verbonden met internet: %s"</string>
-    <string name="atp_DnsServers">"DNS van actief netwerk: %s"</string>
+    <string name="atp_MeteredConnection" instruction="Placeholder is true or false">"Datalimiet: %1$s"</string>
+    <string name="atp_ConnectionStatus" instruction="Placeholder is true or false">"Verbonden met VPN: %1$s"</string>
+    <string name="atp_NetworkAvailable" instruction="Placeholder is true or false">"Verbonden met internet: %1$s"</string>
+    <string name="atp_DnsServers" instruction="Placeholder is a list of dns addresses">"DNS van actief netwerk: %1$s"</string>
     <string name="atp_AppExitsReasonsTitle">Redenen voor sluiten van app</string>
     <string name="atp_AppRestartsTitle">App wordt opnieuw gestart</string>
 
     <!-- Diagnostics -->
-    <string name="vpnTimeRunning">Tijd actief: %s</string>
-    <string name="vpnTrackerCompaniesBlockedToday">Trackerbedrijven geblokkeerd vandaag: %d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek">Trackerbedrijven geblokkeerd deze week: %d</string>
+    <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Tijd actief: %1$s</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Trackerbedrijven geblokkeerd vandaag: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Trackerbedrijven geblokkeerd deze week: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Nog geen trackerbedrijven geblokkeerd"</string>
-    <string name="vpnTrackersBlockedToday">Trackers geblokkeerd vandaag: %d</string>
-    <string name="vpnTrackersBlockedThisWeek">Trackers geblokkeerd deze week: %d</string>
+    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Trackers geblokkeerd vandaag: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Trackers geblokkeerd deze week: %1$d</string>
     <string name="vpnTrackersNone">"Nog geen trackers geblokkeerd"</string>
     <string name="vpnNotRunYet">"VPN is nog niet uitgevoerd"</string>
-    <string name="vpnDataTransferred">"%1s\n%2s pakketten"</string>
+    <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s pakketten"</string>
 
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Heb je problemen met een app?</string>
     <string name="atp_OnInitialNotification">"App Tracking Protection is ingeschakeld en blokkeert pogingen tot tracking in apps"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Scannen op trackingactiviteit…"</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ Trackingpogingen geblokkeerd <b>in %d app</b> (afgelopen uur).]]></item>
-        <item quantity="other"><![CDATA[ Trackingpogingen geblokkeerd <b>in %d apps</b> (afgelopen uur).]]></item>
+        <item quantity="one"><![CDATA[ Trackingpogingen geblokkeerd <b>in %1$d app</b> (afgelopen uur).]]></item>
+        <item quantity="other"><![CDATA[ Trackingpogingen geblokkeerd <b>in %1$d apps</b> (afgelopen uur).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">App Tracking Protection uitgeschakeld. Tik om trackingpogingen te blijven blokkeren.</string>
     <string name="atp_RevokedNotification">Een VPN-app op je apparaat heeft App Tracking Protection uitgeschakeld. Tik om opnieuw in te schakelen.</string>
 
     <!-- App Tracking Protection Daily Notification -->
-    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ App Tracking Protection heeft <b>%1$d trackingpoging</b> geblokkeerd (afgelopen dag).]]></string>
-    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ App Tracking Protection heeft <b>%1$d trackingpoging in 1 app, %2$s</b>, geblokkeerd (afgelopen dag).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ App Tracking Protection heeft <b>%1$d trackingpogingen</b> geblokkeerd (afgelopen dag).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ App Tracking Protection heeft <b>%1$d trackingpogingen in %2$d apps, waaronder %3$s</b>, geblokkeerd (afgelopen dag).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ App Tracking Protection heeft <b>%1$d trackingpoging</b> geblokkeerd (afgelopen dag).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps" instruction="%1$d is the number of tracking attempts and %2$s is the name of the app where it happened"><![CDATA[ App Tracking Protection heeft <b>%1$d trackingpoging in 1 app, %2$s</b> geblokkeerd (afgelopen dag).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ App Tracking Protection <b>%1$d trackingpogingen</b> geblokkeerd (afgelopen dag).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ App Tracking Protection heeft <b>%1$d trackingpogingen in %2$d apps, waaronder %3$s</b> geblokkeerd (afgelopen dag).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[%1$s probeerde je te volgen <b>in %2$d app</b> (afgelopen dag). <b>Meer informatie</b>]]></item>
-        <item quantity="other"><![CDATA[%1$s probeerde je te volgen <b>in %2$d apps</b> (afgelopen dag). <b>Meer informatie</b>]]></item>
+        <item quantity="one"><![CDATA[%1$s probeerde je <b>in %2$d app te volgen</b> (afgelopen dag). <b>Meer informatie</b>]]></item>
+        <item quantity="other"><![CDATA[%1$s probeerde je <b>in %2$d apps te volgen</b> (afgelopen dag). <b>Meer informatie</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[App Tracking Protection heeft de meeste trackingpogingen geblokkeerd in <b>%1$s</b> (afgelopen dag).]]></item>
-        <item quantity="other"><![CDATA[App Tracking Protection heeft de meeste trackingpogingen geblokkeerd in <b>%1$s</b> en <b>%2$s</b> (afgelopen dag).]]></item>
+        <item quantity="one"><![CDATA[App Tracking Protection heeft de meeste trackingpogingen in <b>%1$s</b> geblokkeerd (afgelopen dag).]]></item>
+        <item quantity="other"><![CDATA[App Tracking Protection heeft de meeste trackingpogingen in <b>%1$s</b> en <b>%2$s</b> geblokkeerd (afgelopen dag).]]></item>
     </plurals>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[App Tracking Protection heeft <b>%s %d keer in %s</b> geblokkeerd (afgelopen dag).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[App Tracking Protection heeft <b>%s %d keer in %s en 1 andere app</b> geblokkeerd (afgelopen dag).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[App Tracking Protection heeft <b>%s %d keer in %s en %d andere apps</b> geblokkeerd (afgelopen dag).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection heeft <b>%1$s %2$d keer in %3$s</b> geblokkeerd (afgelopen dag).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection heeft <b>%1$s %2$d keer in %3$s en 1 andere app</b> geblokkeerd (afgelopen dag).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[App Tracking Protection heeft <b>%1$s %2$d keer in %3$s en %4$d andere apps</b> geblokkeerd (afgelopen dag).]]></string>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[App Tracking Protection heeft <b>%s %d keer in %s</b> geblokkeerd (afgelopen dag).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[App Tracking Protection heeft <b>%s %d keer in %s en 1 andere app</b> geblokkeerd (afgelopen dag).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection heeft <b>%s %d keer in %s en %d andere apps</b> geblokkeerd (afgelopen dag).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection heeft <b>%1$s %2$d keer in %3$s</b> geblokkeerd (afgelopen dag).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection heeft <b>%1$s %2$d keer in %3$s en 1 andere app</b> geblokkeerd (afgelopen dag).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[App Tracking Protection heeft <b>%1$s %2$d keer in %3$s en %4$d andere apps</b> geblokkeerd (afgelopen dag).]]></string>
 
     <!-- App Tracking Protection Weekly Notification -->
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[App Tracking Protection heeft <b>%d trackingpoging in %s</b> geblokkeerd (afgelopen week).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[App Tracking Protection heeft <b>%d trackingpoging in %s</b> en 1 andere app geblokkeerd (afgelopen week).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[App Tracking Protection heeft <b>%d trackingpoging in %s</b> en %d andere apps geblokkeerd (afgelopen week).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[App Tracking Protection heeft <b>%d trackingpogingen in %s</b> geblokkeerd (afgelopen week).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[App Tracking Protection heeft <b>%d trackingpogingen in %s</b> en 1 andere app geblokkeerd (afgelopen week).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection heeft <b>%d trackingpogingen in %s</b> en %d andere apps geblokkeerd (afgelopen week).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection heeft <b>%1$d trackingpoging in %2$s</b> geblokkeerd (afgelopen week).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection heeft <b>%1$d trackingpoging in %2$s</b> en 1 andere app geblokkeerd (afgelopen week).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[App Tracking Protection heeft <b>%1$d trackingpoging in %2$s</b> en %3$d andere apps geblokkeerd (afgelopen week).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection heeft <b>%1$d trackingpogingen in %2$s</b> geblokkeerd (afgelopen week).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection heeft <b>%1$d trackingpogingen in %2$s</b> en 1 andere app geblokkeerd (afgelopen week).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[App Tracking Protection heeft <b>%1$d trackingpogingen in %2$s</b> en %3$d andere apps geblokkeerd (afgelopen week).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[App Tracking Protection heeft <b>%s in %d app, %s,</b> geblokkeerd (afgelopen week).]]></item>
-        <item quantity="other"><![CDATA[App Tracking Protection heeft <b>%s in %d apps, waaronder %s,</b> geblokkeerd (afgelopen week).]]></item>
+        <item quantity="one"><![CDATA[App Tracking Protection heeft <b>%1$s in %2$d app geblokkeerd, waaronder %3$s</b> (afgelopen week).]]></item>
+        <item quantity="other"><![CDATA[App Tracking Protection heeft <b>%1$s in %2$d apps geblokkeerd, waaronder %3$s</b> (afgelopen week).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">App Tracking Protection inschakelen</string>
 
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[App Tracking Protection heeft <b>%d trackingpoging in %s</b> geblokkeerd (afgelopen uur).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[App Tracking Protection heeft <b>%d trackingpoging in %s</b> en 1 andere app geblokkeerd (afgelopen uur).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[App Tracking Protection heeft <b>%d trackingpoging in %s</b> en %d andere apps geblokkeerd (afgelopen uur).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[App Tracking Protection heeft <b>%d trackingpogingen in %s</b> geblokkeerd (afgelopen uur).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[App Tracking Protection heeft <b>%d trackingpogingen in %s</b> en 1 andere app geblokkeerd (afgelopen uur).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection heeft <b>%d trackingpogingen in %s</b> en %d andere apps geblokkeerd (afgelopen uur).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection heeft <b>%1$d trackingpoging in %2$s</b> geblokkeerd (afgelopen uur).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[App Tracking Protection heeft <b>%1$d trackingpoging in %2$s en 1 andere app</b> geblokkeerd (afgelopen uur).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[App Tracking Protection heeft <b>%1$d trackingpoging in %2$s en %3$d andere apps</b> geblokkeerd (afgelopen uur).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection heeft <b>%1$d trackingpogingen in %2$s</b> geblokkeerd (afgelopen uur).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[App Tracking Protection heeft <b>%1$d trackingpogingen in %2$s en 1 andere apps</b> geblokkeerd (afgelopen uur).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[App Tracking Protection heeft <b>%1$d trackingpogingen in %2$s en %3$d andere apps</b> geblokkeerd (afgelopen uur).]]></string>
 
     <!-- App Tracking Protection Privacy Report -->
     <string name="atp_PrivacyReportEnabledTooltip">App Tracking Protection is ingeschakeld en blokkeert trackers op het hele apparaat</string>
@@ -105,7 +104,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">App Tracking Protection inschakelen</string>
     <string name="atp_OnboardingLastPageOneTitle">Eén eenvoudige stap voor meer privacy in apps!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">We hebben ontdekt dat <b>meer dan 96% van de populaire gratis apps</b> andere bedrijven toestaat om je persoonlijke gegevens bij te houden, zelfs terwijl je slaapt.\n\nBekijk welke apps <b>we hebben betrapt op het laten volgen door andere bedrijven</b> en neem de controle terug!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle" formatted="false">We hebben ontdekt dat <b>meer dan 96% van de populaire gratis apps</b> andere bedrijven toestaat om je persoonlijke gegevens bij te houden, zelfs terwijl je slaapt.\n\nBekijk welke apps <b>we hebben betrapt op het laten volgen door andere bedrijven</b> en neem de controle terug!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Hoe werkt het?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>detecteert en blokkeert apptrackers van andere bedrijven</b>, zoals wanneer Facebook je probeert te volgen in een gezondheidsapp.\n\n<b>Het is gratis</b> en je kunt je apps op dezelfde manier blijven gebruiken. Doordat het op de achtergrond werkt, <b>word je dag en nacht beschermd.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Wie zien jouw gegevens?</string>
@@ -116,7 +115,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Bescherming tegen app-tracking</string>
-    <string name="atp_daxOnboardingIntroMessage">Via meer dan 96% van de populaire gratis apps kunnen andere bedrijven je volgen, zelfs als je je telefoon niet gebruikt. App Tracking Protection detecteert en blokkeert deze trackingpogingen.</string>
+    <string name="atp_daxOnboardingIntroMessage" formatted="false">Via meer dan 96% van de populaire gratis apps kunnen andere bedrijven je volgen, zelfs als je je telefoon niet gebruikt. App Tracking Protection detecteert en blokkeert deze trackingpogingen.</string>
     <string name="atp_daxOnboardingPermissionTitle">Hoe werkt het?</string>
     <string name="atp_daxOnboardingPermissionMessage">App Tracking Protection is geen VPN. Maar je apparaat zal het wel voor een VPN aanzien. Dit komt omdat er een lokale VPN-verbinding gebruikt wordt. Er wordt geen app-gegevens naar een externe server gestuurd. <annotation type="learn_more_link">Meer informatie</annotation></string>
 
@@ -144,7 +143,7 @@
     <string name="atp_ExcludeAppsManuallyCTACancel">Annuleren</string>
     <string name="atp_ExcludeAppsManuallyCTAEnable">Inschakelen</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Herstellen</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Handmatig beveiliging inschakelen voor %s-app?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Handmatig beveiliging inschakelen voor %1$s-app?</string>
     <string name="atp_ExcludeAppsManuallyEnableAppLabel">Het is bekend dat deze app problemen ondervindt wanneer trackingpogingen mislukken.</string>
     <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Site-inhoud in deze app wordt mogelijk niet correct weergegeven als de beveiliging is ingeschakeld.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Als je de bescherming inschakelt, wordt de naam van de app naar DuckDuckGo gestuurd.</string>
@@ -165,7 +164,7 @@
     <!--  Breakage report app list  -->
     <string name="atp_ReportBreakageAppListActivityTitle">Een probleem melden</string>
     <string name="atp_ReportBreakageAppFeature"><b>Selecteer de app waarmee je een probleem ondervindt</b>. Je feedback helpt ons echt!\n\nHeb je algemene feedback over App Tracking Protection? Gebruik dan <annotation type="use_this_form_link">dit formulier</annotation>.</string>
-    <string name="atp_ReportBreakageAppEntry">%s-app</string>
+    <string name="atp_ReportBreakageAppEntry" instruction="Placeholder is the name of an app">%1$s-app</string>
     <string name="atp_ReportBreakageAppSubmitCta">Verzend</string>
     <string name="atp_ReportBreakageAppNextCta">Volgende</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Beschrijf wat er gebeurt, wat je verwachtte dat er zou gebeuren en de stappen die tot het probleem hebben geleid.</string>
@@ -192,7 +191,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Over apptrackers</string>
     <string name="atp_ProfilingInfoTitle">Wat zijn apptrackers?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Je hebt vast wel eens gehoord dat bedrijven als Google en Facebook je achter de schermen volgen op websites van derden. Maar wist je dat ze ook je persoonlijke gegevens bijhouden via apps op je apparaat?\n\n<b>Meer dan 96\\% van de 100 populaire gratis Android-apps</b> die we hebben getest, bevatten verborgen trackers van derden. Daarvan stuurde 87\\% gegevens naar Google en 68\\% naar Facebook. Dat gebeurt zelfs als je je apparaat niet gebruikt.\n\n<b>Trackers in apps kunnen toegang hebben tot veel meer informatie</b> dan websitetrackers, zoals je locatie (tot op de verdieping nauwkeurig), hoe vaak je games speelt op je werk en wanneer en hoe lang je elke dag slaapt. <b>Zelfs als je bijvoorbeeld geen Google- of Facebook-account hebt, kunnen ze toch gegevens over je verzamelen via apps.</b>Trackingnetwerken zoals Facebook en Google gebruiken deze kleine stukjes informatie <b>om een digitaal profiel over je op te bouwen.</b> Hiermee kunnen trackingnetwerken manipuleren wat je online ziet en kunnen adverteerders toegang tot jou kopen op basis van je gegevens.\n\nTrackers in apps vormen een groot probleem voor de privacy. <b>Maar DuckDuckGo heeft een oplossing die kan helpen.</b>Door App Tracking Protection in te schakelen in de DuckDuckGo Privacy Browser-app, kun je veel trackers in andere apps op je apparaat blokkeren. Tegelijkertijd blokkeert de DuckDuckGo-app trackers die we tijdens het browsen op websites vinden. <b>Dankzij deze dubbele beschermingslaag komen trackingbedrijven minder over je te weten</b>, zodat je je apps onbezorgd kunt gebruiken.</string>
+    <string name="atp_ProfilingInfoFirstParagraph" formatted="false">Je hebt vast wel eens gehoord dat bedrijven als Google en Facebook je achter de schermen volgen op websites van derden. Maar wist je dat ze ook je persoonlijke gegevens bijhouden via apps op je apparaat?\n\n<b>Meer dan 96\\% van de 100 populaire gratis Android-apps</b> die we hebben getest, bevatten verborgen trackers van derden. Daarvan stuurde 87\\% gegevens naar Google en 68\\% naar Facebook. Dat gebeurt zelfs als je je apparaat niet gebruikt.\n\n<b>Trackers in apps kunnen toegang hebben tot veel meer informatie</b> dan websitetrackers, zoals je locatie (tot op de verdieping nauwkeurig), hoe vaak je games speelt op je werk en wanneer en hoe lang je elke dag slaapt. <b>Zelfs als je bijvoorbeeld geen Google- of Facebook-account hebt, kunnen ze toch gegevens over je verzamelen via apps.</b>Trackingnetwerken zoals Facebook en Google gebruiken deze kleine stukjes informatie <b>om een digitaal profiel over je op te bouwen.</b> Hiermee kunnen trackingnetwerken manipuleren wat je online ziet en kunnen adverteerders toegang tot jou kopen op basis van je gegevens.\n\nTrackers in apps vormen een groot probleem voor de privacy. <b>Maar DuckDuckGo heeft een oplossing die kan helpen.</b>Door App Tracking Protection in te schakelen in de DuckDuckGo Privacy Browser-app, kun je veel trackers in andere apps op je apparaat blokkeren. Tegelijkertijd blokkeert de DuckDuckGo-app trackers die we tijdens het browsen op websites vinden. <b>Dankzij deze dubbele beschermingslaag komen trackingbedrijven minder over je te weten</b>, zodat je je apps onbezorgd kunt gebruiken.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Afgelopen 7 dagen</string>
@@ -215,7 +214,7 @@
         <![CDATA[%1$d trackingpogingen geblokkeerd van 1 bedrijf in <b>%2$s</b>-app]]>
     </string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
-        <![CDATA[%1$d trackingpogingen geblokkeerd van %2$d bedrijven in <b>%3$s</b>-app]]>
+        <![CDATA[%1$d trackingpogingen geblokkeerd van %2$d bedrijven in <b>%3$s</b> app]]>
     </string>
 
     <string name="atp_ActivityEmptyListTitle">Geen nieuwe activiteit</string>
@@ -280,15 +279,15 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%d poging. Wat er wordt verzameld:</item>
-        <item quantity="other">%d pogingen. Wat er wordt verzameld:</item>
+        <item quantity="one">%1$d poging. Wat er wordt verzameld:</item>
+        <item quantity="other">%1$d pogingen. Wat er wordt verzameld:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">%d trackingpoging geblokkeerd</item>
-        <item quantity="other">%d trackingpogingen geblokkeerd</item>
+        <item quantity="one">%1$d trackingpoging geblokkeerd</item>
+        <item quantity="other">%1$d trackingpogingen geblokkeerd</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Een probleem met deze app melden</string>
-    <string name="atp_CompanyDetailsTrackingShowMore">Laat nog %d zien</string>
+    <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Nog %1$d weergeven</string>
     <string name="atp_CompanyDetailsTrackingLearnMore">Apps kunnen trackers van andere bedrijven gebruiken voor zaken als analyse en marketing. Als we ze niet blokkeren, kunnen deze trackers nog gedetailleerdere digitale profielen over je opbouwen. <annotation type="learn_more_link">Meer informatie.</annotation></string>
     <string name="atp_CompanyDetailsTrackingShowLess">Toon minder</string>
     <string name="atp_CompanyDetailsAppInfoPanel">Bescherming is momenteel uitgeschakeld voor deze app. Als App Tracking Protection een probleem veroorzaakt, <annotation type="report_issues_link">meld dit probleem dan</annotation></string>
