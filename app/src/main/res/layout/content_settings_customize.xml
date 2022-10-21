@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:id="@+id/settingsCustomizeTitle"
-        android:text="@string/settingsHeadingCustomize"/>
+        app:titleText="@string/settingsHeadingCustomize"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/sitePermissions"

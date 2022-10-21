@@ -40,7 +40,7 @@
                 android:id="@+id/privacyAuditTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auditSettingsScreenPrivacyAuditSection"/>
+                app:titleText="@string/auditSettingsScreenPrivacyAuditSection"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/step1"
@@ -67,7 +67,7 @@
                 android:id="@+id/refTestsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auditSettingsScreenRefTestsSection"/>
+                app:titleText="@string/auditSettingsScreenRefTestsSection"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/requestBlocking"

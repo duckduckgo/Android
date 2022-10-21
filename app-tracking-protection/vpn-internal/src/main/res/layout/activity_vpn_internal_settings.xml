@@ -68,7 +68,7 @@
                 android:id="@+id/sectionConfigTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Config"
+                app:titleText="Config"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -121,7 +121,7 @@
                 android:id="@+id/sectionTrackersTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Trackers"
+                app:titleText="Trackers"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -161,7 +161,7 @@
                 android:id="@+id/sectionAppProtection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="App Protections"
+                app:titleText="App Protections"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -192,7 +192,7 @@
                 android:id="@+id/sectionTrackersLogging"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Logging"
+                app:titleText="Logging"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -213,7 +213,7 @@
                 android:id="@+id/sectionDiagnosticsTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Diagnostics"
+                app:titleText="Diagnostics"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -233,7 +233,7 @@
                 android:id="@+id/sectionHealthTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Health"
+                app:titleText="Health"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem

@@ -40,7 +40,7 @@
                 android:id="@+id/generalTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/devSettingsScreenGeneralSection"/>
+                app:titleText="@string/devSettingsScreenGeneralSection"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                     android:id="@+id/enableAppStartupTrace"
@@ -68,7 +68,7 @@
                 android:id="@+id/privacyTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/devSettingsScreenPrivacySection"/>
+                app:titleText="@string/devSettingsScreenPrivacySection"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                     android:id="@+id/nextTdsEnabled"
@@ -87,7 +87,7 @@
                 android:id="@+id/userAgentTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/devSettingsScreenUserAgentSection"/>
+                app:titleText="@string/devSettingsScreenUserAgentSection"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                     android:id="@+id/overrideUserAgentToggle"

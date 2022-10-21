@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingStart="@dimen/keyline_4"
-        android:text="Horizontal divider (Full Width)"/>
+        app:titleText="Horizontal divider (Full Width)"/>
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingStart="@dimen/keyline_4"
-        android:text="Horizontal divider (Not Full Width)"/>
+        app:titleText="Horizontal divider (Not Full Width)"/>
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingStart="@dimen/keyline_4"
-        android:text="Horizontal divider (Custom margins)"/>
+        app:titleText="Horizontal divider (Custom margins)"/>
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
         android:layout_width="match_parent"
         android:paddingTop="@dimen/keyline_5"
         android:paddingStart="@dimen/keyline_4"
-        android:text="Vertical divider"/>
+        app:titleText="Vertical divider"/>
 
     <LinearLayout
         android:layout_height="wrap_content"

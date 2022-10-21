@@ -34,7 +34,7 @@
         <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Typography"/>
+            app:titleText="Typography"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -129,7 +129,7 @@
         <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Typography Set Manually"/>
+            app:titleText="Typography Set Manually"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/typographyTitle"
@@ -143,7 +143,7 @@
         <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Legacy Typography"/>
+            app:titleText="Legacy Typography"/>
 
         <TextView
             android:layout_width="match_parent"

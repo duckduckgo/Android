@@ -32,7 +32,7 @@
         <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Dialogs"
+            app:titleText="Dialogs"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
@@ -74,7 +74,7 @@
         <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Bottom Sheet Dialogs"
+            app:titleText="Bottom Sheet Dialogs"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
@@ -118,7 +118,7 @@
             android:id="@+id/label"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Dax Dialogs"
+            app:titleText="Dax Dialogs"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>

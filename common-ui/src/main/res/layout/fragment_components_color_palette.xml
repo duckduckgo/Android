@@ -32,7 +32,7 @@
         <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Base Palette"/>
+            app:titleText="Base Palette"/>
 
         <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"

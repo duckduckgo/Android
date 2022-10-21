@@ -59,8 +59,8 @@
                     android:padding="@dimen/keyline_4"
                     android:paddingStart="@dimen/keyline_4"
                     android:paddingEnd="@dimen/keyline_4"
-                    android:text="@string/accessibilityFontSizeTitle"
-                    tools:text="Text goes here"/>
+                    app:titleText="@string/accessibilityFontSizeTitle"
+                    tools:titleText="Text goes here"/>
 
                 <LinearLayout
                         android:layout_width="match_parent"

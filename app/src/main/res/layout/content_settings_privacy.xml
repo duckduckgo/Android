@@ -30,7 +30,7 @@
         android:id="@+id/settingsPrivacyTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settingsHeadingPrivacy"/>
+        app:titleText="@string/settingsHeadingPrivacy"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/globalPrivacyControlSetting"

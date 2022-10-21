@@ -30,7 +30,7 @@
         android:id="@+id/label"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:text="Info Panel"
+        app:titleText="Info Panel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 

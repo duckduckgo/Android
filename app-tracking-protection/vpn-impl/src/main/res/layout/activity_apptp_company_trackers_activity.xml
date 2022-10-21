@@ -55,7 +55,7 @@
                 android:layout_width="match_parent"
                 android:paddingTop="@dimen/keyline_4"
                 android:paddingBottom="@dimen/keyline_2"
-                tools:text="9 tracking attempts blocked"/>
+                tools:titleText="9 tracking attempts blocked"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/activity_recycler_view"

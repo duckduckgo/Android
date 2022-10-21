@@ -21,11 +21,11 @@
                                                    android:paddingTop="@dimen/keyline_5">
 
     <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-        android:id="@+id/label"
+        android:id="@+id/oneLineListTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Single Line Items"
-        android:paddingStart="@dimen/keyline_4"
+        app:titleText="Single Line Items"
+        app:showOverflowMenu="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -36,7 +36,7 @@
         android:layout_marginTop="@dimen/keyline_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListTitle"
         app:primaryText="This is a simple item "/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem

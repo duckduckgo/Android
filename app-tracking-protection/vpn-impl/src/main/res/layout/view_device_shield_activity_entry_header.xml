@@ -26,5 +26,5 @@
     android:paddingTop="15dp"
     android:paddingEnd="0dp"
     android:paddingBottom="16dp"
-    tools:text="Yesterday"
+    tools:titleText="Yesterday"
 />

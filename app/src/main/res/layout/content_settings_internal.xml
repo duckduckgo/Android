@@ -35,7 +35,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settingsInternalSectionBottomDivider"
-        android:text="Internal Features"/>
+        app:titleText="Internal Features"/>
 
     <LinearLayout
         android:id="@+id/settingsInternalFeaturesContainer"

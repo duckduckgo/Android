@@ -30,7 +30,7 @@
         android:id="@+id/label"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:text="Buttons"
+        app:titleText="Buttons"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -87,7 +87,7 @@
     <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Deprecated Button"
+        app:titleText="Deprecated Button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
