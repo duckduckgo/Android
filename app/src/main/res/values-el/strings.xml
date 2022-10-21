@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- smartling.placeholder_format = NONE -->
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo</string>
     <string name="duckDuckGoLogoDescription">Λογότυπο DuckDuckGo</string>
@@ -62,8 +61,8 @@
     <string name="printMenuTitle">Εκτύπωση σελίδας</string>
     <string name="favoriteDeleteConfirmationMessage">Το Αγαπημένο αφαιρέθηκε</string>
     <string name="fireproofDeleteConfirmationMessage">Η διαγραφή δραστηριότητας αφαιρέθηκε</string>
-    <string name="privacyProtectionEnabledConfirmationMessage">Η Προστασία προσωπικών δεδομένων ενεργοποιήθηκε για την εφαρμογή %s</string>
-    <string name="privacyProtectionDisabledConfirmationMessage">Η Προστασία προσωπικών δεδομένων απενεργοποιήθηκε για την εφαρμογή %s</string>
+    <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Η προστασία απορρήτου ενεργοποιήθηκε για %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Η προστασία απορρήτου απενεργοποιήθηκε για %1$s</string>
     <string name="undoSnackbarAction">Αναίρεση</string>
 
     <!-- Downloading files -->
@@ -115,7 +114,7 @@
     <string name="privacyProtectionEnabled">ΕΝΕΡΓΟΠΟΙΗΣΗ ΤΗΣ ΠΡΟΣΤΑΣΙΑΣ ΤΟΥ ΙΣΤΟΤΟΠΟΥ</string>
     <string name="privacyProtectionDisabled">ΑΠΕΝΕΡΓΟΠΟΊΗΣΗ ΤΗΣ ΠΡΟΣΤΑΣΙΑΣ ΤΟΥ ΙΣΤΟΤΟΠΟΥ</string>
     <string name="privacyDashboardActivityTitle">Πίνακας εργαλείων ιδιωτικότητας</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ΒΕΛΤΙΩΘΗΚΕ ΑΠΟ <img src="%d"></img> ΣΕ <img src="%d"></img></string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ΒΕΛΤΙΩΘΗΚΕ ΑΠΟ &lt;img src=\"%1$d\" /&gt; ΣΕ &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Βαθμολογία ιδιωτικότητας</string>
     <string name="privacyProtectionTemporarilyDisabled">Απενεργοποιήσαμε προσωρινά την Προστασία προσωπικών δεδομένων καθώς φαίνεται ότι ρίχνει τον ιστότοπο.</string>
 
@@ -158,7 +157,7 @@
 
     <string name="trackersBlockedNoSectionDescription">Φορτώθηκαν τα αιτήματα του ακόλουθου τομέα.</string>
 
-    <string name="adLoadedSectionDescription">Τα αιτήματα του ακόλουθου τομέα φορτώθηκαν επειδή έγινε πρόσφατα κλικ σε μια διαφήμιση %s στο DuckDuckGo. Τα αιτήματα αυτά βοηθούν στην αξιολόγηση της αποτελεσματικότητας των διαφημίσεων. Καμία διαφήμιση στο DuckDuckGo δεν σκιαγραφεί προφίλ.</string>
+    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Τα αιτήματα του ακόλουθου τομέα φορτώθηκαν επειδή έγινε πρόσφατα κλικ σε μια διαφήμιση %1$s στο DuckDuckGo. Τα αιτήματα αυτά βοηθούν στην αξιολόγηση της αποτελεσματικότητας των διαφημίσεων. Καμία διαφήμιση στο DuckDuckGo δεν σκιαγραφεί προφίλ.</string>
     <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Πώς επηρεάζουν οι διαφημίσεις αναζήτησης τις προστασίες μας</annotation></string>
     <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
 
@@ -167,7 +166,7 @@
     <string name="domainsLoadedSectionEmptyListDescription">Δεν εντοπίσαμε αιτήματα από τομείς τρίτων μερών.</string>
 
     <string name="domainsLoadedBreakageSectionDescription">Τα αιτήματα του ακόλουθου τομέα φορτώθηκαν για να αποφευχθεί η διακοπή της λειτουργίας του ιστότοπου.</string>
-    <string name="domainsLoadedAssociatedSectionDescription">Τα αιτήματα του ακόλουθου τομέα φορτώθηκαν επειδή σχετίζονται με το %s.</string>
+    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Τα αιτήματα του ακόλουθου τομέα φορτώθηκαν επειδή σχετίζονται με την εταιρεία %1$s.</string>
 
     <string name="trackersBlockedText">Αιτήματα που αποκλείστηκαν από τη φόρτωση</string>
     <string name="trackersNotBlockedText">Δεν αποκλείστηκαν αιτήματα παρακολούθησης</string>
@@ -258,8 +257,8 @@
     <string name="bookmarksMenuTitle">Σελιδοδείκτες</string>
     <string name="bookmarksActivityTitle">Σελιδοδείκτες</string>
     <string name="noBookmarks">Δεν προστέθηκαν σελιδοδείκτες ακόμα</string>
-    <string name="bookmarkOverflowContentDescription">Περισσότερες επιλογές για τον σελιδοδείκτη %s</string>
-    <string name="bookmarkDeleteConfirmationMessage">Διαγράφηκε <b>%s</b></string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Περισσότερες επιλογές για σελιδοδείκτη %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Διαγράφηκε &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Εξαγωγή</string>
     <string name="exportBookmarksEmpty">Δεν έχετε σελιδοδείκτες, οπότε δεν θα εξαχθεί κάτι</string>
     <string name="exportBookmarksError">Δεν ήταν δυνατή η εξαγωγή σελιδοδεικτών, κάτι πήγε λάθος</string>
@@ -305,7 +304,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Προσθήκη στην Αρχική Οθόνη</string>
-    <string name="shortcutAddedText">Επιτυχία! Το %s έχει προστεθεί στην αρχική οθόνη σας.</string>
+    <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Επιτυχία! Το %1$s έχει προστεθεί στην αρχική οθόνη σας.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Βοηθήστε μας να βελτιώσουμε την εφαρμογή!</string>
@@ -363,14 +362,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Προστατεύουμε την ιδιωτικότητά σας</string>
     <string name="privacyProtectionNotificationReportTitle">Η αναφορά ιδιωτικότητάς σας</string>
     <string name="privacyProtectionNotificationDefaultDescription">Η χρήση της εφαρμογής DuckDuckGo προστατεύει τα δεδομένα σας αποκλείοντας παρακολουθήσεις και κρυπτογραφώντας συνδέσεις.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Προστατεύσατε τα δεδομένα σας διασφαλίζοντας %d μη κρυπτογραφημένες συνδέσεις κατά τη χρήση του DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Προστατεύσατε τα δεδομένα σας αποκλείοντας %d εφαρμογές παρακολούθησης κατά τη χρήση του DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription">Προστατεύσατε τα δεδομένα σας αποκλείοντας %d εφαρμογές παρακολούθησης και διασφαλίζοντας %d μη κρυπτογραφημένες συνδέσεις κατά τη χρήση του DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Προστατεύσατε τα δεδομένα σας διασφαλίζοντας %1$d μη κρυπτογραφημένες συνδέσεις κατά τη χρήση του DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Προστατεύσατε τα δεδομένα σας αποκλείοντας %1$d παρακολουθήσεις κατά τη χρήση του DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Προστατεύσατε τα δεδομένα σας αποκλείοντας %1$d παρακολουθήσεις και διασφαλίζοντας %2$d μη κρυπτογραφημένες συνδέσεις κατά τη χρήση του DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Συνέχιση περιήγησης</string>
 
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Είσοδος</string>
-    <string name="authenticationDialogMessage">Το %s απαιτεί ένα όνομα χρήστη και κωδικό πρόσβασης.</string>
+    <string name="authenticationDialogMessage" instruction="Placeholder is the name of a website">Το %1$s απαιτεί ένα όνομα χρήστη και κωδικό πρόσβασης.</string>
     <string name="authenticationDialogPositiveButton">Είσοδος</string>
     <string name="authenticationDialogNegativeButton">Ακύρωση</string>
     <string name="authenticationDialogUsernameHint">Όνομα χρήστη</string>
@@ -486,20 +485,20 @@
     <string name="daxEndCtaText"><![CDATA[Το έχετε! <br/><br/>Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου μια ανατριχιαστική διαφήμιση χάνει τα φτερά της. 👍]]></string>
     <string name="daxSerpCtaText">Οι αναζητήσεις σας στο DuckDuckGo είναι ανώνυμες. Πάντα. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ και <b>%d άλλος</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
-        <item quantity="other"><![CDATA[ και <b>%d άλλοι</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
+        <item quantity="one"><![CDATA[ και <b>%1$d άλλος</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
+        <item quantity="other"><![CDATA[ και <b>%1$d άλλοι</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ προσπαθούσε να σας παρακολουθήσει εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
         <item quantity="other"><![CDATA[ προσπαθούσαν να σας παρακολουθήσει εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Καθώς πιέζετε και μετακινείτε τον δρομέα, θα μπλοκάρω ενοχλητικούς ιχνηλάτες. <br/><br/> Εμπρός - συνεχίστε την περιήγηση!]]></string>
-    <string name="daxMainNetworkCtaText">Προσοχή! Δεν μπορώ να εμποδίσω την εταιρεία %s από το να δει τη δραστηριότητά σας στον ιστότοπο %s <br></br><br></br>.Αλλά περιηγηθείτε μαζί μου και θα μπορώ να περιορίσω το τι θα γνωρίζει η εταιρεία %s για σας συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησης σε πλήθος άλλων ιστότοπων.</string>
-    <string name="daxMainNetworkOwnedCtaText">Προσοχή! Επειδή το %s κατέχει %s, δεν μπορώ να τους εμποδίσω από το να δουν τη δραστηριότητά σας εδώ.<br></br><br></br>Αλλά περιηγηθείτε μαζί μου και θα μπορώ να περιορίσω το τι θα γνωρίζει το δίκτυο %s για εσάς συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησης σε πλήθος άλλων ιστότοπων.</string>
+    <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Προσοχή! Δεν μπορώ να εμποδίσω το δίκτυο %1$s από το να δει τη δραστηριότητά σας στο %2$s.\n\nΑλλά περιηγηθείτε μαζί μου και θα μπορώ να περιορίσω το τι θα γνωρίζει το δίκτυο %3$s για σας συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησης σε πλήθος άλλων ιστότοπων.</string>
+    <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Προσοχή! Επειδή το %1$s κατέχει %2$s, δεν μπορώ να τους εμποδίσω από το να δουν τη δραστηριότητά σας εδώ.&lt;br/&gt;&lt;br/&gt;Αλλά περιηγηθείτε μαζί μου και μπορώ να περιορίσω τι θα γνωρίζει το %3$s για εσάς συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησής τους σε πλήθος άλλων ιστότοπων.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Αποθήκευση στις λήψεις</string>
-    <string name="downloadConfirmationSaveFileTitle">Εξοικονομήστε %1$s</string>
+    <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Αποθήκευση %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Κρατήστε και τα δύο</string>
     <string name="downloadConfirmationReplaceOldFileText">Αντικατάσταση</string>
     <string name="downloadConfirmationOpenFileText">΄Άνοιγμα</string>
@@ -527,8 +526,8 @@
     <string name="whitelistActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
     <string name="enablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="disablePrivacyProtection">Απενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
-    <string name="whitelistEntryOverflowContentDescription">Περισσότερες επιλογές για τον μη προστατευόμενο ιστότοπο %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Θέλετε σίγουρα να καταργήσετε το <b>%s</b> από τους Μη προστατευόμενους ιστότοπους;</string>
+    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Περισσότερες επιλογές για τον μη προστατευόμενο ιστότοπο %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Είστε βέβαιοι ότι θέλετε να καταργήσετε το &lt;b&gt;%1$s&lt;/b&gt; από τους Μη προστατευόμενους ιστότοπους;</string>
     <string name="whitelistExplanation">Οι ιστότοποι αυτοί δεν θα ενισχυθούν από την Προστασία προσωπικών δεδομένων.</string>
     <string name="whitelistNoEntries">Η προστασία προσωπικών δεδομένων είναι ενεργοποιημένη για όλους τους ιστότοπους</string>
     <string name="whitelistDomainHint">www.example.com</string>
@@ -541,12 +540,12 @@
     <string name="fireproofWebsitesActivityTitle">Ασφαλείς ιστότοποι</string>
     <string name="settingsFireproofWebsites">Ασφαλείς ιστότοποι</string>
     <string name="fireproofWebsiteMenuTitleAdd">Διαγράψτε τη δραστηριότητα γι\' αυτόν τον ιστότοπο</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">Το <b>%s</b> είναι πλέον ασφαλές</string>
+    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">Το &lt;b&gt;%1$s&lt;/b&gt; είναι πλέον ασφαλές</string>
     <string name="fireproofWebsiteSnackbarAction">Αναίρεση</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Θέλετε σίγουρα να διαγράψετε το <b>%s</b>;</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage" instruction="Placeholder is a website">Είστε βέβαιοι ότι θέλετε να διαγράψετε το &lt;b&gt;%1$s&lt;/b&gt;;</string>
     <string name="fireproofWebsiteFeatureDescription">Οι ιστότοποι βασίζονται σε cookies για να σας διατηρούν συνδεδεμένους. Όταν ενεργοποιείτε τη διαγραφή δραστηριότητας για έναν ιστότοπο, τα cookies δεν διαγράφονται και παραμένετε συνδεδεμένοι, ακόμα και μετά τη χρήση του Κουμπιού διαγραφής δραστηριότητας. Εξακολουθούμε να αποκλείουμε εφαρμογές παρακολούθησης από τρίτους που υπάρχουν σε ιστότοπους με διαγραφή δραστηριότητας.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Περισσότερες επιλογές για ασφαλή ιστότοπο %s</string>
-    <string name="fireproofWebsiteLoginDialogTitle">Θα θέλατε να ενεργοποιήσετε τη διαγραφή δραστηριότητας για το %s;</string>
+    <string name="fireproofWebsiteOverflowContentDescription" instruction="Placeholder is a website">Περισσότερες επιλογές για ασφαλή ιστότοπο %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">Θα θέλατε να ενεργοποιήσετε τη διαγραφή δραστηριότητας για το %1$s;</string>
     <string name="fireproofWebsiteLoginDialogDescription">Ενεργοποιώντας τη διαγραφή δραστηριότητας για αυτόν τον ιστότοπο, θα παραμείνετε συνδεδεμένοι μετά τη χρήση του Κουμπιού διαγραφής δραστηριότητας.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Διαγραφή δραστηριότητας</string>
     <string name="fireproofWebsiteLoginDialogNegative">Όχι τώρα</string>
@@ -554,7 +553,7 @@
     <string name="fireproofWebsiteEmptyListHint">Δεν υπάρχουν ακόμα ιστότοποι στη λίστα διαγραφής δραστηριότητας</string>
     <string name="fireproofWebsiteSettingSelectionTitle">Ασφαλείς ιστότοποι από τη σύνδεση</string>
     <string name="fireproofWebsiteRemoveAllConfirmation">Αφαίρεση διαγραφής δραστηριότητας για όλους τους ιστότοπους</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Η διαγραφή δραστηριότητας αφαιρέθηκε για το <b>%s</b></string>
+    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Η διαγραφή δραστηριότητας αφαιρέθηκε για το &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Να γίνεται ερώτηση κάθε φορά</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Πάντα</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Ποτέ</string>
@@ -583,11 +582,11 @@
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Ενεργοποίηση της τοποθεσίας συσκευής για το DuckDuckGo Privacy Browser;</string>
-    <string name="preciseLocationSystemDialogSubtitle">Η εφαρμογή %s ζητάει την τοποθεσία της συσκευής σας. Αρχικά, θα πρέπει να επιτρέψετε στην εφαρμογή να στείλει την τοποθεσία της συσκευής σας και έπειτα η εφαρμογή %s μπορεί να ζητήσει άδεια.</string>
+    <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">Η εφαρμογή %1$s ζητάει την τοποθεσία της συσκευής σας. Αρχικά, θα πρέπει να επιτρέψετε στην εφαρμογή να στείλει την τοποθεσία της συσκευής σας και έπειτα η εφαρμογή %2$s μπορεί να ζητήσει άδεια.</string>
     <string name="preciseLocationSystemDialogAllow">Ενεργοποίηση</string>
     <string name="preciseLocationSystemDialogDeny">Ίσως αργότερα</string>
     <string name="preciseLocationSystemDialogNeverAllow">Να μην γίνει ξανά ερώτηση γι\' αυτόν τον ιστότοπο</string>
-    <string name="preciseLocationSiteDialogTitle">Εκχώρηση άδειας στην εφαρμογή %s για πρόσβαση στην τοποθεσία;</string>
+    <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Εκχώρηση άδειας στην εφαρμογή %1$s για πρόσβαση στην τοποθεσία;</string>
     <string name="preciseLocationDDGDialogSubtitle">Χρησιμοποιούμε την ανώνυμη τοποθεσία σας αποκλειστικά και μόνο για να προσφέρουμε καλύτερα αποτελέσματα, πιο κοντά σε σας. Μπορείτε πάντα να αλλάξετε γνώμη αργότερα.</string>
     <string name="preciseLocationSiteDialogSubtitle">Μπορείτε να διαχειριστείτε τα δικαιώματα πρόσβασης τοποθεσίας που έχετε εκχωρήσει σε μεμονωμένους ιστότοπους από τις Ρυθμίσεις.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Πάντα</string>
@@ -599,11 +598,11 @@
     <string name="preciseLocationEmptyListHint">Δεν εκχωρήθηκε σε κανέναν ιστότοπο δικαίωμα πρόσβασης στην τοποθεσία</string>
     <string name="preciseLocationNoSystemPermission">Για να διαχειριστείτε τα δικαιώματα πρόσβασης τοποθεσίας που έχετε εκχωρήσει σε μεμονωμένους ιστότοπους, ενεργοποιήστε την τοποθεσία γι\' αυτή την εφαρμογή από τις Ρυθμίσεις Android.</string>
     <string name="preciseLocationActivityTitle">Τοποθεσία</string>
-    <string name="preciseLocationDeleteConfirmMessage">Θέλετε σίγουρα να διαγράψετε το <b>%s</b>;</string>
-    <string name="preciseLocationDeleteContentDescription">Περισσότερες επιλογές για δικαιώματα τοποθεσίας στον τομέα %s</string>
+    <string name="preciseLocationDeleteConfirmMessage" instruction="Placeholder is the name of a website">Είστε βέβαιοι ότι θέλετε να διαγράψετε το &lt;b&gt;%1$s&lt;/b&gt;;</string>
+    <string name="preciseLocationDeleteContentDescription" instruction="Placeholder is the domain of a website">Περισσότερες επιλογές για δικαιώματα τοποθεσίας στον τομέα %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Εκχωρήθηκε</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Απορρίφθηκε</string>
-    <string name="preciseLocationSnackbarMessage">Προηγουμένως εκχωρήσατε δικαίωμα στην εφαρμογή %s για πρόσβαση στην τοποθεσία της συσκευής σας.</string>
+    <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Προηγουμένως εκχωρήσατε δικαίωμα στην εφαρμογή %1$s για πρόσβαση στην τοποθεσία της συσκευής σας.</string>
 
     <!--Fire button education-->
     <string name="daxClearDataCtaText">Τα προσωπικά δεδομένα μπορούν να αυξηθούν σταδιακά στο πρόγραμμα περιήγησής σας. Απαίσιο. Χρησιμοποιήστε το κουμπί φωτιάς για να τα κάψετε όλα. Δοκιμάστε το τώρα! 👇</string>
@@ -624,14 +623,14 @@
     <string name="appLinkDialogTitle">Άνοιγμα σε άλλη εφαρμογή;</string>
     <string name="appLinkSnackBarAction">Ανοίξτε στην εφαρμογή</string>
     <string name="appLinkMultipleSnackBarAction">Επιλέξτε εφαρμογή</string>
-    <string name="appLinkSnackBarMessage">Μπορείτε να ανοίξετε τον σύνδεσμο αυτό σε %s.</string>
+    <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Μπορείτε να ανοίξετε τον σύνδεσμο αυτό σε %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Μπορείτε να ανοίξετε τον σύνδεσμο αυτό σε άλλες εφαρμογές.</string>
     <string name="appLinkIntentChooserTitle">Ανοίξτε με</string>
     <string name="appLinkMenuItemTitle">Ανοίξτε στην εφαρμογή</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Έγινε αντιγραφή νέας διεύθυνσης στο πρόχειρό σας</string>
-    <string name="autofillTooltipUseYourAlias">Χρησιμοποιήστε το %1$s</string>
+    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Χρησιμοποιήστε τη διεύθυνση %1$s</string>
     <string name="autofillTooltipUseYourAliasDescription">Αποκλείει τις εφαρμογές παρακολούθησης email</string>
     <string name="autofillTooltipGenerateAddress">Δημιουργήστε ιδιωτική Duck Address</string>
     <string name="autofillTooltipGenerateAddressDescription">Αποκλείει εφαρμογές παρακολούθησης email και αποκρύπτει τη διεύθυνσή σας</string>
@@ -658,13 +657,13 @@
     <string name="bookmarkFolderEmpty">Κενό</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%s%s και %d στοιχείο;</item>
-        <item quantity="other">%s%s και %d στοιχεία;</item>
+        <item quantity="one">%1$s%2$s και %1$d αντικείμενο;</item>
+        <item quantity="other">%1$s%2$s και %1$d αντικείμενα;</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
-        <item quantity="one">%d στοιχείο</item>
-        <item quantity="other">%d στοιχεία</item>
+        <item quantity="one">%1$d αντικείμενο</item>
+        <item quantity="other">%1$d αντικείμενα</item>
     </plurals>
 
     <!-- Accessibility-->
@@ -681,7 +680,7 @@
     <string name="settingsPrivacyPolicyDuckduckgo">Πολιτική προστασίας προσωπικών δεδομένων</string>
 
     <!-- Home Screen Widget -->
-    <string name="homeScreenWidgetAdded">Προστέθηκε μικροεφαρμογή %s στην αρχική οθόνη</string>
+    <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Προστέθηκε μικροεφαρμογή %1$s στην αρχική οθόνη</string>
     <string name="settingsAddHomeScreenWidget">Μικροεφαρμογή αρχικής οθόνης</string>
 
     <!-- MacOs Settings -->
@@ -700,9 +699,9 @@
     <string name="downloadsItemMenuDelete">Διαγραφή</string>
     <string name="downloadsItemMenuCancel">Ακύρωση</string>
     <string name="downloadsActivityMenuDeleteAll">Διαγραφή όλων</string>
-    <string name="downloadsFileDeletedMessage">Διαγράφηκε %s</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Διαγράφηκε %1$s</string>
     <string name="downloadsAllFilesDeletedMessage">Διαγράφηκαν όλα τα αρχεία</string>
-    <string name="downloadsMoreOptionsContentDescription">Περισσότερες επιλογές για %s</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Περισσότερες επιλογές για %1$s</string>
     <string name="downloadsUndoActionName">Αναίρεση</string>
     <string name="downloadsStateInProgress">Σε εξέλιξη...</string>
 
@@ -734,13 +733,12 @@
     <string name="sitePermissionsSettingsMicrophone">Μικρόφωνο</string>
     <string name="sitePermissionsSettingsAllowedSitesTitle">Διαχείριση ιστότοπων</string>
     <string name="sitePermissionsSettingsEmptyText">Δεν υπάρχουν ακόμη ιστότοποι</string>
-    <string name="permissionPerWebsiteText">Δικαιώματα για «%s» </string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Δικαιώματα για «%1$s» </string>
     <string name="permissionsPerWebsiteAskSetting">Αιτηθείτε</string>
     <string name="permissionsPerWebsiteDenySetting">Απόρριψη</string>
     <string name="permissionsPerWebsiteAllowSetting">Αποδοχή</string>
-    <string name="permissionsPerWebsiteSelectorDialogTitle">Δικαίωμα %s για %s</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s άδεια για %2$s</string>
 
     <!-- Autofill -->
     <string name="autofillSettingsDisplayName">Αυτόματη συμπλήρωση</string>
-
 </resources>
