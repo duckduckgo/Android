@@ -74,7 +74,10 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity(), PermissionsSettingsS
     private fun setViews() {
         setupToolbar(toolbar)
         supportActionBar?.title = url.websiteFromGeoLocationsApiOrigin()
-        binding.sitePermissionsSectionTitle.titleText = String.format(getString(R.string.permissionPerWebsiteText), url.websiteFromGeoLocationsApiOrigin())
+        binding.sitePermissionsSectionTitle.titleText = String.format(
+            getString(R.string.permissionPerWebsiteText),
+            url.websiteFromGeoLocationsApiOrigin()
+        )
         binding.permissionsPerWebsiteRecyclerView.adapter = adapter
     }
 

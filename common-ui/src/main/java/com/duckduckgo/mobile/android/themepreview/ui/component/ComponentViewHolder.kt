@@ -28,6 +28,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
 import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.google.android.material.snackbar.Snackbar
 
@@ -68,6 +69,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         parent: ViewGroup
     ) : ComponentViewHolder(inflate(parent, R.layout.component_one_line_item)) {
         override fun bind(component: Component) {
+            view.findViewById<SectionHeaderListItem>(R.id.oneLineListTitle).apply {
+                setOverflowMenuClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
+            }
+
             view.findViewById<OneLineListItem>(R.id.oneLineListItem).apply {
                 setClickListener { Snackbar.make(view.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
             }
