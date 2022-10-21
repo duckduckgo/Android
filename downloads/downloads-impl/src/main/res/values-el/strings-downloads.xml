@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Αποτυχία λήψης. Ελέγξτε τη σύνδεση στο διαδίκτυο.</string>
 
     <string name="notificationChannelFileDownloading">Λήψη αρχείου</string>
@@ -25,8 +24,8 @@
 
     <string name="downloadInProgress">Λήψη…</string>
 
-    <string name="downloadsDownloadStartedMessage">Άρχισε η λήψη για το %s</string>
-    <string name="downloadsDownloadFinishedMessage">Ολοκληρώθηκε η λήψη για το %s</string>
+    <string name="downloadsDownloadStartedMessage" instruction="Placeholder is the name of a file">Άρχισε η λήψη για το αρχείο %1$s</string>
+    <string name="downloadsDownloadFinishedMessage" instruction="Placeholder is the name of a file">Ολοκληρώθηκε η λήψη για το αρχείο %1$s</string>
     <string name="downloadsDownloadGenericErrorMessage">Αποτυχία λήψης.</string>
     <string name="downloadsCancel">Ακύρωση</string>
     <string name="downloadsRetry">Επανάληψη</string>
