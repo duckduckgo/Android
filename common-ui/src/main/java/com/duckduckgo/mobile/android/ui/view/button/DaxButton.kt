@@ -47,7 +47,6 @@ open class DaxButton @JvmOverloads constructor(
             Small
         }
 
-
         typedArray.recycle()
 
         val sidePadding = if (buttonSize == Small) {
