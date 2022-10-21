@@ -39,10 +39,13 @@
     <dimen name="toolbarOverflowPadding">10dp</dimen>
 
     <!-- Buttons -->
-    <dimen name="buttonLargeHeight">62dp</dimen>
-    <dimen name="buttonLargeIconSize">24dp</dimen>
+    <dimen name="buttonLargeHeight">60dp</dimen>
     <dimen name="buttonSmallHeight">48dp</dimen>
-    <dimen name="buttonSmallIconSize">16dp</dimen>
+    <dimen name="buttonSmallSidePadding">16dp</dimen>
+    <dimen name="buttonLargeSidePadding">24dp</dimen>
+    <dimen name="buttonSmallTopPadding">8dp</dimen>
+    <dimen name="buttonLargeTopPadding">14dp</dimen>
+    <dimen name="buttonIconPadding">8dp</dimen>
 
     <!-- List Items -->
     <dimen name="listItemImageContainerSize">40dp</dimen>
