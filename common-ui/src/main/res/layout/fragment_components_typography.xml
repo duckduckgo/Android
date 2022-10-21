@@ -31,7 +31,7 @@
         android:paddingTop="@dimen/keyline_5"
         android:paddingBottom="@dimen/keyline_5">
 
-        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="Typography"/>
@@ -126,7 +126,7 @@
             android:text="Text Appearance Caption"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="Typography Set Manually"/>
@@ -140,7 +140,7 @@
             android:text="Text Appearance Body 1 set manually"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="Legacy Typography"/>

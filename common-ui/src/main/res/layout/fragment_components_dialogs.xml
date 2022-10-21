@@ -29,7 +29,7 @@
         android:paddingStart="@dimen/keyline_4"
         android:paddingEnd="@dimen/keyline_4">
 
-        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="Dialogs"
@@ -71,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="Bottom Sheet Dialogs"
@@ -114,7 +114,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:id="@+id/label"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"

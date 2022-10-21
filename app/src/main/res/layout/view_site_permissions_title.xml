@@ -20,7 +20,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/sitePermissionsSectionTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

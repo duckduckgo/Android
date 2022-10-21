@@ -53,7 +53,7 @@
                     android:orientation="vertical"
                     tools:ignore="Overdraw">
 
-                <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+                <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/keyline_4"

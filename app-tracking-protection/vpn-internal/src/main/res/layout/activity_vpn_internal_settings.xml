@@ -64,7 +64,7 @@
                 android:layout_margin="16dp"/>
 
             <!-- Section Config -->
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/sectionConfigTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -117,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/sectionTrackersTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -157,7 +157,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/sectionAppProtection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -188,7 +188,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/sectionTrackersLogging"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -209,7 +209,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/sectionDiagnosticsTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -229,7 +229,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/sectionHealthTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

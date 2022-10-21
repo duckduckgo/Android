@@ -36,7 +36,7 @@
             android:orientation="vertical"
             android:layout_height="wrap_content">
 
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/privacyAuditTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
                 app:primaryText="@string/auditStep3Title"
                 app:secondaryText="@string/auditStep3Subtitle" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/refTestsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

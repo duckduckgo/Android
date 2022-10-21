@@ -16,14 +16,14 @@
 
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package com.duckduckgo.mobile.android.ui.view.text
+package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.mobile.android.R
 
-class SectionHeaderTextView
+class SectionHeaderListItem
 @JvmOverloads
 constructor(
     context: Context,
