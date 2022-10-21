@@ -37,4 +37,9 @@ object VpnModule {
     fun providesDispatcherProvider(): VpnDispatcherProvider {
         return DefaultVpnDispatcherProvider()
     }
+
+    @Provides
+    fun provideRuntime(): Runtime {
+        return Runtime.getRuntime()
+    }
 }
