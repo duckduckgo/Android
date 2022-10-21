@@ -129,10 +129,16 @@ class NgVpnNetworkStack @Inject constructor(
 
     private fun persistCacheToDisk() {
         addressLookupDao.deleteAll()
-        addressLookupLruCache.snapshot().forEach { (key, value) ->
-            Timber.d("Persisting to address lookup cache $key -> $value")
-            addressLookupDao.insert(VpnAddressLookup(key, value))
-        }
+        addressLookupLruCache.snapshot()
+            .filter {
+                val hostname = it.value
+                // just interested in tracker domains
+                appTrackerRepository.findTracker(hostname, "") != AppTrackerType.NotTracker
+            }
+            .forEach { (key, value) ->
+                Timber.d("Persisting to address lookup cache $key -> $value")
+                addressLookupDao.insert(VpnAddressLookup(key, value))
+            }
     }
 
     override fun onStopVpn(): Result<Unit> {

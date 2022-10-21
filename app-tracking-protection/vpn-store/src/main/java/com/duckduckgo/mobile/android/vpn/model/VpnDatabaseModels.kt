@@ -48,15 +48,6 @@ data class VpnState(
     val uuid: String
 )
 
-@Entity(tableName = "vpn_data_stats")
-data class VpnDataStats(
-    @PrimaryKey val id: String = DatabaseDateFormatter.bucketByHour(),
-    val dataSent: Long = 0,
-    val dataReceived: Long = 0,
-    val packetsSent: Int = 0,
-    val packetsReceived: Int = 0
-)
-
 @Entity(tableName = "vpn_running_stats")
 data class VpnRunningStats(
     @PrimaryKey val id: String,

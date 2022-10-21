@@ -20,6 +20,8 @@ import android.content.pm.PackageManager
 import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import timber.log.Timber
 
+private const val UNKNOWN = "unknown"
+
 class AppNameResolver(private val packageManager: PackageManager) {
 
     fun getAppNameForPackageId(packageId: String): OriginatingApp {
@@ -29,7 +31,7 @@ class AppNameResolver(private val packageManager: PackageManager) {
             OriginatingApp(packageId, appName)
         } catch (e: PackageManager.NameNotFoundException) {
             Timber.e("Failed to find app name for: $stripped. ${e.message}")
-            OriginatingApp(packageId, OriginatingAppPackageIdentifierStrategy.UNKNOWN)
+            OriginatingApp(packageId, UNKNOWN)
         }
     }
 
@@ -44,7 +46,7 @@ class AppNameResolver(private val packageManager: PackageManager) {
         }
 
         fun isUnknown(): Boolean {
-            return OriginatingAppPackageIdentifierStrategy.UNKNOWN.equals(appName, ignoreCase = true)
+            return UNKNOWN.equals(appName, ignoreCase = true)
         }
     }
 }

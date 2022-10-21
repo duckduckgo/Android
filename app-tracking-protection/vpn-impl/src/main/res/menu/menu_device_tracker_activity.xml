@@ -18,16 +18,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/diagnosticsScreen"
-        android:title="@string/atp_DiagnosticsMenuLabel"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/dataScreen"
-        android:title="@string/atp_DataMenuLabel"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/deviceShieldSwitch"
         android:title="@string/atp_EnableCTA"
         app:showAsAction="always"

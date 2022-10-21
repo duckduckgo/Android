@@ -25,7 +25,6 @@ import android.os.Bundle
 import android.os.ResultReceiver
 import android.provider.Settings
 import android.view.Menu
-import android.view.MenuItem
 import android.widget.CompoundButton
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -57,8 +56,6 @@ import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent.StartVpn
 import com.google.android.material.snackbar.Snackbar
-import dummy.ui.VpnControllerActivity
-import dummy.ui.VpnDiagnosticsActivity
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -456,9 +453,6 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.findItem(R.id.diagnosticsScreen).isVisible = appBuildConfig.isDebug
-        menu.findItem(R.id.dataScreen).isVisible = appBuildConfig.isDebug
-
         vpnCachedState?.let { vpnState ->
             deviceShieldSwitch.quietlySetIsChecked(vpnState.state == VpnRunningState.ENABLED, enableAppTPSwitchListener)
             vpnCachedState = null
@@ -467,29 +461,12 @@ class DeviceShieldTrackerActivity :
         return super.onPrepareOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.dataScreen -> {
-                startActivity(VpnControllerActivity.intent(this)); true
-            }
-            R.id.diagnosticsScreen -> {
-                startActivity(VpnDiagnosticsActivity.intent(this)); true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     @Suppress("DEPRECATION")
     private fun obtainVpnRequestPermission(intent: Intent) {
         startActivityForResult(intent, REQUEST_ASK_VPN_PERMISSION)
     }
 
     private fun launchFeedback() {
-        deviceShieldPixels.didSubmitReportIssuesFromTrackerActivity()
-        reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps)
-    }
-
-    private fun launchAppSettings() {
         deviceShieldPixels.didSubmitReportIssuesFromTrackerActivity()
         reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps)
     }
