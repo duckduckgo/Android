@@ -79,7 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Go to settings"
+            android:text="@string/atp_PromoteAlwaysOnDialogSettings"
         />
 
         <com.duckduckgo.mobile.android.ui.view.button.ButtonSecondaryLarge
@@ -87,7 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Not now"
+            android:text="@string/atp_PromoteAlwaysOnDialogNotNow"
         />
     </LinearLayout>
 </LinearLayout>
