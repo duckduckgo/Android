@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">A letöltés sikertelen. Ellenőrizd az internetkapcsolatot.</string>
 
     <string name="notificationChannelFileDownloading">Fájl letöltése folyamatban</string>
@@ -25,8 +24,8 @@
 
     <string name="downloadInProgress">Letöltés</string>
 
-    <string name="downloadsDownloadStartedMessage">A letöltés elindult: %@</string>
-    <string name="downloadsDownloadFinishedMessage">A letöltés befejeződött: %s</string>
+    <string name="downloadsDownloadStartedMessage" instruction="Placeholder is the name of a file">%1$s letöltése elindult</string>
+    <string name="downloadsDownloadFinishedMessage" instruction="Placeholder is the name of a file">%1$s letöltése befejeződött</string>
     <string name="downloadsDownloadGenericErrorMessage">A letöltés sikertelen.</string>
     <string name="downloadsCancel">Mégsem</string>
     <string name="downloadsRetry">Újrapróbálkozás</string>

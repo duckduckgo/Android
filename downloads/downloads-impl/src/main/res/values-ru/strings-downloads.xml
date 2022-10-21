@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Ошибка загрузки. Проверьте подключение к интернету.</string>
 
     <string name="notificationChannelFileDownloading">Загрузка файла</string>
@@ -25,8 +24,8 @@
 
     <string name="downloadInProgress">Загрузка</string>
 
-    <string name="downloadsDownloadStartedMessage">Началась загрузка файла %s</string>
-    <string name="downloadsDownloadFinishedMessage">Завершена загрузка %s</string>
+    <string name="downloadsDownloadStartedMessage" instruction="Placeholder is the name of a file">Началась загрузка файла %1$s</string>
+    <string name="downloadsDownloadFinishedMessage" instruction="Placeholder is the name of a file">Загрузка файла %1$s завершена</string>
     <string name="downloadsDownloadGenericErrorMessage">Сбой загрузки.</string>
     <string name="downloadsCancel">Отменить</string>
     <string name="downloadsRetry">Повторить попытку</string>
