@@ -44,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_alert_yellow"
+        android:src="@drawable/ic_apptp_alert"
         app:layout_constraintBottom_toBottomOf="@id/deviceShieldAppEntryIcon"
         app:layout_constraintEnd_toEndOf="@id/deviceShieldAppEntryIcon" />
 

@@ -82,7 +82,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/trackingProtectionAppIcon"
         app:layout_constraintEnd_toEndOf="@+id/trackingProtectionAppIcon"
-        app:srcCompat="@drawable/ic_alert_yellow_16" />
+        app:srcCompat="@drawable/ic_apptp_alert" />
 
     <TextView
         android:id="@+id/trackingProtectionEnableProtectionDisclaimer"
