@@ -376,10 +376,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Devre dışı bırak</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Her Zaman Açık olarak ayarlansın mı?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Android\'in Uygulama İzleme Koruması\'nı periyodik olarak devre dışı bırakmasını önlemek için:\n\nAndroid Ayarlarına gidin\nDuckDuckGo için VPN Ayarlarını Açın\n\"Her Zaman Açık VPN\" ayarını açın</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Ayarlar\'a gidin</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Bana Sonra Hatırlat</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Hayır Teşekkürler</string>
 
 </resources>

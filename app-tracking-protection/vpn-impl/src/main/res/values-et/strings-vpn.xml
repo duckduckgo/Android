@@ -376,10 +376,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Keela</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Kas määrata valikuks „Alati sees“?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Androidi rakenduse jälgimise kaitse perioodilise keelamise takistamiseks tee järgmist.\n\nAva Androidi sätted\nAva DuckDuckGo\' VPN-i sätted\nLülita sisse „VPN alati sees“</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Ava Sätted</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Tuleta hiljem meelde</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Ei aitäh</string>
 
 </resources>

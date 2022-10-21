@@ -376,10 +376,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Slå av</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Vil du sette til Alltid på?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Slik forhindrer du at Android innimellom deaktiverer App Tracking Protection:\n\nGå til Innstillinger\nÅpne VPN-innstillinger for DuckDuckGo\nSlå på «Alltid på-VPN»</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Gå til Innstillinger</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Minn meg på det senere</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Nei takk</string>
 
 </resources>

@@ -392,10 +392,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Выключить</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Включить режим «Всегда включено»?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Что делать, чтобы Android периодически не отключал защиту от слежки?\n\nПерейдите в «Настройки» Android.\nОткройте «Настройки VPN» для DuckDuckGo.\nВыберите режим VPN «Всегда включено».</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Открыть «Настройки»</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Напомнить позже</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Нет, спасибо</string>
 
 </resources>

@@ -392,10 +392,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Išjungti</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Nustatyta kaip visada įjungta?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Kaip neleisti „Android“ periodiškai išjungti apsaugos nuo programėlių sekimo:\n\nEikite į „Android“ nustatymus\nAtidarykite „DuckDuckGo“ VPN nustatymus\nĮjunkite „Always-on VPN“.</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Eikite į „Nustatymai“</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Priminti man vėliau</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Ne, dėkoju</string>
 
 </resources>

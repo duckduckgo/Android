@@ -384,10 +384,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Atslēgt</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Vai iestatīt kā \"Vienmēr ieslēgts\"?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Lai nepieļautu, ka operētājsistēmā Android periodiski tiek atspējota Lietotņu pretizsekošanas aizsardzība:\n\nDodies uz Android iestatījumiem\nAtver DuckDuckGo VPN iestatījumus\nIeslēdz opciju \"VPN vienmēr ieslēgts\"</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Doties uz Iestatījumiem</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Atgādiniet vēlāk</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Nē, paldies</string>
 
 </resources>

@@ -392,10 +392,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Onemogoči</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Nastavljeno na možnost »vedno vklopljeno« (Always-on)?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Če želite preprečiti, da bi sistem Android občasno onemogočil zaščito App Tracking Protection:\n\nPojdite v Nastavitve sistema Android\nOdprite Nastavitve VPN za DuckDuckGo\nVklopite možnost »vedno vklopljena« (Always-on) povezava VPN</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Odprite Nastavitve</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Opomni me pozneje</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Ne, hvala</string>
 
 </resources>

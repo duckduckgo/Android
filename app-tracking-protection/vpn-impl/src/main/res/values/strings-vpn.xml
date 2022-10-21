@@ -241,13 +241,6 @@
     <string name="atp_ActivityManage">Manage</string>
     <string name="atp_ActivityRemoveFeature">Disable and Delete Data</string>
 
-    <string name="atp_AlwaysOnModalBody"><![CDATA[Go to your device’s VPN Settings for DuckDuckGo and enable <b>Always-on</b> VPN to prevent Android disabling protection.\n\nMake sure to leave the other setting OFF.]]></string>
-    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[To avoid app issues, go to your device\'s <b>VPN Settings for DuckDuckGo</b> and disable <b>Block connections without VPN</b>]]></string>
-    <string name="atp_AlwaysOnModalHeading">Set to Always-on</string>
-    <string name="atp_AlwaysOnLockdownModalHeading">Change your VPN settings</string>
-    <string name="atp_AlwaysOnLockDownEnabled"><b>Action required!</b> To avoid app issues, you need to change your Android settings. <annotation type="open_settings_link">Change settings</annotation></string>
-    <string name="atp_AlwaysOnLockDownNotificationTitle">Action required! An Android setting needs to be changed for App Tracking Protection.</string>
-
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">FAQ</string>
     <string name="atp_FAQFirstHeader">How does App Tracking Protection work?</string>
@@ -388,11 +381,13 @@
     <string name="atp_RemoveFeatureDialogRemove">Disable</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Set to Always On?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">To prevent Android from periodically disabling App Tracking Protection:\n\nGo to Android Settings\nOpen VPN Settings for DuckDuckGo\nTurn on “Always-on VPN</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Go to Settings</string>
     <string name="atp_PromoteAlwaysOnDialogNotNow">Not Now</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Remind me Later</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">No Thanks</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Go to your device’s VPN Settings for DuckDuckGo and enable <b>Always-on</b> VPN to prevent Android disabling protection.\n\nMake sure to leave the other setting OFF.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[To avoid app issues, go to your device\'s <b>VPN Settings for DuckDuckGo</b> and disable <b>Block connections without VPN</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Set to Always-on</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Change your VPN settings</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Action required!</b> To avoid app issues, you need to change your Android settings. <annotation type="open_settings_link">Change settings</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Action required! An Android setting needs to be changed for App Tracking Protection.</string>
 
 </resources>

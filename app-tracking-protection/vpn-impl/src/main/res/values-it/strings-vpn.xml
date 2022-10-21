@@ -376,10 +376,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Disabilita</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Impostata su Sempre attiva?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Come evitare che Android disattivi periodicamente App Tracking Protection:\n\nAccedi alle impostazioni di Android\nApri le impostazioni VPN per DuckDuckGo\nAttiva \"VPN sempre attiva\"</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Vai a Impostazioni</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Ricordamelo più tardi</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">No, grazie</string>
 
 </resources>

@@ -384,10 +384,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Dezactivează</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Setat în modul „Mereu pornit”?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Pentru a împiedica Android să dezactiveze periodic Protecția împotriva urmăririi de către aplicație:\n\naccesează Setări Android\ndeschide Setări VPN pentru DuckDuckGo\nactivează „VPN activat permanent”</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Mergi la Setări</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Amintește-mi mai târziu</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Nu, mulțumesc</string>
 
 </resources>

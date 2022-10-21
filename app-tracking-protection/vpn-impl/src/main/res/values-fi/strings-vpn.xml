@@ -376,10 +376,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Poista Käytöstä</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Määritä aina käytössä -tilaan?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Estääksesi Androidia poistamasta App Tracking Protectionia ajoittain käytöstä:\n\nSiirry Androidin asetuksiin\nAvaa DuckDuckGon VPN-asetukset\nOta käyttöön \"Aina käytössä oleva VPN\"</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Siirry kohtaan Asetukset</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Muistuta myöhemmin</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Ei kiitos</string>
 
 </resources>

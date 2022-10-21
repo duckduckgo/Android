@@ -376,10 +376,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Letilt</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Mindig be van kapcsolva?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Annak megakadályozása, hogy az Android rendszeresen kikapcsolja az alkalmazáskövetés elleni védelmet:\n\nLépj az Android beállításaiba\nNyisd meg a DuckDuckGo VPN-beállításait\nKapcsold be a VPN „Mindig bekapcsolva” opcióját</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Lépj a Beállítások menübe</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Emlékeztess később</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Nem, köszönöm</string>
 
 </resources>

@@ -376,10 +376,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Забрани</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Задаване като „Винаги включено“?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">За да предотвратите периодично деактивиране на App Tracking Protection от Android:\n\nВлезте в Настройки на Android\nОтворете VPN настройки за DuckDuckGo\nВключете опцията „Винаги включена VPN услуга“</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Влезте в Настройки</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Напомняне по-късно</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Не, благодаря</string>
 
 </resources>

@@ -392,10 +392,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Onemogući</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Postavljeno na Uvijek uključeno?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Kako bi se spriječilo da Android povremeno onemogući App Tracking Protection:\n\nIdi na Postavke Androida\nOtvori VPN postavke za DuckDuckGo\nOznači \"Uvijek uključen VPN\"</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Idi na Postavke</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Podsjeti me kasnije</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Ne, hvala</string>
 
 </resources>
