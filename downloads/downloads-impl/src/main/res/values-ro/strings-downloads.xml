@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- smartling.placeholder_format = NONE -->
     <string name="downloadsErrorMessage">Nu s-a putut descărca. Verifică conexiunea la internet.</string>
 
     <string name="notificationChannelFileDownloading">Descărcare fișier</string>
@@ -25,8 +24,8 @@
 
     <string name="downloadInProgress">Se descarcă</string>
 
-    <string name="downloadsDownloadStartedMessage">Descărcarea a început pentru %s</string>
-    <string name="downloadsDownloadFinishedMessage">Descărcare finalizată pentru %s</string>
+    <string name="downloadsDownloadStartedMessage" instruction="Placeholder is the name of a file">Descărcarea a început pentru %1$s</string>
+    <string name="downloadsDownloadFinishedMessage" instruction="Placeholder is the name of a file">Descărcare finalizată pentru %1$s</string>
     <string name="downloadsDownloadGenericErrorMessage">Nu s-a putut descărca.</string>
     <string name="downloadsCancel">Anulează</string>
     <string name="downloadsRetry">Reîncearcă</string>
