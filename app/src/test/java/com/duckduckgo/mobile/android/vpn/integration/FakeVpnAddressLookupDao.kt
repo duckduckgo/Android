@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
+package com.duckduckgo.mobile.android.vpn.integration
 
-interface VpnTrackerDetectorInterceptor {
-    fun interceptTrackerRequest(
-        hostname: String,
-        packageId: String
-    ): RequestTrackerType?
+import com.duckduckgo.mobile.android.vpn.dao.VpnAddressLookup
+import com.duckduckgo.mobile.android.vpn.dao.VpnAddressLookupDao
+
+class FakeVpnAddressLookupDao : VpnAddressLookupDao {
+    private val lookup = mutableSetOf<VpnAddressLookup>()
+
+    override fun insert(lookup: VpnAddressLookup) {
+        this.lookup.add(lookup)
+    }
+
+    override fun getAll(): List<VpnAddressLookup> {
+        return lookup.toList()
+    }
+
+    override fun deleteAll() {
+        lookup.clear()
+    }
 }

@@ -21,7 +21,6 @@ import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import timber.log.Timber
-import xyz.hexene.localvpn.TCB
 import java.io.RandomAccessFile
 import javax.inject.Inject
 
@@ -40,8 +39,6 @@ class VpnNetworkMemoryCollector @Inject constructor() : VpnMemoryCollectorPlugin
         }
 
         return mutableMapOf<String, String>().apply {
-            this["TCBCacheSize"] = TCB.size().toString()
-
             memoryStat?.let { memory ->
                 val procMemory = memory.split(" ")
                 this["vmRSSKb"] = (procMemory[1].toInt() * PAGE_KB).toString()

@@ -16,10 +16,40 @@
 
 <resources>
 
+    <!-- Design System References Colors
+        daxColorBackground - Bottom Layer - Background of the screen
+        daxColorSurface - First layer on top (Toolbar, Navigation Bar, Dialogs)
+        daxColorContainer - Object container (Favicon rounded background)
+        daxColorPrimaryText - Primary text color
+        daxColorSecondaryText - Secondary text color
+        daxColorPrimaryIcon - Primary color for icons
+        daxColorDestructive - Destructive element (Destructive button)
+        daxColorLines - Dividers between elements
+        daxColorAccentBlue - Main accent color (Button primary)
+        daxColorAccentYellow
+        daxColorDisabled - Disabled color applied to all elements (text, buttons, etc...)
+    -->
+    <attr name="daxColorBackground" format="color"/>
+    <attr name="daxColorBackgroundInverted" format="color"/>
+    <attr name="daxColorSurface" format="color"/>
+    <attr name="daxColorContainer" format="color"/>
+    <attr name="daxColorPrimaryText" format="color"/>
+    <attr name="daxColorSecondaryText" format="color"/>
+    <attr name="daxColorPrimaryIcon" format="color"/>
+    <attr name="daxColorDestructive" format="color"/>
+    <attr name="daxColorLines" format="color"/>
+    <attr name="daxColorAccentBlue" format="color"/>
+    <attr name="daxColorAccentYellow" format="color"/>
+    <attr name="daxColorDisabled" format="color"/>
+
+    <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
+    <color name="destructiveRedLight">#EE1025</color>
+    <color name="destructiveRedDark">#FF5454</color>
+
+    <!-- Design System Raw Colors -->
 
     <color name="red50">#DE5833</color>
-
     <color name="purple50">#5132A9</color>
 
     <color name="yellow50">#FFCC33</color>
@@ -27,6 +57,7 @@
 
     <color name="green50">#4CBA3C</color>
 
+    <color name="gray100">#111111</color>
     <color name="gray95">#494949</color>
     <color name="gray90">#222222</color>
     <color name="gray85">#333333</color>
@@ -38,12 +69,129 @@
     <color name="gray30">#DDDDDD</color>
     <color name="gray25">#E5E5E5</color>
     <color name="gray20">#EEEEEE</color>
+    <color name="gray0">#FAFAFA</color>
 
     <color name="blue30">#7295F6</color>
     <color name="blue50">#3969EF</color>
     <color name="blue60">#2B55CA</color>
     <color name="blue70">#1E42A4</color>
 
-    <color name="black18">#2E000000</color>
+    <color name="black84">#D6000000</color>
+    <color name="black60">#99000000</color>
     <color name="black36">#5C000000</color>
+    <color name="black35">#35000000</color>
+    <color name="black18">#2E000000</color>
+    <color name="black12">#1F000000</color>
+    <color name="black6">#0F000000</color>
+    <color name="black">#000000</color>
+
+    <color name="white84">#D6FFFFFF</color>
+    <color name="white60">#99FFFFFF</color>
+    <color name="white18">#2EFFFFFF</color>
+    <color name="white12">#1FFFFFFF</color>
+    <color name="white">#FFFFFF</color>
 </resources>
+
+    <!-- Opacity Prefixes
+    100% — FF
+    99% — FC
+    98% — FA
+    97% — F7
+    96% — F5
+    95% — F2
+    94% — F0
+    93% — ED
+    92% — EB
+    91% — E8
+    90% — E6
+    89% — E3
+    88% — E0
+    87% — DE
+    86% — DB
+    85% — D9
+    84% — D6
+    83% — D4
+    82% — D1
+    81% — CF
+    80% — CC
+    79% — C9
+    78% — C7
+    77% — C4
+    76% — C2
+    75% — BF
+    74% — BD
+    73% — BA
+    72% — B8
+    71% — B5
+    70% — B3
+    69% — B0
+    68% — AD
+    67% — AB
+    66% — A8
+    65% — A6
+    64% — A3
+    63% — A1
+    62% — 9E
+    61% — 9C
+    60% — 99
+    59% — 96
+    58% — 94
+    57% — 91
+    56% — 8F
+    55% — 8C
+    54% — 8A
+    53% — 87
+    52% — 85
+    51% — 82
+    50% — 80
+    49% — 7D
+    48% — 7A
+    47% — 78
+    46% — 75
+    45% — 73
+    44% — 70
+    43% — 6E
+    42% — 6B
+    41% — 69
+    40% — 66
+    39% — 63
+    38% — 61
+    37% — 5E
+    36% — 5C
+    35% — 59
+    34% — 57
+    33% — 54
+    32% — 52
+    31% — 4F
+    30% — 4D
+    29% — 4A
+    28% — 47
+    27% — 45
+    26% — 42
+    25% — 40
+    24% — 3D
+    23% — 3B
+    22% — 38
+    21% — 36
+    20% — 33
+    19% — 30
+    18% — 2E
+    17% — 2B
+    16% — 29
+    15% — 26
+    14% — 24
+    13% — 21
+    12% — 1F
+    11% — 1C
+    10% — 1A
+    9% — 17
+    8% — 14
+    7% — 12
+    6% — 0F
+    5% — 0D
+    4% — 0A
+    3% — 08
+    2% — 05
+    1% — 03
+    0% — 00
+    -->

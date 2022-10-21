@@ -15,5 +15,5 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="SplashScreen" parent="AppTheme.Dark" />
+    <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Dark" />
 </resources>
