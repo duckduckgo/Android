@@ -77,10 +77,10 @@
 
     <TextView
         android:id="@+id/deviceShieldAppExclusionReason"
-        style="@style/TextAppearance.AppCompat.Caption"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="@color/brownishGrayTwo"
+        android:textAppearance="@style/TextAppearance.DuckDuckGo.Caption"
+        android:textColor="?attr/secondaryTextColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/deviceShieldAppEntryName"
         app:layout_constraintStart_toStartOf="@+id/deviceShieldAppEntryName"

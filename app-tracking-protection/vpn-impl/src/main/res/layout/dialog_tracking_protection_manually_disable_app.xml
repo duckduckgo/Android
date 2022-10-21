@@ -63,7 +63,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_5"
-                android:layout_marginTop="@dinem/keyline_2"
+                android:layout_marginTop="@dimen/keyline_2"
                 android:layout_marginEnd="@dimen/keyline_5"
                 android:gravity="center"
                 android:text="@string/atp_ExcludeAppsManuallyDisableAppDialogLabel"
