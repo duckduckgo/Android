@@ -29,7 +29,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 @Database(
-    exportSchema = true, version = 26,
+    exportSchema = true, version = 27,
     entities = [
         VpnState::class,
         VpnTracker::class,
