@@ -14,46 +14,72 @@
  * limitations under the License.
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatTextView
+import android.view.View
+import android.widget.LinearLayout
+import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderListItemBinding
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class SectionHeaderListItem
-@JvmOverloads
-constructor(
+class SectionHeaderListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.style.Widget_DuckDuckGo_SectionHeader
-) : AppCompatTextView(context, attrs, defStyleAttr) {
+    defStyleAttr: Int = 0
+) : LinearLayout(context, attrs, defStyleAttr) {
+
+    private val binding: ViewSectionHeaderListItemBinding by viewBinding()
+
+    var titleText: String
+        get() = binding.sectionHeaderText.text.toString()
+        set(value) {
+            binding.sectionHeaderText.text = value
+        }
 
     init {
-        val typedArray =
-            context.obtainStyledAttributes(
-                attrs,
-                R.styleable.SectionHeaderTextView,
-                0,
-                R.style.Widget_DuckDuckGo_SectionHeader
-            )
+        context.obtainStyledAttributes(
+            attrs,
+            R.styleable.SectionHeaderListItem,
+            0,
+            defStyleAttr
+        ).apply {
+            // TODO ADS remove uppercase() method in milestone3
+            binding.sectionHeaderText.text = getString(R.styleable.SectionHeaderListItem_titleText)?.uppercase()
+            binding.sectionHeaderText.setTextColor(ContextCompat.getColorStateList(context, R.color.blue_accent_text_color_selector))
 
-        val textAppearanceId =
-            typedArray.getResourceId(
-                R.styleable.SectionHeaderTextView_android_textAppearance,
-                android.R.style.TextAppearance
-            )
-        setTextAppearance(textAppearanceId)
+            val showOverflowMenuIcon = getBoolean(R.styleable.SectionHeaderListItem_showOverflowMenu, false)
+            if (showOverflowMenuIcon) {
+                binding.sectionHeaderOverflowIcon.show()
+            } else {
+                binding.sectionHeaderOverflowIcon.gone()
+            }
 
-        val paddingTop = typedArray.getDimensionPixelOffset(R.styleable.SectionHeaderTextView_android_paddingTop, 24)
-        val paddingStart = typedArray.getDimensionPixelOffset(R.styleable.SectionHeaderTextView_android_paddingStart, 20)
-        val paddingBottom = typedArray.getDimensionPixelOffset(R.styleable.SectionHeaderTextView_android_paddingBottom, 16)
-        val paddingEnd = typedArray.getDimensionPixelOffset(R.styleable.SectionHeaderTextView_android_paddingEnd, 20)
+            recycle()
+        }
+    }
 
-        setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom)
+    /** Sets the item title from a string resource*/
+    fun setText(@StringRes stringRes: Int) {
+        binding.sectionHeaderText.setText(stringRes)
+    }
 
-        typedArray.recycle()
+    /** Sets the Trailing Icon Visible */
+    fun showOverflowMenuIcon(show: Boolean) {
+        if (show) {
+            binding.sectionHeaderOverflowIcon.show()
+        } else {
+            binding.sectionHeaderOverflowIcon.gone()
+        }
+    }
+
+    /** Sets the item overflow menu click listener */
+    fun setOverflowMenuClickListener(onClick: (View) -> Unit) {
+        binding.sectionHeaderOverflowIcon.setOnClickListener { onClick(binding.sectionHeaderOverflowIcon) }
     }
 }

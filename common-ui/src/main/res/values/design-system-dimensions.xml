@@ -44,6 +44,8 @@
     <dimen name="oneLineItemPadding">14dp</dimen>
     <dimen name="twoLineItemHeight">56dp</dimen>
     <dimen name="twoLineItemPadding">14dp</dimen>
+    <dimen name="listItemSectionHeaderIconSize">24dp</dimen>
+    <dimen name="listItemSectionHeaderPadding">16dp</dimen>
 
     <!-- PopupMenu -->
     <dimen name="popupMenuWidth">280dp</dimen>
