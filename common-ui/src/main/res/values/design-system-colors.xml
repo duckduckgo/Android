@@ -63,6 +63,8 @@
 
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
+    <color name="destructiveRedLight">#EE1025</color>
+    <color name="destructiveRedDark">#FF5454</color>
 
     <!-- Design System Raw Colors -->
     <color name="red20">#F2A18A</color>

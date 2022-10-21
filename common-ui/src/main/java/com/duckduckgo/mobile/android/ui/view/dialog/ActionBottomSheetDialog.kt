@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.ui.view.dialog
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import androidx.annotation.ColorRes
@@ -25,6 +26,7 @@ import com.duckduckgo.mobile.android.databinding.BottomSheetActionBinding
 import com.duckduckgo.mobile.android.ui.view.show
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
+@SuppressLint("NoBottomSheetDialog")
 class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.context) {
 
     abstract class EventListener {
