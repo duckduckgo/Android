@@ -35,3 +35,9 @@ java {
 tasks.register('jvm_checks') {
     dependsOn 'test'
 }
+
+jar {
+    manifest {
+        attributes("Lint-Registry-v2": "com.duckduckgo.lint.DuckDuckGoIssueRegistry")
+    }
+}
