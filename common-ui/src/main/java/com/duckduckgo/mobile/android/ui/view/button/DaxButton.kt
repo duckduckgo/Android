@@ -46,11 +46,25 @@ open class DaxButton @JvmOverloads constructor(
         } else {
             Small
         }
+
+
         typedArray.recycle()
 
-        minHeight = resources.getDimensionPixelSize(Size.dimension(buttonSize))
-    }
+        val sidePadding = if (buttonSize == Small) {
+            resources.getDimensionPixelSize(R.dimen.buttonSmallSidePadding)
+        } else {
+            resources.getDimensionPixelSize(R.dimen.buttonLargeSidePadding)
+        }
 
+        val topPadding = if (buttonSize == Small) {
+            resources.getDimensionPixelSize(R.dimen.buttonSmallTopPadding)
+        } else {
+            resources.getDimensionPixelSize(R.dimen.buttonLargeTopPadding)
+        }
+
+        minHeight = resources.getDimensionPixelSize(Size.dimension(buttonSize))
+        setPadding(sidePadding, topPadding, sidePadding, topPadding)
+    }
 }
 
 enum class Size {
