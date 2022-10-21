@@ -16,107 +16,95 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <androidx.core.widget.NestedScrollView
-            android:id="@+id/trackingProtectionScrollView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="?dialogBgColor"
+        android:id="@+id/trackingProtectionScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?dialogBgColor">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
             <ImageView
-                    android:id="@+id/trackingProtectionAppIcon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="24dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_globe_gray_16dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                android:id="@+id/trackingProtectionAppIcon"
+                android:layout_width="@dimen/listItemImageContainerSize"
+                android:layout_height="@dimen/listItemImageContainerSize"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_globe_gray_16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                    android:id="@+id/trackingProtectionTitle"
-                    style="@style/TextAppearance.AppCompat.Title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="24dp"
-                    android:orientation="vertical"
-                    android:text="@string/atp_ExcludeAppsManuallyDisableAppDialogTitle"
-                    android:textAlignment="center"
-                    android:textColor="?normalTextColor"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppIcon"/>
+                android:id="@+id/trackingProtectionTitle"
+                style="@style/TextAppearance.AppCompat.Title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_5"
+                android:gravity="center"
+                android:text="@string/atp_ExcludeAppsManuallyDisableAppDialogTitle"
+                android:textColor="?normalTextColor"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppIcon" />
 
             <TextView
-                    android:id="@+id/trackingProtectionAppLabel"
-                    style="@style/TextAppearance.DuckDuckGo.Body2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="24dp"
-                    android:orientation="vertical"
-                    android:text="@string/atp_ExcludeAppsManuallyDisableAppDialogLabel"
-                    android:textAlignment="center"
-                    android:textColor="?secondaryTextColor"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/trackingProtectionTitle"/>
+                android:id="@+id/trackingProtectionAppLabel"
+                style="@style/TextAppearance.DuckDuckGo.Body2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:layout_marginTop="@dinem/keyline_2"
+                android:layout_marginEnd="@dimen/keyline_5"
+                android:gravity="center"
+                android:text="@string/atp_ExcludeAppsManuallyDisableAppDialogLabel"
+                android:textColor="?secondaryTextColor"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/trackingProtectionTitle" />
 
             <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimarySmall
-                    android:id="@+id/trackingProtectionExcludeAppDialogReport"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/dialogButtonHeight"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:gravity="center|center_horizontal"
-                    android:text="@string/atp_ExcludeAppsManuallyCTAReportIssue"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/guideline2"
-                    app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppLabel"
-                    app:layout_constraintVertical_bias="0.0"/>
+                android:id="@+id/trackingProtectionExcludeAppDialogReport"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dialogButtonHeight"
+                android:layout_marginStart="@dimen/keyline_0"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginBottom="@dimen/keyline_5"
+                android:gravity="center|center_horizontal"
+                android:text="@string/atp_ExcludeAppsManuallyCTAReportIssue"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@id/trackingProtectionExcludeAppDialogSkip"
+                app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppLabel" />
 
             <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostSmall
-                    android:id="@+id/trackingProtectionExcludeAppDialogSkip"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/dialogButtonHeight"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="16dp"
-                    android:gravity="center|center_horizontal"
-                    android:text="@string/atp_ExcludeAppsManuallyCTANotNow"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline2"
-                    app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppLabel"
-                    app:layout_constraintVertical_bias="0.0"/>
-
-            <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/guideline2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.5"/>
+                android:id="@+id/trackingProtectionExcludeAppDialogSkip"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dialogButtonHeight"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_0"
+                android:layout_marginBottom="@dimen/keyline_5"
+                android:gravity="center|center_horizontal"
+                android:text="@string/atp_ExcludeAppsManuallyCTANotNow"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/trackingProtectionExcludeAppDialogReport"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppLabel" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
 
