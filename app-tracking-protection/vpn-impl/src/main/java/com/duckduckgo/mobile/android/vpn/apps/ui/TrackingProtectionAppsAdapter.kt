@@ -141,7 +141,7 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
                 itemView.deviceShieldAppEntryWarningIcon.setImageDrawable(
                     ContextCompat.getDrawable(
                         context,
-                        com.duckduckgo.mobile.android.R.drawable.ic_apptp_link
+                        R.drawable.ic_apptp_link
                     )
                 )
                 itemView.deviceShieldAppEntryWarningIcon.show()
@@ -153,7 +153,7 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
                 itemView.deviceShieldAppEntryWarningIcon.setImageDrawable(
                     ContextCompat.getDrawable(
                         context,
-                        com.duckduckgo.mobile.android.R.drawable.ic_apptp_link
+                        R.drawable.ic_apptp_link
                     )
                 )
                 itemView.deviceShieldAppEntryWarningIcon.show()
@@ -186,8 +186,8 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
 
     private fun getAppExcludingReasonIcon(excludingReason: Int): Int {
         return when (excludingReason) {
-            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> com.duckduckgo.mobile.android.R.drawable.ic_apptp_alert
-            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> com.duckduckgo.mobile.android.R.drawable.ic_apptp_alert
+            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> R.drawable.ic_apptp_alert
+            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> R.drawable.ic_apptp_alert
             else -> 0
         }
     }
