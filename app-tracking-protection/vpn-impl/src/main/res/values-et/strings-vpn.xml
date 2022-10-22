@@ -14,36 +14,38 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
     <string name="atp_name">Rakenduse jälgimise kaitse</string>
     <string name="refresh">Värskenda</string>
 
     <!-- Debug Screens -->
     <string name="atp_DiagnosticsMenuLabel">Diagnostika</string>
     <string name="atp_DataMenuLabel">Andmestatistika</string>
-    <string name="atp_MeteredConnection">"Mõõdetud: %1$s"</string>
-    <string name="atp_ConnectionStatus">"VPN ühendatud: %1$s"</string>
-    <string name="atp_NetworkAvailable">"Internetiga ühendatud: %1$s"</string>
-    <string name="atp_DnsServers">"Aktiivse võrgu DNS: %1$s"</string>
+    <string name="atp_MeteredConnection" instruction="Placeholder is true or false">"Mõõdetud: %1$s"</string>
+    <string name="atp_ConnectionStatus" instruction="Placeholder is true or false">"VPN ühendatud: %1$s"</string>
+    <string name="atp_NetworkAvailable" instruction="Placeholder is true or false">"Internetiga ühendatud: %1$s"</string>
+    <string name="atp_DnsServers" instruction="Placeholder is a list of dns addresses">"Aktiivse võrgu DNS: %1$s"</string>
     <string name="atp_AppExitsReasonsTitle">Rakendusest väljumise põhjused</string>
     <string name="atp_AppRestartsTitle">Rakenduse taaskäivitamised</string>
 
     <!-- Diagnostics -->
-    <string name="vpnTimeRunning">Tööaeg: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday">Täna blokeeritud jälgimisettevõtted: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek">Sel nädalal blokeeritud jälgimisettevõtted: %1$d</string>
+    <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Tööaeg: %1$s</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Täna blokeeritud jälgimisettevõtted: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Sel nädalal blokeeritud jälgimisettevõtted: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Ühtegi jälgimisettevõtet pole veel blokeeritud"</string>
-    <string name="vpnTrackersBlockedToday">Täna blokeeritud jälgurid: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek">Sel nädalal blokeeritud jälgurid: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Täna blokeeritud jälgurid: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Sel nädalal blokeeritud jälgurid: %1$d</string>
     <string name="vpnTrackersNone">"Jälgureid pole veel blokeeritud"</string>
     <string name="vpnNotRunYet">"VPN-i ei ole veel käivitatud"</string>
-    <string name="vpnDataTransferred">"%1$1s\n%2$2s paketti"</string>
+    <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s paketti"</string>
 
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Kas rakendusega on probleeme?</string>
     <string name="atp_OnInitialNotification">"Rakenduse jälgimise kaitse on lubatud ja blokeerib jälgimiskatsed kõigis sinu rakendustes"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Jälgimitegevuste otsimine… piiks… piiks"</string>
-    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Jälgimiskatsed blokeeriti <b>%1$d rakenduses</b> (viimase tunni jooksul).]]></item>
         <item quantity="other"><![CDATA[ Jälgimiskatsed blokeeritud <b>%1$d rakenduses</b> (viimase tunni jooksul).]]></item>
     </plurals>
@@ -51,50 +53,50 @@
     <string name="atp_RevokedNotification">VPN-rakendus sinu seadmes keelas rakenduse jälgimise kaitse. Puuduta selle uuesti lubamiseks.</string>
 
     <!-- App Tracking Protection Daily Notification -->
-    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse</b> (viimase päeva jooksul).]]></string>
-    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse ühes rakenduses, %2$s</b> (viimase päeva jooksul).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset</b> (viimase päeva jooksul).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset %2$d rakenduses, muu hulgas %3$s</b> (viimase päeva jooksul).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse</b> (viimase päeva jooksul).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps" instruction="%1$d is the number of tracking attempts and %2$s is the name of the app where it happened"><![CDATA[ Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse ühes rakenduses, %2$s</b> (viimase päeva jooksul).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset</b> (viimase päeva jooksul).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset %2$d rakenduses, muu hulgas %3$s</b> (viimase päeva jooksul).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_DailyTopCompanyNotification">
         <item quantity="one"><![CDATA[%1$s proovis jälgida sind <b>%2$d rakenduses</b> (viimase päeva jooksul). <b>Lisateave</b>]]></item>
         <item quantity="other"><![CDATA[%1$s proovis jälgida sind <b>%2$d rakenduses</b> (viimase päeva jooksul). <b>Lisateave</b>]]></item>
     </plurals>
 
-     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[Rakenduse jälgimise kaitse blokeeris kõige rohkem jälgimiskatseid rakenduses <b>%1$s</b> (viimase päeva jooksul).]]></item>
-        <item quantity="other"><![CDATA[Rakenduse jälgimise kaitse blokeeris kõige rohkem jälgimiskatseid rakendustes <b>%1$s</b> ja <b>%2$s</b> (viimase päeva jooksul).]]></item>
+    <plurals name="atp_DailyCompanyBlockedNotification">
+        <item quantity="one"><![CDATA[App Tracking Protection blokeeris kõige rohkem jälgimiskatseid rakenduses <b>%1$s</b> (viimase päeva jooksul).]]></item>
+        <item quantity="other"><![CDATA[App Tracking Protection blokeeris kõige rohkem jälgimiskatseid rakenduses <b>%1$s</b> ja <b>%2$s</b> (viimase päeva jooksul).]]></item>
     </plurals>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$d korra rakenduses %3$s</b> (viimase päeva jooksul).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$d korda rakenduses %3$s ja ühes teises rakenduses</b> (viimase päeva jooksul).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$d korda rakendustes %3$s ja %4$d muudes rakendustes</b> (viimase päeva jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$d korra rakenduses %3$s</b> (viimase päeva jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$d korda rakenduses %3$s ja ühes teises rakenduses</b> (viimase päeva jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$d korda rakendustes %3$s ja %4$d muudes rakendustes</b> (viimase päeva jooksul).]]></string>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$d korda rakenduses %3$s</b> (viimase päeva jooksul).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$d korda rakenduses %3$s ja ühes muus rakenduses</b> (viimase päeva jooksul).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$d korda rakendustes %3$s ja %4$d muudes rakendustes</b> (viimase päeva jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$d korda rakenduses %3$s</b> (viimase päeva jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$d korda rakenduses %3$s ja ühes muus rakenduses</b> (viimase päeva jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$d korda rakendustes %3$s ja %4$d muudes rakendustes</b> (viimase päeva jooksul).]]></string>
 
     <!-- App Tracking Protection Weekly Notification -->
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse rakenduses %2$s</b> (viimase nädala jooksul).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset rakenduses %2$s</b> ja ühes teises rakenduses (viimase nädala jooksul).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse rakenduses %2$s</b> ja %3$d muus rakenduses (viimase nädala jooksul).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimise katset rakenduses %2$s</b> (viimase nädala jooksul).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset rakenduses %2$s</b> ja ühes muus rakenduses (viimase nädala jooksul).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimise katset rakenduses %2$s</b> ja %3$d muus rakenduses (viimase nädala jooksul).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse rakenduses %2$s</b> (viimase nädala jooksul).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset rakenduses %2$s</b> ja ühes teises rakenduses (viimase nädala jooksul).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse rakenduses %2$s</b> ja %3$d muus rakenduses (viimase nädala jooksul).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimise katset rakenduses %2$s</b> (viimase nädala jooksul).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset rakenduses %2$s</b> ja ühes muus rakenduses (viimase nädala jooksul).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimise katset rakenduses %2$s</b> ja %3$d muus rakenduses (viimase nädala jooksul).]]></string>
 
-     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_WeeklyCompanyTeaserNotification">
         <item quantity="one"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s %2$drakenduses, %3$s</b> (viimase nädala jooksul).]]></item>
         <item quantity="other"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$s kokku %2$d rakenduses, muu hulgas %3$s</b> (viimase nädala jooksul).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Luba rakenduse jälgimise kaitse</string>
 
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse rakenduses %2$s</b> (viimase tunni jooksul).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse rakenduses %2$s</b> ja ühes muus rakenduses (viimase tunni jooksul).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse rakenduses %2$s</b> ja %3$d muus rakenduses (viimase tunni jooksul).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset rakenduses %2$s</b> (viimase tunni jooksul).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset rakenduses %2$s</b> ja ühes muus rakenduses (viimase tunni jooksul).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset rakenduses %2$s</b> ja %3$d muus rakenduses (viimase tunni jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse rakenduses %2$s</b> (viimase tunni jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse rakenduses %2$s</b> ja ühes muus rakenduses (viimase tunni jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatse rakenduses %2$s</b> ja %3$d muus rakenduses (viimase tunni jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset rakenduses %2$s</b> (viimase tunni jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset rakenduses %2$s</b> ja ühes muus rakenduses (viimase tunni jooksul).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[Rakenduse jälgimise kaitse blokeeris <b>%1$d jälgimiskatset rakenduses %2$s</b> ja %3$d muus rakenduses (viimase tunni jooksul).]]></string>
 
     <!-- App Tracking Protection Privacy Report -->
     <string name="atp_PrivacyReportEnabledTooltip">Rakenduse jälgimise kaitse on lubatud ja blokeerib jälgurid kogu seadmes</string>
@@ -102,7 +104,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Luba rakenduse jälgimise kaitse</string>
     <string name="atp_OnboardingLastPageOneTitle">Üks lihtne samm parema rakenduse privaatsuse saavutamiseks.</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Leidsime, et <b>üle 96\u0025 populaarsetest tasuta rakendustest</b> võimaldab teistel ettevõtetel jälgida sinu isikuandmeid isegi siis, kui sa magad.\n\nVaata, millised rakendused <b>me tabame, mis teistel ettevõtetel sind jälgida lubavad</b>, ja võta kontroll tagasi.</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle" formatted="false">Leidsime, et <b>üle 96% populaarsetest tasuta rakendustest</b> võimaldab teistel ettevõtetel jälgida sinu isikuandmeid isegi siis, kui sa magad.\n\nVaata, millised rakendused <b>me tabame, mis teistel ettevõtetel sind jälgida lubavad</b>, ja võta kontroll tagasi.</string>
     <string name="atp_OnboardingLastPageTwoTitle">Kuidas see töötab?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Rakenduse jälgimise kaitse <b>tuvastab ja blokeerib teiste ettevõtete rakenduste jälgurid</b>, näiteks kui Facebook üritab sind jälgida terviserakenduses.\n\n<b>See on tasuta</b> ja saad nautida oma rakendusi nagu tavaliselt. See töötab taustal ja aitab <b>kaitsta sind ööpäev läbi.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kes näeb sinu andmeid?</string>
@@ -113,7 +115,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Rakenduse jälgimise kaitse</string>
-    <string name="atp_daxOnboardingIntroMessage">Üle 96\u0025 populaarsetest tasuta rakendustest võimaldavad teistel ettevõtetel sind jälgida, isegi kui sa oma telefoni ei kasuta. Rakenduse jälgimise kaitse tuvastab ja blokeerib need jälgimiskatsed.</string>
+    <string name="atp_daxOnboardingIntroMessage" formatted="false">Üle 96% populaarsetest tasuta rakendustest võimaldavad teistel ettevõtetel sind jälgida, isegi kui sa oma telefoni ei kasuta. Rakenduse jälgimise kaitse tuvastab ja blokeerib need jälgimiskatsed.</string>
     <string name="atp_daxOnboardingPermissionTitle">Kuidas see töötab?</string>
     <string name="atp_daxOnboardingPermissionMessage">Rakenduse jälgimise kaitse ei ole VPN. Sinu seade tunneb selle siiski sellena ära. Selle põhjuseks on see, et see kasutab töötamiseks kohalikku VPN-ühendust. See ei suuna rakenduse andmeid kunagi välise serveri kaudu. <annotation type="learn_more_link">Lisateave</annotation></string>
 
@@ -141,7 +143,7 @@
     <string name="atp_ExcludeAppsManuallyCTACancel">Tühista</string>
     <string name="atp_ExcludeAppsManuallyCTAEnable">Luba</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Taasta</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Kas lubada rakenduse %1$s kaitse käsitsi?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Kas lubada rakenduse %1$s kaitse käsitsi?</string>
     <string name="atp_ExcludeAppsManuallyEnableAppLabel">Selle rakenduse puhul esineb teada olevalt probleeme, kui jälgimiskatsed ebaõnnestuvad.</string>
     <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Kui kaitse on lubatud, ei pruugi selle rakenduse saidi sisu korralikult ilmuda.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Kaitse lubamine saadab rakenduse nime DuckDuckGo\'le.</string>
@@ -162,7 +164,7 @@
     <!--  Breakage report app list  -->
     <string name="atp_ReportBreakageAppListActivityTitle">Teata probleemist</string>
     <string name="atp_ReportBreakageAppFeature"><b>Vali rakendus, milles probleem on</b>. Sinu tagasiside aitab meil paremaks saada.\n\nKas sul on rakenduste jälgimise kaitse kohta üldist tagasisidet? Kasuta selle asemel <annotation type="use_this_form_link">seda vormi</annotation>.</string>
-    <string name="atp_ReportBreakageAppEntry">Rakendus %1$s</string>
+    <string name="atp_ReportBreakageAppEntry" instruction="Placeholder is the name of an app">Rakendus %1$s</string>
     <string name="atp_ReportBreakageAppSubmitCta">Esita</string>
     <string name="atp_ReportBreakageAppNextCta">Järgmine</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Palun kirjelda, mis toimub, mida sa ootasid ja mis viis probleemi tekkimiseni.</string>
@@ -189,7 +191,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Rakendusejälgurite teave</string>
     <string name="atp_ProfilingInfoTitle">Mis on rakendusejälgurid?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Oled ilmselt kuulnud sellest, et ettevõtted nagu Google ja Facebook jälgivad sind kulisside taga kolmandate poolte veebisaitidel. Aga kas teadsid, et nad jälgivad sinu isiklikke andmeid ka sinu seadmes olevate rakenduste kaudu?\n\n<b>Enam kui 96\u0025 meie testitud 100 populaarsest tasuta Androidi rakendusest</b> sisaldas peidetud kolmanda poole jälgureid. Neist 87\u0025 saatis andmeid Google\'ile ja 68\u0025 Facebookile. See juhtub isegi siis, kui sa oma seadet ei kasuta.\n\n<b>Rakendusejälguritel võib olla juurdepääs palju rohkemale teabele</b> kui nende veebisaidijälguritest sugulastel, näiteks sinu asukoht isegi hoone korruse täpsusega, kui tihti mängid tööl olles mänge ning millal ja kui kaua sa iga päev magad. <b>Isegi kui sul ei ole näiteks Google\'i või Facebooki kontot, saavad nad ikkagi sinu rakendustest sinu kohta andmeid koguda.</b>\n\nJälgimisvõrgustikud nagu Facebook ja Google kasutavad neid väikeseid infokillukesi, <b>et luua sinu kohta digitaalne profiil.</b> Selle abil saavad jälgimisvõrgustikud manipuleerida sellega, mida sa internetis näed ja võimaldada reklaamijatel teha sinu andmete põhjal pakkumisi sinuni jõudmiseks.\n\nRakendustes peituvad jälgurid on privaatsusele SUUR probleem. <b>Kuid DuckDuckGo pakub lahendust, mis võib aidata.</b>\n\nKui see on DuckDuckGo\' privaatse brauseri rakenduses lubatud, blokeerib rakenduse jälgimise kaitse paljud sinu seadme teistes rakendustes olevad jälgurid, samal ajal kui DuckDuckGo rakendus blokeerib veebisaitidel sirvimise ajal leitud jälgurid. <b>Need kahekihilised kaitsed vähendavad seda, mida jälgimisettevõtted sinu kohta üldiselt teavad,</b> nii et saad oma rakendusi kasutada suurema meelerahuga, teades, et oled paremini kaitstud.</string>
+    <string name="atp_ProfilingInfoFirstParagraph" formatted="false">Oled ilmselt kuulnud sellest, et ettevõtted nagu Google ja Facebook jälgivad sind kulisside taga kolmandate poolte veebisaitidel. Aga kas teadsid, et nad jälgivad sinu isiklikke andmeid ka sinu seadmes olevate rakenduste kaudu?\n\n<b>Enam kui 96\\% meie testitud 100 populaarsest tasuta Androidi rakendusest</b> sisaldas peidetud kolmanda poole jälgureid. Neist 87\\% saatis andmeid Google\'ile ja 68\\% Facebookile. See juhtub isegi siis, kui sa oma seadet ei kasuta.\n\n<b>Rakendusejälguritel võib olla juurdepääs palju rohkemale teabele</b> kui nende veebisaidijälguritest sugulastel, näiteks sinu asukoht isegi hoone korruse täpsusega, kui tihti mängid tööl olles mänge ning millal ja kui kaua sa iga päev magad. <b>Isegi kui sul ei ole näiteks Google\'i või Facebooki kontot, saavad nad ikkagi sinu rakendustest sinu kohta andmeid koguda.</b>\n\nJälgimisvõrgustikud nagu Facebook ja Google kasutavad neid väikeseid infokillukesi, <b>et luua sinu kohta digitaalne profiil.</b> Selle abil saavad jälgimisvõrgustikud manipuleerida sellega, mida sa internetis näed ja võimaldada reklaamijatel teha sinu andmete põhjal pakkumisi sinuni jõudmiseks.\n\nRakendustes peituvad jälgurid on privaatsusele SUUR probleem. <b>Kuid DuckDuckGo pakub lahendust, mis võib aidata.</b>\n\nKui see on DuckDuckGo\' privaatse brauseri rakenduses lubatud, blokeerib rakenduse jälgimise kaitse paljud sinu seadme teistes rakendustes olevad jälgurid, samal ajal kui DuckDuckGo rakendus blokeerib veebisaitidel sirvimise ajal leitud jälgurid. <b>Need kahekihilised kaitsed vähendavad seda, mida jälgimisettevõtted sinu kohta üldiselt teavad,</b> nii et saad oma rakendusi kasutada suurema meelerahuga, teades, et oled paremini kaitstud.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Viimased 7 päeva</string>
@@ -202,21 +204,29 @@
     <string name="atp_ActivityBetaInstructions">Beeta-juhtnöörid</string>
     <string name="atp_ActivityManageProtection">Kas rakendusega on probleeme?</string>
 
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[Rakenduses <b>%3$s</b> blokeeriti %1$d ettevõtte %2$d jälgimiskatse]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[Rakenduses <b>%3$s</b> blokeeriti %1$d jälgimiskatse ettevõtetelt %2$d]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[Rakenduses <b>%3$s</b> blokeeriti %1$d ettevõtte %2$d jälgimiskatset]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[Rakenduses <b>%3$s</b> blokeeriti %1$d jälgimiskatset ettevõtetelt %2$d]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
+        <![CDATA[Blokeeriti 1 ettevõtte 1 jälgimiskatse rakenduses <b>%1$s</b>]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies" instruction="Placeholder %1$d is the number of companies doing the tracking. Placeholder %2$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 5 companies in Venmo app.">
+        <![CDATA[Blokeeriti %1$d ettevõtte 1 jälgimiskatse rakenduses <b>%2$s</b>]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$s is the name of the app doing the tracking. Example: 5 tracking attempts blocked from 1 company in Venmo app.">
+        <![CDATA[Blokeeriti 1 ettevõtte %1$d jälgimiskatset rakenduses <b>%2$s</b>]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
+        <![CDATA[Rakenduses <b>%3$s</b> blokeeriti %1$d jälgimiskatset ettevõtetelt %2$d]]>
+    </string>
 
     <string name="atp_ActivityEmptyListTitle">Uut tegevust pole</string>
     <string name="atp_ActivityEmptyListMessage">Jätka seadme kasutamist. Jälgimiskatsed, mille rakenduste jälgimise kaitse blokeerib, kuvatakse siin.</string>
     <string name="atp_ActivityPastWeekBlocked">Blokeeritud</string>
     <string name="atp_ActivityPastWeekAcross">Üle</string>
 
-     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Jälgimiskatse</item>
         <item quantity="other">Jälgimiskatsed</item>
     </plurals>
-      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Rakendus</item>
         <item quantity="other">Rakendused</item>
     </plurals>
@@ -277,10 +287,11 @@
         <item quantity="other">Blokeeriti %1$d jälgimiskatset</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Teata selle rakendusega seotud probleemist</string>
-    <string name="atp_CompanyDetailsTrackingShowMore">Kuva %1$d rohkem</string>
+    <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Kuva %1$d rohkem</string>
     <string name="atp_CompanyDetailsTrackingLearnMore">Rakendused võivad sisaldada teiste ettevõtete jälgureid, näiteks analüütika ja turunduse jaoks. Kui me neid ei blokeeriks, võiksid need jälgurid luua sinu kohta veelgi üksikasjalikumaid digitaalseid profiile. <annotation type="learn_more_link">Lisateave.</annotation></string>
     <string name="atp_CompanyDetailsTrackingShowLess">Kuva vähem</string>
     <string name="atp_CompanyDetailsAppInfoPanel">Selle rakenduse kaitse on praegu keelatud. Kui rakenduse jälgimise kaitse põhjustas probleemi, <annotation type="report_issues_link">teavitage probleemist</annotation></string>
+    <string name="atp_CompanyDetailsNotAvailableForUninstalledApps" instruction="Toast shown when users tap on item that corresponds to an already uninstalled application">Desinstallitud rakenduste kohta pole jälguri andmed saadaval</string>
 
     <!--  App Tracking Company Signals -->
     <string name="atp_TrackingSignalAAID">Androidi reklaami ID</string>

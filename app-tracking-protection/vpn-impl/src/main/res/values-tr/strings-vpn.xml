@@ -14,36 +14,38 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
     <string name="atp_name">Uygulama İzleme Koruması</string>
     <string name="refresh">Yenile</string>
 
     <!-- Debug Screens -->
     <string name="atp_DiagnosticsMenuLabel">Teşhis</string>
     <string name="atp_DataMenuLabel">Veri İstatistikleri</string>
-    <string name="atp_MeteredConnection">"Tarifeli: %1$s"</string>
-    <string name="atp_ConnectionStatus">"VPN bağlı: %1$s"</string>
-    <string name="atp_NetworkAvailable">"İnternete bağlı: %1$s"</string>
-    <string name="atp_DnsServers">"Etkin ağ DNS: %1$s"</string>
+    <string name="atp_MeteredConnection" instruction="Placeholder is true or false">"Tarifeli: %1$s"</string>
+    <string name="atp_ConnectionStatus" instruction="Placeholder is true or false">"VPN bağlı: %1$s"</string>
+    <string name="atp_NetworkAvailable" instruction="Placeholder is true or false">"İnternete bağlı: %1$s"</string>
+    <string name="atp_DnsServers" instruction="Placeholder is a list of dns addresses">"Etkin ağ DNS: %1$s"</string>
     <string name="atp_AppExitsReasonsTitle">Uygulama çıkış nedenleri</string>
     <string name="atp_AppRestartsTitle">Uygulama yeniden başlatmaları</string>
 
     <!-- Diagnostics -->
-    <string name="vpnTimeRunning">Çalışma süresi: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday">Bugün engellenen izleyici şirketleri: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek">Bu hafta engellenen izleyici şirketleri: %1$d</string>
+    <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Çalışma süresi: %1$s</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Bugün engellenen izleyici şirketleri: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Bu hafta engellenen izleyici şirketleri: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Henüz engellenen izleyici şirketi yok"</string>
-    <string name="vpnTrackersBlockedToday">Bugün engellenen izleyiciler: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek">Bu hafta engellenen izleyiciler: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Bugün engellenen izleyiciler: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Bu hafta engellenen izleyiciler: %1$d</string>
     <string name="vpnTrackersNone">"Henüz engellenen izleyici yok"</string>
     <string name="vpnNotRunYet">"VPN henüz çalıştırılmadı"</string>
-    <string name="vpnDataTransferred">"%1$1s\n%2$2s paket"</string>
+    <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s paket"</string>
 
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</string>
     <string name="atp_OnInitialNotification">"Uygulama İzleme Koruması etkinleştirildi ve uygulamalarınızdaki izleme girişimlerini engelliyor"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"İzleme etkinliği taranıyor… bip… bop"</string>
-    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ <b>%1$d uygulamada</b> engellenen izleme girişimleri (son bir saat).]]></item>
         <item quantity="other"><![CDATA[ <b>%1$d uygulamada</b> engellenen izleme girişimleri (son bir saat).]]></item>
     </plurals>
@@ -51,50 +53,50 @@
     <string name="atp_RevokedNotification">Cihazınızdaki bir VPN uygulaması Uygulama İzleme Korumasını devre dışı bıraktı. Yeniden etkinleştirmek için dokunun.</string>
 
     <!-- App Tracking Protection Daily Notification -->
-    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Uygulama İzleme Koruması <b>%1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
-    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Uygulama İzleme Koruması <b>1 uygulamada (%2$s) %1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Uygulama İzleme Koruması <b>%1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ Uygulama İzleme Koruması <b>%1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps" instruction="%1$d is the number of tracking attempts and %2$s is the name of the app where it happened"><![CDATA[ Uygulama İzleme Koruması <b>1 uygulamada (%2$s) %1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ Uygulama İzleme Koruması <b>%1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$d izleme girişimini</b> engelledi (son bir gün).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_DailyTopCompanyNotification">
         <item quantity="one"><![CDATA[%1$s <b>%2$d uygulamada</b> sizi izleme girişiminde bulundu (son bir gün). <b>Daha Fazla Bilgi</b>]]></item>
         <item quantity="other"><![CDATA[%1$s <b>%2$d uygulamada</b> sizi izleme girişiminde bulundu (son bir gün). <b>Daha Fazla Bilgi</b>]]></item>
     </plurals>
 
-     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[Uygulama İzleme Koruması en çok izleme girişimini <b>%1$s</b> uygulamasında engelledi (son bir gün).]]></item>
-        <item quantity="other"><![CDATA[Uygulama İzleme Koruması en çok izleme girişimini <b>%1$s</b> ve <b>%2$s</b> uygulamalarında engelledi (son bir gün).]]></item>
+    <plurals name="atp_DailyCompanyBlockedNotification">
+        <item quantity="one"><![CDATA[Uygulama İzleme Koruması en çok izleme girişimini <b>%1$s</b> (geçtiğimiz gün) adresinde engelledi.]]></item>
+        <item quantity="other"><![CDATA[Uygulama İzleme Koruması en çok izleme girişimini <b>%1$s</b> ve <b>%2$s</b> (geçtiğimiz gün) adreslerinde engelledi.]]></item>
     </plurals>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s uygulamasında %2$d kez</b> engelledi (son bir gün).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s ve 1 diğer uygulamada %2$d kez</b> engelledi (son bir gün).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s ve %4$d diğer uygulamada %2$d kez</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s uygulamasında %2$d kez</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s ve 1 diğer uygulamada %2$d kez</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s ve %4$d diğer uygulamada %2$d kez</b> engelledi (son bir gün).]]></string>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s uygulamasında %2$d kez</b> engelledi (son bir gün).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s ve 1 diğer uygulamada %2$d kez</b> engelledi (son bir gün).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s ve %4$d diğer uygulamada %2$d kez</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s uygulamasında %2$d kez</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s ve 1 diğer uygulamada %2$d kez</b> engelledi (son bir gün).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[Uygulama İzleme Koruması <b>%1$s uygulamasını %3$s ve %4$d diğer uygulamada %2$d kez</b> engelledi (son bir gün).]]></string>
 
     <!-- App Tracking Protection Weekly Notification -->
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s uygulamasında %1$d izleme girişimini</b> engelledi (son bir hafta).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve 1 diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir hafta).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s</b> ve %3$d diğer uygulamada %1$d izleme girişimini engelledi (son bir hafta).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s uygulamasında %1$d izleme girişimini</b> engelledi (son bir hafta).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%2$s</b> ve 1 diğer uygulamada %1$d izleme girişimini engelledi (son bir hafta).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s</b> ve %3$d diğer uygulamada %1$d izleme girişimini engelledi (son bir hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%2$s uygulamasında %1$d izleme girişimini</b> engelledi (son bir hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve 1 diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Uygulama İzleme Koruması <b>%2$s</b> ve %3$d diğer uygulamada %1$d izleme girişimini engelledi (son bir hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%2$s uygulamasında %1$d izleme girişimini</b> engelledi (son bir hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%2$s</b> ve 1 diğer uygulamada %1$d izleme girişimini engelledi (son bir hafta).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Uygulama İzleme Koruması <b>%2$s</b> ve %3$d diğer uygulamada %1$d izleme girişimini engelledi (son bir hafta).]]></string>
 
-     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_WeeklyCompanyTeaserNotification">
         <item quantity="one"><![CDATA[Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$s uygulamasını</b> engelledi (son bir hafta).]]></item>
         <item quantity="other"><![CDATA[Uygulama İzleme Koruması <b>%3$s dâhil %2$d uygulamada %1$s uygulamasını</b> engelledi (son bir hafta).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Uygulama İzleme Korumasını Etkinleştir</string>
 
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s uygulamasında %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve 1 diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve %3$d diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s uygulamasında %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve 1 diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve %3$d diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%2$s uygulamasında %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve 1 diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve %3$d diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%2$s uygulamasında %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve 1 diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[Uygulama İzleme Koruması <b>%2$s ve %3$d diğer uygulamada %1$d izleme girişimini</b> engelledi (son bir saat).]]></string>
 
     <!-- App Tracking Protection Privacy Report -->
     <string name="atp_PrivacyReportEnabledTooltip">Uygulama İzleme Koruması etkin ve cihazınızın tamamında izleyicileri engelliyor</string>
@@ -102,7 +104,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Uygulama İzleme Korumasını Etkinleştir</string>
     <string name="atp_OnboardingLastPageOneTitle">Daha iyi uygulama gizliliği için tek bir kolay adım!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle"><b>Popüler ücretsiz uygulamaların %96\'sından fazlasının</b> siz uyurken bile diğer şirketlerin kişisel bilgilerinizi izlemesine izin verdiğini tespit ettik.\n\n<b>Diğer şirketlerin sizi izlemesine izin veren hangi uygulamaları tespit ettiğimizi</b> görün ve kontrolü geri alın!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle" formatted="false"><b>Popüler ücretsiz uygulamaların %96\'sından fazlasının</b> siz uyurken bile diğer şirketlerin kişisel bilgilerinizi izlemesine izin verdiğini tespit ettik.\n\n<b>Diğer şirketlerin sizi izlemesine izin veren hangi uygulamaları tespit ettiğimizi</b> görün ve kontrolü geri alın!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Nasıl çalışır?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Uygulama İzleme Koruması, sizi bir sağlık uygulamasında izleme girişiminde bulunan Facebook gibi <b>diğer şirketlere ait uygulama izleyicileri tespit eder ve engeller</b>.\n\n<b>Ücretsizdir</b> ve uygulamalarınızı alışılageldiği gibi keyifle kullanmaya devam edebilirsiniz. Arka planda çalışarak <b>gece gündüz korunmanızı</b> sağlar.</string>
     <string name="atp_OnboardingLastPageThreeTitle">Verilerinizi kimler görür?</string>
@@ -113,7 +115,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Uygulama İzleme Koruması</string>
-    <string name="atp_daxOnboardingIntroMessage">Popüler ücretsiz uygulamaların %96\'sından fazlası, telefonunuzu kullanmadığınız zamanlarda bile diğer şirketlerin sizi izlemesine olanak tanır. Uygulama İzleme Koruması, bu izleme girişimlerini tespit eder ve engeller.</string>
+    <string name="atp_daxOnboardingIntroMessage" formatted="false">Popüler ücretsiz uygulamaların %96\'sından fazlası, telefonunuzu kullanmadığınız zamanlarda bile diğer şirketlerin sizi izlemesine olanak tanır. Uygulama İzleme Koruması, bu izleme girişimlerini tespit eder ve engeller.</string>
     <string name="atp_daxOnboardingPermissionTitle">Nasıl çalışır?</string>
     <string name="atp_daxOnboardingPermissionMessage">Uygulama İzleme Koruması bir VPN değildir. Ancak cihazınız onu bir VPN olarak algılayacaktır. Bunun nedeni, çalışmak için yerel bir VPN bağlantısı kullanmasıdır. Uygulama verilerini asla haricî bir sunucu üzerinden yönlendirmez. <annotation type="learn_more_link">Daha fazla bilgi edinin</annotation></string>
 
@@ -141,7 +143,7 @@
     <string name="atp_ExcludeAppsManuallyCTACancel">İptal</string>
     <string name="atp_ExcludeAppsManuallyCTAEnable">Etkinleştir</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Geri Yükle</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">%1$s uygulaması için koruma manuel olarak etkinleştirilsin mi?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">%1$s uygulaması için koruma manuel olarak etkinleştirilsin mi?</string>
     <string name="atp_ExcludeAppsManuallyEnableAppLabel">Bu uygulamanın, izleme girişimleri başarısız olduğunda sorunlarla karşılaştığı bilinmektedir.</string>
     <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Koruma etkinleştirildiğinde bu uygulamadaki site içeriği düzgün görünmeyebilir.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Korumayı etkinleştirdiğinizde, uygulamanın adı DuckDuckGo\'ya gönderilir.</string>
@@ -162,7 +164,7 @@
     <!--  Breakage report app list  -->
     <string name="atp_ReportBreakageAppListActivityTitle">Bir Sorun Bildir</string>
     <string name="atp_ReportBreakageAppFeature"><b>Sorunun yaşandığı uygulamayı seçin</b>. Geri bildiriminiz gelişmemize gerçekten yardımcı oluyor!\n\nUygulama İzleme Koruması hakkında genel bir geri bildiriminiz mi var? Bunun yerine <annotation type="use_this_form_link">bu formu</annotation> kullanın.</string>
-    <string name="atp_ReportBreakageAppEntry">%1$s uygulaması</string>
+    <string name="atp_ReportBreakageAppEntry" instruction="Placeholder is the name of an app">%1$s uygulaması</string>
     <string name="atp_ReportBreakageAppSubmitCta">Gönder</string>
     <string name="atp_ReportBreakageAppNextCta">Sonraki</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Lütfen neler olduğunu, ne olmasını beklediğinizi ve soruna yol açan adımları açıklayın.</string>
@@ -189,7 +191,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Uygulama İzleyiciler Hakkında</string>
     <string name="atp_ProfilingInfoTitle">Uygulama izleyici nedir?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Büyük olasılıkla Google ve Facebook gibi şirketlerin sizi üçüncü taraf web sitelerinde perde arkasında izlediğini duymuşsunuzdur. Ancak cihazınızdaki uygulamalar aracılığıyla kişisel bilgilerinizi de izlediklerini biliyor muydunuz?\n\nTest ettiğimiz <b>100 popüler ücretsiz Android uygulamasının %96\'sından fazlası</b> gizli üçüncü taraf izleyiciler içeriyordu. Bunların %87\'si Google\'a ve %68\'i Facebook\'a veri gönderiyordu. Bu, cihazınızı kullanmadığınızda bile gerçekleşmektedir.\n\n<b>Uygulamalardaki izleyiciler, kuzenleri sayılabilecek web sitesi izleyicilere göre çok daha fazla bilgiye erişebilir</b>. Bunlar, bir binada çıktığınız kata varana kadar konumunuz, işteyken ne sıklıkta oyun oynadığınız ve her gün ne zaman ve ne kadar uyuduğunuz gibi bilgilerdir. <b>Örneğin, bir Google veya Facebook hesabınız olmasa bile, uygulamalarınızdan sizin hakkınızda veri toplayabilirler.</b>\n\nFacebook ve Google gibi izleme ağları, <b>sizinle ilgili dijital bir profil oluşturmak için</b> bu bilgi parçacıklarını kullanır. Bu bilgiler yardımıyla, izleme ağları internette kendilerinin istediği şeyleri görmenizi sağlayabilir ve verilerinize dayalı olarak reklam verenlerin size erişmek için teklif vermelerine olanak tanıyabilir.\n\nUygulamalardaki izleyiciler gizlilik açısından BÜYÜK bir sorundur. <b>Ancak DuckDuckGo\'nun size yardımcı olabilecek bir çözümü var.</b>\n\nDuckDuckGo Gizlilik Tarayıcı uygulamasında etkinleştirildiğinde, Uygulama İzleme Koruması, DuckDuckGo uygulamasının siz internette gezinirken web sitelerinde bulduğumuz izleyicileri engellemesi gibi, cihazınızdaki diğer uygulamalarda bulunan birçok izleyiciyi engeller. <b>Bu çift koruma katmanı, izleme şirketlerinin genel olarak sizin hakkınızda bildiklerini azaltır</b>, böylece uygulamalarınızı daha fazla korunduğunuzu bilerek daha rahat kullanabilirsiniz.</string>
+    <string name="atp_ProfilingInfoFirstParagraph" formatted="false">Büyük olasılıkla Google ve Facebook gibi şirketlerin sizi üçüncü taraf web sitelerinde perde arkasında izlediğini duymuşsunuzdur. Ancak cihazınızdaki uygulamalar aracılığıyla kişisel bilgilerinizi de izlediklerini biliyor muydunuz?\n\nTest ettiğimiz <b>100 popüler ücretsiz Android uygulamasının %96\'sından fazlası</b> gizli üçüncü taraf izleyiciler içeriyordu. Bunların %87\'si Google\'a ve %68\'i Facebook\'a veri gönderiyordu. Bu, cihazınızı kullanmadığınızda bile gerçekleşmektedir.\n\n<b>Uygulamalardaki izleyiciler, kuzenleri sayılabilecek web sitesi izleyicilere göre çok daha fazla bilgiye erişebilir</b>. Bunlar, bir binada çıktığınız kata varana kadar konumunuz, işteyken ne sıklıkta oyun oynadığınız ve her gün ne zaman ve ne kadar uyuduğunuz gibi bilgilerdir. <b>Örneğin, bir Google veya Facebook hesabınız olmasa bile, uygulamalarınızdan sizin hakkınızda veri toplayabilirler.</b>\n\nFacebook ve Google gibi izleme ağları, <b>sizinle ilgili dijital bir profil oluşturmak için</b> bu bilgi parçacıklarını kullanır. Bu bilgiler yardımıyla, izleme ağları internette kendilerinin istediği şeyleri görmenizi sağlayabilir ve verilerinize dayalı olarak reklam verenlerin size erişmek için teklif vermelerine olanak tanıyabilir.\n\nUygulamalardaki izleyiciler gizlilik açısından BÜYÜK bir sorundur. <b>Ancak DuckDuckGo\'nun size yardımcı olabilecek bir çözümü var.</b>\n\nDuckDuckGo Gizlilik Tarayıcı uygulamasında etkinleştirildiğinde, Uygulama İzleme Koruması, DuckDuckGo uygulamasının siz internette gezinirken web sitelerinde bulduğumuz izleyicileri engellemesi gibi, cihazınızdaki diğer uygulamalarda bulunan birçok izleyiciyi engeller. <b>Bu çift koruma katmanı, izleme şirketlerinin genel olarak sizin hakkınızda bildiklerini azaltır</b>, böylece uygulamalarınızı daha fazla korunduğunuzu bilerek daha rahat kullanabilirsiniz.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Son 7 Gün</string>
@@ -202,21 +204,29 @@
     <string name="atp_ActivityBetaInstructions">Beta Talimatları</string>
     <string name="atp_ActivityManageProtection">Bir Uygulamayla İlgili Sorun mu Yaşıyorsunuz?</string>
 
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[<b>%3$s</b> uygulamasında %2$d şirkete ait %1$d izleme girişimi engellendi]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[<b>%3$s</b> uygulamasında %2$d şirkete ait %1$d izleme girişimi engellendi]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[<b>%3$s</b> uygulamasında %2$d şirketine ait %1$d izleme girişimi engellendi]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[<b>%3$s</b> uygulamasında %2$d şirketlerine ait %1$d izleme girişimi engellendi]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
+        <![CDATA[<b>%1$s</b> uygulamasında 1 şirket tarafından 1 izleme girişimi engellendi]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies" instruction="Placeholder %1$d is the number of companies doing the tracking. Placeholder %2$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 5 companies in Venmo app.">
+        <![CDATA[<b>%2$s</b> uygulamasında %1$d şirket tarafından 1 izleme girişimi engellendi]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$s is the name of the app doing the tracking. Example: 5 tracking attempts blocked from 1 company in Venmo app.">
+        <![CDATA[<b>%2$s</b> uygulamasında 1 şirket tarafından %1$d izleme girişimi engellendi]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
+        <![CDATA[<b>%3$s</b> uygulamasında %2$d şirketlerine ait %1$d izleme girişimi engellendi]]>
+    </string>
 
     <string name="atp_ActivityEmptyListTitle">Yeni etkinlik yok</string>
     <string name="atp_ActivityEmptyListMessage">Cihazınızı kullanmaya devam edin. Uygulama İzleme Koruması\'nın engellediği izleme girişimleri burada görünür.</string>
     <string name="atp_ActivityPastWeekBlocked">Engellendi</string>
     <string name="atp_ActivityPastWeekAcross">Uygulama Sayısı:</string>
 
-     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">İzleme Girişimi</item>
         <item quantity="other">İzleme Girişimi</item>
     </plurals>
-      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Uygulama</item>
         <item quantity="other">Uygulama</item>
     </plurals>
@@ -277,10 +287,11 @@
         <item quantity="other">%1$d izleme girişimini engelledi</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Bu Uygulamayla İlgili Bir Sorun Bildirin</string>
-    <string name="atp_CompanyDetailsTrackingShowMore">%1$d tane daha göster</string>
+    <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">%1$d tane daha göster</string>
     <string name="atp_CompanyDetailsTrackingLearnMore">Uygulamalar, diğer şirketlerin analiz ve pazarlama gibi amaçlarla kullandıkları izleyicileri içerebilir. Eğer onları engellemezsek, bu izleyiciler sizinle ilgili daha da ayrıntılı dijital profiller oluşturabilir. <annotation type="learn_more_link">Daha fazla bilgi</annotation></string>
     <string name="atp_CompanyDetailsTrackingShowLess">Daha az göster</string>
     <string name="atp_CompanyDetailsAppInfoPanel">Koruma bu uygulama için şu anda devre dışı. Uygulama İzleme Koruması bir soruna neden olduysa, lütfen <annotation type="report_issues_link">sorunu bildirin</annotation></string>
+    <string name="atp_CompanyDetailsNotAvailableForUninstalledApps" instruction="Toast shown when users tap on item that corresponds to an already uninstalled application">Kaldırılan uygulamalar için izleyici ayrıntıları mevcut değil</string>
 
     <!--  App Tracking Company Signals -->
     <string name="atp_TrackingSignalAAID">Android Reklam Kimliği</string>

@@ -191,19 +191,19 @@ class TrackerFeedAdapter @Inject constructor(
                         if (trackingCompanies == 1) {
                             resources.getString(
                                 R.string.atp_ActivityTrackersCompanyBlockedOnetimeOneCompany,
-                                trackersCount, trackingCompanies, trackingAppName
+                                trackingAppName
                             )
                         } else {
                             resources.getString(
                                 R.string.atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies,
-                                trackersCount, trackingCompanies, trackingAppName
+                                trackingCompanies, trackingAppName
                             )
                         }
                     } else {
                         if (trackingCompanies == 1) {
                             resources.getString(
                                 R.string.atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany,
-                                trackersCount, trackingCompanies, trackingAppName
+                                trackersCount, trackingAppName
                             )
                         } else {
                             resources.getString(
