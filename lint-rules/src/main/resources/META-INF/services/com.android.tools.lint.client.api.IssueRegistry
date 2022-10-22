@@ -1,2 +1,1 @@
-com.duckduckgo.lint.DuckDuckGoIssueRegistry
-com.duckduckgo.lint.ui.DuckDuckGoDesignSystemRegistry
+com.duckduckgo.lint.registry.DuckDuckGoIssueRegistry
