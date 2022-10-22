@@ -38,7 +38,7 @@ class TrackerDataDevReceiver(
     context: Context,
     intentAction: String = DOWNLOAD_TDS_INTENT_ACTION,
     private val receiver: (Intent) -> Unit
-) : BroadcastReceiver() {
+) : BroadcastReceiver(), LifecycleObserver {
     init {
         context.registerReceiver(this, IntentFilter(intentAction))
     }
