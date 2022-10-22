@@ -25,16 +25,31 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface VpnTrackerDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(tracker: VpnTracker)
+    @Transaction
+    fun insert(tracker: VpnTracker) {
+        getTrackerFor(tracker.bucket, tracker.domain, tracker.trackingApp.packageId)?.let {
+            incrementCount(tracker.bucket, tracker.timestamp, tracker.domain, tracker.trackingApp.packageId)
+        } ?: internalInsertTracker(tracker.copy(count = 1))
+    }
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(tracker: List<VpnTracker>)
+    fun internalInsertTracker(tracker: VpnTracker)
+
+    @Transaction
+    fun insert(tracker: List<VpnTracker>) {
+        tracker.forEach { insert(it) }
+    }
+
+    @Query("UPDATE vpn_tracker SET count = count + 1, timestamp = :timestamp WHERE bucket = :bucket AND domain = :domain AND packageId = :packageId")
+    fun incrementCount(bucket: String, timestamp: String, domain: String, packageId: String)
+
+    @Query("SELECT * FROM vpn_tracker WHERE bucket = :bucket AND domain = :domain AND packageId = :packageId LIMIT 1")
+    fun getTrackerFor(bucket: String, domain: String, packageId: String): VpnTracker?
 
     @Query("DELETE FROM vpn_tracker")
     fun deleteAllTrackers()
 
-    @Query("SELECT * FROM vpn_tracker ORDER BY trackerId DESC LIMIT 1")
+    @Query("SELECT * FROM vpn_tracker ORDER BY timestamp DESC LIMIT 1")
     fun getLatestTracker(): Flow<VpnTracker?>
 
     @Query(
@@ -58,7 +73,7 @@ interface VpnTrackerDao {
     @Query("DELETE FROM vpn_tracker WHERE timestamp < :startTime")
     fun deleteOldDataUntil(startTime: String)
 
-    @Query("SELECT COUNT(*) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
+    @Query("SELECT sum(count) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
     fun getTrackersCountBetween(
         startTime: String,
         endTime: String
@@ -71,7 +86,7 @@ interface VpnTrackerDao {
     ): Flow<Int>
 
     @Query(
-        "SELECT strftime('%Y-%m-%d', timestamp) bucket, * FROM vpn_tracker " +
+        "SELECT * FROM vpn_tracker " +
             "WHERE timestamp >= :startTime order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS"
     )
     fun getPagedTrackersSince(startTime: String): Flow<List<BucketizedVpnTracker>>

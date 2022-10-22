@@ -25,20 +25,21 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 
 @Entity(
     tableName = "vpn_tracker",
-    indices = [Index(value = ["timestamp"])]
+    indices = [Index(value = ["bucket"])],
+    primaryKeys = ["bucket", "domain", "packageId"]
 )
 data class VpnTracker(
-    @PrimaryKey(autoGenerate = true) val trackerId: Int = 0,
     val trackerCompanyId: Int,
     val domain: String,
     val company: String,
     val companyDisplayName: String,
     @Embedded val trackingApp: TrackingApp,
-    val timestamp: String = DatabaseDateFormatter.timestamp()
+    val timestamp: String = DatabaseDateFormatter.timestamp(),
+    val bucket: String = DatabaseDateFormatter.timestamp().split("T").first(),
+    val count: Int = 1,
 )
 
 data class BucketizedVpnTracker(
-    val bucket: String,
     @Embedded val trackerCompanySignal: VpnTrackerCompanySignal
 )
 

@@ -92,7 +92,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         trackerData: List<BucketizedVpnTracker>
     ): List<TrackingApp> {
         val sourceData = mutableListOf<TrackingApp>()
-        val perSessionData = trackerData.groupBy { it.bucket }
+        val perSessionData = trackerData.groupBy { it.trackerCompanySignal.tracker.bucket }
 
         perSessionData.values.forEach { sessionTrackers ->
             coroutineContext.ensureActive()

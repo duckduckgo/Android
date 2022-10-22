@@ -29,7 +29,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 @Database(
-    exportSchema = true, version = 27,
+    exportSchema = true, version = 28,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -148,6 +148,33 @@ abstract class VpnDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_27_TO_28: Migration = object : Migration(27, 28) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // https://stackoverflow.com/a/57797179/980345
+                // SQLite does not support Alter table operations like Foreign keys
+                database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `vpn_tracker_new`" +
+                        "(trackerCompanyId INTEGER NOT NULL, domain TEXT NOT NULL, company TEXT NOT NULL," +
+                        "companyDisplayName TEXT NOT NULL, packageId TEXT NOT NULL, appDisplayName TEXT NOT NULL," +
+                        "timestamp TEXT NOT NULL, bucket TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY(bucket, domain, packageId))"
+                )
+
+                database.execSQL(
+                    """
+                    INSERT INTO vpn_tracker_new (trackerCompanyId, domain, company, companyDisplayName, packageId, appDisplayName, timestamp, bucket, count)
+                    SELECT  trackerCompanyId, domain, company, companyDisplayName, packageId, appDisplayName, timestamp,
+                            strftime('%Y-%m-%d', timestamp), count()
+                    FROM vpn_tracker
+                    GROUP BY strftime('%Y-%m-%d', timestamp), domain, packageId
+                    """.trimIndent()
+                )
+
+                database.execSQL("DROP TABLE IF EXISTS `vpn_tracker`")
+                database.execSQL("ALTER TABLE `vpn_tracker_new` RENAME TO `vpn_tracker`")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_vpn_tracker_bucket` ON `vpn_tracker` (`bucket`)")
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_18_TO_19,
@@ -159,6 +186,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_24_TO_25,
                 MIGRATION_25_TO_26,
                 MIGRATION_26_TO_27,
+                MIGRATION_27_TO_28,
             )
     }
 }
