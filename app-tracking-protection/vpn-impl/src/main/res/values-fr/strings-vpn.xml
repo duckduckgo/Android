@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Protection contre le suivi des applications</string>
     <string name="refresh">Actualiser</string>
 
@@ -45,7 +45,7 @@
     <string name="atp_ReportIssue">Vous rencontrez des problèmes avec une application ?</string>
     <string name="atp_OnInitialNotification">"App Tracking Protection est activé et bloque les tentatives de suivi sur vos applications"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Analyse de l'activité de suivi… bip… boop"</string>
-    <plurals name="atp_OnNotification">
+    <plurals name="atp_OnNotification" tools:ignore="MissingQuantity">
         <item quantity="one"><![CDATA[ Tentatives de suivi bloquées <b>dans %1$d application</b> (dernière heure).]]></item>
         <item quantity="other"><![CDATA[ Tentatives de suivi bloquées <b>dans %1$d applications</b> (dernière heure).]]></item>
     </plurals>
@@ -58,12 +58,12 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ App Tracking Protection a bloqué <b>%1$d tentatives de suivi</b> (dernières 24 heures).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ App Tracking Protection a bloqué <b>%1$d tentatives de suivi dans %2$d applications, dont %3$s</b> (dernières 24 heures).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification">
+    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="MissingQuantity">
         <item quantity="one"><![CDATA[%1$s a essayé de vous suivre <b>dans %2$d application</b> (dernières 24 heures). <b>Voir plus</b>]]></item>
         <item quantity="other"><![CDATA[%1$s a essayé de vous suivre <b>dans %2$d applications</b> (dernières 24 heures). <b>Voir plus</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification">
+    <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="MissingQuantity">
         <item quantity="one"><![CDATA[App Tracking Protection a bloqué le plus grand nombre de tentatives de suivi dans <b>%1$s</b> (dernières 24 heures).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection a bloqué le plus grand nombre de tentatives de suivi dans <b>%1$s</b> et <b>%2$s</b>(dernières 24 heures).]]></item>
     </plurals>
@@ -84,7 +84,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection a bloqué <b>%1$d tentatives de suivi dans %2$s</b> et 1 autre application (semaine dernière).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[App Tracking Protection a bloqué <b>%1$d tentatives de suivi dans %2$s</b> et %3$d autres applications (semaine dernière).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification">
+    <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="MissingQuantity">
         <item quantity="one"><![CDATA[App Tracking Protection a bloqué <b>%1$s dans %2$d application, %3$s</b> (semaine dernière).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection a bloqué <b>%1$s dans %2$d applications, dont %3$s</b> (semaine dernière).]]></item>
     </plurals>
@@ -222,11 +222,11 @@
     <string name="atp_ActivityPastWeekBlocked">Blocages</string>
     <string name="atp_ActivityPastWeekAcross">Dans</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="MissingQuantity, ImpliedQuantity">
         <item quantity="one">Tentative de suivi</item>
         <item quantity="other">Tentatives de suivi</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="MissingQuantity, ImpliedQuantity">
         <item quantity="one">Application</item>
         <item quantity="other">Applications</item>
     </plurals>
@@ -278,11 +278,11 @@
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
-    <plurals name="atp_CompanyDetailsTrackingAttempts">
+    <plurals name="atp_CompanyDetailsTrackingAttempts" tools:ignore="MissingQuantity">
         <item quantity="one">%1$d tentative. Informations recueillies en général :</item>
         <item quantity="other">%1$d tentatives. Informations recueillies en général :</item>
     </plurals>
-    <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
+    <plurals name="atp_CompanyDetailsTrackingAttemptsTitle" tools:ignore="MissingQuantity">
         <item quantity="one">%1$d tentative de suivi bloquée</item>
         <item quantity="other">%1$d tentatives de suivi bloquées</item>
     </plurals>
