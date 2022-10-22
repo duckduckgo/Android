@@ -469,22 +469,24 @@ class DeviceShieldTrackerActivity :
         } else {
             binding.deviceShieldTrackerLabelEnabled.gone()
 
-            val disabledLabel = if (runningState.stopReason == REVOKED) {
-                R.string.atp_ActivityRevokedLabel
+            val (disabledLabel, annotation) = if (runningState.stopReason == REVOKED) {
+                R.string.atp_ActivityRevokedLabel to REPORT_ISSUES_ANNOTATION
             } else if (runningState.stopReason == SELF_STOP) {
-                R.string.atp_ActivityDisabledLabel
+                R.string.atp_ActivityDisabledLabel to REPORT_ISSUES_ANNOTATION
             } else {
-                R.string.atp_ActivityDisabledBySystemLabel
+                R.string.atp_ActivityDisabledBySystemLabel to RE_ENABLE_ANNOTATION
             }
             binding.deviceShieldTrackerLabelDisabled.apply {
                 setClickableLink(
-                    REPORT_ISSUES_ANNOTATION,
+                    annotation,
                     getText(disabledLabel)
-                ) { launchFeedback() }
-                setClickableLink(
-                    RE_ENABLE_ANNOTATION,
-                    getText(disabledLabel)
-                ) { reEnableAppTrackingProtection() }
+                ) {
+                    if (annotation == REPORT_ISSUES_ANNOTATION) {
+                        launchFeedback()
+                    } else if (annotation == RE_ENABLE_ANNOTATION) {
+                        reEnableAppTrackingProtection()
+                    }
+                }
                 show()
             }
         }

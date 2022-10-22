@@ -67,7 +67,14 @@ class AlwaysOnAlertDialogFragment private constructor() : BottomSheetDialogFragm
         }
 
         fun configureCloseButtons(binding: ContentVpnAlwaysOnAlertBinding) {
-            binding.closeButton.setOnClickListener { animatedClosed() }
+            binding.closeButton.setOnClickListener {
+                if (this::listener.isInitialized) {
+                    listener.onCanceled()
+                } else {
+                    Timber.e("Listener not initialized")
+                }
+                animatedClosed()
+            }
             binding.notNowButton.setOnClickListener {
                 animatedClosed()
                 if (this::listener.isInitialized) {
