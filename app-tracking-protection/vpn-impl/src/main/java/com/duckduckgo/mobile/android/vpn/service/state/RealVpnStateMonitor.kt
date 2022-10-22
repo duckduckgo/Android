@@ -67,17 +67,12 @@ class RealVpnStateMonitor @Inject constructor(
                 else vpnState.copy(state = VpnRunningState.DISABLED)
             }
             .onStart {
-                if (vpnFeaturesRegistry.isFeatureRegistered(vpnFeature)) {
-                    val alwaysOnState = database.vpnServiceStateDao().getLastStateStats()?.alwaysOnState ?: AlwaysOnState.ALWAYS_ON_DISABLED
-                    emit(
-                        VpnState(
-                            state = VpnRunningState.ENABLED,
-                            alwaysOnState = alwaysOnState.asAlwaysOnStateModel()
-                        )
-                    )
-                } else {
-                    emit(VpnState(VpnRunningState.DISABLED))
-                }
+                val vpnState = mapState(database.vpnServiceStateDao().getLastStateStats())
+                VpnState(
+                    state = if (vpnFeaturesRegistry.isFeatureRegistered(vpnFeature)) VpnRunningState.ENABLED else VpnRunningState.DISABLED,
+                    alwaysOnState = vpnState.alwaysOnState,
+                    stopReason = vpnState.stopReason
+                ).also { emit(it) }
             }.flowOn(dispatcherProvider.io())
             .distinctUntilChanged()
     }
