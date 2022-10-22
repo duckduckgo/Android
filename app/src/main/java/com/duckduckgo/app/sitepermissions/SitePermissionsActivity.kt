@@ -44,8 +44,7 @@ import javax.inject.Inject
 @InjectWith(ActivityScope::class)
 class SitePermissionsActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var faviconManager: FaviconManager
+    @Inject lateinit var faviconManager: FaviconManager
 
     private val viewModel: SitePermissionsViewModel by bindViewModel()
     private val binding: ActivitySitePermissionsBinding by viewBinding()
