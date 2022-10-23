@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.lint
+package com.duckduckgo.lint.registry
 
 import com.android.tools.lint.client.api.IssueRegistry
 import com.android.tools.lint.client.api.Vendor
@@ -25,8 +25,11 @@ import com.duckduckgo.lint.NoLifecycleObserverDetector.Companion.NO_LIFECYCLE_OB
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
 import com.duckduckgo.lint.ui.DeprecatedAndroidButtonUsedInXmlDetector.Companion.DEPRECATED_BUTTON_IN_XML
-import com.duckduckgo.lint.ui.DeprecatedSwitchUsedInXmlDetector
-import com.duckduckgo.lint.ui.DeprecatedSwitchUsedInXmlDetector.Companion
+import com.duckduckgo.lint.ui.DeprecatedSwitchUsedInXmlDetector.Companion.DEPRECATED_SWITCH_IN_XML
+import com.duckduckgo.lint.ui.MissingDividerDetector.Companion.MISSING_HORIZONTAL_DIVIDER
+import com.duckduckgo.lint.ui.MissingDividerDetector.Companion.MISSING_VERTICAL_DIVIDER
+import com.duckduckgo.lint.ui.NoAlertDialogDetector.Companion.NO_DESIGN_SYSTEM_DIALOG
+import com.duckduckgo.lint.ui.NoBottomSheetDialogDetector.Companion.NO_BOTTOM_SHEET
 import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Companion.STYLE_IN_DESIGN_SYSTEM_COMPONENT
 
 @Suppress("UnstableApiUsage")
@@ -37,8 +40,15 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_LIFECYCLE_OBSERVER_ISSUE,
             NO_FRAGMENT_ISSUE,
             NO_SYSTEM_LOAD_LIBRARY,
-            DeprecatedSwitchUsedInXmlDetector.DEPRECATED_SWITCH_IN_XML,
+
+            // Android Design System
             DEPRECATED_BUTTON_IN_XML,
+            STYLE_IN_DESIGN_SYSTEM_COMPONENT,
+            NO_DESIGN_SYSTEM_DIALOG,
+            DEPRECATED_SWITCH_IN_XML,
+            MISSING_VERTICAL_DIVIDER,
+            MISSING_HORIZONTAL_DIVIDER,
+            NO_BOTTOM_SHEET,
         )
 
     override val api: Int
@@ -51,4 +61,3 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
         contact = "https://github.com/duckduckgo/android"
     )
 }
-
