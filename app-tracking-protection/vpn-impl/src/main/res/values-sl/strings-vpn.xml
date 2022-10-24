@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="atp_name">Zaščita pred sledenjem aplikacij</string>
     <string name="refresh">Osveži</string>
 
@@ -230,19 +230,21 @@
     <string name="atp_ActivityPastWeekBlocked">Blokirana stran</string>
     <string name="atp_ActivityPastWeekAcross">Na spletni strani</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Poskus sledenja</item>
         <item quantity="two">Poskusa sledenja</item>
         <item quantity="few">Poskusi sledenja</item>
         <item quantity="other">Poskusi sledenja</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Aplikacija</item>
         <item quantity="two">Aplikaciji</item>
         <item quantity="few">Aplikacije</item>
         <item quantity="other">Aplikacij</item>
     </plurals>
+    <string name="atp_ActivityEnabledLabel">Ta funkcija je v različici beta. Če opazite težavo z aplikacijo, <annotation type="app_settings_link">nam pošljite sporočilo.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Zaščita pred sledenjem aplikacijam je onemogočena</b>\nAli je zaščita pred sledenjem aplikacijam povzročila težave z vašimi aplikacijami? <annotation type="report_issues_link">Odgovori o vprašanjih </annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android je onemogočil zaščito sledenja aplikaciji</b>. Želite preprečiti, da bi se to ponovilo? <annotation type="re_enable_link">Omogoči znova</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Aplikacija VPN v vaši napravi je onemogočila zaščito pred sledenjem aplikacij App Tracking Protection.</b>\nAli je zaščita pred sledenjem aplikacijam App Tracking Protection povzročila težave z vašimi aplikacijami? <annotation type="report_issues_link">Odgovori o vprašanjih</annotation></string>
     <string name="atp_ActivityAbout">O nas</string>
     <string name="atp_ActivityManage">Upravljanje</string>
@@ -393,5 +395,12 @@
 
     <!--  App Tracking Protection Promote Always On -->
     <string name="atp_PromoteAlwaysOnDialogSettings">Odprite Nastavitve</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Ne zdaj</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[V napravi pojdite na nastavitve VPN za DuckDuckGo in omogočite <b>Always-on</b> VPN, da preprečite, da bi Android onemogočil zaščito.\n\nDrugo nastavitev pustite IZKLOPLJENO.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Če se želite izogniti težavam z aplikacijo, obiščite spletno stran svoje naprave <b>Nastavitve VPN za DuckDuckGo</b> in onemogočite <b>Blokiraj povezave brez VPN</b>.]]></string>
+    <string name="atp_AlwaysOnModalHeading">Nastavitev na Vedno vklopljeno</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Spreminjanje nastavitev VPN</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Potrebno je ukrepanje!</b> Če se želite izogniti težavam z aplikacijami, morate spremeniti nastavitve sistema Android. <annotation type="open_settings_link">Spremenite nastavitve</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Potrebno je ukrepanje! Za zaščito pred sledenjem aplikacijam je treba spremeniti nastavitev sistema Android.</string>
 
 </resources>
