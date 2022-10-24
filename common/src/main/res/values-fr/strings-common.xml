@@ -14,14 +14,16 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="common_Today">Aujourd\'hui</string>
     <string name="common_Yesterday">Hier</string>
-    <string name="common_DaysAgo">Il y a %1$d jours</string>
+    <string name="common_DaysAgo" instruction="Placeholder is the number of days">Il y a %1$d jours</string>
     <string name="common_PastWeek">La semaine dernière</string>
     <string name="common_PastMonth">Le mois dernier</string>
-    <string name="common_MinutesAgo">Il y a %1$d min</string>
-    <string name="common_HoursAgo">il y a %1$d h</string>
+    <string name="common_MinutesAgo" instruction="Placeholder is the number of minutes">Il y a %1$d min</string>
+    <string name="common_HoursAgo" instruction="Placeholder is the number of hours">il y a %1$d h</string>
     <string name="common_JustNow">À l\'instant</string>
     <string name="common_hour_abbreviation">h</string>
     <string name="common_min_abbreviation">min</string>

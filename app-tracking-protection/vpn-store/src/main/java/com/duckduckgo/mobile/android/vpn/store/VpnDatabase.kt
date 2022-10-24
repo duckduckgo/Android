@@ -29,14 +29,12 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 @Database(
-    exportSchema = true,
-    version = 25,
+    exportSchema = true, version = 26,
     entities = [
         VpnState::class,
         VpnTracker::class,
         VpnRunningStats::class,
         VpnServiceStateStats::class,
-        VpnDataStats::class,
         HeartBeatEntity::class,
         VpnPhoenixEntity::class,
         VpnNotification::class,
@@ -53,7 +51,7 @@ import org.threeten.bp.format.DateTimeFormatter
         AppTrackerEntity::class,
         VpnFeatureRemoverState::class,
         VpnAddressLookup::class,
-    ],
+    ]
 )
 
 @TypeConverters(VpnTypeConverters::class)
@@ -62,7 +60,6 @@ abstract class VpnDatabase : RoomDatabase() {
     abstract fun vpnStateDao(): VpnStateDao
     abstract fun vpnTrackerDao(): VpnTrackerDao
     abstract fun vpnRunningStatsDao(): VpnRunningStatsDao
-    abstract fun vpnDataStatsDao(): VpnDataStatsDao
     abstract fun vpnHeartBeatDao(): VpnHeartBeatDao
     abstract fun vpnPhoenixDao(): VpnPhoenixDao
     abstract fun vpnNotificationsDao(): VpnNotificationsDao
@@ -77,11 +74,11 @@ abstract class VpnDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list`" +
-                        " (`packageId` TEXT NOT NULL, PRIMARY KEY (`packageId`))",
+                        " (`packageId` TEXT NOT NULL, PRIMARY KEY (`packageId`))"
                 )
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list_metadata`" +
-                        " (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eTag` TEXT)",
+                        " (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eTag` TEXT)"
                 )
             }
         }
@@ -91,7 +88,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_entities`" +
                         " (`trackerCompanyId` INTEGER PRIMARY KEY NOT NULL, `entityName` TEXT NOT NULL, " +
-                        "`score` INTEGER NOT NULL, `signals` TEXT NOT NULL)",
+                        "`score` INTEGER NOT NULL, `signals` TEXT NOT NULL)"
                 )
             }
         }
@@ -107,7 +104,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_feature_remover`" +
                         " (`id` INTEGER PRIMARY KEY NOT NULL, " +
-                        "`isFeatureRemoved` INTEGER NOT NULL)",
+                        "`isFeatureRemoved` INTEGER NOT NULL)"
                 )
             }
         }
@@ -117,7 +114,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_prefs`" +
                         " (`preference` TEXT PRIMARY KEY NOT NULL, " +
-                        "`value` INTEGER NOT NULL)",
+                        "`value` INTEGER NOT NULL)"
                 )
             }
         }
@@ -133,8 +130,14 @@ abstract class VpnDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_address_lookup`" +
                         " (`address` TEXT PRIMARY KEY NOT NULL, " +
-                        "`domain` TEXT NOT NULL)",
+                        "`domain` TEXT NOT NULL)"
                 )
+            }
+        }
+
+        private val MIGRATION_25_TO_26: Migration = object : Migration(25, 26) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE IF EXISTS `vpn_data_stats`")
             }
         }
 
@@ -147,6 +150,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_22_TO_23,
                 MIGRATION_23_TO_24,
                 MIGRATION_24_TO_25,
+                MIGRATION_25_TO_26,
             )
     }
 }

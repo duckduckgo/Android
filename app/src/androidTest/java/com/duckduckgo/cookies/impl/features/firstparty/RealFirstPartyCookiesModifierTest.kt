@@ -103,8 +103,9 @@ class RealFirstPartyCookiesModifierTest {
         val expires = queryCookiesDB("example.com")
 
         assertNotNull(expires)
-        val diffInSeconds = (expires!! - expectedValue) / 1000000 // initially in microseconds
-        assertTrue(diffInSeconds < 1) // There should be less than 1s difference between the expected and the actual
+        val diff = (expires!! - expectedValue) / 1000000 // initially in microseconds
+        assertTrue(diff > -5L && diff < 5L) // Diff within +- 5 seconds
+
     }
 
     @Test

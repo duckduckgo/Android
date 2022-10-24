@@ -138,6 +138,7 @@ class WelcomePage : OnboardingPageFragment() {
             decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             decorView.systemUiVisibility += View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
             statusBarColor = Color.TRANSPARENT
+            navigationBarColor = Color.BLACK
         }
         ViewCompat.requestApplyInsets(longDescriptionContainer)
     }

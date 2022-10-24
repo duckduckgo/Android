@@ -151,13 +151,16 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun getUserPreferencesJson(userPreferences: String): String {
+        val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()}"
         if (userPreferences.isEmpty()) {
-            return "{${getVersionNumberKeyValuePair()}}"
+            return "{$defaultParameters}"
         }
-        return "{$userPreferences,${getVersionNumberKeyValuePair()}}"
+        return "{$userPreferences,$defaultParameters}"
     }
 
     private fun getVersionNumberKeyValuePair() = "\"versionNumber\":${appBuildConfig.versionCode}"
+
+    private fun getPlatformKeyValuePair() = "\"platform\":{\"name\":\"android\"}"
 
     private fun getContentScopeJson(config: String, unprotectedTemporaryExceptions: List<UnprotectedTemporaryException>): String = (
         "{\"features\":{$config},\"unprotectedTemporary\":${getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)}}"

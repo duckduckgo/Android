@@ -25,7 +25,7 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 
 @Entity(
     tableName = "vpn_tracker",
-    indices = [Index(value = ["timestamp"])],
+    indices = [Index(value = ["timestamp"])]
 )
 data class VpnTracker(
     @PrimaryKey(autoGenerate = true) val trackerId: Int = 0,
@@ -34,46 +34,37 @@ data class VpnTracker(
     val company: String,
     val companyDisplayName: String,
     @Embedded val trackingApp: TrackingApp,
-    val timestamp: String = DatabaseDateFormatter.timestamp(),
+    val timestamp: String = DatabaseDateFormatter.timestamp()
 )
 
 data class BucketizedVpnTracker(
     val bucket: String,
-    @Embedded val trackerCompanySignal: VpnTrackerCompanySignal,
+    @Embedded val trackerCompanySignal: VpnTrackerCompanySignal
 )
 
 @Entity(tableName = "vpn_state")
 data class VpnState(
     @PrimaryKey val id: Long = 1,
-    val uuid: String,
-)
-
-@Entity(tableName = "vpn_data_stats")
-data class VpnDataStats(
-    @PrimaryKey val id: String = DatabaseDateFormatter.bucketByHour(),
-    val dataSent: Long = 0,
-    val dataReceived: Long = 0,
-    val packetsSent: Int = 0,
-    val packetsReceived: Int = 0,
+    val uuid: String
 )
 
 @Entity(tableName = "vpn_running_stats")
 data class VpnRunningStats(
     @PrimaryKey val id: String,
-    val timeRunningMillis: Long,
+    val timeRunningMillis: Long
 )
 
 enum class VpnServiceState {
     ENABLED,
     DISABLED,
-    INVALID,
+    INVALID
 }
 
 enum class VpnStoppingReason {
     SELF_STOP,
     ERROR,
     REVOKED,
-    UNKNOWN,
+    UNKNOWN
 }
 
 @Entity(tableName = "vpn_service_state_stats")
@@ -81,17 +72,17 @@ data class VpnServiceStateStats(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val timestamp: String = DatabaseDateFormatter.timestamp(),
     val state: VpnServiceState,
-    val stopReason: VpnStoppingReason = UNKNOWN,
+    val stopReason: VpnStoppingReason = UNKNOWN
 )
 
 data class BucketizedVpnServiceStateStats(
     val day: String,
-    @Embedded val vpnServiceStateStats: VpnServiceStateStats,
+    @Embedded val vpnServiceStateStats: VpnServiceStateStats
 )
 
 data class TrackingApp(
     val packageId: String,
-    val appDisplayName: String,
+    val appDisplayName: String
 ) {
     override fun toString(): String = "package=$packageId ($appDisplayName)"
 }
@@ -100,7 +91,7 @@ data class VpnTrackerCompanySignal(
     @Embedded val tracker: VpnTracker,
     @Relation(
         parentColumn = "trackerCompanyId",
-        entityColumn = "trackerCompanyId",
+        entityColumn = "trackerCompanyId"
     )
-    val trackerEntity: AppTrackerEntity,
+    val trackerEntity: AppTrackerEntity
 )

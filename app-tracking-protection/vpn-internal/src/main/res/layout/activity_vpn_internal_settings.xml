@@ -27,7 +27,7 @@
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ToolbarTheme"
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/toolbarBgColor"
-            android:theme="@style/ToolbarTheme"
+            android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
             app:popupTheme="@style/PopUpOverflowMenu"/>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -122,14 +122,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Trackers"
-            />
-
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                android:id="@+id/transparencyModeToggle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="Transparency Mode"
-                app:showSwitch="true"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -230,16 +222,6 @@
                 android:layout_height="wrap_content"
                 app:primaryText="Generate AppTP bugreport"
             />
-
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                android:id="@+id/viewDiagnostics"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:primaryText="View Diagnostics Data"
-            />
-
 
             <!-- Section Health -->
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider

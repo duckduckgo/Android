@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.history
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.lifecycle.LifecycleOwner
@@ -27,6 +28,7 @@ import com.duckduckgo.mobile.android.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
+@SuppressLint("NoBottomSheetDialog")
 class NavigationHistorySheet(
     context: Context,
     private val viewLifecycleOwner: LifecycleOwner,

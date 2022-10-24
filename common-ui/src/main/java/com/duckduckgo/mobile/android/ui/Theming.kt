@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.ui
 
 import android.app.UiModeManager
-import android.app.UiModeManager.MODE_NIGHT_NO
 import android.app.UiModeManager.MODE_NIGHT_YES
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -30,12 +29,11 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.Theming.Constants.BROADCAST_THEME_CHANGED
-import com.duckduckgo.mobile.android.ui.Theming.Constants.THEME_MAP
 
 enum class DuckDuckGoTheme {
     SYSTEM_DEFAULT,
     DARK,
-    LIGHT,
+    LIGHT;
 }
 
 object Theming {
@@ -43,51 +41,48 @@ object Theming {
     fun getThemedDrawable(
         context: Context,
         drawableId: Int,
-        theme: DuckDuckGoTheme,
+        theme: DuckDuckGoTheme
     ): Drawable? {
-        val themeId: Int = THEME_MAP[Pair(R.style.AppTheme, theme)] ?: R.style.AppTheme_Light
+        val themeId = when (theme) {
+            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
+                val uiManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+                when (uiManager.nightMode) {
+                    MODE_NIGHT_YES -> R.style.Theme_DuckDuckGo_Dark
+                    else -> R.style.Theme_DuckDuckGo_Light
+                }
+            }
+
+            DuckDuckGoTheme.DARK -> R.style.Theme_DuckDuckGo_Dark
+            else -> R.style.Theme_DuckDuckGo_Light
+        }
         return ResourcesCompat.getDrawable(
-            context.resources,
-            drawableId,
-            ContextThemeWrapper(context, themeId).theme,
+            context.resources, drawableId, ContextThemeWrapper(context, themeId).theme
         )
     }
 
     object Constants {
-
         const val BROADCAST_THEME_CHANGED = "BROADCAST_THEME_CHANGED"
-
-        val THEME_MAP =
-            mapOf(
-                Pair(R.style.AppTheme, DuckDuckGoTheme.LIGHT) to R.style.AppTheme_Light,
-                Pair(R.style.AppTheme, DuckDuckGoTheme.DARK) to R.style.AppTheme_Dark,
-            )
-    }
-}
-
-private fun AppCompatActivity.manifestThemeId(): Int {
-    return try {
-        packageManager.getActivityInfo(componentName, 0).themeResource
-    } catch (exception: Exception) {
-        R.style.AppTheme
     }
 }
 
 fun AppCompatActivity.applyTheme(theme: DuckDuckGoTheme): BroadcastReceiver? {
-    if (theme == DuckDuckGoTheme.SYSTEM_DEFAULT) {
-        val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
-        val themeId =
-            when (uiManager.nightMode) {
-                MODE_NIGHT_YES -> THEME_MAP[Pair(manifestThemeId(), DuckDuckGoTheme.DARK)]
-                MODE_NIGHT_NO -> THEME_MAP[Pair(manifestThemeId(), DuckDuckGoTheme.LIGHT)]
-                else -> THEME_MAP[Pair(manifestThemeId(), DuckDuckGoTheme.LIGHT)]
-            }
-        if (themeId != null) setTheme(themeId)
-    } else {
-        val themeId = THEME_MAP[Pair(manifestThemeId(), theme)] ?: return null
-        setTheme(themeId)
-    }
+    setTheme(getThemeId(theme))
     return registerForThemeChangeBroadcast()
+}
+
+fun AppCompatActivity.getThemeId(theme: DuckDuckGoTheme): Int {
+    return when (theme) {
+        DuckDuckGoTheme.SYSTEM_DEFAULT -> {
+            val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+            when (uiManager.nightMode) {
+                MODE_NIGHT_YES -> R.style.Theme_DuckDuckGo_Dark
+                else -> R.style.Theme_DuckDuckGo_Light
+            }
+        }
+
+        DuckDuckGoTheme.DARK -> R.style.Theme_DuckDuckGo_Dark
+        else -> R.style.Theme_DuckDuckGo_Light
+    }
 }
 
 // Move this to LiveData/Flow and use appDelegate for night/day theming
@@ -97,7 +92,7 @@ private fun AppCompatActivity.registerForThemeChangeBroadcast(): BroadcastReceiv
         object : BroadcastReceiver() {
             override fun onReceive(
                 context: Context,
-                intent: Intent,
+                intent: Intent
             ) {
                 recreate()
             }

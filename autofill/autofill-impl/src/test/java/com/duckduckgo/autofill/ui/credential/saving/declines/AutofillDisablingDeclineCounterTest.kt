@@ -58,12 +58,6 @@ class AutofillDisablingDeclineCounterTest {
     }
 
     @Test
-    fun whenInitialisedThenNoPreviouslySessionDeclinedCount() = runTest {
-        initialiseDeclineCounter()
-        assertEquals(0, testee.currentSessionDomainDeclineCount)
-    }
-
-    @Test
     fun whenNotMonitoringDeclineCountsThenShouldNotRecordNewDeclines() = runTest {
         whenever(autofillStore.monitorDeclineCounts).thenReturn(false)
         initialiseDeclineCounter()
@@ -114,30 +108,18 @@ class AutofillDisablingDeclineCounterTest {
     }
 
     @Test
-    fun whenDeclineIncreasesTotalCountAboveThresholdButInMemoryCountIsBelowThenShouldNotOfferToDisable() = runTest {
-        initialiseDeclineCounter()
-        configureGlobalDeclineCountAtThreshold()
-        testee.currentSessionDomainDeclineCount = 0
-        testee.userDeclinedToSaveCredentials("example.com")
-        assertShouldNotPromptToDisableAutofill()
-    }
-
-    @Test
-    fun whenDeclineTotalCountBelowThresholdButInMemoryCountIsAtThresholdThenShouldNotOfferToDisable() = runTest {
+    fun whenDeclineTotalCountBelowThresholdThenShouldNotOfferToDisable() = runTest {
         initialiseDeclineCounter()
         whenever(autofillStore.autofillDeclineCount).thenReturn(0)
-        configureInMemoryCountAtThreshold()
         testee.userDeclinedToSaveCredentials("example.com")
         assertShouldNotPromptToDisableAutofill()
     }
 
     @Test
-    fun whenDeclineIncreasesTotalCountAtThresholdAndInMemoryCountAtThresholdThenShouldOfferToDisable() = runTest {
+    fun whenDeclineIncreasesTotalCountAtThresholdThenShouldOfferToDisable() = runTest {
         initialiseDeclineCounter()
         configureGlobalDeclineCountAtThreshold()
         testee.userDeclinedToSaveCredentials("a.com")
-        assertShouldNotPromptToDisableAutofill()
-        testee.userDeclinedToSaveCredentials("b.com")
         assertShouldPromptToDisableAutofill()
     }
 
@@ -146,7 +128,6 @@ class AutofillDisablingDeclineCounterTest {
         initialiseDeclineCounter()
         testee.isActive = false
         configureGlobalDeclineCountAtThreshold()
-        configureInMemoryCountAtThreshold()
         assertFalse(testee.shouldPromptToDisableAutofill())
     }
 
@@ -168,10 +149,6 @@ class AutofillDisablingDeclineCounterTest {
         whenever(autofillStore.autofillDeclineCount).thenReturn(3)
     }
 
-    private fun configureInMemoryCountAtThreshold() {
-        testee.currentSessionDomainDeclineCount = 2
-    }
-
     private fun assertDeclineNotRecorded() {
         verify(autofillStore, never()).autofillDeclineCount = any()
     }
@@ -184,6 +161,7 @@ class AutofillDisablingDeclineCounterTest {
         assertTrue(testee.shouldPromptToDisableAutofill())
     }
 
+    @Suppress("SameParameterValue")
     private fun assertDeclineRecorded(expectedNewValue: Int) {
         verify(autofillStore).autofillDeclineCount = eq(expectedNewValue)
     }
@@ -196,6 +174,7 @@ class AutofillDisablingDeclineCounterTest {
         )
     }
 
+    @Suppress("SameParameterValue")
     private fun configureAutofillState(enabled: Boolean = true, available: Boolean = true) {
         whenever(autofillStore.autofillEnabled).thenReturn(enabled)
         whenever(autofillStore.autofillAvailable).thenReturn(available)

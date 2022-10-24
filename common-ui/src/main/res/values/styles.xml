@@ -16,6 +16,70 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <style name="TextInputLayoutTheme" parent="Widget.Design.TextInputLayout">
+        <item name="colorControlActivated">?colorAccent</item>
+        <item name="colorControlNormal">?colorAccent</item>
+        <item name="colorControlHighlight">?colorAccent</item>
+        <item name="android:textColor">?normalTextColor</item>
+        <item name="android:textColorSecondary">?normalTextColor</item>
+        <item name="android:textColorHint">?normalTextColor</item>
+    </style>
+
+    <style name="AutoCompleteTextViewStyle" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:textCursorDrawable">@drawable/text_cursor</item>
+        <item name="android:textColorHint">?attr/omnibarHintColor</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="PopUpOverflowMenu" parent="@style/Widget.MaterialComponents.PopupMenu.Overflow">
+        <item name="android:popupBackground">@drawable/popup_menu_bg</item>
+    </style>
+
+    <style name="PopUpOverflowButton" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+        <item name="srcCompat">@drawable/ic_overflow</item>
+        <item name="android:src">@drawable/ic_overflow</item>
+    </style>
+
+    <style name="DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="PopUpMenuCheckBoxTheme">
+        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
+    </style>
+
+    <style name="BottomSheetDialog" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="behavior_peekHeight">512dp</item>
+    </style>
+
+    <style name="RadioButtonStyle" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="buttonTint">@color/radio_button_tint</item>
+    </style>
+
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:textColorPrimary">?attr/normalTextColor</item>
+        <item name="android:textColorSecondary">?attr/secondaryTextColor</item>
+        <item name="android:background">?attr/dialogBgColor</item>
+        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
+        <item name="textColorAlertDialogListItem">?attr/normalTextColor</item>
+        <item name="android:buttonBarButtonStyle">@style/AlertDialogButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/AlertDialogButtonStyle</item>
+    </style>
+
+    <style name="AlertDialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/cornflowerBlue</item>
+    </style>
+
     <style name="DashboardHeader">
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:letterSpacing">0.14</item>

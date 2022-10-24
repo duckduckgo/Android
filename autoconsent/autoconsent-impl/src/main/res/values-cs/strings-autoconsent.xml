@@ -14,10 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Autoconsent -->
     <string name="autoconsentTitle">Správa vyskakovacích oken ohledně cookies</string>
-    <string name="autoconsentDescription">Když DuckDuckGo na navštívené stránce zjistí vyskakovací okno žádající o souhlas se soubory cookie, můžeme tvou předvolbu automaticky nastavit na co nejméně souborů cookie a maximální ochranu soukromí a potom vyskakovací okno zavřít.</string>
+    <string name="autoconsentDescription">Když DuckDuckGo na navštívené stránce zjistí vyskakovací okno žádající o souhlas se soubory cookie, můžeme zkusit tvou předvolbu automaticky nastavit na co nejméně souborů cookie a maximální ochranu soukromí a potom vyskakovací okno zavřít.</string>
     <string name="autoconsentToggle">Nechat správu oken pro souhlas s cookies na DuckDuckGo</string>
-
 </resources>

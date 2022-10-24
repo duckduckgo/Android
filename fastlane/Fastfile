@@ -21,6 +21,7 @@
     releaseNotesFileSuffix = "../app/version/release-notes-suffix"
     releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
     errorMessageCancelled = "Release cancelled 😢"
+    asanaBridgeInstallationProblem = "Android Asana Release Bridge not installed or configured correctly - see https://app.asana.com/0/0/1203116937958001/f for instructions"
 
 default_platform(:android)
 
@@ -281,5 +282,23 @@ platform :android do
        private_lane :"determine_version_number" do
             prompt(text: "\nLast release was: #{last_git_tag}\nEnter New Version Number:")
        end
+
+    desc "Prepares the Asana release board with a new release task, tags tasks waiting for release etc.."
+    lane :asana_release_prep do
+        bridgeLocation = ENV["ANDROID_ASANA_BRIDGE"]
+        if bridgeLocation == nil then
+            UI.error("#{asanaBridgeInstallationProblem}. Install the tool, then set ANDROID_ASANA_BRIDGE environment variable to point to the directory of the tool.")
+        elsif !File.exists?(bridgeLocation) then
+            UI.error("#{asanaBridgeInstallationProblem}. Ensure it is located at #{bridgeLocation} as specified by the environment variable ANDROID_ASANA_BRIDGE")
+        else
+            newVersion = determine_version_number()
+            if UI.confirm("About to create a new release task for #{newVersion}. Ready to continue?")
+                UI.message("Creating release task...")
+                sh "#{bridgeLocation}", "version=#{newVersion}", "action=createRelease,tagPendingTasks,addLinksToDescription,removePendingTasks", "board=real"
+            else
+                UI.error(errorMessageCancelled)
+            end
+        end
+    end
 
 end

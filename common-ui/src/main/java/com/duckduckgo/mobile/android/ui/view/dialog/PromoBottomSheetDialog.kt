@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.ui.view.dialog
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
@@ -23,6 +24,7 @@ import com.duckduckgo.mobile.android.databinding.BottomSheetPromoBinding
 import com.duckduckgo.mobile.android.ui.view.show
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
+@SuppressLint("NoBottomSheetDialog")
 class PromoBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.context) {
 
     abstract class EventListener {
