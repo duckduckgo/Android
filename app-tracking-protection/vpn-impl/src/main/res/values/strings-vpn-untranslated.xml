@@ -24,7 +24,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue" translatable="false">Report Issue</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow" translatable="false">Not Now</string>
     <string name="atp_ActivityRecentActivityHeader" translatable="false">Activity</string>
-    <string name="atp_ActivityManageProtectionLabel" translatable="false">Report Issue with an App</string>
+    <string name="atp_ActivityManageProtectionLabel" translatable="false">Having Problems With An App?</string>
     <string name="atp_ActivityEnabledBannerLabel" translatable="false">During beta, protection for some apps is automatically disabled. <annotation type="app_settings_link">View Apps</annotation></string>
     <string name="atp_ActivityDescription" translatable="false">Blocked tracking attempts will appear here</string>
     <plurals name="atp_ActivityProtectedApps" translatable="false">
