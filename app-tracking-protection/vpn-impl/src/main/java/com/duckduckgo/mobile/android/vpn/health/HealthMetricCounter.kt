@@ -22,11 +22,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.NO_VPN_CONNECTIVITY
 import dagger.SingleInstanceIn
+import java.util.concurrent.Executors
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
-import java.util.concurrent.Executors
-import javax.inject.Inject
 
 /**
  * HealthMetricCounter is used to temporarily store raw health metrics
@@ -59,7 +59,7 @@ class HealthMetricCounter @Inject constructor(
 
     fun getStat(
         type: SimpleEvent,
-        recentTimeThresholdMillis: Long
+        recentTimeThresholdMillis: Long,
     ): Long {
         return healthStatsDao.eventCount(type.type, recentTimeThresholdMillis)
     }

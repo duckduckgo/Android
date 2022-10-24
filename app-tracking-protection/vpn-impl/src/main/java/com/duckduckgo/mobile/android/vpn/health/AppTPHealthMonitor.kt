@@ -26,14 +26,14 @@ import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.G
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.NO_VPN_CONNECTIVITY
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.minutes
 
 /**
  * Health monitor will periodically obtain the current health metrics across AppTP, and raise an
@@ -86,7 +86,8 @@ class AppTPHealthMonitor @Inject constructor(
     private val healthRules = mutableListOf<HealthRule>()
 
     private val noNetworkConnectivityAlert = object : HealthRule(
-        "noNetworkConnectivityAlert", samplesToWaitBeforeAlerting = NO_NETWORK_CONNECTIVITY_SAMPLES
+        "noNetworkConnectivityAlert",
+        samplesToWaitBeforeAlerting = NO_NETWORK_CONNECTIVITY_SAMPLES,
     ) {}.also { healthRules.add(it) }
 
     private suspend fun checkCurrentHealth() {
@@ -123,7 +124,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private fun sampleVpnConnectivityEvents(
         timeWindow: Long,
-        healthAlerts: HealthRule
+        healthAlerts: HealthRule,
     ): HealthState {
         val noConnectivityStats = healthMetricCounter.getStat(NO_VPN_CONNECTIVITY(), timeWindow)
         val state = healthClassifier.determineHealthVpnConnectivity(noConnectivityStats, healthAlerts.name)
@@ -212,7 +213,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private abstract class HealthRule(
         open val name: String,
-        open var samplesToWaitBeforeAlerting: Int = DEFAULT_ALERT_SAMPLES
+        open var samplesToWaitBeforeAlerting: Int = DEFAULT_ALERT_SAMPLES,
     ) {
         var badHealthSampleCount: Int = 0
 

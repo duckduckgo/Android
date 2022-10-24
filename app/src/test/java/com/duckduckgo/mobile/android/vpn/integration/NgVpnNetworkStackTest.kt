@@ -80,7 +80,7 @@ class NgVpnNetworkStackTest {
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
             vpnDatabase,
-            runtime
+            runtime,
         )
     }
 
@@ -217,7 +217,7 @@ class NgVpnNetworkStackTest {
                 displayName = "Branch",
             ),
             app = TrackerApp(0, 0.0),
-            isCdn = false
+            isCdn = false,
         )
 
         private val THIRD_PARTY_TRACKER = AppTrackerType.ThirdParty(TEST_APP_TRACKER)
