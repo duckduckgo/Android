@@ -52,6 +52,7 @@ class TrackerFeedAdapter @Inject constructor(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), StickyHeaders {
 
     private val trackerFeedItems = mutableListOf<TrackerFeedItem>()
+    private lateinit var onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit
 
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
@@ -60,6 +61,7 @@ class TrackerFeedAdapter @Inject constructor(
         when (holder) {
             is TrackerFeedViewHolder -> holder.bind(
                 trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData,
+                onAppClick,
                 position == trackerFeedItems.size - 1 && trackerFeedItems.size < MAX_FEED_ITEMS_SIZE,
             )
             is TrackerSkeletonViewHolder -> holder.bind()
@@ -101,8 +103,10 @@ class TrackerFeedAdapter @Inject constructor(
     }
 
     suspend fun updateData(
-        data: List<TrackerFeedItem>
+        data: List<TrackerFeedItem>,
+        onAppClickListener: (TrackerFeedItem.TrackerFeedData) -> Unit
     ) {
+        onAppClick = onAppClickListener
         val newData = data
         val oldData = trackerFeedItems
         val diffResult = withContext(Dispatchers.IO) {
@@ -175,6 +179,7 @@ class TrackerFeedAdapter @Inject constructor(
 
         fun bind(
             tracker: TrackerFeedItem.TrackerFeedData?,
+            onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit,
             shouldHideDivider: Boolean
         ) {
             tracker?.let { item ->
@@ -235,6 +240,9 @@ class TrackerFeedAdapter @Inject constructor(
                         ),
                         null
                     )
+                }
+                itemView.setOnClickListener {
+                    onAppClick(item)
                 }
                 if (shouldHideDivider) {
                     splitter.hide()
