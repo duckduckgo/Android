@@ -55,7 +55,7 @@ class AppTpPrivacyFeaturePlugin @Inject constructor(
                 return true
             }
 
-            preferences.setSignature(config.hash)
+            config.hash?.let { preferences.setSignature(it) }
             config.settings.forEach { setting ->
                 setting.value?.let { jsonObject ->
                     settings.firstOrNull { setting.key == it.settingName.value }?.let { settingPlugin ->
