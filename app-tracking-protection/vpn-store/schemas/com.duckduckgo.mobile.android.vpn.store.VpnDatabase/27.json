@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 26,
-    "identityHash": "2a58bdb505a789fcefe2bc24fb9ead16",
+    "version": 27,
+    "identityHash": "05b8ce9cafca842571bbc4866c82691f",
     "entities": [
       {
         "tableName": "vpn_state",
@@ -162,50 +162,6 @@
             "id"
           ],
           "autoGenerate": true
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "vpn_data_stats",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `dataSent` INTEGER NOT NULL, `dataReceived` INTEGER NOT NULL, `packetsSent` INTEGER NOT NULL, `packetsReceived` INTEGER NOT NULL, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "dataSent",
-            "columnName": "dataSent",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "dataReceived",
-            "columnName": "dataReceived",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "packetsSent",
-            "columnName": "packetsSent",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "packetsReceived",
-            "columnName": "packetsReceived",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": false
         },
         "indices": [],
         "foreignKeys": []
@@ -678,7 +634,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2a58bdb505a789fcefe2bc24fb9ead16')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '05b8ce9cafca842571bbc4866c82691f')"
     ]
   }
 }
