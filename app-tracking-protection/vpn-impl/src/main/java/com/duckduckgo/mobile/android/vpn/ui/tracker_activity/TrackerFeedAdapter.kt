@@ -272,6 +272,7 @@ class TrackerFeedAdapter @Inject constructor(
         val appsText: TextView = view.findViewById(R.id.activity_apps)
         val splitter: View = view.findViewById(R.id.activity_apps_splitter)
         val warningImage: View = view.findViewById(R.id.activity_apps_warning_image)
+        val multiAppsIcon: MultiAppsIcon = view.findViewById(R.id.activity_apps_image)
 
         fun bind(item: TrackerFeedItem.TrackerAppsData, shouldHideDivider: Boolean) {
             appsText.text = context.resources.getQuantityString(
@@ -279,15 +280,20 @@ class TrackerFeedAdapter @Inject constructor(
                 item.appsCount,
                 item.appsCount
             )
+
+            multiAppsIcon.setIcons(item.packageNames.mapNotNull { context.packageManager.safeGetApplicationIcon(it) })
+
             if (item.isProtected) {
                 warningImage.hide()
             } else {
                 warningImage.show()
             }
+
             itemView.setOnClickListener {
                 val appsFilter = if (item.isProtected) PROTECTED_ONLY else UNPROTECTED_ONLY
                 startActivity(context, TrackingProtectionExclusionListActivity.intent(context = context, filter = appsFilter), null)
             }
+
             if (shouldHideDivider) {
                 splitter.hide()
             } else {

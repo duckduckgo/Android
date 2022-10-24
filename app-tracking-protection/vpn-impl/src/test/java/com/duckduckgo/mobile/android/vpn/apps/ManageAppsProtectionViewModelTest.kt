@@ -277,7 +277,7 @@ class ManageAppsProtectionViewModelTest {
         viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.ALL)
 
         viewModel.getProtectedApps().test {
-            assertEquals(ViewState(allApps, R.string.atp_ExcludedAppsFilterAllLabel), awaitItem())
+            assertEquals(ViewState(allApps, R.string.atp_ExcludedAppsFilterAllLabel, BannerContent.ALL_OR_PROTECTED_APPS), awaitItem())
         }
     }
 
@@ -294,7 +294,10 @@ class ManageAppsProtectionViewModelTest {
         viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.PROTECTED_ONLY)
 
         viewModel.getProtectedApps().test {
-            assertEquals(ViewState(protectedApps, R.string.atp_ExcludedAppsFilterProtectedLabel), awaitItem())
+            assertEquals(
+                ViewState(protectedApps, R.string.atp_ExcludedAppsFilterProtectedLabel, BannerContent.ALL_OR_PROTECTED_APPS),
+                awaitItem()
+            )
         }
     }
 
@@ -328,24 +331,63 @@ class ManageAppsProtectionViewModelTest {
         viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.UNPROTECTED_ONLY)
 
         viewModel.getProtectedApps().test {
-            assertEquals(ViewState(emptyList(), R.string.atp_ExcludedAppsFilterUnprotectedLabel), awaitItem())
+            assertEquals(
+                ViewState(emptyList(), R.string.atp_ExcludedAppsFilterUnprotectedLabel, BannerContent.UNPROTECTED_APPS),
+                awaitItem()
+            )
         }
     }
 
     @Test
-    fun whenUnprotectedOnlyFilterAppliedAndGetProtectedAppsCalledThenOnlyUnprotectedAppsAreReturned() = runTest {
-        val protectedApps = listOf(appWithoutIssues)
-        val unprotectedApps = listOf(appWithKnownIssues, appLoadsWebsites, appManuallyExcluded)
-        val allApps = protectedApps + unprotectedApps
+    fun whenUnprotectedOnlyFilterAppliedAndGetProtectedAppsCalledThenOnlyUnprotectedAppsAreReturnedAndUnprotectedAppsBannerShown() =
+        runTest {
+            val protectedApps = listOf(appWithoutIssues)
+            val unprotectedApps = listOf(appWithKnownIssues, appLoadsWebsites, appManuallyExcluded)
+            val allApps = protectedApps + unprotectedApps
+            whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
+                flowOf(
+                    allApps
+                )
+            )
+            viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.UNPROTECTED_ONLY)
+
+            viewModel.getProtectedApps().test {
+                assertEquals(
+                    ViewState(unprotectedApps, R.string.atp_ExcludedAppsFilterUnprotectedLabel, BannerContent.UNPROTECTED_APPS),
+                    awaitItem()
+                )
+            }
+        }
+
+    @Test
+    fun whenAtLeastOneAppManuallyExcludedAndGetProtectedAppsCalledThenShowAllOrProtectedBannerContent() = runTest {
+        val expectedBannerContent = BannerContent.ALL_OR_PROTECTED_APPS
+        val allApps = listOf(appWithKnownIssues, appManuallyExcluded)
         whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
                 allApps
             )
         )
-        viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.UNPROTECTED_ONLY)
+        viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.ALL)
 
         viewModel.getProtectedApps().test {
-            assertEquals(ViewState(unprotectedApps, R.string.atp_ExcludedAppsFilterUnprotectedLabel), awaitItem())
+            assertEquals(ViewState(allApps, R.string.atp_ExcludedAppsFilterAllLabel, expectedBannerContent), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenAtLeastOneAppProblematicNotExcludedAndGetProtectedAppsCalledThenShowCustomBannerContent() = runTest {
+        val expectedBannerContent = BannerContent.CUSTOMISED_PROTECTION
+        val allApps = listOf(appWithKnownIssues, appProblematicNotExcluded)
+        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
+            flowOf(
+                allApps
+            )
+        )
+        viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.ALL)
+
+        viewModel.getProtectedApps().test {
+            assertEquals(ViewState(allApps, R.string.atp_ExcludedAppsFilterAllLabel, expectedBannerContent), awaitItem())
         }
     }
 
@@ -387,5 +429,15 @@ class ManageAppsProtectionViewModelTest {
         isExcluded = false,
         knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
         userModified = false
+    )
+
+    private val appProblematicNotExcluded = TrackingProtectionAppInfo(
+        packageName = "com.package.name",
+        name = "App",
+        type = "None",
+        category = AppCategory.Undefined,
+        isExcluded = false,
+        knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
+        userModified = true
     )
 }

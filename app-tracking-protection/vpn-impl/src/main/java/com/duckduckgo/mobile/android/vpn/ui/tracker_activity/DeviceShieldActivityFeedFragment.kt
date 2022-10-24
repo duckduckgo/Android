@@ -66,7 +66,13 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
     ) {
         with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
             val stickyHeadersLayoutManager =
-                StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
+                object : StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext()) {
+                    override fun onLayoutCompleted(state: RecyclerView.State?) {
+                        super.onLayoutCompleted(state)
+                        val position = findLastCompletelyVisibleItemPosition()
+                        feedListener?.onLastItemShown(position)
+                    }
+                }
             layoutManager = stickyHeadersLayoutManager
             adapter = trackerFeedAdapter
         }
@@ -154,5 +160,6 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
 
     interface DeviceShieldActivityFeedListener {
         fun onTrackerListShowed(totalTrackers: Int)
+        fun onLastItemShown(position: Int)
     }
 }

@@ -136,8 +136,8 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         }
     }
 
-    fun showAppTpEnabledCtaIfNeeded() {
-        if (!vpnStore.didShowAppTpEnabledCta()) {
+    fun showAppTpEnabledCtaIfNeeded(lastVisibleItemPosition: Int) {
+        if (!vpnStore.didShowAppTpEnabledCta() && lastVisibleItemPosition > MIN_VISIBLE_ITEMS) {
             vpnStore.appTpEnabledCtaDidShow()
             vpnStore.onOnboardingSessionSet()
             sendCommand(Command.ShowAppTpEnabledCta)
@@ -272,6 +272,11 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object CloseScreen : Command()
         object OpenVpnSettings : Command()
         object ShowAppTpEnabledCta : Command()
+    }
+
+    companion object {
+        private const val WINDOW_INTERVAL_HOURS = 24L
+        internal const val MIN_VISIBLE_ITEMS = 1
     }
 }
 

@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.*
 import okhttp3.internal.toImmutableList
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
+import java.lang.Integer.min
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
@@ -47,6 +49,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
 
     private val MAX_BADGES_TO_DISPLAY = 5
     private val MAX_ELEMENTS_TO_DISPLAY = 6
+    private val MAX_ICONS_TO_DISPLAY = 4
 
     private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
     private var tickerJob: Job? = null
@@ -86,17 +89,37 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
 
     private suspend fun getAppsData(): Flow<List<TrackerFeedItem>> = withContext(dispatcherProvider.io()) {
         return@withContext excludedApps.getAppsAndProtectionInfo().map { list ->
-            val unprotectedCount = list.count { it.isExcluded }
+            val unprotected = list.filter { it.isExcluded }
+            val protected = list.filter { !it.isExcluded }
+            val unprotectedCount = unprotected.size
             val protectedCount = list.size - unprotectedCount
             val items = mutableListOf<TrackerFeedItem.TrackerAppsData>()
             if (protectedCount > 0) {
-                items.add(TrackerFeedItem.TrackerAppsData(appsCount = protectedCount, isProtected = true))
+                items.add(
+                    TrackerFeedItem.TrackerAppsData(
+                        appsCount = protectedCount,
+                        isProtected = true,
+                        packageNames = getPackageNamesList(protected)
+                    )
+                )
             }
             if (unprotectedCount > 0) {
-                items.add(TrackerFeedItem.TrackerAppsData(appsCount = unprotectedCount, isProtected = false))
+                items.add(
+                    TrackerFeedItem.TrackerAppsData(
+                        appsCount = unprotectedCount,
+                        isProtected = false,
+                        packageNames = getPackageNamesList(unprotected)
+                    )
+                )
             }
             items.toImmutableList()
         }
+    }
+
+    private fun getPackageNamesList(appInfoList: List<TrackingProtectionAppInfo>): List<String> {
+        if (appInfoList.isEmpty()) return emptyList()
+        val size = min(appInfoList.size, MAX_ICONS_TO_DISPLAY)
+        return appInfoList.slice(IntRange(0, size - 1)).map { it.packageName }
     }
 
     private suspend fun aggregateDataPerApp(
