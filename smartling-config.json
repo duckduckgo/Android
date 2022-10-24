@@ -1,0 +1,108 @@
+{
+  "locales": [
+    {
+      "smartling": "bg-BG",
+      "application": "values-bg"
+    },
+    {
+      "smartling": "cs-CZ",
+      "application": "values-cs"
+    },
+    {
+      "smartling": "da-DK",
+      "application": "values-da"
+    },
+    {
+      "smartling": "de-DE",
+      "application": "values-de"
+    },
+    {
+      "smartling": "el-GR",
+      "application": "values-el"
+    },
+    {
+      "smartling": "es-ES",
+      "application": "values-es"
+    },
+    {
+      "smartling": "et-EE",
+      "application": "values-et"
+    },
+    {
+      "smartling": "fi-FI",
+      "application": "values-fi"
+    },
+    {
+      "smartling": "fr-FR",
+      "application": "values-fr"
+    },
+    {
+      "smartling": "hr-HR",
+      "application": "values-hr"
+    },
+    {
+      "smartling": "hu-HU",
+      "application": "values-hu"
+    },
+    {
+      "smartling": "it-IT",
+      "application": "values-it"
+    },
+    {
+      "smartling": "lt-LT",
+      "application": "values-lt"
+    },
+    {
+      "smartling": "lv-LV",
+      "application": "values-lv"
+    },
+    {
+      "smartling": "nb",
+      "application": "values-nb"
+    },
+    {
+      "smartling": "nl-NL",
+      "application": "values-nl"
+    },
+    {
+      "smartling": "pl-PL",
+      "application": "values-pl"
+    },
+    {
+      "smartling": "pt-PT",
+      "application": "values-pt"
+    },
+    {
+      "smartling": "ro-RO",
+      "application": "values-ro"
+    },
+    {
+      "smartling": "ru-RU",
+      "application": "values-ru"
+    },
+    {
+      "smartling": "sk-SK",
+      "application": "values-sk"
+    },
+    {
+      "smartling": "sl-SI",
+      "application": "values-sl"
+    },
+    {
+      "smartling": "sv-SE",
+      "application": "values-sv"
+    },
+    {
+      "smartling": "tr-TR",
+      "application": "values-tr"
+    }
+  ],
+  "resourceSets": [
+    {
+      "type": "android",
+      "pathRegex": ".*.\\/values\\/strings.*\\.xml",
+      "translationPathExpression": "${originalFile.fullName.replaceAll('values', locale)}",
+      "translationCommitMessage": "Translate ${originalFile.baseName} to ${locale}"
+    }
+  ]
+}

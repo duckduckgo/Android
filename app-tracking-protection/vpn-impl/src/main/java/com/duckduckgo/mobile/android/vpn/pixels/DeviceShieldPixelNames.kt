@@ -160,9 +160,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME("m_atp_ev_waitlist_dialog_notify_me_c"),
     ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS("m_atp_ev_waitlist_dialog_dismiss_c"),
 
-    ATP_RECEIVED_UNKNOWN_PACKET_PROTOCOL("m_atp_ev_unknown_packet_%d_c"),
-    ATP_RECEIVED_UNKNOWN_PACKET_PROTOCOL_DAILY("m_atp_ev_unknown_packet_%d_d"),
-
     ATP_DID_SHOW_VPN_CONFLICT_DIALOG("m_atp_imp_vpn_conflict_dialog_c"),
     ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG_DAILY("m_atp_ev_vpn_conflict_dialog_dismiss_d"),
     ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG("m_atp_ev_vpn_conflict_dialog_dismiss_c"),

@@ -14,10 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Autoconsent -->
     <string name="autoconsentTitle">Evästeiden hallinnan ponnahdusikkunat</string>
-    <string name="autoconsentDescription">Kun DuckDuckGo havaitsee evästeiden hallinnan ponnahdusikkunoita sivustoilla, joilla käyt, voimme automaattisesti määrittää evästeasetuksesi evästeiden minimoimiseksi ja yksityisyyden maksimoimiseksi ja sulkea sitten ponnahdusikkunat.</string>
+    <string name="autoconsentDescription">Kun DuckDuckGo havaitsee evästeiden hallinnan ponnahdusikkunoita sivustoilla, joilla käyt, voimme automaattisesti yrittää määrittää evästeasetuksesi evästeiden minimoimiseksi ja yksityisyyden maksimoimiseksi ja sulkea sitten ponnahdusikkunat.</string>
     <string name="autoconsentToggle">Anna DuckDuckGon hallinnoida evästeiden hallinnan ponnahdusikkunoita</string>
-
 </resources>

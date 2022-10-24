@@ -312,11 +312,6 @@ interface DeviceShieldPixels {
     fun sendHealthMonitorAlert(alertName: String)
 
     /**
-     * Will fire when the VPN receives a packet of unknown protocol
-     */
-    fun sendUnknownPacketProtocol(protocol: Int)
-
-    /**
      * Will fire when the VPN detected bad health, restarted and fixed the bad health
      */
     fun badHealthResolvedByRestart(data: Map<String, String>)
@@ -738,11 +733,6 @@ class RealDeviceShieldPixels @Inject constructor(
         tryToFireDailyPixel(
             String.format(Locale.US, DeviceShieldPixelNames.ATP_APP_HEALTH_ALERT_DAILY.pixelName, alertName)
         )
-    }
-
-    override fun sendUnknownPacketProtocol(protocol: Int) {
-        tryToFireDailyPixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_RECEIVED_UNKNOWN_PACKET_PROTOCOL_DAILY.pixelName, protocol))
-        firePixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_RECEIVED_UNKNOWN_PACKET_PROTOCOL.pixelName, protocol))
     }
 
     override fun badHealthResolvedByRestart(data: Map<String, String>) {
