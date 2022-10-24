@@ -14,12 +14,10 @@
   ~ limitations under the License.
   -->
 
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="40dp"
-    android:height="40dp"
-    android:viewportWidth="16"
-    android:viewportHeight="16">
-    <path
-        android:fillColor="?attr/listItemImageBackground"
-        android:pathData="M15.333,8C15.333,12.05 12.05,15.333 8,15.333C3.95,15.333 0.667,12.05 0.667,8C0.667,3.95 3.95,0.667 8,0.667C12.05,0.667 15.333,3.95 15.333,8Z" />
-</vector>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="?attr/listItemImageBackground" />
+    <size
+        android:width="@dimen/listItemImageContainerSize"
+        android:height="@dimen/listItemImageContainerSize" />
+</shape>

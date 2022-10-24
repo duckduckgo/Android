@@ -129,29 +129,18 @@
     <string name="atp_NewTabEnabled"><b>Az alkalmazáskövetés elleni védelem be van kapcsolva</b> és blokkolja a követési kísérleteket az alkalmazásokban.</string>
 
     <!-- Exclusion List -->
-    <string name="atp_ExclusionListActivityTitle">Minden alkalmazás</string>
     <string name="atp_ExcludedAppsFeature">Az alkalmazáskövetés elleni védelem felismeri és blokkolja más cégek alkalmazáskövetőit, például amikor a Facebook megpróbál nyomon követni egy egészségügyi alkalmazásban. A cégek továbbra is követhetnek a saját alkalmazásaikban.\n\nHa egy alkalmazás nem a várt módon működik, próbáld meg kikapcsolni a védelmet az adott alkalmazásnál.</string>
     <string name="atp_ExcludedAppsEnabledLabel">A bétaverzióban a DuckDuckGo kikapcsolhatja a védelmet egyes alkalmazásoknál az ismert tartalombetöltési problémák megoldása érdekében. Az egyéni beállításaid csak akkor változnak, ha visszaállítod az alapértelmezett beállításokat.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Az alkalmazáskövetés elleni védelem ki van kapcsolva</b> Okozott problémát az alkalmazáskövetés elleni védelem az alkalmazásaidban? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
     <string name="atp_ExcludedAppsReport">Másik alkalmazással kapcsolatos probléma jelentése</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Webhelyek betöltése</string>
-    <string name="atp_ExcludedReasonKnownIssues">Ismert problémák</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuálisan kikapcsolva</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manuálisan bekapcsolva</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Mégsem</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Engedélyezés</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Visszaállítás</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Manuálisan bekapcsolod a védelmet a(z) %1$s alkalmazás számára?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Ebben az alkalmazásban köztudottan problémák lépnek fel, ha a követési kísérletek sikertelenek.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Előfordulhat, hogy az alkalmazásban lévő webhelytartalom nem jelenik meg megfelelően, ha a védelem be van kapcsolva.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">A védelem bekapcsolása elküldi az alkalmazás nevét a DuckDuckGo részére.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Adatvédelem letiltva</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Ha kikapcsolod a védelmet egy probléma kijavításához, ellenőrizd, hogy az alkalmazás most működik-e, mielőtt jelentenéd a problémát a DuckDuckGónak.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Leállt az elvárt módon történő működés</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Elfogadom, hogy nyomon követnek ebben az alkalmazásban</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Más okból</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Jelentés</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Kihagyás</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Az alapértelmezett védett alkalmazások visszaállítása</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Alkalmazással kapcsolatos probléma bejelentése</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Visszaállítod az alapértelmezett védelmet?</string>
@@ -195,20 +184,16 @@
     <string name="atp_ActivityPastWeek">Az elmúlt 7 nap</string>
     <string name="atp_ActivityTitle">Alkalmazáskövetés elleni védelem</string>
     <string name="atp_MostRecentActivityTitle">Minden legutóbbi tevékenység</string>
-    <string name="atp_ActivityRecentActivity">Legutóbbi tevékenység</string>
     <string name="atp_ActivityCtaShowAll">Minden legutóbbi tevékenység megtekintése</string>
     <string name="atp_ActivityAppTrackersFAQ">Mik az alkalmazáskövetők?</string>
     <string name="atp_ActivityReportProblem">Alkalmazással kapcsolatos probléma bejelentése</string>
     <string name="atp_ActivityBetaInstructions">Béta utasítások</string>
-    <string name="atp_ActivityManageProtection">Problémáid vannak egy alkalmazással?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]></string>
 
-    <string name="atp_ActivityEmptyListTitle">Nincs új tevékenység</string>
-    <string name="atp_ActivityEmptyListMessage">Továbbra is használd a készülékedet Az alkalmazáskövetés elleni védelem által blokkolt követési kísérletek itt jelennek meg.</string>
     <string name="atp_ActivityPastWeekBlocked">Blokkolt</string>
     <string name="atp_ActivityPastWeekAcross">Itt:</string>
 
@@ -220,7 +205,6 @@
         <item quantity="one">Alkalmazás</item>
         <item quantity="other">Alkalmazások</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Ez a funkció bétaverzióban van. <annotation type="app_settings_link">Problémáid vannak egy alkalmazással?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Az alkalmazáskövetés elleni védelem le van tiltva</b> Okozott problémát az alkalmazáskövetés elleni védelem az Ön alkalmazásainál? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>A készülékeden lévő VPN alkalmazás kikapcsolta az alkalmazáskövetés elleni védelmet.</b>\nProblémát okozott az alkalmazáskövetés elleni védelem az alkalmazásaidban? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
     <string name="atp_ActivityAbout">További információ</string>

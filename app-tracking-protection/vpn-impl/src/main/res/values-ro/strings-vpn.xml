@@ -133,29 +133,18 @@
     <string name="atp_NewTabEnabled"><b>Protecția împotriva urmăririi de către aplicație este activată</b> și blochează încercările de urmărire în aplicațiile tale.</string>
 
     <!-- Exclusion List -->
-    <string name="atp_ExclusionListActivityTitle">Toate aplicațiile</string>
     <string name="atp_ExcludedAppsFeature">Protecția împotriva urmăririi de către aplicație detectează și blochează tehnologiile de urmărire a aplicațiilor de la alte companii, cum ar fi atunci când Facebook încearcă să te urmărească într-o aplicație de sănătate. Companiile te pot urmări în continuare în aplicațiile pe care le dețin.\n\nDacă o aplicație nu funcționează conform așteptărilor, încearcă să dezactivezi protecția pentru aplicația respectivă.</string>
     <string name="atp_ExcludedAppsEnabledLabel">În timpul versiunii beta, DuckDuckGo poate dezactiva protecția pentru unele aplicații pentru a rezolva probleme cunoscute de încărcare a conținutului. Setările tale personalizate nu se vor schimba decât dacă restaurezi setările implicite.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Protecția împotriva urmăririi de către aplicație este dezactivată</b> Protecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale <annotation type="report_issues_link">Raportează problemele</annotation></string>
     <string name="atp_ExcludedAppsReport">Raportează o problemă cu o altă aplicație</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Încarcă site-uri</string>
-    <string name="atp_ExcludedReasonKnownIssues">Probleme cunoscute</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Dezactivat manual</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Activat manual</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Anulează</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Activare</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Restaurează</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Activezi manual protecția pentru aplicația %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Această aplicație este cunoscută pentru faptul că întâmpină probleme atunci când încercările de urmărire nu reușesc.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Este posibil să nu apară corect conținutul site-ului din această aplicație atunci când protecția este activată.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Activarea protecției trimite numele aplicației către DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Protecția confidențialității dezactivată</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Dacă ai dezactivat protecția pentru a remedia o problemă, verifică dacă aplicația funcționează acum înainte de a raporta problema către DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Nu mai funcționează așa cum era de așteptat</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Sunt de acord să fiu urmărit în această aplicație</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Din alt motiv</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Raportează</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Ignorare</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Restaurează aplicațiile protejate implicite</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Raportează o problemă cu o aplicație</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Restabilești protecția implicită?</string>
@@ -199,20 +188,16 @@
     <string name="atp_ActivityPastWeek">Ultimele 7 zile</string>
     <string name="atp_ActivityTitle">Protecția la urmărirea aplicațiilor</string>
     <string name="atp_MostRecentActivityTitle">Toate activitățile recente</string>
-    <string name="atp_ActivityRecentActivity">Activitate recentă</string>
     <string name="atp_ActivityCtaShowAll">Vezi toate activitățile recente</string>
     <string name="atp_ActivityAppTrackersFAQ">Ce sunt tehnologiile de urmărire din aplicații?</string>
     <string name="atp_ActivityReportProblem">Raportează o problemă cu o aplicație</string>
     <string name="atp_ActivityBetaInstructions">Instrucțiuni beta</string>
-    <string name="atp_ActivityManageProtection">Aveți probleme cu o aplicație?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d încercare de urmărire blocată de la compania %2$d în aplicația <b>%3$s</b>]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d încercare de urmărire blocată de la %2$d companii în aplicația <b>%3$s</b>]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d încercări de urmărire blocate de la %2$d companie în aplicația <b>%3$s</b>]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d încercări de urmărire blocate de la %2$d companii în aplicația <b>%3$s</b>]]></string>
 
-    <string name="atp_ActivityEmptyListTitle">Nicio activitate nouă</string>
-    <string name="atp_ActivityEmptyListMessage">Continuă să îți folosești dispozitivul. Încercările de urmărire pe care Protecția împotriva urmăririi de către aplicație le blochează apar aici.</string>
     <string name="atp_ActivityPastWeekBlocked">Blocat</string>
     <string name="atp_ActivityPastWeekAcross">Din</string>
 
@@ -226,7 +211,6 @@
         <item quantity="few">Aplicații</item>
         <item quantity="other">Aplicații</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Această funcție este în versiune beta. <annotation type="app_settings_link">Ai probleme cu o aplicație?</annotation></string>
     <string name="atp_ActivityDisabledLabel">Protecția împotriva urmăririi de către aplicație <b>este dezactivată</b>\nProtecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale? <annotation type="report_issues_link">Raportează probleme</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>O aplicație VPN de pe dispozitivul tău a dezactivat Protecția împotriva urmăririi de către aplicație.</b>\nProtecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale? <annotation type="report_issues_link">Raportează probleme</annotation></string>
     <string name="atp_ActivityAbout">Despre</string>

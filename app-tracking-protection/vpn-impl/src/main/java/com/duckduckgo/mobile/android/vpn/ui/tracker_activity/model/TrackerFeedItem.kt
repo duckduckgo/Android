@@ -36,7 +36,8 @@ sealed class TrackerFeedItem(open val id: Int) {
     data class TrackerAppsData(
         override val id: Int = 0,
         val appsCount: Int,
-        val isProtected: Boolean
+        val isProtected: Boolean,
+        val packageNames: List<String>
     ) : TrackerFeedItem(id)
 
     data class TrackerFeedItemHeader(val timestamp: String) : TrackerFeedItem(timestamp.hashCode())
@@ -47,6 +48,7 @@ sealed class TrackerCompanyBadge {
         val companyName: String,
         val companyDisplayName: String,
     ) : TrackerCompanyBadge()
+
     data class Extra(
         val amount: Int
     ) : TrackerCompanyBadge()

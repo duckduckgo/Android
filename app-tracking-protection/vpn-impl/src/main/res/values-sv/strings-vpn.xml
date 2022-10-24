@@ -129,29 +129,18 @@
     <string name="atp_NewTabEnabled"><b>App Tracking Protection är aktiverat</b> och blockerar spårningsförsök i alla dina appar.</string>
 
     <!-- Exclusion List -->
-    <string name="atp_ExclusionListActivityTitle">Alla appar</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection upptäcker och blockerar appspårare från andra företag, till exempel när Facebook försöker spåra dig i en hälsoapp. Företag kan fortfarande spåra dig i appar som de äger.\n\nOm en app inte fungerar som väntat kan du prova med att inaktivera skyddet för den appen.</string>
     <string name="atp_ExcludedAppsEnabledLabel">Under betaperioden kan det hända att DuckDuckGo inaktiverar skyddet för vissa appar för att lösa kända problem med inläsning av innehåll. Dina egna inställningar ändras inte om du inte återställer standardinställningarna.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection är inaktiverat</b> Har App Tracking Protection orsakat problem med dina appar? <annotation type="report_issues_link">Rapportera problem</annotation></string>
     <string name="atp_ExcludedAppsReport">Rapportera problem med en annan app</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Läser in webbplatser</string>
-    <string name="atp_ExcludedReasonKnownIssues">Kända problem</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuellt inaktiverat</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manuellt aktiverat</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Avbryt</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Aktivera</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Återställ</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Aktivera skydd för %1$s-appen manuellt?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Vi vet att det kan uppstå problem med den här appen när spårningsförsök misslyckas.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Webbplatsinnehåll i den här appen kanske inte visas korrekt när skyddet är aktiverat.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Om du aktiverar skydd skickas appens namn till DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Integritetsskydd är inaktiverat</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Om du har inaktiverat skyddet för att åtgärda ett problem bör du kontrollera att appen nu fungerar innan du rapporterar problemet till DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Den slutade att fungera som väntat</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Det gör inget om jag blir spårad i den här appen</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Av andra skäl</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Rapportera</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Hoppa över</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Återställ appar som skyddas som standard</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Rapportera ett problem med en app</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Återställ standardskyddet?</string>
@@ -195,20 +184,16 @@
     <string name="atp_ActivityPastWeek">De senaste sju dagarna</string>
     <string name="atp_ActivityTitle">Skydd mot appspårning</string>
     <string name="atp_MostRecentActivityTitle">All senaste aktivitet</string>
-    <string name="atp_ActivityRecentActivity">Senaste aktivitet</string>
     <string name="atp_ActivityCtaShowAll">Visa all senaste aktivitet</string>
     <string name="atp_ActivityAppTrackersFAQ">Vad är appspårare?</string>
     <string name="atp_ActivityReportProblem">Rapportera ett problem med en app</string>
     <string name="atp_ActivityBetaInstructions">Betainstruktioner</string>
-    <string name="atp_ActivityManageProtection">Har du problem med en app?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d spårningsförsök av %2$d företag blockerades i appen <b>%3$s</b>]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d spårningsförsök av %2$d företag blockerades i appen <b>%3$s</b>]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d spårningsförsök av %2$d företag blockerades i appen <b>%3$s</b>]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d spårningsförsök av %2$d företag blockerades i appen <b>%3$s</b>]]></string>
 
-    <string name="atp_ActivityEmptyListTitle">Ingen ny aktivitet</string>
-    <string name="atp_ActivityEmptyListMessage">Fortsätt att använda enheten. Spårningsförsök som App Tracking Protection blockerar visas här.</string>
     <string name="atp_ActivityPastWeekBlocked">Blockerat</string>
     <string name="atp_ActivityPastWeekAcross">I</string>
 
@@ -220,7 +205,6 @@
         <item quantity="one">App</item>
         <item quantity="other">Appar</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Den här funktionen är på betastadiet. <annotation type="app_settings_link">Har du problem med en app?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection är inaktiverat</b>\nHar App Tracking Protection orsakat problem med dina appar? <annotation type="report_issues_link">Rapportera problem</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>En VPN-app på din enhet har inaktiverat App Tracking Protection.</b>\nHar App Tracking Protection orsakat problem med dina appar? <annotation type="report_issues_link">Rapportera problem</annotation></string>
     <string name="atp_ActivityAbout">Om</string>

@@ -129,29 +129,18 @@
     <string name="atp_NewTabEnabled"><b>Uygulama İzleme Koruması etkinleştirildi</b> ve uygulamalarınızdaki izleme girişimlerini engelliyor.</string>
 
     <!-- Exclusion List -->
-    <string name="atp_ExclusionListActivityTitle">Tüm Uygulamalar</string>
     <string name="atp_ExcludedAppsFeature">Uygulama İzleme Koruması, Facebook\'un sizi bir sağlık uygulamasında izlemeye çalışması gibi diğer şirketlerin uygulama izleyicilerini algılar ve engeller. Şirketler, sahip oldukları uygulamalarda sizi izlemeye devam edebilir.\n\nBir uygulama beklendiği gibi çalışmıyorsa, o uygulama için korumayı devre dışı bırakmayı deneyin.</string>
     <string name="atp_ExcludedAppsEnabledLabel">Beta sırasında DuckDuckGo, bilinen içerik yükleme sorunlarını çözmek üzere bazı uygulamalar için korumayı devre dışı bırakabilir. Varsayılan ayarlara geri dönmediğiniz sürece özel ayarlarınız değişmez.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Uygulama İzleme Koruması devre dışı</b> Uygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
     <string name="atp_ExcludedAppsReport">Başka Bir Uygulamayla İlgili Sorun Bildir</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Web sitelerini yükler</string>
-    <string name="atp_ExcludedReasonKnownIssues">Bilinen sorunlar</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuel olarak devre dışı bırakıldı</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manuel olarak etkinleştirildi</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">İptal</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Etkinleştir</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Geri Yükle</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">%1$s uygulaması için koruma manuel olarak etkinleştirilsin mi?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Bu uygulamanın, izleme girişimleri başarısız olduğunda sorunlarla karşılaştığı bilinmektedir.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Koruma etkinleştirildiğinde bu uygulamadaki site içeriği düzgün görünmeyebilir.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Korumayı etkinleştirdiğinizde, uygulamanın adı DuckDuckGo\'ya gönderilir.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Gizlilik Koruması Devre Dışı</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Bir sorunu çözmek için korumayı devre dışı bıraktıysanız, lütfen sorunu DuckDuckGo\'ya bildirmeden önce uygulamanın artık çalışıp çalışmadığını kontrol edin.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Beklendiği gibi çalışmayı durdurdu</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Bu uygulamada izlenmek benim için sorun değil</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Başka bir nedenden dolayı</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Bildir</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Atla</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Varsayılan Korumalı Uygulamaları Geri Yükle</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Bir Uygulamayla İlgili Sorun Bildir</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Varsayılan koruma geri yüklensin mi?</string>
@@ -195,20 +184,16 @@
     <string name="atp_ActivityPastWeek">Son 7 Gün</string>
     <string name="atp_ActivityTitle">Uygulama İzleme Koruması</string>
     <string name="atp_MostRecentActivityTitle">Tüm Son Etkinlikler</string>
-    <string name="atp_ActivityRecentActivity">Son Etkinlikler</string>
     <string name="atp_ActivityCtaShowAll">Tüm Son Etkinlikleri Görüntüle</string>
     <string name="atp_ActivityAppTrackersFAQ">Uygulama İzleyici Nedir?</string>
     <string name="atp_ActivityReportProblem">Bir Uygulamayla İlgili Sorun Bildir</string>
     <string name="atp_ActivityBetaInstructions">Beta Talimatları</string>
-    <string name="atp_ActivityManageProtection">Bir Uygulamayla İlgili Sorun mu Yaşıyorsunuz?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[<b>%3$s</b> uygulamasında %2$d şirkete ait %1$d izleme girişimi engellendi]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[<b>%3$s</b> uygulamasında %2$d şirkete ait %1$d izleme girişimi engellendi]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[<b>%3$s</b> uygulamasında %2$d şirketine ait %1$d izleme girişimi engellendi]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[<b>%3$s</b> uygulamasında %2$d şirketlerine ait %1$d izleme girişimi engellendi]]></string>
 
-    <string name="atp_ActivityEmptyListTitle">Yeni etkinlik yok</string>
-    <string name="atp_ActivityEmptyListMessage">Cihazınızı kullanmaya devam edin. Uygulama İzleme Koruması\'nın engellediği izleme girişimleri burada görünür.</string>
     <string name="atp_ActivityPastWeekBlocked">Engellendi</string>
     <string name="atp_ActivityPastWeekAcross">Uygulama Sayısı:</string>
 
@@ -220,7 +205,6 @@
         <item quantity="one">Uygulama</item>
         <item quantity="other">Uygulama</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Bu özellik beta aşamasındadır. <annotation type="app_settings_link">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Uygulama İzleme Koruması devre dışı</b> Uygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Cihazınızdaki bir VPN uygulaması Uygulama İzleme Koruması\'nı devre dışı bıraktı.</b>\nUygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
     <string name="atp_ActivityAbout">Hakkında</string>

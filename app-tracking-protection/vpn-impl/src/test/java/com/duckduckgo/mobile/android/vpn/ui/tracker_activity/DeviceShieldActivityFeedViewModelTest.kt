@@ -122,7 +122,7 @@ class DeviceShieldActivityFeedViewModelTest {
                     listOf(
                         trackerFeedDataWithTwoTrackers,
                         trackerFeedDataWithOneTracker,
-                        TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = true),
+                        TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = true, packageNames = listOf("package1", "package2")),
                     ),
                     awaitItem()
                 )
@@ -146,7 +146,7 @@ class DeviceShieldActivityFeedViewModelTest {
                     listOf(
                         trackerFeedDataWithTwoTrackers,
                         trackerFeedDataWithOneTracker,
-                        TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = false),
+                        TrackerFeedItem.TrackerAppsData(appsCount = 2, isProtected = false, packageNames = listOf("package1", "package2")),
                     ),
                     awaitItem()
                 )
@@ -170,8 +170,8 @@ class DeviceShieldActivityFeedViewModelTest {
                     listOf(
                         trackerFeedDataWithTwoTrackers,
                         trackerFeedDataWithOneTracker,
-                        TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = true),
-                        TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = false),
+                        TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = true, packageNames = listOf("package1")),
+                        TrackerFeedItem.TrackerAppsData(appsCount = 1, isProtected = false, packageNames = listOf("package2")),
                     ),
                     awaitItem()
                 )

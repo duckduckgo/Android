@@ -137,29 +137,18 @@
     <string name="atp_NewTabEnabled"><b>App Tracking Protection je zapnutá</b> a blokuje pokusy o sledování ve všech aplikacích.</string>
 
     <!-- Exclusion List -->
-    <string name="atp_ExclusionListActivityTitle">Všechny aplikace</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection detekuje a blokuje trackery jiných společností, například když se tě Facebook snaží sledovat ve zdravotní aplikaci. Společnosti tě i nadále můžou sledovat v aplikacích, které samy vlastní.\n\nPokud některá aplikace nefunguje podle očekávání, zkus vypnout její ochranu.</string>
     <string name="atp_ExcludedAppsEnabledLabel">V betaverzi může DuckDuckGo ochranu pro některé aplikace vypnout, a vyřešit tak známé problémy s načítáním obsahu. Pokud neobnovíš výchozí nastavení, tvoje vlastní nastavení se nezmění.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection je vypnutá</b> Způsobila ti App Tracking Protection problém s aplikacemi <annotation type="report_issues_link">Nahlásit problémy</annotation></string>
     <string name="atp_ExcludedAppsReport">Nahlásit problém s jinou aplikací</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Načte webové stránky</string>
-    <string name="atp_ExcludedReasonKnownIssues">Známé problémy</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Ručně vypnuto</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Ručně zapnuto</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Zrušit</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Povolit</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Obnovit</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Ručně zapnout ochranu aplikace %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">O téhle aplikaci se ví, že při neúspěšných pokusech o sledování v ní dochází k problémům.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Když je zapnutá ochrana, nemusí se obsah stránek v téhle aplikaci zobrazovat správně.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Zapnutí ochrany odešle název aplikace do DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Vypnutá ochrana soukromí</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Pokud jsi ochranu vypnul(a) kvůli vyřešení problému, zkontroluj před jeho nahlášením DuckDuckGo, jestli už aplikace nefunguje.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Přestalo to fungovat podle mých očekávání</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Nemám problém s tím, že mě tahle aplikace sleduje</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Jiný důvod</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Nahlásit</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Přeskočit</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Obnovení výchozích chráněných aplikací</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Nahlášení problému s aplikací</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Obnovit výchozí ochranu?</string>
@@ -203,20 +192,16 @@
     <string name="atp_ActivityPastWeek">Posledních 7 dní</string>
     <string name="atp_ActivityTitle">Ochrana před sledováním aplikace</string>
     <string name="atp_MostRecentActivityTitle">Všechny nedávné aktivity</string>
-    <string name="atp_ActivityRecentActivity">Nedávná aktivita</string>
     <string name="atp_ActivityCtaShowAll">Zobrazit všechny nedávné aktivity</string>
     <string name="atp_ActivityAppTrackersFAQ">Co jsou trackery v aplikacích?</string>
     <string name="atp_ActivityReportProblem">Nahlásit problém s aplikací</string>
     <string name="atp_ActivityBetaInstructions">Pokyny pro beta verzi</string>
-    <string name="atp_ActivityManageProtection">Máš problémy s aplikací?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[blokován %1$d pokus o sledování od %2$d společnosti v <b>%3$s</b> aplikaci]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[zablokovaný %1$d pokus o sledování od %2$d společností v aplikaci <b>%3$s</b>]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[počet zablokovaných pokusů o sledování: %1$d od %2$d společnosti v aplikaci <b>%3$s</b> ]]></string>
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[počet zablokovaných pokusů o sledování: %1$d od %2$d společností v aplikaci <b>%3$s</b>]]></string>
 
-    <string name="atp_ActivityEmptyListTitle">Žádná nová aktivita</string>
-    <string name="atp_ActivityEmptyListMessage">Používej i nadále své zařízení. Zde se zobrazují pokusy o sledování, které ochrana před sledováním aplikací blokuje.</string>
     <string name="atp_ActivityPastWeekBlocked">Zablokované</string>
     <string name="atp_ActivityPastWeekAcross">Ve více</string>
 
@@ -232,7 +217,6 @@
         <item quantity="many">Aplikace</item>
         <item quantity="other">Aplikace</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Tato funkce je ve fázi beta. <annotation type="app_settings_link">Máš problémy s aplikací?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection je zakázána</b>\nZpůsobila ti APp Tracking Protection problém s tvými aplikacemi? <annotation type="report_issues_link">Oznámit problémy</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPN aplikace ve tvém zařízení vypnula App Tracking Protection.</b>\nZpůsobila ti App Tracking Protection problém s aplikacemi? <annotation type="report_issues_link">Oznámit problémy</annotation></string>
     <string name="atp_ActivityAbout">Informace</string>
