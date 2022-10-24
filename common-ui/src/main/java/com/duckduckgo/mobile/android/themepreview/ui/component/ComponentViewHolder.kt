@@ -65,14 +65,24 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         parent: ViewGroup
     ) : ComponentViewHolder(inflate(parent, R.layout.component_menu_item))
 
+    class HeaderSectionComponentViewHolder(
+        parent: ViewGroup
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_section_header_item)) {
+        override fun bind(component: Component) {
+            view.findViewById<SectionHeaderListItem>(R.id.sectionHeaderItemTitle).apply {
+                revertUpperCaseTitleText()
+            }
+            view.findViewById<SectionHeaderListItem>(R.id.sectionHeaderWithOverflow).apply {
+                setOverflowMenuClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
+                revertUpperCaseTitleText()
+            }
+        }
+    }
+
     class OneLineListItemComponentViewHolder(
         parent: ViewGroup
     ) : ComponentViewHolder(inflate(parent, R.layout.component_one_line_item)) {
         override fun bind(component: Component) {
-            view.findViewById<SectionHeaderListItem>(R.id.oneLineListTitle).apply {
-                setOverflowMenuClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
-            }
-
             view.findViewById<OneLineListItem>(R.id.oneLineListItem).apply {
                 setClickListener { Snackbar.make(view.rootView, component.name, Snackbar.LENGTH_SHORT).show() }
             }
@@ -220,6 +230,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
+                Component.SECTION_HEADER_LIST_ITEM -> HeaderSectionComponentViewHolder(parent)
                 Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)

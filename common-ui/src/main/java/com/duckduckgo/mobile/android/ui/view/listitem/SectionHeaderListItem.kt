@@ -36,10 +36,10 @@ class SectionHeaderListItem @JvmOverloads constructor(
 
     private val binding: ViewSectionHeaderListItemBinding by viewBinding()
 
-    var titleText: String
-        get() = binding.sectionHeaderText.text.toString()
+    var titleText: String = ""
         set(value) {
             binding.sectionHeaderText.text = value
+            field = value
         }
 
     init {
@@ -50,7 +50,8 @@ class SectionHeaderListItem @JvmOverloads constructor(
             defStyleAttr
         ).apply {
             // TODO ADS remove uppercase() method in milestone3
-            binding.sectionHeaderText.text = getString(R.styleable.SectionHeaderListItem_titleText)?.uppercase()
+            titleText = getString(R.styleable.SectionHeaderListItem_titleText).orEmpty()
+            binding.sectionHeaderText.text = titleText.uppercase()
             binding.sectionHeaderText.setTextColor(ContextCompat.getColorStateList(context, R.color.blue_accent_text_color_selector))
 
             val showOverflowMenuIcon = getBoolean(R.styleable.SectionHeaderListItem_showOverflowMenu, false)
@@ -64,9 +65,15 @@ class SectionHeaderListItem @JvmOverloads constructor(
         }
     }
 
+    @Deprecated("Delete function in ADS milestone3 when removing uppercase from headers")
+    fun revertUpperCaseTitleText() {
+        binding.sectionHeaderText.text = titleText
+    }
+
     /** Sets the item title from a string resource*/
     fun setText(@StringRes stringRes: Int) {
-        binding.sectionHeaderText.setText(stringRes)
+        titleText = context.getString(stringRes)
+        binding.sectionHeaderText.text = titleText.uppercase() // TODO ADS remove uppercase() method in milestone3
     }
 
     /** Sets the Trailing Icon Visible */

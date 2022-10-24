@@ -13,29 +13,25 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:clipToPadding="false">
+    android:clipToPadding="false"
+    android:orientation="vertical">
 
     <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-        android:id="@+id/label"
+        android:id="@+id/sectionHeaderItemTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="Deprecated Menu Item"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:titleText="Section Header" />
 
-    <com.duckduckgo.mobile.android.ui.view.MenuItemView
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/sectionHeaderWithOverflow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:labelText="This is a Test"
-        app:iconDrawable="@drawable/ic_globe_gray_16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label"
-        android:clickable="true"
-        android:focusable="true" />
+        app:showOverflowMenu="true"
+        app:titleText="Section Header with Overflow Menu" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
