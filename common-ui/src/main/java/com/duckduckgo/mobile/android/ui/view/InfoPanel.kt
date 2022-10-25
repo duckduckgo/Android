@@ -30,7 +30,6 @@ import android.text.style.UnderlineSpan
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewInfoPanelBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding

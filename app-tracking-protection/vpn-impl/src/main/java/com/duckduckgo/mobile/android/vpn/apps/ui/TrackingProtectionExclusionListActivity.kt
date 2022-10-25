@@ -210,7 +210,7 @@ class TrackingProtectionExclusionListActivity :
                     getText(R.string.atp_ExcludedAppsDisabledLearnWhyLabel)
                 ) { launchFaq() }
             }
-            BannerContent.CUSTOMISED_PROTECTION -> binding.excludedAppsEnabledVPNLabel.apply{
+            BannerContent.CUSTOMISED_PROTECTION -> binding.excludedAppsEnabledVPNLabel.apply {
                 setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_info_panel_link)
                 setText(getString(R.string.atp_ExcludedAppsEnabledLabel))
             }
