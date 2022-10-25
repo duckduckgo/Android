@@ -230,7 +230,9 @@
         <item quantity="one">Rakendus</item>
         <item quantity="other">Rakendused</item>
     </plurals>
+    <string name="atp_ActivityEnabledLabel">See funktsioon on beetaversioonis. Kas märkad rakendusega probleeme? <annotation type="app_settings_link">Teata probleemist.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Rakenduse jälgimise kaitse on välja lülitatud</b>\nKas rakenduse jälgimise kaitse põhjustas sinu rakendustega probleeme? <annotation type="report_issues_link">Probleemidest teavitamine</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android keelas rakenduste jälgimise kaitse</b>. Kas soovid selle kordumist vältida? <annotation type="re_enable_link">Luba uuesti</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPN-rakendus sinu seadmes on rakenduse jälgimise kaitse keelanud.</b>\nKas rakenduse jälgimise kaitse põhjustas sinu rakendustega probleeme? <annotation type="report_issues_link">Teata probleemidest</annotation></string>
     <string name="atp_ActivityAbout">Teave</string>
     <string name="atp_ActivityManage">Halda</string>
@@ -377,5 +379,12 @@
 
     <!--  App Tracking Protection Promote Always On -->
     <string name="atp_PromoteAlwaysOnDialogSettings">Ava Sätted</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Mitte praegu</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Ava oma seadmes DuckDuckGo VPN-i sätted ja luba VPN-i <b>alati sees</b> hoidmine, et Android ei keelaks kaitset.\n\nKontrolli, et teine säte oleks VÄLJA lülitatud.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Rakenduseprobleemide vältimiseks ava oma seadmes <b>DuckDuckGo VPN-i sätted</b> ja keela <b>ilma VPN-ita ühenduste blokeerimine</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Vali Alati sees</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Muuda oma VPN-i sätteid</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Sekkumine on vajalik!</b> Rakenduseprobleemide vältimiseks tuleb muuta Androidi sätteid. <annotation type="open_settings_link">Muuda sätteid</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Sekkumine on vajalik! Rakenduse jälgimiskaitse jaoks tuleb muuta üht Androidi sätet.</string>
 
 </resources>
