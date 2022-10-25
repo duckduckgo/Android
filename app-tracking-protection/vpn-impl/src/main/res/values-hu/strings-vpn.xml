@@ -230,7 +230,9 @@
         <item quantity="one">Alkalmazás</item>
         <item quantity="other">Alkalmazások</item>
     </plurals>
+    <string name="atp_ActivityEnabledLabel">Ez a funkció bétaverzióban van. Problémáid vannak egy alkalmazással? <annotation type="app_settings_link">Jelentsd a hibát.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Az alkalmazáskövetés elleni védelem le van tiltva</b> Okozott problémát az alkalmazáskövetés elleni védelem az Ön alkalmazásainál? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Az Android kikapcsolta az alkalmazáskövetés elleni védelmet</b>. Meg szeretnéd akadályozni, hogy ez újra megtörténjen? <annotation type="re_enable_link">Újbóli engedélyezés</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>A készülékeden lévő VPN alkalmazás kikapcsolta az alkalmazáskövetés elleni védelmet.</b>\nProblémát okozott az alkalmazáskövetés elleni védelem az alkalmazásaidban? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
     <string name="atp_ActivityAbout">További információ</string>
     <string name="atp_ActivityManage">Kezelés</string>
@@ -377,5 +379,12 @@
 
     <!--  App Tracking Protection Promote Always On -->
     <string name="atp_PromoteAlwaysOnDialogSettings">Lépj a Beállítások menübe</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Most nem</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[A készüléken lépj a DuckDuckGo VPN-beállításai lehetőségre, és engedélyezd a <b>Mindig bekapcsolt</b> VPN-t, hogy az Android ne kapcsolja ki a védelmet.\n\nA másik beállítást hagyd kikapcsolva.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Az alkalmazással kapcsolatos problémák elkerülése érdekében a készüléken lépj a <b>DuckDuckGo VPN-beállításai</b> lehetőségre, és tiltsd le a <b>A VPN nélküli kapcsolatok blokkolása</b> funkciót.]]></string>
+    <string name="atp_AlwaysOnModalHeading">Mindig bekapcsolva</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">A VPN beállítások módosítása</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Beavatkozás szükséges!</b> Az alkalmazással kapcsolatos problémák elkerülése érdekében módosítanod kell az Android beállításait. <annotation type="open_settings_link">Beállítások módosítása</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Beavatkozás szükséges! Az alkalmazáskövetés elleni védelemhez módosítani kell egy Android-beállítást.</string>
 
 </resources>
