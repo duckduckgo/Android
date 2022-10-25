@@ -18,8 +18,14 @@ package com.duckduckgo.mobile.android.vpn.feature
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
@@ -32,6 +38,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class AppTpPrivacyFeaturePluginTest {
 
@@ -50,13 +57,14 @@ class AppTpPrivacyFeaturePluginTest {
     private val testConfig = JsonAppTpFeatureConfig("enabled", null, testSettings, "2a58bdb505a789fcefe2bc24fb9ead16")
 
     private val mockPlugin: AppTpSettingPlugin = mock()
+    private val mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
 
     @Before
     fun setup() {
         whenever(mockPlugin.settingName).thenReturn(SettingName {testSettingName})
 
         plugins.add(mockPlugin)
-        featurePlugin = AppTpPrivacyFeaturePlugin(plugins, context)
+        featurePlugin = AppTpPrivacyFeaturePlugin(plugins, context, TestScope(), mockVpnFeaturesRegistry)
         testSettings[testSettingName] = JSONObject(settingAdapter.toJson(testSetting))
     }
 
@@ -79,32 +87,42 @@ class AppTpPrivacyFeaturePluginTest {
     }
 
     @Test
-    fun whenHashIsTheSameSkipStore() {
+    fun whenHashIsTheSameSkipStore() = runTest {
+        featurePlugin = AppTpPrivacyFeaturePlugin(plugins, context, this, mockVpnFeaturesRegistry)
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig)))
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig)))
 
-        verify(mockPlugin, times(1)).store(mockPlugin.settingName, settingAdapter.toJson(testSetting))
+        assertStoredAndRestarted(this,1)
     }
 
     @Test
-    fun whenHashChangesStore() {
+    fun whenHashChangesStore() = runTest {
+        featurePlugin = AppTpPrivacyFeaturePlugin(plugins, context, this, mockVpnFeaturesRegistry)
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig)))
 
         val testConfig2 = JsonAppTpFeatureConfig("enabled", null, testSettings, "b123f6ba3f75a565f14b2350e9c2751c")
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig2)))
 
-        verify(mockPlugin, times(2)).store(mockPlugin.settingName, settingAdapter.toJson(testSetting))
+        assertStoredAndRestarted(this,2)
     }
 
     @Test
-    fun whenHashMissingAlwaysStore() {
+    fun whenHashMissingAlwaysStore() = runTest {
+        featurePlugin = AppTpPrivacyFeaturePlugin(plugins, context, this, mockVpnFeaturesRegistry)
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig)))
 
         val testConfig2 = JsonAppTpFeatureConfig("enabled", null, testSettings, null)
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig2)))
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig2)))
 
-        verify(mockPlugin, times(3)).store(mockPlugin.settingName, settingAdapter.toJson(testSetting))
+        assertStoredAndRestarted(this,3)
+    }
+
+    private suspend fun assertStoredAndRestarted(testScope: TestScope, expectedTimes: Int) {
+        verify(mockPlugin, times(expectedTimes)).store(mockPlugin.settingName, settingAdapter.toJson(testSetting))
+
+        testScope.advanceUntilIdle()
+        verify(mockVpnFeaturesRegistry, times(expectedTimes)).refreshFeature(AppTpVpnFeature.APPTP_VPN)
     }
 
     private data class SimpleSettingJsonModel(val state: String)

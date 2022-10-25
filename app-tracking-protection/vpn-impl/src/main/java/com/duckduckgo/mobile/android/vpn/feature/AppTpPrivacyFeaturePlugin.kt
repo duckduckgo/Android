@@ -19,12 +19,17 @@ package com.duckduckgo.mobile.android.vpn.feature
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -34,6 +39,8 @@ private const val APPTP_FEATURE_SIGNATURE_KEY = "apptp_feature_signature"
 class AppTpPrivacyFeaturePlugin @Inject constructor(
     plugins: DaggerSet<AppTpSettingPlugin>,
     private val context: Context,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry
 ) : PrivacyFeaturePlugin {
 
     private val settings = plugins.sortedBy { it.settingName.value }
@@ -62,6 +69,10 @@ class AppTpPrivacyFeaturePlugin @Inject constructor(
                         settingPlugin.store(SettingName { setting.key }, jsonObject.toString())
                     }
                 }
+            }
+
+            appCoroutineScope.launch {
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             }
 
             return true
