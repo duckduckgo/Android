@@ -19,61 +19,53 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center"
-    android:orientation="horizontal"
-    android:paddingStart="16dp"
-    android:paddingTop="8dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="8dp">
+    android:minHeight="@dimen/twoLineItemHeight"
+    android:paddingEnd="@dimen/keyline_0">
 
     <ImageView
         android:id="@+id/deviceShieldAppEntryIcon"
         android:layout_width="@dimen/listItemImageContainerSize"
         android:layout_height="@dimen/listItemImageContainerSize"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_1"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:importantForAccessibility="no"
-        android:paddingBottom="@dimen/keyline_1"
         android:src="@drawable/ic_globe_gray_16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageView
         android:id="@+id/deviceShieldAppEntryWarningIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="-4dp"
+        android:layout_marginBottom="-4dp"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_apptp_alert"
-        app:layout_constraintBottom_toBottomOf="@id/deviceShieldAppEntryIcon"
-        app:layout_constraintEnd_toEndOf="@id/deviceShieldAppEntryIcon" />
+        app:layout_constraintBottom_toBottomOf="@id/deviceShieldAppEntryIcon" app:layout_constraintEnd_toEndOf="@id/deviceShieldAppEntryIcon"/>
 
     <TextView
         android:id="@+id/deviceShieldAppEntryName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="14dp"
         android:layout_weight="1"
-        android:ellipsize="end"
-        android:maxLines="1"
         android:orientation="vertical"
-        android:singleLine="true"
         android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
         app:layout_constraintBottom_toTopOf="@+id/deviceShieldAppExclusionReason"
         app:layout_constraintEnd_toStartOf="@+id/deviceShieldAppEntryShieldEnabled"
         app:layout_constraintStart_toEndOf="@+id/deviceShieldAppEntryIcon"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Facebook" />
+        tools:text="Facebooasdasdas dasd asd asd asasd as dasdasd asdk"/>
 
     <com.duckduckgo.mobile.android.ui.view.SwitchView
         android:id="@+id/deviceShieldAppEntryShieldEnabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/deviceShieldAppExclusionReason"
@@ -81,10 +73,13 @@
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.DuckDuckGo.Caption"
         android:textColor="?attr/secondaryTextColor"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="@dimen/oneLineItemPadding"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/deviceShieldAppEntryName"
         app:layout_constraintStart_toStartOf="@+id/deviceShieldAppEntryName"
         app:layout_constraintTop_toBottomOf="@+id/deviceShieldAppEntryName"
-        tools:text="App issues may occur if enabled" />
+        tools:text="App issues may occur if enabled"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

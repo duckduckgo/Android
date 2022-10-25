@@ -46,14 +46,14 @@
                     android:minHeight="80dp"
                     style="@style/Widget.DuckDuckGo.InfoPanel"
                     app:panelBackground="@drawable/info_panel_tooltip_background"
-                    app:panelDrawable="@drawable/ic_link_color_24"
+                    app:panelDrawable="@drawable/ic_info_panel_link"
                     android:layout_margin="16dp"/>
 
             <com.duckduckgo.mobile.android.ui.view.InfoPanel
                     android:id="@+id/excludedAppsDisabledVPNLabel"
                     style="@style/Widget.DuckDuckGo.InfoPanel"
                     app:panelBackground="@drawable/info_panel_alert_background"
-                    app:panelDrawable="@drawable/ic_alert_color_24"
+                    app:panelDrawable="@drawable/ic_info_panel_alert"
                     android:layout_margin="16dp"/>
 
             <TextView

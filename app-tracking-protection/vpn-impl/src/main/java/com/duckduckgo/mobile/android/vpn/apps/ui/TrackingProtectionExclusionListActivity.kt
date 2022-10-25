@@ -197,18 +197,23 @@ class TrackingProtectionExclusionListActivity :
     private fun renderBanner(bannerContent: BannerContent) {
         when (bannerContent) {
             BannerContent.ALL_OR_PROTECTED_APPS -> binding.excludedAppsEnabledVPNLabel.apply {
+                setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_info_panel_info)
                 setClickableLink(
                     LEARN_WHY_ANNOTATION,
                     getText(R.string.atp_ExcludedAppsEnabledLearnWhyLabel)
                 ) { launchFaq() }
             }
             BannerContent.UNPROTECTED_APPS -> binding.excludedAppsEnabledVPNLabel.apply {
+                setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_info_panel_info)
                 setClickableLink(
                     LEARN_WHY_ANNOTATION,
                     getText(R.string.atp_ExcludedAppsDisabledLearnWhyLabel)
                 ) { launchFaq() }
             }
-            BannerContent.CUSTOMISED_PROTECTION -> binding.excludedAppsEnabledVPNLabel.setText(getString(R.string.atp_ExcludedAppsEnabledLabel))
+            BannerContent.CUSTOMISED_PROTECTION -> binding.excludedAppsEnabledVPNLabel.apply{
+                setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_info_panel_link)
+                setText(getString(R.string.atp_ExcludedAppsEnabledLabel))
+            }
         }
         binding.excludedAppsEnabledVPNLabel.minimumHeight = 0
     }

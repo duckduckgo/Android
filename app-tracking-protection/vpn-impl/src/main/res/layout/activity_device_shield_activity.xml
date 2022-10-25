@@ -46,7 +46,7 @@
                 android:id="@+id/deviceShieldTrackerLabelEnabled"
                 style="@style/Widget.DuckDuckGo.InfoPanel"
                 app:panelBackground="@drawable/info_panel_tooltip_background"
-                app:panelDrawable="@drawable/ic_link_color_24"
+                app:panelDrawable="@drawable/ic_info_panel_info"
                 app:panelText="@string/atp_ActivityEnabledBannerLabel"
                 android:visibility="gone"
                 android:layout_margin="16dp"/>
@@ -55,7 +55,7 @@
                 android:id="@+id/deviceShieldTrackerLabelDisabled"
                 style="@style/Widget.DuckDuckGo.InfoPanel"
                 app:panelBackground="@drawable/info_panel_alert_background"
-                app:panelDrawable="@drawable/ic_alert_color_24"
+                app:panelDrawable="@drawable/ic_info_panel_alert"
                 app:panelText="@string/atp_ActivityDisabledLabel"
                 android:visibility="gone"
                 android:layout_margin="16dp"/>

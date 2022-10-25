@@ -15,12 +15,12 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="20dp"
-    android:height="20dp"
+    android:width="24dp"
+    android:height="24dp"
     android:viewportWidth="22"
     android:viewportHeight="22">
     <path
-        android:fillColor="#ffffff"
+        android:fillColor="?attr/daxColorSurface"
         android:pathData="M11,1L11,1A10,10 0,0 1,21 11L21,11A10,10 0,0 1,11 21L11,21A10,10 0,0 1,1 11L1,11A10,10 0,0 1,11 1z" />
     <path
         android:fillColor="#FFCC33"

@@ -59,7 +59,7 @@ class InfoPanel : FrameLayout {
         setImageResource(
             attributes.getResourceId(
                 R.styleable.InfoPanel_panelDrawable,
-                R.drawable.ic_link_color_24
+                R.drawable.ic_info_panel_link
             )
         )
         setBackgroundResource(
@@ -124,8 +124,7 @@ class InfoPanel : FrameLayout {
      * Sets the panel image resource
      */
     fun setImageResource(idRes: Int) {
-        val drawable = VectorDrawableCompat.create(resources, idRes, null)
-        binding.infoPanelImage.setImageDrawable(drawable)
+        binding.infoPanelImage.setImageResource(idRes)
     }
 
     companion object {

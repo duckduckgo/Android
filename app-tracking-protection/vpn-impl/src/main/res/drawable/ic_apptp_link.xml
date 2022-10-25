@@ -15,17 +15,17 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="20dp"
-    android:height="20dp"
+    android:width="24dp"
+    android:height="24dp"
     android:viewportWidth="22"
     android:viewportHeight="22">
     <path
-        android:fillColor="#ffffff"
+        android:fillColor="?attr/daxColorSurface"
         android:pathData="M11,1L11,1A10,10 0,0 1,21 11L21,11A10,10 0,0 1,11 21L11,21A10,10 0,0 1,1 11L1,11A10,10 0,0 1,11 1z" />
     <group>
         <clip-path android:pathData="M3,3h16v16h-16z" />
         <path
-            android:fillColor="#3969EF"
+            android:fillColor="?attr/daxColorAccentBlue"
             android:pathData="M19,11C19,15.418 15.418,19 11,19C6.582,19 3,15.418 3,11C3,6.582 6.582,3 11,3C15.418,3 19,6.582 19,11Z" />
         <path
             android:fillColor="#ffffff"
