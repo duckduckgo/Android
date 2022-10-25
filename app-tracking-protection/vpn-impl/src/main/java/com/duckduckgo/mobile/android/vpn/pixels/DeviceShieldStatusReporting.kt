@@ -24,6 +24,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
@@ -35,7 +36,6 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
@@ -92,6 +92,8 @@ class DeviceShieldStatusReportingWorker(
     lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
     @Inject
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     override suspend fun doWork(): Result {
         if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
@@ -105,7 +107,7 @@ class DeviceShieldStatusReportingWorker(
         return Result.success()
     }
 
-    private suspend fun sendLastDayVpnEnableDisableCounts() = withContext(Dispatchers.IO) {
+    private suspend fun sendLastDayVpnEnableDisableCounts() = withContext(dispatchers.io()) {
         val startTime = LocalDateTime.now().minusDays(1).toLocalDate().atStartOfDay().run {
             DatabaseDateFormatter.timestamp(this)
         }

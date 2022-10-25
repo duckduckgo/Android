@@ -36,6 +36,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 
+@Suppress("NoHardcodedCoroutineDispatcher")
 class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapter.CompanyDetailsViewHolder>() {
 
     private val items = mutableListOf<AppTPCompanyTrackersViewModel.CompanyTrackingDetails>()

@@ -36,6 +36,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+@Suppress("NoHardcodedCoroutineDispatcher")
 @ContributesWorker(AppScope::class)
 class DataRemovalAdClickWorker(context: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(context, workerParameters) {

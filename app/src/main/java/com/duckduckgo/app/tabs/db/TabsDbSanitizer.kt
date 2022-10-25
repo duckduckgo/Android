@@ -18,10 +18,10 @@ package com.duckduckgo.app.tabs.db
 
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -29,7 +29,8 @@ import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class TabsDbSanitizer @Inject constructor(
-    private val tabRepository: TabRepository
+    private val tabRepository: TabRepository,
+    private val dispatchers: DispatcherProvider
 ) : DefaultLifecycleObserver {
 
     override fun onStart(owner: LifecycleOwner) {
@@ -38,7 +39,7 @@ class TabsDbSanitizer @Inject constructor(
         }
     }
 
-    private suspend fun purgeTabsDatabaseAsync() = withContext(Dispatchers.IO) {
+    private suspend fun purgeTabsDatabaseAsync() = withContext(dispatchers.io()) {
         tabRepository.purgeDeletableTabs()
     }
 }

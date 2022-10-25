@@ -41,6 +41,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+@Suppress("NoHardcodedCoroutineDispatcher")
 @InjectWith(ActivityScope::class)
 class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTrackerListener {
 

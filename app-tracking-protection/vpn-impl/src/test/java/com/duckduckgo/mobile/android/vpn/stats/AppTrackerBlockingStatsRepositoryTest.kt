@@ -61,7 +61,7 @@ class AppTrackerBlockingStatsRepositoryTest {
         vpnRunningStatsDao = db.vpnRunningStatsDao()
         vpnTrackerDao = db.vpnTrackerDao()
         vpnPhoenixDao = db.vpnPhoenixDao()
-        repository = RealAppTrackerBlockingStatsRepository(db)
+        repository = RealAppTrackerBlockingStatsRepository(db, coroutineRule.testDispatcherProvider)
     }
 
     @After

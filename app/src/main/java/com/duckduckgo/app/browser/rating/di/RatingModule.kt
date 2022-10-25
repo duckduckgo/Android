@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentDatabaseRepository
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.rating.*
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils
@@ -72,15 +73,15 @@ class RatingModule {
         searchCountDao: SearchCountDao,
         @Named(INITIAL_PROMPT_DECIDER_NAME) initialPromptDecider: ShowPromptDecider,
         @Named(SECONDARY_PROMPT_DECIDER_NAME) secondaryPromptDecider: ShowPromptDecider,
-        context: Context,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
+        dispatchers: DispatcherProvider
     ): PromptTypeDecider {
         return InitialPromptTypeDecider(
             playStoreUtils,
             searchCountDao,
             initialPromptDecider,
             secondaryPromptDecider,
-            context,
+            dispatchers,
             appBuildConfig
         )
     }

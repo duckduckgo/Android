@@ -38,7 +38,7 @@ import kotlin.coroutines.coroutineContext
 @ContributesViewModel(FragmentScope::class)
 class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
-    private val dispatcherProvider: DispatcherProvider,
+    private val dispatchers: DispatcherProvider,
     private val timeDiffFormatter: TimeDiffFormatter
 ) : ViewModel() {
 
@@ -62,11 +62,11 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     suspend fun getMostRecentTrackers(
         timeWindow: TimeWindow,
         showHeadings: Boolean
-    ): Flow<List<TrackerFeedItem>> = withContext(dispatcherProvider.io()) {
+    ): Flow<List<TrackerFeedItem>> = withContext(dispatchers.io()) {
         return@withContext statsRepository.getMostRecentVpnTrackers { timeWindow.asString() }
             .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
             .map { aggregateDataPerApp(it, showHeadings) }
-            .flowOn(Dispatchers.Default)
+            .flowOn(dispatchers.default())
             .map { it.ifEmpty { listOf(TrackerFeedItem.TrackerEmptyFeed) } }
             .onStart {
                 startTickerRefresher()

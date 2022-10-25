@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global.rating
 
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -26,11 +27,15 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
 @Suppress("RemoveExplicitTypeArguments")
 class InitialPromptTypeDeciderTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private lateinit var testee: InitialPromptTypeDecider
 
@@ -48,8 +53,8 @@ class InitialPromptTypeDeciderTest {
             searchCountDao = mockSearchCountDao,
             initialPromptDecider = mockInitialPromptDecider,
             secondaryPromptDecider = mockSecondaryPromptDecider,
-            context = mock(),
-            appBuildConfig = mockAppBuildConfig
+            appBuildConfig = mockAppBuildConfig,
+            dispatchers = coroutineTestRule.testDispatcherProvider
         )
 
         whenever(mockPlayStoreUtils.isPlayStoreInstalled()).thenReturn(true)
