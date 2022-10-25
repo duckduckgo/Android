@@ -15,19 +15,19 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              style="@style/Widget.DuckDuckGo.InfoPanel"
-              android:id="@+id/item_container"
-              android:orientation="horizontal"
-android:padding="@dimen/keyline_4">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   style="@style/Widget.DuckDuckGo.InfoPanel"
+                                                   android:id="@+id/item_container"
+                                                   android:orientation="horizontal"
+                                                   android:padding="@dimen/keyline_4">
 
     <ImageView
         android:id="@+id/infoPanelImage"
         android:layout_width="@dimen/infoPanelIconSize"
         android:layout_height="@dimen/infoPanelIconSize"
         android:layout_gravity="start"
-        android:layout_marginTop="@dimen/keyline_0"
+        android:layout_marginTop="@dimen/keyline_1"
         android:importantForAccessibility="no"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" app:srcCompat="@drawable/ic_info_panel_info"/>

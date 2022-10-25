@@ -59,7 +59,7 @@ class InfoPanel : FrameLayout {
         setImageResource(
             attributes.getResourceId(
                 R.styleable.InfoPanel_panelDrawable,
-                R.drawable.ic_info_panel_link
+                R.drawable.ic_info_panel_info
             )
         )
         setBackgroundResource(

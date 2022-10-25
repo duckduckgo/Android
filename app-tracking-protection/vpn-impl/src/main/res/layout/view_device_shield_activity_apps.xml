@@ -38,10 +38,10 @@
         android:id="@+id/activity_apps_warning_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="-4dp"
+        android:layout_marginBottom="-4dp"
         android:src="@drawable/ic_apptp_alert"
-        android:elevation="12dp"
-        app:layout_constraintBottom_toBottomOf="@id/activity_apps_image"
-        app:layout_constraintEnd_toEndOf="@id/activity_apps_image" />
+        app:layout_constraintBottom_toBottomOf="@id/activity_apps_image" app:layout_constraintEnd_toEndOf="@id/activity_apps_image"/>
 
     <TextView
         android:id="@+id/activity_apps"

@@ -552,13 +552,13 @@ class DeviceShieldTrackerActivity :
         binding.appTpEnabledKonfetti.build()
             .addColors(magenta, blue, purple, green, yellow)
             .setDirection(0.0, 359.0)
-            .setSpeed(1f, 5f)
+            .setSpeed(4f, 9f)
             .setFadeOutEnabled(true)
-            .setTimeToLive(2000L)
+            .setTimeToLive(1500L)
             .addShapes(Shape.Rectangle(1f))
             .addSizes(Size(8))
             .setPosition(displayWidth / 2f, displayWidth / 2f, -50f, -50f)
-            .streamFor(50, 4000L)
+            .streamFor(60, 2000L)
     }
 
     companion object {
