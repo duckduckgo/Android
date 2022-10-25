@@ -80,7 +80,7 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="-4dp"
+        android:layout_marginEnd="-8dp"
         android:layout_marginBottom="-4dp"
         app:layout_constraintBottom_toBottomOf="@+id/trackingProtectionAppIcon"
         app:layout_constraintEnd_toEndOf="@+id/trackingProtectionAppIcon" app:srcCompat="@drawable/ic_apptp_alert"/>

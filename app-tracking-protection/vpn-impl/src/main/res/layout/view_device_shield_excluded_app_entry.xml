@@ -43,11 +43,12 @@
         android:id="@+id/deviceShieldAppEntryWarningIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="-4dp"
+        android:layout_marginEnd="-8dp"
         android:layout_marginBottom="-4dp"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_apptp_alert"
-        app:layout_constraintBottom_toBottomOf="@id/deviceShieldAppEntryIcon" app:layout_constraintEnd_toEndOf="@id/deviceShieldAppEntryIcon"/>
+        app:layout_constraintBottom_toBottomOf="@id/deviceShieldAppEntryIcon"
+        app:layout_constraintEnd_toEndOf="@id/deviceShieldAppEntryIcon"/>
 
     <TextView
         android:id="@+id/deviceShieldAppExclusionReason"
