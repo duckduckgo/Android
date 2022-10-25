@@ -230,7 +230,9 @@
         <item quantity="one">App</item>
         <item quantity="other">Apps</item>
     </plurals>
+    <string name="atp_ActivityEnabledLabel">Deze functie is in bèta. Heb je een probleem met een app opgemerkt? <annotation type="app_settings_link">Meld dit probleem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is uitgeschakeld</b>\nHeeft App Tracking Protection een probleem met een van je apps veroorzaakt? <annotation type="report_issues_link">Problemen melden</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android heeft App Tracking Protection uitgeschakeld</b>. Wil je voorkomen dat dit nog een keer gebeurt? <annotation type="re_enable_link">Opnieuw inschakelen</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Een VPN-app op je apparaat heeft App Tracking Protection uitgeschakeld.</b>Heeft App Tracking Protection een probleem veroorzaakt met je apps? <annotation type="report_issues_link">Problemen melden</annotation></string>
     <string name="atp_ActivityAbout">Over</string>
     <string name="atp_ActivityManage">Beheren</string>
@@ -377,5 +379,12 @@
 
     <!--  App Tracking Protection Promote Always On -->
     <string name="atp_PromoteAlwaysOnDialogSettings">Ga naar Instellingen</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Niet nu</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Ga naar de VPN-instellingen van je apparaat voor DuckDuckGo en schakel <b>Always-on VPN</b> in om te voorkomen dat Android de beveiliging uitschakelt.\n\nZorg ervoor dat je de andere instelling UIT laat.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Om problemen met de app te voorkomen, ga je naar de <b>VPN-instellingen voor DuckDuckGo</b> van je apparaat en schakel je <b>Blokkeren van verbindingen zonder VPN</b> uit]]></string>
+    <string name="atp_AlwaysOnModalHeading">Instellen op Always on</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Wijzig je VPN-instellingen</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Actie vereist!</b> Om app-problemen te voorkomen, moet je je Android-instellingen wijzigen. <annotation type="open_settings_link">Instellingen wijzigen</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Actie vereist! Er moet een Android-instelling worden gewijzigd voor App Tracking Protection.</string>
 
 </resources>
