@@ -180,7 +180,7 @@ class TrackerFeedAdapter @Inject constructor(
         fun bind(
             tracker: TrackerFeedItem.TrackerFeedData?,
             onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit,
-            isLastPosition: Boolean
+            shouldHideDivider: Boolean
         ) {
             tracker?.let { item ->
                 with(activityMessage) {
