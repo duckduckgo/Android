@@ -31,11 +31,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Time running: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Tracker companies blocked today: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Tracker companies blocked this week: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Tracker companies blocked today: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Tracker companies blocked this week: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"No tracker companies blocked yet"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Trackers blocked today: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Trackers blocked this week: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Trackers blocked today: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Trackers blocked this week: %1$d</string>
     <string name="vpnTrackersNone">"No trackers blocked yet"</string>
     <string name="vpnNotRunYet">"VPN hasn't been run yet"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s packets"</string>
@@ -372,5 +372,39 @@
     <string name="atp_PromoteAlwaysOnDialogSettings">Go to Settings</string>
     <string name="atp_PromoteAlwaysOnDialogLater">Remind me Later</string>
     <string name="atp_PromoteAlwaysOnDialogForget">No Thanks</string>
+
+    <!--  App Tracking Protection Exclusion List -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">My Apps</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">App issues may occur if enabled</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Enable Anyway</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of the app">%1$s may experience issues if App Tracking Protection is enabled</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Report an issue?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of the app">Please let us know if you disabled App Tracking Protection for %1$s because you experienced app issues.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Report Issue</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Not Now</string>
+    <string name="atp_ActivityRecentActivityHeader">Activity</string>
+    <string name="atp_ActivityManageProtectionLabel">Having Problems With An App?</string>
+    <string name="atp_ActivityEnabledBannerLabel">During beta, protection for some apps is automatically disabled. <annotation type="app_settings_link">View Apps</annotation></string>
+    <string name="atp_ActivityDescription">Blocked tracking attempts will appear here</string>
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the total number of apps">
+        <item quantity="one">%1$s of your apps is protected from hidden trackers we find trying to access your personal info</item>
+        <item quantity="other">%1$s of your apps are protected from hidden trackers we find trying to access your personal info</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the total number of apps">
+        <item quantity="one">%1$s of your apps has protection automatically disabled</item>
+        <item quantity="other">%1$s of your apps have protection automatically disabled</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Good news! App Tracking Protection is now enabled.<br/><br/>👌I’ll show you a real-time list of apps on your device that I catch trying to track you.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Got It!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the total number of apps">Protection Enabled (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the total number of apps">Protection Disabled (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">All</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Protection Enabled</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Protection Disabled</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">All</string>
+    <string name="atp_ActivityViewAppsLabel">View Apps</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">This feature is in beta. Having issues with an app? <annotation type="app_settings_link">Help Us Improve</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Some apps may experience issues when App Tracking Protection is enabled.\n<annotation type="learn_why_link">Learn Why</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Protection is disabled for apps with known issues. You can enable these apps, but they may not work as expected. <annotation type="learn_why_link">Learn Why</annotation></string>
 
 </resources>
