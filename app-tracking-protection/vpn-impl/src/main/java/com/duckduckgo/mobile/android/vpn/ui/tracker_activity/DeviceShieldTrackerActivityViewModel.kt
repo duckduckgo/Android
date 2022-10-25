@@ -88,7 +88,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     }
 
     private suspend fun shouldPromoteAlwaysOnOnAppTPEnable(): Boolean {
-        return !vpnStore.isAlwaysOnEnabled() && vpnStore.vpnLastDisabledByAndroid()
+        return !vpnStore.isAlwaysOnEnabled() && vpnStore.vpnLastDisabledByAndroid() && !vpnStore.alwaysOnDialogsReachedMaxAttempts()
     }
 
     private fun sendCommand(newCommand: Command) {
@@ -182,10 +182,14 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     private fun onAlwaysOnInitialState(alwaysOnState: VpnStateMonitor.AlwaysOnState) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (alwaysOnState.enabled && alwaysOnState.lockedDown && vpnStore.alwaysOnPromotionDialogCancelCount() <= 2) {
+            if (alwaysOnState.enabled && alwaysOnState.lockedDown && !vpnStore.alwaysOnDialogsReachedMaxAttempts()) {
                 sendCommand(Command.ShowAlwaysOnLockdownWarningDialog)
             }
         }
+    }
+
+    private suspend fun VpnStore.alwaysOnDialogsReachedMaxAttempts(): Boolean {
+        return vpnStore.alwaysOnPromotionDialogCancelCount() > 2
     }
 
     internal data class TrackerActivityViewState(

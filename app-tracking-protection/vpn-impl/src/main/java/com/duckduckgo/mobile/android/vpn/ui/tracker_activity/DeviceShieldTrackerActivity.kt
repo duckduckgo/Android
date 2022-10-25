@@ -197,7 +197,8 @@ class DeviceShieldTrackerActivity :
                 .map { it.alwaysOnState }
                 .debounce(500) // give a bit of time so that pop doesn't just suddenly pops up
                 .take(1)
-                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                // we do this on CREATED because we don't want to show the dialogs when user leaves app and switches back here
+                .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
                 .collect {
                     viewModel.onViewEvent(ViewEvent.AlwaysOnInitialState(it))
                 }
