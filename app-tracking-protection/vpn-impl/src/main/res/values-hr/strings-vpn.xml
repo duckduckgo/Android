@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="atp_name">Zaštita od praćenja aplikacija</string>
     <string name="refresh">Osvježi</string>
 
@@ -230,19 +230,21 @@
     <string name="atp_ActivityPastWeekBlocked">Blokirano</string>
     <string name="atp_ActivityPastWeekAcross">U</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">pokušaj praćenja</item>
         <item quantity="few">pokušaja praćenja</item>
         <item quantity="many">pokušaja praćenja</item>
         <item quantity="other">pokušaja praćenja</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">aplikacija</item>
         <item quantity="few">aplikacije</item>
         <item quantity="many">aplikacija</item>
         <item quantity="other">aplikacije</item>
     </plurals>
+    <string name="atp_ActivityEnabledLabel">Ova je značajka u beta verziji. Primijetio si problem s aplikacijom? <annotation type="app_settings_link">Prijavi problem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection je onemogućen</b>\nJe li App Tracking Protection uzrokovao problem s tvojim aplikacijama? <annotation type="report_issues_link">Prijavi probleme</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android je onemogućio zaštitu od praćenja aplikacija App Tracking Protection</b>. Želite li spriječiti da se ovo ponovi? <annotation type="re_enable_link">Ponovno omogući</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPN aplikacija na tvom uređaju onemogućila je App Tracking Protection</b>\n.Je li App Tracking Protection uzrokovao problem s tvojim aplikacijama? <annotation type="report_issues_link">Prijavi probleme</annotation></string>
     <string name="atp_ActivityAbout">O</string>
     <string name="atp_ActivityManage">Upravljanje</string>
@@ -393,5 +395,12 @@
 
     <!--  App Tracking Protection Promote Always On -->
     <string name="atp_PromoteAlwaysOnDialogSettings">Idi na Postavke</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Ne sada</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Idi na VPN postavke svog uređaja za DuckDuckGo i omogući <b>Uvijek uključeno</b> za VPN - time ćeš spriječiti Androidovo onemogućavanje zaštite.\n\nObavezno ostavi drugu postavku isključenu (OFF).]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Kako bi se izbjegli problemi s aplikacijom, idi na <b>VPN postavke uređaja za DuckDuckGo</b> i onemogući <b>Blokiranje veza bez VPN-a</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Postavi na \"Uvijek uključeno\" (Always-on)</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Promijeni svoje VPN postavke</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Potrebno je izvršiti radnju!</b> Za izbjegavanje problema s aplikacijom, moraš promijeniti postavke za Android. <annotation type="open_settings_link">Promjena postavki</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Potrebno je izvršiti radnju! Potrebno je promijeniti postavku za Android, tj. za zaštitu praćenja aplikacija App Tracking Protection.</string>
 
 </resources>

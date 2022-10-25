@@ -242,7 +242,9 @@
         <item quantity="many">Aplikacji</item>
         <item quantity="other">Aplikacji</item>
     </plurals>
+    <string name="atp_ActivityEnabledLabel">Ta funkcja jest w fazie beta. Masz problem z aplikacją? <annotation type="app_settings_link">Prześlij zgłoszenie.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Ochrona przed śledzeniem przez aplikacje jest wyłączona.</b>\nCzy ochrona przed śledzeniem przez aplikacje wywołała problem z Twoimi aplikacjami? <annotation type="report_issues_link">Zgłoś problemy</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>System Android wyłączył ochronę przed śledzeniem aplikacji</b>. Chcesz temu zapobiec w przyszłości? <annotation type="re_enable_link">Włącz ją ponownie</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Aplikacja VPN na Twoim urządzeniu wyłączyła ochronę przed śledzeniem przez aplikacje. </b>\nCzy ochrona przed śledzeniem przez aplikacje wywołała problem z Twoimi aplikacjami? <annotation type="report_issues_link">Zgłoś problemy</annotation></string>
     <string name="atp_ActivityAbout">Informacje</string>
     <string name="atp_ActivityManage">Zarządzaj</string>
@@ -393,5 +395,12 @@
 
     <!--  App Tracking Protection Promote Always On -->
     <string name="atp_PromoteAlwaysOnDialogSettings">Przejdź do ustawień</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Nie teraz</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Przejdź do ustawień VPN swojego urządzenia dla aplikacji DuckDuckGo i włącz opcję <b>zawsze włączone</b> przy funkcji VPN, aby zapobiec wyłączeniu ochrony przez system Android.\n\nUpewnij się, że pozostałe ustawienia są wyłączone.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Aby uniknąć problemów z aplikacją, przejdź do <b>ustawień VPN dla DuckDuckGo</b> swojego urządzenia i wyłącz opcję <b>blokuj połączenia bez VPN</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Włącz ustawienie Zawsze włączone</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Zmień ustawienia VPN</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Wymagane działanie!</b> Aby uniknąć problemów z aplikacją, zmień ustawienia systemu Android. <annotation type="open_settings_link">Zmień ustawienia</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Wymagane działanie! Zmień ustawienia systemu Android dla ochrony przed śledzeniem przez aplikacje.</string>
 
 </resources>
