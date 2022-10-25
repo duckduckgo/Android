@@ -27,6 +27,7 @@ import com.duckduckgo.lint.NoLifecycleObserverDetector.Companion.NO_LIFECYCLE_OB
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
 import com.duckduckgo.lint.strings.MissingInstructionDetector.Companion.MISSING_INSTRUCTION
+import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MISSING_POSITION
 import com.duckduckgo.lint.ui.DeprecatedAndroidButtonUsedInXmlDetector.Companion.DEPRECATED_BUTTON_IN_XML
 import com.duckduckgo.lint.ui.DeprecatedSwitchUsedInXmlDetector.Companion.DEPRECATED_SWITCH_IN_XML
 import com.duckduckgo.lint.ui.MissingDividerDetector.Companion.MISSING_HORIZONTAL_DIVIDER
@@ -46,6 +47,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_HARCODED_COROUTINE_DISPATCHER,
             MISSING_SMARTLING_REQUIRED_DIRECTIVES,
             MISSING_INSTRUCTION,
+            PLACEHOLDER_MISSING_POSITION,
 
             // Android Design System
             DEPRECATED_BUTTON_IN_XML,

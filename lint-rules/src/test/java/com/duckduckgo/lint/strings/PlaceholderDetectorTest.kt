@@ -19,16 +19,17 @@ package com.duckduckgo.lint.strings
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest.xml
 import com.android.tools.lint.checks.infrastructure.TestLintTask
 import com.android.tools.lint.checks.infrastructure.TestMode
+import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MISSING_POSITION
 import org.junit.Test
 
 @Suppress("UnstableApiUsage")
-class MissingInstructionDetectorTest {
+class PlaceholderDetectorTest {
 
     @Test
-    fun whenStringHasSPlaceholderAndNoInstructionThenFailWithError() {
+    fun whenStringHasSPlaceholderThenFailWithError() {
         val expected =
             """
-            res/values/strings.xml:3: Error: Missing instructions attribute [MissingInstruction]
+            res/values/strings.xml:3: Error: Placeholder is missing the position in a string [PlaceholderMissingPosition]
                 <string name="macos_windows">Windows coming soon! %s</string>
                                              ~~~~~
             1 errors, 0 warnings
@@ -45,7 +46,7 @@ class MissingInstructionDetectorTest {
                 """
             ).indented())
             .skipTestModes(TestMode.CDATA)
-            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .issues(PLACEHOLDER_MISSING_POSITION)
             .run().expect(expected)
     }
 
@@ -53,7 +54,7 @@ class MissingInstructionDetectorTest {
     fun whenStringHasDPlaceholderAndNoInstructionThenFailWithError() {
         val expected =
             """
-            res/values/strings.xml:3: Error: Missing instructions attribute [MissingInstruction]
+            res/values/strings.xml:3: Error: Placeholder is missing the position in a string [PlaceholderMissingPosition]
                 <string name="macos_windows">Windows coming soon! %d</string>
                                              ~~~~~
             1 errors, 0 warnings
@@ -70,7 +71,7 @@ class MissingInstructionDetectorTest {
                 """
             ).indented())
             .skipTestModes(TestMode.CDATA)
-            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .issues(PLACEHOLDER_MISSING_POSITION)
             .run().expect(expected)
     }
 
@@ -78,7 +79,7 @@ class MissingInstructionDetectorTest {
     fun whenStringHasSeveralPlaceholdersAndNoInstructionThenFailWithError() {
         val expected =
             """
-            res/values/strings.xml:3: Error: Missing instructions attribute [MissingInstruction]
+            res/values/strings.xml:3: Error: Placeholder is missing the position in a string [PlaceholderMissingPosition]
                 <string name="macos_windows">Windows %d coming soon! %s</string>
                                              ~~~~~
             1 errors, 0 warnings
@@ -95,116 +96,76 @@ class MissingInstructionDetectorTest {
                 """
             ).indented())
             .skipTestModes(TestMode.CDATA)
-            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .issues(PLACEHOLDER_MISSING_POSITION)
             .run().expect(expected)
     }
 
     @Test
-    fun whenStringHasOrderedPlaceholdersAndNoInstructionThenFailWithError() {
-        val expected =
-            """
-            res/values/strings.xml:3: Error: Missing instructions attribute [MissingInstruction]
-                <string name="macos_windows">Windows %1$\s coming soon! %2$\s</string>
-                                             ~~~~~
-            1 errors, 0 warnings
-            """
-
+    fun whenStringHasSPlaceholderWithOrderThenSuccess() {
         TestLintTask.lint().files(
             xml(
                 "res/values/strings.xml",
                 """
                 <?xml version="1.0" encoding="utf-8"?>
                 <resources>
-                    <string name="macos_windows">Windows %1$\s coming soon! %2$\s</string>
+                    <string name="macos_windows">Windows coming soon! %1$\s</string>
                 </resources>    
                 """
             ).indented())
             .skipTestModes(TestMode.CDATA)
-            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
-            .run().expect(expected)
-    }
-
-    @Test
-    fun whenStringHasSPlaceholderAndInstructionThenSuccess() {
-        TestLintTask.lint().files(
-            xml(
-                "res/values/strings.xml",
-                """
-                <?xml version="1.0" encoding="utf-8"?>
-                <resources>
-                    <string name="macos_windows" instruction="test">Windows coming soon! %s</string>
-                </resources>    
-                """
-            ).indented())
-            .skipTestModes(TestMode.CDATA)
-            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .issues(PLACEHOLDER_MISSING_POSITION)
             .run().expectClean()
     }
 
     @Test
-    fun whenStringHasDPlaceholderAndInstructionThenSuccess() {
+    fun whenStringHasDPlaceholderWithOrderThenSuccess() {
         TestLintTask.lint().files(
             xml(
                 "res/values/strings.xml",
                 """
                 <?xml version="1.0" encoding="utf-8"?>
                 <resources>
-                    <string name="macos_windows" instruction="">Windows coming soon! %d</string>
+                    <string name="macos_windows" instruction="">Windows coming soon! %1$\d</string>
                 </resources>    
                 """
             ).indented())
             .skipTestModes(TestMode.CDATA)
-            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .issues(PLACEHOLDER_MISSING_POSITION)
             .run().expectClean()
     }
 
     @Test
-    fun whenStringHasSeveralPlaceholdersAndInstructionThenSuccess() {
+    fun whenStringHasSeveralPlaceholdersWithOrderThenSuccess() {
         TestLintTask.lint().files(
             xml(
                 "res/values/strings.xml",
                 """
                 <?xml version="1.0" encoding="utf-8"?>
                 <resources>
-                    <string name="macos_windows" instruction="test">Windows %d coming soon! %s</string>
+                    <string name="macos_windows" instruction="test">Windows %1$\d coming soon! %2$\s</string>
                 </resources>    
                 """
             ).indented())
             .skipTestModes(TestMode.CDATA)
-            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .issues(PLACEHOLDER_MISSING_POSITION)
             .run().expectClean()
     }
 
+
     @Test
-    fun whenStringHasOrderedPlaceholdersAndInstructionThenSuccess() {
+    fun whenStringHasPlaceholdersIsInDoNotTranslateFileAndNoOrderThenSuccess() {
         TestLintTask.lint().files(
             xml(
-                "res/values/strings.xml",
+                "res/values/donottranslate.xml",
                 """
                 <?xml version="1.0" encoding="utf-8"?>
                 <resources>
-                    <string name="macos_windows" instruction="test">Windows %1$\s coming soon! %2$\s</string>
+                    <string name="macos_windows">Windows %s s coming soon!</string>
                 </resources>    
                 """
             ).indented())
             .skipTestModes(TestMode.CDATA)
-            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
-            .run().expectClean()
-    }
-    @Test
-    fun whenStringHasPlaceholdersIsNotTranslatableAndNoInstructionThenSuccess() {
-        TestLintTask.lint().files(
-            xml(
-                "res/values/strings.xml",
-                """
-                <?xml version="1.0" encoding="utf-8"?>
-                <resources>
-                    <string name="macos_windows" translatable="false">Windows %1$\s coming soon! %2$\s</string>
-                </resources>    
-                """
-            ).indented())
-            .skipTestModes(TestMode.CDATA)
-            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .issues(PLACEHOLDER_MISSING_POSITION)
             .run().expectClean()
     }
 }
