@@ -27,12 +27,6 @@ interface AppTrackerListService {
     @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTB/1.0/blocklist.json")
     fun appTrackerBlocklist(): Call<JsonAppBlockingList>
 
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTB/1.0/apps-unprotected-temporary.json")
-    fun appTrackerExclusionList(): Call<JsonAppTrackerExclusionList>
-
     @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTB/1.0/unbreak.json")
     fun appTrackerExceptionRules(): Call<JsonAppTrackerExceptionRules>
-
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTB/1.0/system-apps-overrides.json")
-    fun appTrackerSystemAppsOverrides(): Call<JsonAppTrackerSystemAppOverrides>
 }

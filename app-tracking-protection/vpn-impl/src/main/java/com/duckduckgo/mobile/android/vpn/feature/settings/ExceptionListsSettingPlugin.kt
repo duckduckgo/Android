@@ -55,6 +55,11 @@ class ExceptionListsSettingPlugin @Inject constructor(
                     for (item in exceptionLists.unprotectedApps) {
                         Timber.v("${item.packageId}, ${item.reason}")
                     }
+
+                    vpnDatabase.vpnSystemAppsOverridesDao().upsertSystemAppOverrides(
+                        exceptionLists.unhideSystemApps.map { AppTrackerSystemAppOverridePackage(it) }
+                    )
+
                 }
             }.onFailure {
                 Timber.w(it, "Invalid JSON remote configuration for $settingName")
