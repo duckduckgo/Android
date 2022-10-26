@@ -24,25 +24,14 @@
     </issue>
 
     <issue
-        id="CheckResult"
-        message="The result of `test` is not used"
-        errorLine1="        testee.enqueuePixel(PRIVACY_DASHBOARD_OPENED.pixelName, params, emptyMap()).test()"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="InlinedApi"
+        message="Field requires API level 31 (current min is 23): `android.app.PendingIntent#FLAG_MUTABLE`"
+        errorLine1="        val pendingIntentFlags = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0"
+        errorLine2="                                                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/statistics/api/RxPixelSenderTest.kt"
-            line="161"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="CheckResult"
-        message="The result of `test` is not used"
-        errorLine1="        testee.enqueuePixel(PRIVACY_DASHBOARD_OPENED.pixelName, emptyMap(), emptyMap()).test()"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/statistics/api/RxPixelSenderTest.kt"
-            line="185"
-            column="9"/>
+            file="src/main/java/com/duckduckgo/widget/SearchAndFavoritesWidget.kt"
+            line="248"
+            column="86"/>
     </issue>
 
     <issue
@@ -52,7 +41,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="31"
+            line="37"
             column="9"/>
     </issue>
 
@@ -74,7 +63,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="77"
+            line="83"
             column="13"/>
     </issue>
 
@@ -85,7 +74,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="196"
+            line="202"
             column="13"/>
     </issue>
 
@@ -96,7 +85,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="217"
+            line="223"
             column="13"/>
     </issue>
 
@@ -125,7 +114,7 @@
         errorLine2="                       ~~">
         <location
             file="src/main/java/com/duckduckgo/app/bookmarks/ui/bookmarkfolders/BookmarkFoldersAdapter.kt"
-            line="183"
+            line="184"
             column="24"/>
     </issue>
 
@@ -160,6 +149,17 @@
             file="src/main/java/com/duckduckgo/app/browser/state/BrowserApplicationStateInfo.kt"
             line="74"
             column="26"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Use of this function is discouraged because resource reflection makes it harder to perform build optimizations and compile-time verification of code. It is much more efficient to retrieve resources by identifier (e.g. `R.foo.bar`) than by name (e.g. `getIdentifier(&quot;bar&quot;, &quot;foo&quot;, null)`)."
+        errorLine1="        val resource = context.resources.getIdentifier(drawable, &quot;drawable&quot;, context.packageName)"
+        errorLine2="                                         ~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/privacy/renderer/TrackersRenderer.kt"
+            line="107"
+            column="42"/>
     </issue>
 
     <issue
@@ -213,7 +213,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="485"
+            line="487"
             column="5"/>
     </issue>
 
@@ -224,7 +224,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="489"
+            line="491"
             column="5"/>
     </issue>
 
@@ -235,7 +235,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="695"
+            line="659"
             column="5"/>
     </issue>
 
@@ -246,7 +246,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="700"
+            line="664"
             column="5"/>
     </issue>
 
@@ -257,7 +257,7 @@
         errorLine2="                                                                      ^">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="663"
+            line="647"
             column="71"/>
     </issue>
 
@@ -268,7 +268,7 @@
         errorLine2="                                                                                                                                                                                                                                                                                                                                                                                 ^">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="663"
+            line="647"
             column="370"/>
     </issue>
 
@@ -279,7 +279,7 @@
         errorLine2="                                                                                                                        ^">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="663"
+            line="647"
             column="121"/>
     </issue>
 
@@ -290,52 +290,8 @@
         errorLine2="                                                                                                                                                                                   ^">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="663"
+            line="647"
             column="180"/>
-    </issue>
-
-    <issue
-        id="Typos"
-        message="&quot;eletrónico&quot; is a common misspelling; did you mean &quot;electrónico&quot; or &quot;eletrônico&quot;?"
-        errorLine1="    &lt;string name=&quot;emailProtectionDescriptionJoin&quot;>&lt;![CDATA[Bloqueie os rastreadores de correio eletrónico e oculte o seu endereço, sem mudar o fornecedor de correio eletrónico.&lt;br/>&lt;a href=\&quot;\&quot;>&lt;b>Saiba mais&lt;/b>&lt;/a>.]]&gt;&lt;/string>"
-        errorLine2="                                                                                               ^">
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="667"
-            column="96"/>
-    </issue>
-
-    <issue
-        id="Typos"
-        message="&quot;eletrónico&quot; is a common misspelling; did you mean &quot;electrónico&quot; or &quot;eletrônico&quot;?"
-        errorLine1="    &lt;string name=&quot;emailProtectionDescriptionJoin&quot;>&lt;![CDATA[Bloqueie os rastreadores de correio eletrónico e oculte o seu endereço, sem mudar o fornecedor de correio eletrónico.&lt;br/>&lt;a href=\&quot;\&quot;>&lt;b>Saiba mais&lt;/b>&lt;/a>.]]&gt;&lt;/string>"
-        errorLine2="                                                                                                                                                                     ^">
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="667"
-            column="166"/>
-    </issue>
-
-    <issue
-        id="Typos"
-        message="&quot;eletrónico&quot; is a common misspelling; did you mean &quot;electrónico&quot; or &quot;eletrônico&quot;?"
-        errorLine1="    &lt;string name=&quot;emailProtectionDescriptionInBeta&quot;>&lt;![CDATA[Bloqueie os rastreadores de correio eletrónico e oculte o seu endereço,&lt;br/>sem mudar o fornecedor de correio eletrónico.&lt;br/>&lt;a href=\&quot;\&quot;>&lt;b>Saiba mais&lt;/b>&lt;/a>.]]&gt;&lt;/string>"
-        errorLine2="                                                                                                 ^">
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="676"
-            column="98"/>
-    </issue>
-
-    <issue
-        id="Typos"
-        message="&quot;eletrónico&quot; is a common misspelling; did you mean &quot;electrónico&quot; or &quot;eletrônico&quot;?"
-        errorLine1="    &lt;string name=&quot;emailProtectionDescriptionInBeta&quot;>&lt;![CDATA[Bloqueie os rastreadores de correio eletrónico e oculte o seu endereço,&lt;br/>sem mudar o fornecedor de correio eletrónico.&lt;br/>&lt;a href=\&quot;\&quot;>&lt;b>Saiba mais&lt;/b>&lt;/a>.]]&gt;&lt;/string>"
-        errorLine2="                                                                                                                                                                           ^">
-        <location
-            file="src/main/res/values-pt/strings.xml"
-            line="676"
-            column="172"/>
     </issue>
 
     <issue
@@ -345,7 +301,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -356,7 +312,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -367,7 +323,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -378,7 +334,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -389,7 +345,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -400,7 +356,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -411,7 +367,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -422,7 +378,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -433,7 +389,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -444,7 +400,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -455,7 +411,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -466,7 +422,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -477,7 +433,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -488,7 +444,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -499,7 +455,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -510,7 +466,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -521,7 +477,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -532,7 +488,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -543,7 +499,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -554,7 +510,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -565,7 +521,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -576,7 +532,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -587,7 +543,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
@@ -598,271 +554,271 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="19"
+            line="20"
             column="28"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
     <issue
         id="Untranslatable"
         message="The resource string &quot;appDescription&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
-        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo &lt;/string>"
+        errorLine1="    &lt;string name=&quot;appDescription&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="20"
+            line="21"
             column="35"/>
     </issue>
 
@@ -873,7 +829,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -884,7 +840,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -895,7 +851,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -906,7 +862,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -917,7 +873,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -928,7 +884,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -939,7 +895,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -950,7 +906,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -961,7 +917,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -972,7 +928,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -983,7 +939,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -994,7 +950,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -1005,7 +961,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -1016,7 +972,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -1027,7 +983,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -1038,7 +994,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -1049,7 +1005,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -1060,7 +1016,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -1071,7 +1027,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -1082,7 +1038,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -1093,7 +1049,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -1104,7 +1060,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -1115,7 +1071,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -1126,7 +1082,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="83"
+            line="84"
             column="38"/>
     </issue>
 
@@ -1137,7 +1093,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1148,7 +1104,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1159,7 +1115,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1170,7 +1126,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1181,7 +1137,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1192,7 +1148,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1203,7 +1159,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1214,7 +1170,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1225,7 +1181,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1236,7 +1192,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1247,7 +1203,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1258,7 +1214,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1269,7 +1225,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1280,7 +1236,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1291,7 +1247,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1302,7 +1258,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1313,7 +1269,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1324,7 +1280,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1335,7 +1291,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1346,7 +1302,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1357,7 +1313,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1368,7 +1324,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1379,7 +1335,7 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
     </issue>
 
@@ -1390,8 +1346,536 @@
         errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="96"
+            line="97"
             column="28"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;webTrackingProtectionsUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;webTrackingProtectionsUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings.xml"
+            line="156"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings.xml"
+            line="162"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;adLoadedSectionUrl&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;adLoadedSectionUrl&quot; translatable=&quot;false&quot;>https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection&lt;/string>"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings.xml"
+            line="162"
+            column="39"/>
     </issue>
 
     <issue
@@ -1401,7 +1885,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1412,7 +1896,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1423,7 +1907,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1434,7 +1918,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1445,7 +1929,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1456,7 +1940,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1467,7 +1951,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1478,7 +1962,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1489,7 +1973,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1500,7 +1984,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1511,7 +1995,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1522,7 +2006,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1533,7 +2017,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1544,7 +2028,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1555,7 +2039,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1566,7 +2050,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1577,7 +2061,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1588,7 +2072,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1599,7 +2083,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1610,7 +2094,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1621,7 +2105,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1632,7 +2116,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1643,7 +2127,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1654,7 +2138,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="343"
+            line="345"
             column="48"/>
     </issue>
 
@@ -1665,7 +2149,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1676,7 +2160,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1687,7 +2171,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1698,7 +2182,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1709,7 +2193,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1720,7 +2204,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1731,7 +2215,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1742,7 +2226,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1753,7 +2237,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1764,7 +2248,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1775,7 +2259,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1786,7 +2270,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1797,7 +2281,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1808,7 +2292,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1819,7 +2303,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1830,7 +2314,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1841,7 +2325,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1852,7 +2336,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1863,7 +2347,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1874,7 +2358,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1885,7 +2369,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1896,7 +2380,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1907,7 +2391,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1918,7 +2402,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="348"
+            line="350"
             column="53"/>
     </issue>
 
@@ -1929,7 +2413,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="490"
+            line="492"
             column="9"/>
     </issue>
 
@@ -1940,7 +2424,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="490"
+            line="492"
             column="9"/>
     </issue>
 
@@ -1951,7 +2435,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
-            line="491"
+            line="493"
             column="9"/>
     </issue>
 
@@ -1962,7 +2446,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings.xml"
-            line="492"
+            line="494"
             column="9"/>
     </issue>
 
@@ -1973,7 +2457,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="492"
+            line="494"
             column="9"/>
     </issue>
 
@@ -1984,7 +2468,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="492"
+            line="494"
             column="9"/>
     </issue>
 
@@ -1995,7 +2479,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
-            line="492"
+            line="494"
             column="9"/>
     </issue>
 
@@ -2006,7 +2490,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
-            line="492"
+            line="494"
             column="9"/>
     </issue>
 
@@ -2017,7 +2501,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings.xml"
-            line="493"
+            line="495"
             column="9"/>
     </issue>
 
@@ -2028,40 +2512,40 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="269"
+            line="271"
             column="5"/>
     </issue>
 
     <issue
         id="PluralsCandidate"
         message="Formatting %d followed by words (&quot;unencrypted&quot;): This should probably be a plural rather than a string"
-        errorLine1="    &lt;string name=&quot;privacyProtectionNotificationUpgadeDescription&quot;>You protected your data by securing %d unencrypted connections while using DuckDuckGo.&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="364"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="PluralsCandidate"
-        message="Formatting %d followed by words (&quot;trackers&quot;): This should probably be a plural rather than a string"
-        errorLine1="    &lt;string name=&quot;privacyProtectionNotificationTrackerDescription&quot;>You protected your data by blocking %d trackers while using DuckDuckGo.&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="365"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="PluralsCandidate"
-        message="Formatting %d followed by words (&quot;trackers&quot;): This should probably be a plural rather than a string"
-        errorLine1="    &lt;string name=&quot;privacyProtectionNotificationBothDescription&quot;>You protected your data by blocking %d trackers and securing %d unencrypted connections while using DuckDuckGo.&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="    &lt;string name=&quot;privacyProtectionNotificationUpgadeDescription&quot; instruction=&quot;Placeholder is a the number of connections we have protected&quot;>You protected your data by securing %1$d unencrypted connections while using DuckDuckGo.&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
             line="366"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="PluralsCandidate"
+        message="Formatting %d followed by words (&quot;trackers&quot;): This should probably be a plural rather than a string"
+        errorLine1="    &lt;string name=&quot;privacyProtectionNotificationTrackerDescription&quot; instruction=&quot;Placeholder is the numer of trackers blocked&quot;>You protected your data by blocking %1$d trackers while using DuckDuckGo.&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="367"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="PluralsCandidate"
+        message="Formatting %d followed by words (&quot;trackers&quot;): This should probably be a plural rather than a string"
+        errorLine1="    &lt;string name=&quot;privacyProtectionNotificationBothDescription&quot; instruction=&quot;%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections&quot;>You protected your data by blocking %1$d trackers and securing %2$d unencrypted connections while using DuckDuckGo.&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="368"
             column="5"/>
     </issue>
 
@@ -2072,7 +2556,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="485"
+            line="487"
             column="5"/>
     </issue>
 
@@ -2083,7 +2567,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="491"
+            line="493"
             column="5"/>
     </issue>
 
@@ -2094,7 +2578,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="699"
+            line="663"
             column="5"/>
     </issue>
 
@@ -2105,7 +2589,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="706"
+            line="670"
             column="5"/>
     </issue>
 
@@ -2143,90 +2627,13 @@
     </issue>
 
     <issue
-        id="UnspecifiedImmutableFlag"
-        message="Missing `PendingIntent` mutability flag"
-        errorLine1="            return PendingIntent.getService(context, 0, intent, 0)!!"
-        errorLine2="                                                                ~">
-        <location
-            file="src/main/java/com/duckduckgo/app/notification/NotificationHandlerService.kt"
-            line="205"
-            column="65"/>
-    </issue>
-
-    <issue
-        id="UnspecifiedImmutableFlag"
-        message="Missing `PendingIntent` mutability flag"
-        errorLine1="        val favoriteClickPendingIntent = PendingIntent.getActivity(context, 0, favoriteItemClickIntent, 0)"
-        errorLine2="                                                                                                        ~">
-        <location
-            file="src/main/java/com/duckduckgo/widget/SearchAndFavoritesWidget.kt"
-            line="218"
-            column="105"/>
-    </issue>
-
-    <issue
-        id="UnspecifiedImmutableFlag"
-        message="Missing `PendingIntent` mutability flag"
-        errorLine1="        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)"
-        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/widget/SearchAndFavoritesWidget.kt"
-            line="252"
-            column="62"/>
-    </issue>
-
-    <issue
-        id="UnspecifiedImmutableFlag"
-        message="Missing `PendingIntent` mutability flag"
-        errorLine1="        return PendingIntent.getActivity(context, appWidgetId, intent, 0)"
-        errorLine2="                                                                       ~">
-        <location
-            file="src/main/java/com/duckduckgo/widget/SearchAndFavoritesWidget.kt"
-            line="261"
-            column="72"/>
-    </issue>
-
-    <issue
-        id="UnspecifiedImmutableFlag"
-        message="Missing `PendingIntent` mutability flag"
-        errorLine1="        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)"
-        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/widget/SearchWidget.kt"
-            line="123"
-            column="62"/>
-    </issue>
-
-    <issue
-        id="UnspecifiedImmutableFlag"
-        message="Missing `PendingIntent` mutability flag"
-        errorLine1="        return PendingIntent.getBroadcast(context, SHORTCUT_ADDED_CODE, pinnedShortcutCallbackIntent, FLAG_UPDATE_CURRENT)"
-        errorLine2="                                                                                                      ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/browser/shortcut/ShortcutBuilder.kt"
-            line="63"
-            column="103"/>
-    </issue>
-
-    <issue
-        id="UnspecifiedImmutableFlag"
-        message="Missing `PendingIntent` mutability flag"
-        errorLine1="        return PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)"
-        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/widget/VoiceSearchWidgetConfigurator.kt"
-            line="51"
-            column="62"/>
-    </issue>
-
-    <issue
         id="WebViewClientOnReceivedSslError"
         message="Permitting connections with SSL-related errors could allow eavesdroppers to intercept data sent by your app, which impacts the privacy of your users. Consider canceling the connections by invoking `SslErrorHandler#cancel()`."
         errorLine1="        if (trusted is CertificateValidationState.TrustedChain) handler.proceed() else super.onReceivedSslError(view, handler, error)"
         errorLine2="                                                                ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserWebViewClient.kt"
-            line="402"
+            line="395"
             column="65"/>
     </issue>
 
@@ -2237,8 +2644,19 @@
         errorLine2="                                                                ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/urlextraction/UrlExtractingWebViewClient.kt"
-            line="140"
+            line="132"
             column="65"/>
+    </issue>
+
+    <issue
+        id="DataExtractionRules"
+        message="The attribute `android:allowBackup` is deprecated from Android 12 and higher and may be removed in future versions. Consider adding the attribute `android:dataExtractionRules` specifying an `@xml` resource which configures cloud backups and device transfers on Android 12 and higher."
+        errorLine1="        android:allowBackup=&quot;false&quot;"
+        errorLine2="                             ~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="34"
+            column="30"/>
     </issue>
 
     <issue
@@ -2302,8 +2720,8 @@
         errorLine1="        notifyDataSetChanged()"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/duckduckgo/app/location/ui/LocationPermissionsAdapter.kt"
-            line="72"
+            file="src/main/java/com/duckduckgo/app/sitepermissions/permissionsperwebsite/PermissionSettingAdapter.kt"
+            line="34"
             column="9"/>
     </issue>
 
@@ -2315,6 +2733,17 @@
         <location
             file="src/main/java/com/duckduckgo/app/privacy/ui/PrivacyPracticesAdapter.kt"
             line="64"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NotifyDataSetChanged"
+        message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort."
+        errorLine1="        notifyDataSetChanged()"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/sitepermissions/SitePermissionsAdapter.kt"
+            line="81"
             column="9"/>
     </issue>
 
@@ -2334,6 +2763,17 @@
         message="This folder configuration (`v23`) is unnecessary; `minSdkVersion` is 23. Merge all the resources in this folder into `values`.">
         <location
             file="src/main/res/values-v23"/>
+    </issue>
+
+    <issue
+        id="UseCompoundDrawables"
+        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
+        errorLine1="&lt;LinearLayout android:layout_width=&quot;match_parent&quot;"
+        errorLine2=" ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_site_permissions_empty_list.xml"
+            line="16"
+            column="2"/>
     </issue>
 
     <issue
@@ -2641,6 +3081,28 @@
         <location
             file="src/main/res/drawable/network_logo_index_exchange_inc.xml"
             line="47"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1224 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M11.765,6.261h-0.394L11.371,6.26c-1.305,0.002 -1.555,0.01 -2.2,0.04 -0.683,0.031 -1.053,0.145 -1.3,0.24 -0.326,0.128 -0.56,0.28 -0.804,0.525 -0.245,0.245 -0.397,0.478 -0.524,0.804 -0.096,0.247 -0.21,0.617 -0.241,1.3 -0.034,0.737 -0.04,0.958 -0.04,2.826 0,1.87 0.006,2.09 0.04,2.828 0.03,0.683 0.145,1.053 0.24,1.3 0.128,0.326 0.28,0.559 0.525,0.804 0.244,0.245 0.478,0.396 0.804,0.523 0.247,0.096 0.617,0.21 1.3,0.241 0.737,0.034 0.959,0.041 2.827,0.041 1.869,0 2.09,-0.007 2.828,-0.04 0.682,-0.032 1.053,-0.146 1.3,-0.242 0.326,-0.127 0.559,-0.278 0.803,-0.523 0.245,-0.245 0.397,-0.477 0.524,-0.804 0.096,-0.246 0.21,-0.617 0.241,-1.3 0.034,-0.737 0.041,-0.958 0.041,-2.826 0,-1.867 -0.007,-2.089 -0.04,-2.827 -0.032,-0.682 -0.146,-1.052 -0.242,-1.299 -0.127,-0.326 -0.279,-0.56 -0.523,-0.804 -0.245,-0.245 -0.478,-0.397 -0.805,-0.524 -0.246,-0.096 -0.617,-0.21 -1.299,-0.24 -0.738,-0.034 -0.96,-0.04 -2.828,-0.04l-0.233,-0.001zM14.895,8.262c0,-0.463 0.375,-0.839 0.839,-0.839 0.463,0 0.84,0.376 0.84,0.84 0,0.463 -0.377,0.84 -0.84,0.84 -0.464,0 -0.84,-0.377 -0.84,-0.84zM8.405,11.998c0,-1.985 1.609,-3.594 3.593,-3.594 1.985,0 3.594,1.61 3.594,3.594 0,1.984 -1.609,3.593 -3.594,3.593 -1.984,0 -3.593,-1.609 -3.593,-3.593z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/network_logo_instagram.xml"
+            line="28"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (962 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M12,24c6.627,0 12,-5.373 12,-12S18.627,0 12,0 0,5.373 0,12s5.373,12 12,12zM9.113,5.042c0.746,-0.034 0.985,-0.042 2.885,-0.042h-0.002c1.901,0 2.139,0.008 2.885,0.042 0.745,0.034 1.254,0.152 1.7,0.325 0.46,0.179 0.85,0.418 1.24,0.807 0.389,0.39 0.628,0.78 0.807,1.24 0.172,0.445 0.29,0.953 0.325,1.698 0.034,0.747 0.043,0.985 0.043,2.886 0,1.9 -0.01,2.138 -0.043,2.885 -0.035,0.744 -0.153,1.253 -0.325,1.698 -0.18,0.46 -0.418,0.85 -0.808,1.24 -0.388,0.389 -0.778,0.628 -1.238,0.807 -0.445,0.173 -0.955,0.291 -1.7,0.325 -0.746,0.034 -0.984,0.043 -2.884,0.043s-2.14,-0.009 -2.886,-0.043c-0.744,-0.034 -1.253,-0.152 -1.698,-0.325 -0.46,-0.179 -0.85,-0.418 -1.24,-0.808 -0.389,-0.389 -0.628,-0.779 -0.807,-1.24 -0.173,-0.444 -0.29,-0.953 -0.325,-1.698 -0.034,-0.746 -0.042,-0.984 -0.042,-2.884s0.009,-2.14 0.042,-2.886c0.034,-0.744 0.152,-1.253 0.325,-1.698 0.18,-0.46 0.419,-0.85 0.808,-1.24 0.389,-0.389 0.78,-0.628 1.24,-0.807 0.444,-0.173 0.953,-0.29 1.698,-0.325z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/network_logo_instagram.xml"
+            line="33"
             column="25"/>
     </issue>
 
@@ -3118,8 +3580,19 @@
     </issue>
 
     <issue
+        id="MergeRootFrame"
+        message="This `&lt;FrameLayout>` can be replaced with a `&lt;merge>` tag"
+        errorLine1="&lt;FrameLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/cookie_scene_1.xml"
+            line="17"
+            column="1"/>
+    </issue>
+
+    <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/cornflowerDark` with a theme that also paints a background (inferred theme is `@style/ModalCardTheme`)"
+        message="Possible overdraw: Root element paints background `@color/cornflowerDark` with a theme that also paints a background (inferred theme is `@style/Theme_DuckDuckGo_Survey`)"
         errorLine1="    android:background=&quot;@color/cornflowerDark&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3130,7 +3603,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/white` with a theme that also paints a background (inferred theme is `@style/AppTheme_Dark_Transparent`)"
+        message="Possible overdraw: Root element paints background `@color/white` with a theme that also paints a background (inferred theme is `@style/Theme_DuckDuckGo_Light`)"
         errorLine1="    android:background=&quot;@color/white&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3141,7 +3614,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorPrimaryDark` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        message="Possible overdraw: Root element paints background `?attr/colorPrimaryDark` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
         errorLine1="    android:background=&quot;?attr/colorPrimaryDark&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3152,7 +3625,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxDialogBackgroundColor` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        message="Possible overdraw: Root element paints background `?attr/daxDialogBackgroundColor` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
         errorLine1="    android:background=&quot;?attr/daxDialogBackgroundColor&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3163,7 +3636,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/white` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        message="Possible overdraw: Root element paints background `@color/white` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
         errorLine1="    android:background=&quot;@color/white&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3218,12 +3691,34 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.string.trackersOverviewEmpty` appears to be unused"
+        errorLine1="    &lt;string name=&quot;trackersOverviewEmpty&quot;>No tracking requests were blocked from loading on this page. If a company\&apos;s requests are loaded, it can allow them to profile you.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/donottranslate.xml"
+            line="32"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.menu.fireproof_website_individual_overflow_menu` appears to be unused"
         errorLine1="&lt;menu xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
         errorLine2="^">
         <location
             file="src/main/res/menu/fireproof_website_individual_overflow_menu.xml"
             line="17"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_beta_pill` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_beta_pill.xml"
+            line="1"
             column="1"/>
     </issue>
 
@@ -3267,6 +3762,17 @@
         errorLine2="^">
         <location
             file="src/main/res/drawable/ic_circle_pulse.xml"
+            line="17"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_download_image` appears to be unused"
+        errorLine1="&lt;layer-list xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_download_image.xml"
             line="17"
             column="1"/>
     </issue>
@@ -3469,6 +3975,17 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.drawable.network_logo_amazon_technologies_inc` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/network_logo_amazon_technologies_inc.xml"
+            line="17"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.drawable.network_logo_appnexus_inc` appears to be unused"
         errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
@@ -3524,6 +4041,28 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.drawable.network_logo_google_ads` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/network_logo_google_ads.xml"
+            line="17"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.network_logo_google_analytics` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/network_logo_google_analytics.xml"
+            line="17"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.drawable.network_logo_google_llc` appears to be unused"
         errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
@@ -3540,6 +4079,17 @@
         errorLine2="^">
         <location
             file="src/main/res/drawable/network_logo_index_exchange_inc.xml"
+            line="17"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.network_logo_instagram` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/network_logo_instagram.xml"
             line="17"
             column="1"/>
     </issue>
@@ -3617,6 +4167,17 @@
         errorLine2="^">
         <location
             file="src/main/res/drawable/network_logo_oracle_corporation.xml"
+            line="17"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.network_logo_outbrain` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/network_logo_outbrain.xml"
             line="17"
             column="1"/>
     </issue>
@@ -3733,9 +4294,27 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.drawable.network_logo_youtube` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/network_logo_youtube.xml"
+            line="17"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.drawable.network_pill_adobe_inc` appears to be unused">
         <location
             file="src/main/res/drawable-hdpi/network_pill_adobe_inc.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.network_pill_amazon_technologies_inc` appears to be unused">
+        <location
+            file="src/main/res/drawable-hdpi/network_pill_amazon_technologies_inc.png"/>
     </issue>
 
     <issue
@@ -3792,6 +4371,13 @@
         message="The resource `R.drawable.network_pill_nielsen` appears to be unused">
         <location
             file="src/main/res/drawable-hdpi/network_pill_nielsen.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.network_pill_outbrain` appears to be unused">
+        <location
+            file="src/main/res/drawable-hdpi/network_pill_outbrain.png"/>
     </issue>
 
     <issue
@@ -3860,12 +4446,34 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.trackersOverviewEmpty` appears to be unused"
-        errorLine1="    &lt;string name=&quot;trackersOverviewEmpty&quot;>No tracking requests were blocked from loading on this page. If a company\&apos;s requests are loaded, it can allow them to profile you.&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="The resource `R.drawable.report_broken_site_button_outlined_bg` appears to be unused"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
         <location
-            file="src/main/res/values/string-untranslated.xml"
+            file="src/main/res/drawable/report_broken_site_button_outlined_bg.xml"
+            line="17"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.yes` appears to be unused"
+        errorLine1="    &lt;string name=&quot;yes&quot;>Yes&lt;/string>"
+        errorLine2="            ~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
             line="23"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.no` appears to be unused"
+        errorLine1="    &lt;string name=&quot;no&quot;>No&lt;/string>"
+        errorLine2="            ~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="24"
             column="13"/>
     </issue>
 
@@ -3876,7 +4484,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="97"
+            line="98"
             column="13"/>
     </issue>
 
@@ -3887,7 +4495,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="147"
+            line="148"
             column="13"/>
     </issue>
 
@@ -3898,7 +4506,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="163"
+            line="164"
             column="13"/>
     </issue>
 
@@ -3909,7 +4517,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="164"
+            line="165"
             column="13"/>
     </issue>
 
@@ -3920,7 +4528,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="258"
+            line="260"
             column="13"/>
     </issue>
 
@@ -3931,7 +4539,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="272"
+            line="274"
             column="13"/>
     </issue>
 
@@ -3942,18 +4550,18 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="472"
+            line="474"
             column="13"/>
     </issue>
 
     <issue
         id="UnusedResources"
         message="The resource `R.string.downloadConfirmationSaveFileTitle` appears to be unused"
-        errorLine1="    &lt;string name=&quot;downloadConfirmationSaveFileTitle&quot;>Save %1$s&lt;/string>"
+        errorLine1="    &lt;string name=&quot;downloadConfirmationSaveFileTitle&quot; instruction=&quot;Placeholder is the name of a file&quot;>Save %1$s&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="500"
+            line="502"
             column="13"/>
     </issue>
 
@@ -3964,7 +4572,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="501"
+            line="503"
             column="13"/>
     </issue>
 
@@ -3975,7 +4583,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="502"
+            line="504"
             column="13"/>
     </issue>
 
@@ -3986,7 +4594,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="503"
+            line="505"
             column="13"/>
     </issue>
 
@@ -3997,7 +4605,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="504"
+            line="506"
             column="13"/>
     </issue>
 
@@ -4008,29 +4616,117 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="505"
+            line="507"
             column="13"/>
     </issue>
 
     <issue
         id="UnusedResources"
         message="The resource `R.string.whitelistEntryOverflowContentDescription` appears to be unused"
-        errorLine1="    &lt;string name=&quot;whitelistEntryOverflowContentDescription&quot;>More options for unprotected site %s&lt;/string>"
+        errorLine1="    &lt;string name=&quot;whitelistEntryOverflowContentDescription&quot; instruction=&quot;Placeholder is a website&quot;>More options for unprotected site %1$s&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="528"
+            line="530"
             column="13"/>
     </issue>
 
     <issue
         id="UnusedResources"
         message="The resource `R.string.fireproofWebsiteDeleteConfirmMessage` appears to be unused"
-        errorLine1="    &lt;string name=&quot;fireproofWebsiteDeleteConfirmMessage&quot;>Are you sure you want to delete &amp;lt;b>%s&amp;lt;/b>?&lt;/string>"
+        errorLine1="    &lt;string name=&quot;fireproofWebsiteDeleteConfirmMessage&quot; instruction=&quot;Placeholder is a website&quot;>Are you sure you want to delete &amp;lt;b>%1$s&amp;lt;/b>?&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="544"
+            line="546"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.preciseLocationFeatureDescription` appears to be unused"
+        errorLine1="    &lt;string name=&quot;preciseLocationFeatureDescription&quot;>Sites you visit may ask to know your device location. They won\&apos;t be able to access it until you explicitly grant permission. DuckDuckGo only uses your location anonymously to deliver local search results.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="597"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.preciseLocationEmptyListHint` appears to be unused"
+        errorLine1="    &lt;string name=&quot;preciseLocationEmptyListHint&quot;>No websites granted permission to access location&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="599"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.preciseLocationNoSystemPermission` appears to be unused"
+        errorLine1="    &lt;string name=&quot;preciseLocationNoSystemPermission&quot;>To manage the location access permissions you\’ve granted to individual sites, enable location for this app in Android Settings.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="600"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.preciseLocationActivityTitle` appears to be unused"
+        errorLine1="    &lt;string name=&quot;preciseLocationActivityTitle&quot;>Location&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="601"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.preciseLocationDeleteConfirmMessage` appears to be unused"
+        errorLine1="    &lt;string name=&quot;preciseLocationDeleteConfirmMessage&quot; instruction=&quot;Placeholder is the name of a website&quot;>Are you sure you want to delete &amp;lt;b>%1$s&amp;lt;/b>?&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="602"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.preciseLocationDeleteContentDescription` appears to be unused"
+        errorLine1="    &lt;string name=&quot;preciseLocationDeleteContentDescription&quot; instruction=&quot;Placeholder is the domain of a website&quot;>More options for location permissions in domain %1$s&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="603"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.preciseLocationAllowedSitesSectionTitle` appears to be unused"
+        errorLine1="    &lt;string name=&quot;preciseLocationAllowedSitesSectionTitle&quot;>Granted&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="604"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.preciseLocationDeniedSitesSectionTitle` appears to be unused"
+        errorLine1="    &lt;string name=&quot;preciseLocationDeniedSitesSectionTitle&quot;>Denied&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="605"
             column="13"/>
     </issue>
 
@@ -4041,7 +4737,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="621"
+            line="622"
             column="13"/>
     </issue>
 
@@ -4052,7 +4748,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="622"
+            line="623"
             column="13"/>
     </issue>
 
@@ -4063,7 +4759,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="623"
+            line="624"
             column="13"/>
     </issue>
 
@@ -4074,18 +4770,18 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="730"
+            line="692"
             column="13"/>
     </issue>
 
     <issue
         id="UnusedResources"
-        message="The resource `R.layout.view_whitelist_entry` appears to be unused"
-        errorLine1="&lt;com.duckduckgo.mobile.android.ui.view.listitem.SingleLineListItem xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        message="The resource `R.layout.view_location_permissions_toggle` appears to be unused"
+        errorLine1="&lt;com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem"
         errorLine2="^">
         <location
-            file="src/main/res/layout/view_whitelist_entry.xml"
-            line="19"
+            file="src/main/res/layout/view_location_permissions_toggle.xml"
+            line="17"
             column="1"/>
     </issue>
 
@@ -4129,7 +4825,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
-            line="198"
+            line="200"
             column="40"/>
     </issue>
 
@@ -4140,7 +4836,7 @@
         errorLine2="                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="213"
+            line="215"
             column="51"/>
     </issue>
 
@@ -4151,51 +4847,7 @@
         errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings.xml"
-            line="214"
-            column="62"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;emailProtectionDescriptionJoin&quot;>&lt;![CDATA[Чтобы блокировать трекеры и скрывать свой адрес, вовсе не нужно менять почтовый сервис.&lt;br/>&lt;a href=\&quot;\&quot;>&lt;b>Подробнее&lt;/b>&lt;/a>...]]&gt;&lt;/string>"
-        errorLine2="                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="671"
-            column="60"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;emailProtectionDescriptionJoinedWithNotification&quot;>&lt;![CDATA[Мы отправим вам уведомление, когда&lt;br/> защита почты будет доступна и вам. &lt;a href=\&quot;\&quot;>&lt;b>Подробнее&lt;/b>&lt;/a>...]]&gt;&lt;/string>"
-        errorLine2="                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="675"
-            column="78"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;emailProtectionDescriptionJoinedWithoutNotification&quot;>&lt;![CDATA[Когда настанет время, ваше приглашение появится здесь. Хотите также &lt;a href=\&quot;\&quot;>&lt;b>получить уведомление&lt;/b>&lt;/a>?&lt;br/>&lt;a href=\&quot;\&quot;>&lt;b>Подробнее&lt;/b>&lt;/a> о защите почты...]]&gt;&lt;/string>"
-        errorLine2="                                                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="676"
-            column="81"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;emailProtectionDescriptionInBeta&quot;>&lt;![CDATA[Чтобы блокировать трекеры &lt;br/>и скрывать свой адрес, вовсе не нужно менять почтовый сервис.&lt;br/>&lt;a href=\&quot;\&quot;>&lt;b>Подробнее&lt;/b>&lt;/a>...]]&gt;&lt;/string>"
-        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="680"
+            line="216"
             column="62"/>
     </issue>
 
@@ -4206,7 +4858,7 @@
         errorLine2="                                       ~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
-            line="732"
+            line="694"
             column="40"/>
     </issue>
 
@@ -4217,7 +4869,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
-            line="732"
+            line="694"
             column="40"/>
     </issue>
 
@@ -4228,7 +4880,7 @@
         errorLine2="                                       ~~~~~~">
         <location
             file="src/main/res/values-fi/strings.xml"
-            line="732"
+            line="694"
             column="40"/>
     </issue>
 
@@ -4239,7 +4891,7 @@
         errorLine2="                                       ~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
-            line="732"
+            line="694"
             column="40"/>
     </issue>
 
@@ -4250,7 +4902,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings.xml"
-            line="732"
+            line="694"
             column="40"/>
     </issue>
 
@@ -4261,7 +4913,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
-            line="736"
+            line="698"
             column="40"/>
     </issue>
 
@@ -4272,7 +4924,7 @@
         errorLine2="                                       ~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
-            line="740"
+            line="702"
             column="40"/>
     </issue>
 
@@ -4283,7 +4935,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="740"
+            line="702"
             column="40"/>
     </issue>
 
@@ -4294,7 +4946,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="740"
+            line="702"
             column="40"/>
     </issue>
 
@@ -4305,7 +4957,7 @@
         errorLine2="                                       ~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings.xml"
-            line="740"
+            line="702"
             column="40"/>
     </issue>
 
@@ -4316,7 +4968,7 @@
         errorLine2="                                            ~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings.xml"
-            line="744"
+            line="706"
             column="45"/>
     </issue>
 
@@ -4327,7 +4979,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings.xml"
-            line="744"
+            line="706"
             column="45"/>
     </issue>
 
@@ -4338,7 +4990,7 @@
         errorLine2="                                            ~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="744"
+            line="706"
             column="45"/>
     </issue>
 
@@ -4349,7 +5001,7 @@
         errorLine2="                                            ~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings.xml"
-            line="744"
+            line="706"
             column="45"/>
     </issue>
 
@@ -4360,7 +5012,7 @@
         errorLine2="                                            ~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings.xml"
-            line="748"
+            line="710"
             column="45"/>
     </issue>
 
@@ -4371,7 +5023,7 @@
         errorLine2="                                            ~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings.xml"
-            line="748"
+            line="710"
             column="45"/>
     </issue>
 
@@ -4382,7 +5034,7 @@
         errorLine2="                                            ~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings.xml"
-            line="752"
+            line="714"
             column="45"/>
     </issue>
 
@@ -4393,7 +5045,7 @@
         errorLine2="                                            ~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings.xml"
-            line="752"
+            line="714"
             column="45"/>
     </issue>
 
@@ -4404,7 +5056,7 @@
         errorLine2="                                            ~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings.xml"
-            line="752"
+            line="714"
             column="45"/>
     </issue>
 
@@ -4634,7 +5286,7 @@
         errorLine2="                                                       ~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="562"
+            line="564"
             column="56"/>
     </issue>
 
@@ -4667,7 +5319,7 @@
         errorLine2="                                  ^">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="1542"
+            line="1602"
             column="35"/>
     </issue>
 
@@ -4699,8 +5351,8 @@
         errorLine1="    &lt;ImageView"
         errorLine2="     ~~~~~~~~~">
         <location
-            file="src/main/res/layout/content_settings_general.xml"
-            line="75"
+            file="src/main/res/layout/item_site_permission_setting_selection.xml"
+            line="24"
             column="6"/>
     </issue>
 
@@ -4903,13 +5555,35 @@
     </issue>
 
     <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_site_permissions_empty_list.xml"
+            line="21"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_site_permissions_toggle.xml"
+            line="23"
+            column="6"/>
+    </issue>
+
+    <issue
         id="HardcodedText"
         message="Hardcoded string &quot;Internal Features&quot;, should use `@string` resource"
-        errorLine1="        android:text=&quot;Internal Features&quot; />"
+        errorLine1="        android:text=&quot;Internal Features&quot;/>"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/content_settings_internal.xml"
-            line="40"
+            line="38"
             column="9"/>
     </issue>
 
@@ -4942,7 +5616,7 @@
         errorLine2="                                     ~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabViewModel.kt"
-            line="1644"
+            line="1681"
             column="38"/>
     </issue>
 
