@@ -230,7 +230,9 @@
         <item quantity="one">App</item>
         <item quantity="other">Apper</item>
     </plurals>
+    <string name="atp_ActivityEnabledLabel">Denne funksjonen er i beta. Har du lagt merke til et problem med en app? <annotation type="app_settings_link">Rapporter et problem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection er deaktivert</b>\nHar appsporingsbeskyttelse forårsaket et problem med appene dine? <annotation type="report_issues_link">Rapporter problemer</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android deaktiverte App Tracking Protection</b>. Vil du forhindre at dette skjer igjen? <annotation type="re_enable_link">Aktiver på nytt</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>En VPN-app på enheten din deaktiverte App Tracking Protection.</b>\nHar App Tracking Protection forårsaket et problem med appene dine? <annotation type="report_issues_link">Rapporter problemer</annotation></string>
     <string name="atp_ActivityAbout">Om</string>
     <string name="atp_ActivityManage">Administrere</string>
@@ -377,5 +379,12 @@
 
     <!--  App Tracking Protection Promote Always On -->
     <string name="atp_PromoteAlwaysOnDialogSettings">Gå til Innstillinger</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Ikke nå</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Gå til enhetens VPN-innstillinger for DuckDuckGo og aktiver <b>Alltid på</b>. Dette forhindrer at Android deaktiverer beskyttelsen.\n\nPåse at den andre innstillingen er satt til AV.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Gå til enhetens <b>VPN-innstillinger for DuckDuckGo</b> og deaktiver <b>Blokker tilkoblinger uten VPN</b> for å unngå problemer med apper.]]></string>
+    <string name="atp_AlwaysOnModalHeading">Sett til Alltid på</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Endre VPN-innstillingene dine</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Handling kreves!</b> For å unngå problemer med apper må du endre Android-innstillingene. <annotation type="open_settings_link">Endre innstillinger</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Handling kreves! En Android-innstilling må endres for App Tracking Protection.</string>
 
 </resources>
