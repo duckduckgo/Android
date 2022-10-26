@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Czas trwania: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Liczba zablokowanych dzisiaj skryptów firm śledzących: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Liczba zablokowanych w tym tygodniu skryptów firm śledzących: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Liczba zablokowanych dzisiaj skryptów firm śledzących: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Liczba zablokowanych w tym tygodniu skryptów firm śledzących: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Nie zablokowano jeszcze żadnych skryptów firm śledzących"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Liczba zablokowanych dzisiaj skryptów śledzących: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Liczba zablokowanych w tym tygodniu skryptów śledzących: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Liczba zablokowanych dzisiaj skryptów śledzących: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Liczba zablokowanych w tym tygodniu skryptów śledzących: %1$d</string>
     <string name="vpnTrackersNone">"Żadne skrypty śledzące nie zostały jeszcze zablokowane"</string>
     <string name="vpnNotRunYet">"Sieć VPN nie została jeszcze uruchomiona"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\nPakiety: %2$s"</string>
@@ -139,29 +139,18 @@
     <string name="atp_NewTabEnabled"><b>Ochrona przed śledzeniem przez aplikacje jest włączona</b> i blokuje próby śledzenia przez Twoje aplikacje.</string>
 
     <!-- Exclusion List -->
-    <string name="atp_ExclusionListActivityTitle">Wszystkie aplikacje</string>
     <string name="atp_ExcludedAppsFeature">Ochrona przed śledzeniem przez aplikacje wykrywa i blokuje aplikacje śledzące innych firm, na przykład w sytuacji, gdy Facebook próbuje Cię śledzić za pomocą aplikacji medycznej. Firmy mogą nadal śledzić Cię w aplikacjach, których są właścicielami.\n\nJeśli jakaś aplikacja nie działa zgodnie z oczekiwaniami, spróbuj wyłączyć ochronę dla tej aplikacji.</string>
     <string name="atp_ExcludedAppsEnabledLabel">Podczas wersji beta DuckDuckGo może wyłączyć ochronę dla niektórych aplikacji, aby rozwiązać znane problemy z ładowaniem treści. Ustawienia niestandardowe nie ulegną zmianie, chyba że przywrócisz ustawienia domyślne.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Ochrona przed śledzeniem przez aplikacje jest wyłączona.</b>\nCzy ochrona przed śledzeniem przez aplikacje wywołała problem z Twoimi aplikacjami? <annotation type="report_issues_link">Zgłoś problemy</annotation></string>
     <string name="atp_ExcludedAppsReport">Zgłoś problem z inną aplikacją</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Ładuje strony internetowe</string>
-    <string name="atp_ExcludedReasonKnownIssues">Znane problemy</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Wyłączone ręcznie</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Włączone ręcznie</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Anuluj</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Włącz</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Przywróć</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Czy chcesz ręcznie włączyć ochronę dla aplikacji %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">W tej aplikacji występują problemy, gdy próby śledzenia są nieudane.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Zawartość stron w tej aplikacji może nie być wyświetlana prawidłowo, gdy włączona jest ochrona.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Włączenie ochrony powoduje wysłanie nazwy aplikacji do DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Ochrona prywatności wyłączona</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Jeśli wyłączysz ochronę, aby rozwiązać problem, sprawdź, czy aplikacja działa, zanim zgłosisz problem do DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Nie działa zgodnie z oczekiwaniami</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Nie mam nic przeciwko śledzeniu mnie przez tę aplikację</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Inny powód</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Zgłoś</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Pomiń</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Przywróć domyślne chronione aplikacje</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Zgłoś problem z aplikacją</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Przywrócić domyślną ochronę?</string>
@@ -205,11 +194,12 @@
     <string name="atp_ActivityPastWeek">Ostatnie 7 dni</string>
     <string name="atp_ActivityTitle">Ochrona przed śledzeniem przez aplikacje</string>
     <string name="atp_MostRecentActivityTitle">Wszystkie ostatnie aktywności</string>
-    <string name="atp_ActivityRecentActivity">Ostatnia aktywność</string>
+    <string name="atp_ActivityRecentActivity">Aktywność</string>
     <string name="atp_ActivityCtaShowAll">Zobacz wszystkie ostatnie aktywności</string>
     <string name="atp_ActivityAppTrackersFAQ">Czym są moduły śledzące aplikacji?</string>
     <string name="atp_ActivityReportProblem">Zgłoś problem z aplikacją</string>
     <string name="atp_ActivityBetaInstructions">Instrukcje Beta</string>
+    <!-- TODO [ANA] Modified, double check if new key is needed -->
     <string name="atp_ActivityManageProtection">Masz problemy z aplikacją?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
@@ -225,8 +215,6 @@
         <![CDATA[%1$d prób(y) śledzenia przez %2$d firm(y) zablokowane w aplikacji <b>%3$s</b>]]>
     </string>
 
-    <string name="atp_ActivityEmptyListTitle">Brak nowej aktywności</string>
-    <string name="atp_ActivityEmptyListMessage">Używaj nadal swojego urządzenia. Tutaj pojawiają się próby śledzenia, które są blokowane przez ochronę przed śledzeniem przez aplikację.</string>
     <string name="atp_ActivityPastWeekBlocked">Zablokowano</string>
     <string name="atp_ActivityPastWeekAcross">W</string>
 
@@ -242,7 +230,6 @@
         <item quantity="many">Aplikacji</item>
         <item quantity="other">Aplikacji</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Ta funkcja jest w fazie beta. <annotation type="app_settings_link">Masz problemy z aplikacją?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Ochrona przed śledzeniem przez aplikacje jest wyłączona.</b>\nCzy ochrona przed śledzeniem przez aplikacje wywołała problem z Twoimi aplikacjami? <annotation type="report_issues_link">Zgłoś problemy</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Aplikacja VPN na Twoim urządzeniu wyłączyła ochronę przed śledzeniem przez aplikacje. </b>\nCzy ochrona przed śledzeniem przez aplikacje wywołała problem z Twoimi aplikacjami? <annotation type="report_issues_link">Zgłoś problemy</annotation></string>
     <string name="atp_ActivityAbout">Informacje</string>
@@ -398,5 +385,43 @@
     <string name="atp_PromoteAlwaysOnDialogSettings">Przejdź do ustawień</string>
     <string name="atp_PromoteAlwaysOnDialogLater">Przypomnij mi później</string>
     <string name="atp_PromoteAlwaysOnDialogForget">Nie, dziękuję</string>
+
+    <!--  App Tracking Protection Exclusion List -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Moje aplikacje</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Po włączeniu mogą wystąpić problemy z aplikacją</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Włącz mimo to</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of the app">Mogą wystąpić problemy z aplikacją %1$s, jeśli włączona jest ochrona przed śledzeniem przez aplikacje</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Chcesz zgłosić problem?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of the app">Daj nam znać, jeśli ochrona przed śledzeniem przez aplikacje została wyłączona dla aplikacji %1$s z powodu problemów z tą aplikacją.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Zgłoś błąd</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Nie teraz</string>
+    <string name="atp_ActivityRecentActivityHeader">Aktywność</string>
+    <string name="atp_ActivityManageProtectionLabel">Masz problemy z aplikacją?</string>
+    <string name="atp_ActivityEnabledBannerLabel">W wersji beta w przypadku niektórych aplikacji ochrona jest automatycznie wyłączona. <annotation type="app_settings_link">Wyświetl aplikacje</annotation></string>
+    <string name="atp_ActivityDescription">Tutaj pojawią się zablokowane próby śledzenia</string>
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the total number of apps">
+        <item quantity="one">%1$s z Twoich aplikacji jest chroniona przed ukrytymi trackerami, które według nas próbują uzyskać dostęp do Twoich danych osobowych.</item>
+        <item quantity="few">%1$s z Twoich aplikacji są chronione przed ukrytymi trackerami, które według nas próbują uzyskać dostęp do Twoich danych osobowych.</item>
+        <item quantity="many">%1$s z Twoich aplikacji jest chronionych przed ukrytymi trackerami, które według nas próbują uzyskać dostęp do Twoich danych osobowych.</item>
+        <item quantity="other">%1$s z Twoich aplikacji jest chronione przed ukrytymi trackerami, które według nas próbują uzyskać dostęp do Twoich danych osobowych.</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the total number of apps">
+        <item quantity="one">%1$s z Twoich aplikacji ma automatycznie wyłączoną ochronę.</item>
+        <item quantity="few">%1$s z Twoich aplikacji mają automatycznie wyłączoną ochronę.</item>
+        <item quantity="many">%1$s z Twoich aplikacji ma automatycznie wyłączoną ochronę.</item>
+        <item quantity="other">%1$s z Twoich aplikacji ma automatycznie wyłączoną ochronę.</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Dobra wiadomość! Ochrona przed śledzeniem przez aplikacje jest teraz włączona.<br/><br/>👌Na bieżąco będziemy pokazywać Ci listę aplikacji zainstalowanych na Twoim urządzeniu, które próbują Cię śledzić.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Rozumiem!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the total number of apps">Ochrona włączona (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the total number of apps">Ochrona wyłączona (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Wszystko</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Ochrona włączona</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Ochrona wyłączona</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Wszystko</string>
+    <string name="atp_ActivityViewAppsLabel">Wyświetl aplikacje</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Ta funkcja jest w fazie beta. Masz problemy z aplikacją? <annotation type="app_settings_link"> Pomóż nam naprawić błędy</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Gdy ochrona przed śledzeniem przez aplikacje jest włączona, mogą wystąpić problemy z niektórymi aplikacjami.\n<annotation type="learn_why_link">Dowiedz się, dlaczego</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Ochrona została wyłączona dla aplikacji, w których występują znane problemy. Możesz włączyć ochronę dla tych aplikacji, ale wówczas mogą wystąpić z nimi problemy. <annotation type="learn_why_link">Dowiedz się, dlaczego</annotation></string>
 
 </resources>
