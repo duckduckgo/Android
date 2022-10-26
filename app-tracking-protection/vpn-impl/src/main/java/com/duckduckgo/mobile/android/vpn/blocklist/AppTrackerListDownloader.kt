@@ -40,21 +40,6 @@ data class AppTrackerBlocklist(
     val entities: List<AppTrackerEntity> = listOf()
 )
 
-data class AppTrackerExclusionList(
-    val etag: ETag = ETag.InvalidETag,
-    val excludedPackages: List<AppTrackerExcludedPackage> = listOf()
-)
-
-data class AppTrackerSystemAppOverrideList(
-    val etag: ETag = ETag.InvalidETag,
-    val overridePackages: List<AppTrackerSystemAppOverridePackage> = listOf()
-)
-
-data class AppTrackerRuleList(
-    val etag: ETag = ETag.InvalidETag,
-    val trackerExceptionRules: List<AppTrackerExceptionRule> = listOf()
-)
-
 sealed class ETag {
     object InvalidETag : ETag()
     data class ValidETag(val value: String) : ETag()
@@ -63,9 +48,6 @@ sealed class ETag {
 interface AppTrackerListDownloader {
     @WorkerThread
     fun downloadAppTrackerBlocklist(): AppTrackerBlocklist
-
-    @WorkerThread
-    fun downloadAppTrackerExceptionRules(): AppTrackerRuleList
 }
 
 @ContributesBinding(AppScope::class)
@@ -111,27 +93,5 @@ class RealAppTrackerListDownloader @Inject constructor(
 
     private fun extractTrackerEntities(response: JsonAppBlockingList?): List<AppTrackerEntity> {
         return AppTrackerJsonParser.parseTrackerEntities(response)
-    }
-
-    override fun downloadAppTrackerExceptionRules(): AppTrackerRuleList {
-        Timber.d("Downloading the app tracker rule list...")
-        val response = kotlin.runCatching {
-            appTrackerListService.appTrackerExceptionRules().execute()
-        }.getOrElse {
-            Timber.w("Error downloading tracker rules list: $it")
-            Response.error(400, "".toResponseBody(null))
-        }
-
-        if (!response.isSuccessful) {
-            Timber.e("Fail to download the app tracker exclusion list, error code: ${response.code()}")
-            return AppTrackerRuleList()
-        }
-
-        val eTag = response.headers().extractETag()
-        val exceptionRules = response.body()?.rules.orEmpty()
-
-        Timber.d("Received the app tracker rule list, size: ${exceptionRules.size}")
-
-        return AppTrackerRuleList(etag = ETag.ValidETag(eTag), trackerExceptionRules = exceptionRules)
     }
 }

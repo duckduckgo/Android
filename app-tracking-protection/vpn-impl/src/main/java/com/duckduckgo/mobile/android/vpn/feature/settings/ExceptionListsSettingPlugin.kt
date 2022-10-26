@@ -19,14 +19,12 @@ package com.duckduckgo.mobile.android.vpn.feature.settings
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExclusionListMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverridePackage
-import com.duckduckgo.mobile.android.vpn.trackers.JsonAppTrackerExclusionList
 import com.squareup.anvil.annotations.ContributesMultibinding
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import org.json.JSONObject
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -40,8 +38,6 @@ class ExceptionListsSettingPlugin @Inject constructor(
     private val jsonAdapter = Moshi.Builder().build().adapter(JsonConfigModel::class.java)
 
     override fun store(name: SettingName, jsonString: String): Boolean {
-        Timber.d("store called with ${name.value}")
-
         @Suppress("NAME_SHADOWING")
         val name = appTpSettingValueOf(name.value)
         if (name == settingName) {
@@ -49,17 +45,20 @@ class ExceptionListsSettingPlugin @Inject constructor(
             runCatching {
                 jsonAdapter.fromJson(jsonString)?.let { exceptionLists ->
 
-                    Timber.d("Updating the app tracker exclusion list")
-                    vpnDatabase.vpnAppTrackerBlockingDao().updateExclusionList(exceptionLists.unprotectedApps)
-
-                    for (item in exceptionLists.unprotectedApps) {
-                        Timber.v("${item.packageId}, ${item.reason}")
+                    val appTrackerExceptionRuleList = exceptionLists.appTrackerAllowList.map { appTrackerAllowRule ->
+                        AppTrackerExceptionRule(
+                            appTrackerAllowRule.domain,
+                            appTrackerAllowRule.packageNames.map { it.packageName }
+                        )
                     }
 
+                    vpnDatabase.vpnAppTrackerBlockingDao().updateTrackerExceptionRules(appTrackerExceptionRuleList)
+                    vpnDatabase.vpnAppTrackerBlockingDao().updateExclusionList(exceptionLists.unprotectedApps)
                     vpnDatabase.vpnSystemAppsOverridesDao().upsertSystemAppOverrides(
                         exceptionLists.unhideSystemApps.map { AppTrackerSystemAppOverridePackage(it) }
                     )
 
+                    // TODO: potentially refresh feature here
                 }
             }.onFailure {
                 Timber.w(it, "Invalid JSON remote configuration for $settingName")
@@ -73,8 +72,19 @@ class ExceptionListsSettingPlugin @Inject constructor(
     override val settingName: SettingName = AppTpSetting.ExceptionLists
 
     private data class JsonConfigModel(
-        //val appTrackerAllowList: List<JSONObject>, // TODO: can't have JSONObject here. Injection breaks. Not correct anyway
+        val appTrackerAllowList: List<AppTrackerAllowRuleModel>,
         val unprotectedApps: List<AppTrackerExcludedPackage>,
         val unhideSystemApps: List<String>,
+    )
+
+    private data class AppTrackerAllowRuleModel(
+        val domain: String,
+        val defaultTTL: Int?,
+        val packageNames: List<AllowedPackageModel>,
+    )
+
+    private data class AllowedPackageModel(
+        val packageName: String,
+        val allowTTL: String?
     )
 }

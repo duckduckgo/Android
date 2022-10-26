@@ -113,9 +113,6 @@ interface VpnAppTrackerBlockingDao {
     @Query("SELECT * from vpn_app_tracker_exception_rules")
     fun getTrackerExceptionRulesFlow(): Flow<List<AppTrackerExceptionRule>>
 
-    @Insert
-    fun setTrackerExceptionRulesMetadata(appTrackerExceptionRuleMetadata: AppTrackerExceptionRuleMetadata)
-
     @Query("SELECT * from vpn_app_tracker_exception_rules_metadata ORDER BY id DESC LIMIT 1")
     fun getTrackerExceptionRulesMetadata(): AppTrackerExceptionRuleMetadata?
 
@@ -124,10 +121,8 @@ interface VpnAppTrackerBlockingDao {
 
     @Transaction
     fun updateTrackerExceptionRules(
-        exceptionRules: List<AppTrackerExceptionRule>,
-        metadata: AppTrackerExceptionRuleMetadata
+        exceptionRules: List<AppTrackerExceptionRule>
     ) {
-        setTrackerExceptionRulesMetadata(metadata)
         deleteTrackerExceptionRules()
         insertTrackerExceptionRules(exceptionRules)
     }
