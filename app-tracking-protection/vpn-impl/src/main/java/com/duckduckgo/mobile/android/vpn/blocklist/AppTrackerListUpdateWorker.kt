@@ -29,7 +29,6 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit

@@ -23,9 +23,6 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerJsonParser
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
 import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverridePackage
 import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.squareup.anvil.annotations.ContributesBinding
 import okhttp3.ResponseBody.Companion.toResponseBody

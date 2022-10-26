@@ -18,14 +18,9 @@ package com.duckduckgo.mobile.android.vpn.feature
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
@@ -57,14 +52,13 @@ class AppTpPrivacyFeaturePluginTest {
     private val testConfig = JsonAppTpFeatureConfig("enabled", null, testSettings, "2a58bdb505a789fcefe2bc24fb9ead16")
 
     private val mockPlugin: AppTpSettingPlugin = mock()
-    private val mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
 
     @Before
     fun setup() {
-        whenever(mockPlugin.settingName).thenReturn(SettingName {testSettingName})
+        whenever(mockPlugin.settingName).thenReturn(SettingName { testSettingName })
 
         plugins.add(mockPlugin)
-        featurePlugin = AppTpPrivacyFeaturePlugin(plugins, context, TestScope(), mockVpnFeaturesRegistry)
+        featurePlugin = AppTpPrivacyFeaturePlugin(plugins, context)
         testSettings[testSettingName] = JSONObject(settingAdapter.toJson(testSetting))
     }
 
@@ -80,49 +74,39 @@ class AppTpPrivacyFeaturePluginTest {
 
     @Test
     fun whenPluginNameNotMatchingDontStore() {
-        whenever(mockPlugin.settingName).thenReturn(SettingName {"unmatched"})
+        whenever(mockPlugin.settingName).thenReturn(SettingName { "unmatched" })
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig)))
 
         verify(mockPlugin, never()).store(any(), any())
     }
 
     @Test
-    fun whenHashIsTheSameSkipStore() = runTest {
-        featurePlugin = AppTpPrivacyFeaturePlugin(plugins, context, this, mockVpnFeaturesRegistry)
+    fun whenHashIsTheSameSkipStore() {
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig)))
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig)))
 
-        assertStoredAndRestarted(this,1)
+        verify(mockPlugin, times(1)).store(mockPlugin.settingName, settingAdapter.toJson(testSetting))
     }
 
     @Test
-    fun whenHashChangesStore() = runTest {
-        featurePlugin = AppTpPrivacyFeaturePlugin(plugins, context, this, mockVpnFeaturesRegistry)
+    fun whenHashChangesStore() {
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig)))
 
         val testConfig2 = JsonAppTpFeatureConfig("enabled", null, testSettings, "b123f6ba3f75a565f14b2350e9c2751c")
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig2)))
 
-        assertStoredAndRestarted(this,2)
+        verify(mockPlugin, times(2)).store(mockPlugin.settingName, settingAdapter.toJson(testSetting))
     }
 
     @Test
-    fun whenHashMissingAlwaysStore() = runTest {
-        featurePlugin = AppTpPrivacyFeaturePlugin(plugins, context, this, mockVpnFeaturesRegistry)
+    fun whenHashMissingAlwaysStore() {
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig)))
 
         val testConfig2 = JsonAppTpFeatureConfig("enabled", null, testSettings, null)
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig2)))
         assertTrue(featurePlugin.store(AppTpFeatureName.AppTrackerProtection.value, configAdapter.toJson(testConfig2)))
 
-        assertStoredAndRestarted(this,3)
-    }
-
-    private suspend fun assertStoredAndRestarted(testScope: TestScope, expectedTimes: Int) {
-        verify(mockPlugin, times(expectedTimes)).store(mockPlugin.settingName, settingAdapter.toJson(testSetting))
-
-        testScope.advanceUntilIdle()
-        verify(mockVpnFeaturesRegistry, times(expectedTimes)).refreshFeature(AppTpVpnFeature.APPTP_VPN)
+        verify(mockPlugin, times(3)).store(mockPlugin.settingName, settingAdapter.toJson(testSetting))
     }
 
     private data class SimpleSettingJsonModel(val state: String)

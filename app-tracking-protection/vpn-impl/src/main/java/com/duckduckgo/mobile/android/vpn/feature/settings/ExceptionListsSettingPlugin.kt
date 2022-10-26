@@ -16,15 +16,19 @@
 
 package com.duckduckgo.mobile.android.vpn.feature.settings
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverridePackage
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -33,7 +37,9 @@ import javax.inject.Inject
     boundType = AppTpSettingPlugin::class
 )
 class ExceptionListsSettingPlugin @Inject constructor(
-    val vpnDatabase: VpnDatabase
+    private val vpnDatabase: VpnDatabase,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry
 ) : AppTpSettingPlugin {
     private val jsonAdapter = Moshi.Builder().build().adapter(JsonConfigModel::class.java)
 
@@ -58,7 +64,10 @@ class ExceptionListsSettingPlugin @Inject constructor(
                         exceptionLists.unhideSystemApps.map { AppTrackerSystemAppOverridePackage(it) }
                     )
 
-                    // TODO: potentially refresh feature here
+                    // Restart VPN now that the lists were updated
+                    appCoroutineScope.launch {
+                        vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+                    }
                 }
             }.onFailure {
                 Timber.w(it, "Invalid JSON remote configuration for $settingName")
