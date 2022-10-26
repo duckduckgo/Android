@@ -87,9 +87,6 @@ interface VpnAppTrackerBlockingDao {
     @Query("SELECT * from vpn_app_tracker_exclusion_list")
     fun getAppExclusionListFlow(): Flow<List<AppTrackerExcludedPackage>>
 
-    @Insert
-    fun setExclusionListMetadata(appTrackerExclusionListMetadata: AppTrackerExclusionListMetadata)
-
     @Query("SELECT * from vpn_app_tracker_exclusion_list_metadata ORDER BY id DESC LIMIT 1")
     fun getExclusionListMetadata(): AppTrackerExclusionListMetadata?
 
@@ -98,10 +95,8 @@ interface VpnAppTrackerBlockingDao {
 
     @Transaction
     fun updateExclusionList(
-        exclusionList: List<AppTrackerExcludedPackage>,
-        metadata: AppTrackerExclusionListMetadata
+        exclusionList: List<AppTrackerExcludedPackage>
     ) {
-        setExclusionListMetadata(metadata)
         deleteExclusionList()
         insertExclusionList(exclusionList)
     }

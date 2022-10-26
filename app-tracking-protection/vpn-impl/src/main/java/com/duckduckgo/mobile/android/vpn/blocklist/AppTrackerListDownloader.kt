@@ -65,9 +65,6 @@ interface AppTrackerListDownloader {
     fun downloadAppTrackerBlocklist(): AppTrackerBlocklist
 
     @WorkerThread
-    fun downloadAppTrackerExclusionList(): AppTrackerExclusionList
-
-    @WorkerThread
     fun downloadSystemAppOverrideList(): AppTrackerSystemAppOverrideList
 
     @WorkerThread
@@ -117,28 +114,6 @@ class RealAppTrackerListDownloader @Inject constructor(
 
     private fun extractTrackerEntities(response: JsonAppBlockingList?): List<AppTrackerEntity> {
         return AppTrackerJsonParser.parseTrackerEntities(response)
-    }
-
-    override fun downloadAppTrackerExclusionList(): AppTrackerExclusionList {
-        Timber.d("Downloading the app tracker exclusion list...")
-        val response = runCatching {
-            appTrackerListService.appTrackerExclusionList().execute()
-        }.getOrElse {
-            Timber.w("Error downloading tracker rules list: $it")
-            Response.error(400, "".toResponseBody(null))
-        }
-
-        if (!response.isSuccessful) {
-            Timber.e("Fail to download the app tracker exclusion list, error code: ${response.code()}")
-            return AppTrackerExclusionList()
-        }
-
-        val eTag = response.headers().extractETag()
-        val exclusionList = response.body()?.rules.orEmpty()
-
-        Timber.d("Received the app tracker exclusion list, size: ${exclusionList.size}")
-
-        return AppTrackerExclusionList(etag = ETag.ValidETag(eTag), excludedPackages = exclusionList)
     }
 
     override fun downloadSystemAppOverrideList(): AppTrackerSystemAppOverrideList {

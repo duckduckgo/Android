@@ -48,11 +48,10 @@ class AppTrackerExclusionListUpdateWorker(
 
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
-            val exclusionListResult = updateExclusionList()
             val sysAppOverridesListResult = updateSystemAppOverrides()
 
             val success = Result.success()
-            if (exclusionListResult != success) {
+            if (sysAppOverridesListResult != success) {
                 Timber.w("Failed downloading exclusion or system app override lists, scheduling a retry")
                 return@withContext Result.retry()
             }
@@ -80,35 +79,6 @@ class AppTrackerExclusionListUpdateWorker(
                 vpnDatabase.vpnSystemAppsOverridesDao().upsertSystemAppOverrides(
                     sysAppsOverrides.overridePackages, AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag)
                 )
-
-                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
-
-                return Result.success()
-            }
-            else -> {
-                Timber.w("Received app tracker exclusion list with invalid eTag")
-                return Result.retry()
-            }
-        }
-    }
-
-    private suspend fun updateExclusionList(): Result {
-        Timber.d("Updating the app tracker exclusion list")
-        val exclusionList = appTrackerListDownloader.downloadAppTrackerExclusionList()
-
-        when (exclusionList.etag) {
-            is ETag.ValidETag -> {
-                val currentEtag = vpnDatabase.vpnAppTrackerBlockingDao().getExclusionListMetadata()?.eTag
-                val updatedEtag = exclusionList.etag.value
-
-                if (updatedEtag == currentEtag) {
-                    Timber.v("Downloaded exclusion list has same eTag, noop")
-                    return Result.success()
-                }
-
-                Timber.d("Updating the app tracker exclusion list, eTag: ${exclusionList.etag.value}")
-                vpnDatabase.vpnAppTrackerBlockingDao()
-                    .updateExclusionList(exclusionList.excludedPackages, AppTrackerExclusionListMetadata(eTag = exclusionList.etag.value))
 
                 vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
 
