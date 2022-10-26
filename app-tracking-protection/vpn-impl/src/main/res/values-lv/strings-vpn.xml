@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="atp_name">Lietotņu pretizsekošanas aizsardzība</string>
     <string name="refresh">Atsvaidzināt</string>
 
@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Darbības laiks: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Šodien bloķēti izsekotāju uzņēmumi: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Šonedēļ bloķēti izsekotāju uzņēmumi: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Šodien bloķēti izsekotāju uzņēmumi: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Šonedēļ bloķēti izsekotāju uzņēmumi: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Vēl nav bloķēts neviens izsekotāju uzņēmums"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Šodien bloķēti izsekotāji: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Šonedēļ bloķēti izsekotāji: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Šodien bloķēti izsekotāji: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Šonedēļ bloķēti izsekotāji: %1$d</string>
     <string name="vpnTrackersNone">"Vēl nav bloķēts neviens izsekotājs"</string>
     <string name="vpnNotRunYet">"VPN vēl nav palaists"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s paketes"</string>
@@ -135,29 +135,18 @@
     <string name="atp_NewTabEnabled"><b>Lietotņu pretizsekošanas aizsardzība ir iespējota</b> un bloķē izsekošanas mēģinājumus tavās lietotnēs.</string>
 
     <!-- Exclusion List -->
-    <string name="atp_ExclusionListActivityTitle">Visas lietotnes</string>
     <string name="atp_ExcludedAppsFeature">Lietotņu pretizsekošanas aizsardzība atklāj un bloķē citu uzņēmumu lietotņu izsekotājus, piemēram, Facebook, kad tas mēģina tevi izsekot veselības lietotnē. Uzņēmumi joprojām var izsekot tevi paši savās lietotnēs.\n\nJa kāda lietotne nedarbojas, kā paredzēts, mēģini atspējot tās aizsardzību.</string>
     <string name="atp_ExcludedAppsEnabledLabel">Beta versijā DuckDuckGo var atspējot dažu lietotņu aizsardzību, lai atrisinātu zināmas satura ielādes problēmas. Tavi pielāgotie iestatījumi nemainīsies, ja vien neatjaunosi noklusējuma iestatījumus.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Lietotņu pretizsekošanas aizsardzība ir atspējota</b> Vai Lietotņu pretizsekošanas aizsardzība ir apgrūtinājusi tavu lietotņu darbību? <annotation type="report_issues_link">Ziņo par problēmām</annotation></string>
     <string name="atp_ExcludedAppsReport">Ziņot par problēmu ar citu lietotni</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Ielādē tīmekļa vietnes</string>
-    <string name="atp_ExcludedReasonKnownIssues">Zināmas problēmas</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuāli atspējota</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manuāli iespējota</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Atcelt</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Iespējot</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Atjaunot</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Vai manuāli iespējot aizsardzību lietotnei %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Ir zināms, ka nesekmīgi izsekošanas mēģinājumi šai lietotnei rada problēmas.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Vietņu saturs šajā lietotnē var netikt parādīts pareizi, ja ir iespējota aizsardzība.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Aizsardzības iespējošana nosūta lietotnes nosaukumu DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Privātuma aizsardzība ir atspējota</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Ja esi atspējojis aizsardzību, lai novērstu kādu problēmu, pirms ziņošanas par problēmu DuckDuckGo pārbaudi, vai lietotne tagad darbojas.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Tā pārstāja darboties pareizi</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Es neiebilstu pret izsekošanu šajā lietotnē</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Cita iemesla dēļ</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Ziņot</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Izlaist</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Atjaunot noklusējuma aizsargātās lietotnes</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Ziņot par problēmu ar lietotni</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Vai atjaunot noklusējuma aizsardzību?</string>
@@ -201,12 +190,13 @@
     <string name="atp_ActivityPastWeek">Pēdējās 7 dienas</string>
     <string name="atp_ActivityTitle">Lietotņu pretizsekošanas aizsardzība</string>
     <string name="atp_MostRecentActivityTitle">Visas nesen veiktās darbības</string>
-    <string name="atp_ActivityRecentActivity">Nesen veiktās darbības</string>
+    <string name="atp_ActivityRecentActivity">Darbības</string>
     <string name="atp_ActivityCtaShowAll">Skatīt visas nesen veiktās darbības</string>
     <string name="atp_ActivityAppTrackersFAQ">Kas ir lietotņu izsekotāji?</string>
     <string name="atp_ActivityReportProblem">Ziņojiet par problēmu ar lietotni</string>
     <string name="atp_ActivityBetaInstructions">Beta versijas norādījumi</string>
-    <string name="atp_ActivityManageProtection">Problēmas ar lietotni?</string>
+    <!-- TODO [ANA] Modified, double check if new key is needed -->
+    <string name="atp_ActivityManageProtection">Problēmas ar kādu lietotni?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[Bloķēts 1 izsekošanas mēģinājums no 1 uzņēmuma lietotnē <b>%1$s</b>]]>
@@ -221,22 +211,19 @@
         <![CDATA[%1$d bloķēti izsekošanas mēģinājumi no %2$d uzņēmumiem <b>%3$s</b> lietotnē]]>
     </string>
 
-    <string name="atp_ActivityEmptyListTitle">Nav jaunu darbību</string>
-    <string name="atp_ActivityEmptyListMessage">Turpināt lietot ierīci. Šeit parādās Lietotņu pretizsekošanas aizsardzības bloķētie izsekošanas mēģinājumi.</string>
     <string name="atp_ActivityPastWeekBlocked">Bloķēti</string>
     <string name="atp_ActivityPastWeekAcross">Lietotņu skaits</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="zero">izsekošanas mēģinājumu</item>
         <item quantity="one">izsekošanas mēģinājums</item>
         <item quantity="other">izsekošanas mēģinājumi</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="zero">lietotnes</item>
         <item quantity="one">lietotne</item>
         <item quantity="other">lietotnes</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Šī funkcija ir beta versijā. <annotation type="app_settings_link">Problēmas ar lietotni?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Lietotņu pretizsekošanas aizsardzība ir atspējota</b>\nVai Lietotņu pretizsekošanas aizsardzība ir radījusi kādu problēmu ar tavām lietotnēm? <annotation type="report_issues_link">Ziņo par problēmām</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Kāda VPN lietotne tavā ierīcē atspējojusi Lietotņu pretizsekošanas aizsardzību.</b>\nVai Lietotņu pretizsekošanas aizsardzība radījusi problēmas lietotnēs? <annotation type="report_issues_link">Ziņo par problēmām</annotation></string>
     <string name="atp_ActivityAbout">Par</string>
@@ -390,5 +377,41 @@
     <string name="atp_PromoteAlwaysOnDialogSettings">Doties uz Iestatījumiem</string>
     <string name="atp_PromoteAlwaysOnDialogLater">Atgādiniet vēlāk</string>
     <string name="atp_PromoteAlwaysOnDialogForget">Nē, paldies</string>
+
+    <!--  App Tracking Protection Exclusion List -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Manas lietotnes</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Iespējošana var traucēt citām lietotnēm</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Tomēr iespējot</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of the app">%1$s var nedarboties pareizi, ja ir iespējota lietotņu pretizsekošanas aizsardzība</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Ziņot par problēmu?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of the app">Lūdzu, informē mūs, ja atspējoji pretizsekošanas aizsardzību lietotnei %1$s tās darbības traucējumu dēļ.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Ziņot par problēmu</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Ne tagad</string>
+    <string name="atp_ActivityRecentActivityHeader">Darbības</string>
+    <string name="atp_ActivityManageProtectionLabel">Problēmas ar lietotni?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Beta versijas stadijā dažu lietotņu aizsardzība ir automātiski atspējota. <annotation type="app_settings_link">Skatīt lietotnes</annotation></string>
+    <string name="atp_ActivityDescription">Šeit tiks parādīti bloķētie izsekošanas mēģinājumi</string>
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the total number of apps">
+        <item quantity="zero">%1$s no tavām lietotnēm ir aizsargātas pret slēptiem izsekotājiem, kuri mēģina piekļūt tavai personiskajai informācijai</item>
+        <item quantity="one">%1$s no tavām lietotnēm ir aizsargāta pret slēptiem izsekotājiem, kuri mēģina piekļūt tavai personiskajai informācijai</item>
+        <item quantity="other">%1$s no tavām lietotnēm ir aizsargātas pret slēptiem izsekotājiem, kuri mēģina piekļūt tavai personiskajai informācijai</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the total number of apps">
+        <item quantity="zero">%1$s no tavām lietotnēm aizsardzība ir automātiski atspējota</item>
+        <item quantity="one">%1$s no tavām lietotnēm aizsardzība ir automātiski atspējota</item>
+        <item quantity="other">%1$s no tavām lietotnēm aizsardzība ir automātiski atspējota</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Labas ziņas! Lietotņu pretizsekošanas aizsardzība tagad ir iespējota.<br/><br/>👌Es rādīšu reāllaika sarakstu ar lietotnēm tavā ierīcē, kuras pieķeršu, mēģinot tevi izsekot.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Sapratu!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the total number of apps">Aizsardzība iespējota (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the total number of apps">Aizsardzība atspējota (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Viss</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Aizsardzība iespējota</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Aizsardzība atspējota</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Viss</string>
+    <string name="atp_ActivityViewAppsLabel">Skatīt lietotnes</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Šī funkcija ir beta versijā. Problēmas ar kādu lietotni? <annotation type="app_settings_link">Palīdzi mums veikt uzlabojumus</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Dažām lietotnēm var rasties problēmas, ja ir iespējota lietotņu pretizsekošanas aizsardzība.\n<annotation type="learn_why_link">Uzzini, kāpēc</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Aizsardzība ir atspējota lietotnēm ar zināmām problēmām. Vari šīs lietotnes iespējot, taču tās var nedarboties, kā paredzēts. <annotation type="learn_why_link">Uzzini, kāpēc</annotation></string>
 
 </resources>
