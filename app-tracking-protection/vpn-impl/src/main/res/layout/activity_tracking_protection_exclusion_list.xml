@@ -65,7 +65,6 @@
                 style="@style/TextAppearance.DuckDuckGo.Body2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?selectableItemBackground"
                 android:drawablePadding="@dimen/keyline_2"
                 android:layout_marginTop="@dimen/keyline_2"
                 android:padding="@dimen/keyline_4"
