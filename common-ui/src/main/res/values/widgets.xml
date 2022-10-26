@@ -207,7 +207,7 @@
         <item name="android:textAlignment">center</item>
         <item name="android:paddingStart">@dimen/keyline_3</item>
         <item name="android:paddingEnd">@dimen/keyline_3</item>
-        <item name="android:layout_height">@dimen/buttonLargeHeight</item>
+        <item name="android:layout_height">@dimen/legacyButtonHeight</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Primary">
@@ -216,7 +216,7 @@
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Primary.Small">
-        <item name="android:layout_height">@dimen/buttonSmallHeight</item>
+        <item name="android:layout_height">@dimen/legacyButtonSmallHeight</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Primary.Lowercase">
@@ -229,7 +229,7 @@
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Secondary.Small">
-        <item name="android:layout_height">@dimen/buttonSmallHeight</item>
+        <item name="android:layout_height">@dimen/legacyButtonSmallHeight</item>
     </style>
 
     <!-- Rename to Ghost when migration happens -->
@@ -240,7 +240,7 @@
 
     <!-- Rename to Ghost when migration happens -->
     <style name="Widget.DuckDuckGo.Button.Borderless.Small">
-        <item name="android:layout_height">@dimen/buttonSmallHeight</item>
+        <item name="android:layout_height">@dimen/legacyButtonSmallHeight</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Rounded">
