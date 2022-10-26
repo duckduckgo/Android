@@ -453,7 +453,7 @@ class DeviceShieldTrackerActivity :
                     setClickableLink(
                         OPEN_SETTINGS_ANNOTATION,
                         getText(R.string.atp_AlwaysOnLockDownEnabled)
-                    ) { openVPNSettings() }
+                    ) { launchAlwaysOnLockdownEnabledDialog() }
                     show()
                 }
             } else {
