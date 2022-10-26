@@ -76,7 +76,6 @@ class VpnOnboardingViewModel @Inject constructor(
     )
 
     fun onTurnAppTpOffOn() {
-        vpnStore.onboardingDidShow()
         if (vpnDetector.isVpnDetected()) {
             sendCommand(Command.ShowVpnConflictDialog)
         } else {
@@ -86,6 +85,7 @@ class VpnOnboardingViewModel @Inject constructor(
 
     fun onAppTpEnabled() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            vpnStore.onboardingDidShow()
             deviceShieldPixels.enableFromOnboarding()
         }
     }
