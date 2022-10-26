@@ -35,7 +35,7 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 @Module
 @ContributesTo(AppScope::class)
@@ -63,7 +63,7 @@ class DeviceShieldStatusReporting(
     }
 
     private fun scheduleDeviceShieldStatusReporting() {
-        Timber.v("Scheduling the DeviceShieldStatusReporting worker")
+        logcat { "Scheduling the DeviceShieldStatusReporting worker" }
 
         PeriodicWorkRequestBuilder<DeviceShieldStatusReportingWorker>(24, TimeUnit.HOURS)
             .addTag(WORKER_STATUS_REPORTING_TAG)

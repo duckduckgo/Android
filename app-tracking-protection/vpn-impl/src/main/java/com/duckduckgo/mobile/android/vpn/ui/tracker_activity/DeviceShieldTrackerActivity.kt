@@ -71,9 +71,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import logcat.logcat
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class DeviceShieldTrackerActivity :
@@ -434,7 +434,7 @@ class DeviceShieldTrackerActivity :
         if (::deviceShieldSwitch.isInitialized) {
             quietlyToggleAppTpSwitch(state.runningState.state == VpnRunningState.ENABLED)
         } else {
-            Timber.v("switch view reference not yet initialized; cache value until menu populated")
+            logcat { "switch view reference not yet initialized; cache value until menu populated" }
         }
 
         updateCounts(state.trackerCountInfo)

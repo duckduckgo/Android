@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = VpnScope::class,
@@ -42,14 +42,14 @@ class VpnFeatureRemoverStateListener @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         coroutineScope.launch() {
-            Timber.d("FeatureRemoverVpnStateListener, new state ENABLED. Descheduling automatic feature removal")
+            logcat { "FeatureRemoverVpnStateListener, new state ENABLED. Descheduling automatic feature removal" }
             resetState()
         }
     }
 
     private suspend fun resetState() {
         vpnDatabase.vpnFeatureRemoverDao().getState()?.let {
-            Timber.d("FeatureRemoverVpnStateListener, feature was removed, setting it back to not removed")
+            logcat { "FeatureRemoverVpnStateListener, feature was removed, setting it back to not removed" }
             vpnDatabase.vpnFeatureRemoverDao().insert(VpnFeatureRemoverState(isFeatureRemoved = false))
         }
         workManager.cancelAllWorkByTag(VpnFeatureRemoverWorker.WORKER_VPN_FEATURE_REMOVER_TAG)
@@ -61,14 +61,14 @@ class VpnFeatureRemoverStateListener @Inject constructor(
     ) {
         if (vpnStopReason == VpnStopReason.SELF_STOP) {
             coroutineScope.launch() {
-                Timber.d("FeatureRemoverVpnStateListener, new state DISABLED and it was MANUALLY. Scheduling automatic feature removal")
+                logcat { "FeatureRemoverVpnStateListener, new state DISABLED and it was MANUALLY. Scheduling automatic feature removal" }
                 scheduleFeatureRemoval()
             }
         }
     }
 
     private fun scheduleFeatureRemoval() {
-        Timber.v("Scheduling the VpnFeatureRemoverWorker worker 7 days from now")
+        logcat { "Scheduling the VpnFeatureRemoverWorker worker 7 days from now" }
         val request = OneTimeWorkRequestBuilder<VpnFeatureRemoverWorker>()
             .setInitialDelay(7, TimeUnit.DAYS)
             .addTag(VpnFeatureRemoverWorker.WORKER_VPN_FEATURE_REMOVER_TAG)

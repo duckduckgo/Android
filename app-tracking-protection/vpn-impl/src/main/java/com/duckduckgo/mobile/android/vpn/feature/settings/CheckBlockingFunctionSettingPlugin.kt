@@ -23,7 +23,9 @@ import com.duckduckgo.mobile.android.vpn.feature.*
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -39,13 +41,13 @@ class CheckBlockingFunctionSettingPlugin @Inject constructor(
         @Suppress("NAME_SHADOWING")
         val name = appTpSettingValueOf(name.value)
         if (name == settingName) {
-            Timber.d("Received configuration: $jsonString")
+            logcat { "Received configuration: $jsonString" }
             runCatching {
                 jsonAdapter.fromJson(jsonString)?.state?.let { state ->
                     appTpFeatureConfig.edit { setEnabled(settingName, state.isEnabled()) }
                 }
             }.onFailure {
-                Timber.w(it, "Invalid JSON remote configuration for $settingName")
+                logcat(LogPriority.WARN) { it.asLog() }
             }
             return true
         }

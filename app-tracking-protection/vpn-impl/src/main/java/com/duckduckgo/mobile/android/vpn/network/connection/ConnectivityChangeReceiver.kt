@@ -33,7 +33,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(VpnScope::class)
 class ConnectivityChangeReceiver @Inject constructor(
@@ -52,12 +52,12 @@ class ConnectivityChangeReceiver @Inject constructor(
             val oldNetworkType = vpnPreferences.activeNetworkType
 
             if (oldNetworkType?.lowercase() == networkType.toString().lowercase()) {
-                Timber.d("Network type didn't change, skip")
+                logcat { "Network type didn't change, skip" }
                 return
             }
 
             vpnPreferences.activeNetworkType = networkType.toString()
-            Timber.d("Connectivity change to $networkType, reconfiguring VPN")
+            logcat { "Connectivity change to $networkType, reconfiguring VPN" }
 
             coroutineScope.launch {
                 TrackerBlockingVpnService.restartVpnService(context)
@@ -72,7 +72,7 @@ class ConnectivityChangeReceiver @Inject constructor(
             }
             context.registerReceiver(connectivityChangedReceiver, intentFilter)
         } else {
-            Timber.v("NetworkSwitchHandling disabled...skip restarting VPN upon network switch")
+            logcat { "NetworkSwitchHandling disabled...skip restarting VPN upon network switch" }
         }
     }
 

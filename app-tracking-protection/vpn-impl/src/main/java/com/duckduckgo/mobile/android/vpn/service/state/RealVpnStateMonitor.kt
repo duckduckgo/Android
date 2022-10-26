@@ -39,7 +39,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class RealVpnStateMonitor @Inject constructor(
@@ -51,7 +51,7 @@ class RealVpnStateMonitor @Inject constructor(
     override fun getStateFlow(vpnFeature: VpnFeature): Flow<VpnState> {
         return database.vpnServiceStateDao().getStateStats().map { mapState(it) }
             .filter { it.state != INVALID }
-            .onEach { Timber.v("service $it") }
+            .onEach { logcat { "service $it" } }
             .combine(
                 vpnFeaturesRegistry.registryChanges()
                     .filter { it.first == vpnFeature.featureName }
@@ -61,7 +61,7 @@ class RealVpnStateMonitor @Inject constructor(
                         delay(1000)
                         emit(vpnFeature.featureName to vpnFeaturesRegistry.isFeatureRegistered(vpnFeature))
                     }
-                    .onEach { Timber.v("feature $it") },
+                    .onEach { logcat { "feature $it" } },
             ) { vpnState, feature ->
                 val isFeatureEnabled = feature.second
                 val isVpnEnabled = vpnState.state == VpnRunningState.ENABLED

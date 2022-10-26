@@ -23,7 +23,8 @@ import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import java.util.UUID
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.logcat
 
 private const val PREFS_FILENAME = "com.duckduckgo.mobile.android.vpn.feature.registry.v1"
 private const val IS_INITIALIZED = "IS_INITIALIZED"
@@ -51,16 +52,16 @@ internal class VpnFeaturesRegistryImpl(
     @Synchronized
     override fun registerFeature(feature: VpnFeature) {
         if (!isInitialized) {
-            Timber.d("Initializing VpnFeaturesRegistry")
+            logcat { "Initializing VpnFeaturesRegistry" }
             isInitialized = true
         }
 
         if (!vpnServiceWrapper.isServiceRunning()) {
-            Timber.d("no features registered, start the service")
+            logcat { "no features registered, start the service" }
             // there's not a registered feature, so we need to start the VPN too
             vpnServiceWrapper.startService()
         }
-        Timber.d("(re)registering feature")
+        logcat { "(re)registering feature" }
         preferences.edit(commit = true) {
             // we use random UUID to force change listener to be called
             putString(feature.featureName, UUID.randomUUID().toString())
@@ -70,19 +71,19 @@ internal class VpnFeaturesRegistryImpl(
     @Synchronized
     override fun unregisterFeature(feature: VpnFeature) {
         if (!isInitialized) {
-            Timber.d("Initializing VpnFeaturesRegistry, auto-registering AppTP")
+            logcat { "Initializing VpnFeaturesRegistry, auto-registering AppTP" }
             isInitialized = true
             vpnServiceWrapper.stopService()
             return
         }
 
         if (registeredFeatures().size == 1 && preferences.contains(feature.featureName)) {
-            Timber.d("$feature is the last registered feature, stopping VPN")
+            logcat { "$feature is the last registered feature, stopping VPN" }
             // this is the last feature registered for VPN usage, stop the service
             vpnServiceWrapper.stopService()
         }
 
-        Timber.d("$feature removal")
+        logcat { "$feature removal" }
         preferences.edit(commit = true) {
             remove(feature.featureName)
         }
@@ -93,7 +94,7 @@ internal class VpnFeaturesRegistryImpl(
             (!isInitialized && vpnServiceWrapper.isServiceRunning())
 
         if (isRegistered && !isInitialized) {
-            Timber.v("isFeatureRegistered($feature) - should be registered as we're not initialised ")
+            logcat { "isFeatureRegistered($feature) - should be registered as we're not initialised " }
             preferences.edit(commit = true) {
                 // we use random UUID to force change listener to be called
                 putString(feature.featureName, UUID.randomUUID().toString())
@@ -101,18 +102,18 @@ internal class VpnFeaturesRegistryImpl(
             isInitialized = true
         }
 
-        Timber.v("isFeatureRegistered($feature) = $isRegistered")
+        logcat { "isFeatureRegistered($feature) = $isRegistered" }
         return isRegistered && vpnServiceWrapper.isServiceRunning()
     }
 
     override suspend fun refreshFeature(feature: VpnFeature) {
         if (!isInitialized) {
-            Timber.d("Initializing VpnFeaturesRegistry, attempting to restart VPN service")
+            logcat { "Initializing VpnFeaturesRegistry, attempting to restart VPN service" }
             isInitialized = true
 
             vpnServiceWrapper.restartVpnService()
         } else if (!preferences.all.contains(feature.featureName)) {
-            Timber.e("The $feature is not registered for VPN usage")
+            logcat(LogPriority.WARN) { "The $feature is not registered for VPN usage" }
         } else {
             vpnServiceWrapper.restartVpnService()
         }
@@ -121,13 +122,13 @@ internal class VpnFeaturesRegistryImpl(
     override fun registryChanges(): Flow<Pair<String, Boolean>> {
         return _registry.asStateFlow()
             .filter {
-                Timber.v("change $it")
+                logcat { "change $it" }
                 it != registryInitialValue && it.first != IS_INITIALIZED
             }
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        Timber.d("onSharedPreferenceChanged($key)")
+        logcat { "onSharedPreferenceChanged($key)" }
         _registry.update { Pair(key, sharedPreferences.contains(key)) }
     }
 

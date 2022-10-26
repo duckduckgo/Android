@@ -43,10 +43,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
-import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -82,7 +82,7 @@ class AppBadHealthStateHandler @Inject constructor(
 
     override suspend fun onAppHealthUpdate(appHealthData: AppHealthData): Boolean {
         if (!appTpConfig.isEnabled(AppTpSetting.BadHealthMitigation)) {
-            Timber.d("Feature is disabled, skipping mitigation")
+            logcat { "Feature is disabled, skipping mitigation" }
             return false
         }
 
@@ -104,7 +104,7 @@ class AppBadHealthStateHandler @Inject constructor(
 
                 val json = jsonAdapter.toJson(badHealthData)
 
-                Timber.v("Storing app health alerts in local store: $badHealthData")
+                logcat { "Storing app health alerts in local store: $badHealthData" }
 
                 val shouldRestartVpn = shouldRestartVpn(json)
                 val restartLocaltime = if (shouldRestartVpn) {
@@ -132,7 +132,7 @@ class AppBadHealthStateHandler @Inject constructor(
                     AppHealthState(type = GOOD_HEALTH, alerts = listOf(), healthDataJsonString = "", restartedAtEpochSeconds = null),
                 )
                 resetBackoff()
-                Timber.d("No alerts")
+                logcat { "No alerts" }
                 return@withContext false
             }
         }
@@ -141,7 +141,7 @@ class AppBadHealthStateHandler @Inject constructor(
     private fun AppHealthState.updateBadHealthEpochSeconds(): AppHealthState {
         // this case should not happen but just safeguard
         if (this.type == GOOD_HEALTH) {
-            Timber.d("Provided GOOD_HEALTH state...noop")
+            logcat { "Provided GOOD_HEALTH state...noop" }
             return this
         }
 
@@ -161,7 +161,7 @@ class AppBadHealthStateHandler @Inject constructor(
     private fun resetBackoff() {
         backoffIncrement = INITIAL_BACKOFF
         restartBoundary = null
-        Timber.d("Reset backoff, restartBoundary = $restartBoundary")
+        logcat { "Reset backoff, restartBoundary = $restartBoundary" }
     }
 
     private fun sendFirstInDayAlertPixels(alerts: List<String>) {
@@ -175,7 +175,7 @@ class AppBadHealthStateHandler @Inject constructor(
     private fun shouldRestartVpn(json: String): Boolean {
         val boundary = restartBoundary
         return if (isVpnRestartAllowed(boundary)) {
-            Timber.v("Restarting the VPN...")
+            logcat { "Restarting the VPN..." }
 
             // update the restart boundary
             backoffIncrement = if (backoffIncrement == 0L) INITIAL_BACKOFF_INCREMENT_SECONDS else backoffIncrement * 2
@@ -183,12 +183,12 @@ class AppBadHealthStateHandler @Inject constructor(
                 restartBoundary = this
             }
 
-            Timber.v("backoff = $backoffIncrement, boundary = $restartBoundary")
+            logcat { "backoff = $backoffIncrement, boundary = $restartBoundary" }
 
             debouncedPixelBadHealth(json, restarted = true)
             true
         } else {
-            Timber.v("Cancelled VPN restart, backoff boundary ($boundary)...")
+            logcat { "Cancelled VPN restart, backoff boundary ($boundary)..." }
             debouncedPixelBadHealth(json)
             false
         }
@@ -198,13 +198,13 @@ class AppBadHealthStateHandler @Inject constructor(
         // place this in a different job to ensure the restart completes successfully and nobody can cancel it by mistake
         appCoroutineScope.launch {
             if (isCriticalBadHealth) {
-                Timber.d("Internal build and critical bad health, killing VPN process...")
+                logcat { "Internal build and critical bad health, killing VPN process..." }
                 deviceShieldPixels.didRestartVpnProcessOnBadHealth()
                 // delay a bit to ensure pixel is sent. This is not great but our pixel API doesn't leave an option in this case
                 delay(300)
                 Runtime.getRuntime().exit(0)
             } else {
-                Timber.d("Bad health, stop/restart VPN...")
+                logcat { "Bad health, stop/restart VPN..." }
                 deviceShieldPixels.didRestartVpnOnBadHealth()
                 TrackerBlockingVpnService.restartVpnService(context, forceGc = true)
             }
@@ -213,7 +213,7 @@ class AppBadHealthStateHandler @Inject constructor(
 
     private fun isVpnRestartAllowed(boundary: String?): Boolean {
         val now = DATE_FORMATTER.format(LocalDateTime.now())
-        Timber.d("Checking if should restart VPN, boundary = $boundary")
+        logcat { "Checking if should restart VPN, boundary = $boundary" }
         return (boundary == null || now >= boundary)
     }
 
@@ -222,7 +222,7 @@ class AppBadHealthStateHandler @Inject constructor(
         restarted: Boolean = false,
     ) {
         if (debounceJob.isActive) {
-            Timber.v("debouncing bad health pixel firing")
+            logcat { "debouncing bad health pixel firing" }
             return
         }
         // Place this in a different job (form the app scope) to make sure it is sent

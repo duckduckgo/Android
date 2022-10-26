@@ -43,7 +43,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = VpnScope::class,
@@ -62,7 +62,7 @@ class VpnServiceStateLogger @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         job += coroutineScope.launch(dispatcher) {
-            Timber.d("VpnServiceStateLogger, new state ENABLED")
+            logcat { "VpnServiceStateLogger, new state ENABLED" }
             vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = VpnServiceState.ENABLED))
 
             @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
@@ -78,7 +78,7 @@ class VpnServiceStateLogger @Inject constructor(
                             state = VpnServiceState.ENABLED,
                             alwaysOnState = AlwaysOnState(isAlwaysOnEnabled, isLockdownEnabled),
                         ).also {
-                            Timber.d("VpnServiceStateLogger, state: $it")
+                            logcat { "VpnServiceStateLogger, state: $it" }
                         },
                     )
                 }
@@ -94,7 +94,7 @@ class VpnServiceStateLogger @Inject constructor(
         job.cancel()
 
         coroutineScope.launch(dispatcher) {
-            Timber.d("VpnServiceStateLogger, new state DISABLED, reason $vpnStopReason")
+            logcat { "VpnServiceStateLogger, new state DISABLED, reason $vpnStopReason" }
             val alwaysOnState = if (appBuildConfig.sdkInt >= 29) {
                 val isAlwaysOnEnabled = vpnService.get().isAlwaysOn
                 val isLockdownEnabled = vpnService.get().isLockdownEnabled

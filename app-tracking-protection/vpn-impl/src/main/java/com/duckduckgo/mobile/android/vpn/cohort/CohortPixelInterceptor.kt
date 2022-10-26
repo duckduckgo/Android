@@ -21,11 +21,11 @@ import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Protocol
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
-import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -53,7 +53,7 @@ class CohortPixelInterceptor @Inject constructor(
     }
 
     private fun dummyResponse(chain: Interceptor.Chain): Response {
-        Timber.v("Pixel URL request dropped: ${chain.request()}")
+        logcat { "Pixel URL request dropped: ${chain.request()}" }
 
         return Response.Builder()
             .code(200)

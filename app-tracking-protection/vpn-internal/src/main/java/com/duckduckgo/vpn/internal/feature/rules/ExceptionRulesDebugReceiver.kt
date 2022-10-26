@@ -29,7 +29,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 /**
  * This receiver allows to add exclusion rules to appTP
@@ -82,7 +82,7 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val exceptionRulesSavedState = mutableListOf<AppTrackerExceptionRule>()
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.i("Debug receiver ExceptionRulesDebugReceiver registered")
+        logcat { "Debug receiver ExceptionRulesDebugReceiver registered" }
 
         saveExceptionRulesState(coroutineScope)
 
@@ -90,7 +90,7 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
             val appId = kotlin.runCatching { intent.getStringExtra("app") }.getOrNull()
             val domain = kotlin.runCatching { intent.getStringExtra("domain") }.getOrNull()
 
-            Timber.i("Excluding %s for app %s", domain, appId)
+            logcat { "Excluding $domain for app $appId" }
 
             if (appId != null && domain != null) {
                 coroutineScope.launch(dispatchers.io()) {
@@ -104,7 +104,7 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        Timber.i("Debug receiver ExceptionRulesDebugReceiver restoring exception rules")
+        logcat { "Debug receiver ExceptionRulesDebugReceiver restoring exception rules" }
 
         coroutineScope.launch(dispatchers.io()) {
             exclusionRulesRepository.deleteAllTrackerRules()

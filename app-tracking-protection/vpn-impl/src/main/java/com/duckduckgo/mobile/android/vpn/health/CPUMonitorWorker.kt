@@ -25,7 +25,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 @ContributesWorker(AppScope::class)
 class CPUMonitorWorker(
@@ -55,7 +57,7 @@ class CPUMonitorWorker(
                     }
                 }
             } catch (e: Exception) {
-                Timber.e("Could not read CPU usage", e)
+                logcat(LogPriority.ERROR) { e.asLog() }
                 return@withContext Result.failure()
             }
 

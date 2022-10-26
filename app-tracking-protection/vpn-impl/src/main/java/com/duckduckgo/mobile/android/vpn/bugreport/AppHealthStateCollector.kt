@@ -25,8 +25,8 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import logcat.logcat
 import org.json.JSONObject
-import timber.log.Timber
 
 @ContributesMultibinding(VpnScope::class)
 class AppHealthStateCollector @Inject constructor(
@@ -42,8 +42,8 @@ class AppHealthStateCollector @Inject constructor(
             return@let latestBadHealth == null || it.localtime > latestBadHealth.localtime
         } ?: (latestBadHealth == null)
 
-        Timber.v("Latest app BAD health state: $latestBadHealth")
-        Timber.v("Is currently in GOOD health: $isGoodHealthNow")
+        logcat { "Latest app BAD health state: $latestBadHealth" }
+        logcat { "Is currently in GOOD health: $isGoodHealthNow" }
 
         // ensure DB table is cleared
         appHealthDatabase.appHealthDao().clearAll()
