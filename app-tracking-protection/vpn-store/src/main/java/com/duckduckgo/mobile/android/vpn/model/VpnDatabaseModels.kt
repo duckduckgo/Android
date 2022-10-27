@@ -67,17 +67,21 @@ enum class VpnStoppingReason {
     UNKNOWN
 }
 
+data class AlwaysOnState(val alwaysOnEnabled: Boolean, val alwaysOnLockedDown: Boolean) {
+    companion object {
+        val ALWAYS_ON_DISABLED = AlwaysOnState(alwaysOnEnabled = false, alwaysOnLockedDown = false)
+        val ALWAYS_ON_ENABLED = AlwaysOnState(alwaysOnEnabled = true, alwaysOnLockedDown = false)
+        val ALWAYS_ON_ENABLED_LOCKED_DOWN = AlwaysOnState(alwaysOnEnabled = true, alwaysOnLockedDown = true)
+    }
+}
+
 @Entity(tableName = "vpn_service_state_stats")
 data class VpnServiceStateStats(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val timestamp: String = DatabaseDateFormatter.timestamp(),
     val state: VpnServiceState,
-    val stopReason: VpnStoppingReason = UNKNOWN
-)
-
-data class BucketizedVpnServiceStateStats(
-    val day: String,
-    @Embedded val vpnServiceStateStats: VpnServiceStateStats
+    val stopReason: VpnStoppingReason = UNKNOWN,
+    @Embedded val alwaysOnState: AlwaysOnState = AlwaysOnState.ALWAYS_ON_DISABLED
 )
 
 data class TrackingApp(

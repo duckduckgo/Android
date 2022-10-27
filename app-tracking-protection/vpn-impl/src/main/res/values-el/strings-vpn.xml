@@ -230,8 +230,9 @@
         <item quantity="one">Εφαρμογή</item>
         <item quantity="other">Εφαρμογές</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Αυτή η λειτουργία είναι σε έκδοση beta. <annotation type="app_settings_link">Αντιμετωπίζετε προβλήματα με μια εφαρμογή;</annotation></string>
+    <string name="atp_ActivityEnabledLabel">Αυτή η λειτουργία είναι σε έκδοση beta. Παρατηρήσατε κάποιο πρόβλημα με μια εφαρμογή; <annotation type="app_settings_link">Αναφέρετε κάποιο πρόβλημα.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Η Προστασία παρακολούθησης από εφαρμογές είναι απενεργοποιημένη</b>\nΠροκάλεσε η Προστασία παρακολούθησης από εφαρμογές πρόβλημα στις εφαρμογές σας; <annotation type="report_issues_link">Αναφορά προβλημάτων</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Το Android απενεργοποίησε την Προστασία παρακολούθησης από εφαρμογές</b>. Θέλετε να αποτρέψετε την επανάληψή του; <annotation type="re_enable_link">Επανενεργοποίηση</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Μια εφαρμογή VPN στη συσκευή σας απενεργοποίησε την Προστασία παρακολούθησης από εφαρμογές.</b>\nΠροκάλεσε η Προστασία παρακολούθησης από εφαρμογές πρόβλημα με τις εφαρμογές σας; <annotation type="report_issues_link">Αναφορά προβλημάτων</annotation></string>
     <string name="atp_ActivityAbout">Σχετικά</string>
     <string name="atp_ActivityManage">Διαχείριση</string>
@@ -377,10 +378,13 @@
     <string name="atp_RemoveFeatureDialogRemove">Απενεργοποίηση</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Να ρυθμιστεί σε «Πάντα ενεργή»;</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Για να αποτρέψετε το Android από την περιοδική απενεργοποίηση της Προστασίας παρακολούθησης από εφαρμογές:\n\nΜεταβείτε στις Ρυθμίσεις Android\nΑνοίξτε τις Ρυθμίσεις VPN για το DuckDuckGo\nΕνεργοποιήστε την επιλογή «Πάντα ενεργό VPN»</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Μεταβείτε στις Ρυθμίσεις</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Να μου γίνει υπενθύμιση αργότερα</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Όχι, ευχαριστώ</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Όχι τώρα</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Μεταβείτε στις Ρυθμίσεις VPN της συσκευής σας για το DuckDuckGo και ενεργοποιήστε το <b>Πάντα ενεργό</b> VPN για να αποτρέψετε απενεργοποίηση της προστασίας από το Android.\n\nΒεβαιωθείτε ότι έχετε αφήσει την άλλη ρύθμιση στη θέση OFF (ανενεργή).]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Για να αποφύγετε προβλήματα με εφαρμογές, μεταβείτε στις <b>Ρυθμίσεις VPN για το DuckDuckGo</b> της συσκευής σας και απενεργοποιήστε την επιλογή <b>Αποκλεισμός συνδέσεων χωρίς VPN</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Να ρυθμιστεί σε «Πάντα ενεργή»</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Αλλάξτε τις ρυθμίσεις του VPN σας</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Απαιτείται ενέργεια!</b> Για να αποφύγετε προβλήματα με εφαρμογές, πρέπει να αλλάξετε τις ρυθμίσεις του Android σας. <annotation type="open_settings_link">Αλλαγή ρυθμίσεων</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Απαιτείται ενέργεια! Πρέπει να αλλάξει μια ρύθμιση του Android για την Προστασία παρακολούθησης από εφαρμογές.</string>
 
 </resources>
