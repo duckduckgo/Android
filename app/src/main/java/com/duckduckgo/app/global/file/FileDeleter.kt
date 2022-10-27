@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.global.file
 
-import kotlinx.coroutines.Dispatchers
+import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -47,12 +47,12 @@ interface FileDeleter {
     )
 }
 
-class AndroidFileDeleter : FileDeleter {
+class AndroidFileDeleter(private val dispatchers: DispatcherProvider) : FileDeleter {
     override suspend fun deleteContents(
         parentDirectory: File,
         excludedFiles: List<String>
     ) {
-        withContext(Dispatchers.IO) {
+        withContext(dispatchers.io()) {
             val files = parentDirectory.listFiles() ?: return@withContext
             val filesToDelete = files.filterNot { excludedFiles.contains(it.name) }
             filesToDelete.forEach { it.deleteRecursively() }
@@ -60,7 +60,7 @@ class AndroidFileDeleter : FileDeleter {
     }
 
     override suspend fun deleteDirectory(directoryToDelete: File) {
-        withContext(Dispatchers.IO) {
+        withContext(dispatchers.io()) {
             directoryToDelete.deleteRecursively()
         }
     }
@@ -69,7 +69,7 @@ class AndroidFileDeleter : FileDeleter {
         parentDirectory: File,
         files: List<String>
     ) {
-        withContext(Dispatchers.IO) {
+        withContext(dispatchers.io()) {
             val allFiles = parentDirectory.listFiles() ?: return@withContext
             val filesToDelete = allFiles.filter { files.contains(it.name) }
             filesToDelete.forEach { it.deleteRecursively() }

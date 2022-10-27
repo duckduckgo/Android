@@ -17,13 +17,13 @@
 package com.duckduckgo.mobile.android.vpn.stats
 
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
 import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.LocalDateTime
 import java.util.concurrent.TimeUnit
@@ -85,7 +85,8 @@ interface AppTrackerBlockingStatsRepository {
 
 @ContributesBinding(AppScope::class)
 class RealAppTrackerBlockingStatsRepository @Inject constructor(
-    val vpnDatabase: VpnDatabase
+    val vpnDatabase: VpnDatabase,
+    private val dispatchers: DispatcherProvider
 ) : AppTrackerBlockingStatsRepository {
 
     private val trackerDao = vpnDatabase.vpnTrackerDao()
@@ -100,7 +101,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
             .conflate()
             .distinctUntilChanged()
             .map { it.filter { tracker -> tracker.timestamp >= startTime() } }
-            .flowOn(Dispatchers.Default)
+            .flowOn(dispatchers.default())
     }
 
     @WorkerThread
@@ -140,7 +141,7 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
             .transform { runningTimes ->
                 emit(runningTimes.sumOf { it.timeRunningMillis })
             }
-            .flowOn(Dispatchers.Default)
+            .flowOn(dispatchers.default())
     }
 
     @WorkerThread

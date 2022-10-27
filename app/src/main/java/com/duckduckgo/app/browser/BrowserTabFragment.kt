@@ -178,6 +178,7 @@ import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.cta.ui.DaxDialogCta.DaxAutoconsentCta
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -224,7 +225,10 @@ class BrowserTabFragment :
     private val supervisorJob = SupervisorJob()
 
     override val coroutineContext: CoroutineContext
-        get() = supervisorJob + Dispatchers.Main
+        get() = supervisorJob + dispatchers.main()
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     @Inject
     lateinit var webViewClient: BrowserWebViewClient
@@ -1550,7 +1554,7 @@ class BrowserTabFragment :
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
         appCoroutineScope.launch {
             viewModel.fireAutocompletePixel(suggestion)
-            withContext(Dispatchers.Main) {
+            withContext(dispatchers.main()) {
                 val origin = when (suggestion) {
                     is AutoCompleteBookmarkSuggestion -> FromAutocomplete(isNav = true)
                     is AutoCompleteSearchSuggestion -> FromAutocomplete(isNav = suggestion.isUrl)
@@ -1698,7 +1702,7 @@ class BrowserTabFragment :
         delay: Long = 200
     ) {
         delay(delay)
-        withContext(Dispatchers.Main) {
+        withContext(dispatchers.main()) {
             browserLayout.makeSnackbarWithNoBottomInset(messageResourceId, Snackbar.LENGTH_LONG)
                 .setAction(R.string.autofillSnackbarAction) {
                     context?.let { startActivity(autofillSettingsActivityLauncher.intent(it, loginCredentials)) }

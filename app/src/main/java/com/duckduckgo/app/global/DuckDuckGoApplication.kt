@@ -63,6 +63,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     @Inject
     lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*, *>>
 
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
+
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
 
     open lateinit var daggerAppComponent: AppComponent
@@ -178,7 +181,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     private fun initializeDateLibrary() {
         AndroidThreeTen.init(this)
         // Query the ZoneRulesProvider so that it is loaded on a background coroutine
-        GlobalScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(dispatchers.io()) {
             ZoneRulesProvider.getAvailableZoneIds()
         }
     }

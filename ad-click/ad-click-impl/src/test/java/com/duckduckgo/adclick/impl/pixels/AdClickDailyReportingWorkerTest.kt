@@ -49,6 +49,7 @@ internal class AdClickDailyReportingWorkerTest {
         runTest {
             val worker = TestListenableWorkerBuilder<AdClickDailyReportingWorker>(context = context).build()
             worker.adClickPixels = mockAdClickPixels
+            worker.dispatchers = coroutineRule.testDispatcherProvider
 
             val result = worker.doWork()
 
