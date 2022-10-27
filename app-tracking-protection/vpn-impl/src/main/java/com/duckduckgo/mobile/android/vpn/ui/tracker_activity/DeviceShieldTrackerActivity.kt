@@ -312,12 +312,10 @@ class DeviceShieldTrackerActivity :
         AlwaysOnAlertDialogFragment.newAlwaysOnLockdownDialog(
             object : AlwaysOnAlertDialogFragment.Listener {
                 override fun onGoToSettingsClicked() {
-                    Timber.d("aitor: onGoToSettingsClicked")
                     viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings)
                 }
 
                 override fun onCanceled() {
-                    Timber.d("aitor: onCanceled")
                     viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnCancelled)
                 }
             }
