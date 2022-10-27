@@ -88,12 +88,10 @@ class ExceptionListsSettingPlugin @Inject constructor(
 
     private data class AppTrackerAllowRuleModel(
         val domain: String,
-        val defaultTTL: Int?,
         val packageNames: List<AllowedPackageModel>,
     )
 
     private data class AllowedPackageModel(
         val packageName: String,
-        val allowTTL: String?
     )
 }

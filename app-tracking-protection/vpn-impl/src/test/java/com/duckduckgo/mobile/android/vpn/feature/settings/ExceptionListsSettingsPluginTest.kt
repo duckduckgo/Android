@@ -47,14 +47,20 @@ class ExceptionListsSettingsPluginTest {
     private val mockVpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao = mock()
     private val mockVpnAppTrackerSystemAppsOverridesDao: VpnAppTrackerSystemAppsOverridesDao = mock()
 
+    /**
+     * Test JSON that contains additional fields as well so we can test that they are safely ignored
+     */
     private val testJson = """
         {
             "appTrackerAllowList": [
                 {
                     "domain": "api.apptentive.com",
+                    "defaultTTL": 1,
                     "packageNames": [
                         {
-                            "packageName": "com.subway.mobile.subwayapp03"
+                            "packageName": "com.subway.mobile.subwayapp03",
+                            "allowTTL": 2,
+                            "randomNote": "note"
                         }
                     ]
                 }
