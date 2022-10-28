@@ -1523,7 +1523,9 @@ class BrowserTabFragment :
         omnibarTextInput.onFocusChangeListener =
             OnFocusChangeListener { _, hasFocus: Boolean ->
                 viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus, false)
-                if (!hasFocus) {
+                if (hasFocus) {
+                    cancelPendingAutofillRequestsToChooseCredentials()
+                } else {
                     omnibarTextInput.hideKeyboard()
                     focusDummy.requestFocus()
                 }
@@ -1674,10 +1676,18 @@ class BrowserTabFragment :
     }
 
     private fun showAutofillDialogChooseCredentials(credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
-        Timber.v("onCredentialsAvailable. %d creds to choose from", credentials.size)
+        if (triggerType == LoginTriggerType.AUTOPROMPT && !(viewModel.canAutofillSelectCredentialsDialogCanAutomaticallyShow())) {
+            Timber.d("AutoPrompt is disabled, not showing dialog")
+            return
+        }
         val url = webView?.url ?: return
         val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(url, credentials, triggerType, tabId)
         showDialogHidingPrevious(dialog, CredentialAutofillPickerDialog.TAG)
+    }
+
+    private fun cancelPendingAutofillRequestsToChooseCredentials() {
+        browserAutofill.cancelPendingAutofillRequestToChooseCredentials()
+        viewModel.cancelPendingAutofillRequestToChooseCredentials()
     }
 
     private fun showAutofillDialogSaveCredentials(currentUrl: String, credentials: LoginCredentials) {
