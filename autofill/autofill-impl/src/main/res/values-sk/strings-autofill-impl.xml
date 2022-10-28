@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Aktualizovať heslo</string>
     <string name="updateLoginDialogButtonNotNow">Teraz nie</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Aktualizovať používateľské meno?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Aktualizovať používateľské meno</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Zavrieť dialógové okno automatického vypĺňania</string>
 
     <string name="credentialManagementEditLoginTitleHint">Prihlasovací názov</string>
