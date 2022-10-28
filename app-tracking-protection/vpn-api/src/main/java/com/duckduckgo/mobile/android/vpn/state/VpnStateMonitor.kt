@@ -15,6 +15,7 @@
  */
 
 package com.duckduckgo.mobile.android.vpn.state
+
 import com.duckduckgo.mobile.android.vpn.VpnFeature
 import kotlinx.coroutines.flow.Flow
 
