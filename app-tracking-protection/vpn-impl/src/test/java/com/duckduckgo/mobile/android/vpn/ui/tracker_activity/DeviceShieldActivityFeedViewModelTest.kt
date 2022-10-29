@@ -25,20 +25,35 @@ import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.ERROR
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNKNOWN
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.AppsData
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.AppsProtectionData
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.TrackerFeedViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerLoadingSkeleton
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit.DAYS
 import kotlin.time.ExperimentalTime
 
@@ -50,6 +65,9 @@ class DeviceShieldActivityFeedViewModelTest {
     private lateinit var db: VpnDatabase
     private lateinit var viewModel: DeviceShieldActivityFeedViewModel
 
+    private val mockExcludedApps: TrackingProtectionAppsRepository = mock()
+    private val mockVpnStateMonitor: VpnStateMonitor = mock()
+
     @Before
     fun setup() {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
@@ -60,7 +78,9 @@ class DeviceShieldActivityFeedViewModelTest {
         viewModel = DeviceShieldActivityFeedViewModel(
             RealAppTrackerBlockingStatsRepository(db),
             CoroutineTestRule().testDispatcherProvider,
-            RealTimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext)
+            RealTimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext),
+            mockExcludedApps,
+            mockVpnStateMonitor
         )
     }
 
@@ -72,16 +92,7 @@ class DeviceShieldActivityFeedViewModelTest {
     @Test
     fun whenGetMostRecentTrackersCalledStartWithSkeleton() = runBlocking {
         viewModel.getMostRecentTrackers(timeWindow, false).test {
-            assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenGetMostRecentTrackersIsEmptyThenEmitEmpty() = runBlocking {
-        viewModel.getMostRecentTrackers(timeWindow, false).test {
-            assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
-            assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), awaitItem())
+            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), null, VpnState(DISABLED, ERROR)), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -93,33 +104,22 @@ class DeviceShieldActivityFeedViewModelTest {
         db.vpnTrackerDao().insert(dummyTrackers[2])
         db.vpnAppTrackerBlockingDao().insertTrackerEntities(dummySignals)
 
+        mockVpnEnabled()
+        getAppsAndProtectionInfoReturnsEmptyList()
+
         viewModel.getMostRecentTrackers(timeWindow, false).test {
-            assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
+            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), null, VpnState(DISABLED, ERROR)), awaitItem())
             assertEquals(
-                listOf(
-                    TrackerFeedItem.TrackerFeedData(
-                        id = dummyTrackers[0].id(),
-                        bucket = dummyTrackers[0].bucket(),
-                        trackingApp = dummyTrackers[0].trackingApp,
-                        trackingCompanyBadges = listOf(
-                            TrackerCompanyBadge.Company(dummyTrackers[0].company, dummyTrackers[0].companyDisplayName),
-                            TrackerCompanyBadge.Company(dummyTrackers[1].company, dummyTrackers[1].companyDisplayName),
-                        ),
-                        timestamp = TEST_TIMESTAMP,
-                        displayTimestamp = "Just Now",
-                        trackersTotalCount = 2
+                TrackerFeedViewState(
+                    listOf(
+                        trackerFeedDataWithTwoTrackers,
+                        trackerFeedDataWithOneTracker,
                     ),
-                    TrackerFeedItem.TrackerFeedData(
-                        id = dummyTrackers[2].id(),
-                        bucket = dummyTrackers[2].bucket(),
-                        trackingApp = dummyTrackers[2].trackingApp,
-                        trackingCompanyBadges = listOf(
-                            TrackerCompanyBadge.Company(dummyTrackers[2].company, dummyTrackers[2].companyDisplayName),
-                        ),
-                        timestamp = TEST_TIMESTAMP,
-                        displayTimestamp = "Just Now",
-                        trackersTotalCount = 1
+                    appsProtectionData = AppsProtectionData(
+                        protectedAppsData = AppsData(appsCount = 0, isProtected = true, packageNames = emptyList()),
+                        unprotectedAppsData = AppsData(appsCount = 0, isProtected = false, packageNames = emptyList())
                     ),
+                    vpnState = VpnState(state = ENABLED, stopReason = UNKNOWN)
                 ),
                 awaitItem()
             )
@@ -129,16 +129,29 @@ class DeviceShieldActivityFeedViewModelTest {
     }
 
     @Test
-    fun whenGetMostRecentTrackersIsNotEmptyAndOutsideTimeWindowThenEmitEmpty() = runBlocking {
+    fun whenGetMostRecentTrackersIsNotEmptyAndOutsideTimeWindowThenEmitLoadingSkeleton() = runBlocking {
         db.vpnTrackerDao().insert(dummyTrackers[3])
 
-        // we always start with skeleton, that's why we expect two items
         viewModel.getMostRecentTrackers(timeWindow, false).test {
-            assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
-            assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), awaitItem())
+            assertEquals(
+                TrackerFeedViewState(
+                    listOf(TrackerLoadingSkeleton),
+                    appsProtectionData = null,
+                    vpnState = VpnState(state = DISABLED, stopReason = ERROR)
+                ),
+                awaitItem()
+            )
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    private suspend fun getAppsAndProtectionInfoReturnsEmptyList() {
+        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(flowOf(emptyList()))
+    }
+
+    private fun mockVpnEnabled() {
+        whenever(mockVpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN)).thenReturn(flowOf(VpnState(ENABLED, UNKNOWN)))
     }
 
     companion object {
@@ -234,4 +247,29 @@ private val dummyTrackers = listOf(
             appDisplayName = "DuckDuckGo"
         )
     )
+)
+
+private val trackerFeedDataWithTwoTrackers = TrackerFeedItem.TrackerFeedData(
+    id = dummyTrackers[0].id(),
+    bucket = dummyTrackers[0].bucket(),
+    trackingApp = dummyTrackers[0].trackingApp,
+    trackingCompanyBadges = listOf(
+        TrackerCompanyBadge.Company(dummyTrackers[0].company, dummyTrackers[0].companyDisplayName),
+        TrackerCompanyBadge.Company(dummyTrackers[1].company, dummyTrackers[1].companyDisplayName),
+    ),
+    timestamp = TEST_TIMESTAMP,
+    displayTimestamp = "Just Now",
+    trackersTotalCount = 2
+)
+
+private val trackerFeedDataWithOneTracker = TrackerFeedItem.TrackerFeedData(
+    id = dummyTrackers[2].id(),
+    bucket = dummyTrackers[2].bucket(),
+    trackingApp = dummyTrackers[2].trackingApp,
+    trackingCompanyBadges = listOf(
+        TrackerCompanyBadge.Company(dummyTrackers[2].company, dummyTrackers[2].companyDisplayName),
+    ),
+    timestamp = TEST_TIMESTAMP,
+    displayTimestamp = "Just Now",
+    trackersTotalCount = 1
 )

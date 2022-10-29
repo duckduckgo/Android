@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Mens funksjonen beta-testes kan DuckDuckGo deaktivere beskyttelsen for enkelte apper for å løse kjente problemer med lasting av innhold. Egendefinerte innstillinger blir ikke endret med mindre du gjenoppretter til standardinnstillingene.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection er deaktivert</b> Har App Tracking Protection forårsaket et problem med appene dine? <annotation type="report_issues_link">Rapporter problemer</annotation></string>
     <string name="atp_ExcludedAppsReport">Rapporter et problem med en annen app</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Laster nettsteder</string>
-    <string name="atp_ExcludedReasonKnownIssues">Kjente problemer</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuelt deaktivert</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manuelt aktivert</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Avbryt</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Aktiver</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Gjenopprett</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Vil du aktivere beskyttelse for %1$s manuelt?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Denne appen er kjent for å få problemer når sporingsforsøk mislykkes.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Det kan være at nettstedsinnholdet i denne appen ikke vises riktig når beskyttelse er aktivert.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Aktivering av beskyttelse sender appens navn til DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Personvern er deaktivert</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Hvis du deaktiverte beskyttelsen for å løse et problem, må du kontrollere at appen nå fungerer før du rapporterer problemet til DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Den sluttet å fungere som forventet</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Det er greit at jeg blir sporet i denne appen</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Av en annen grunn</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Rapportere</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Hopp over</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Gjenopprett standardvalg for beskyttede apper</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Rapporter et problem med en app</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Vil du gjenopprette standardbeskyttelsen?</string>
@@ -216,9 +206,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d sporingsforsøk blokkert fra %2$d selskaper i <b>%3$s</b>-appen]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Ingen ny aktivitet</string>
-    <string name="atp_ActivityEmptyListMessage">Fortsett å bruke enheten. Sporingsforsøk som App Tracking Protection blokkerer, vises her.</string>
     <string name="atp_ActivityPastWeekBlocked">Blokkert</string>
     <string name="atp_ActivityPastWeekAcross">I</string>
 

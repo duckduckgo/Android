@@ -29,7 +29,8 @@ import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.eq
@@ -124,5 +125,28 @@ class SharedPreferencesVpnStoreTest {
         )
 
         assertFalse(sharedPreferencesVpnStore.vpnLastDisabledByAndroid())
+    }
+
+    @Test
+    fun whenAppTpEnabledCtaDidShowThenSetPreferenceValueToTrue() {
+        assertFalse(sharedPreferencesVpnStore.didShowAppTpEnabledCta())
+
+        sharedPreferencesVpnStore.appTpEnabledCtaDidShow()
+
+        assertTrue(sharedPreferencesVpnStore.didShowAppTpEnabledCta())
+    }
+
+    @Test
+    fun whenIsOnboardingSessionCalledWithoutBeingSetThenReturnFalse() {
+        assertFalse(sharedPreferencesVpnStore.isOnboardingSession())
+    }
+
+    @Test
+    fun whenOnOnboardingSessionSetCalledThenSetValueAndReturnTrueWhenAsked() {
+        assertFalse(sharedPreferencesVpnStore.isOnboardingSession())
+
+        sharedPreferencesVpnStore.onOnboardingSessionSet()
+
+        assertTrue(sharedPreferencesVpnStore.isOnboardingSession())
     }
 }

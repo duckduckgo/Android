@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Κατά τη διάρκεια του beta, το DuckDuckGo ενδέχεται να απενεργοποιήσει την προστασία για ορισμένες εφαρμογές ώστε να επιλύσει γνωστά προβλήματα φόρτωσης περιεχομένου. Οι προσαρμοσμένες ρυθμίσεις σας δεν θα αλλάξουν εάν δεν κάνετε επαναφορά στις προεπιλεγμένες ρυθμίσεις.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Η Προστασία παρακολούθησης από εφαρμογές είναι απενεργοποιημένη</b> Προκάλεσε η Προστασία παρακολούθησης από εφαρμογές πρόβλημα στις εφαρμογές σας; <annotation type="report_issues_link">Αναφορά προβλημάτων</annotation></string>
     <string name="atp_ExcludedAppsReport">Αναφορά προβλήματος με άλλη εφαρμογή</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Φορτώνει ιστότοπους</string>
-    <string name="atp_ExcludedReasonKnownIssues">Γνωστά προβλήματα</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Μη αυτόματη απενεργοποίηση</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Μη αυτόματη ενεργοποίηση</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Ακύρωση</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Ενεργοποίηση</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Επαναφορά</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Μη αυτόματη ενεργοποίηση προστασίας για την εφαρμογή %1$s;</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Η εφαρμογή αυτή είναι γνωστό ότι αντιμετωπίζει προβλήματα όταν αποτυγχάνουν οι προσπάθειες παρακολούθησης.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Το περιεχόμενο τοποθεσίας στην εφαρμογή αυτή ενδέχεται να μην εμφανίζεται σωστά όταν είναι ενεργοποιημένη η προστασία.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Η ενεργοποίηση της προστασίας στέλνει το όνομα της εφαρμογής στο DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Απενεργοποιήθηκε η προστασία προσωπικών δεδομένων</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Εάν απενεργοποιήσατε την προστασία για να επιδιορθώσετε ένα πρόβλημα, βεβαιωθείτε ότι η εφαρμογή λειτουργεί τώρα προτού αναφέρετε το πρόβλημα στο DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Σταμάτησε να λειτουργεί όπως αναμενόταν</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Αποδέχομαι να παρακολουθούμαι σε αυτήν την εφαρμογή</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Για άλλον λόγο</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Αναφορά</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Παράλειψη</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Επαναφορά προεπιλεγμένων προστατευμένων εφαρμογών</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Αναφέρετε ένα πρόβλημα με μια εφαρμογή</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Επαναφορά προεπιλεγμένης προστασίας;</string>
@@ -216,9 +206,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d απόπειρες παρακολούθησης αποκλείστηκαν από %2$d εταιρείες στην εφαρμογή <b>%3$s</b>]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Καμία νέα δραστηριότητα</string>
-    <string name="atp_ActivityEmptyListMessage">Συνεχίστε να χρησιμοποιείτε τη συσκευή σας. Οι προσπάθειες παρακολούθησης που αποκλείει η Προστασία παρακολούθησης από εφαρμογές εμφανίζονται εδώ.</string>
     <string name="atp_ActivityPastWeekBlocked">Αποκλείστηκαν</string>
     <string name="atp_ActivityPastWeekAcross">Σε συνολικά</string>
 
