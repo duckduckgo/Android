@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Einantis laikas: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Šiandien užblokuotos sekimo įmonės: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Užblokuotos sekimo įmonės:%1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Šiandien užblokuotos sekimo įmonės: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Užblokuotos sekimo įmonės:%1$d</string>
     <string name="vpnTrackerCompaniesNone">"Dar nėra užblokuotų sekimo įmonių"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Šiandien užblokuoti sekimo įrenginiai: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Šią savaitę užblokuoti sekimo įrenginiai: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Šiandien užblokuoti sekimo įrenginiai: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Šią savaitę užblokuoti sekimo įrenginiai: %1$d</string>
     <string name="vpnTrackersNone">"Dar neužblokuota sekimo įrenginių"</string>
     <string name="vpnNotRunYet">"VPN dar nebuvo paleistas"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s paketai"</string>
@@ -195,12 +195,12 @@
     <string name="atp_ActivityPastWeek">Praėjusios 7 dienos</string>
     <string name="atp_ActivityTitle">Programų sekimo apsauga</string>
     <string name="atp_MostRecentActivityTitle">Visa pastarojo meto veikla</string>
-    <string name="atp_ActivityRecentActivity">Naujausia veikla</string>
+    <string name="atp_ActivityRecentActivity">Veikla</string>
     <string name="atp_ActivityCtaShowAll">Peržiūrėti visą naujausią veiklą</string>
     <string name="atp_ActivityAppTrackersFAQ">Kas yra programų sekimo įrenginiai?</string>
     <string name="atp_ActivityReportProblem">Praneškite apie problemą, susijusią su programa</string>
     <string name="atp_ActivityBetaInstructions">Beta instrukcijos</string>
-    <string name="atp_ActivityManageProtection">Turite problemų su programėle?</string>
+    <string name="atp_ActivityManageProtection">Kyla problemų dėl programėlės?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[1 sekimo bandymas iš 1 įmonės užblokuotas <b>%1$s</b> programoje]]>
@@ -214,6 +214,7 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d sekimo bandymai užblokuoti iš %2$d įmonių <b>%3$s</b> programoje]]>
     </string>
+
     <string name="atp_ActivityPastWeekBlocked">Užblokuota</string>
     <string name="atp_ActivityPastWeekAcross">Per</string>
 
@@ -389,5 +390,43 @@
     <string name="atp_AlwaysOnLockdownModalHeading">Pakeiskite VPN nustatymus</string>
     <string name="atp_AlwaysOnLockDownEnabled"><b>Reikia imtis veiksmų!</b> Kad išvengtumėte programėlių problemų, turite pakeisti savo „Android“ nustatymus. <annotation type="open_settings_link">Keisti nustatymus</annotation></string>
     <string name="atp_AlwaysOnLockDownNotificationTitle">Reikia imtis veiksmų! Reikia pakeisti „Android“ nustatymą, kad būtų užtikrinta programėlių sekimo apsauga.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Mano programėlės</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Jei įjungta, gali kilti programėlių problemų</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Vis tiek įjungti</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">Gali kilti %1$s problemų, jei įjungta programėlės sekimo apsauga</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Pranešti apie problemą?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Praneškite mums, jei %1$s išjungėte programėlių sekimo apsaugą, nes kilo programėlės problemų.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Pranešti apie problemą</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Ne dabar</string>
+    <string name="atp_ActivityRecentActivityHeader">Veikla</string>
+    <string name="atp_ActivityManageProtectionLabel">Turite problemų su programėle?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Beta versijos metu kai kurių programėlių apsauga automatiškai išjungiama. <annotation type="app_settings_link">Rodyti programėles</annotation></string>
+    <string name="atp_ActivityDescription">Čia bus rodomi užblokuoti sekimo bandymai</string>
+    <plurals name="atp_ActivityProtectedApps">
+        <item quantity="one">%1$s jūsų programėlė apsaugota nuo paslėptų sekimo priemonių, kurias randame bandydami pasiekti jūsų asmeninę informaciją</item>
+        <item quantity="few">%1$s jūsų programėlės apsaugotos nuo paslėptų sekimo priemonių, kurias randame bandydami pasiekti jūsų asmeninę informaciją</item>
+        <item quantity="many">%1$s jūsų programėlės apsaugota nuo paslėptų sekimo priemonių, kurias randame bandydami pasiekti jūsų asmeninę informaciją</item>
+        <item quantity="other">%1$s jūsų programėlių apsaugota nuo paslėptų sekimo priemonių, kurias randame bandydami pasiekti jūsų asmeninę informaciją</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps">
+        <item quantity="one">%1$s jūsų programėlės apsauga automatiškai išjungta</item>
+        <item quantity="few">%1$s jūsų programėlių apsauga automatiškai išjungta</item>
+        <item quantity="many">%1$s jūsų programėlių apsauga automatiškai išjungta</item>
+        <item quantity="other">%1$s jūsų programėlių apsauga automatiškai išjungta</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Geros naujienos! Programėlių sekimo apsauga dabar įjungta.<br/><br/>👌Realiuoju laiku parodysiu jūsų įrenginyje esančių programėlių, kurias užfiksuoju bandant jus sekti, sąrašą.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Supratau!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel">Apsauga įjungta (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Apsauga išjungta (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Visi</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Apsauga įjungta</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Apsauga išjungta</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Visi</string>
+    <string name="atp_ActivityViewAppsLabel">Rodyti programėles</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Ši funkcija yra beta versijos. Kyla problemų dėl programėlės? <annotation type="app_settings_link">Padėkite mums tobulėti</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Kai kuriose programėlėse gali kilti problemų, kai įjungta programėlės sekimo apsauga.\n<annotation type="learn_why_link">Sužinokite, kodėl</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Programėlių, kuriose yra žinomų problemų, apsauga išjungta. Galite įjungti šias programėles, tačiau jos gali neveikti taip, kaip tikėtasi. <annotation type="learn_why_link">Sužinokite, kodėl</annotation></string>
 
 </resources>
