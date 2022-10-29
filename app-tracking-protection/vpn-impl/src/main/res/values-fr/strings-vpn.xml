@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Durée d\'exécution : %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Traqueurs (sociétés) bloqués aujourd\'hui : %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Traqueurs (sociétés) bloqués cette semaine : %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Traqueurs (sociétés) bloqués aujourd\'hui : %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Traqueurs (sociétés) bloqués cette semaine : %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Aucun traqueur (société) n'a encore été bloqué"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Traqueurs bloqués aujourd\'hui : %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Traqueurs bloqués cette semaine : %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Traqueurs bloqués aujourd\'hui : %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Traqueurs bloqués cette semaine : %1$d</string>
     <string name="vpnTrackersNone">"Aucun traqueur n'a encore été bloqué"</string>
     <string name="vpnNotRunYet">"Le VPN n'a pas encore été lancé"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s paquets"</string>
@@ -187,12 +187,12 @@
     <string name="atp_ActivityPastWeek">7 derniers jours</string>
     <string name="atp_ActivityTitle">Protection contre le suivi des applications</string>
     <string name="atp_MostRecentActivityTitle">Toute l\'activité récente</string>
-    <string name="atp_ActivityRecentActivity">Activité récente</string>
+    <string name="atp_ActivityRecentActivity">Activité</string>
     <string name="atp_ActivityCtaShowAll">Voir toute l\'activité récente</string>
     <string name="atp_ActivityAppTrackersFAQ">Les traqueurs d\'applications, c\'est quoi ?</string>
     <string name="atp_ActivityReportProblem">Signaler un problème avec une application</string>
     <string name="atp_ActivityBetaInstructions">Instructions bêta</string>
-    <string name="atp_ActivityManageProtection">Vous rencontrez des problèmes avec une application ?</string>
+    <string name="atp_ActivityManageProtection">Vous rencontrez des problèmes liés à une application ?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[Blocage de 1 tentative de suivi de 1 société dans l\'application <b>%1$s</b>]]>
@@ -206,6 +206,7 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[Blocage de %1$d tentatives de suivi des sociétés %2$d dans l\'application <b>%3$s</b>]]>
     </string>
+
     <string name="atp_ActivityPastWeekBlocked">Blocages</string>
     <string name="atp_ActivityPastWeekAcross">Dans</string>
 
@@ -373,5 +374,39 @@
     <string name="atp_AlwaysOnLockdownModalHeading">Modifiez vos paramètres VPN</string>
     <string name="atp_AlwaysOnLockDownEnabled"><b>Action requise</b> Pour assurer le bon fonctionnement de votre application, vous devez modifier vos paramètres Android. <annotation type="open_settings_link">Modifier les paramètres</annotation></string>
     <string name="atp_AlwaysOnLockDownNotificationTitle">Action requise Un paramètre Android doit être modifié pour assurer le bon fonctionnement de votre App Tracking Protection.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Mes applications</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">L\'activation de cette option peut affecter le fonctionnement des applications</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Activer quand même</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">L\'activation d\'App Tracking Protection peut affecter %1$s</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Signaler un problème ?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Veuillez préciser si vous avez désactivé App Tracking Protection parce que %1$s ne fonctionnait pas correctement.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Signaler le problème</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Pas maintenant</string>
+    <string name="atp_ActivityRecentActivityHeader">Activité</string>
+    <string name="atp_ActivityManageProtectionLabel">Vous rencontrez des problèmes avec une application ?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Dans la version bêta, la protection de certaines applications est automatiquement désactivée. <annotation type="app_settings_link">Afficher les applications</annotation></string>
+    <string name="atp_ActivityDescription">Les tentatives de pistage bloquées apparaîtront ici</string>
+    <plurals name="atp_ActivityProtectedApps">
+        <item quantity="one">%1$s de vos applications est protégée contre les traqueurs cachés qui tentent d\'accéder à vos données personnelles</item>
+        <item quantity="other">%1$s de vos applications sont protégées contre les traqueurs cachés qui tentent d\'accéder à vos données personnelles</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps">
+        <item quantity="one">La protection automatiquement est désactivée pour %1$s de vos applications</item>
+        <item quantity="other">La protection automatiquement est désactivée pour %1$s de vos applications</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Bonne nouvelle ! L\'option App Tracking Protection a bien été activée.<br/><br/>👌Je vous communiquerai en temps réel la liste des applications détectées sur votre appareil qui tentent de vous pister.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">J\'ai compris !</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel">Protection activée (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Protection désactivée (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Tous</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Protection activée</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Protection désactivée</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Tous</string>
+    <string name="atp_ActivityViewAppsLabel">Afficher les applications</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Cette fonctionnalité est disponible en version bêta. Vous rencontrez un problème lié à une application ? <annotation type="app_settings_link">Aidez-nous à nous améliorer</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">L\'activation d\'App Tracking Protection peut affecter certaines applications.\n<annotation type="learn_why_link">En savoir plus</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">La protection est désactivée pour les applications présentant des problèmes connus. Vous pouvez l\'activer, mais cela peut affecter le fonctionnement de ces applications. <annotation type="learn_why_link">En savoir plus</annotation></string>
 
 </resources>
