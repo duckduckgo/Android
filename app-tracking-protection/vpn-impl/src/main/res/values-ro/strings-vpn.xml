@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Timp de funcționare: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Firme de urmărire blocate astăzi: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Firme de urmărire blocate în această săptămână: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Firme de urmărire blocate astăzi: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Firme de urmărire blocate în această săptămână: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Nicio firmă de urmărire nu a fost blocată încă"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Tehnologii de urmărire blocate astăzi: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Tehnologii de urmărire blocate în această săptămână: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Tehnologii de urmărire blocate astăzi: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Tehnologii de urmărire blocate în această săptămână: %1$d</string>
     <string name="vpnTrackersNone">"Nicio tehnologie de urmărire nu a fost blocată încă"</string>
     <string name="vpnNotRunYet">"VPN nu a fost încă executat"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s pachete"</string>
@@ -191,12 +191,12 @@
     <string name="atp_ActivityPastWeek">Ultimele 7 zile</string>
     <string name="atp_ActivityTitle">Protecția la urmărirea aplicațiilor</string>
     <string name="atp_MostRecentActivityTitle">Toate activitățile recente</string>
-    <string name="atp_ActivityRecentActivity">Activitate recentă</string>
+    <string name="atp_ActivityRecentActivity">Activitate</string>
     <string name="atp_ActivityCtaShowAll">Vezi toate activitățile recente</string>
     <string name="atp_ActivityAppTrackersFAQ">Ce sunt tehnologiile de urmărire din aplicații?</string>
     <string name="atp_ActivityReportProblem">Raportează o problemă cu o aplicație</string>
     <string name="atp_ActivityBetaInstructions">Instrucțiuni beta</string>
-    <string name="atp_ActivityManageProtection">Aveți probleme cu o aplicație?</string>
+    <string name="atp_ActivityManageProtection">Ai probleme cu o aplicație?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[O încercare de urmărire blocată de la o societate în aplicația <b>%1$s</b>]]>
@@ -210,6 +210,7 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d încercări de urmărire blocate de la %2$d companii în aplicația <b>%3$s</b>]]>
     </string>
+
     <string name="atp_ActivityPastWeekBlocked">Blocat</string>
     <string name="atp_ActivityPastWeekAcross">Din</string>
 
@@ -381,5 +382,41 @@
     <string name="atp_AlwaysOnLockdownModalHeading">Modifică setările VPN</string>
     <string name="atp_AlwaysOnLockDownEnabled"><b>Acțiune necesară!</b> Pentru a evita problemele legate de aplicații, trebuie să modifici setările Android. <annotation type="open_settings_link">Schimbă setările</annotation></string>
     <string name="atp_AlwaysOnLockDownNotificationTitle">Acțiune necesară! Trebuie modificată o setare Android pentru Protecția împotriva urmăririi de către aplicații.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Aplicațiile mele</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Dacă se activează, pot apărea probleme cu aplicația</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Activează oricum</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">%1$s poate întâmpina probleme dacă se activează funcția Protecția împotriva urmăririi de către aplicație</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Vrei să raportezi o problemă?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Anunță-ne dacă ai dezactivat Protecția împotriva urmăririi de către aplicație pentru %1$s, deoarece ai întâmpinat probleme legate de aplicație.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Raportează problema</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Nu acum</string>
+    <string name="atp_ActivityRecentActivityHeader">Activitate</string>
+    <string name="atp_ActivityManageProtectionLabel">Aveți probleme cu o aplicație?</string>
+    <string name="atp_ActivityEnabledBannerLabel">În timpul versiunii beta, protecția pentru unele aplicații este dezactivată automat. <annotation type="app_settings_link">Vezi aplicațiile</annotation></string>
+    <string name="atp_ActivityDescription">Încercările de urmărire blocate vor apărea aici</string>
+    <plurals name="atp_ActivityProtectedApps">
+        <item quantity="one">%1$s dintre aplicațiile tale este protejată împotriva tehnologiilor de urmărire ascunse despre care am constatat că încearcă să îți acceseze informațiile personale</item>
+        <item quantity="few">%1$s dintre aplicațiile tale sunt protejate împotriva tehnologiilor de urmărire ascunse despre care am constatat că încearcă să îți acceseze informațiile personale</item>
+        <item quantity="other">%1$s dintre aplicațiile tale sunt protejate împotriva tehnologiilor de urmărire ascunse despre care am constatat că încearcă să îți acceseze informațiile personale</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps">
+        <item quantity="one">%1$s dintre aplicațiile tale are protecția dezactivată automat</item>
+        <item quantity="few">%1$s dintre aplicațiile tale au protecția dezactivată automat</item>
+        <item quantity="other">%1$s dintre aplicațiile tale au protecția dezactivată automat</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Vești bune! Protecția împotriva urmăririi de către aplicație este acum activată.<br/><br/>👌Îți voi arăta o listă în timp real a aplicațiilor de pe dispozitivul tău despre care am observat că încearcă să te urmărească.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Am înțeles!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel">Protecție activată (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Protecție dezactivată (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Toate</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Protecție activată</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Protecție dezactivată</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Toate</string>
+    <string name="atp_ActivityViewAppsLabel">Vezi aplicațiile</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Această funcție este în versiune beta. Ai probleme cu o aplicație? <annotation type="app_settings_link">Ajută-ne să ne îmbunătățim</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Unele aplicații pot întâmpina probleme atunci când este activată funcția de Protecție împotriva urmăririi de către aplicație.\n<annotation type="learn_why_link">Află motivul</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Protecția este dezactivată pentru aplicațiile cu probleme cunoscute. Poți activa aceste aplicații, dar este posibil ca ele să nu funcționeze conform așteptărilor. <annotation type="learn_why_link">Află motivul</annotation></string>
 
 </resources>

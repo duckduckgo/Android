@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Darbības laiks: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Šodien bloķēti izsekotāju uzņēmumi: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Šonedēļ bloķēti izsekotāju uzņēmumi: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Šodien bloķēti izsekotāju uzņēmumi: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Šonedēļ bloķēti izsekotāju uzņēmumi: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Vēl nav bloķēts neviens izsekotāju uzņēmums"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Šodien bloķēti izsekotāji: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Šonedēļ bloķēti izsekotāji: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Šodien bloķēti izsekotāji: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Šonedēļ bloķēti izsekotāji: %1$d</string>
     <string name="vpnTrackersNone">"Vēl nav bloķēts neviens izsekotājs"</string>
     <string name="vpnNotRunYet">"VPN vēl nav palaists"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s paketes"</string>
@@ -191,12 +191,12 @@
     <string name="atp_ActivityPastWeek">Pēdējās 7 dienas</string>
     <string name="atp_ActivityTitle">Lietotņu pretizsekošanas aizsardzība</string>
     <string name="atp_MostRecentActivityTitle">Visas nesen veiktās darbības</string>
-    <string name="atp_ActivityRecentActivity">Nesen veiktās darbības</string>
+    <string name="atp_ActivityRecentActivity">Darbības</string>
     <string name="atp_ActivityCtaShowAll">Skatīt visas nesen veiktās darbības</string>
     <string name="atp_ActivityAppTrackersFAQ">Kas ir lietotņu izsekotāji?</string>
     <string name="atp_ActivityReportProblem">Ziņojiet par problēmu ar lietotni</string>
     <string name="atp_ActivityBetaInstructions">Beta versijas norādījumi</string>
-    <string name="atp_ActivityManageProtection">Problēmas ar lietotni?</string>
+    <string name="atp_ActivityManageProtection">Problēmas ar kādu lietotni?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[Bloķēts 1 izsekošanas mēģinājums no 1 uzņēmuma lietotnē <b>%1$s</b>]]>
@@ -210,6 +210,7 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d bloķēti izsekošanas mēģinājumi no %2$d uzņēmumiem <b>%3$s</b> lietotnē]]>
     </string>
+
     <string name="atp_ActivityPastWeekBlocked">Bloķēti</string>
     <string name="atp_ActivityPastWeekAcross">Lietotņu skaits</string>
 
@@ -381,5 +382,41 @@
     <string name="atp_AlwaysOnLockdownModalHeading">VPN iestatījumu maiņa</string>
     <string name="atp_AlwaysOnLockDownEnabled"><b>Nepieciešama rīcība!</b> Lai izvairītos no problēmām ar lietotnēm, ir jāmaina Android iestatījumi. <annotation type="open_settings_link">Mainīt iestatījumus</annotation></string>
     <string name="atp_AlwaysOnLockDownNotificationTitle">Nepieciešama rīcība! Ir jāmaina Android iestatījums, lai nodrošinātu lietotņu pretizsekošanas aizsardzību.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Manas lietotnes</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Iespējošana var traucēt citām lietotnēm</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Tomēr iespējot</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">%1$s var nedarboties pareizi, ja ir iespējota lietotņu pretizsekošanas aizsardzība</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Ziņot par problēmu?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Lūdzu, informē mūs, ja atspējoji pretizsekošanas aizsardzību lietotnei %1$s tās darbības traucējumu dēļ.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Ziņot par problēmu</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Ne tagad</string>
+    <string name="atp_ActivityRecentActivityHeader">Darbības</string>
+    <string name="atp_ActivityManageProtectionLabel">Problēmas ar lietotni?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Beta versijas stadijā dažu lietotņu aizsardzība ir automātiski atspējota. <annotation type="app_settings_link">Skatīt lietotnes</annotation></string>
+    <string name="atp_ActivityDescription">Šeit tiks parādīti bloķētie izsekošanas mēģinājumi</string>
+    <plurals name="atp_ActivityProtectedApps">
+        <item quantity="zero">%1$s no tavām lietotnēm ir aizsargātas pret slēptiem izsekotājiem, kuri mēģina piekļūt tavai personiskajai informācijai</item>
+        <item quantity="one">%1$s no tavām lietotnēm ir aizsargāta pret slēptiem izsekotājiem, kuri mēģina piekļūt tavai personiskajai informācijai</item>
+        <item quantity="other">%1$s no tavām lietotnēm ir aizsargātas pret slēptiem izsekotājiem, kuri mēģina piekļūt tavai personiskajai informācijai</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps">
+        <item quantity="zero">%1$s no tavām lietotnēm aizsardzība ir automātiski atspējota</item>
+        <item quantity="one">%1$s no tavām lietotnēm aizsardzība ir automātiski atspējota</item>
+        <item quantity="other">%1$s no tavām lietotnēm aizsardzība ir automātiski atspējota</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Labas ziņas! Lietotņu pretizsekošanas aizsardzība tagad ir iespējota.<br/><br/>👌Es rādīšu reāllaika sarakstu ar lietotnēm tavā ierīcē, kuras pieķeršu, mēģinot tevi izsekot.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Sapratu!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel">Aizsardzība iespējota (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Aizsardzība atspējota (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Viss</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Aizsardzība iespējota</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Aizsardzība atspējota</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Viss</string>
+    <string name="atp_ActivityViewAppsLabel">Skatīt lietotnes</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Šī funkcija ir beta versijā. Problēmas ar kādu lietotni? <annotation type="app_settings_link">Palīdzi mums veikt uzlabojumus</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Dažām lietotnēm var rasties problēmas, ja ir iespējota lietotņu pretizsekošanas aizsardzība.\n<annotation type="learn_why_link">Uzzini, kāpēc</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Aizsardzība ir atspējota lietotnēm ar zināmām problēmām. Vari šīs lietotnes iespējot, taču tās var nedarboties, kā paredzēts. <annotation type="learn_why_link">Uzzini, kāpēc</annotation></string>
 
 </resources>

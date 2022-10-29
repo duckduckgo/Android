@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Aktivno vrijeme: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Tvrtke za praćenje blokirane danas: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Tvrtke za praćenje blokirane ovaj tjedan: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Tvrtke za praćenje blokirane danas: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Tvrtke za praćenje blokirane ovaj tjedan: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Nije blokirana još nijedna tvrtka za praćenje"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Alati za praćenje blokirani danas : %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Alati za praćenje blokirani ovaj tjedan: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Alati za praćenje blokirani danas : %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Alati za praćenje blokirani ovaj tjedan: %1$d</string>
     <string name="vpnTrackersNone">"Još nema blokiranih alata za praćenje"</string>
     <string name="vpnNotRunYet">"VPN još nije pokrenut"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s paketa"</string>
@@ -195,7 +195,7 @@
     <string name="atp_ActivityPastWeek">Proteklih 7 dana</string>
     <string name="atp_ActivityTitle">Zaštita od praćenja aplikacija</string>
     <string name="atp_MostRecentActivityTitle">Sve nedavne aktivnosti</string>
-    <string name="atp_ActivityRecentActivity">Nedavna aktivnost</string>
+    <string name="atp_ActivityRecentActivity">Aktivnost</string>
     <string name="atp_ActivityCtaShowAll">Prikaži sve nedavne aktivnosti</string>
     <string name="atp_ActivityAppTrackersFAQ">Što su alati za praćenje aplikacija?</string>
     <string name="atp_ActivityReportProblem">Prijavi problem s aplikacijom</string>
@@ -214,6 +214,7 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d pokušaja praćenja blokiranih iz %2$d tvrtki u aplikacijama <b>%3$s</b>]]>
     </string>
+
     <string name="atp_ActivityPastWeekBlocked">Blokirano</string>
     <string name="atp_ActivityPastWeekAcross">U</string>
 
@@ -389,5 +390,43 @@
     <string name="atp_AlwaysOnLockdownModalHeading">Promijeni svoje VPN postavke</string>
     <string name="atp_AlwaysOnLockDownEnabled"><b>Potrebno je izvršiti radnju!</b> Za izbjegavanje problema s aplikacijom, moraš promijeniti postavke za Android. <annotation type="open_settings_link">Promjena postavki</annotation></string>
     <string name="atp_AlwaysOnLockDownNotificationTitle">Potrebno je izvršiti radnju! Potrebno je promijeniti postavku za Android, tj. za zaštitu praćenja aplikacija App Tracking Protection.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Moje aplikacije</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Ako je App Tracking Protection omogućen, mogu se pojaviti problemi s aplikacijom</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Ipak omogući</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">%1$s može imati problema ako je omogućena zaštita od praćenja aplikacija App Tracking Protection</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Prijaviti problem?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Obavijesti nas ako si onemogućio App Tracking Protection za %1$s jer si imao problema s tom aplikacijom.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Prijavi problem</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Ne sada</string>
+    <string name="atp_ActivityRecentActivityHeader">Aktivnost</string>
+    <string name="atp_ActivityManageProtectionLabel">Imaš problema s aplikacijom?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Tijekom beta verzije, zaštita za neke aplikacije automatski je onemogućena. <annotation type="app_settings_link">Prikaži aplikacije</annotation></string>
+    <string name="atp_ActivityDescription">Ovdje će se pojaviti blokirani pokušaji praćenja</string>
+    <plurals name="atp_ActivityProtectedApps">
+        <item quantity="one">%1$s tvoja aplikacija zaštićena je od skrivenih alata za praćenje koje smo otkrili da pokušavaju pristupiti tvojim osobnim podacima</item>
+        <item quantity="few">%1$s tvoje aplikacije zaštićene su od skrivenih alata za praćenje koje smo otkrili da pokušavaju pristupiti tvojim osobnim podacima</item>
+        <item quantity="many">%1$s tvojih aplikacija zaštićeno je od skrivenih alata za praćenje koje smo otkrili da pokušavaju pristupiti tvojim osobnim podacima</item>
+        <item quantity="other">%1$s tvojih aplikacija zaštićeno je od skrivenih alata za praćenje koje smo otkrili da pokušavaju pristupiti tvojim osobnim podacima</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps">
+        <item quantity="one">%1$s tvoja aplikacija ima automatski onemogućenu zaštitu</item>
+        <item quantity="few">%1$s tvoje aplikacije imaju automatski onemogućenu zaštitu</item>
+        <item quantity="many">%1$s tvojih aplikacija ima automatski onemogućenu zaštitu</item>
+        <item quantity="other">%1$s tvojih aplikacija ima automatski onemogućenu zaštitu</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Dobre vijesti! Zaštita od praćenja aplikacije App Tracking Protection sad je omogućena.<br/><br/>👌U stvarnom vremenu ću ti pokazivati popis aplikacija koje uhvatim u pokušaju praćenja na tvom uređaju.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Shvaćam!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel">Zaštita omogućena (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Zaštita onemogućena (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Sve</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Zaštita je omogućena</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Zaštita je onemogućena</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Sve</string>
+    <string name="atp_ActivityViewAppsLabel">Prikaži aplikacije</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Ova je značajka u beta verziji. Imaš problema s aplikacijom? <annotation type="app_settings_link">Pomozi nam da se poboljšamo</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Neke aplikacije mogu imati problema kad je omogućena zaštita od praćenja aplikacija App Tracking Protection.\n<annotation type="learn_why_link">Saznaj zašto</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Zaštita je onemogućena za aplikacije s poznatim problemima. Te aplikacije možeš omogućiti, ali one možda neće raditi kako se očekivalo. <annotation type="learn_why_link">Saznaj zašto</annotation></string>
 
 </resources>
