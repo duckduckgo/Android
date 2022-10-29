@@ -140,24 +140,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">În timpul versiunii beta, DuckDuckGo poate dezactiva protecția pentru unele aplicații pentru a rezolva probleme cunoscute de încărcare a conținutului. Setările tale personalizate nu se vor schimba decât dacă restaurezi setările implicite.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Protecția împotriva urmăririi de către aplicație este dezactivată</b> Protecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale <annotation type="report_issues_link">Raportează problemele</annotation></string>
     <string name="atp_ExcludedAppsReport">Raportează o problemă cu o altă aplicație</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Încarcă site-uri</string>
-    <string name="atp_ExcludedReasonKnownIssues">Probleme cunoscute</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Dezactivat manual</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Activat manual</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Anulează</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Activare</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Restaurează</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Activezi manual protecția pentru aplicația %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Această aplicație este cunoscută pentru faptul că întâmpină probleme atunci când încercările de urmărire nu reușesc.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Este posibil să nu apară corect conținutul site-ului din această aplicație atunci când protecția este activată.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Activarea protecției trimite numele aplicației către DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Protecția confidențialității dezactivată</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Dacă ai dezactivat protecția pentru a remedia o problemă, verifică dacă aplicația funcționează acum înainte de a raporta problema către DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Nu mai funcționează așa cum era de așteptat</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Sunt de acord să fiu urmărit în această aplicație</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Din alt motiv</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Raportează</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Ignorare</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Restaurează aplicațiile protejate implicite</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Raportează o problemă cu o aplicație</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Restabilești protecția implicită?</string>
@@ -220,9 +210,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d încercări de urmărire blocate de la %2$d companii în aplicația <b>%3$s</b>]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Nicio activitate nouă</string>
-    <string name="atp_ActivityEmptyListMessage">Continuă să îți folosești dispozitivul. Încercările de urmărire pe care Protecția împotriva urmăririi de către aplicație le blochează apar aici.</string>
     <string name="atp_ActivityPastWeekBlocked">Blocat</string>
     <string name="atp_ActivityPastWeekAcross">Din</string>
 

@@ -17,15 +17,14 @@
 package com.duckduckgo.mobile.android.vpn.apps.ui
 
 import android.content.Context
-import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.leftDrawable
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
@@ -112,6 +111,8 @@ interface AppProtectionListener {
 }
 
 class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private val context = itemView.context
+
     fun bind(
         isListEnabled: Boolean,
         excludedAppInfo: TrackingProtectionAppInfo,
@@ -126,20 +127,39 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
             if (excludedAppInfo.isExcluded) {
                 itemView.deviceShieldAppExclusionReason.text =
                     getAppExcludingReasonText(itemView.context, excludedAppInfo.knownProblem)
-                itemView.deviceShieldAppExclusionReason.leftDrawable(getAppExcludingReasonIcon(excludedAppInfo.knownProblem))
                 itemView.deviceShieldAppExclusionReason.show()
+                itemView.deviceShieldAppEntryWarningIcon.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        getAppExcludingReasonIcon(excludedAppInfo.knownProblem)
+                    )
+                )
+                itemView.deviceShieldAppEntryWarningIcon.show()
             } else {
                 itemView.deviceShieldAppExclusionReason.text = itemView.context.getString(R.string.atp_ExcludedReasonManuallyEnabled)
-                itemView.deviceShieldAppExclusionReason.leftDrawable(com.duckduckgo.mobile.android.R.drawable.ic_link_blue_16)
                 itemView.deviceShieldAppExclusionReason.show()
+                itemView.deviceShieldAppEntryWarningIcon.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_apptp_link
+                    )
+                )
+                itemView.deviceShieldAppEntryWarningIcon.show()
             }
         } else {
             if (excludedAppInfo.isExcluded) {
                 itemView.deviceShieldAppExclusionReason.text = itemView.context.getString(R.string.atp_ExcludedReasonManuallyDisabled)
-                itemView.deviceShieldAppExclusionReason.leftDrawable(com.duckduckgo.mobile.android.R.drawable.ic_link_blue_16)
                 itemView.deviceShieldAppExclusionReason.show()
+                itemView.deviceShieldAppEntryWarningIcon.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_apptp_link
+                    )
+                )
+                itemView.deviceShieldAppEntryWarningIcon.show()
             } else {
                 itemView.deviceShieldAppExclusionReason.gone()
+                itemView.deviceShieldAppEntryWarningIcon.gone()
             }
         }
 
@@ -158,23 +178,17 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
         excludingReason: Int
     ): String {
         return when (excludingReason) {
-            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> context.getString(R.string.atp_ExcludedReasonLoadsWebsites)
-            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> context.getString(R.string.atp_ExcludedReasonKnownIssues)
+            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON, TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON ->
+                context.getString(R.string.atp_ExcludedReasonIssuesMayOccur)
             else -> ""
         }
     }
 
     private fun getAppExcludingReasonIcon(excludingReason: Int): Int {
         return when (excludingReason) {
-            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> com.duckduckgo.mobile.android.R.drawable.ic_alert_yellow_16
-            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> com.duckduckgo.mobile.android.R.drawable.ic_alert_yellow_16
+            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> R.drawable.ic_apptp_alert
+            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> R.drawable.ic_apptp_alert
             else -> 0
         }
     }
-}
-
-fun PackageManager.safeGetApplicationIcon(packageName: String): Drawable? {
-    return runCatching {
-        getApplicationIcon(packageName)
-    }.getOrNull()
 }

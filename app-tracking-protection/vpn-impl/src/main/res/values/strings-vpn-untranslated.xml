@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="atp_TrackingProtectionExclusionListActivityTitle" translatable="false">My Apps</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur" translatable="false">App issues may occur if enabled</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway" translatable="false">Enable Anyway</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" translatable="false">%1$s may experience issues if App Tracking Protection is enabled</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle" translatable="false">Report an issue?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" translatable="false">Please let us know if you disabled App Tracking Protection for %1$s because you experienced app issues.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue" translatable="false">Report Issue</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow" translatable="false">Not Now</string>
+    <string name="atp_ActivityRecentActivityHeader" translatable="false">Activity</string>
+    <string name="atp_ActivityManageProtectionLabel" translatable="false">Having Problems With An App?</string>
+    <string name="atp_ActivityEnabledBannerLabel" translatable="false">During beta, protection for some apps is automatically disabled. <annotation type="app_settings_link">View Apps</annotation></string>
+    <string name="atp_ActivityDescription" translatable="false">Blocked tracking attempts will appear here</string>
+    <plurals name="atp_ActivityProtectedApps" translatable="false">
+        <item quantity="one">%1$s of your apps is protected from hidden trackers we find trying to access your personal info</item>
+        <item quantity="other">%1$s of your apps are protected from hidden trackers we find trying to access your personal info</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps" translatable="false">
+        <item quantity="one">%1$s of your apps has protection automatically disabled</item>
+        <item quantity="other">%1$s of your apps have protection automatically disabled</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText" translatable="false"><![CDATA[Good news! App Tracking Protection is now enabled.<br/><br/>👌I’ll show you a real-time list of apps on your device that I catch trying to track you.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel" translatable="false">Got It!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" translatable="false">Protection Enabled (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" translatable="false">Protection Disabled (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel" translatable="false">All</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel" translatable="false">Protection Enabled</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel" translatable="false">Protection Disabled</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel" translatable="false">All</string>
+    <string name="atp_ActivityViewAppsLabel" translatable="false">View Apps</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel" translatable="false">This feature is in beta. Having issues with an app? <annotation type="app_settings_link">Help Us Improve</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel" translatable="false">Some apps may experience issues when App Tracking Protection is enabled.\n<annotation type="learn_why_link">Learn Why</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel" translatable="false">Protection is disabled for apps with known issues. You can enable these apps, but they may not work as expected. <annotation type="learn_why_link">Learn Why</annotation></string>
+</resources>

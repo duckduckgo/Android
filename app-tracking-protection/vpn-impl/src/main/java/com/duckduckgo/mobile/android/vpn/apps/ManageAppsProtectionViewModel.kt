@@ -16,10 +16,13 @@
 
 package com.duckduckgo.mobile.android.vpn.apps
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -57,6 +60,8 @@ class ManageAppsProtectionViewModel @Inject constructor(
         }
     }
 
+    private val filterState = MutableStateFlow(AppsFilter.ALL)
+
     init {
         excludedApps.manuallyExcludedApps()
             .combine(refreshSnapshot.asStateFlow()) { excludedApps, timestamp -> ManualProtectionSnapshot(timestamp, excludedApps) }
@@ -74,7 +79,32 @@ class ManageAppsProtectionViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    internal suspend fun getProtectedApps() = excludedApps.getAppsAndProtectionInfo().map { ViewState(it) }
+    internal suspend fun getProtectedApps(): Flow<ViewState> {
+        return excludedApps.getAppsAndProtectionInfo()
+            .combine(filterState.asStateFlow()) { list, filter ->
+                val protectedApps = list.filter { !it.isExcluded }
+                val unprotectedApps = list.filter { it.isExcluded }
+                val customProtection = list.any { it.isProblematic() && !it.isExcluded }
+
+                when (filter) {
+                    AppsFilter.PROTECTED_ONLY -> return@combine ViewState(
+                        protectedApps,
+                        R.string.atp_ExcludedAppsFilterProtectedLabel,
+                        if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.ALL_OR_PROTECTED_APPS
+                    )
+                    AppsFilter.UNPROTECTED_ONLY -> return@combine ViewState(
+                        unprotectedApps,
+                        R.string.atp_ExcludedAppsFilterUnprotectedLabel,
+                        if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.UNPROTECTED_APPS
+                    )
+                    else -> return@combine ViewState(
+                        list,
+                        R.string.atp_ExcludedAppsFilterAllLabel,
+                        if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.ALL_OR_PROTECTED_APPS
+                    )
+                }
+            }
+    }
 
     internal suspend fun getRecentApps() =
         appTrackersRepository.getMostRecentVpnTrackers { defaultTimeWindow.asString() }.map { aggregateDataPerApp(it) }
@@ -159,6 +189,12 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
     fun canRestoreDefaults() = currentManualProtections.isNotEmpty()
 
+    fun applyAppsFilter(value: AppsFilter) {
+        viewModelScope.launch {
+            filterState.emit(value)
+        }
+    }
+
     override fun onResume(owner: LifecycleOwner) {
         refreshSnapshot.refresh()
     }
@@ -228,7 +264,18 @@ private data class ManualProtectionSnapshot(
     val snapshot: List<Pair<String, Boolean>>
 )
 
-internal data class ViewState(val excludedApps: List<TrackingProtectionAppInfo>)
+internal data class ViewState(
+    val excludedApps: List<TrackingProtectionAppInfo>,
+    @StringRes val filterResId: Int? = null,
+    val bannerContent: BannerContent = BannerContent.ALL_OR_PROTECTED_APPS
+)
+
+enum class BannerContent {
+    ALL_OR_PROTECTED_APPS,
+    UNPROTECTED_APPS,
+    CUSTOMISED_PROTECTION
+}
+
 internal sealed class Command {
     object RestartVpn : Command()
     data class LaunchFeedback(val reportBreakageScreen: ReportBreakageScreen) : Command()

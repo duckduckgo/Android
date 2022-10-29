@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import androidx.recyclerview.widget.DiffUtil
@@ -31,12 +32,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
+import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeaders
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.facebook.shimmer.ShimmerFrameLayout
 import kotlinx.coroutines.withContext
@@ -59,8 +60,9 @@ class TrackerFeedAdapter @Inject constructor(
             is TrackerFeedViewHolder -> holder.bind(
                 trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData,
                 onAppClick,
-                position == trackerFeedItems.size - 1,
+                position == trackerFeedItems.size - 1
             )
+
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
         }
@@ -72,8 +74,8 @@ class TrackerFeedAdapter @Inject constructor(
     ): RecyclerView.ViewHolder {
         return when (viewType) {
             LOADING_STATE_TYPE -> TrackerSkeletonViewHolder.create(parent)
-            EMPTY_STATE_TYPE -> TrackerEmptyFeedViewHolder.create(parent)
             DATA_STATE_TYPE -> TrackerFeedViewHolder.create(parent)
+            DESCRIPTION_TYPE -> TrackerDescriptionViewHolder.create(parent)
             else -> TrackerFeedHeaderViewHolder.create(parent, timeDiffFormatter)
         }
     }
@@ -83,9 +85,9 @@ class TrackerFeedAdapter @Inject constructor(
     override fun getItemViewType(position: Int): Int {
         return when (trackerFeedItems[position]) {
             is TrackerFeedItem.TrackerLoadingSkeleton -> LOADING_STATE_TYPE
-            is TrackerFeedItem.TrackerEmptyFeed -> EMPTY_STATE_TYPE
             is TrackerFeedItem.TrackerFeedData -> DATA_STATE_TYPE
             is TrackerFeedItem.TrackerFeedItemHeader -> HEADER_TYPE
+            is TrackerFeedItem.TrackerDescriptionFeed -> DESCRIPTION_TYPE
         }
     }
 
@@ -95,7 +97,7 @@ class TrackerFeedAdapter @Inject constructor(
 
     suspend fun updateData(
         data: List<TrackerFeedItem>,
-        onAppClickListener: (TrackerFeedItem.TrackerFeedData) -> Unit
+        onAppClickListener: (TrackerFeedItem.TrackerFeedData) -> Unit,
     ) {
         onAppClick = onAppClickListener
         val newData = data
@@ -107,16 +109,6 @@ class TrackerFeedAdapter @Inject constructor(
         trackerFeedItems.clear().also { trackerFeedItems.addAll(newData) }
 
         diffResult.dispatchUpdatesTo(this@TrackerFeedAdapter)
-    }
-
-    private class TrackerEmptyFeedViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        companion object {
-            fun create(parent: ViewGroup): TrackerEmptyFeedViewHolder {
-                val inflater = LayoutInflater.from(parent.context)
-                val view = inflater.inflate(R.layout.view_device_shield_activity_empty, parent, false)
-                return TrackerEmptyFeedViewHolder(view)
-            }
-        }
     }
 
     private class TrackerSkeletonViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -181,7 +173,7 @@ class TrackerFeedAdapter @Inject constructor(
         fun bind(
             tracker: TrackerFeedItem.TrackerFeedData?,
             onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit,
-            isLastPosition: Boolean
+            shouldHideDivider: Boolean
         ) {
             tracker?.let { item ->
                 with(activityMessage) {
@@ -231,9 +223,21 @@ class TrackerFeedAdapter @Inject constructor(
                     suppressLayout(true)
                 }
                 itemView.setOnClickListener {
+                    startActivity(
+                        context,
+                        AppTPCompanyTrackersActivity.intent(
+                            context,
+                            item.trackingApp.packageId,
+                            item.trackingApp.appDisplayName,
+                            item.bucket
+                        ),
+                        null
+                    )
+                }
+                itemView.setOnClickListener {
                     onAppClick(item)
                 }
-                if (isLastPosition) {
+                if (shouldHideDivider) {
                     splitter.hide()
                 } else {
                     splitter.show()
@@ -243,6 +247,16 @@ class TrackerFeedAdapter @Inject constructor(
 
         private fun String.asIconDrawable(): TextDrawable {
             return TextDrawable.builder().buildRound(this.take(1), Color.DKGRAY)
+        }
+    }
+
+    private class TrackerDescriptionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        companion object {
+            fun create(parent: ViewGroup): TrackerDescriptionViewHolder {
+                val inflater = LayoutInflater.from(parent.context)
+                val view = inflater.inflate(R.layout.view_device_shield_activity_description, parent, false)
+                return TrackerDescriptionViewHolder(view)
+            }
         }
     }
 
@@ -272,8 +286,8 @@ class TrackerFeedAdapter @Inject constructor(
 
     companion object {
         private const val LOADING_STATE_TYPE = 0
-        private const val EMPTY_STATE_TYPE = 1
-        private const val DATA_STATE_TYPE = 2
-        private const val HEADER_TYPE = 3
+        private const val DATA_STATE_TYPE = 1
+        private const val HEADER_TYPE = 2
+        private const val DESCRIPTION_TYPE = 3
     }
 }

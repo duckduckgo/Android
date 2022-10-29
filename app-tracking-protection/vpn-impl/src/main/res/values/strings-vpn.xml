@@ -135,24 +135,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">During beta, DuckDuckGo may disable protection for some apps to resolve known content loading issues. Your custom settings won’t change unless you restore to default settings.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection is disabled</b> Did App Tracking Protection cause a problem with your apps <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ExcludedAppsReport">Report Problem With Another App</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Loads websites</string>
-    <string name="atp_ExcludedReasonKnownIssues">Known issues</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manually disabled</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manually enabled</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Cancel</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Enable</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Restore</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Manually enable protection for %1$s app?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">This app is known to experience issues when tracking attempts fail.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Site content in this app may not appear properly when protection is enabled.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Enabling protection sends the app\'s name to DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Privacy Protection Disabled</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">If you disabled protection to fix an issue, please check that the app now works before reporting the problem to DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">It stopped working as expected</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">I\'m OK being tracked in this app</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">For other reason</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Report</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Skip</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Restore Default Protected Apps</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Report an Issue With an App</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Restore default protection?</string>
@@ -196,12 +186,12 @@
     <string name="atp_ActivityPastWeek">Past 7 Days</string>
     <string name="atp_ActivityTitle">App Tracking Protection</string>
     <string name="atp_MostRecentActivityTitle">All Recent Activity</string>
-    <string name="atp_ActivityRecentActivity">Recent Activity</string>
+    <string name="atp_ActivityRecentActivity">Activity</string>
     <string name="atp_ActivityCtaShowAll">View All Recent Activity</string>
     <string name="atp_ActivityAppTrackersFAQ">What Are App Trackers?</string>
     <string name="atp_ActivityReportProblem">Report a problem With an App</string>
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
-    <string name="atp_ActivityManageProtection">Having Problems With An App?</string>
+    <string name="atp_ActivityManageProtection">Having Issues with an app?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"
         instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
@@ -220,8 +210,6 @@
         <![CDATA[%1$d tracking attempts blocked from %2$d companies in <b>%3$s</b> app]]>
     </string>
 
-    <string name="atp_ActivityEmptyListTitle">No new activity</string>
-    <string name="atp_ActivityEmptyListMessage">Keep using your device. Tracking attempts that App Tracking Protection blocks appear here.</string>
     <string name="atp_ActivityPastWeekBlocked">Blocked</string>
     <string name="atp_ActivityPastWeekAcross">Across</string>
 

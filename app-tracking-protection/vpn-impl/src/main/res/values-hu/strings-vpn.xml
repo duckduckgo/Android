@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">A bétaverzióban a DuckDuckGo kikapcsolhatja a védelmet egyes alkalmazásoknál az ismert tartalombetöltési problémák megoldása érdekében. Az egyéni beállításaid csak akkor változnak, ha visszaállítod az alapértelmezett beállításokat.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Az alkalmazáskövetés elleni védelem ki van kapcsolva</b> Okozott problémát az alkalmazáskövetés elleni védelem az alkalmazásaidban? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
     <string name="atp_ExcludedAppsReport">Másik alkalmazással kapcsolatos probléma jelentése</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Webhelyek betöltése</string>
-    <string name="atp_ExcludedReasonKnownIssues">Ismert problémák</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuálisan kikapcsolva</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manuálisan bekapcsolva</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Mégsem</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Engedélyezés</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Visszaállítás</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Manuálisan bekapcsolod a védelmet a(z) %1$s alkalmazás számára?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Ebben az alkalmazásban köztudottan problémák lépnek fel, ha a követési kísérletek sikertelenek.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Előfordulhat, hogy az alkalmazásban lévő webhelytartalom nem jelenik meg megfelelően, ha a védelem be van kapcsolva.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">A védelem bekapcsolása elküldi az alkalmazás nevét a DuckDuckGo részére.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Adatvédelem letiltva</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Ha kikapcsolod a védelmet egy probléma kijavításához, ellenőrizd, hogy az alkalmazás most működik-e, mielőtt jelentenéd a problémát a DuckDuckGónak.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Leállt az elvárt módon történő működés</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Elfogadom, hogy nyomon követnek ebben az alkalmazásban</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Más okból</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Jelentés</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Kihagyás</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Az alapértelmezett védett alkalmazások visszaállítása</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Alkalmazással kapcsolatos probléma bejelentése</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Visszaállítod az alapértelmezett védelmet?</string>
@@ -216,9 +206,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Nincs új tevékenység</string>
-    <string name="atp_ActivityEmptyListMessage">Továbbra is használd a készülékedet Az alkalmazáskövetés elleni védelem által blokkolt követési kísérletek itt jelennek meg.</string>
     <string name="atp_ActivityPastWeekBlocked">Blokkolt</string>
     <string name="atp_ActivityPastWeekAcross">Itt:</string>
 

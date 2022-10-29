@@ -29,14 +29,22 @@ import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import org.threeten.bp.Instant
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface VpnStore {
     fun onboardingDidShow()
     fun onboardingDidNotShow()
     fun didShowOnboarding(): Boolean
+
     suspend fun isAlwaysOnEnabled(): Boolean
     suspend fun vpnLastDisabledByAndroid(): Boolean
+
+    fun didShowAppTpEnabledCta(): Boolean
+    fun appTpEnabledCtaDidShow()
+    fun onOnboardingSessionSet()
+    fun isOnboardingSession(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -87,9 +95,32 @@ class SharedPreferencesVpnStore @Inject constructor(
         return vpnUnexpectedlyDisabled() || vpnKilledBySystem()
     }
 
+    override fun didShowAppTpEnabledCta(): Boolean {
+        return preferences.getBoolean(KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN, false)
+    }
+
+    override fun appTpEnabledCtaDidShow() {
+        preferences.edit { putBoolean(KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN, true) }
+    }
+
+    override fun onOnboardingSessionSet() {
+        val now = Instant.now().toEpochMilli()
+        val expiryTimestamp = now.plus(TimeUnit.HOURS.toMillis(WINDOW_INTERVAL_HOURS))
+        preferences.edit { putLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, expiryTimestamp) }
+    }
+
+    override fun isOnboardingSession(): Boolean {
+        val expiryTimestamp = preferences.getLong(KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP, -1)
+        return Instant.now().toEpochMilli() < expiryTimestamp
+    }
+
     companion object {
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
 
         private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
+        private const val KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN = "KEY_APP_TP_ONBOARDING_VPN_ENABLED_CTA_SHOWN"
+        private const val KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP = "KEY_APP_TP_ONBOARDING_BANNER_EXPIRY_TIMESTAMP"
+
+        private const val WINDOW_INTERVAL_HOURS = 24L
     }
 }

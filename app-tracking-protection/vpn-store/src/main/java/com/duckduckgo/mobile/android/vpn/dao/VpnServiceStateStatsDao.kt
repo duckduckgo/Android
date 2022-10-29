@@ -31,4 +31,7 @@ interface VpnServiceStateStatsDao {
 
     @Query("SELECT * FROM vpn_service_state_stats ORDER BY id DESC limit 1")
     fun getStateStats(): Flow<VpnServiceStateStats?>
+
+    @Query("DELETE FROM vpn_service_state_stats WHERE id NOT in (SELECT id FROM vpn_service_state_stats ORDER BY id DESC limit 10)")
+    fun deleteOldEntries()
 }
