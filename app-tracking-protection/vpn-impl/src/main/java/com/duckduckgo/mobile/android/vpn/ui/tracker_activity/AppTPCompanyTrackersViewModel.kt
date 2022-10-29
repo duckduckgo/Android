@@ -111,7 +111,7 @@ constructor(
                 CompanyTrackingDetails(
                     companyName = trackerCompanyName,
                     companyDisplayName = trackerCompanyDisplayName,
-                    trackingAttempts = data.value.size,
+                    trackingAttempts = data.value.sumOf { it.tracker.count },
                     timestamp = timestamp,
                     trackingSignals = trackingSignals
                 )
@@ -119,7 +119,7 @@ constructor(
         }
 
         return viewStateFlow.value.copy(
-            totalTrackingAttempts = trackerData.size,
+            totalTrackingAttempts = sourceData.sumOf { it.trackingAttempts },
             lastTrackerBlockedAgo = lastTrackerBlockedAgo,
             trackingCompanies = sourceData,
             protectionEnabled = excludedAppsRepository.isAppProtectionEnabled(packageName)

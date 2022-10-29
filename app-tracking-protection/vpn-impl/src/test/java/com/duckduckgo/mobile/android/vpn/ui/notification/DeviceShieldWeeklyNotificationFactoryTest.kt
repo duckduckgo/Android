@@ -77,7 +77,11 @@ class DeviceShieldWeeklyNotificationFactoryTest {
     fun createsWeeklyReportNotificationWhenTrackersFoundInTwoApps() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
-        trackerFound(trackerDomain, appContainingTracker = trackingApp2())
+        trackerFound(
+            trackerDomain,
+            appContainingTracker = trackingApp2(),
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+        )
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
         notification.assertTitleEquals("App Tracking Protection blocked 2 tracking attempts in app2 and 1 other app (past week).")
@@ -89,7 +93,11 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
         trackerFound(trackerDomain, appContainingTracker = trackingApp2())
-        trackerFound(trackerDomain, appContainingTracker = trackingApp3())
+        trackerFound(
+            trackerDomain,
+            appContainingTracker = trackingApp3(),
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+        )
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
         notification.assertTitleEquals("App Tracking Protection blocked 3 tracking attempts in app3 and 2 other apps (past week).")
@@ -104,7 +112,11 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerFound(trackerDomain, appContainingTracker = trackingApp2())
         trackerFound(trackerDomain, appContainingTracker = trackingApp3())
         trackerFound(trackerDomain, appContainingTracker = trackingApp3())
-        trackerFound(trackerDomain, appContainingTracker = trackingApp3())
+        trackerFound(
+            trackerDomain,
+            appContainingTracker = trackingApp3(),
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+        )
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
         notification.assertTitleEquals("App Tracking Protection blocked 6 tracking attempts in app3 and 2 other apps (past week).")
@@ -131,13 +143,13 @@ class DeviceShieldWeeklyNotificationFactoryTest {
     fun createsWeeklyTopTrackerCompanyNotificationWhenTrackersFoundInTwoApps() = runBlocking {
         val trackerDomain = "example.com"
 
-        trackerFound(trackerDomain, company = "Google", appContainingTracker = trackingApp1())
-        trackerFound(trackerDomain, company = "Google", appContainingTracker = trackingApp1())
-        trackerFound(trackerDomain, company = "Facebook", appContainingTracker = trackingApp2())
-        trackerFound(trackerDomain, company = "Google", appContainingTracker = trackingApp2())
-        trackerFound(trackerDomain, company = "Google", appContainingTracker = trackingApp2())
+        trackerFound("google.com", company = "Google", appContainingTracker = trackingApp1())
+        trackerFound("google.com", company = "Google", appContainingTracker = trackingApp1())
+        trackerFound("facebook.com", company = "Facebook", appContainingTracker = trackingApp2())
+        trackerFound("google.com", company = "Google", appContainingTracker = trackingApp2())
+        trackerFound("google.com", company = "Google", appContainingTracker = trackingApp2())
         trackerFound(
-            trackerDomain, company = "Google", appContainingTracker = trackingApp2(),
+            "google.com", company = "Google", appContainingTracker = trackingApp2(),
             timestamp = DatabaseDateFormatter.bucketByHour(
                 LocalDateTime.now().plusHours(2)
             )

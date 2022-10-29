@@ -88,9 +88,9 @@ class DeviceShieldActivityFeedViewModelTest {
 
     @Test
     fun whenGetMostRecentTrackersIsNotEmptyThenStartWithSkeletonThenEmit() = runBlocking {
-        db.vpnTrackerDao().insert(dummyTrackers[2])
-        db.vpnTrackerDao().insert(dummyTrackers[1])
         db.vpnTrackerDao().insert(dummyTrackers[0])
+        db.vpnTrackerDao().insert(dummyTrackers[1])
+        db.vpnTrackerDao().insert(dummyTrackers[2])
         db.vpnAppTrackerBlockingDao().insertTrackerEntities(dummySignals)
 
         viewModel.getMostRecentTrackers(timeWindow, false).test {

@@ -78,7 +78,11 @@ class DeviceShieldDailyNotificationFactoryTest {
     fun createsTotalTrackersNotificationWhenTrackersFoundInTwoApps() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
-        trackerFound(trackerDomain, appContainingTracker = trackingApp2())
+        trackerFound(
+            trackerDomain,
+            appContainingTracker = trackingApp2(),
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+        )
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(0)
 
@@ -165,7 +169,11 @@ class DeviceShieldDailyNotificationFactoryTest {
     fun createsLastCompanyAttemptNotificationWhenTrackersFoundInTwoApps() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
-        trackerFound(trackerDomain, appContainingTracker = trackingApp2())
+        trackerFound(
+            trackerDomain,
+            appContainingTracker = trackingApp2(),
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+        )
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(3)
 
@@ -177,16 +185,16 @@ class DeviceShieldDailyNotificationFactoryTest {
     fun createsLastCompanyAttemptNotificationWhenTrackersFoundInThreeApps() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
-        trackerFound(trackerDomain, trackerCompanyId = 1, company = "Google", appContainingTracker = trackingApp1())
+        trackerFound("google.com", trackerCompanyId = 1, company = "Google", appContainingTracker = trackingApp1())
         trackerFound(
-            trackerDomain,
+            "google.com",
             trackerCompanyId = 1,
             company = "Google",
             appContainingTracker = trackingApp2(),
             timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(3))
         )
         trackerFound(
-            trackerDomain,
+            "google.com",
             trackerCompanyId = 1,
             company = "Google",
             appContainingTracker = trackingApp3(),

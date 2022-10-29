@@ -85,7 +85,7 @@ class AppTrackerBlockingStatsRepositoryTest {
         trackerFound(trackerDomain)
         val vpnTrackers = repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
         assertTrackerFound(vpnTrackers, trackerDomain)
-        assertEquals(2, vpnTrackers!!.size)
+        assertEquals(2, vpnTrackers!!.sumOf { it.count })
     }
 
     @Test
