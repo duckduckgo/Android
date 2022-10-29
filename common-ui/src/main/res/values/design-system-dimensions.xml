@@ -69,4 +69,7 @@
     <dimen name="horizontalDividerBottomPadding">@dimen/keyline_4</dimen>
     <dimen name="verticalDividerWidth">1dp</dimen>
     <dimen name="verticalDividerSidePadding">@dimen/keyline_4</dimen>
+
+    <!-- InfoPanel -->
+    <dimen name="infoPanelIconSize">16dp</dimen>
 </resources>

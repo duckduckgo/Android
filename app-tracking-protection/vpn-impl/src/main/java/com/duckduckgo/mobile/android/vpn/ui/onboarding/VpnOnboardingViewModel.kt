@@ -72,15 +72,10 @@ class VpnOnboardingViewModel @Inject constructor(
         OnboardingPage(
             appTPOnboardingAnimationHelper.getHeaderRes(VPN),
             R.string.atp_OnboardingLastPageThreeTitle, R.string.atp_OnboardingLastPageThreeSubTitle
-        ),
-        OnboardingPage(
-            appTPOnboardingAnimationHelper.getHeaderRes(TRACKING_APPS),
-            R.string.atp_EnabledTitle, R.string.atp_EnabledMessage
         )
     )
 
     fun onTurnAppTpOffOn() {
-        vpnStore.onboardingDidShow()
         if (vpnDetector.isVpnDetected()) {
             sendCommand(Command.ShowVpnConflictDialog)
         } else {
@@ -90,6 +85,7 @@ class VpnOnboardingViewModel @Inject constructor(
 
     fun onAppTpEnabled() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            vpnStore.onboardingDidShow()
             deviceShieldPixels.enableFromOnboarding()
         }
     }

@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Бета версията на DuckDuckGo може да деактивира защитата за някои приложения с цел разрешаване на известни проблеми със зареждането на съдържание. Вашите персонализирани настройки няма да се променят, освен ако не възстановите настройките по подразбиране.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection е деактивирана</b> App Tracking Protection предизвиква ли проблеми с Вашите приложения <annotation type="report_issues_link">Докладване на проблеми</annotation></string>
     <string name="atp_ExcludedAppsReport">Докладване на проблем с друго приложение</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Зарежда уебсайтове</string>
-    <string name="atp_ExcludedReasonKnownIssues">Известни проблеми</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Деактивирана ръчно</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Активирана ръчно</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Отмени</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Активиране</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Възстановяване</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Да се активира ли ръчно защитата за приложението %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Известно е, че в това приложение възникват проблеми при неуспешни опити за проследяване.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Възможно е съдържанието на сайта в това приложение да не се показва правилно, когато защитата е активирана.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">При активиране на защитата името на приложението се изпраща на DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Защитата на поверителността е деактивирана</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Ако сте деактивирали защитата, за да отстраните проблем, проверете дали приложението вече работи, преди да докладвате за проблема на DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Спря да работи според очакванията</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Нямам нищо против да ме следят в това приложение</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">По друга причина</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Докладване</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Пропускане</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Възстановяване на защитени приложения по подразбиране</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Докладване на проблем с приложение</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Възстановяване на защитата по подразбиране?</string>
@@ -216,9 +206,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d блокирани опита за проследяване от %2$d компании в приложението <b>%3$s</b>]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Няма нови дейности</string>
-    <string name="atp_ActivityEmptyListMessage">Продължете да използвате устройството си. Опитите за проследяване, които App Tracking Protection блокира, се появяват тук.</string>
     <string name="atp_ActivityPastWeekBlocked">Блокиран/и</string>
     <string name="atp_ActivityPastWeekAcross">В</string>
 

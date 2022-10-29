@@ -144,24 +144,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">V beta različici lahko DuckDuckGo onemogoči zaščito nekaterih aplikacij, da bi odpravil znane težave z nalaganjem vsebine. Nastavitve po meri se ne bodo spremenile, razen če obnovite privzete nastavitve.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Zaščita pred sledenjem aplikacijam App Tracking Protection je onemogočena</b> Ali je zaščita pred sledenjem aplikacijam povzročila težavo z vašimi aplikacijami <annotation type="report_issues_link">Prijavite težave</annotation></string>
     <string name="atp_ExcludedAppsReport">Prijavite težavo z drugo aplikacijo</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Naloži spletne strani</string>
-    <string name="atp_ExcludedReasonKnownIssues">Znane težave</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Ročno onemogočeno</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Ročno omogočeno</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Preklic</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Omogoči</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Obnovitev</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Želite ročno omogočiti zaščito za aplikacijo %1$s ?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Ta aplikacija je znana po težavah, ko poskusi sledenja niso uspešni.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Če je omogočena zaščita, vsebina spletnega mesta v tej aplikaciji morda ne bo pravilno prikazana.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Ko omogočite zaščito, se pošlje ime aplikacije portalu DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Onemogočena zaščita zasebnosti</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Če ste onemogočili zaščito, da bi odpravili težavo, preverite, ali aplikacija zdaj deluje, preden o težavi poročate DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Po pričakovanjih je prenehalo delovati</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">V redu je, da mi sledijo v tej aplikaciji</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Iz drugega razloga</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Poročilo</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Preskoči</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Obnovi privzeto zaščitene aplikacije</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Prijava težave z aplikacijo</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Obnovitev privzete zaščite?</string>
@@ -224,9 +214,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d poskusov sledenja blokiranih iz %2$d podjetij v aplikaciji <b>%3$s</b>]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Ni novih dejavnosti</string>
-    <string name="atp_ActivityEmptyListMessage">Še naprej uporabljajte svojo napravo. Tu so prikazani poskusi sledenja, ki jih zaščita pred sledenjem aplikacijam App Tracking Protection blokira.</string>
     <string name="atp_ActivityPastWeekBlocked">Blokirana stran</string>
     <string name="atp_ActivityPastWeekAcross">Na spletni strani</string>
 
