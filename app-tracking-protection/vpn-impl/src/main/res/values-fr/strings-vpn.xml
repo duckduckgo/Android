@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">En phase bêta, DuckDuckGo peut désactiver la protection de certaines applications afin de résoudre des problèmes identifiés de chargement de contenu. Vos paramètres personnalisés ne changeront pas à moins que vous ne rétablissiez les paramètres par défaut.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection est désactivé</b> Vos applications ont-elles rencontré des problèmes à cause d\'App Tracking Protection ? <annotation type="report_issues_link">Signaler des problèmes</annotation></string>
     <string name="atp_ExcludedAppsReport">Signaler un problème avec une autre application</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Charge des sites Web</string>
-    <string name="atp_ExcludedReasonKnownIssues">Problèmes connus</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Désactivé manuellement</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Activé manuellement</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Annuler</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Activer</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Rétablir</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Activer manuellement la protection pour l\'application %1$s ?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">On sait que cette application rencontre des problèmes lorsque les tentatives de suivi échouent.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Le contenu du site de cette application est susceptible de ne pas s\'afficher correctement lorsque la protection est activée.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Le fait d\'activer la protection déclenche l\'envoi du nom de l\'application à DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">La protection de la confidentialité est désactivée</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Si vous avez désactivé la protection pour résoudre un problème, veuillez vérifier que l\'application fonctionne de nouveau avant de signaler le problème à DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Elle a cessé de fonctionner comme prévu</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">J\'accepte le suivi dans cette application</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Pour une autre raison</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Rapport</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Ignorer</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Rétablir les applications protégées par défaut</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Signaler un problème avec une application</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Rétablir la protection par défaut ?</string>
@@ -216,9 +206,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[Blocage de %1$d tentatives de suivi des sociétés %2$d dans l\'application <b>%3$s</b>]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Aucune nouvelle activité</string>
-    <string name="atp_ActivityEmptyListMessage">Continuez d\'utiliser votre appareil. Les tentatives de suivi bloquées par App Tracking Protection s\'affichent ici.</string>
     <string name="atp_ActivityPastWeekBlocked">Blocages</string>
     <string name="atp_ActivityPastWeekAcross">Dans</string>
 

@@ -144,24 +144,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Podczas wersji beta DuckDuckGo może wyłączyć ochronę dla niektórych aplikacji, aby rozwiązać znane problemy z ładowaniem treści. Ustawienia niestandardowe nie ulegną zmianie, chyba że przywrócisz ustawienia domyślne.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Ochrona przed śledzeniem przez aplikacje jest wyłączona.</b>\nCzy ochrona przed śledzeniem przez aplikacje wywołała problem z Twoimi aplikacjami? <annotation type="report_issues_link">Zgłoś problemy</annotation></string>
     <string name="atp_ExcludedAppsReport">Zgłoś problem z inną aplikacją</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Ładuje strony internetowe</string>
-    <string name="atp_ExcludedReasonKnownIssues">Znane problemy</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Wyłączone ręcznie</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Włączone ręcznie</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Anuluj</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Włącz</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Przywróć</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Czy chcesz ręcznie włączyć ochronę dla aplikacji %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">W tej aplikacji występują problemy, gdy próby śledzenia są nieudane.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Zawartość stron w tej aplikacji może nie być wyświetlana prawidłowo, gdy włączona jest ochrona.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Włączenie ochrony powoduje wysłanie nazwy aplikacji do DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Ochrona prywatności wyłączona</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Jeśli wyłączysz ochronę, aby rozwiązać problem, sprawdź, czy aplikacja działa, zanim zgłosisz problem do DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Nie działa zgodnie z oczekiwaniami</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Nie mam nic przeciwko śledzeniu mnie przez tę aplikację</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Inny powód</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Zgłoś</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Pomiń</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Przywróć domyślne chronione aplikacje</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Zgłoś problem z aplikacją</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Przywrócić domyślną ochronę?</string>
@@ -224,9 +214,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d prób(y) śledzenia przez %2$d firm(y) zablokowane w aplikacji <b>%3$s</b>]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Brak nowej aktywności</string>
-    <string name="atp_ActivityEmptyListMessage">Używaj nadal swojego urządzenia. Tutaj pojawiają się próby śledzenia, które są blokowane przez ochronę przed śledzeniem przez aplikację.</string>
     <string name="atp_ActivityPastWeekBlocked">Zablokowano</string>
     <string name="atp_ActivityPastWeekAcross">W</string>
 

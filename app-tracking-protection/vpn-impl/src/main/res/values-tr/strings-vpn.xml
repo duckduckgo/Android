@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Beta sırasında DuckDuckGo, bilinen içerik yükleme sorunlarını çözmek üzere bazı uygulamalar için korumayı devre dışı bırakabilir. Varsayılan ayarlara geri dönmediğiniz sürece özel ayarlarınız değişmez.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Uygulama İzleme Koruması devre dışı</b> Uygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
     <string name="atp_ExcludedAppsReport">Başka Bir Uygulamayla İlgili Sorun Bildir</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Web sitelerini yükler</string>
-    <string name="atp_ExcludedReasonKnownIssues">Bilinen sorunlar</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuel olarak devre dışı bırakıldı</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manuel olarak etkinleştirildi</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">İptal</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Etkinleştir</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Geri Yükle</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">%1$s uygulaması için koruma manuel olarak etkinleştirilsin mi?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Bu uygulamanın, izleme girişimleri başarısız olduğunda sorunlarla karşılaştığı bilinmektedir.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Koruma etkinleştirildiğinde bu uygulamadaki site içeriği düzgün görünmeyebilir.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Korumayı etkinleştirdiğinizde, uygulamanın adı DuckDuckGo\'ya gönderilir.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Gizlilik Koruması Devre Dışı</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Bir sorunu çözmek için korumayı devre dışı bıraktıysanız, lütfen sorunu DuckDuckGo\'ya bildirmeden önce uygulamanın artık çalışıp çalışmadığını kontrol edin.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Beklendiği gibi çalışmayı durdurdu</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Bu uygulamada izlenmek benim için sorun değil</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Başka bir nedenden dolayı</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Bildir</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Atla</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Varsayılan Korumalı Uygulamaları Geri Yükle</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Bir Uygulamayla İlgili Sorun Bildir</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Varsayılan koruma geri yüklensin mi?</string>
@@ -216,9 +206,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[<b>%3$s</b> uygulamasında %2$d şirketlerine ait %1$d izleme girişimi engellendi]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Yeni etkinlik yok</string>
-    <string name="atp_ActivityEmptyListMessage">Cihazınızı kullanmaya devam edin. Uygulama İzleme Koruması\'nın engellediği izleme girişimleri burada görünür.</string>
     <string name="atp_ActivityPastWeekBlocked">Engellendi</string>
     <string name="atp_ActivityPastWeekAcross">Uygulama Sayısı:</string>
 

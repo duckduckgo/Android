@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Durante o lançamento beta, o DuckDuckGo pode desativar a proteção para algumas aplicações para resolver problemas de carregamento de conteúdo conhecidos. As tuas definições personalizadas não mudam, a menos que reponhas as predefinições.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>A App Tracking Protection está desativada</b> A App Tracking Protection causou um problema com as tuas aplicações <annotation type="report_issues_link">Comunicar problemas</annotation></string>
     <string name="atp_ExcludedAppsReport">Comunicar problema com outra aplicação</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Carrega sites</string>
-    <string name="atp_ExcludedReasonKnownIssues">Problemas conhecidos</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Desativada manualmente</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Ativada manualmente</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Cancelar</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Permitir</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Repor</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Ativar manualmente a proteção para a aplicação %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Esta aplicação é conhecida por ter problemas quando as tentativas de rastreamento falham.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">O conteúdo dos sites nesta aplicação pode não ser apresentado corretamente quando a proteção está ativada.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Ativar a proteção envia o nome da aplicação para o DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Proteção de privacidade desativada</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Se desativaste a proteção para corrigir um problema, confirma que a aplicação funciona corretamente antes de comunicares o problema ao DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Deixou de funcionar como esperado</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Não me importo que esta aplicação me rastreie</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Outro motivo</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Comunicar</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Ignorar</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Repor aplicações protegidas por predefinição</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Comunicar um problema com uma aplicação</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Restaurar proteção predefinida?</string>
@@ -216,9 +206,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d tentativas de rastreamento bloqueadas de %2$d empresas em <b>%3$s</b> aplicação]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Sem atividade nova</string>
-    <string name="atp_ActivityEmptyListMessage">Continua a utilizar o teu dispositivo. As tentativas de rastreamento bloqueadas pela App Tracking Protection aparecem aqui.</string>
     <string name="atp_ActivityPastWeekBlocked">Bloqueios</string>
     <string name="atp_ActivityPastWeekAcross">Em</string>
 

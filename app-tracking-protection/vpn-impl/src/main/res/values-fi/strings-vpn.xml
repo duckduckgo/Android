@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Beetaversion aikana DuckDuckGo voi poistaa suojauksen käytöstä joistakin sovelluksista ratkaistakseen tunnettuja sisällön latausongelmia. Mukautetut asetukset eivät muutu, ellet palauta oletusasetuksia.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection on poistettu käytöstä</b> Aiheuttiko App Tracking Protection ongelmia sovelluksissasi <annotation type="report_issues_link">Ilmoita ongelmista</annotation></string>
     <string name="atp_ExcludedAppsReport">Ilmoita ongelmasta toisessa sovelluksessa</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Lataa verkkosivustoja</string>
-    <string name="atp_ExcludedReasonKnownIssues">Tunnetut ongelmat</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Poistettu käytöstä manuaalisesti</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Otettu käyttöön manuaalisesti</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Peruuta</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Ota käyttöön</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Palauta</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Ota suojaus käyttöön manuaalisesti sovellukselle %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Tässä sovelluksessa tiedetään olevan ongelmia, kun seurantayritykset epäonnistuvat.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Sivuston sisältö tässä sovelluksessa ei ehkä näy oikein, kun suojaus on käytössä.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Suojauksen ottaminen käyttöön lähettää sovelluksen nimen DuckDuckGolle.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Yksityisyyden suoja poistettu käytöstä</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Jos poistit suojauksen käytöstä ongelman ratkaisemiseksi, tarkista, että sovellus toimii, ennen kuin ilmoitat ongelmasta DuckDuckGolle.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Se lakkasi toimimasta odotetusti</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Seuranta ei haittaa minua tässä sovelluksessa</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Muu syy</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Ilmoita</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Ohita</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Palauta oletuksena suojatut sovellukset</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Ilmoita ongelmasta sovelluksessa</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Palauta oletussuojaus?</string>
@@ -216,9 +206,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d seurantayritystä estetty %2$d yritykseltä <b>%3$s</b> sovelluksessa]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Ei uutta toimintaa</string>
-    <string name="atp_ActivityEmptyListMessage">Jatka laitteen käyttöä. Seurantayritykset, jotka App Tracking Protection estää, näkyvät tässä.</string>
     <string name="atp_ActivityPastWeekBlocked">Estetty</string>
     <string name="atp_ActivityPastWeekAcross">Kaikkiaan</string>
 

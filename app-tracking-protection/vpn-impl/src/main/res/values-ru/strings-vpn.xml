@@ -144,24 +144,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Чтобы устранить проблемы с загрузкой контента, DuckDuckGo может отключить защиту для некоторых приложений при тестировании бета-версий. Ваши собственные настройки не изменятся, если вы сами не сбросите их на значения по умолчанию.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Защита от слежки отключена</b> Она нарушает работу приложений? <annotation type="report_issues_link">Сообщите о проблемах</annotation></string>
     <string name="atp_ExcludedAppsReport">Сообщить о проблеме с другим приложением</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Загружает сайты</string>
-    <string name="atp_ExcludedReasonKnownIssues">Известные проблемы</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Выключено вручную</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Включено вручную</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Отменить</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Включить</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Восстановить</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Включить защиту приложения %1$s вручную?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">При неудачных попытках отслеживания в этом приложении часто возникают сбои.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Если включена защита, содержимое сайта в этом приложении может отображаться некорректно.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">При включении защиты название приложения передается в DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Защита конфиденциальности выключена</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Прежде чем сообщать о проблеме в DuckDuckGo, проверьте, не заработало ли приложение после выключения защиты для устранения неполадки.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Приложение перестало корректно работать</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Я не против отслеживания в этом приложении</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Другая причина</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Сообщить</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Пропустить</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Восстановить список приложений по умолчанию</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Сообщить о проблеме с приложением</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Восстановить параметры защиты по умолчанию?</string>
@@ -224,9 +214,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[Пресечены попытки отслеживания (%1$d) компаниями %2$d в приложении <b>%3$s</b>]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Новой активности нет</string>
-    <string name="atp_ActivityEmptyListMessage">Продолжайте пользоваться устройством. Попытки отслеживания, блокированные защитой от слежки, отобразятся здесь.</string>
     <string name="atp_ActivityPastWeekBlocked">Заблокировано</string>
     <string name="atp_ActivityPastWeekAcross">в</string>
 

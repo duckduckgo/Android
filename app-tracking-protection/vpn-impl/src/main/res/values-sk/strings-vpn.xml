@@ -144,24 +144,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Počas beta verzie môže DuckDuckGo vypnúť ochranu niektorých aplikácií, aby sa vyriešili známe problémy s načítavaním obsahu. Vaše vlastné nastavenia sa nezmenia, pokiaľ neobnovíte predvolené nastavenia.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Ochrana pred sledovaním aplikácií je vypnutá</b> Spôsobila ochrana pred sledovaním aplikácií problém s aplikáciami <annotation type="report_issues_link">nahlásiť problémy</annotation></string>
     <string name="atp_ExcludedAppsReport">Nahlásiť problém s inou aplikáciou</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Načítanie webových stránok</string>
-    <string name="atp_ExcludedReasonKnownIssues">Známe problémy</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Ručne vypnuté</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manuálne povolené</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Zrušiť</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Povoliť</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Obnovenie</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Chcete manuálne povoliť ochranu pre aplikáciu %1$s ?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Táto aplikácia je známa tým, že pri neúspešných pokusoch o sledovanie dochádza k problémom.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Obsah lokality v tejto aplikácii sa nemusí zobrazovať správne, ak je povolená ochrana.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Zapnutím ochrany sa názov aplikácie odošle do DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Ochrana súkromia vypnutá</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Ak ste vypli ochranu s cieľom odstrániť problém, skontrolujte, či aplikácia teraz funguje, a až potom nahláste problém spoločnosti DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Prestalo fungovať podľa očakávania</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Som v poriadku, že ma táto aplikácia sleduje</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Z iného dôvodu</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Správa</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Preskočiť</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Obnoviť predvolené chránené aplikácie</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Nahlásenie problému s aplikáciou</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Obnoviť predvolenú ochranu?</string>
@@ -224,9 +214,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d pokusy o sledovanie zablokované od %2$d spoločností na <b>%3$s</b> app]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Žiadna nová činnosť</string>
-    <string name="atp_ActivityEmptyListMessage">Pokračujte v používaní zariadenia. Tu sa zobrazujú pokusy o sledovanie, ktoré ochrana pred sledovaním aplikácií blokuje.</string>
     <string name="atp_ActivityPastWeekBlocked">Zablokované</string>
     <string name="atp_ActivityPastWeekAcross">Cez</string>
 

@@ -140,24 +140,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Beta versijā DuckDuckGo var atspējot dažu lietotņu aizsardzību, lai atrisinātu zināmas satura ielādes problēmas. Tavi pielāgotie iestatījumi nemainīsies, ja vien neatjaunosi noklusējuma iestatījumus.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Lietotņu pretizsekošanas aizsardzība ir atspējota</b> Vai Lietotņu pretizsekošanas aizsardzība ir apgrūtinājusi tavu lietotņu darbību? <annotation type="report_issues_link">Ziņo par problēmām</annotation></string>
     <string name="atp_ExcludedAppsReport">Ziņot par problēmu ar citu lietotni</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Ielādē tīmekļa vietnes</string>
-    <string name="atp_ExcludedReasonKnownIssues">Zināmas problēmas</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuāli atspējota</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manuāli iespējota</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Atcelt</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Iespējot</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Atjaunot</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Vai manuāli iespējot aizsardzību lietotnei %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Ir zināms, ka nesekmīgi izsekošanas mēģinājumi šai lietotnei rada problēmas.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Vietņu saturs šajā lietotnē var netikt parādīts pareizi, ja ir iespējota aizsardzība.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Aizsardzības iespējošana nosūta lietotnes nosaukumu DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Privātuma aizsardzība ir atspējota</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Ja esi atspējojis aizsardzību, lai novērstu kādu problēmu, pirms ziņošanas par problēmu DuckDuckGo pārbaudi, vai lietotne tagad darbojas.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Tā pārstāja darboties pareizi</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Es neiebilstu pret izsekošanu šajā lietotnē</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Cita iemesla dēļ</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Ziņot</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Izlaist</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Atjaunot noklusējuma aizsargātās lietotnes</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Ziņot par problēmu ar lietotni</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Vai atjaunot noklusējuma aizsardzību?</string>
@@ -220,9 +210,6 @@
     <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
         <![CDATA[%1$d bloķēti izsekošanas mēģinājumi no %2$d uzņēmumiem <b>%3$s</b> lietotnē]]>
     </string>
-
-    <string name="atp_ActivityEmptyListTitle">Nav jaunu darbību</string>
-    <string name="atp_ActivityEmptyListMessage">Turpināt lietot ierīci. Šeit parādās Lietotņu pretizsekošanas aizsardzības bloķētie izsekošanas mēģinājumi.</string>
     <string name="atp_ActivityPastWeekBlocked">Bloķēti</string>
     <string name="atp_ActivityPastWeekAcross">Lietotņu skaits</string>
 
