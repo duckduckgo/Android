@@ -49,12 +49,6 @@ data class VpnState(
     val uuid: String
 )
 
-@Entity(tableName = "vpn_running_stats")
-data class VpnRunningStats(
-    @PrimaryKey val id: String,
-    val timeRunningMillis: Long
-)
-
 enum class VpnServiceState {
     ENABLED,
     DISABLED,
