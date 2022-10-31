@@ -16,58 +16,22 @@
 
 package com.duckduckgo.mobile.android.vpn.waitlist.store
 
-import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import org.junit.Assert.*
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 class WaitlistStateRepositoryTest {
 
-    private val dataStore: AppTrackingProtectionWaitlistDataStore = mock()
-    private val testee = WaitlistStateRepository(dataStore)
+    private val testee = WaitlistStateRepository()
 
     @Test
     fun whenGettingStateAndUserInBetaTheReturnInBeta() {
-        whenever(dataStore.inviteCode).thenReturn("inviteCode")
-
         val state = testee.getState()
 
         assertEquals(WaitlistState.InBeta, state)
     }
 
     @Test
-    fun whenGettingStateAndUserJoinedWaitlistTheReturnJoinedWaitlist() {
-        whenever(dataStore.inviteCode).thenReturn(null)
-        whenever(dataStore.waitlistTimestamp).thenReturn(1643404916)
-        whenever(dataStore.waitlistToken).thenReturn("someToken")
-
-        val state = testee.getState()
-
-        assertTrue(state is WaitlistState.JoinedWaitlist)
-    }
-
-    @Test
-    fun whenGettingStateAndUserNotIntBetaOrWaitlistTheReturnNotJoinedQueue() {
-        whenever(dataStore.waitlistTimestamp).thenReturn(-1)
-        whenever(dataStore.waitlistToken).thenReturn(null)
-
-        val state = testee.getState()
-
-        assertEquals(WaitlistState.NotJoinedQueue, state)
-    }
-
-    @Test
     fun whenUserJoinedWaitlistAfterCuttingEdgeThenReturnsTrue() {
-        whenever(dataStore.waitlistTimestamp).thenReturn(1643404916)
-
         assertTrue(testee.joinedAfterCuttingDate())
-    }
-
-    @Test
-    fun whenUserJoinedWaitlistBeforeCuttingEdgeThenReturnsFalse() {
-        whenever(dataStore.waitlistTimestamp).thenReturn(1639343328)
-
-        assertFalse(testee.joinedAfterCuttingDate())
     }
 }

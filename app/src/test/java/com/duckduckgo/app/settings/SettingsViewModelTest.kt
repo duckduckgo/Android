@@ -42,7 +42,6 @@ import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistStateRepository
 import com.duckduckgo.privacy.config.api.Gpc
@@ -111,8 +110,6 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var autoconsent: Autoconsent
 
-    private lateinit var appTrackingProtectionWaitlistDataStore: FakeAppTrackingProtectionWaitlistDataStore
-
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -120,8 +117,7 @@ class SettingsViewModelTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        appTrackingProtectionWaitlistDataStore = FakeAppTrackingProtectionWaitlistDataStore()
-        appTPRepository = WaitlistStateRepository(appTrackingProtectionWaitlistDataStore)
+        appTPRepository = WaitlistStateRepository()
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
@@ -704,17 +700,4 @@ class SettingsViewModelTest {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(theme)
         whenever(mockThemeSettingsDataStore.isCurrentlySelected(theme)).thenReturn(true)
     }
-}
-
-private class FakeAppTrackingProtectionWaitlistDataStore : AppTrackingProtectionWaitlistDataStore {
-    override var inviteCode: String? = null
-    override var waitlistTimestamp: Int = -1
-    override var waitlistToken: String? = null
-    override var sendNotification: Boolean = false
-    override var lastUsedDate: String? = null
-
-    override fun canUseEncryption(): Boolean {
-        return false
-    }
-
 }

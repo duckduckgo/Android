@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.waitlist.store
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -29,31 +28,14 @@ interface AtpWaitlistStateRepository {
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class WaitlistStateRepository @Inject constructor(
-    private val dataStore: AppTrackingProtectionWaitlistDataStore,
-) : AtpWaitlistStateRepository {
+class WaitlistStateRepository @Inject constructor() : AtpWaitlistStateRepository {
 
     override fun getState(): WaitlistState {
-        if (didJoinBeta()) {
-            return WaitlistState.InBeta
-        }
-        if (didJoinWaitlist()) {
-            return WaitlistState.JoinedWaitlist(dataStore.sendNotification)
-        }
-        return WaitlistState.NotJoinedQueue
+        return WaitlistState.InBeta
     }
 
     override fun joinedAfterCuttingDate(): Boolean {
-        return dataStore.waitlistTimestamp > CUTOFF_DATE
-    }
-
-    private fun didJoinBeta(): Boolean = dataStore.inviteCode != null
-
-    private fun didJoinWaitlist(): Boolean = dataStore.waitlistTimestamp != -1 && dataStore.waitlistToken != null
-
-    companion object {
-        // Cutoff date set to 1/1/2022 https://app.asana.com/0/1174433894299346/1201742199841250
-        const val CUTOFF_DATE = 1641071328
+        return true
     }
 }
 
