@@ -18,12 +18,12 @@ package com.duckduckgo.app.privacy.store
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
@@ -36,14 +36,15 @@ import dagger.SingleInstanceIn
 @SingleInstanceIn(AppScope::class)
 class TermsOfServiceRawStore @Inject constructor(
     private val moshi: Moshi,
-    private val context: Context
+    private val context: Context,
+    private val dispatchers: DispatcherProvider
 ) : TermsOfServiceStore {
 
     private var data: List<TermsOfService> = ArrayList()
     private var initialized: Boolean = false
 
     override suspend fun loadData() {
-        withContext(Dispatchers.IO) {
+        withContext(dispatchers.io()) {
             val json = context.resources.openRawResource(R.raw.tosdr).bufferedReader().use { it.readText() }
             val type = Types.newParameterizedType(List::class.java, TermsOfService::class.java)
             val adapter: JsonAdapter<List<TermsOfService>> = moshi.adapter(type)

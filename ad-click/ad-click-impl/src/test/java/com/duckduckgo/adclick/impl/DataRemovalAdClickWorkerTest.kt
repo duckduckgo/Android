@@ -50,6 +50,7 @@ class DataRemovalAdClickWorkerTest {
         runTest {
             val worker = TestListenableWorkerBuilder<DataRemovalAdClickWorker>(context = context).build()
             worker.adClickManager = mockAdClickManager
+            worker.dispatchers = coroutineRule.testDispatcherProvider
 
             val result = worker.doWork()
 

@@ -27,6 +27,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
@@ -34,7 +35,6 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -45,9 +45,11 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
     @Inject
     lateinit var vpnDatabase: VpnDatabase
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     override suspend fun doWork(): Result {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatchers.io()) {
             val updateBlocklistResult = updateTrackerBlocklist()
             val updateRulesResult = updateTrackerExceptionRules()
 
