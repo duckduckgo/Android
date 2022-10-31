@@ -124,6 +124,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.downloads.api.DownloadStateListener
@@ -4205,9 +4206,9 @@ class BrowserTabViewModelTest {
             username = "tester",
             password = "test123"
         )
-        testee.updateCredentials(url, credentials)
+        testee.updateCredentials(url, credentials, CredentialUpdateType.Password)
 
-        verify(mockAutofillStore).updateCredentials(url, credentials)
+        verify(mockAutofillStore).updateCredentials(url, credentials, CredentialUpdateType.Password)
     }
 
     @Test
