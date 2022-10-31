@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Aktualizuj hasło</string>
     <string name="updateLoginDialogButtonNotNow">Nie teraz</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Zaktualizować nazwę użytkownika?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Zaktualizuj nazwę użytkownika</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Zamknij okno dialogowe autouzupełniania</string>
 
     <string name="credentialManagementEditLoginTitleHint">Nazwa loginu</string>
