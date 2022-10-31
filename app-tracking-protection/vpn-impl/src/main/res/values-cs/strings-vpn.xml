@@ -242,7 +242,9 @@
         <item quantity="many">Aplikace</item>
         <item quantity="other">Aplikace</item>
     </plurals>
+    <string name="atp_ActivityEnabledLabel">Tahle funkce je ve fázi beta. Máš problémy s aplikací? <annotation type="app_settings_link">Nahlas nám to, prosím.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection je zakázána</b>\nZpůsobila ti APp Tracking Protection problém s tvými aplikacemi? <annotation type="report_issues_link">Oznámit problémy</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android deaktivoval ochranu App Tracking Protection</b>. Chceš zabránit tomu, aby se to opakovalo? <annotation type="re_enable_link">Znovu povolit</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPN aplikace ve tvém zařízení vypnula App Tracking Protection.</b>\nZpůsobila ti App Tracking Protection problém s aplikacemi? <annotation type="report_issues_link">Oznámit problémy</annotation></string>
     <string name="atp_ActivityAbout">Informace</string>
     <string name="atp_ActivityManage">Spravovat</string>
@@ -393,5 +395,12 @@
 
     <!--  App Tracking Protection Promote Always On -->
     <string name="atp_PromoteAlwaysOnDialogSettings">Přejdi do Nastavení</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Teď ne</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Přejdi ve svém zařízení do nastavení VPN pro DuckDuckGo a vyber <b>Vždy zapnout</b> VPN. Tím zabráníš vypnutí naší ochrany v systému Android.\n\nUjisti se, že ostatní nastavení jsou vypnutá.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Problémům s aplikací předejdeš tak, že v <b>nastavení VPN ve svém zařízení pro DuckDuckGo</b> zakážeš možnost <b>Blokovat připojení bez VPN</b>.]]></string>
+    <string name="atp_AlwaysOnModalHeading">Nastavit na Vždy zapnout</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Změň si nastavení sítě VPN</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Je potřeba něco udělat!</b> Pokud se chceš vyhnout problémům s aplikací, musíš změnit nastavení systému Android. <annotation type="open_settings_link">Změnit nastavení</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Je potřeba něco udělat! App Tracking Protection vyžaduje pro správné fungování změnu nastavení systému Android.</string>
 
 </resources>
