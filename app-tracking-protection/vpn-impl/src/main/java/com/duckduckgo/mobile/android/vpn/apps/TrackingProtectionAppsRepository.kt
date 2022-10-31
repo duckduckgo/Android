@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.apps
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
@@ -75,6 +76,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
                         val isExcluded = shouldBeExcluded(it, ddgExclusionList, manualList)
                         TrackingProtectionAppInfo(
                             packageName = it.packageName,
+                            packageIcon = packageManager.safeGetApplicationIcon(it.packageName),
                             name = packageManager.getApplicationLabel(it).toString(),
                             type = it.getAppType(),
                             category = it.parseAppCategory(),

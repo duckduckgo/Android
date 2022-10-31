@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.apps
 
+import android.graphics.drawable.Drawable
+
 sealed class AppCategory {
     object Undefined : AppCategory() {
         override fun toString() = "CATEGORY_UNDEFINED"
@@ -56,6 +58,7 @@ sealed class AppCategory {
 
 data class TrackingProtectionAppInfo(
     val packageName: String,
+    val packageIcon: Drawable? = null,
     val name: String,
     val type: String? = null,
     val category: AppCategory = AppCategory.Undefined,
