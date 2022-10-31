@@ -29,11 +29,10 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 @Database(
-    exportSchema = true, version = 28,
+    exportSchema = true, version = 29,
     entities = [
         VpnState::class,
         VpnTracker::class,
-        VpnRunningStats::class,
         VpnServiceStateStats::class,
         HeartBeatEntity::class,
         VpnPhoenixEntity::class,
@@ -59,7 +58,6 @@ abstract class VpnDatabase : RoomDatabase() {
 
     abstract fun vpnStateDao(): VpnStateDao
     abstract fun vpnTrackerDao(): VpnTrackerDao
-    abstract fun vpnRunningStatsDao(): VpnRunningStatsDao
     abstract fun vpnHeartBeatDao(): VpnHeartBeatDao
     abstract fun vpnPhoenixDao(): VpnPhoenixDao
     abstract fun vpnNotificationsDao(): VpnNotificationsDao
@@ -175,6 +173,12 @@ abstract class VpnDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_28_TO_29: Migration = object : Migration(28, 29) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE IF EXISTS `vpn_running_stats`")
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_18_TO_19,
@@ -187,6 +191,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_25_TO_26,
                 MIGRATION_26_TO_27,
                 MIGRATION_27_TO_28,
+                MIGRATION_28_TO_29,
             )
     }
 }

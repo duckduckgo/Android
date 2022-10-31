@@ -65,11 +65,6 @@ interface AppTrackerBlockingStatsRepository {
         packageName: String
     ): Flow<List<VpnTrackerCompanySignal>>
 
-    fun getRunningTimeMillis(
-        startTime: () -> String,
-        endTime: String = noEndDate()
-    ): Flow<Long>
-
     fun getVpnRestartHistory(): List<VpnPhoenixEntity>
     fun deleteVpnRestartHistory()
     fun getBlockedTrackersCountBetween(
@@ -90,7 +85,6 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
 ) : AppTrackerBlockingStatsRepository {
 
     private val trackerDao = vpnDatabase.vpnTrackerDao()
-    private val runningTimeDao = vpnDatabase.vpnRunningStatsDao()
     private val phoenixDao = vpnDatabase.vpnPhoenixDao()
 
     override fun getVpnTrackers(
@@ -128,20 +122,6 @@ class RealAppTrackerBlockingStatsRepository @Inject constructor(
         return trackerDao.getTrackersForAppFromDate(date, packageName)
             .conflate()
             .distinctUntilChanged()
-    }
-
-    override fun getRunningTimeMillis(
-        startTime: () -> String,
-        endTime: String
-    ): Flow<Long> {
-        return runningTimeDao.getRunningStatsBetween(startTime(), endTime)
-            .conflate()
-            .distinctUntilChanged()
-            .map { list -> list.filter { it.id >= startTime() } }
-            .transform { runningTimes ->
-                emit(runningTimes.sumOf { it.timeRunningMillis })
-            }
-            .flowOn(dispatchers.default())
     }
 
     @WorkerThread
