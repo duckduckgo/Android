@@ -109,7 +109,7 @@ interface VpnAppTrackerBlockingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTrackerExceptionRules(trackerExceptionRules: List<AppTrackerExceptionRule>)
 
-    @Query("SELECT * from vpn_app_tracker_exception_rules WHERE rule = :domain LIMIT 1")
+    @Query("SELECT * from vpn_app_tracker_exception_rules WHERE :domain LIKE '%' || rule LIMIT 1")
     fun getRuleByTrackerDomain(domain: String): AppTrackerExceptionRule?
 
     @Query("SELECT * from vpn_app_tracker_exception_rules")
