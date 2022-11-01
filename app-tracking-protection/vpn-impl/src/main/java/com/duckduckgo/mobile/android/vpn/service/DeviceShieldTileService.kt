@@ -26,7 +26,6 @@ import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.QuickSettingsScope
@@ -41,6 +40,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.*
 import timber.log.Timber
 
+@Suppress("NoHardcodedCoroutineDispatcher")
 @RequiresApi(Build.VERSION_CODES.N)
 // We don't use the DeviceShieldTileService::class as binding key because TileService (Android) class does not
 // exist in all APIs, and so using it DeviceShieldTileService::class as key would compile but immediately crash
@@ -54,10 +54,9 @@ class DeviceShieldTileService : TileService() {
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
     @Inject lateinit var repository: AtpWaitlistStateRepository
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
-    @Inject lateinit var dispatchers: DispatcherProvider
 
     private var deviceShieldStatePollingJob = ConflatedJob()
-    private val serviceScope = CoroutineScope(dispatchers.io())
+    private val serviceScope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
