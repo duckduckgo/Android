@@ -26,11 +26,11 @@
               android:paddingStart="@dimen/keyline_4"
               android:paddingEnd="@dimen/keyline_4">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:id="@+id/label"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        app:titleText="Buttons"
+        android:text="Buttons"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -84,10 +84,10 @@
         android:layout_marginTop="16dp"
         app:srcCompat="@drawable/ic_union"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="Deprecated Button"
+        android:text="Deprecated Button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 

@@ -90,7 +90,7 @@ class AutofillManagementRecyclerAdapter(
     private fun onBindViewHolderHeading(position: Int, viewHolder: HeadingViewHolder) {
         val item = listItems[position] as ListItem.GroupHeading
         with(viewHolder.binding) {
-            groupHeader.titleText = item.initial
+            groupHeader.text = item.initial
         }
     }
 

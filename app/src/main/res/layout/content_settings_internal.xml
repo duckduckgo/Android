@@ -28,14 +28,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:id="@+id/settingsInternalTitle"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settingsInternalSectionBottomDivider"
-        app:titleText="Internal Features"/>
+        android:text="Internal Features"/>
 
     <LinearLayout
         android:id="@+id/settingsInternalFeaturesContainer"

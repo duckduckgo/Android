@@ -136,7 +136,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         cachedState = viewState
-        binding.trackingAttempts.titleText = resources.getQuantityString(
+        binding.trackingAttempts.text = resources.getQuantityString(
             R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
             viewState.totalTrackingAttempts, viewState.totalTrackingAttempts
         )

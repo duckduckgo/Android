@@ -29,10 +29,10 @@
         android:paddingEnd="@dimen/keyline_4"
         android:paddingBottom="@dimen/keyline_5">
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            app:titleText="Base Palette"/>
+            android:text="Base Palette"/>
 
         <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"

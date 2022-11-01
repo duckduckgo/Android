@@ -48,14 +48,14 @@
                 android:visibility="gone"
                 android:layout_margin="16dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/tracking_attempts"
                 android:paddingStart="@dimen/keyline_4"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:paddingTop="@dimen/keyline_4"
                 android:paddingBottom="@dimen/keyline_2"
-                tools:titleText="9 tracking attempts blocked"/>
+                tools:text="9 tracking attempts blocked"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/activity_recycler_view"

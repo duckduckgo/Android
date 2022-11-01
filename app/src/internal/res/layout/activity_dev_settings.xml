@@ -36,11 +36,11 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/generalTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:titleText="@string/devSettingsScreenGeneralSection"/>
+                android:text="@string/devSettingsScreenGeneralSection"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                     android:id="@+id/enableAppStartupTrace"
@@ -64,11 +64,11 @@
                     app:secondaryText="@string/devSettingsClearSavedSitesSubtitle"
                     app:primaryText="@string/devSettingsClearSavedSites"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/privacyTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:titleText="@string/devSettingsScreenPrivacySection"/>
+                android:text="@string/devSettingsScreenPrivacySection"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                     android:id="@+id/nextTdsEnabled"
@@ -83,11 +83,11 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/userAgentTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:titleText="@string/devSettingsScreenUserAgentSection"/>
+                android:text="@string/devSettingsScreenUserAgentSection"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                     android:id="@+id/overrideUserAgentToggle"

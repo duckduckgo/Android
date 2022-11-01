@@ -36,11 +36,11 @@
             android:orientation="vertical"
             android:layout_height="wrap_content">
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/privacyAuditTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:titleText="@string/auditSettingsScreenPrivacyAuditSection"/>
+                android:text="@string/auditSettingsScreenPrivacyAuditSection"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/step1"
@@ -63,11 +63,11 @@
                 app:primaryText="@string/auditStep3Title"
                 app:secondaryText="@string/auditStep3Subtitle" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/refTestsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:titleText="@string/auditSettingsScreenRefTestsSection"/>
+                android:text="@string/auditSettingsScreenRefTestsSection"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/requestBlocking"

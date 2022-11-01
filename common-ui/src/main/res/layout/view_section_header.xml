@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+<com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/sectionHeader"
     android:padding="@dimen/keyline_4"

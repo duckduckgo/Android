@@ -130,6 +130,22 @@
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
+    <!-- Section Header -->
+    <style name="Widget.DuckDuckGo.SectionHeader">
+        <item name="android:paddingTop">@dimen/keyline_4</item>
+        <item name="android:paddingBottom">@dimen/keyline_4</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:paddingEnd">@dimen/keyline_4</item>
+        <item name="android:textAppearance">@style/Widget.DuckDuckGo.SectionHeader.TextAppearance</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.SectionHeader.TextAppearance" parent="TextAppearance.DuckDuckGo.Body2">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/blue50</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
     <!-- Info Panel -->
     <style name="Widget.DuckDuckGo.InfoPanel">
         <item name="android:layout_width">match_parent</item>

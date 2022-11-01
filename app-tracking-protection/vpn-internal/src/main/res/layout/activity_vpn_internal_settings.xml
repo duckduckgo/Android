@@ -64,11 +64,11 @@
                 android:layout_margin="16dp"/>
 
             <!-- Section Config -->
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/sectionConfigTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:titleText="Config"
+                android:text="Config"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -117,11 +117,11 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/sectionTrackersTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:titleText="Trackers"
+                android:text="Trackers"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -157,11 +157,11 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/sectionAppProtection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:titleText="App Protections"
+                android:text="App Protections"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -188,11 +188,11 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/sectionTrackersLogging"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:titleText="Logging"
+                android:text="Logging"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -209,11 +209,11 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/sectionDiagnosticsTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:titleText="Diagnostics"
+                android:text="Diagnostics"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
@@ -229,11 +229,11 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                 android:id="@+id/sectionHealthTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:titleText="Health"
+                android:text="Health"
             />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem

@@ -31,10 +31,10 @@
         android:paddingTop="@dimen/keyline_5"
         android:paddingBottom="@dimen/keyline_5">
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            app:titleText="Typography"/>
+            android:text="Typography"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -126,10 +126,10 @@
             android:text="Text Appearance Caption"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            app:titleText="Typography Set Manually"/>
+            android:text="Typography Set Manually"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/typographyTitle"
@@ -140,10 +140,10 @@
             android:text="Text Appearance Body 1 set manually"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            app:titleText="Legacy Typography"/>
+            android:text="Legacy Typography"/>
 
         <TextView
             android:layout_width="match_parent"

@@ -103,7 +103,7 @@ class DownloadsAdapter @Inject constructor(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Header) {
-            binding.downloadsHeaderTextView.titleText = item.text
+            binding.downloadsHeaderTextView.text = item.text
         }
     }
 

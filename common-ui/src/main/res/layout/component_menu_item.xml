@@ -19,11 +19,11 @@
     android:layout_height="wrap_content"
     android:clipToPadding="false">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:id="@+id/label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="Deprecated Menu Item"
+        android:text="Deprecated Menu Item"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 

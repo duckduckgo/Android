@@ -25,11 +25,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:id="@+id/settingsCustomizeTitle"
-        app:titleText="@string/settingsHeadingCustomize"/>
+        android:text="@string/settingsHeadingCustomize"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/sitePermissions"

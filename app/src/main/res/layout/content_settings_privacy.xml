@@ -26,11 +26,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:id="@+id/settingsPrivacyTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="@string/settingsHeadingPrivacy"/>
+        android:text="@string/settingsHeadingPrivacy"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/globalPrivacyControlSetting"
