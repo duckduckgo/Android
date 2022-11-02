@@ -191,7 +191,6 @@
     <string name="atp_ActivityCtaShowAll">Visa all senaste aktivitet</string>
     <string name="atp_ActivityAppTrackersFAQ">Vad är appspårare?</string>
     <string name="atp_ActivityReportProblem">Rapportera ett problem med en app</string>
-    <string name="atp_ActivityBetaInstructions">Betainstruktioner</string>
     <string name="atp_ActivityManageProtection">Har du problem med en app?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
@@ -264,7 +263,6 @@
     <string name="atp_WaitlistJoinedWithoutNotification">Din inbjudan att prova App Tracking Protection visas här. Kom tillbaka snart, eller så kan vi skicka ett meddelande när det är din tur\n\n<annotation type="notify_me_link">Meddela mig</annotation>\n\n<annotation type="beta_link">Läs mer om betaversionen</annotation></string>
     <string name="atp_WaitlistRedeemCodeActivityTitle">Ange din inbjudningskod</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Klart! Du är inne.</string>
-    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">

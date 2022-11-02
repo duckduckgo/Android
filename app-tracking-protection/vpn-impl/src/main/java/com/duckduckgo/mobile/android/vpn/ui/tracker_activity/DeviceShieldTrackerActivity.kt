@@ -136,10 +136,6 @@ class DeviceShieldTrackerActivity :
             viewModel.onViewEvent(ViewEvent.LaunchDeviceShieldFAQ)
         }
 
-        binding.ctaBetaInstructions.setClickListener {
-            viewModel.onViewEvent(ViewEvent.LaunchBetaInstructions)
-        }
-
         binding.ctaWhatAreAppTrackers.setClickListener {
             viewModel.onViewEvent(ViewEvent.LaunchAppTrackersFAQ)
         }
@@ -247,7 +243,6 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.CheckVPNPermission -> checkVPNPermission()
             is DeviceShieldTrackerActivityViewModel.Command.RequestVPNPermission -> obtainVpnRequestPermission(it.vpnIntent)
             is DeviceShieldTrackerActivityViewModel.Command.LaunchAppTrackersFAQ -> launchAppTrackersFAQ()
-            is DeviceShieldTrackerActivityViewModel.Command.LaunchBetaInstructions -> launchBetaInstructions()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchDeviceShieldFAQ -> launchDeviceShieldFAQ()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchManageAppsProtection -> launchManageAppsProtection()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchMostRecentActivity -> launchMostRecentActivity()
@@ -384,13 +379,6 @@ class DeviceShieldTrackerActivity :
 
     override fun onRemoveFeature() {
         viewModel.removeFeature()
-    }
-
-    private fun launchBetaInstructions() {
-        val intent = Intent(this, Class.forName("com.duckduckgo.app.browser.webview.WebViewActivity"))
-        intent.putExtra("URL_EXTRA", getString(R.string.atp_WaitlistBetaBlogPost))
-        intent.putExtra("TITLE_EXTRA", getString(R.string.atp_ActivityBetaInstructions))
-        startActivity(intent)
     }
 
     private fun checkVPNPermission() {

@@ -24,7 +24,6 @@ import androidx.work.WorkManager
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.*
 import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
@@ -32,7 +31,6 @@ import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -110,14 +108,5 @@ object NotificationModule {
         pluginPoint: PluginPoint<SchedulableNotificationPlugin>
     ): NotificationSender {
         return AppNotificationSender(context, pixel, manager, factory, notificationDao, pluginPoint)
-    }
-
-    @Provides
-    fun provideAppTpWaitlistCodeNotification(
-        context: Context,
-        notificationDao: NotificationDao,
-        dataStore: AppTrackingProtectionWaitlistDataStore
-    ): AppTPWaitlistCodeNotification {
-        return AppTPWaitlistCodeNotification(context, notificationDao, dataStore)
     }
 }

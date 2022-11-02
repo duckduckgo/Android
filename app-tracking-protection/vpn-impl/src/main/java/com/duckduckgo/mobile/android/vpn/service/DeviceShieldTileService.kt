@@ -32,8 +32,6 @@ import com.duckduckgo.di.scopes.QuickSettingsScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
-import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import dagger.android.AndroidInjection
 import dagger.binding.TileServiceBingingKey
 import javax.inject.Inject
@@ -52,7 +50,6 @@ import timber.log.Timber
 class DeviceShieldTileService : TileService() {
 
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
-    @Inject lateinit var repository: AtpWaitlistStateRepository
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     private var deviceShieldStatePollingJob = ConflatedJob()
@@ -64,11 +61,7 @@ class DeviceShieldTileService : TileService() {
     }
 
     override fun onClick() {
-        if (repository.getState() == WaitlistState.InBeta) {
-            respondToTile()
-        } else {
-            launchActivity(Class.forName("com.duckduckgo.app.settings.SettingsActivity"))
-        }
+        respondToTile()
     }
 
     private fun respondToTile() {

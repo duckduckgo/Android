@@ -148,10 +148,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     internal fun onViewEvent(viewEvent: ViewEvent) {
         when (viewEvent) {
             ViewEvent.LaunchAppTrackersFAQ -> sendCommand(Command.LaunchAppTrackersFAQ)
-            ViewEvent.LaunchBetaInstructions -> {
-                deviceShieldPixels.didOpenBetaInstructions()
-                sendCommand(Command.LaunchBetaInstructions)
-            }
             ViewEvent.LaunchDeviceShieldFAQ -> sendCommand(Command.LaunchDeviceShieldFAQ)
             ViewEvent.LaunchExcludedApps -> launchExcludedApps()
             ViewEvent.LaunchMostRecentActivity -> sendCommand(Command.LaunchMostRecentActivity)
@@ -238,7 +234,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchExcludedApps : ViewEvent()
         object LaunchDeviceShieldFAQ : ViewEvent()
         object LaunchAppTrackersFAQ : ViewEvent()
-        object LaunchBetaInstructions : ViewEvent()
         object LaunchMostRecentActivity : ViewEvent()
         object LaunchTrackingProtectionExclusionListActivity : ViewEvent()
         object RemoveFeature : ViewEvent()
@@ -259,7 +254,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchManageAppsProtection : Command()
         object LaunchDeviceShieldFAQ : Command()
         object LaunchAppTrackersFAQ : Command()
-        object LaunchBetaInstructions : Command()
         object LaunchMostRecentActivity : Command()
         object LaunchTrackingProtectionExclusionListActivity : Command()
         object ShowDisableVpnConfirmationDialog : Command()

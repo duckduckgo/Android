@@ -411,16 +411,6 @@
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
         <activity
-            android:name="com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity"
-            android:exported="false"
-            android:label="@string/atp_WaitlistActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-        <activity
-            android:name="com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistRedeemCodeActivity"
-            android:exported="false"
-            android:label="@string/atp_WaitlistRedeemCodeActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity" />
-        <activity
             android:name="com.duckduckgo.app.browser.webview.WebViewActivity"
             android:exported="false"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />

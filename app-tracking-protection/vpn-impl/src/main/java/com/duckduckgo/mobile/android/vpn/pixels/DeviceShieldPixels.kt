@@ -310,9 +310,6 @@ interface DeviceShieldPixels {
      */
     fun didRestartVpnProcessOnBadHealth()
 
-    /** Will fire when Beta instructions CTA is pressed */
-    fun didOpenBetaInstructions()
-
     /**
      * This fun will fire two pixels
      * daily -> fire only once a day no matter how many times we call this fun
@@ -704,11 +701,6 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun didRestartVpnProcessOnBadHealth() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH)
-    }
-
-    override fun didOpenBetaInstructions() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_OPEN_BETA_INSTRUCTIONS_DAILY)
-        firePixel(DeviceShieldPixelNames.ATP_DID_OPEN_BETA_INSTRUCTIONS)
     }
 
     override fun didShowExclusionListActivity() {

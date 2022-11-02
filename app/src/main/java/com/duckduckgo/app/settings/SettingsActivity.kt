@@ -25,10 +25,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
-import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -57,7 +54,6 @@ import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -70,7 +66,6 @@ import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
-import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -239,7 +234,7 @@ class SettingsActivity :
                     setAutoconsentSetting(it.autoconsentEnabled)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
-                    updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
+                    updateDeviceShieldSettings(it.appTrackingProtectionEnabled)
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
                 }
@@ -345,7 +340,6 @@ class SettingsActivity :
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
             is Command.LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
-            is Command.LaunchAppTPWaitlist -> launchAppTPWaitlist()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
             is Command.LaunchEmailProtectionNotSUpported -> launchEmailProtectionNotSupported()
@@ -374,17 +368,12 @@ class SettingsActivity :
 
     private fun updateDeviceShieldSettings(
         appTPEnabled: Boolean,
-        waitlistState: WaitlistState
     ) {
         with(viewsMore) {
-            if (waitlistState != WaitlistState.InBeta) {
-                vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
+            if (appTPEnabled) {
+                vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldEnabled))
             } else {
-                if (appTPEnabled) {
-                    vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldEnabled))
-                } else {
-                    vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
-                }
+                vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
             }
         }
     }
@@ -480,17 +469,6 @@ class SettingsActivity :
 
     private fun launchAppTPOnboardingScreen() {
         startActivity(VpnOnboardingActivity.intent(this))
-    }
-
-    private val appTPWaitlistActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            startActivity(VpnOnboardingActivity.intent(this))
-        }
-    }
-
-    private fun launchAppTPWaitlist() {
-        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this)
-        appTPWaitlistActivityResult.launch(AppTPWaitlistActivity.intent(this), options)
     }
 
     private fun launchAddHomeScreenWidget() {

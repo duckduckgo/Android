@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APPTP_WAITLIST_CODE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CHANGE_ICON_FEATURE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
@@ -40,7 +39,6 @@ import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_CANCELLED
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_LAUNCHED
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import dagger.android.AndroidInjection
 import timber.log.Timber
@@ -85,7 +83,6 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             CANCEL -> onCancelled(pixelSuffix)
             WEBSITE -> onWebsiteNotification(intent, pixelSuffix)
             CHANGE_ICON_FEATURE -> onCustomizeIconLaunched(pixelSuffix)
-            APPTP_WAITLIST_CODE -> onAppTPWaitlistCodeReceived(pixelSuffix)
             else -> {
                 schedulableNotificationPluginPoint.getPlugins().forEach {
                     when (intent.type) {
@@ -104,15 +101,6 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
             clearNotification(notificationId)
         }
-    }
-
-    private fun onAppTPWaitlistCodeReceived(pixelSuffix: String) {
-        Timber.i("App Tracking Protection waitlist code received launched!")
-        val intent = AppTPWaitlistActivity.intent(context)
-        taskStackBuilderFactory.createTaskBuilder()
-            .addNextIntentWithParentStack(intent)
-            .startActivities()
-        onLaunched(pixelSuffix)
     }
 
     private fun onWebsiteNotification(
@@ -170,7 +158,6 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val CANCEL = "com.duckduckgo.notification.cancel"
         const val WEBSITE = "com.duckduckgo.notification.website"
         const val CHANGE_ICON_FEATURE = "com.duckduckgo.notification.app.feature.changeIcon"
-        const val APPTP_WAITLIST_CODE = "com.duckduckgo.notification.apptp.waitlist.code"
     }
 
     companion object {

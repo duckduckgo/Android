@@ -199,7 +199,6 @@
     <string name="atp_ActivityCtaShowAll">Zobacz wszystkie ostatnie aktywności</string>
     <string name="atp_ActivityAppTrackersFAQ">Czym są moduły śledzące aplikacji?</string>
     <string name="atp_ActivityReportProblem">Zgłoś problem z aplikacją</string>
-    <string name="atp_ActivityBetaInstructions">Instrukcje Beta</string>
     <string name="atp_ActivityManageProtection">Masz problemy z aplikacją?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
@@ -276,7 +275,6 @@
     <string name="atp_WaitlistJoinedWithoutNotification">Twoje zaproszenie do wypróbowania ochrony przed śledzeniem przez aplikacje pojawi się tutaj. Sprawdź ponownie później. Możemy też wysłać Ci powiadomienie, gdy nadejdzie Twoja kolej.\n\n<annotation type="notify_me_link">Powiadom mnie</annotation>\n\n<annotation type="beta_link">Dowiedz się więcej o wersji beta</annotation></string>
     <string name="atp_WaitlistRedeemCodeActivityTitle">Wprowadź swój kod zaproszenia</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Udało się! Wszystko gotowe.</string>
-    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">

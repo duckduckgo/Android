@@ -199,7 +199,6 @@
     <string name="atp_ActivityCtaShowAll">Ogled vseh nedavnih dejavnosti</string>
     <string name="atp_ActivityAppTrackersFAQ">Kaj so sledilniki aplikacij?</string>
     <string name="atp_ActivityReportProblem">Prijava težave z aplikacijo</string>
-    <string name="atp_ActivityBetaInstructions">Navodila beta</string>
     <string name="atp_ActivityManageProtection">Imate težave z aplikacijo?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
@@ -276,7 +275,6 @@
     <string name="atp_WaitlistJoinedWithoutNotification">Povabilo za preizkus programa App Tracking Protection bo prispelo sem. V kratkem se spet oglasite ali pa vam lahko pošljemo obvestilo, ko pridete na vrsto\n\n<annotation type="notify_me_link">Želim prejeti obvestilo</annotation>\n\n<annotation type="beta_link">Več informacij o različici beta</annotation></string>
     <string name="atp_WaitlistRedeemCodeActivityTitle">Vnesite kodo vabila</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Uspešno ste se prijavili v aplikacijo.</string>
-    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
