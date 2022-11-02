@@ -420,7 +420,8 @@ class TabDataRepositoryTest {
             SiteFactoryImpl(entityLookup, allowListDao, contentBlocking, TestScope()),
             webViewPreviewPersister,
             faviconManager,
-            TestScope()
+            coroutinesTestRule.testScope,
+            coroutinesTestRule.testDispatcherProvider
         )
     }
 

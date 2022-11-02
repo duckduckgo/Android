@@ -312,9 +312,10 @@ class BrowserModule {
     @Provides
     fun webViewPreviewPersister(
         context: Context,
-        fileDeleter: FileDeleter
+        fileDeleter: FileDeleter,
+        dispatchers: DispatcherProvider
     ): WebViewPreviewPersister {
-        return FileBasedWebViewPreviewPersister(context, fileDeleter)
+        return FileBasedWebViewPreviewPersister(context, fileDeleter, dispatchers)
     }
 
     @SingleInstanceIn(AppScope::class)

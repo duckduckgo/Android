@@ -27,9 +27,9 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -42,8 +42,11 @@ class AdClickDailyReportingWorker(context: Context, workerParameters: WorkerPara
     @Inject
     lateinit var adClickPixels: AdClickPixels
 
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
+
     override suspend fun doWork(): Result {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatchers.io()) {
             adClickPixels.fireCountPixel(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION)
             return@withContext Result.success()
         }

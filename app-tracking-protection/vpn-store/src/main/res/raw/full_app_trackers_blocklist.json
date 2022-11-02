@@ -433,6 +433,30 @@
       "default": "block",
       "CDN": false
     },
+    "mobile.yandex.net": {
+      "owner": {
+        "name": "Yandex LLC",
+        "displayName": "Yandex"
+      },
+      "app": {
+        "score": 340,
+        "prevalence": 0.013
+      },
+      "default": "block",
+      "CDN": false
+    },
+    "mobile.webvisor.net": {
+      "owner": {
+        "name": "Yandex LLC",
+        "displayName": "Yandex"
+      },
+      "app": {
+        "score": 340,
+        "prevalence": 0.013
+      },
+      "default": "block",
+      "CDN": false
+    },
     "ad.doubleclick.net": {
       "owner": {
         "name": "Google LLC",
@@ -613,6 +637,18 @@
       "default": "block",
       "CDN": false
     },
+    "bat.bing.com": {
+      "owner": {
+        "name": "Microsoft Corporation",
+        "displayName": "Microsoft"
+      },
+      "app": {
+        "score": 283,
+        "prevalence": 0.093
+      },
+      "default": "block",
+      "CDN": false
+    },
     "p.placed.com": {
       "owner": {
         "name": "Foursquare Labs, Inc.",
@@ -724,7 +760,7 @@
     "in.appcenter.ms": {
       "owner": {
         "name": "Microsoft Corporation",
-        "displayName": "Visual Studio App Center"
+        "displayName": "Microsoft"
       },
       "app": {
         "score": 258,
@@ -937,6 +973,18 @@
       "default": "block",
       "CDN": false
     },
+    "lbs.yandex.net": {
+      "owner": {
+        "name": "Yandex LLC",
+        "displayName": "Yandex"
+      },
+      "app": {
+        "score": 234,
+        "prevalence": 0.013
+      },
+      "default": "block",
+      "CDN": false
+    },
     "aax.amazon-adsystem.com": {
       "owner": {
         "name": "Amazon Technologies, Inc.",
@@ -1144,7 +1192,7 @@
     "ads.linkedin.com": {
       "owner": {
         "name": "Microsoft Corporation",
-        "displayName": "LinkedIn"
+        "displayName": "Microsoft"
       },
       "app": {
         "score": 199,
@@ -1153,10 +1201,22 @@
       "default": "block",
       "CDN": false
     },
+    "appmetrica.yandex.net": {
+      "owner": {
+        "name": "Yandex LLC",
+        "displayName": "Yandex"
+      },
+      "app": {
+        "score": 199,
+        "prevalence": 0.013
+      },
+      "default": "block",
+      "CDN": false
+    },
     "p.adsymptotic.com": {
       "owner": {
         "name": "Microsoft Corporation",
-        "displayName": "LinkedIn"
+        "displayName": "Microsoft"
       },
       "app": {
         "score": 199,
@@ -2713,6 +2773,18 @@
       "default": "block",
       "CDN": false
     },
+    "mc.yandex.ru": {
+      "owner": {
+        "name": "Yandex LLC",
+        "displayName": "Yandex"
+      },
+      "app": {
+        "score": 106,
+        "prevalence": 0.013
+      },
+      "default": "block",
+      "CDN": false
+    },
     "c.amazon-adsystem.com": {
       "owner": {
         "name": "Amazon Technologies, Inc.",
@@ -2973,18 +3045,6 @@
       "app": {
         "score": 96,
         "prevalence": 0.107
-      },
-      "default": "block",
-      "CDN": false
-    },
-    "platform.twitter.com": {
-      "owner": {
-        "name": "Twitter, Inc.",
-        "displayName": "Twitter"
-      },
-      "app": {
-        "score": 96,
-        "prevalence": 0.093
       },
       "default": "block",
       "CDN": false
@@ -3358,9 +3418,11 @@
     "com.android.hotwordenrollment.xgoogle": "Google LLC",
     "com.android.partnerbrowsercustomizations.chromeHomepage": "Google LLC",
     "com.android.chrome": "Google LLC",
+    "com.android.vending": "Google LLC",
     "com.chrome.beta": "Google LLC",
     "com.chrome.canary": "Google LLC",
     "com.chrome.dev": "Google LLC",
+    "com.fitbit.FitbitMobile": "Google LLC",
     "com.google.android.apps.access.wifi.consumer": "Google LLC",
     "com.google.android.apps.adm": "Google LLC",
     "com.google.android.apps.ads.publisher": "Google LLC",
@@ -3384,6 +3446,7 @@
     "com.google.android.apps.freighter": "Google LLC",
     "com.google.android.apps.giant": "Google LLC",
     "com.google.android.apps.googleassistant": "Google LLC",
+    "com.google.android.apps.googlevoice": "Google LLC",
     "com.google.android.apps.handwriting.ime": "Google LLC",
     "com.google.android.apps.hangoutsdialer": "Google LLC",
     "com.google.android.apps.inbox": "Google LLC",
@@ -3391,15 +3454,18 @@
     "com.google.android.apps.kids.familylinkhelper": "Google LLC",
     "com.google.android.apps.m4b": "Google LLC",
     "com.google.android.apps.magazines": "Google LLC",
+    "com.google.android.apps.maps": "Google LLC",
     "com.google.android.apps.mapslite": "Google LLC",
     "com.google.android.apps.meetings": "Google LLC",
     "com.google.android.apps.messaging": "Google LLC",
     "com.google.android.apps.navlite": "Google LLC",
     "com.google.android.apps.nbu.files": "Google LLC",
+    "com.google.android.apps.nbu.paisa.user": "Google LLC",
     "com.google.android.apps.paidtasks": "Google LLC",
     "com.google.android.apps.pdfviewer": "Google LLC",
     "com.google.android.apps.photos": "Google LLC",
     "com.google.android.apps.photos.scanner": "Google LLC",
+    "com.google.android.apps.photosgo": "Google LLC",
     "com.google.android.apps.plus": "Google LLC",
     "com.google.android.apps.podcasts": "Google LLC",
     "com.google.android.apps.restore": "Google LLC",
@@ -3411,6 +3477,7 @@
     "com.google.android.apps.tasks": "Google LLC",
     "com.google.android.apps.translate": "Google LLC",
     "com.google.android.apps.travel.onthego": "Google LLC",
+    "com.google.android.apps.tycho": "Google LLC",
     "com.google.android.apps.uploader": "Google LLC",
     "com.google.android.apps.vega": "Google LLC",
     "com.google.android.apps.walletnfcrel": "Google LLC",
@@ -3420,14 +3487,21 @@
     "com.google.android.apps.youtube.gaming": "Google LLC",
     "com.google.android.apps.youtube.kids": "Google LLC",
     "com.google.android.apps.youtube.music": "Google LLC",
+    "com.google.android.apps.youtube.unplugged": "Google LLC",
     "com.google.android.apps.youtube.vr": "Google LLC",
     "com.google.android.backup": "Google LLC",
     "com.google.android.backuptransport": "Google LLC",
     "com.google.android.calculator": "Google LLC",
     "com.google.android.calendar": "Google LLC",
     "com.google.android.configupdater": "Google LLC",
+    "com.google.android.contacts": "Google LLC",
+    "com.google.android.deskclock": "Google LLC",
+    "com.google.android.dialer": "Google LLC",
     "com.google.android.feedback": "Google LLC",
+    "com.google.android.gm": "Google LLC",
+    "com.google.android.gm.lite": "Google LLC",
     "com.google.android.googlequicksearchbox": "Google LLC",
+    "com.google.android.inputmethod.latin": "Google LLC",
     "com.google.android.instantapps.supervisor": "Google LLC",
     "com.google.android.keep": "Google LLC",
     "com.google.android.markup": "Google LLC",
@@ -3461,6 +3535,7 @@
     "com.google.earth": "Google LLC",
     "com.google.marvin.talkback": "Google LLC",
     "com.google.samples.apps.cardboarddemo": "Google LLC",
+    "com.google.socratic": "Google LLC",
     "com.google.tango.measure": "Google LLC",
     "com.google.vr.cyclops": "Google LLC",
     "com.google.vr.expeditions": "Google LLC",
@@ -3473,6 +3548,7 @@
     "com.google.android.gms.policy_sidecar_aps": "Google LLC",
     "com.google.android.partnersetup": "Google LLC",
     "com.google.audio.hearing.visualization.accessibility.scribe": "Google LLC",
+    "com.niksoftware.snapseed": "Google LLC",
     "com.waze": "Google LLC",
     "dev.firebase.appdistribution": "Google LLC",
     "com.mapbox.mapboxandroiddemo": "Mapbox Inc.",
@@ -3618,7 +3694,47 @@
     "com.wb.wbtvdistribution": "WarnerMedia, LLC",
     "com.wb.wbfyc": "WarnerMedia, LLC",
     "com.rhythmnewmedia.tmz": "WarnerMedia, LLC",
-    "eu.hbogo.android": "WarnerMedia, LLC"
+    "eu.hbogo.android": "WarnerMedia, LLC",
+    "com.yandex.browser": "Yandex LLC",
+    "ru.yandex.searchplugin": "Yandex LLC",
+    "ru.yandex.searchplugin.beta": "Yandex LLC",
+    "ru.yandex.taxi": "Yandex LLC",
+    "ru.yandex.yandexmaps": "Yandex LLC",
+    "ru.yandex.yandexnavi": "Yandex LLC",
+    "ru.yandex.disk": "Yandex LLC",
+    "ru.yandex.disk.beta": "Yandex LLC",
+    "ru.yandex.music": "Yandex LLC",
+    "ru.kinopoisk": "Yandex LLC",
+    "ru.kinopoisk.tv": "Yandex LLC",
+    "ru.yandex.mail": "Yandex LLC",
+    "ru.yandex.taximeter": "Yandex LLC",
+    "ru.yandex.taximeter.beta": "Yandex LLC",
+    "ru.auto.ara": "Yandex LLC",
+    "ru.foodfox.client": "Yandex LLC",
+    "ru.foodfox.courier.debug.releaseserver": "Yandex LLC",
+    "ru.foodfox.vendor": "Yandex LLC",
+    "ru.yandex.metro": "Yandex LLC",
+    "ru.yandex.weatherplugin": "Yandex LLC",
+    "ru.yandex.telemost": "Yandex LLC",
+    "ru.yandex.key": "Yandex LLC",
+    "ru.yandex.rasp": "Yandex LLC",
+    "com.yandex.mobile.drive": "Yandex LLC",
+    "ru.yandex.mobile.avia": "Yandex LLC",
+    "com.yandex.yamb": "Yandex LLC",
+    "ru.yandex.market.partner": "Yandex LLC",
+    "ru.yandex.market": "Yandex LLC",
+    "ru.yandex.mobile.gasstations": "Yandex LLC",
+    "ru.yandex.direct": "Yandex LLC",
+    "yandex.auto.mobile": "Yandex LLC",
+    "ru.yandex.mobile.appmetrica": "Yandex LLC",
+    "ru.yandex.mobile.metrica": "Yandex LLC",
+    "com.yandex.courier": "Yandex LLC",
+    "ru.yandex.nokiasystemservice": "Yandex LLC",
+    "com.yandex.q": "Yandex LLC",
+    "com.yandex.qmobile": "Yandex LLC",
+    "ru.yandex.med": "Yandex LLC",
+    "ru.yandex.telemed.doctor": "Yandex LLC",
+    "ru.theexpert.app": "Yandex LLC"
   },
   "entities": {
     "Google LLC": {
@@ -4799,6 +4915,23 @@
         "device_connectivity",
         "app_name",
         "device_make",
+        "os_version",
+        "platform"
+      ]
+    },
+    "Yandex LLC": {
+      "score": 1219,
+      "signals": [
+        "gps_coordinates",
+        "AAID",
+        "unique_identifier",
+        "cookies",
+        "os_build_version",
+        "device_resolution",
+        "device_model",
+        "device_language",
+        "device_make",
+        "app_name",
         "os_version",
         "platform"
       ]

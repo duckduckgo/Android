@@ -29,6 +29,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.CredentialSavePickerDialog
 import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_CANCELLED
@@ -152,7 +153,9 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
     ): LoginCredentials? {
         val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS) ?: return null
         val originalUrl = result.getString(CredentialUpdateExistingCredentialsDialog.KEY_URL) ?: return null
-        return credentialSaver.updateCredentials(originalUrl, selectedCredentials)
+        val updateType =
+            result.getParcelable<CredentialUpdateType>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE) ?: return null
+        return credentialSaver.updateCredentials(originalUrl, selectedCredentials, updateType)
     }
 
     private suspend fun refreshCurrentWebPageToDisableAutofill(viewModel: BrowserTabViewModel) {
@@ -178,7 +181,8 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
 
         suspend fun updateCredentials(
             url: String,
-            credentials: LoginCredentials
+            credentials: LoginCredentials,
+            updateType: CredentialUpdateType
         ): LoginCredentials?
     }
 }

@@ -37,7 +37,7 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="${appIconRound}"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/Theme.DuckDuckGo.Light"
         android:requestLegacyExternalStorage="true"
         tools:ignore="GoogleAppIndexingWarning">
         <meta-data
@@ -82,7 +82,7 @@
             android:icon="${appIcon}"
             android:label="@string/appName"
             android:roundIcon="${appIconRound}"
-            android:theme="@style/SplashScreen">
+            android:theme="@style/Theme.DuckDuckGo.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -221,7 +221,7 @@
             android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
             android:exported="false"
             android:label="@string/appName"
-            android:theme="@style/AppTheme.Dark.Transparent" />
+            android:theme="@style/Theme.DuckDuckGo.Light" />
 
         <activity
             android:name=".BrowserActivity"
@@ -323,12 +323,12 @@
             android:exported="false"
             android:label="@string/surveyActivityTitle"
             android:parentActivityName=".BrowserActivity"
-            android:theme="@style/ModalCardTheme" />
+            android:theme="@style/Theme.DuckDuckGo.Survey" />
         <activity
             android:name="com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity"
             android:exported="false"
             android:label="@string/addWidgetInstructionsActivityTitle"
-            android:theme="@style/ModalCardTheme" />
+            android:theme="@style/Theme.DuckDuckGo.Survey" />
         <activity
             android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
             android:exported="false"
@@ -407,7 +407,7 @@
             android:name="com.duckduckgo.app.WidgetThemeConfiguration"
             android:exported="false"
             android:label="@string/widgetConfigurationActivityTitle"
-            android:theme="@style/AppTheme.Transparent">
+            android:theme="@style/Theme.DuckDuckGo.Light">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>

@@ -14,36 +14,38 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
     <string name="atp_name">Блокировка отслеживания приложениями</string>
     <string name="refresh">Обновить</string>
 
     <!-- Debug Screens -->
     <string name="atp_DiagnosticsMenuLabel">Диагностика</string>
     <string name="atp_DataMenuLabel">Статистика данных</string>
-    <string name="atp_MeteredConnection">"Лимит: %1$s"</string>
-    <string name="atp_ConnectionStatus">"Подключение по VPN: %1$s"</string>
-    <string name="atp_NetworkAvailable">"Подключение к Интернету: %1$s"</string>
-    <string name="atp_DnsServers">"DNS активной сети: %1$s"</string>
+    <string name="atp_MeteredConnection" instruction="Placeholder is true or false">"Лимит: %1$s"</string>
+    <string name="atp_ConnectionStatus" instruction="Placeholder is true or false">"Подключение по VPN: %1$s"</string>
+    <string name="atp_NetworkAvailable" instruction="Placeholder is true or false">"Подключение к Интернету: %1$s"</string>
+    <string name="atp_DnsServers" instruction="Placeholder is a list of dns addresses">"DNS активной сети: %1$s"</string>
     <string name="atp_AppExitsReasonsTitle">Причины выхода из приложения</string>
     <string name="atp_AppRestartsTitle">Перезапуски приложения</string>
 
     <!-- Diagnostics -->
-    <string name="vpnTimeRunning">Время работы: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday">Заблокировано отслеживающих компаний сегодня: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek">Заблокировано отслеживающих компаний на этой неделе: %1$d</string>
+    <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Время работы: %1$s</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Заблокировано отслеживающих компаний сегодня: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Заблокировано отслеживающих компаний на этой неделе: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Ни одной отслеживающей компании пока не заблокировано"</string>
-    <string name="vpnTrackersBlockedToday">Заблокировано трекеров сегодня: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek">Заблокировано трекеров на этой неделе: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Заблокировано трекеров сегодня: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Заблокировано трекеров на этой неделе: %1$d</string>
     <string name="vpnTrackersNone">"Ни одного трекера пока не заблокировано"</string>
     <string name="vpnNotRunYet">"VPN еще не запускался"</string>
-    <string name="vpnDataTransferred">"%1$1s\nПакетов: %2$2s"</string>
+    <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\nПакетов: %2$s"</string>
 
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Возникли проблемы с приложением?</string>
     <string name="atp_OnInitialNotification">"Защита от слежки включена и блокирует попытки отслеживания во всех приложениях"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Выполняется поиск трекеров... бип-бип"</string>
-    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложении</b> (за последний час).]]></item>
         <item quantity="few"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложениях</b> (за последний час).]]></item>
         <item quantity="many"><![CDATA[ Пресечены попытки отслеживания <b>в %1$d приложениях</b> (за последний час).]]></item>
@@ -53,42 +55,42 @@
     <string name="atp_RevokedNotification">Приложение VPN отключило защиту от слежки. Нажмите, чтобы включить ее.</string>
 
     <!-- App Tracking Protection Daily Notification -->
-    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Функция App Tracking Protection пресекла <b>%1$d попытку отслеживания</b> (за последний день).]]></string>
-    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Пресечена <b>%1$d попытка отслеживания в 1 приложении — %2$s</b> (за последний день).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Функция App Tracking Protection пресекла <b>попытки отслеживания: %1$d</b> (за последний день).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Пресечены <b>попытки отслеживания (%1$d) в %2$d приложениях, включая %3$s</b> (за последний день).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ Функция App Tracking Protection пресекла <b>%1$d попытку отслеживания</b> (за последний день).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps" instruction="%1$d is the number of tracking attempts and %2$s is the name of the app where it happened"><![CDATA[ Пресечена <b>%1$d попытка отслеживания в 1 приложении — %2$s</b> (за последний день).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ Функция App Tracking Protection пресекла <b>попытки отслеживания: %1$d</b> (за последний день).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Пресечены <b>попытки отслеживания (%1$d) в %2$d приложениях, включая %3$s</b> (за последний день).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_DailyTopCompanyNotification">
         <item quantity="one"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложение</b> (за последний день). <b>Подробнее...</b>]]></item>
         <item quantity="few"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложения</b> (за последний день). <b>Подробнее...</b>]]></item>
         <item quantity="many"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложений</b> (за последний день). <b>Подробнее...</b>]]></item>
         <item quantity="other"><![CDATA[Компания %1$s пыталась отследить вас <b>через %2$d приложения</b> (за последний день). <b>Подробнее...</b>]]></item>
     </plurals>
 
-     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[Пресечено большинство попыток отслеживания в <b>%1$s</b> (за последний день).]]></item>
-        <item quantity="few"><![CDATA[Пресечено большинство попыток отслеживания в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
-        <item quantity="many"><![CDATA[Пресечено большинство попыток отслеживания в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
-        <item quantity="other"><![CDATA[Пресечено большинство попыток отслеживания в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
+    <plurals name="atp_DailyCompanyBlockedNotification">
+        <item quantity="one"><![CDATA[Больше всего попыток отслеживания пресечено в <b>%1$s</b> (за последний день).]]></item>
+        <item quantity="few"><![CDATA[Больше всего попыток отслеживания пресечено в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
+        <item quantity="many"><![CDATA[Больше всего попыток отслеживания пресечено в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
+        <item quantity="other"><![CDATA[Больше всего попыток отслеживания пресечено в <b>%1$s</b> и <b>%2$s</b> (за последний день).]]></item>
     </plurals>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Заблокировано <b>%1$s %2$d раз в %3$s</b> (за последний день).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[Заблокировано <b>%1$s %2$d раз в %3$s и еще 1 приложении</b> (за последний день).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Функция App Tracking Protection заблокировала <b>%1$s %2$d раз в %3$s и %4$d других приложениях</b> (за последний день).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Заблокировано <b>%1$s %2$d раз в %3$s</b> (за последний день).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Заблокировано <b>%1$s %2$d раз в %3$s и еще 1 приложении</b> (за последний день).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[Функция App Tracking Protection заблокировала <b>%1$s %2$d раз в %3$s и %4$d других приложениях</b> (за последний день).]]></string>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Функция App Tracking Protection заблокировала <b>%1$s %2$d раз(а) в %3$s</b> (за последний день).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Функция App Tracking Protection заблокировала <b>%1$s %2$d раз(а) в %3$s и еще 1 приложении</b> (за последний день).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Функция App Tracking Protection заблокировала <b>%1$s %2$d раз(а) в %3$s и %4$d других приложениях</b> (за последний день).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Функция App Tracking Protection заблокировала <b>%1$s %2$d раз(а) в %3$s</b> (за последний день).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Функция App Tracking Protection заблокировала <b>%1$s %2$d раз(а) в %3$s и еще 1 приложении</b> (за последний день).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[Функция App Tracking Protection заблокировала <b>%1$s %2$d раз(а) в %3$s и %4$d других приложениях</b> (за последний день).]]></string>
 
     <!-- App Tracking Protection Weekly Notification -->
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Заблокировано <b>%1$d попытку отслеживания в %2$s</b> (за последнюю неделю).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Заблокировано <b>%1$d попытку отслеживания в %2$s</b> и еще 1 приложении (за последнюю неделю).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Функция App Tracking Protection пресекла <b>%1$d попытку отслеживания в %2$s</b> и %3$d других приложениях (за последнюю неделю).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> (за последнюю неделю).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> и еще 1 приложении (за последнюю неделю).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> и %3$d других приложениях (за последнюю неделю).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Заблокировано <b>%1$d попытку отслеживания в %2$s</b> (за последнюю неделю).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Заблокировано <b>%1$d попытку отслеживания в %2$s</b> и еще 1 приложении (за последнюю неделю).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Функция App Tracking Protection пресекла <b>%1$d попытку отслеживания в %2$s</b> и %3$d других приложениях (за последнюю неделю).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> (за последнюю неделю).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> и еще 1 приложении (за последнюю неделю).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> и %3$d других приложениях (за последнюю неделю).]]></string>
 
-     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_WeeklyCompanyTeaserNotification">
         <item quantity="one"><![CDATA[Заблокировано <b>%1$s в %2$d приложении — %3$s</b> (за последнюю неделю).]]></item>
         <item quantity="few"><![CDATA[Заблокировано <b>%1$s в %2$d приложениях, включая %3$s</b> (за последнюю неделю).]]></item>
         <item quantity="many"><![CDATA[Заблокировано <b>%1$s в %2$d приложениях, включая %3$s</b> (за последнюю неделю).]]></item>
@@ -97,12 +99,12 @@
 
     <string name="atp_EnableCTA">Включить защиту от слежки</string>
 
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Пресечена <b>%1$d попытка отслеживания в %2$s</b> (за последний час).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Функция App Tracking Protection пресекла <b>%1$d попытку отслеживания в %2$s и еще 1 приложении</b> (за последний час).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Функция App Tracking Protection пресекла <b>%1$d попытку отслеживания в %2$s и %3$d других приложениях</b> (за последний час).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> (за последний час).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s и еще 1 приложении</b> (за последний час).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s и %3$d других приложениях</b> (за последний час).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Пресечена <b>%1$d попытка отслеживания в %2$s</b> (за последний час).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[Функция App Tracking Protection пресекла <b>%1$d попытку отслеживания в %2$s и еще 1 приложении</b> (за последний час).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[Функция App Tracking Protection пресекла <b>%1$d попытку отслеживания в %2$s и %3$d других приложениях</b> (за последний час).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s</b> (за последний час).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s и еще 1 приложении</b> (за последний час).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[Функция App Tracking Protection пресекла <b>попытки отслеживания (%1$d) в %2$s и %3$d других приложениях</b> (за последний час).]]></string>
 
     <!-- App Tracking Protection Privacy Report -->
     <string name="atp_PrivacyReportEnabledTooltip">Защита от слежки включена и блокирует трекеры во всех приложениях</string>
@@ -110,7 +112,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Включить защиту от слежки</string>
     <string name="atp_OnboardingLastPageOneTitle">Простой способ надежно защитить данные!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle"><b>Более 96\u0025 популярных бесплатных приложений</b> позволяют сторонним компаниям отслеживать ваши личные данные, даже когда вы спите.\n\nТеперь вы можете увидеть, <b>какие это приложения</b>, и вернуть контроль над своими данными!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle" formatted="false"><b>Более 96% популярных бесплатных приложений</b> позволяют сторонним компаниям отслеживать ваши личные данные, даже когда вы спите.\n\nТеперь вы можете увидеть, <b>какие это приложения</b>, и вернуть контроль над своими данными!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Как это работает?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Защита от слежки <b>блокирует трекеры сторонних компаний</b> (например, Facebook) при попытке следить за вами в таких приложениях как «Здоровье».\n\n<b>Это бесплатная функция</b>, которая никак не влияет на работу других приложений. Работая в фоновом режиме, она <b>обеспечивает круглосуточную защиту</b>.</string>
     <string name="atp_OnboardingLastPageThreeTitle">Кто видит ваши данные?</string>
@@ -121,7 +123,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Блокировка отслеживания приложениями</string>
-    <string name="atp_daxOnboardingIntroMessage">Более 96\u0025 популярных бесплатных приложений позволяют другим компаниям отслеживать вас, даже когда вы не пользуетесь телефоном. Защита от слежки выявляет и блокирует подобные действия.</string>
+    <string name="atp_daxOnboardingIntroMessage" formatted="false">Более 96% популярных бесплатных приложений позволяют другим компаниям отслеживать вас, даже когда вы не пользуетесь телефоном. Защита от слежки выявляет и блокирует подобные действия.</string>
     <string name="atp_daxOnboardingPermissionTitle">Как это работает?</string>
     <string name="atp_daxOnboardingPermissionMessage">App Tracking Protection не VPN-сервис. Но ваше устройство примет эту функцию именно за VPN, а всё потому, что она использует локальное VPN-соединение. App Tracking Protection ни в коем случае не направляет данные приложения через внешний сервер. <annotation type="learn_more_link">Подробнее...</annotation></string>
 
@@ -149,7 +151,7 @@
     <string name="atp_ExcludeAppsManuallyCTACancel">Отменить</string>
     <string name="atp_ExcludeAppsManuallyCTAEnable">Включить</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Восстановить</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Включить защиту приложения %1$s вручную?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Включить защиту приложения %1$s вручную?</string>
     <string name="atp_ExcludeAppsManuallyEnableAppLabel">При неудачных попытках отслеживания в этом приложении часто возникают сбои.</string>
     <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Если включена защита, содержимое сайта в этом приложении может отображаться некорректно.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">При включении защиты название приложения передается в DuckDuckGo.</string>
@@ -170,7 +172,7 @@
     <!--  Breakage report app list  -->
     <string name="atp_ReportBreakageAppListActivityTitle">Сообщить о проблеме</string>
     <string name="atp_ReportBreakageAppFeature"><b>Выберите приложение, с которым возникла проблема</b>. Ваши отзывы помогают нам совершенствовать защиту!\n\nУ вас отзыв общего характера? Воспользуйтесь <annotation type="use_this_form_link">этой формой</annotation>.</string>
-    <string name="atp_ReportBreakageAppEntry">Приложение %1$s</string>
+    <string name="atp_ReportBreakageAppEntry" instruction="Placeholder is the name of an app">Приложение %1$s</string>
     <string name="atp_ReportBreakageAppSubmitCta">Подтвердить</string>
     <string name="atp_ReportBreakageAppNextCta">Далее</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Опишите, что происходит, что ожидалось и какие действия привели к неполадке.</string>
@@ -197,7 +199,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">О трекерах в приложениях</string>
     <string name="atp_ProfilingInfoTitle">Что такое трекеры в приложениях?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Вы, вероятно, слышали, что Google, Facebook и многие другие компании незаметно отслеживают ваши действия на сторонних сайтах. Однако не всем известно, что они также собирают личные данные через приложения.\n\nМы протестировали 100 популярных бесплатных приложений для Android, и <b>как минимум 96</b> из них содержали трекеры. 87 из них отправляли данные в Google, а 68 — в Facebook, причем даже когда не использовалось устройство.\n\nБолее того, <b>трекеры в приложениях могут извлекать намного больше информации</b>, чем на сайтах — например, определить, на каком этаже вы живете, как часто играете в игры на работе, когда и сколько вы спите. <b>Даже если у вас нет учетной записи Google или Facebook, они все равно могут собирать о вас данные через приложения.</b>\n\nИспользуя полученные крупицы информации, сети отслеживания (Facebook, Google и подобные) <b>составляют на вас цифровое досье</b>. Опираясь на него, они могут управлять тем, что вы видите в Интернете, а доступ к досье также продается рекламщикам, которые готовы за него заплатить.\n\nТрекеры в приложениях — СЕРЬЕЗНАЯ угроза конфиденциальности. <b>Но у DuckDuckGo есть решение.</b>Включите в конфиденциальном браузере приложения DuckDuckGo защиту от слежки, которая будет блокировать множество трекеров в других программах на вашем устройстве. Кроме того, приложение DuckDuckGo одновременно блокирует трекеры на сайтах. <b>Эта двойная защита существенно уменьшит объем данных, собранных о вас сторонними компаниями</b>, пока вы пользуетесь привычными приложениями.</string>
+    <string name="atp_ProfilingInfoFirstParagraph" formatted="false">Вы, вероятно, слышали, что Google, Facebook и многие другие компании незаметно отслеживают ваши действия на сторонних сайтах. Однако не всем известно, что они также собирают личные данные через приложения.\n\nМы протестировали 100 популярных бесплатных приложений для Android, и <b>как минимум 96</b> из них содержали трекеры. 87 из них отправляли данные в Google, а 68 — в Facebook, причем даже когда не использовалось устройство.\n\nБолее того, <b>трекеры в приложениях могут извлекать намного больше информации</b>, чем на сайтах — например, определить, на каком этаже вы живете, как часто играете в игры на работе, когда и сколько вы спите. <b>Даже если у вас нет учетной записи Google или Facebook, они все равно могут собирать о вас данные через приложения.</b>\n\nИспользуя полученные крупицы информации, сети отслеживания (Facebook, Google и подобные) <b>составляют на вас цифровое досье</b>. Опираясь на него, они могут управлять тем, что вы видите в Интернете, а доступ к досье также продается рекламщикам, которые готовы за него заплатить.\n\nТрекеры в приложениях — СЕРЬЕЗНАЯ угроза конфиденциальности. <b>Но у DuckDuckGo есть решение.</b>Включите в конфиденциальном браузере приложения DuckDuckGo защиту от слежки, которая будет блокировать множество трекеров в других программах на вашем устройстве. Кроме того, приложение DuckDuckGo одновременно блокирует трекеры на сайтах. <b>Эта двойная защита существенно уменьшит объем данных, собранных о вас сторонними компаниями</b>, пока вы пользуетесь привычными приложениями.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">За последние 7 дней</string>
@@ -210,30 +212,39 @@
     <string name="atp_ActivityBetaInstructions">Инструкции к бета-версии</string>
     <string name="atp_ActivityManageProtection">Возникли проблемы с приложением?</string>
 
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[Пресечена %1$d попытка отслеживания %2$d компанией в приложении <b>%3$s</b>]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[Пресечена %1$d попытка отслеживания %2$d компаниями в приложении <b>%3$s</b>]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[Пресечены попытки отслеживания (%1$d) компанией %2$d в приложении <b>%3$s</b>]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[Пресечены попытки отслеживания (%1$d) компаниями %2$d в приложении <b>%3$s</b>]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
+        <![CDATA[В приложении <b>%1$s</b> пресечена 1 попытка отслеживания 1 компанией]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies" instruction="Placeholder %1$d is the number of companies doing the tracking. Placeholder %2$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 5 companies in Venmo app.">
+        <![CDATA[В приложении <b>%2$s</b> пресечена 1 попытка отслеживания %1$d компаниями]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$s is the name of the app doing the tracking. Example: 5 tracking attempts blocked from 1 company in Venmo app.">
+        <![CDATA[В приложении <b>%2$s</b> пресечены попытки отслеживания (%1$d) 1 компанией]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
+        <![CDATA[Пресечены попытки отслеживания (%1$d) компаниями %2$d в приложении <b>%3$s</b>]]>
+    </string>
 
     <string name="atp_ActivityEmptyListTitle">Новой активности нет</string>
     <string name="atp_ActivityEmptyListMessage">Продолжайте пользоваться устройством. Попытки отслеживания, блокированные защитой от слежки, отобразятся здесь.</string>
     <string name="atp_ActivityPastWeekBlocked">Заблокировано</string>
     <string name="atp_ActivityPastWeekAcross">в</string>
 
-     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">попытка отслеживания</item>
         <item quantity="few">попытки отслеживания</item>
         <item quantity="many">попыток отслеживания</item>
         <item quantity="other">попытки отслеживания</item>
     </plurals>
-      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">приложении</item>
         <item quantity="few">приложениях</item>
         <item quantity="many">приложениях</item>
         <item quantity="other">приложения</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Эта функция доступна в бета-версии. <annotation type="app_settings_link">Возникли проблемы с приложением?</annotation></string>
+    <string name="atp_ActivityEnabledLabel">Это бета-версия функции. Заметили проблему с приложением? <annotation type="app_settings_link">Сообщите нам!</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Функция App Tracking Protection отключена</b> \nИз-за нее возникли сбои в приложениях? <annotation type="report_issues_link">Сообщить о проблемах</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Система Android отключила функцию блокировки отслеживания приложениями</b>. Не делать этого впредь? <annotation type="re_enable_link">Включить снова</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPN-приложение на вашем устройстве отключило защиту от слежки.</b>\nЗащите от слежки вызывает сбои в приложениях? <annotation type="report_issues_link">Сообщить о проблемах</annotation></string>
     <string name="atp_ActivityAbout">О нас</string>
     <string name="atp_ActivityManage">Настроить</string>
@@ -293,10 +304,11 @@
         <item quantity="other">Пресечено попыток отслеживания: %1$d</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Сообщить о проблеме с приложением</string>
-    <string name="atp_CompanyDetailsTrackingShowMore">Показать еще %1$d</string>
+    <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Показать еще %1$d</string>
     <string name="atp_CompanyDetailsTrackingLearnMore">Приложения могут задействовать трекеры других компаний для аналитики, маркетинга и подобных целей. Если эти трекеры не блокировать, постепенно они могут составить о вас подробное досье. <annotation type="learn_more_link">Подробнее...</annotation></string>
     <string name="atp_CompanyDetailsTrackingShowLess">Показать меньше результатов</string>
     <string name="atp_CompanyDetailsAppInfoPanel">В настоящее время в этом приложении отключена защита. Если защита от слежки вызвала сбой, <annotation type="report_issues_link">сообщите нам</annotation></string>
+    <string name="atp_CompanyDetailsNotAvailableForUninstalledApps" instruction="Toast shown when users tap on item that corresponds to an already uninstalled application">Данные о трекерах не предоставляются по удаленным приложениям</string>
 
     <!--  App Tracking Company Signals -->
     <string name="atp_TrackingSignalAAID">Рекламный идентификатор Android</string>
@@ -382,10 +394,13 @@
     <string name="atp_RemoveFeatureDialogRemove">Выключить</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Включить режим «Всегда включено»?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Что делать, чтобы Android периодически не отключал защиту от слежки?\n\nПерейдите в «Настройки» Android.\nОткройте «Настройки VPN» для DuckDuckGo.\nВыберите режим VPN «Всегда включено».</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Открыть «Настройки»</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Напомнить позже</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Нет, спасибо</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Не сейчас</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Чтобы Android не отключил вам защиту от трекеров в будущем, откройте настройки VPN для DuckDuckGo на своем устройстве и выберите для VPN вариант <b>«Всегда включено»</b>.\n\nУбедитесь, что другой параметр ВЫКЛЮЧЕН.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Чтобы приложение работало без перебоев, откройте <b>настройки VPN для DuckDuckGo</b> и отключите опцию <b>«Блокировать подключения без VPN»</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Задать «Всегда включено»</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Измените настройки VPN</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Внимание!</b> Измените настройки Android, чтобы приложение работало без перебоев. <annotation type="open_settings_link">Изменить настройки</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Внимание! Необходимо изменить настройки Android для функции блокировки отслеживания приложениями.</string>
 
 </resources>
