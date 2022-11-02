@@ -86,7 +86,7 @@ report
 /node_modules/@duckduckgo/privacy_dashboard/*
 !/node_modules/@duckduckgo/privacy_dashboard/build/
 /node_modules/@duckduckgo/privacy_dashboard/build/*
-!/node_modules/@duckduckgo/privacy_dashboard/build/android
+!/node_modules/@duckduckgo/privacy_dashboard/build/app
 
 !/node_modules/@duckduckgo/content-scope-scripts/
 /node_modules/@duckduckgo/content-scope-scripts/*
