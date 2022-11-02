@@ -22,6 +22,9 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType
+import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.FilterType
+import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.InfoPanelType
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
@@ -82,26 +85,35 @@ class ManageAppsProtectionViewModel @Inject constructor(
     internal suspend fun getProtectedApps(): Flow<ViewState> {
         return excludedApps.getAppsAndProtectionInfo()
             .combine(filterState.asStateFlow()) { list, filter ->
-                val protectedApps = list.filter { !it.isExcluded }
-                val unprotectedApps = list.filter { it.isExcluded }
+                val protectedApps = list.filter { !it.isExcluded }.map { AppInfoType(it) }
+                val unprotectedApps = list.filter { it.isExcluded }.map { AppInfoType(it) }
+                val allApps = list.map { AppInfoType(it) }
                 val customProtection = list.any { it.isProblematic() && !it.isExcluded }
 
                 when (filter) {
-                    AppsFilter.PROTECTED_ONLY -> return@combine ViewState(
-                        protectedApps,
-                        R.string.atp_ExcludedAppsFilterProtectedLabel,
-                        if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.ALL_OR_PROTECTED_APPS
-                    )
-                    AppsFilter.UNPROTECTED_ONLY -> return@combine ViewState(
-                        unprotectedApps,
-                        R.string.atp_ExcludedAppsFilterUnprotectedLabel,
-                        if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.UNPROTECTED_APPS
-                    )
-                    else -> return@combine ViewState(
-                        list,
-                        R.string.atp_ExcludedAppsFilterAllLabel,
-                        if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.ALL_OR_PROTECTED_APPS
-                    )
+                    AppsFilter.PROTECTED_ONLY -> {
+                        val panelType = InfoPanelType(if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.ALL_OR_PROTECTED_APPS)
+                        val filterType = FilterType(R.string.atp_ExcludedAppsFilterProtectedLabel, protectedApps.size)
+                        val protectedAppsList = mutableListOf(panelType, filterType).plus(protectedApps)
+
+                        return@combine ViewState(protectedAppsList)
+                    }
+
+                    AppsFilter.UNPROTECTED_ONLY -> {
+                        val panelType = InfoPanelType(if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.UNPROTECTED_APPS)
+                        val filterType = FilterType(R.string.atp_ExcludedAppsFilterUnprotectedLabel, unprotectedApps.size)
+                        val unProtectedAppsList = mutableListOf(panelType, filterType).plus(unprotectedApps)
+
+                        return@combine ViewState(unProtectedAppsList)
+                    }
+
+                    else -> {
+                        val panelType = InfoPanelType(if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.ALL_OR_PROTECTED_APPS)
+                        val filterType = FilterType(R.string.atp_ExcludedAppsFilterAllLabel, allApps.size)
+                        val appsList = listOf(panelType, filterType).plus(allApps)
+
+                        return@combine ViewState(appsList)
+                    }
                 }
             }
     }
@@ -114,6 +126,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
                 }
                     .filterNotNull()
                     .take(5)
+                    .map { AppInfoType(it) }
             }.map { ViewState(it) }
             .onStart { pixel.didShowExclusionListActivity() }
             .flowOn(dispatcherProvider.io())
@@ -264,11 +277,19 @@ private data class ManualProtectionSnapshot(
     val snapshot: List<Pair<String, Boolean>>
 )
 
-internal data class ViewState(
-    val excludedApps: List<TrackingProtectionAppInfo>,
-    @StringRes val filterResId: Int? = null,
-    val bannerContent: BannerContent = BannerContent.ALL_OR_PROTECTED_APPS
+data class ViewState(
+    val excludedApps: List<AppsProtectionType>
 )
+
+sealed class AppsProtectionType {
+    data class InfoPanelType(val bannerContent: BannerContent) : AppsProtectionType()
+    data class FilterType(
+        val filterResId: Int,
+        val appsNumber: Int
+    ) : AppsProtectionType()
+
+    data class AppInfoType(val appInfo: TrackingProtectionAppInfo) : AppsProtectionType()
+}
 
 enum class BannerContent {
     ALL_OR_PROTECTED_APPS,
