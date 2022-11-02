@@ -27,12 +27,12 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.BannerContent
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.FilterType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.InfoPanelType
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.databinding.RowExclusionListAppBinding
 import com.duckduckgo.mobile.android.vpn.databinding.RowExclusionListFilterBinding

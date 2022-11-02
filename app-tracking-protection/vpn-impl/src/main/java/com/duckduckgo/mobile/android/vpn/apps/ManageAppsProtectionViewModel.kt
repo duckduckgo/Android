@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.FilterType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.InfoPanelType
