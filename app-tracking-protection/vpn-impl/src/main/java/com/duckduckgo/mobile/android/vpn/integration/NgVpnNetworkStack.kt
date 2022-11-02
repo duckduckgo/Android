@@ -32,7 +32,6 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorder
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType
@@ -49,6 +48,7 @@ import javax.inject.Inject
 import kotlin.random.Random
 
 private const val LRU_CACHE_SIZE = 2048
+private const val EMFILE_ERRNO = 24
 
 @ContributesBinding(
     scope = VpnScope::class,
@@ -60,7 +60,7 @@ private const val LRU_CACHE_SIZE = 2048
 )
 @SingleInstanceIn(VpnScope::class)
 class NgVpnNetworkStack @Inject constructor(
-    private val context: Context,
+    context: Context,
     private val appBuildConfig: AppBuildConfig,
     private val vpnNetwork: Lazy<VpnNetwork>,
     private val appTrackerRepository: AppTrackerRepository,
@@ -69,6 +69,7 @@ class NgVpnNetworkStack @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     vpnDatabase: VpnDatabase,
+    private val runtime: Runtime,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
     private val addressLookupDao = vpnDatabase.vpnAddressLookupDao()
@@ -129,10 +130,16 @@ class NgVpnNetworkStack @Inject constructor(
 
     private fun persistCacheToDisk() {
         addressLookupDao.deleteAll()
-        addressLookupLruCache.snapshot().forEach { (key, value) ->
-            Timber.d("Persisting to address lookup cache $key -> $value")
-            addressLookupDao.insert(VpnAddressLookup(key, value))
-        }
+        addressLookupLruCache.snapshot()
+            .filter {
+                val hostname = it.value
+                // just interested in tracker domains
+                appTrackerRepository.findTracker(hostname, "") != AppTrackerType.NotTracker
+            }
+            .forEach { (key, value) ->
+                Timber.d("Persisting to address lookup cache $key -> $value")
+                addressLookupDao.insert(VpnAddressLookup(key, value))
+            }
     }
 
     override fun onStopVpn(): Result<Unit> {
@@ -160,35 +167,45 @@ class NgVpnNetworkStack @Inject constructor(
 
     override fun onExit(reason: String) {
         Timber.w("Native exit reason=$reason")
-        // restart the VPN
-        appCoroutineScope.launch {
-            TrackerBlockingVpnService.restartVpnService(context, forceGc = true)
+
+        fun killProcess() {
+            runtime.exit(0)
         }
+        // restart the VPN. We kill process to also avoid any memory leak in the native layer
+        killProcess()
     }
 
     override fun onError(errorCode: Int, message: String) {
+        fun Int.isEmfile(): Boolean {
+            return this == EMFILE_ERRNO
+        }
+
         Timber.w("onError $errorCode:$message")
+
+        if (errorCode.isEmfile()) {
+            onExit(message)
+        }
     }
 
     override fun onDnsResolved(dnsRR: DnsRR) {
         addressLookupLruCache.put(dnsRR.resource, dnsRR.qName)
-        Timber.w("dnsResolved called for $dnsRR")
+        Timber.d("dnsResolved called for $dnsRR")
     }
 
     override fun onSniResolved(sniRR: SniRR) {
         addressLookupLruCache.put(sniRR.resource, sniRR.name)
-        Timber.w("sniResolved called for ${sniRR.name} / ${sniRR.resource}")
+        Timber.d("sniResolved called for ${sniRR.name} / ${sniRR.resource}")
     }
 
     override fun isDomainBlocked(domainRR: DomainRR): Boolean {
-        Timber.w("isDomainBlocked for $domainRR")
+        Timber.d("isDomainBlocked for $domainRR")
         return !shouldAllowDomain(domainRR.name, domainRR.uid)
     }
 
     override fun isAddressBlocked(addressRR: AddressRR): Boolean {
         val hostname = addressLookupLruCache[addressRR.address] ?: return false
         val domainAllowed = shouldAllowDomain(hostname, addressRR.uid)
-        Timber.w("isAddressBlocked for $addressRR ($hostname) = ${!domainAllowed}")
+        Timber.d("isAddressBlocked for $addressRR ($hostname) = ${!domainAllowed}")
         return !domainAllowed
     }
 

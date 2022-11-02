@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.store
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
@@ -25,6 +26,7 @@ import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.Exa
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.UrlOnlyMatch
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.UsernameMatch
+import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.UsernameMissing
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
@@ -148,6 +150,22 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     @Test
+    fun whenPasswordExistsForSiteWithNoUsernameThenReturnUsernameMissing() = runTest {
+        setupTesteeWithAutofillAvailable()
+        storeCredentials(id = 1, domain = "https://example.com", username = null, password = "password")
+        val result = testee.containsCredentials("example.com", "username", "password")
+        assertUsernameMissing(result)
+    }
+
+    @Test
+    fun whenDifferentPasswordExistsForSiteWithNoUsernameThenReturnUrlMatch() = runTest {
+        setupTesteeWithAutofillAvailable()
+        storeCredentials(id = 1, domain = "https://example.com", username = null, password = "password")
+        val result = testee.containsCredentials("example.com", "username", "not-the-same-password")
+        assertUrlOnlyMatch(result)
+    }
+
+    @Test
     fun whenStoreContainsDomainAndUsernameButDifferentPassword() = runTest {
         setupTesteeWithAutofillAvailable()
         storeCredentials(1, "https://example.com", "username", "password")
@@ -188,7 +206,7 @@ class SecureStoreBackedAutofillStoreTest {
             domain = url, username = "username1", password = "newpassword", id = 1
         )
 
-        testee.updateCredentials(url, credentials)
+        testee.updateCredentials(url, credentials, CredentialUpdateType.Password)
 
         testee.getCredentials(url).run {
             this.assertHasLoginCredentials(url, "username1", "newpassword", UPDATED_INITIAL_LAST_UPDATED)
@@ -214,6 +232,42 @@ class SecureStoreBackedAutofillStoreTest {
             this.assertHasLoginCredentials(url, "username1", "newpassword", UPDATED_INITIAL_LAST_UPDATED)
             this.assertHasLoginCredentials(url, "username2", "password456")
             this.assertHasLoginCredentials(url, "username3", "password789")
+        }
+    }
+
+    @Test
+    fun whenUsernameIsUpdatedForUrlThenUpdatedOnlyMatchingCredential() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val url = "https://example.com"
+        storeCredentials(1, url, null, "password123")
+        storeCredentials(2, url, "username2", "password456")
+        storeCredentials(3, url, "username3", "password789")
+        val credentials = LoginCredentials(
+            domain = url, username = "username1", password = "password123", id = 1
+        )
+
+        testee.updateCredentials(url, credentials, CredentialUpdateType.Username)
+
+        testee.getCredentials(url).run {
+            this.assertHasLoginCredentials(url, "username1", "password123", UPDATED_INITIAL_LAST_UPDATED)
+            this.assertHasLoginCredentials(url, "username2", "password456")
+            this.assertHasLoginCredentials(url, "username3", "password789")
+        }
+    }
+
+    @Test
+    fun whenUsernameMissingForAnotherUrlThenNoUpdatesMade() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val urlStored = "https://example.com"
+        val newDomain = "https://test.com"
+        storeCredentials(1, urlStored, null, "password123")
+
+        val credentials = LoginCredentials(domain = newDomain, username = "username1", password = "password123", id = 1)
+
+        assertNull(testee.updateCredentials(newDomain, credentials, CredentialUpdateType.Username))
+
+        testee.getCredentials(urlStored).run {
+            this.assertHasLoginCredentials(urlStored, null, "password123")
         }
     }
 
@@ -296,7 +350,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     private fun List<LoginCredentials>.assertHasLoginCredentials(
         url: String,
-        username: String,
+        username: String?,
         password: String,
         lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED
     ) {
@@ -335,6 +389,10 @@ class SecureStoreBackedAutofillStoreTest {
         assertTrue(String.format("Expected UrlOnlyMatch but was %s", result), result is UrlOnlyMatch)
     }
 
+    private fun assertUsernameMissing(result: ContainsCredentialsResult) {
+        assertTrue(String.format("Expected UsernameMissing but was %s", result), result is UsernameMissing)
+    }
+
     private fun assertUsernameMatch(result: ContainsCredentialsResult) {
         assertTrue(String.format("Expected UsernameMatch but was %s", result), result is UsernameMatch)
     }
@@ -346,7 +404,7 @@ class SecureStoreBackedAutofillStoreTest {
     private suspend fun storeCredentials(
         id: Long,
         domain: String,
-        username: String,
+        username: String?,
         password: String,
         lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED,
         notes: String = "notes"

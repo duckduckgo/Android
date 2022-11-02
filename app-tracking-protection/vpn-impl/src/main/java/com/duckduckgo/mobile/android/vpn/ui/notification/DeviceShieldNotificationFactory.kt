@@ -81,17 +81,18 @@ class DeviceShieldNotificationFactory @Inject constructor(
         suspend fun createDailyDeviceShieldNotification(dailyNotificationType: Int): DeviceShieldNotification {
 
             val trackers = appTrackerBlockingStatsRepository.getVpnTrackersSync({ dateOfLastDay() })
-            val trackerCount = appTrackerBlockingStatsRepository.getBlockedTrackersCountBetween({ dateOfLastDay() }).firstOrNull() ?: trackers.size
+            val trackerCount =
+                appTrackerBlockingStatsRepository.getBlockedTrackersCountBetween({ dateOfLastDay() }).firstOrNull() ?: trackers.sumOf { it.count }
             Timber.v(
                 "createDailyDeviceShieldNotification. $trackerCount total trackers in the last day, number of trackers returned is " +
-                    "${trackers.size}. Notification type: $dailyNotificationType"
+                    "${trackers.sumOf { it.count }}. Notification type: $dailyNotificationType"
             )
 
             if (trackers.isEmpty()) {
                 return DeviceShieldNotification(hidden = true)
             }
 
-            val apps = trackers.groupBy { it.trackingApp }.toList().sortedByDescending { it.second.size }
+            val apps = trackers.groupBy { it.trackingApp }.toList().sortedByDescending { it.second.sumOf { t -> t.count } }
             val firstAppName = apps.firstOrNull()?.first?.appDisplayName ?: ""
 
             return when (dailyNotificationType) {
@@ -222,7 +223,8 @@ class DeviceShieldNotificationFactory @Inject constructor(
 
         suspend fun createWeeklyDeviceShieldNotification(randomNumber: Int): DeviceShieldNotification {
             val trackers = appTrackerBlockingStatsRepository.getVpnTrackersSync({ dateOfLastWeek() })
-            val trackerCount = appTrackerBlockingStatsRepository.getBlockedTrackersCountBetween({ dateOfLastDay() }).firstOrNull() ?: trackers.size
+            val trackerCount =
+                appTrackerBlockingStatsRepository.getBlockedTrackersCountBetween({ dateOfLastDay() }).firstOrNull() ?: trackers.sumOf { it.count }
             if (trackers.isEmpty()) {
                 return DeviceShieldNotification(hidden = true)
             }

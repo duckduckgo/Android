@@ -172,7 +172,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             val container: FrameLayout = view.findViewById(R.id.snackbar_container)
             val snackbarView =
                 Snackbar.make(container, "This is a Snackbar message", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Action") {}
+                    .setAction("Action") { Snackbar.make(container, "Action pressed", Snackbar.LENGTH_LONG).show() }
                     .view
             (snackbarView.layoutParams as FrameLayout.LayoutParams).gravity = Gravity.CENTER
 

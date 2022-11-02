@@ -26,6 +26,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
@@ -42,9 +43,7 @@ import com.duckduckgo.vpn.internal.feature.logs.TimberExtensions
 import com.duckduckgo.vpn.internal.feature.remote.VpnRemoteFeatureReceiver
 import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.duckduckgo.vpn.internal.feature.trackers.DeleteTrackersDebugReceiver
-import com.duckduckgo.vpn.internal.feature.transparency.TransparencyModeDebugReceiver
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -70,17 +69,10 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var workManager: WorkManager
 
-    private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
-    private var transparencyModeDebugReceiver: TransparencyModeDebugReceiver? = null
-    private var debugLoggingReceiver: DebugLoggingReceiver? = null
+    @Inject lateinit var dispatchers: DispatcherProvider
 
-    private val transparencyToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
-        if (toggleState) {
-            TransparencyModeDebugReceiver.turnOnIntent()
-        } else {
-            TransparencyModeDebugReceiver.turnOffIntent()
-        }.also { sendBroadcast(it) }
-    }
+    private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
+    private var debugLoggingReceiver: DebugLoggingReceiver? = null
 
     private val badHealthMonitoringToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
         if (toggleState) {
@@ -111,22 +103,15 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
 
-        setupTransparencyMode()
         setupAppTrackerExceptionRules()
         setupDebugLogging()
         setupBugReport()
         setupDeleteTrackingHistory()
         setupForceUpdateBlocklist()
-        setupViewDiagnosticsView()
         setupBadHealthMonitoring()
         setupConfigSection()
         setupUiElementsState()
         setupAppProtectionSection()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        transparencyModeDebugReceiver?.unregister()
     }
 
     private fun setupAppProtectionSection() {
@@ -141,7 +126,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
                 canProtect to canRestoreDefaults
             }
-            .flowOn(Dispatchers.IO)
+            .flowOn(dispatchers.io())
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach {
                 val canProtect = it.first
@@ -150,11 +135,11 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.restoreDefaultAppProtections.isEnabled = canRestoreDefaults
                 binding.protectAllApps.isEnabled = canProtect
             }
-            .flowOn(Dispatchers.Main)
+            .flowOn(dispatchers.main())
             .launchIn(lifecycleScope)
 
         binding.protectAllApps.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch(dispatchers.io()) {
                 for (excludedPackage in appTrackerRepository.getAppExclusionList()) {
                     appTrackerRepository.manuallyEnabledApp(excludedPackage.packageId)
                 }
@@ -163,7 +148,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.restoreDefaultAppProtections.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch(dispatchers.io()) {
                 appTrackerRepository.restoreDefaultProtectedList()
                 vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             }
@@ -183,7 +168,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
                 binding.vpnConnectivityChecksToggle.isEnabled = isEnabled
                 binding.debugLoggingToggle.isEnabled = isEnabled
-                binding.transparencyModeToggle.isEnabled = isEnabled
                 binding.settingsInfo.isVisible = !isEnabled
             }
             .launchIn(lifecycleScope)
@@ -202,13 +186,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 OneTimeWorkRequestBuilder<AppTrackerListUpdateWorker>().build()
             workManager.enqueue(workerRequest)
             Snackbar.make(binding.root, "Blocklist downloading...", Snackbar.LENGTH_LONG).show()
-        }
-    }
-
-    private fun setupViewDiagnosticsView() {
-        binding.viewDiagnostics.setOnClickListener {
-            val i = Intent().also { it.setClassName(packageName, "dummy.ui.VpnDiagnosticsActivity") }
-            startActivity(i)
         }
     }
 
@@ -237,21 +214,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         binding.exceptionRules.setOnClickListener {
             startActivity(ExceptionRulesDebugActivity.intent(this))
         }
-    }
-
-    private fun setupTransparencyMode() {
-
-        // we use the same receiver as it makes IPC much easier
-        transparencyModeDebugReceiver = TransparencyModeDebugReceiver(this) {
-            // avoid duplicating broadcast intent when toggle changes state
-            if (TransparencyModeDebugReceiver.isTurnOnIntent(it)) {
-                binding.transparencyModeToggle.quietlySetIsChecked(true, transparencyToggleListener)
-            } else if (TransparencyModeDebugReceiver.isTurnOffIntent(it)) {
-                binding.transparencyModeToggle.quietlySetIsChecked(false, transparencyToggleListener)
-            }
-        }.apply { register() }
-
-        binding.transparencyModeToggle.setOnCheckedChangeListener(transparencyToggleListener)
     }
 
     private fun setupBadHealthMonitoring() {

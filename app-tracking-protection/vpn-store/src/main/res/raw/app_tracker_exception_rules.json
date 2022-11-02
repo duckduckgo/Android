@@ -1,28 +1,36 @@
 {
   "rules": [
     {
-      "rule": "tt.omtrdc.net",
+      "rule": "acdn.adnxs.com",
       "packageNames": [
-        "com.coppi.bestbuy"
+        "se.prisjakt.pricespy"
+      ]
+    },
+    {
+      "rule": "ad.doubleclick.net",
+      "packageNames": [
+        "com.subway.mobile.subwayapp03",
+        "com.subway.subway"
+      ]
+    },
+    {
+      "rule": "adservice.google.com",
+      "packageNames": [
+        "com.subway.mobile.subwayapp03",
+        "com.subway.subway"
       ]
     },
     {
       "rule": "api2.branch.io",
       "packageNames": [
         "com.airbnb.android",
+        "com.amazon.mp3",
+        "com.cvs.launchers.cvs",
         "com.deliveroo.orderapp",
+        "com.esharesinc.android",
         "com.glovo",
         "com.imdb.mobile",
-        "com.marriott.mrt",
-        "com.esharesinc.android",
-        "com.cvs.launchers.cvs"
-      ]
-    },
-    {
-      "rule": "dpm.demdex.net",
-      "packageNames": [
-        "com.marriott.mrt",
-        "com.excentus.frn.android"
+        "com.marriott.mrt"
       ]
     },
     {
@@ -32,44 +40,29 @@
       ]
     },
     {
-      "rule": "t.co",
+      "rule": "connect.facebook.net",
       "packageNames": [
-        "com.zecwalletmobile"
+        "com.subway.mobile.subwayapp03",
+        "com.subway.subway"
       ]
     },
     {
-      "rule": "g.doubleclick.net",
+      "rule": "data.flurry.com",
       "packageNames": [
-        "pl.promate.bilkom",
-        "com.tour.pgatour",
-        "com.treemolabs.apps.cbsnews",
-        "com.bloomberg.android.plus",
-        "com.cbs.app",
-        "com.thoptv.livetvstream",
-        "com.ftt.boxingstar.gl.aos",
-        "ro.rcsrds.mydigi",
-        "com.goldtouch.ynet"
+        "ru.afisha.android"
       ]
     },
     {
-      "rule": "www.google-analytics.com",
+      "rule": "device-api.urbanairship.com",
       "packageNames": [
-        "pl.promate.bilkom",
-        "com.fitbit.FitbitMobile",
-        "jp.naver.line.android",
-        "com.bladock.perkopolis"
+        "com.thehomedepot"
       ]
     },
     {
-      "rule": "acdn.adnxs.com",
+      "rule": "dpm.demdex.net",
       "packageNames": [
-        "se.prisjakt.pricespy"
-      ]
-    },
-    {
-      "rule": "ib.adnxs.com",
-      "packageNames": [
-        "se.prisjakt.pricespy"
+        "com.excentus.frn.android",
+        "com.marriott.mrt"
       ]
     },
     {
@@ -79,9 +72,59 @@
       ]
     },
     {
-      "rule": "data.flurry.com",
+      "rule": "g.doubleclick.net",
       "packageNames": [
-        "ru.afisha.android"
+        "com.bloomberg.android.plus",
+        "com.cbs.app",
+        "com.ftt.boxingstar.gl.aos",
+        "com.goldtouch.ynet",
+        "com.subway.mobile.subwayapp03",
+        "com.subway.subway",
+        "com.thoptv.livetvstream",
+        "com.tour.pgatour",
+        "com.treemolabs.apps.cbsnews",
+        "pl.promate.bilkom",
+        "ro.rcsrds.mydigi"
+      ]
+    },
+    {
+      "rule": "graph.instagram.com",
+      "packageNames": [
+        "com.okcupid.okcupid"
+      ]
+    },
+    {
+      "rule": "ib.adnxs.com",
+      "packageNames": [
+        "se.prisjakt.pricespy"
+      ]
+    },
+    {
+      "rule": "sc.omtrdc.net",
+      "packageNames": [
+        "com.audible.application",
+        "com.subway.mobile.subwayapp03",
+        "com.subway.subway"
+      ]
+    },
+    {
+      "rule": "sentry.io",
+      "packageNames": [
+        "com.fastmail.app"
+      ]
+    },
+    {
+      "rule": "t.co",
+      "packageNames": [
+        "com.zecwalletmobile"
+      ]
+    },
+    {
+      "rule": "tt.omtrdc.net",
+      "packageNames": [
+        "com.coppi.bestbuy",
+        "com.subway.mobile.subwayapp03",
+        "com.subway.subway"
       ]
     },
     {
@@ -94,13 +137,27 @@
     {
       "rule": "www.facebook.com",
       "packageNames": [
-        "com.chefsteps.circulator"
+        "com.chefsteps.circulator",
+        "com.subway.mobile.subwayapp03",
+        "com.subway.subway"
+      ]
+    },
+    {
+      "rule": "www.google-analytics.com",
+      "packageNames": [
+        "com.bladock.perkopolis",
+        "com.fitbit.FitbitMobile",
+        "jp.naver.line.android",
+        "pl.promate.bilkom"
       ]
     },
     {
       "rule": "www.instagram.com",
       "packageNames": [
-        "com.timehop"
+        "com.okcupid.okcupid",
+        "com.timehop",
+        "com.maximolab.followeranalyzer",
+        "get.instagram.followers.unfollowers"
       ]
     }
   ]

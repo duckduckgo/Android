@@ -37,6 +37,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit.DAYS
@@ -46,6 +47,9 @@ import kotlin.time.ExperimentalTime
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class DeviceShieldActivityFeedViewModelTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private lateinit var db: VpnDatabase
     private lateinit var viewModel: DeviceShieldActivityFeedViewModel
@@ -58,9 +62,9 @@ class DeviceShieldActivityFeedViewModelTest {
             .build()
 
         viewModel = DeviceShieldActivityFeedViewModel(
-            RealAppTrackerBlockingStatsRepository(db),
-            CoroutineTestRule().testDispatcherProvider,
-            RealTimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext)
+            RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider),
+            coroutineTestRule.testDispatcherProvider,
+            RealTimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext),
         )
     }
 
@@ -88,9 +92,9 @@ class DeviceShieldActivityFeedViewModelTest {
 
     @Test
     fun whenGetMostRecentTrackersIsNotEmptyThenStartWithSkeletonThenEmit() = runBlocking {
-        db.vpnTrackerDao().insert(dummyTrackers[2])
-        db.vpnTrackerDao().insert(dummyTrackers[1])
         db.vpnTrackerDao().insert(dummyTrackers[0])
+        db.vpnTrackerDao().insert(dummyTrackers[1])
+        db.vpnTrackerDao().insert(dummyTrackers[2])
         db.vpnAppTrackerBlockingDao().insertTrackerEntities(dummySignals)
 
         viewModel.getMostRecentTrackers(timeWindow, false).test {

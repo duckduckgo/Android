@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="voiceSearchIconContentDescription">Zoeken via spraak</string>
+    <string name="voiceSearchListening">Praat nu</string>
+    <string name="voiceSearchListeningFooter">Audio wordt op het apparaat verwerkt. Het wordt niet opgeslagen of met iemand gedeeld, ook niet met DuckDuckGo.</string>
+    <string name="voiceSearchNegativeAction">Annuleren</string>
+    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo luistert nooit naar wat je zegt. Audio wordt op het apparaat verwerkt. Het wordt niet opgeslagen en met niemand gedeeld.</string>
+    <string name="voiceSearchPermissionRationaleTitle">Microfoontoegang vereist voor Private Voice Search</string>
+    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
+    <string name="voiceSearchPermissionRejectedDialogMessage">Om te zoeken via spraak in DuckDuckGo, moet je toegang tot de microfoon inschakelen in de systeeminstellingen.</string>
+    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Instellingen</string>
+    <string name="voiceSearchPermissionRejectedDialogTitle">Toegang tot microfoon vereist</string>
+    <string name="voiceSearchTitle">Zoeken via spraak</string>
+</resources>

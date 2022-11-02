@@ -14,14 +14,16 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="common_Today">Šodien</string>
     <string name="common_Yesterday">Vakar</string>
-    <string name="common_DaysAgo">Pirms %1$d dienām</string>
+    <string name="common_DaysAgo" instruction="Placeholder is the number of days">Pirms %1$d dienām</string>
     <string name="common_PastWeek">Pēdējā nedēļa</string>
     <string name="common_PastMonth">Pēdējais mēnesis</string>
-    <string name="common_MinutesAgo">Pirms %1$d m</string>
-    <string name="common_HoursAgo">Pirms %1$d h</string>
+    <string name="common_MinutesAgo" instruction="Placeholder is the number of minutes">Pirms %1$d m</string>
+    <string name="common_HoursAgo" instruction="Placeholder is the number of hours">Pirms %1$d h</string>
     <string name="common_JustNow">Tikko</string>
     <string name="common_hour_abbreviation">st.</string>
     <string name="common_min_abbreviation">min.</string>

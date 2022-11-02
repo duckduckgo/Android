@@ -114,6 +114,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
@@ -2725,9 +2726,13 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override suspend fun updateCredentials(url: String, credentials: LoginCredentials): LoginCredentials? {
+    override suspend fun updateCredentials(
+        url: String,
+        credentials: LoginCredentials,
+        updateType: CredentialUpdateType
+    ): LoginCredentials? {
         return withContext(appCoroutineScope.coroutineContext) {
-            autofillStore.updateCredentials(url, credentials)
+            autofillStore.updateCredentials(url, credentials, updateType)
         }
     }
 

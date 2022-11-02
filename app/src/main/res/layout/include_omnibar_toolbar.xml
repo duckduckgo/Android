@@ -27,7 +27,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:theme="@style/AppTheme.Dark.AppBarOverlay">
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbarContainer"
@@ -46,7 +46,7 @@
                 app:layout_constraintEnd_toStartOf="@id/fireIconMenu"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:popupTheme="@style/AppTheme.Dark.PopupOverlay">
+                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/omniBarContainer"

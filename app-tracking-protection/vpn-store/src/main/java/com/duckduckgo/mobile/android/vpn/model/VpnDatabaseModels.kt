@@ -25,20 +25,21 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 
 @Entity(
     tableName = "vpn_tracker",
-    indices = [Index(value = ["timestamp"])]
+    indices = [Index(value = ["bucket"])],
+    primaryKeys = ["bucket", "domain", "packageId"]
 )
 data class VpnTracker(
-    @PrimaryKey(autoGenerate = true) val trackerId: Int = 0,
     val trackerCompanyId: Int,
     val domain: String,
     val company: String,
     val companyDisplayName: String,
     @Embedded val trackingApp: TrackingApp,
-    val timestamp: String = DatabaseDateFormatter.timestamp()
+    val timestamp: String = DatabaseDateFormatter.timestamp(),
+    val bucket: String = DatabaseDateFormatter.timestamp().split("T").first(),
+    val count: Int = 1,
 )
 
 data class BucketizedVpnTracker(
-    val bucket: String,
     @Embedded val trackerCompanySignal: VpnTrackerCompanySignal
 )
 
@@ -46,21 +47,6 @@ data class BucketizedVpnTracker(
 data class VpnState(
     @PrimaryKey val id: Long = 1,
     val uuid: String
-)
-
-@Entity(tableName = "vpn_data_stats")
-data class VpnDataStats(
-    @PrimaryKey val id: String = DatabaseDateFormatter.bucketByHour(),
-    val dataSent: Long = 0,
-    val dataReceived: Long = 0,
-    val packetsSent: Int = 0,
-    val packetsReceived: Int = 0
-)
-
-@Entity(tableName = "vpn_running_stats")
-data class VpnRunningStats(
-    @PrimaryKey val id: String,
-    val timeRunningMillis: Long
 )
 
 enum class VpnServiceState {
@@ -76,17 +62,21 @@ enum class VpnStoppingReason {
     UNKNOWN
 }
 
+data class AlwaysOnState(val alwaysOnEnabled: Boolean, val alwaysOnLockedDown: Boolean) {
+    companion object {
+        val ALWAYS_ON_DISABLED = AlwaysOnState(alwaysOnEnabled = false, alwaysOnLockedDown = false)
+        val ALWAYS_ON_ENABLED = AlwaysOnState(alwaysOnEnabled = true, alwaysOnLockedDown = false)
+        val ALWAYS_ON_ENABLED_LOCKED_DOWN = AlwaysOnState(alwaysOnEnabled = true, alwaysOnLockedDown = true)
+    }
+}
+
 @Entity(tableName = "vpn_service_state_stats")
 data class VpnServiceStateStats(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val timestamp: String = DatabaseDateFormatter.timestamp(),
     val state: VpnServiceState,
-    val stopReason: VpnStoppingReason = UNKNOWN
-)
-
-data class BucketizedVpnServiceStateStats(
-    val day: String,
-    @Embedded val vpnServiceStateStats: VpnServiceStateStats
+    val stopReason: VpnStoppingReason = UNKNOWN,
+    @Embedded val alwaysOnState: AlwaysOnState = AlwaysOnState.ALWAYS_ON_DISABLED
 )
 
 data class TrackingApp(

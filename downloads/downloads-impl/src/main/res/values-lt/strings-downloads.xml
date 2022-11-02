@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="downloadsErrorMessage">Nepavyko atsisiųsti. Patikrinkite interneto ryšį.</string>
+
+    <string name="notificationChannelFileDownloading">Failas atsisiunčiamas</string>
+    <string name="notificationChannelFileDownloaded">Failas atsiųstas</string>
+
+    <string name="downloadInProgress">Atsisiunčiama</string>
+
+    <string name="downloadsDownloadStartedMessage" instruction="Placeholder is the name of a file">%1$s atsisiuntimas prasidėjo</string>
+    <string name="downloadsDownloadFinishedMessage" instruction="Placeholder is the name of a file">%1$s atsisiuntimas baigtas</string>
+    <string name="downloadsDownloadGenericErrorMessage">Nepavyko atsisiųsti.</string>
+    <string name="downloadsCancel">Atšaukti</string>
+    <string name="downloadsRetry">Pakartoti</string>
+    <string name="notificationDownloadComplete">Atsisiuntimas baigtas.</string>
+    <string name="notificationDownloadFailed">Nepavyko atsisiųsti.</string>
+</resources>

@@ -24,6 +24,8 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
@@ -34,7 +36,6 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.Gpc
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -63,7 +64,8 @@ class WebViewRequestInterceptor(
     private val gpc: Gpc,
     private val userAgentProvider: UserAgentProvider,
     private val adClickManager: AdClickManager,
-    private val cloakedCnameDetector: CloakedCnameDetector
+    private val cloakedCnameDetector: CloakedCnameDetector,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : RequestInterceptor {
 
     /**
@@ -88,7 +90,7 @@ class WebViewRequestInterceptor(
         adClickManager.detectAdClick(url?.toString(), request.isForMainFrame)
 
         newUserAgent(request, webView, webViewClientListener)?.let {
-            withContext(Dispatchers.Main) {
+            withContext(dispatchers.main()) {
                 webView.settings?.userAgentString = it
                 webView.loadUrl(url.toString(), getHeaders(request))
             }
@@ -100,7 +102,7 @@ class WebViewRequestInterceptor(
         if (shouldUpgrade(request)) {
             val newUri = httpsUpgrader.upgrade(url)
 
-            withContext(Dispatchers.Main) {
+            withContext(dispatchers.main()) {
                 webView.loadUrl(newUri.toString(), getHeaders(request))
             }
 
@@ -110,7 +112,7 @@ class WebViewRequestInterceptor(
         }
 
         if (shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
-            withContext(Dispatchers.Main) {
+            withContext(dispatchers.main()) {
                 webViewClientListener?.redirectTriggeredByGpc()
                 webView.loadUrl(url.toString(), getHeaders(request))
             }
@@ -202,7 +204,7 @@ class WebViewRequestInterceptor(
         url: Uri,
         webView: WebView
     ): Boolean {
-        return withContext(Dispatchers.Main) {
+        return withContext(dispatchers.main()) {
             val webBackForwardList = webView.copyBackForwardList()
             webBackForwardList.currentItem?.url == url.toString()
         }
@@ -217,7 +219,7 @@ class WebViewRequestInterceptor(
             val url = request.url ?: return null
             if (requestWasInTheStack(url, webView)) return null
             val desktopSiteEnabled = webViewClientListener?.isDesktopSiteEnabled() == true
-            val currentAgent = withContext(Dispatchers.Main) { webView.settings?.userAgentString }
+            val currentAgent = withContext(dispatchers.main()) { webView.settings?.userAgentString }
             val newAgent = userAgentProvider.userAgent(url.toString(), desktopSiteEnabled)
             return if (currentAgent != newAgent) {
                 newAgent

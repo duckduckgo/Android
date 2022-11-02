@@ -214,9 +214,6 @@ dependencies {
     implementation project(':site-permissions-api')
     implementation project(':site-permissions-impl')
 
-    implementation project(':bandwidth-impl')
-    implementation project(':bandwidth-store')
-
     implementation project(':secure-storage-api')
     implementation project(':secure-storage-impl')
     implementation project(':secure-storage-store')

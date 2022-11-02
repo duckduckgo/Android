@@ -36,7 +36,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -86,7 +85,7 @@ class ClearPersonalDataAction(
         appInForeground: Boolean,
         shouldFireDataClearPixel: Boolean
     ) {
-        withContext(Dispatchers.IO) {
+        withContext(dispatchers.io()) {
             clearDataPixel.onDataCleared()
             val fireproofDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
             cookieManager.flush()
@@ -96,7 +95,7 @@ class ClearPersonalDataAction(
             clearTabsAsync(appInForeground)
         }
 
-        withContext(Dispatchers.Main) {
+        withContext(dispatchers.main()) {
             clearDataAsync(shouldFireDataClearPixel)
         }
 

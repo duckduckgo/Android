@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
@@ -28,16 +29,22 @@ import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsReposi
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory.DeviceShieldNotification
 import com.jakewharton.threetenabp.AndroidThreeTen
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.threeten.bp.LocalDateTime
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class DeviceShieldDailyNotificationFactoryTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private lateinit var db: VpnDatabase
     private lateinit var vpnTrackerDao: VpnTrackerDao
@@ -52,7 +59,7 @@ class DeviceShieldDailyNotificationFactoryTest {
             .allowMainThreadQueries()
             .build()
         vpnTrackerDao = db.vpnTrackerDao()
-        appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db)
+        appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider)
 
         factory =
             DeviceShieldNotificationFactory(InstrumentationRegistry.getInstrumentation().targetContext.resources, appTrackerBlockingStatsRepository)
@@ -78,7 +85,11 @@ class DeviceShieldDailyNotificationFactoryTest {
     fun createsTotalTrackersNotificationWhenTrackersFoundInTwoApps() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
-        trackerFound(trackerDomain, appContainingTracker = trackingApp2())
+        trackerFound(
+            trackerDomain,
+            appContainingTracker = trackingApp2(),
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+        )
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(0)
 
@@ -165,7 +176,11 @@ class DeviceShieldDailyNotificationFactoryTest {
     fun createsLastCompanyAttemptNotificationWhenTrackersFoundInTwoApps() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
-        trackerFound(trackerDomain, appContainingTracker = trackingApp2())
+        trackerFound(
+            trackerDomain,
+            appContainingTracker = trackingApp2(),
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(1))
+        )
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(3)
 
@@ -177,16 +192,16 @@ class DeviceShieldDailyNotificationFactoryTest {
     fun createsLastCompanyAttemptNotificationWhenTrackersFoundInThreeApps() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
-        trackerFound(trackerDomain, trackerCompanyId = 1, company = "Google", appContainingTracker = trackingApp1())
+        trackerFound("google.com", trackerCompanyId = 1, company = "Google", appContainingTracker = trackingApp1())
         trackerFound(
-            trackerDomain,
+            "google.com",
             trackerCompanyId = 1,
             company = "Google",
             appContainingTracker = trackingApp2(),
             timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(3))
         )
         trackerFound(
-            trackerDomain,
+            "google.com",
             trackerCompanyId = 1,
             company = "Google",
             appContainingTracker = trackingApp3(),

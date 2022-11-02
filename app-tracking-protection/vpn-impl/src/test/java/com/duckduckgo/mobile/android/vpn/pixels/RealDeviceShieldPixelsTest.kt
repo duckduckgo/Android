@@ -298,13 +298,6 @@ class RealDeviceShieldPixelsTest {
     }
 
     @Test
-    fun whenDidShowWaitlistDialogThenFirePixels() {
-        deviceShieldPixels.didShowWaitlistDialog()
-
-        verify(pixel).fire(DeviceShieldPixelNames.ATP_DID_SHOW_WAITLIST_DIALOG.pixelName)
-    }
-
-    @Test
     fun whenWaitlistDialogDismissThenFirePixels() {
         deviceShieldPixels.didPressWaitlistDialogDismiss()
 

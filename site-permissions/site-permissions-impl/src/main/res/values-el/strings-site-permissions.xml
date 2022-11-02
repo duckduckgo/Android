@@ -14,10 +14,12 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="sitePermissionsMicAndCameraDialogTitle">Ο/η %1$s θέλει να αποκτήσει πρόσβαση στην κάμερα και στο μικρόφωνο</string>
-    <string name="sitePermissionsMicDialogTitle">Ο/η %1$s θέλει να αποκτήσει πρόσβαση στο μικρόφωνο</string>
-    <string name="sitePermissionsCameraDialogTitle">Ο/η %1$s θέλει να αποκτήσει πρόσβαση στην κάμερα</string>
+    <string name="sitePermissionsMicAndCameraDialogTitle" instruction="Placeholder is a website">Η εφαρμογή «%1$s» επιθυμεί να αποκτήσει πρόσβαση στην κάμερα και στο μικρόφωνο</string>
+    <string name="sitePermissionsMicDialogTitle" instruction="Placeholder is a website">Η εφαρμογή «%1$s» επιθυμεί να αποκτήσει πρόσβαση στο μικρόφωνο</string>
+    <string name="sitePermissionsCameraDialogTitle" instruction="Placeholder is a website">Η εφαρμογή «%1$s» επιθυμεί να αποκτήσει πρόσβαση στην κάμερα</string>
     <string name="sitePermissionsDialogContent">Διαχειριστείτε εκχωρημένα δικαιώματα στις ρυθμίσεις</string>
     <string name="sitePermissionsDialogDenyButton">Απόρριψη</string>
     <string name="sitePermissionsDialogAllowButton">Αποδοχή</string>

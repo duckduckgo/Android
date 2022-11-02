@@ -19,6 +19,9 @@ package com.duckduckgo.autofill.store
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extractSchemeAndDomain
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Username
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
@@ -113,15 +116,24 @@ class SecureStoreBackedAutofillStore(
         }
     }
 
-    override suspend fun updateCredentials(rawUrl: String, credentials: LoginCredentials): LoginCredentials? {
+    override suspend fun updateCredentials(
+        rawUrl: String,
+        credentials: LoginCredentials,
+        updateType: CredentialUpdateType
+    ): LoginCredentials? {
         val url = rawUrl.extractSchemeAndDomain()
         if (url == null) {
             Timber.w("Cannot update credentials as given url was in an unexpected format. Original url: %s", rawUrl)
             return null
         }
 
-        val matchingCredentials =
-            secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull()?.filter { it.details.username == credentials.username }
+        val filter = when (updateType) {
+            Username -> filterMatchingPassword(credentials)
+            Password -> filterMatchingUsername(credentials)
+            else -> return null
+        }
+
+        val matchingCredentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull()?.filter(filter)
         if (matchingCredentials.isNullOrEmpty()) {
             Timber.w("Cannot update credentials as no credentials were found for %s", url)
             return null
@@ -138,6 +150,13 @@ class SecureStoreBackedAutofillStore(
         }
 
         return updatedCredentials?.toLoginCredentials()
+    }
+
+    private fun filterMatchingUsername(credentials: LoginCredentials): (WebsiteLoginDetailsWithCredentials) -> Boolean =
+        { it.details.username == credentials.username }
+
+    private fun filterMatchingPassword(credentials: LoginCredentials): (WebsiteLoginDetailsWithCredentials) -> Boolean = {
+        it.password == credentials.password && it.details.username.isNullOrEmpty()
     }
 
     override suspend fun getAllCredentials(): Flow<List<LoginCredentials>> {
@@ -169,11 +188,14 @@ class SecureStoreBackedAutofillStore(
         var exactMatchFound = false
         var usernameMatchFound = false
         var urlMatch = false
+        var missingUsername = false
 
         credentials.forEach {
             urlMatch = true
 
-            if (it.details.username == username) {
+            if (it.details.username == null && it.password != null && it.password == password) {
+                missingUsername = true
+            } else if (it.details.username == username) {
                 usernameMatchFound = true
                 if (it.password == password) {
                     exactMatchFound = true
@@ -185,6 +207,8 @@ class SecureStoreBackedAutofillStore(
             ContainsCredentialsResult.ExactMatch
         } else if (usernameMatchFound) {
             ContainsCredentialsResult.UsernameMatch
+        } else if (missingUsername) {
+            ContainsCredentialsResult.UsernameMissing
         } else if (urlMatch) {
             ContainsCredentialsResult.UrlOnlyMatch
         } else {

@@ -14,10 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Autoconsent -->
     <string name="autoconsentTitle">Управление на изскачащите прозорци за бисквитки</string>
-    <string name="autoconsentDescription">Когато DuckDuckGo открие изскачащи прозорци за съгласие за използване на бисквитки в сайтовете, които посещавате, можем автоматично да настроим предпочитанията Ви за бисквитки така, че бисквитките да са сведени до минимум, а поверителността да е максимална, след което да затворим изскачащите прозорци.</string>
+    <string name="autoconsentDescription">Когато DuckDuckGo открие изскачащи прозорци за съгласие за използване на бисквитки в сайтовете, които посещавате, можем да опитаме автоматично да настроим предпочитанията Ви за бисквитки така, че бисквитките да са сведени до минимум, а поверителността да е максимална, след което да затворим изскачащите прозорци.</string>
     <string name="autoconsentToggle">Позволете на DuckDuckGo да управлява изскачащите прозорци за съгласие за бисквитки</string>
-
 </resources>

@@ -29,6 +29,7 @@ import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeaders
@@ -38,13 +39,13 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.facebook.shimmer.ShimmerFrameLayout
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
 
 class TrackerFeedAdapter @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
+    private val dispatchers: DispatcherProvider
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), StickyHeaders {
 
     private val trackerFeedItems = mutableListOf<TrackerFeedItem>()
@@ -99,7 +100,7 @@ class TrackerFeedAdapter @Inject constructor(
         onAppClick = onAppClickListener
         val newData = data
         val oldData = trackerFeedItems
-        val diffResult = withContext(Dispatchers.IO) {
+        val diffResult = withContext(dispatchers.io()) {
             DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
         }
 
@@ -191,19 +192,19 @@ class TrackerFeedAdapter @Inject constructor(
                         if (trackingCompanies == 1) {
                             resources.getString(
                                 R.string.atp_ActivityTrackersCompanyBlockedOnetimeOneCompany,
-                                trackersCount, trackingCompanies, trackingAppName
+                                trackingAppName
                             )
                         } else {
                             resources.getString(
                                 R.string.atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies,
-                                trackersCount, trackingCompanies, trackingAppName
+                                trackingCompanies, trackingAppName
                             )
                         }
                     } else {
                         if (trackingCompanies == 1) {
                             resources.getString(
                                 R.string.atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany,
-                                trackersCount, trackingCompanies, trackingAppName
+                                trackersCount, trackingAppName
                             )
                         } else {
                             resources.getString(

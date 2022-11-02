@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -31,7 +32,6 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDateTime
@@ -55,6 +55,7 @@ class SendTrackerDebugReceiver @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
     private val vpnDatabase: VpnDatabase,
+    private val dispatchers: DispatcherProvider
 ) : BroadcastReceiver(), VpnServiceCallbacks {
 
     private fun register() {
@@ -73,7 +74,7 @@ class SendTrackerDebugReceiver @Inject constructor(
     }
 
     fun handleIntent(intent: Intent) {
-        GlobalScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(dispatchers.io()) {
             val times = intent.getStringExtra("times")?.toInt() ?: 1
             val hoursAgo = intent.getStringExtra("hago")?.toLong() ?: 0L
             Timber.i("Inserting %d trackers into the DB", times)
