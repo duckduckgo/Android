@@ -179,7 +179,6 @@ class NgVpnNetworkStackTest {
 
         whenever(appTrackerRepository.findTracker(eq(hostname), anyString())).thenReturn(FIRST_PARTY_TRACKER)
         whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(hostname)).thenReturn(null)
-        ngVpnNetworkStack.isDomainBlocked(DomainRR(hostname, uid))
 
         assertFalse(ngVpnNetworkStack.isDomainBlocked(DomainRR(hostname, uid)))
     }
@@ -191,7 +190,6 @@ class NgVpnNetworkStackTest {
 
         whenever(appTrackerRepository.findTracker(eq(hostname), anyString())).thenReturn(THIRD_PARTY_TRACKER)
         whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(hostname)).thenReturn(null)
-        ngVpnNetworkStack.isDomainBlocked(DomainRR(hostname, uid))
 
         assertTrue(ngVpnNetworkStack.isDomainBlocked(DomainRR(hostname, uid)))
     }
@@ -203,7 +201,6 @@ class NgVpnNetworkStackTest {
 
         whenever(appTrackerRepository.findTracker(eq(hostname), anyString())).thenReturn(AppTrackerType.NotTracker)
         whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(hostname)).thenReturn(null)
-        ngVpnNetworkStack.isDomainBlocked(DomainRR(hostname, uid))
 
         assertFalse(ngVpnNetworkStack.isDomainBlocked(DomainRR(hostname, uid)))
     }
