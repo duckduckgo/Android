@@ -73,7 +73,7 @@ class PrivacyDashboardRendererTest {
     fun whenLoadDashboardThenLoadLocalHtml() {
         testee.loadDashboard(spyWebView)
 
-        verify(spyWebView).loadUrl("file:///android_asset/html/popup.html")
+        verify(spyWebView).loadUrl("file:///android_asset/html/android.html")
     }
 
     @Test
