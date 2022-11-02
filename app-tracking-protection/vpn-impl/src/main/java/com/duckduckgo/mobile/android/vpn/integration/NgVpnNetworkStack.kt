@@ -224,8 +224,8 @@ class NgVpnNetworkStack @Inject constructor(
             val trackingApp = appNamesCache[packageId] ?: appNameResolver.getAppNameForPackageId(packageId)
             appNamesCache.put(packageId, trackingApp)
 
-            // if the app name is unknown, skip inserting the tracker but still block the tracker
-            if (trackingApp.isUnknown()) return false
+            // if the app name is unknown, do not block
+            if (trackingApp.isUnknown()) return true
 
             VpnTracker(
                 trackerCompanyId = type.tracker.trackerCompanyId,
