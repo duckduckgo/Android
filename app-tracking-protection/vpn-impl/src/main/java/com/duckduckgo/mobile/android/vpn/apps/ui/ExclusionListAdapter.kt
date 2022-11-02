@@ -219,7 +219,6 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
             listener: ExclusionListListener
         ) {
             binding.excludedAppsFilterText.text = context.resources.getString(filterResId, appsFiltered)
-            binding.excludedAppsFilterText.show()
             binding.excludedAppsFilterText.setOnClickListener {
                 listener.onFilterClick(it)
             }
