@@ -36,11 +36,11 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.apps.BannerContent
 import com.duckduckgo.mobile.android.vpn.apps.Command
 import com.duckduckgo.mobile.android.vpn.apps.ManageAppsProtectionViewModel
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.ViewState
+import com.duckduckgo.mobile.android.vpn.apps.ui.ExclusionListAdapter.ExclusionListListener
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityTrackingProtectionExclusionListBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -75,7 +75,7 @@ class TrackingProtectionExclusionListActivity :
 
     private val viewModel: ManageAppsProtectionViewModel by bindViewModel()
 
-    lateinit var adapter: TrackingProtectionAppsAdapter
+    lateinit var adapter: ExclusionListAdapter
 
     private val shimmerLayout by lazy { findViewById<ShimmerFrameLayout>(R.id.deviceShieldExclusionAppListSkeleton) }
 
@@ -136,18 +136,11 @@ class TrackingProtectionExclusionListActivity :
 
     private fun bindViews() {
         shimmerLayout.startShimmer()
-        binding.excludedAppsDisabledVPNLabel.apply {
-            setClickableLink(
-                REPORT_ISSUES_ANNOTATION,
-                getText(R.string.atp_ActivityDisabledLabel)
-            ) { launchFeedback() }
-        }
-        binding.excludedAppsFilterText.setOnClickListener { showFilterPopupMenu(it) }
         setupRecycler()
     }
 
     private fun setupRecycler() {
-        adapter = TrackingProtectionAppsAdapter(object : AppProtectionListener {
+        adapter = ExclusionListAdapter(object : ExclusionListListener {
             override fun onAppProtectionChanged(
                 excludedAppInfo: TrackingProtectionAppInfo,
                 enabled: Boolean,
@@ -155,17 +148,26 @@ class TrackingProtectionExclusionListActivity :
             ) {
                 viewModel.onAppProtectionChanged(excludedAppInfo, position, enabled)
             }
+
+            override fun onLaunchFAQ() {
+                launchFaq()
+            }
+
+            override fun onLaunchFeedback() {
+                launchFeedback()
+            }
+
+            override fun onFilterClick(anchorView: View) {
+                showFilterPopupMenu(anchorView)
+            }
         })
 
         val recyclerView = binding.excludedAppsRecycler
         val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
 
         if (isListEnabled) {
-            binding.excludedAppsEnabledVPNLabel.show()
-            binding.excludedAppsDisabledVPNLabel.gone()
+            recyclerView.alpha = 1.0f
         } else {
-            binding.excludedAppsEnabledVPNLabel.gone()
-            binding.excludedAppsDisabledVPNLabel.show()
             recyclerView.alpha = 0.45f
         }
 
@@ -187,37 +189,9 @@ class TrackingProtectionExclusionListActivity :
     private fun renderViewState(viewState: ViewState) {
         shimmerLayout.stopShimmer()
         val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
-        binding.excludedAppsFilterText.text = getString(viewState.filterResId!!, viewState.excludedApps.size)
-        binding.excludedAppsFilterText.show()
-        adapter.update(viewState.excludedApps, isListEnabled)
-        renderBanner(viewState.bannerContent)
+        adapter.update(viewState, isListEnabled)
         shimmerLayout.gone()
     }
-
-    private fun renderBanner(bannerContent: BannerContent) {
-        when (bannerContent) {
-            BannerContent.ALL_OR_PROTECTED_APPS -> binding.excludedAppsEnabledVPNLabel.apply {
-                setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_info_panel_info)
-                setClickableLink(
-                    LEARN_WHY_ANNOTATION,
-                    getText(R.string.atp_ExcludedAppsEnabledLearnWhyLabel)
-                ) { launchFaq() }
-            }
-            BannerContent.UNPROTECTED_APPS -> binding.excludedAppsEnabledVPNLabel.apply {
-                setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_info_panel_info)
-                setClickableLink(
-                    LEARN_WHY_ANNOTATION,
-                    getText(R.string.atp_ExcludedAppsDisabledLearnWhyLabel)
-                ) { launchFaq() }
-            }
-            BannerContent.CUSTOMISED_PROTECTION -> binding.excludedAppsEnabledVPNLabel.apply {
-                setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_info_panel_link)
-                setText(getString(R.string.atp_ExcludedAppsEnabledLabel))
-            }
-        }
-        binding.excludedAppsEnabledVPNLabel.minimumHeight = 0
-    }
-
     private fun processCommand(command: Command) {
         when (command) {
             is Command.RestartVpn -> restartVpn()
@@ -308,8 +282,8 @@ class TrackingProtectionExclusionListActivity :
     }
 
     companion object {
-        private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
-        private const val LEARN_WHY_ANNOTATION = "learn_why_link"
+        const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
+        const val LEARN_WHY_ANNOTATION = "learn_why_link"
         private const val KEY_LIST_ENABLED = "KEY_LIST_ENABLED"
         private const val KEY_FILTER_LIST = "KEY_FILTER_LIST"
 
