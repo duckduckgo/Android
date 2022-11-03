@@ -16,13 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.apps
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.FilterType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.InfoPanelType
@@ -93,7 +91,8 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
                 when (filter) {
                     AppsFilter.PROTECTED_ONLY -> {
-                        val panelType = InfoPanelType(if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.ALL_OR_PROTECTED_APPS)
+                        val panelType =
+                            InfoPanelType(if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.ALL_OR_PROTECTED_APPS)
                         val filterType = FilterType(R.string.atp_ExcludedAppsFilterProtectedLabel, protectedApps.size)
                         val protectedAppsList = mutableListOf(panelType, filterType).plus(protectedApps)
 
@@ -109,7 +108,8 @@ class ManageAppsProtectionViewModel @Inject constructor(
                     }
 
                     else -> {
-                        val panelType = InfoPanelType(if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.ALL_OR_PROTECTED_APPS)
+                        val panelType =
+                            InfoPanelType(if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.ALL_OR_PROTECTED_APPS)
                         val filterType = FilterType(R.string.atp_ExcludedAppsFilterAllLabel, allApps.size)
                         val appsList = listOf(panelType, filterType).plus(allApps)
 
