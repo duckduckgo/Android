@@ -38,7 +38,7 @@ import kotlin.coroutines.coroutineContext
 @ContributesViewModel(FragmentScope::class)
 class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
-    private val dispatcherProvider: DispatcherProvider,
+    private val dispatchers: DispatcherProvider,
     private val timeDiffFormatter: TimeDiffFormatter
 ) : ViewModel() {
 
@@ -62,11 +62,11 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     suspend fun getMostRecentTrackers(
         timeWindow: TimeWindow,
         showHeadings: Boolean
-    ): Flow<List<TrackerFeedItem>> = withContext(dispatcherProvider.io()) {
+    ): Flow<List<TrackerFeedItem>> = withContext(dispatchers.io()) {
         return@withContext statsRepository.getMostRecentVpnTrackers { timeWindow.asString() }
             .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
             .map { aggregateDataPerApp(it, showHeadings) }
-            .flowOn(Dispatchers.Default)
+            .flowOn(dispatchers.default())
             .map { it.ifEmpty { listOf(TrackerFeedItem.TrackerEmptyFeed) } }
             .onStart {
                 startTickerRefresher()
@@ -80,7 +80,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         showHeadings: Boolean
     ): List<TrackerFeedItem> {
         val sourceData = mutableListOf<TrackerFeedItem>()
-        val perSessionData = trackerData.groupBy { it.bucket }
+        val perSessionData = trackerData.groupBy { it.trackerCompanySignal.tracker.bucket }
 
         perSessionData.values.forEach { sessionTrackers ->
             coroutineContext.ensureActive()
@@ -110,7 +110,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
                             companyPrevalence = trackerCompanyPrevalence
                         )
                     )
-                    totalTrackerCount += trackerBucket.value.size
+                    totalTrackerCount += trackerBucket.value.sumOf { it.trackerCompanySignal.tracker.count }
                 }
 
                 if (firstInBucket && showHeadings) {
@@ -120,8 +120,8 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
 
                 sourceData.add(
                     TrackerFeedItem.TrackerFeedData(
-                        id = item.bucket.hashCode() + item.trackerCompanySignal.tracker.trackingApp.packageId.hashCode(),
-                        bucket = item.bucket,
+                        id = item.trackerCompanySignal.tracker.bucket.hashCode() + item.trackerCompanySignal.tracker.trackingApp.packageId.hashCode(),
+                        bucket = item.trackerCompanySignal.tracker.bucket,
                         trackingApp = TrackingApp(
                             item.trackerCompanySignal.tracker.trackingApp.packageId,
                             item.trackerCompanySignal.tracker.trackingApp.appDisplayName

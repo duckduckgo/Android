@@ -230,8 +230,9 @@
         <item quantity="one">Sovellus</item>
         <item quantity="other">Sovellukset</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Tämä ominaisuus on beetavaiheessa. <annotation type="app_settings_link">Ongelmia sovelluksen kanssa?</annotation></string>
+    <string name="atp_ActivityEnabledLabel">Tämä ominaisuus on beetavaiheessa. Huomasitko ongelman sovelluksessa? <annotation type="app_settings_link">Ilmoita ongelmasta.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection on poistettu käytöstä</b>\nAiheuttiko App Tracking Protection ongelmia sovelluksissasi? <annotation type="report_issues_link">Ilmoita ongelmista</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android poisti App Tracking Protectionin käytöstä</b>. Haluatko estää tämän jatkossa? <annotation type="re_enable_link">Ota uudelleen käyttöön</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Laitteesi VPN poisti App Tracking Protectionin käytöstä.</b>\nAiheuttiko App Tracking Protection ongelman sovelluksissasi? <annotation type="report_issues_link">Ilmoita ongelmista</annotation></string>
     <string name="atp_ActivityAbout">Tietoa meistä</string>
     <string name="atp_ActivityManage">Hallitse</string>
@@ -377,10 +378,13 @@
     <string name="atp_RemoveFeatureDialogRemove">Poista Käytöstä</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Määritä aina käytössä -tilaan?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Estääksesi Androidia poistamasta App Tracking Protectionia ajoittain käytöstä:\n\nSiirry Androidin asetuksiin\nAvaa DuckDuckGon VPN-asetukset\nOta käyttöön \"Aina käytössä oleva VPN\"</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Siirry kohtaan Asetukset</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Muistuta myöhemmin</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Ei kiitos</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Ei nyt</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Mene laitteellasi DuckDuckGon VPN-asetuksiin ja ota käyttöön <b>Aina päällä</b> -asetus VPN:lle, jotta Android ei poista suojausta käytöstä.\n\nMuista jättää toinen asetus pois päältä.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Voit välttää sovellusongelmat siirtymällä laitteellasi <b>DuckDuckGon VPN-asetuksiin</b> ja poistamalla <b>Estä yhteydet ilman VPN:ää</b> -asetuksen käytöstä.]]></string>
+    <string name="atp_AlwaysOnModalHeading">Määritä asetukseksi Aina päällä</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Muokkaa VPN-asetuksia</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Toimia vaaditaan!</b> Sovellusongelmien välttämiseksi sinun on muokattava Android-asetuksia. <annotation type="open_settings_link">Muokkaa asetuksia</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Toimia vaaditaan! App Tracking Protection edellyttää Android-asetuksen muuttamista.</string>
 
 </resources>

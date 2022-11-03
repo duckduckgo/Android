@@ -53,11 +53,11 @@ class PrivacyReportViewModel @Inject constructor(
             if (trackers.isEmpty()) {
                 PrivacyReportView.TrackersBlocked("", 0, 0)
             } else {
-                val perApp = trackers.groupBy { it.trackingApp }.toList().sortedByDescending { it.second.size }
+                val perApp = trackers.groupBy { it.trackingApp }.toList().sortedByDescending { it.second.sumOf { t -> t.count } }
                 val otherAppsSize = (perApp.size - 1).coerceAtLeast(0)
                 val latestApp = perApp.first().first.appDisplayName
 
-                PrivacyReportView.TrackersBlocked(latestApp, otherAppsSize, trackers.size)
+                PrivacyReportView.TrackersBlocked(latestApp, otherAppsSize, trackers.sumOf { it.count })
             }
 
         }

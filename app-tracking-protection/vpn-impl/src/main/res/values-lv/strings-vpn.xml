@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="atp_name">Lietotņu pretizsekošanas aizsardzība</string>
     <string name="refresh">Atsvaidzināt</string>
 
@@ -226,18 +226,19 @@
     <string name="atp_ActivityPastWeekBlocked">Bloķēti</string>
     <string name="atp_ActivityPastWeekAcross">Lietotņu skaits</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="zero">izsekošanas mēģinājumu</item>
         <item quantity="one">izsekošanas mēģinājums</item>
         <item quantity="other">izsekošanas mēģinājumi</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="zero">lietotnes</item>
         <item quantity="one">lietotne</item>
         <item quantity="other">lietotnes</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Šī funkcija ir beta versijā. <annotation type="app_settings_link">Problēmas ar lietotni?</annotation></string>
+    <string name="atp_ActivityEnabledLabel">Šī funkcija ir beta versijā. Pamanīji problēmu ar kādu lietotni? <annotation type="app_settings_link">Lūdzu, ziņo par to.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Lietotņu pretizsekošanas aizsardzība ir atspējota</b>\nVai Lietotņu pretizsekošanas aizsardzība ir radījusi kādu problēmu ar tavām lietotnēm? <annotation type="report_issues_link">Ziņo par problēmām</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android atspējoja lietotņu pretizsekošanas aizsardzību</b>. Vai vēlies, lai tas vairs neatkārtotos? <annotation type="re_enable_link">Iespējot no jauna</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Kāda VPN lietotne tavā ierīcē atspējojusi Lietotņu pretizsekošanas aizsardzību.</b>\nVai Lietotņu pretizsekošanas aizsardzība radījusi problēmas lietotnēs? <annotation type="report_issues_link">Ziņo par problēmām</annotation></string>
     <string name="atp_ActivityAbout">Par</string>
     <string name="atp_ActivityManage">Pārvaldīt</string>
@@ -385,10 +386,13 @@
     <string name="atp_RemoveFeatureDialogRemove">Atslēgt</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Vai iestatīt kā \"Vienmēr ieslēgts\"?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Lai nepieļautu, ka operētājsistēmā Android periodiski tiek atspējota Lietotņu pretizsekošanas aizsardzība:\n\nDodies uz Android iestatījumiem\nAtver DuckDuckGo VPN iestatījumus\nIeslēdz opciju \"VPN vienmēr ieslēgts\"</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Doties uz Iestatījumiem</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Atgādiniet vēlāk</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Nē, paldies</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Ne tagad</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Dodies uz savas ierīces DuckDuckGo VPN iestatījumiem un iespējo opciju <b>Vienmēr ieslēgts</b> VPN, lai nepieļautu, ka Android atspējo aizsardzību.\n\nAtceries, ka otrs iestatījums jāatstāj IZSLĒGTS.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Lai izvairītos no lietotņu problēmām, dodies uz savas ierīces <b>DuckDuckGo VPN iestatījumiem</b> un atspējo opciju <b>Bloķēt savienojumus bez VPN</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Iestatīt \"Vienmēr ieslēgts\"</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">VPN iestatījumu maiņa</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Nepieciešama rīcība!</b> Lai izvairītos no problēmām ar lietotnēm, ir jāmaina Android iestatījumi. <annotation type="open_settings_link">Mainīt iestatījumus</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Nepieciešama rīcība! Ir jāmaina Android iestatījums, lai nodrošinātu lietotņu pretizsekošanas aizsardzību.</string>
 
 </resources>

@@ -54,6 +54,8 @@ import timber.log.Timber
 import java.net.Inet4Address
 import java.net.InetAddress
 import javax.inject.Inject
+
+@Suppress("NoHardcodedCoroutineDispatcher")
 @InjectWith(VpnScope::class)
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 

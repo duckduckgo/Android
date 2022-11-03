@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.state
 import com.duckduckgo.mobile.android.vpn.VpnFeature
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.AlwaysOnState.Companion.DEFAULT
 import kotlinx.coroutines.flow.Flow
 
 interface VpnStateMonitor {
@@ -29,8 +30,19 @@ interface VpnStateMonitor {
     fun getStateFlow(vpnFeature: VpnFeature): Flow<VpnState>
     data class VpnState(
         val state: VpnRunningState,
-        val stopReason: VpnStopReason? = null
+        val stopReason: VpnStopReason? = null,
+        val alwaysOnState: AlwaysOnState = DEFAULT
     )
+
+    data class AlwaysOnState(val enabled: Boolean, val lockedDown: Boolean) {
+        companion object {
+            val DEFAULT = AlwaysOnState(enabled = false, lockedDown = false)
+            val ALWAYS_ON_ENABLED = AlwaysOnState(enabled = true, lockedDown = false)
+            val ALWAYS_ON_LOCKED_DOWN = AlwaysOnState(enabled = true, lockedDown = true)
+        }
+
+        fun isAlwaysOnLockedDown(): Boolean = enabled && lockedDown
+    }
 
     enum class VpnRunningState {
         ENABLED,

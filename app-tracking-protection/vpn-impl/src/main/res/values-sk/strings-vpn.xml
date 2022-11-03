@@ -242,8 +242,9 @@
         <item quantity="many">Aplikácie</item>
         <item quantity="other">Aplikácií</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Táto funkcia je vo verzii beta. <annotation type="app_settings_link"> Máte problémy s aplikáciou? </annotation></string>
+    <string name="atp_ActivityEnabledLabel">Táto funkcia je vo verzii beta. Zaznamenali ste nejaký problém s aplikáciou? <annotation type="app_settings_link">Prosím, nahláste problém.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Ochrana sledovania aplikácií je vypnutá</b>\nSpôsobila ochrana sledovania aplikácií problém s vašimi aplikáciami? <annotation type="report_issues_link">Hlásenie problémov</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android zakázal ochranu pred sledovaním aplikácií</b>. Chcete zabrániť tomu, aby sa to opakovalo? <annotation type="re_enable_link">Znovu povoliť</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Aplikácia VPN vo vašom zariadení zakázala ochranu pred sledovaním aplikácií.</b>\nSpôsobila stránka App Tracking Protection problém s vašimi aplikáciami? <annotation type="report_issues_link">Záležitosti správy</annotation></string>
     <string name="atp_ActivityAbout">O</string>
     <string name="atp_ActivityManage">Spravujte stránku</string>
@@ -393,10 +394,13 @@
     <string name="atp_RemoveFeatureDialogRemove">Zakázať</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Nastavenie na možnosť Vždy zapnuté?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Ak chcete zabrániť tomu, aby systém Android pravidelne deaktiváciu ochrany sledovania aplikácií:\n\nPrejdite do Nastavenia systému Android\nOtvorte nastavenia VPN pre DuckDuckGo\nZapnite „Vždy zapnutý VPN</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Prejdite do Nastavení</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Pripomenúť neskôr</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Nie, ďakujem</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Teraz nie</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Prejdite do nastavení VPN vo svojom zariadení a pre DuckDuckGo a povoľte <b>Vždy zapnuté</b> VPN, aby ste zabránili vypnutiu ochrany systému Android.\n\nDbajte na to, aby ostatné nastavenia zostali vypnuté.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Ak sa chcete vyhnúť problémom s aplikáciou, prejdite na stránku <b>Nastavenia VPN pre DuckDuckGo</b> a vypnite <b>Blokovanie pripojení bez VPN</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Nastavené na možnosť Vždy zapnuté</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Zmena nastavení VPN</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Vyžaduje sa akcia!</b> Ak chcete predísť problémom s aplikáciami, musíte zmeniť nastavenia systému Android. <annotation type="open_settings_link">Zmena nastavení</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Vyžaduje sa akcia! Na ochranu aplikácií pred sledovaním je potrebné zmeniť nastavenie systému Android.</string>
 
 </resources>

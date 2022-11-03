@@ -484,11 +484,11 @@
     <string name="daxIntroCtaText"><![CDATA[Maintenant, essayez de visiter un de vos sites préférés !<br/><br/>Je bloquerai les traqueurs afin qu\'ils ne puissent pas vous espionner. J\'améliorerai également la sécurité de votre connexion dans la mesure du possible. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Bien joué !<br/><br/>Souvenez-vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent. 👍]]></string>
     <string name="daxSerpCtaText">Vos recherches sur DuckDuckGo sont anonymes. Toujours. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText" tools:ignore="MissingQuantity">
+    <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ et <b>%1$d autre</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
         <item quantity="other"><![CDATA[ et <b>%1$d autres</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="MissingQuantity, ImpliedQuantity">
+    <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ essayait de vous traquer ici. <br/><br/>Je l\'ai bloqué !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
         <item quantity="other"><![CDATA[ essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
     </plurals>
@@ -656,12 +656,12 @@
     <string name="bookmarkFolderDeleteDialogMessage">"Voulez-vous vraiment supprimer "</string>
     <string name="bookmarkFolderEmpty">Vide</string>
 
-    <plurals name="bookmarkFolderDeleteDialogMessage" tools:ignore="MissingQuantity">
+    <plurals name="bookmarkFolderDeleteDialogMessage">
         <item quantity="one">%1$s%2$s et %1$d élément ?</item>
         <item quantity="other">%1$s%2$s et %1$d éléments ?</item>
     </plurals>
 
-    <plurals name="bookmarkFolderItems" tools:ignore="MissingQuantity">
+    <plurals name="bookmarkFolderItems">
         <item quantity="one">%1$d élément</item>
         <item quantity="other">%1$d éléments</item>
     </plurals>

@@ -230,8 +230,9 @@
         <item quantity="one">Приложение</item>
         <item quantity="other">Приложения</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Тази функция е в бета версия. <annotation type="app_settings_link">Имате ли проблеми с някое приложение?</annotation></string>
+    <string name="atp_ActivityEnabledLabel">Тази функция е в бета версия. Установили сте проблем с някое приложение? <annotation type="app_settings_link">Моля, докладвайте за проблем.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection е деактивирана</b>\nApp Tracking Protection предизвиква ли проблеми с Вашите приложения? <annotation type="report_issues_link">Докладване на проблеми</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android деактивира App Tracking Protection</b>. Искате ли да предотвратите това, за да не се случва отново? <annotation type="re_enable_link">Повторно активиране</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPN приложение на Вашето устройство деактивира App Tracking Protection.</b>\nApp Tracking Protection предизвиква ли проблеми с Вашите приложения? <annotation type="report_issues_link">Докладване на проблеми</annotation></string>
     <string name="atp_ActivityAbout">За нас</string>
     <string name="atp_ActivityManage">Управление</string>
@@ -377,10 +378,13 @@
     <string name="atp_RemoveFeatureDialogRemove">Забрани</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Задаване като „Винаги включено“?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">За да предотвратите периодично деактивиране на App Tracking Protection от Android:\n\nВлезте в Настройки на Android\nОтворете VPN настройки за DuckDuckGo\nВключете опцията „Винаги включена VPN услуга“</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Влезте в Настройки</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Напомняне по-късно</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Не, благодаря</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Не сега</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Влезте във настройките на VPN за DuckDuckGo на Вашето устройство и активирайте VPN настройката <b>Винаги включено</b>, за да предотвратите деактивирането на защитата от Android.\n\nУверете се, че сте другата настройка остава ИЗКЛ.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[За да избегнете проблеми с приложенията, влезте в <b>Настройки на VPN за DuckDuckGo</b> и деактивирайте настройката <b>Блокиране на връзките без VPN</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Задайте настройка „Винаги включено“</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Промяна на настройките на VPN</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Изисква се действие!</b> За да избегнете проблеми с приложенията, трябва да промените настройките на Android. <annotation type="open_settings_link">Промяна на настройките</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Необходимо е действие! Необходимо е да промените една от настройките на Android за App Tracking Protection.</string>
 
 </resources>

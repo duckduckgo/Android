@@ -41,7 +41,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -63,7 +62,7 @@ class BrowserViewModel @Inject constructor(
     CoroutineScope {
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
+        get() = dispatchers.main()
 
     data class ViewState(
         val hideWebContent: Boolean = true

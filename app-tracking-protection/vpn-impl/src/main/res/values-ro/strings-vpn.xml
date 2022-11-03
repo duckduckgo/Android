@@ -236,7 +236,6 @@
         <item quantity="few">Aplicații</item>
         <item quantity="other">Aplicații</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Această funcție este în versiune beta. <annotation type="app_settings_link">Ai probleme cu o aplicație?</annotation></string>
     <string name="atp_ActivityDisabledLabel">Protecția împotriva urmăririi de către aplicație <b>este dezactivată</b>\nProtecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale? <annotation type="report_issues_link">Raportează probleme</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>O aplicație VPN de pe dispozitivul tău a dezactivat Protecția împotriva urmăririi de către aplicație.</b>\nProtecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale? <annotation type="report_issues_link">Raportează probleme</annotation></string>
     <string name="atp_ActivityAbout">Despre</string>
@@ -385,10 +384,6 @@
     <string name="atp_RemoveFeatureDialogRemove">Dezactivează</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Setat în modul „Mereu pornit”?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Pentru a împiedica Android să dezactiveze periodic Protecția împotriva urmăririi de către aplicație:\n\naccesează Setări Android\ndeschide Setări VPN pentru DuckDuckGo\nactivează „VPN activat permanent”</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Mergi la Setări</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Amintește-mi mai târziu</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Nu, mulțumesc</string>
 
 </resources>

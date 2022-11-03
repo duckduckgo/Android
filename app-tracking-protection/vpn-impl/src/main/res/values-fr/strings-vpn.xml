@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="atp_name">Protection contre le suivi des applications</string>
     <string name="refresh">Actualiser</string>
 
@@ -45,7 +45,7 @@
     <string name="atp_ReportIssue">Vous rencontrez des problèmes avec une application ?</string>
     <string name="atp_OnInitialNotification">"App Tracking Protection est activé et bloque les tentatives de suivi sur vos applications"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Analyse de l'activité de suivi… bip… boop"</string>
-    <plurals name="atp_OnNotification" tools:ignore="MissingQuantity">
+    <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Tentatives de suivi bloquées <b>dans %1$d application</b> (dernière heure).]]></item>
         <item quantity="other"><![CDATA[ Tentatives de suivi bloquées <b>dans %1$d applications</b> (dernière heure).]]></item>
     </plurals>
@@ -58,12 +58,12 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ App Tracking Protection a bloqué <b>%1$d tentatives de suivi</b> (dernières 24 heures).]]></string>
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ App Tracking Protection a bloqué <b>%1$d tentatives de suivi dans %2$d applications, dont %3$s</b> (dernières 24 heures).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="MissingQuantity">
+    <plurals name="atp_DailyTopCompanyNotification">
         <item quantity="one"><![CDATA[%1$s a essayé de vous suivre <b>dans %2$d application</b> (dernières 24 heures). <b>Voir plus</b>]]></item>
         <item quantity="other"><![CDATA[%1$s a essayé de vous suivre <b>dans %2$d applications</b> (dernières 24 heures). <b>Voir plus</b>]]></item>
     </plurals>
 
-    <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="MissingQuantity">
+    <plurals name="atp_DailyCompanyBlockedNotification">
         <item quantity="one"><![CDATA[App Tracking Protection a bloqué le plus grand nombre de tentatives de suivi dans <b>%1$s</b> (dernières 24 heures).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection a bloqué le plus grand nombre de tentatives de suivi dans <b>%1$s</b> et <b>%2$s</b>(dernières 24 heures).]]></item>
     </plurals>
@@ -84,7 +84,7 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection a bloqué <b>%1$d tentatives de suivi dans %2$s</b> et 1 autre application (semaine dernière).]]></string>
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[App Tracking Protection a bloqué <b>%1$d tentatives de suivi dans %2$s</b> et %3$d autres applications (semaine dernière).]]></string>
 
-    <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="MissingQuantity">
+    <plurals name="atp_WeeklyCompanyTeaserNotification">
         <item quantity="one"><![CDATA[App Tracking Protection a bloqué <b>%1$s dans %2$d application, %3$s</b> (semaine dernière).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection a bloqué <b>%1$s dans %2$d applications, dont %3$s</b> (semaine dernière).]]></item>
     </plurals>
@@ -222,16 +222,17 @@
     <string name="atp_ActivityPastWeekBlocked">Blocages</string>
     <string name="atp_ActivityPastWeekAcross">Dans</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="MissingQuantity, ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Tentative de suivi</item>
         <item quantity="other">Tentatives de suivi</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="MissingQuantity, ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Application</item>
         <item quantity="other">Applications</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Cette fonctionnalité est en version bêta. <annotation type="app_settings_link">Vous rencontrez des problèmes avec une application ?</annotation></string>
+    <string name="atp_ActivityEnabledLabel">Cette fonctionnalité est disponible en version bêta. Vous rencontrez un problème lié à une application ? <annotation type="app_settings_link">Veuillez le signaler.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection est désactivé</b>\nVos applications ont-elles rencontré des problèmes à cause d\'App Tracking Protection ? <annotation type="report_issues_link">Signaler des problèmes</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android a désactivé App Tracking Protection.</b> Vous voulez éviter que cela se reproduise ? <annotation type="re_enable_link">Réactiver</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Une application VPN de votre appareil a désactivé App Tracking Protection.</b>\nVos applications ont-elles rencontré des problèmes à cause d\'App Tracking Protection ? <annotation type="report_issues_link">Signaler des problèmes</annotation></string>
     <string name="atp_ActivityAbout">À propos</string>
     <string name="atp_ActivityManage">Gérer</string>
@@ -278,11 +279,11 @@
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
-    <plurals name="atp_CompanyDetailsTrackingAttempts" tools:ignore="MissingQuantity">
+    <plurals name="atp_CompanyDetailsTrackingAttempts">
         <item quantity="one">%1$d tentative. Informations recueillies en général :</item>
         <item quantity="other">%1$d tentatives. Informations recueillies en général :</item>
     </plurals>
-    <plurals name="atp_CompanyDetailsTrackingAttemptsTitle" tools:ignore="MissingQuantity">
+    <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
         <item quantity="one">%1$d tentative de suivi bloquée</item>
         <item quantity="other">%1$d tentatives de suivi bloquées</item>
     </plurals>
@@ -377,10 +378,13 @@
     <string name="atp_RemoveFeatureDialogRemove">Désactiver</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Régler sur « Toujours activée » ?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Pour empêcher Android de désactiver périodiquement App Tracking Protection :\n\nAccédez aux paramètres Android\nOuvrez les paramètres VPN pour DuckDuckGo\nActivez « VPN toujours actif »</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Accéder à Paramètres</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Me le rappeler plus tard</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Non merci</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Pas maintenant</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Accédez aux paramètres VPN DuckDuckGo de votre appareil et sélectionnez <b>Toujours actif</b> pour empêcher Android de désactiver la protection.\n\nL\'autre paramètre doit rester désactivé.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Pour éviter les problèmes d\'application, accédez aux <b>paramètres VPN DuckDuckGo de votre appareil</b> et désactivez <b>Bloquer les connexions sans VPN</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Sélectionnez Toujours actif</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Modifiez vos paramètres VPN</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Action requise</b> Pour assurer le bon fonctionnement de votre application, vous devez modifier vos paramètres Android. <annotation type="open_settings_link">Modifier les paramètres</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Action requise Un paramètre Android doit être modifié pour assurer le bon fonctionnement de votre App Tracking Protection.</string>
 
 </resources>

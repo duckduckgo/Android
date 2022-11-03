@@ -18,36 +18,34 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
+import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface VpnStore {
     fun onboardingDidShow()
     fun onboardingDidNotShow()
     fun didShowOnboarding(): Boolean
-    fun resetAppTPManuallyEnablesCounter()
-    fun onAppTPManuallyEnabled()
-    fun getAppTPManuallyEnables(): Int
-    fun onForgetPromoteAlwaysOn()
-    fun userAllowsShowPromoteAlwaysOn(): Boolean
-    suspend fun setAlwaysOn(enabled: Boolean)
-    fun isAlwaysOnEnabled(): Boolean
-
-    companion object {
-        const val ALWAYS_ON_PROMOTION_DELTA = 3
-    }
+    suspend fun isAlwaysOnEnabled(): Boolean
+    suspend fun vpnLastDisabledByAndroid(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class SharedPreferencesVpnStore @Inject constructor(
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
-    private val dispatcherProvider: DispatcherProvider,
+    private val vpnHeartBeatDao: VpnHeartBeatDao,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val vpnServiceStateDao: VpnServiceStateStatsDao,
 ) : VpnStore {
 
     private val preferences: SharedPreferences
@@ -65,41 +63,33 @@ class SharedPreferencesVpnStore @Inject constructor(
         return preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false)
     }
 
-    override fun resetAppTPManuallyEnablesCounter() {
-        preferences.edit(commit = true) { putInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, 0) }
+    override suspend fun isAlwaysOnEnabled(): Boolean {
+        return vpnServiceStateDao.getLastStateStats()?.alwaysOnState?.alwaysOnEnabled ?: false
     }
 
-    override fun onAppTPManuallyEnabled() {
-        preferences.edit(commit = true) { putInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, getAppTPManuallyEnables() + 1) }
-    }
+    override suspend fun vpnLastDisabledByAndroid(): Boolean {
+        fun vpnUnexpectedlyDisabled(): Boolean {
+            return vpnServiceStateDao.getLastStateStats()?.let {
+                (
+                    it.state == VpnServiceState.DISABLED &&
+                        it.stopReason != VpnStoppingReason.SELF_STOP &&
+                        it.stopReason != VpnStoppingReason.REVOKED
+                    )
+            } ?: false
+        }
 
-    override fun getAppTPManuallyEnables(): Int {
-        return preferences.getInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, 0)
-    }
+        fun vpnKilledBySystem(): Boolean {
+            val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
+            return lastHeartBeat?.type == VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE &&
+                !vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+        }
 
-    override fun onForgetPromoteAlwaysOn() {
-        preferences.edit(commit = true) { putBoolean(KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED, false) }
-    }
-
-    override fun userAllowsShowPromoteAlwaysOn(): Boolean {
-        return preferences.getBoolean(KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED, true)
-    }
-
-    override suspend fun setAlwaysOn(enabled: Boolean) = withContext(dispatcherProvider.io()) {
-        preferences.edit(commit = true) { putBoolean(KEY_ALWAYS_ON_MODE_ENABLED, enabled) }
-    }
-
-    override fun isAlwaysOnEnabled(): Boolean {
-        return preferences.getBoolean(KEY_ALWAYS_ON_MODE_ENABLED, false)
+        return vpnUnexpectedlyDisabled() || vpnKilledBySystem()
     }
 
     companion object {
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
 
         private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
-        private const val KEY_DEVICE_SHIELD_MANUALLY_ENABLED = "KEY_DEVICE_SHIELD_MANUALLY_ENABLED"
-        private const val KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED = "KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED"
-
-        private const val KEY_ALWAYS_ON_MODE_ENABLED = "KEY_ALWAYS_ON_MODE_ENABLED"
     }
 }

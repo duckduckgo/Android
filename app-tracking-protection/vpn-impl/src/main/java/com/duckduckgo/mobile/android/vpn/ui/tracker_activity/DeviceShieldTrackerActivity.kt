@@ -51,6 +51,8 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
+import com.duckduckgo.mobile.android.vpn.ui.alwayson.AlwaysOnAlertDialogFragment
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
@@ -59,6 +61,8 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -70,7 +74,6 @@ class DeviceShieldTrackerActivity :
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener,
     AppTPDisableConfirmationDialog.Listener,
     AppTPVpnConflictDialog.Listener,
-    AppTPPromoteAlwaysOnDialog.Listener,
     VpnRemoveFeatureConfirmationDialog.Listener {
 
     @Inject
@@ -122,27 +125,27 @@ class DeviceShieldTrackerActivity :
 
     private fun bindViews() {
         binding.ctaTrackerFaq.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
+            viewModel.onViewEvent(ViewEvent.LaunchDeviceShieldFAQ)
         }
 
         binding.ctaBetaInstructions.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchBetaInstructions)
+            viewModel.onViewEvent(ViewEvent.LaunchBetaInstructions)
         }
 
         binding.ctaWhatAreAppTrackers.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchAppTrackersFAQ)
+            viewModel.onViewEvent(ViewEvent.LaunchAppTrackersFAQ)
         }
 
         binding.ctaManageProtection.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
+            viewModel.onViewEvent(ViewEvent.LaunchExcludedApps)
         }
 
         binding.ctaRemoveFeature.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.AskToRemoveFeature)
+            viewModel.onViewEvent(ViewEvent.AskToRemoveFeature)
         }
 
         binding.ctaShowAll.setClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
+            viewModel.onViewEvent(ViewEvent.LaunchMostRecentActivity)
         }
     }
 
@@ -174,6 +177,7 @@ class DeviceShieldTrackerActivity :
             .commitNow()
     }
 
+    @OptIn(FlowPreview::class)
     private fun observeViewModel() {
         lifecycleScope.launch {
             viewModel.getBlockedTrackersCount()
@@ -185,6 +189,19 @@ class DeviceShieldTrackerActivity :
                 }
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { renderViewState(it) }
+        }
+
+        lifecycleScope.launch {
+            // This is a one-shot check as soon as the screen is shown
+            viewModel.getRunningState()
+                .map { it.alwaysOnState }
+                .debounce(500) // give a bit of time so that pop doesn't just suddenly pops up
+                .take(1)
+                // we do this on CREATED because we don't want to show the dialogs when user leaves app and switches back here
+                .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+                .collect {
+                    viewModel.onViewEvent(ViewEvent.AlwaysOnInitialState(it))
+                }
         }
 
         viewModel.commands()
@@ -225,6 +242,7 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog -> launchVPNConflictDialog(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnAlwaysOnConflictDialog -> launchVPNConflictDialog(true)
             is DeviceShieldTrackerActivityViewModel.Command.ShowAlwaysOnPromotionDialog -> launchAlwaysOnPromotionDialog()
+            is DeviceShieldTrackerActivityViewModel.Command.ShowAlwaysOnLockdownWarningDialog -> launchAlwaysOnLockdownEnabledDialog()
             is DeviceShieldTrackerActivityViewModel.Command.VPNPermissionNotGranted -> quietlyToggleAppTpSwitch(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowRemoveFeatureConfirmationDialog -> launchRemoveFeatureConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.CloseScreen -> finish()
@@ -271,17 +289,42 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchAlwaysOnPromotionDialog() {
-        deviceShieldPixels.didShowDisableTrackingProtectionDialog()
-        val dialog = AppTPPromoteAlwaysOnDialog.instance(this)
-        dialog.show(
-            supportFragmentManager,
-            AppTPPromoteAlwaysOnDialog.TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG
-        )
+        val dialog = supportFragmentManager.findFragmentByTag(TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG) as? AlwaysOnAlertDialogFragment
+        dialog?.dismiss()
+
+        AlwaysOnAlertDialogFragment.newAlwaysOnDialog(
+            object : AlwaysOnAlertDialogFragment.Listener {
+                override fun onGoToSettingsClicked() {
+                    viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings)
+                }
+
+                override fun onCanceled() {
+                    viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnCancelled)
+                }
+            }
+        ).show(supportFragmentManager, TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG)
+    }
+
+    private fun launchAlwaysOnLockdownEnabledDialog() {
+        val dialog = supportFragmentManager.findFragmentByTag(TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG) as? AlwaysOnAlertDialogFragment
+        dialog?.dismiss()
+
+        AlwaysOnAlertDialogFragment.newAlwaysOnLockdownDialog(
+            object : AlwaysOnAlertDialogFragment.Listener {
+                override fun onGoToSettingsClicked() {
+                    viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings)
+                }
+
+                override fun onCanceled() {
+                    viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnCancelled)
+                }
+            }
+        ).show(supportFragmentManager, TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG)
     }
 
     override fun onOpenAppProtection() {
         deviceShieldPixels.didChooseToDisableOneAppFromDialog()
-        viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
+        viewModel.onViewEvent(ViewEvent.LaunchExcludedApps)
     }
 
     override fun onTurnAppTrackingProtectionOff() {
@@ -301,10 +344,6 @@ class DeviceShieldTrackerActivity :
     override fun onVpnConflictDialogGoToSettings() {
         deviceShieldPixels.didChooseToOpenSettingsFromVpnConflictDialog()
         openVPNSettings()
-    }
-
-    override fun onPromoteAlwaysOnGoToVPNSettings() {
-        viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.PromoteAlwaysOnOpenSettings)
     }
 
     @SuppressLint("InlinedApi")
@@ -329,14 +368,6 @@ class DeviceShieldTrackerActivity :
 
     override fun onRemoveFeature() {
         viewModel.removeFeature()
-    }
-
-    override fun onPromoteAlwaysOnRemindLater() {
-        viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.PromoteAlwaysOnRemindLater)
-    }
-
-    override fun onPromoteAlwaysOnForget() {
-        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnForget)
     }
 
     private fun launchBetaInstructions() {
@@ -413,31 +444,48 @@ class DeviceShieldTrackerActivity :
 
     private fun updateRunningState(runningState: VpnState) {
         if (runningState.state == VpnRunningState.ENABLED) {
-            Timber.d("updateRunningState enabled")
-            binding.deviceShieldTrackerLabelDisabled.gone()
+            if (runningState.alwaysOnState.isAlwaysOnLockedDown()) {
+                binding.deviceShieldTrackerLabelEnabled.gone()
 
-            binding.deviceShieldTrackerLabelEnabled.apply {
-                setClickableLink(
-                    APPTP_SETTINGS_ANNOTATION,
-                    getText(R.string.atp_ActivityEnabledLabel)
-                ) { launchManageAppsProtection() }
-                show()
+                binding.deviceShieldTrackerLabelDisabled.apply {
+                    setClickableLink(
+                        OPEN_SETTINGS_ANNOTATION,
+                        getText(R.string.atp_AlwaysOnLockDownEnabled)
+                    ) { launchAlwaysOnLockdownEnabledDialog() }
+                    show()
+                }
+            } else {
+                binding.deviceShieldTrackerLabelDisabled.gone()
+
+                binding.deviceShieldTrackerLabelEnabled.apply {
+                    setClickableLink(
+                        APPTP_SETTINGS_ANNOTATION,
+                        getText(R.string.atp_ActivityEnabledLabel)
+                    ) { launchManageAppsProtection() }
+                    show()
+                }
             }
         } else {
             binding.deviceShieldTrackerLabelEnabled.gone()
 
-            val disabledLabel = if (runningState.stopReason == REVOKED) {
-                Timber.d("updateRunningState revoked")
-                R.string.atp_ActivityRevokedLabel
+            val (disabledLabel, annotation) = if (runningState.stopReason == REVOKED) {
+                R.string.atp_ActivityRevokedLabel to REPORT_ISSUES_ANNOTATION
+            } else if (runningState.stopReason == SELF_STOP) {
+                R.string.atp_ActivityDisabledLabel to REPORT_ISSUES_ANNOTATION
             } else {
-                Timber.d("updateRunningState disabled")
-                R.string.atp_ActivityDisabledLabel
+                R.string.atp_ActivityDisabledBySystemLabel to RE_ENABLE_ANNOTATION
             }
             binding.deviceShieldTrackerLabelDisabled.apply {
                 setClickableLink(
-                    REPORT_ISSUES_ANNOTATION,
+                    annotation,
                     getText(disabledLabel)
-                ) { launchFeedback() }
+                ) {
+                    if (annotation == REPORT_ISSUES_ANNOTATION) {
+                        launchFeedback()
+                    } else if (annotation == RE_ENABLE_ANNOTATION) {
+                        reEnableAppTrackingProtection()
+                    }
+                }
                 show()
             }
         }
@@ -471,6 +519,10 @@ class DeviceShieldTrackerActivity :
         reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps)
     }
 
+    private fun reEnableAppTrackingProtection() {
+        checkVPNPermission()
+    }
+
     private sealed class VpnPermissionStatus {
         object Granted : VpnPermissionStatus()
         data class Denied(val intent: Intent) : VpnPermissionStatus()
@@ -478,8 +530,11 @@ class DeviceShieldTrackerActivity :
 
     companion object {
         private const val RESULT_RECEIVER_EXTRA = "RESULT_RECEIVER_EXTRA"
+        private const val RE_ENABLE_ANNOTATION = "re_enable_link"
+        private const val OPEN_SETTINGS_ANNOTATION = "open_settings_link"
         private const val ON_LAUNCHED_CALLED_SUCCESS = 0
         private const val MIN_ROWS_FOR_ALL_ACTIVITY = 6
+        private const val TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG = "AppTPPromoteAlwaysOnDialog"
 
         private const val REQUEST_ASK_VPN_PERMISSION = 101
 

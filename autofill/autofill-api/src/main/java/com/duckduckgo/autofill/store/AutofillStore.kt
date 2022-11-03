@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.store
 
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import kotlinx.coroutines.flow.Flow
 
@@ -77,9 +78,10 @@ interface AutofillStore {
      * Updates the credentials saved for the given URL
      * @param rawUrl Can be a full, unmodified URL taken from the URL bar (containing subdomains, query params etc...)
      * @param credentials The credentials to be updated. The ID can be null.
+     * @param updateType The type of update to perform, whether updating the username or password.
      * @return The saved credential if it saved successfully, otherwise null
      */
-    suspend fun updateCredentials(rawUrl: String, credentials: LoginCredentials): LoginCredentials?
+    suspend fun updateCredentials(rawUrl: String, credentials: LoginCredentials, updateType: CredentialUpdateType): LoginCredentials?
 
     /**
      * Returns the full list of stored login credentials
@@ -113,6 +115,7 @@ interface AutofillStore {
         object ExactMatch : ContainsCredentialsResult
         object UsernameMatch : ContainsCredentialsResult
         object UrlOnlyMatch : ContainsCredentialsResult
+        object UsernameMissing : ContainsCredentialsResult
         object NoMatch : ContainsCredentialsResult
     }
 }
