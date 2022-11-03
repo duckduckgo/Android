@@ -54,6 +54,8 @@ interface AutofillJavascriptInterface {
     fun injectCredentials(credentials: LoginCredentials)
     fun injectNoCredentials()
 
+    fun cancelRetrievingStoredLogins()
+
     var callback: Callback?
     var webView: WebView?
 
@@ -76,7 +78,11 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
     override var callback: Callback? = null
     override var webView: WebView? = null
+
+    // coroutine jobs tracked for supporting cancellation
     private val getAutofillDataJob = ConflatedJob()
+    private val storeFormDataJob = ConflatedJob()
+    private val injectCredentialsJob = ConflatedJob()
 
     @JavascriptInterface
     override fun getAutofillData(requestString: String) {
@@ -138,7 +144,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     fun storeFormData(data: String) {
         Timber.i("storeFormData called, credentials provided to be persisted")
 
-        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
+        storeFormDataJob += coroutineScope.launch(dispatcherProvider.default()) {
 
             val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
             val title = autofillDomainFormatter.extractDomain(currentUrl)
@@ -166,7 +172,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
     override fun injectCredentials(credentials: LoginCredentials) {
         Timber.v("Informing JS layer with credentials selected")
-        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
+        injectCredentialsJob += coroutineScope.launch(dispatcherProvider.default()) {
             val jsCredentials = credentials.asJsCredentials()
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateResponseGetAutofillData(jsCredentials))
         }
@@ -174,7 +180,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
     override fun injectNoCredentials() {
         Timber.v("No credentials selected; informing JS layer")
-        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
+        injectCredentialsJob += coroutineScope.launch(dispatcherProvider.default()) {
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateEmptyResponseGetAutofillData())
         }
     }
@@ -184,6 +190,10 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
             username = username,
             password = password
         )
+    }
+
+    override fun cancelRetrievingStoredLogins() {
+        getAutofillDataJob.cancel()
     }
 
     private fun JavascriptCredentials.asLoginCredentials(

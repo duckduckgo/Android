@@ -117,6 +117,10 @@ class InlineBrowserAutofillTest {
             lastAction = NoCredentialsInjected
         }
 
+        override fun cancelRetrievingStoredLogins() {
+
+        }
+
         override var callback: Callback? = null
         override var webView: WebView? = null
     }
