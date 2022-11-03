@@ -236,7 +236,9 @@
         <item quantity="few">Aplicații</item>
         <item quantity="other">Aplicații</item>
     </plurals>
+    <string name="atp_ActivityEnabledLabel">Această funcție este în versiune beta. Ai observat o problemă cu o aplicație? <annotation type="app_settings_link">Raportează o problemă.</annotation></string>
     <string name="atp_ActivityDisabledLabel">Protecția împotriva urmăririi de către aplicație <b>este dezactivată</b>\nProtecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale? <annotation type="report_issues_link">Raportează probleme</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android a dezactivat Protecția împotriva urmăririi de către aplicație</b>. Vrei să împiedici recurența acestei situații? <annotation type="re_enable_link">Reactivează</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>O aplicație VPN de pe dispozitivul tău a dezactivat Protecția împotriva urmăririi de către aplicație.</b>\nProtecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale? <annotation type="report_issues_link">Raportează probleme</annotation></string>
     <string name="atp_ActivityAbout">Despre</string>
     <string name="atp_ActivityManage">Gestionează</string>
@@ -385,5 +387,12 @@
 
     <!--  App Tracking Protection Promote Always On -->
     <string name="atp_PromoteAlwaysOnDialogSettings">Mergi la Setări</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Nu acum</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Accesează Setările VPN ale dispozitivului tău pentru DuckDuckGo și activează <b>VPN mereu pornit</b> pentru a preveni dezactivarea protecției de către Android.\n\nAsigură-te că ai lăsat dezactivată cealaltă setare.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Pentru a evita problemele legate de aplicație, accesează <b>Setări VPN pentru DuckDuckGo</b> și dezactivează <b>Blochează conexiunile fără VPN</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Setează ca Mereu pornit</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Modifică setările VPN</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Acțiune necesară!</b> Pentru a evita problemele legate de aplicații, trebuie să modifici setările Android. <annotation type="open_settings_link">Schimbă setările</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Acțiune necesară! Trebuie modificată o setare Android pentru Protecția împotriva urmăririi de către aplicații.</string>
 
 </resources>

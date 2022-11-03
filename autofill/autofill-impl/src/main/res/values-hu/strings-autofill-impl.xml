@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Jelszó frissítése</string>
     <string name="updateLoginDialogButtonNotNow">Most nem</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Frissíted a felhasználónevet?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Felhasználónév frissítése</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Automatikus kitöltési párbeszédablak bezárása</string>
 
     <string name="credentialManagementEditLoginTitleHint">Bejelentkezési cím</string>
