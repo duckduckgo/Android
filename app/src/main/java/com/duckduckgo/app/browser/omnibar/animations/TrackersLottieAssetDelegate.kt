@@ -34,7 +34,6 @@ import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.ImageLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.LetterLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.StackedLogo
-import java.time.format.TextStyle
 
 internal class TrackersLottieAssetDelegate(
     val context: Context,
