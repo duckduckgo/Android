@@ -49,14 +49,11 @@
             <ImageView
                 android:id="@+id/onboarding_page_image"
                 android:layout_gravity="center"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="260dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="12dp"
                 android:contentDescription="@string/atp_OnboardingLogoDescription"
                 android:importantForAccessibility="no"
-                android:background="?attr/appTPHeaderBackground"
-                app:srcCompat="@drawable/device_shield_onboarding_page_three_header" />
+                app:srcCompat="@drawable/device_shield_onboarding_page_three_header_transparent" />
 
         </FrameLayout>
 
