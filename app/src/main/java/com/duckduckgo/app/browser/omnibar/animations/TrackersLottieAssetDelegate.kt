@@ -34,6 +34,7 @@ import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.ImageLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.LetterLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.StackedLogo
+import java.time.format.TextStyle
 
 internal class TrackersLottieAssetDelegate(
     val context: Context,
@@ -100,7 +101,8 @@ internal class TrackersLottieAssetDelegate(
             override fun draw(canvas: Canvas) {
                 val centerX = bounds.width() * 0.5f
                 val centerY = bounds.height() * 0.5f
-                textPaint.textSize = (bounds.width() / 2).toFloat()
+                textPaint.textSize = (bounds.width() * 0.7f).toFloat()
+                textPaint.typeface = Typeface.DEFAULT_BOLD
                 val textWidth: Float = textPaint.measureText(letter) * 0.5f
                 val textBaseLineHeight = textPaint.fontMetrics.ascent * -0.4f
                 canvas.drawCircle(centerX, centerY, centerX, backgroundPaint)
