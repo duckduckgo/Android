@@ -264,7 +264,6 @@ class TrackingProtectionExclusionListActivity :
 
     override fun onDefaultProtectionRestored() {
         viewModel.restoreProtectedApps()
-        restartVpn()
         Snackbar.make(shimmerLayout, getString(R.string.atp_ExcludeAppsRestoreDefaultSnackbar), Snackbar.LENGTH_LONG)
             .show()
     }
