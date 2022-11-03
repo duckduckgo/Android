@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
@@ -241,7 +242,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
             position: Int,
             listener: ExclusionListListener
         ) {
-            val appIcon = excludedAppInfo.packageIcon
+            val appIcon = itemView.context.packageManager.safeGetApplicationIcon(excludedAppInfo.packageName)
             binding.deviceShieldAppEntryIcon.setImageDrawable(appIcon)
             binding.deviceShieldAppEntryName.text = excludedAppInfo.name
 
