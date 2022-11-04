@@ -36,9 +36,10 @@ class UncaughtExceptionModule {
     fun uncaughtWebViewExceptionRepository(
         uncaughtExceptionDao: UncaughtExceptionDao,
         rootExceptionFinder: RootExceptionFinder,
-        deviceInfo: DeviceInfo
+        deviceInfo: DeviceInfo,
+        dispatchers: DispatcherProvider,
     ): UncaughtExceptionRepository {
-        return UncaughtExceptionRepositoryDb(uncaughtExceptionDao, rootExceptionFinder, deviceInfo)
+        return UncaughtExceptionRepositoryDb(uncaughtExceptionDao, rootExceptionFinder, deviceInfo, dispatchers)
     }
 
     @Provides

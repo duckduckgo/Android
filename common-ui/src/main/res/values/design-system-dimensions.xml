@@ -47,7 +47,6 @@
     <dimen name="buttonLargeSidePadding">24dp</dimen>
     <dimen name="buttonSmallTopPadding">8dp</dimen>
     <dimen name="buttonLargeTopPadding">14dp</dimen>
-    <dimen name="buttonIconPadding">8dp</dimen>
 
     <!-- List Items -->
     <dimen name="listItemImageContainerSize">40dp</dimen>
@@ -81,4 +80,7 @@
     <dimen name="horizontalDividerBottomPadding">@dimen/keyline_4</dimen>
     <dimen name="verticalDividerWidth">1dp</dimen>
     <dimen name="verticalDividerSidePadding">@dimen/keyline_4</dimen>
+
+    <!-- InfoPanel -->
+    <dimen name="infoPanelIconSize">16dp</dimen>
 </resources>

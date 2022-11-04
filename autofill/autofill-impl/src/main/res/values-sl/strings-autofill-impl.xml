@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Posodobitev gesla</string>
     <string name="updateLoginDialogButtonNotNow">Ne zdaj</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Želite posodobiti uporabniško ime?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Posodobi uporabniško ime</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Zapri pogovorno okno za samodejno izpolnjevanje</string>
 
     <string name="credentialManagementEditLoginTitleHint">Naslov prijave</string>

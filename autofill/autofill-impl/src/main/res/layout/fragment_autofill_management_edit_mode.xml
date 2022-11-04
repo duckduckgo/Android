@@ -55,7 +55,7 @@
             app:editable="false"
             app:endIcon="@drawable/ic_copy"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyPassword"
-            app:isPassword="true" />
+            app:type="password" />
 
         <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
             android:id="@+id/domainEditText"

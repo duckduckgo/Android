@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Värskenda parooli</string>
     <string name="updateLoginDialogButtonNotNow">Mitte praegu</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Kas värskendada kasutajanime?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Värskenda kasutajanime</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Sulge automaatse täitmise dialoog</string>
 
     <string name="credentialManagementEditLoginTitleHint">Sisselogimise pealkiri</string>

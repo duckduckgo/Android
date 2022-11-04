@@ -54,9 +54,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <nl.dionsegijn.konfetti.KonfettiView
-        android:id="@+id/deviceShieldKonfetti"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

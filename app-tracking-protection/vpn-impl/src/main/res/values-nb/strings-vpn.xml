@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Aktiv tid: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Sporingsselskaper blokkert i dag: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Sporingsselskaper blokkert denne uken: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Sporingsselskaper blokkert i dag: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Sporingsselskaper blokkert denne uken: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Ingen sporingsselskaper er blokkert ennå"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Sporere blokkert i dag: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Sporere blokkert denne uken: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Sporere blokkert i dag: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Sporere blokkert denne uken: %1$d</string>
     <string name="vpnTrackersNone">"Ingen sporere er blokkert ennå"</string>
     <string name="vpnNotRunYet">"VPN er ikke brukt ennå"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s pakker"</string>
@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Mens funksjonen beta-testes kan DuckDuckGo deaktivere beskyttelsen for enkelte apper for å løse kjente problemer med lasting av innhold. Egendefinerte innstillinger blir ikke endret med mindre du gjenoppretter til standardinnstillingene.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection er deaktivert</b> Har App Tracking Protection forårsaket et problem med appene dine? <annotation type="report_issues_link">Rapporter problemer</annotation></string>
     <string name="atp_ExcludedAppsReport">Rapporter et problem med en annen app</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Laster nettsteder</string>
-    <string name="atp_ExcludedReasonKnownIssues">Kjente problemer</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuelt deaktivert</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manuelt aktivert</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Avbryt</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Aktiver</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Gjenopprett</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Vil du aktivere beskyttelse for %1$s manuelt?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Denne appen er kjent for å få problemer når sporingsforsøk mislykkes.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Det kan være at nettstedsinnholdet i denne appen ikke vises riktig når beskyttelse er aktivert.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Aktivering av beskyttelse sender appens navn til DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Personvern er deaktivert</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Hvis du deaktiverte beskyttelsen for å løse et problem, må du kontrollere at appen nå fungerer før du rapporterer problemet til DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Den sluttet å fungere som forventet</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Det er greit at jeg blir sporet i denne appen</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Av en annen grunn</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Rapportere</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Hopp over</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Gjenopprett standardvalg for beskyttede apper</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Rapporter et problem med en app</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Vil du gjenopprette standardbeskyttelsen?</string>
@@ -197,7 +187,7 @@
     <string name="atp_ActivityPastWeek">Siste 7 dager</string>
     <string name="atp_ActivityTitle">Beskyttelse mot appsporing</string>
     <string name="atp_MostRecentActivityTitle">All nylig aktivitet</string>
-    <string name="atp_ActivityRecentActivity">Nylig aktivitet</string>
+    <string name="atp_ActivityRecentActivity">Aktivitet</string>
     <string name="atp_ActivityCtaShowAll">Vis alle nylige aktiviteter</string>
     <string name="atp_ActivityAppTrackersFAQ">Hva er appsporere?</string>
     <string name="atp_ActivityReportProblem">Rapporter et problem med en app</string>
@@ -217,8 +207,6 @@
         <![CDATA[%1$d sporingsforsøk blokkert fra %2$d selskaper i <b>%3$s</b>-appen]]>
     </string>
 
-    <string name="atp_ActivityEmptyListTitle">Ingen ny aktivitet</string>
-    <string name="atp_ActivityEmptyListMessage">Fortsett å bruke enheten. Sporingsforsøk som App Tracking Protection blokkerer, vises her.</string>
     <string name="atp_ActivityPastWeekBlocked">Blokkert</string>
     <string name="atp_ActivityPastWeekAcross">I</string>
 
@@ -230,8 +218,9 @@
         <item quantity="one">App</item>
         <item quantity="other">Apper</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Denne funksjonen er i beta. <annotation type="app_settings_link">Har du problemer med en app?</annotation></string>
+    <string name="atp_ActivityEnabledLabel">Denne funksjonen er i beta. Har du lagt merke til et problem med en app? <annotation type="app_settings_link">Rapporter et problem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection er deaktivert</b>\nHar appsporingsbeskyttelse forårsaket et problem med appene dine? <annotation type="report_issues_link">Rapporter problemer</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android deaktiverte App Tracking Protection</b>. Vil du forhindre at dette skjer igjen? <annotation type="re_enable_link">Aktiver på nytt</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>En VPN-app på enheten din deaktiverte App Tracking Protection.</b>\nHar App Tracking Protection forårsaket et problem med appene dine? <annotation type="report_issues_link">Rapporter problemer</annotation></string>
     <string name="atp_ActivityAbout">Om</string>
     <string name="atp_ActivityManage">Administrere</string>
@@ -377,10 +366,47 @@
     <string name="atp_RemoveFeatureDialogRemove">Slå av</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Vil du sette til Alltid på?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Slik forhindrer du at Android innimellom deaktiverer App Tracking Protection:\n\nGå til Innstillinger\nÅpne VPN-innstillinger for DuckDuckGo\nSlå på «Alltid på-VPN»</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Gå til Innstillinger</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Minn meg på det senere</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Nei takk</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Ikke nå</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Gå til enhetens VPN-innstillinger for DuckDuckGo og aktiver <b>Alltid på</b>. Dette forhindrer at Android deaktiverer beskyttelsen.\n\nPåse at den andre innstillingen er satt til AV.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Gå til enhetens <b>VPN-innstillinger for DuckDuckGo</b> og deaktiver <b>Blokker tilkoblinger uten VPN</b> for å unngå problemer med apper.]]></string>
+    <string name="atp_AlwaysOnModalHeading">Sett til Alltid på</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Endre VPN-innstillingene dine</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Handling kreves!</b> For å unngå problemer med apper må du endre Android-innstillingene. <annotation type="open_settings_link">Endre innstillinger</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Handling kreves! En Android-innstilling må endres for App Tracking Protection.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Mine apper</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Det kan oppstå problemer med apper når dette er aktivert.</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Aktiver likevel</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">%1$s kan få problemer hvis App Tracking Protection er aktivert</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Rapportere et problem?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Gi oss beskjed hvis du har deaktivert App Tracking Protection for %1$s fordi du har hatt problemer med appen.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Rapporter problem</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Ikke nå</string>
+    <string name="atp_ActivityRecentActivityHeader">Aktivitet</string>
+    <string name="atp_ActivityManageProtectionLabel">Har du problemer med en app?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Under beta blir beskyttelsen for enkelte apper automatisk deaktivert. <annotation type="app_settings_link">Vis apper</annotation></string>
+    <string name="atp_ActivityDescription">Blokkerte sporingsforsøk vises her</string>
+    <plurals name="atp_ActivityProtectedApps">
+        <item quantity="one">%1$s av appene dine er beskyttet mot skjulte sporere vi finner som prøver å få tilgang til personopplysningene dine</item>
+        <item quantity="other">%1$s av appene dine er beskyttet mot skjulte sporere vi finner som prøver å få tilgang til personopplysningene dine</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps">
+        <item quantity="one">%1$s av appene dine har automatisk beskyttelse deaktivert</item>
+        <item quantity="other">%1$s av appene dine har automatisk beskyttelse deaktivert</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Gode nyheter! App Tracking Protection er nå aktivert.<br/><br/>👌Jeg viser deg en sanntidsliste over apper som prøver å spore deg.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Skjønner!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel">Beskyttelse aktivert (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Beskyttelse deaktivert (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Alle</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Beskyttelse aktivert</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Beskyttelse deaktivert</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Alle</string>
+    <string name="atp_ActivityViewAppsLabel">Vis apper</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Denne funksjonen er i beta. Har du problemer med en app? <annotation type="app_settings_link"> Hjelp oss å bli bedre</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Noen apper kan få problemer når App Tracking Protection er aktivert.\n<annotation type="learn_why_link">Finn ut hvorfor</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Beskyttelse er deaktivert for apper med kjente problemer. Du kan aktivere disse appene, men de fungerer kanskje ikke som forventet. <annotation type="learn_why_link">Finn ut hvorfor</annotation></string>
 
 </resources>

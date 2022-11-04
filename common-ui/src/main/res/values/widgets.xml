@@ -152,11 +152,6 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.InfoPanel.Text" parent="TextAppearance.DuckDuckGo.Body2">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/almostBlackDark</item>
-    </style>
-
     <!-- Buttons -->
     <style name="Widget.DuckDuckGo.DaxButton.Contained" parent="Widget.MaterialComponents.Button">
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
@@ -178,7 +173,6 @@
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:textAppearance">?attr/textAppearanceButton</item>
         <item name="android:textColor">@color/button_secondary_text_color_selector</item>
         <item name="shapeAppearance">?attr/shapeAppearanceSmallComponent</item>
         <item name="strokeColor">@color/button_secondary_stroke_selector</item>

@@ -38,8 +38,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_ENABLE_DAILY("m_atp_ev_enabled_d"),
     ATP_UPTIME("m_atp_ev_uptime_c"),
     ATP_DISABLE_DAILY("m_atp_ev_disabled_d"),
-    ATP_LAST_DAY_ENABLE_COUNT_DAILY("m_atp_ev_enabled_count_d"),
-    ATP_LAST_DAY_DISABLE_COUNT_DAILY("m_atp_ev_disabled_count_d"),
 
     ATP_ENABLE_UNIQUE("m_atp_ev_enabled_u"),
     ATP_ENABLE_FROM_REMINDER_NOTIFICATION_UNIQUE("m_atp_ev_enabled_reminder_notification_u"),
@@ -146,8 +144,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
 
     ATP_DID_SHOW_REPORT_BREAKAGE_APP_LIST("m_atp_imp_report_breakage_c"),
     ATP_DID_SHOW_REPORT_BREAKAGE_APP_LIST_DAILY("m_atp_imp_report_breakage_d"),
-    ATP_DID_SHOW_REPORT_BREAKAGE_TEXT_FORM("m_atp_imp_report_breakage_desc_c"),
-    ATP_DID_SHOW_REPORT_BREAKAGE_TEXT_FORM_DAILY("m_atp_imp_report_breakage_desc_d"),
     ATP_DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM("m_atp_imp_report_breakage_login_c"),
     ATP_DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM_DAILY("m_atp_imp_report_breakage_login_d"),
 
@@ -156,7 +152,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_DID_CHOOSE_DISABLE_ONE_APP_PROTECTION_DIALOG("m_atp_ev_selected_disable_app_protection_c"),
     ATP_DID_CHOOSE_CANCEL_APP_PROTECTION_DIALOG("m_atp_ev_selected_cancel_app_protection_c"),
 
-    ATP_DID_SHOW_WAITLIST_DIALOG("m_atp_imp_waitlist_dialog_c"),
     ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME("m_atp_ev_waitlist_dialog_notify_me_c"),
     ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS("m_atp_ev_waitlist_dialog_dismiss_c"),
 
@@ -211,10 +206,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG("m_atp_imp_promote_always_on_dialog_c"),
     ATP_DID_CHOOSE_OPEN_SETTINGS_PROMOTE_ALWAYS_ON_DIALOG_DAILY("m_atp_ev_selected_settings_promote_always_on_d"),
     ATP_DID_CHOOSE_OPEN_SETTINGS_PROMOTE_ALWAYS_ON_DIALOG("m_atp_ev_selected_settings_promote_always_on_c"),
-    ATP_DID_CHOOSE_REMIND_LATER_PROMOTE_ALWAYS_ON_DIALOG_DAILY("m_atp_ev_selected_remind_later_promote_always_on_d"),
-    ATP_DID_CHOOSE_REMIND_LATER_PROMOTE_ALWAYS_ON_DIALOG("m_atp_ev_selected_remind_later_promote_always_on_c"),
-    ATP_DID_CHOOSE_FORGET_PROMOTE_ALWAYS_ON_DIALOG_DAILY("m_atp_ev_selected_forget_later_promote_always_on_d"),
-    ATP_DID_CHOOSE_FORGET_PROMOTE_ALWAYS_ON_DIALOG("m_atp_ev_selected_forget_later_promote_always_on_c"),
 
     ATP_DID_ENABLE_APP_PROTECTION_FROM_ALL("m_atp_imp_enable_app_protection_all_c"),
     ATP_DID_ENABLE_APP_PROTECTION_FROM_DETAIL("m_atp_imp_enable_app_protection_detail_c"),
@@ -226,6 +217,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
 
     ATP_REPORT_UNPROTECTED_APPS_BUCKET("m_atp_unprotected_apps_bucket_%d_c"),
     ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY("m_atp_unprotected_apps_bucket_%d_d"),
+
+    ATP_DID_PRESS_APPTP_ENABLED_CTA_BUTTON("m_atp_ev_apptp_enabled_cta_button_press"),
 
     ;
 }

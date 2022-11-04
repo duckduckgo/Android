@@ -52,6 +52,11 @@ interface BrowserAutofill {
      */
     fun injectCredentials(credentials: LoginCredentials?)
 
+    /**
+     * Cancels any ongoing autofill operations which would show the user the prompt to choose credentials
+     * This would only normally be needed if a user-interaction happened such that showing autofill prompt would be undesirable.
+     */
+    fun cancelPendingAutofillRequestToChooseCredentials()
 }
 
 /**

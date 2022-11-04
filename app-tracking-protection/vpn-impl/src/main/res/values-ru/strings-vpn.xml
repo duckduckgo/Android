@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="atp_name">Блокировка отслеживания приложениями</string>
     <string name="refresh">Обновить</string>
 
@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Время работы: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Заблокировано отслеживающих компаний сегодня: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Заблокировано отслеживающих компаний на этой неделе: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Заблокировано отслеживающих компаний сегодня: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Заблокировано отслеживающих компаний на этой неделе: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Ни одной отслеживающей компании пока не заблокировано"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Заблокировано трекеров сегодня: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Заблокировано трекеров на этой неделе: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Заблокировано трекеров сегодня: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Заблокировано трекеров на этой неделе: %1$d</string>
     <string name="vpnTrackersNone">"Ни одного трекера пока не заблокировано"</string>
     <string name="vpnNotRunYet">"VPN еще не запускался"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\nПакетов: %2$s"</string>
@@ -144,24 +144,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Чтобы устранить проблемы с загрузкой контента, DuckDuckGo может отключить защиту для некоторых приложений при тестировании бета-версий. Ваши собственные настройки не изменятся, если вы сами не сбросите их на значения по умолчанию.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Защита от слежки отключена</b> Она нарушает работу приложений? <annotation type="report_issues_link">Сообщите о проблемах</annotation></string>
     <string name="atp_ExcludedAppsReport">Сообщить о проблеме с другим приложением</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Загружает сайты</string>
-    <string name="atp_ExcludedReasonKnownIssues">Известные проблемы</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Выключено вручную</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Включено вручную</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Отменить</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Включить</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Восстановить</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Включить защиту приложения %1$s вручную?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">При неудачных попытках отслеживания в этом приложении часто возникают сбои.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Если включена защита, содержимое сайта в этом приложении может отображаться некорректно.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">При включении защиты название приложения передается в DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Защита конфиденциальности выключена</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Прежде чем сообщать о проблеме в DuckDuckGo, проверьте, не заработало ли приложение после выключения защиты для устранения неполадки.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Приложение перестало корректно работать</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Я не против отслеживания в этом приложении</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Другая причина</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Сообщить</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Пропустить</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Восстановить список приложений по умолчанию</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Сообщить о проблеме с приложением</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Восстановить параметры защиты по умолчанию?</string>
@@ -205,12 +195,12 @@
     <string name="atp_ActivityPastWeek">За последние 7 дней</string>
     <string name="atp_ActivityTitle">Блокировка отслеживания приложениями</string>
     <string name="atp_MostRecentActivityTitle">Вся недавняя активность</string>
-    <string name="atp_ActivityRecentActivity">Недавняя активность</string>
+    <string name="atp_ActivityRecentActivity">Активность</string>
     <string name="atp_ActivityCtaShowAll">Просмотреть всю недавнюю активность</string>
     <string name="atp_ActivityAppTrackersFAQ">Что такое трекеры в приложениях?</string>
     <string name="atp_ActivityReportProblem">Сообщить о проблеме с приложением</string>
     <string name="atp_ActivityBetaInstructions">Инструкции к бета-версии</string>
-    <string name="atp_ActivityManageProtection">Возникли проблемы с приложением?</string>
+    <string name="atp_ActivityManageProtection">Проблемы с приложением?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[В приложении <b>%1$s</b> пресечена 1 попытка отслеживания 1 компанией]]>
@@ -225,25 +215,24 @@
         <![CDATA[Пресечены попытки отслеживания (%1$d) компаниями %2$d в приложении <b>%3$s</b>]]>
     </string>
 
-    <string name="atp_ActivityEmptyListTitle">Новой активности нет</string>
-    <string name="atp_ActivityEmptyListMessage">Продолжайте пользоваться устройством. Попытки отслеживания, блокированные защитой от слежки, отобразятся здесь.</string>
     <string name="atp_ActivityPastWeekBlocked">Заблокировано</string>
     <string name="atp_ActivityPastWeekAcross">в</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">попытка отслеживания</item>
         <item quantity="few">попытки отслеживания</item>
         <item quantity="many">попыток отслеживания</item>
         <item quantity="other">попытки отслеживания</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">приложении</item>
         <item quantity="few">приложениях</item>
         <item quantity="many">приложениях</item>
         <item quantity="other">приложения</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Эта функция доступна в бета-версии. <annotation type="app_settings_link">Возникли проблемы с приложением?</annotation></string>
+    <string name="atp_ActivityEnabledLabel">Это бета-версия функции. Заметили проблему с приложением? <annotation type="app_settings_link">Сообщите нам!</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Функция App Tracking Protection отключена</b> \nИз-за нее возникли сбои в приложениях? <annotation type="report_issues_link">Сообщить о проблемах</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Система Android отключила функцию блокировки отслеживания приложениями</b>. Не делать этого впредь? <annotation type="re_enable_link">Включить снова</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPN-приложение на вашем устройстве отключило защиту от слежки.</b>\nЗащите от слежки вызывает сбои в приложениях? <annotation type="report_issues_link">Сообщить о проблемах</annotation></string>
     <string name="atp_ActivityAbout">О нас</string>
     <string name="atp_ActivityManage">Настроить</string>
@@ -393,10 +382,51 @@
     <string name="atp_RemoveFeatureDialogRemove">Выключить</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Включить режим «Всегда включено»?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Что делать, чтобы Android периодически не отключал защиту от слежки?\n\nПерейдите в «Настройки» Android.\nОткройте «Настройки VPN» для DuckDuckGo.\nВыберите режим VPN «Всегда включено».</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Открыть «Настройки»</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Напомнить позже</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Нет, спасибо</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Не сейчас</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Чтобы Android не отключил вам защиту от трекеров в будущем, откройте настройки VPN для DuckDuckGo на своем устройстве и выберите для VPN вариант <b>«Всегда включено»</b>.\n\nУбедитесь, что другой параметр ВЫКЛЮЧЕН.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Чтобы приложение работало без перебоев, откройте <b>настройки VPN для DuckDuckGo</b> и отключите опцию <b>«Блокировать подключения без VPN»</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Задать «Всегда включено»</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Измените настройки VPN</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Внимание!</b> Измените настройки Android, чтобы приложение работало без перебоев. <annotation type="open_settings_link">Изменить настройки</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Внимание! Необходимо изменить настройки Android для функции блокировки отслеживания приложениями.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Мои приложения</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Активация этой функции может нарушить работу приложения</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Все равно включить</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">Активация блокировки отслеживания приложениями может нарушить работу %1$s</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Сообщить о проблеме?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Если вы отключили блокировку отслеживания приложениями в %1$s из-за сбоев в работе программы, дайте нам знать.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Сообщить о проблеме</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Не сейчас</string>
+    <string name="atp_ActivityRecentActivityHeader">Активность</string>
+    <string name="atp_ActivityManageProtectionLabel">Возникли проблемы с приложением?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Защита некоторых приложений автоматически отключается на время бета-тестирования. <annotation type="app_settings_link">Просмотреть приложения</annotation></string>
+    <string name="atp_ActivityDescription">Заблокированные попытки отслеживания будут отображаться здесь</string>
+    <plurals name="atp_ActivityProtectedApps">
+        <item quantity="one">Мы защитили %1$s приложение от скрытых трекеров, которые пытались получить доступ к вашим личным данным</item>
+        <item quantity="few">Мы защитили %1$s приложения от скрытых трекеров, которые пытались получить доступ к вашим личным данным</item>
+        <item quantity="many">Мы защитили %1$s приложений от скрытых трекеров, которые пытались получить доступ к вашим личным данным</item>
+        <item quantity="other">Мы защитили %1$s приложений от скрытых трекеров, которые пытались получить доступ к вашим личным данным</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps">
+        <item quantity="one">Защита %1$s приложения отключена автоматически</item>
+        <item quantity="few">Защита %1$s приложений отключена автоматически</item>
+        <item quantity="many">Защита %1$s приложений отключена автоматически</item>
+        <item quantity="other">Защита %1$s приложений отключена автоматически</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Хорошие новости! Функция блокировки отслеживания приложениями включена.<br/><br/>👌Теперь мы будем в реальном времени показывать вам список приложений, заблокированных за попытки слежки.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Понятно!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel">Защита включена (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Защита отключена (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Всё</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Защита включена</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Защита отключена</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Всё</string>
+    <string name="atp_ActivityViewAppsLabel">Просмотреть приложения</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Это бета-версия функции. Проблемы с приложением? <annotation type="app_settings_link">Давайте устраним их вместе!</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Активация блокировки отслеживания приложениями может нарушить работу некоторых программ.\n<annotation type="learn_why_link">С чем это связано...</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Защита отключена для сбоивших приложений. Ее можно включить снова, но при этом приложения могут работать некорректно. <annotation type="learn_why_link">С чем это связано...</annotation></string>
 
 </resources>

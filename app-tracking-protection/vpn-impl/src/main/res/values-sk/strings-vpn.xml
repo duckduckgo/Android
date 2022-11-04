@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Čas behu: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Dnes zablokované sledovacie spoločnosti: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Tento týždeň zablokované sledovacie spoločnosti: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Dnes zablokované sledovacie spoločnosti: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Tento týždeň zablokované sledovacie spoločnosti: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Zatiaľ nie sú zablokované žiadne sledovacie spoločnosti"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Dnes zablokované sledovače: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Tento týždeň zablokované sledovače: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Dnes zablokované sledovače: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Tento týždeň zablokované sledovače: %1$d</string>
     <string name="vpnTrackersNone">"Zatiaľ nie sú zablokované žiadne sledovače"</string>
     <string name="vpnNotRunYet">"VPN ešte nebola spustená"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s paketov"</string>
@@ -144,24 +144,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Počas beta verzie môže DuckDuckGo vypnúť ochranu niektorých aplikácií, aby sa vyriešili známe problémy s načítavaním obsahu. Vaše vlastné nastavenia sa nezmenia, pokiaľ neobnovíte predvolené nastavenia.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Ochrana pred sledovaním aplikácií je vypnutá</b> Spôsobila ochrana pred sledovaním aplikácií problém s aplikáciami <annotation type="report_issues_link">nahlásiť problémy</annotation></string>
     <string name="atp_ExcludedAppsReport">Nahlásiť problém s inou aplikáciou</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Načítanie webových stránok</string>
-    <string name="atp_ExcludedReasonKnownIssues">Známe problémy</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Ručne vypnuté</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manuálne povolené</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Zrušiť</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Povoliť</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Obnovenie</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Chcete manuálne povoliť ochranu pre aplikáciu %1$s ?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Táto aplikácia je známa tým, že pri neúspešných pokusoch o sledovanie dochádza k problémom.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Obsah lokality v tejto aplikácii sa nemusí zobrazovať správne, ak je povolená ochrana.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Zapnutím ochrany sa názov aplikácie odošle do DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Ochrana súkromia vypnutá</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Ak ste vypli ochranu s cieľom odstrániť problém, skontrolujte, či aplikácia teraz funguje, a až potom nahláste problém spoločnosti DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Prestalo fungovať podľa očakávania</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Som v poriadku, že ma táto aplikácia sleduje</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Z iného dôvodu</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Správa</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Preskočiť</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Obnoviť predvolené chránené aplikácie</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Nahlásenie problému s aplikáciou</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Obnoviť predvolenú ochranu?</string>
@@ -205,7 +195,7 @@
     <string name="atp_ActivityPastWeek">Posledných 7 dní</string>
     <string name="atp_ActivityTitle">Ochrana pred sledovaním činnosti v aplikáciách</string>
     <string name="atp_MostRecentActivityTitle">Všetky nedávne aktivity</string>
-    <string name="atp_ActivityRecentActivity">Nedávna aktivita</string>
+    <string name="atp_ActivityRecentActivity">Aktivita</string>
     <string name="atp_ActivityCtaShowAll">Zobraziť všetky nedávne aktivity</string>
     <string name="atp_ActivityAppTrackersFAQ">Čo sú sledovače aplikácií?</string>
     <string name="atp_ActivityReportProblem">Nahlásenie problému s aplikáciou</string>
@@ -225,8 +215,6 @@
         <![CDATA[%1$d pokusy o sledovanie zablokované od %2$d spoločností na <b>%3$s</b> app]]>
     </string>
 
-    <string name="atp_ActivityEmptyListTitle">Žiadna nová činnosť</string>
-    <string name="atp_ActivityEmptyListMessage">Pokračujte v používaní zariadenia. Tu sa zobrazujú pokusy o sledovanie, ktoré ochrana pred sledovaním aplikácií blokuje.</string>
     <string name="atp_ActivityPastWeekBlocked">Zablokované</string>
     <string name="atp_ActivityPastWeekAcross">Cez</string>
 
@@ -242,8 +230,9 @@
         <item quantity="many">Aplikácie</item>
         <item quantity="other">Aplikácií</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Táto funkcia je vo verzii beta. <annotation type="app_settings_link"> Máte problémy s aplikáciou? </annotation></string>
+    <string name="atp_ActivityEnabledLabel">Táto funkcia je vo verzii beta. Zaznamenali ste nejaký problém s aplikáciou? <annotation type="app_settings_link">Prosím, nahláste problém.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Ochrana sledovania aplikácií je vypnutá</b>\nSpôsobila ochrana sledovania aplikácií problém s vašimi aplikáciami? <annotation type="report_issues_link">Hlásenie problémov</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android zakázal ochranu pred sledovaním aplikácií</b>. Chcete zabrániť tomu, aby sa to opakovalo? <annotation type="re_enable_link">Znovu povoliť</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Aplikácia VPN vo vašom zariadení zakázala ochranu pred sledovaním aplikácií.</b>\nSpôsobila stránka App Tracking Protection problém s vašimi aplikáciami? <annotation type="report_issues_link">Záležitosti správy</annotation></string>
     <string name="atp_ActivityAbout">O</string>
     <string name="atp_ActivityManage">Spravujte stránku</string>
@@ -393,10 +382,51 @@
     <string name="atp_RemoveFeatureDialogRemove">Zakázať</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Nastavenie na možnosť Vždy zapnuté?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Ak chcete zabrániť tomu, aby systém Android pravidelne deaktiváciu ochrany sledovania aplikácií:\n\nPrejdite do Nastavenia systému Android\nOtvorte nastavenia VPN pre DuckDuckGo\nZapnite „Vždy zapnutý VPN</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Prejdite do Nastavení</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Pripomenúť neskôr</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Nie, ďakujem</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Teraz nie</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Prejdite do nastavení VPN vo svojom zariadení a pre DuckDuckGo a povoľte <b>Vždy zapnuté</b> VPN, aby ste zabránili vypnutiu ochrany systému Android.\n\nDbajte na to, aby ostatné nastavenia zostali vypnuté.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Ak sa chcete vyhnúť problémom s aplikáciou, prejdite na stránku <b>Nastavenia VPN pre DuckDuckGo</b> a vypnite <b>Blokovanie pripojení bez VPN</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Nastavené na možnosť Vždy zapnuté</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Zmena nastavení VPN</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Vyžaduje sa akcia!</b> Ak chcete predísť problémom s aplikáciami, musíte zmeniť nastavenia systému Android. <annotation type="open_settings_link">Zmena nastavení</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Vyžaduje sa akcia! Na ochranu aplikácií pred sledovaním je potrebné zmeniť nastavenie systému Android.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Moje aplikácie</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Ak je táto možnosť povolená, môžu sa vyskytnúť problémy s aplikáciou</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Napriek tomu povoliť</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">%1$s môžu nastať problémy, ak je povolená Ochrana aplikácii pred sledovaním</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Chcete nahlásiť problému?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Ak ste zakázali Ochranu aplikácie pred sledovaním pre %1$s, dajte nám o tom vedieť, pretože ste zaznamenali problémy s aplikáciou.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Nahlásiť problém</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Teraz nie</string>
+    <string name="atp_ActivityRecentActivityHeader">Aktivita</string>
+    <string name="atp_ActivityManageProtectionLabel">Máte problémy s aplikáciou?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Pri používaní beta verzie je ochrana niektorých aplikácií automaticky vypnutá. <annotation type="app_settings_link">Zobraziť aplikácie</annotation></string>
+    <string name="atp_ActivityDescription">Tu sa zobrazia zablokované pokusy o sledovanie</string>
+    <plurals name="atp_ActivityProtectedApps">
+        <item quantity="one">%1$s z vašich aplikácií je chránených pred skrytými sledovaniami, o ktorých si myslíme, že sa pokúšajú získať prístup k vašim osobným údajom</item>
+        <item quantity="few">%1$s z vašich aplikácií sú chránené pred skrytými sledovaniami, o ktorých si myslíme, že sa pokúšajú získať prístup k vašim osobným údajom</item>
+        <item quantity="many">%1$s z vašich aplikácií je chránených pred skrytými sledovaniami, o ktorých si myslíme, že sa pokúšajú získať prístup k vašim osobným údajom</item>
+        <item quantity="other">%1$s z vašich aplikácií je chránených pred skrytými sledovaniami, o ktorých si myslíme, že sa pokúšajú získať prístup k vašim osobným údajom</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps">
+        <item quantity="one">%1$s z vašich aplikácií má automaticky zakázanú ochranu</item>
+        <item quantity="few">%1$s z vašich aplikácií automaticky majú zakázanú ochranu</item>
+        <item quantity="many">%1$s z vašich aplikácií má automaticky zakázanú ochranu</item>
+        <item quantity="other">%1$s z vašich aplikácií má automaticky zakázanú ochranu</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Máme dobré správy! Ochrana aplikácii pred sledovaním je teraz povolená.<br/><br/>👌V reálnom čase vám zobrazím zoznam aplikácií vo vašom zariadení, ktoré sa vás pokúšajú sledovať.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Mám to!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel">Ochrana povolená (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Ochrana vypnutá (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Všetko</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Ochrana povolená</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Ochrana vypnutá</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Všetko</string>
+    <string name="atp_ActivityViewAppsLabel">Zobraziť aplikácie</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Táto funkcia je vo verzii beta. Máte problémy s aplikáciou? <annotation type="app_settings_link"> Pomôžte nám zlepšiť sa </annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Pri niektorých aplikáciách môžu nastať problémy, keď je zapnutá ochrana aplikácií pred sledovaním.\n<annotation type="learn_why_link">Zistite, prečo</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Ochrana je zakázaná pre aplikácie so známymi problémami. Tieto aplikácie môžete povoliť, ale nemusia fungovať podľa očakávania. <annotation type="learn_why_link">Zistite, prečo</annotation></string>
 
 </resources>
