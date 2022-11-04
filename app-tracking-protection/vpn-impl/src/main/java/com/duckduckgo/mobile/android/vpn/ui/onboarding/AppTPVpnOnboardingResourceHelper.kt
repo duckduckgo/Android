@@ -54,9 +54,9 @@ class AppThemeAppTPOnboardingResourceHelper @Inject constructor(val appTheme: Ap
             }
             VPN ->
                 if (appTheme.isLightModeEnabled()) {
-                    R.drawable.device_shield_onboarding_page_three_header
+                    R.drawable.device_shield_onboarding_page_three_header_transparent
                 } else {
-                    R.drawable.device_shield_onboarding_page_three_header_dark
+                    R.drawable.device_shield_onboarding_page_three_header_dark_transparent
                 }
         }
     }
