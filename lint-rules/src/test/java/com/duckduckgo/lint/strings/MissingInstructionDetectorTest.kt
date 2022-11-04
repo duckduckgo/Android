@@ -207,4 +207,55 @@ class MissingInstructionDetectorTest {
             .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
             .run().expectClean()
     }
+
+    @Test
+    fun whenPluralsHavePlaceholdersAndInstructionThenSuccess() {
+        TestLintTask.lint().files(
+            xml(
+                "res/values/strings.xml",
+                """
+                <?xml version="1.0" encoding="utf-8"?>
+                <resources>
+                     <plurals name="atp_ActivityProtectedApps" instruction="test">
+                        <item quantity="one">%1${'$'}s of your apps is protected from hidden trackers we find trying to access your personal info</item>
+                        <item quantity="other">%1${'$'}s of your apps are protected from hidden trackers we find trying to access your personal info</item>
+                    </plurals>
+                </resources>    
+                """
+            ).indented())
+            .skipTestModes(TestMode.CDATA)
+            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .run().expectClean()
+    }
+
+    @Test
+    fun whenPluralsHavePlaceholdersAndNoInstructionThenFailWithError() {
+        val expected =
+            """
+            res/values/strings.xml:4: Error: Missing instructions attribute [MissingInstruction]
+                    <item quantity="one">%1＄s of your apps is protected from hidden trackers we find trying to access your personal info</item>
+                                         ~~~~~
+            res/values/strings.xml:5: Error: Missing instructions attribute [MissingInstruction]
+                    <item quantity="other">%1＄s of your apps are protected from hidden trackers we find trying to access your personal info</item>
+                                           ~~~~~
+            2 errors, 0 warnings
+            """
+
+        TestLintTask.lint().files(
+            xml(
+                "res/values/strings.xml",
+                """
+                <?xml version="1.0" encoding="utf-8"?>
+                <resources>
+                     <plurals name="atp_ActivityProtectedApps">
+                        <item quantity="one">%1${'$'}s of your apps is protected from hidden trackers we find trying to access your personal info</item>
+                        <item quantity="other">%1${'$'}s of your apps are protected from hidden trackers we find trying to access your personal info</item>
+                    </plurals>
+                </resources>    
+                """
+            ).indented())
+            .skipTestModes(TestMode.CDATA)
+            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .run().expect(expected)
+    }
 }
