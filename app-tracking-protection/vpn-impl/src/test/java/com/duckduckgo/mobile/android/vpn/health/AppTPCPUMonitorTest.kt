@@ -133,25 +133,21 @@ class AppTPCPUMonitorTest {
 
     @Test
     fun whenCPUAbove30ThresholdSendAlert() {
-        print("whenCPUAbove30ThresholdSendAlert\n")
         assertAlertSent(42.0, 30)
     }
 
     @Test
     fun whenCPUAbove20ThresholdSendAlert() {
-        print("whenCPUAbove20ThresholdSendAlert\n")
         assertAlertSent(30.0, 20)
     }
 
     @Test
     fun whenCPUAbove10ThresholdSendAlert() {
-        print("whenCPUAbove10ThresholdSendAlert\n")
         assertAlertSent(10.1, 10)
     }
 
     @Test
     fun whenCPUAbove5ThresholdSendAlert() {
-        print("whenCPUAbove5ThresholdSendAlert\n")
         assertAlertSent(5.5, 5)
     }
 
@@ -185,7 +181,6 @@ class AppTPCPUMonitorTest {
 
         assertStartWorker()
 
-        print("About to verify\n")
         verify(mockDeviceShieldPixels, timeout(1000)).sendCPUUsageAlert(eq(expectedAlert))
         verifyNoMoreInteractions(mockDeviceShieldPixels)
     }
@@ -198,17 +193,12 @@ class AppTPCPUMonitorTest {
     }
 
     private fun assertWorkerRunning() {
-        var scheduledWorkers = getScheduledWorkers()
+        val scheduledWorkers = getScheduledWorkers()
         assertEquals(1, scheduledWorkers.size)
         assertEquals(WorkInfo.State.ENQUEUED, scheduledWorkers[0].state)
 
         // Skip initial delay so we don't have to wait
         testDriver.setInitialDelayMet(scheduledWorkers[0].id)
-
-        // scheduledWorkers = getScheduledWorkers()
-        // assertEquals(1, scheduledWorkers.size)
-        // val currState = scheduledWorkers[0].state
-        // assertTrue(WorkInfo.State.RUNNING == currState || WorkInfo.State.SUCCEEDED == currState)
     }
 
     private fun assertWorkerNotRunning() {

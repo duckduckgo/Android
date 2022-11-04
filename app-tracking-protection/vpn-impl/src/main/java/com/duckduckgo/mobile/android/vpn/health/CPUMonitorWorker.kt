@@ -47,7 +47,6 @@ class CPUMonitorWorker(
     override suspend fun doWork(): Result {
         return withContext(dispatcherProvider.io()) {
             try {
-                print("HELLO: WORKER STARTED\n")
                 val avgCPUUsagePercent = cpuUsageReader.readCPUUsage()
                 alertThresholds.forEach {
                     if (avgCPUUsagePercent > it) {
