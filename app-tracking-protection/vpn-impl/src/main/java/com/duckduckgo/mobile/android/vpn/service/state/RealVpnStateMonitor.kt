@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.DISABLED
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLED
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.ERROR
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.RESTART
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -79,6 +80,7 @@ class RealVpnStateMonitor @Inject constructor(
 
     private fun mapState(lastState: VpnServiceStateStats?): VpnState {
         val stoppingReason = when (lastState?.stopReason) {
+            RESTART -> VpnStopReason.RESTART
             SELF_STOP -> VpnStopReason.SELF_STOP
             REVOKED -> VpnStopReason.REVOKED
             ERROR -> VpnStopReason.ERROR
