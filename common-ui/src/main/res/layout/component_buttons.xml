@@ -30,9 +30,7 @@
     <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:text="Dax Buttons"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:text="Dax Buttons"/>
 
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/dax_button_primary"
