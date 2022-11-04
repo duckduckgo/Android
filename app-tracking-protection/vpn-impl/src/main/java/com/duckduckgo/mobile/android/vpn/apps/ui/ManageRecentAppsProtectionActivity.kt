@@ -144,6 +144,8 @@ class ManageRecentAppsProtectionActivity :
             adapter.update(viewState.excludedApps)
             binding.manageRecentAppsRecycler.show()
         }
+        binding.manageRecentAppsShowAll.show()
+        binding.manageRecentAppsDivider.show()
         shimmerLayout.gone()
     }
 
