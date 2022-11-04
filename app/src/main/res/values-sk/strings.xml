@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Hľadať predchádzajúce</string>
     <string name="closeFindInPageButtonDescription">Zavrieť vyhľadávanie v zobrazení stránky</string>
     <string name="findInPageHint">Hľadať na stránke</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Upraviť otázku pred vyhľadávaním</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">OCHRANA STRÁNKY ZAPNUTÁ</string>
     <string name="privacyProtectionDisabled">OCHRANA STRÁNKY VYPNUTÁ</string>
     <string name="privacyDashboardActivityTitle">Ovládací panel ochrany súkromia</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ZDOKONALENÉ Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">ZDOKONALENÉ Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Stupeň ochrany súkromia</string>
     <string name="privacyProtectionTemporarilyDisabled">Dočasne sme vypli ochranu súkromia, pretože sa zdá, že spôsobuje poruchy na tejto lokalite.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Vyberte záložku, ktorú chcete naimportovať</string>
     <string name="importBookmarksError">Nepodarilo sa naimportovať žiadne záložky, pretože došlo k chybe</string>
     <string name="importBookmarksEmpty">Súbor neobsahuje žiadne záložky na importovanie</string>
-    <string name="importBookmarksSuccess">Úspešne sa naimportovali záložky (%1$d)</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Úspešne sa naimportovali záložky (%1$d)</string>
     <string name="savedSiteDialogTitleHint">Názov</string>
     <string name="savedSiteDialogUrlHint">URL adresa</string>
     <string name="savedSiteDialogTitleEdit">Upraviť</string>

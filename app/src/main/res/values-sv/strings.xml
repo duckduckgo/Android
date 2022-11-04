@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Hitta föregående</string>
     <string name="closeFindInPageButtonDescription">Stäng sökning i sidvy</string>
     <string name="findInPageHint">Hitta på sidan</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redigera förfrågan innan sökning</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">WEBBPLATSSKYDD AKTIVERAT</string>
     <string name="privacyProtectionDisabled">WEBBPLATSSKYDD INAKTIVERAT</string>
     <string name="privacyDashboardActivityTitle">Sekretesspanel</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FÖRBÄTTRAD FRÅN &lt;img src=\"%1$d\" /&gt; TILL &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">FÖRBÄTTRAD FRÅN &lt;img src=\"%1$d\" /&gt; TILL &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Sekretessklass</string>
     <string name="privacyProtectionTemporarilyDisabled">Vi har tillfälligt inaktiverat integritetsskydd eftersom det verkade göra att denna webbplats inte fungerade.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Välj en bokmärkesfil att importera</string>
     <string name="importBookmarksError">Det gick inte att importera några bokmärken, något gick fel</string>
     <string name="importBookmarksEmpty">Filen har inga bokmärken att importera</string>
-    <string name="importBookmarksSuccess">%1$d bokmärken har importerats</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d bokmärken har importerats</string>
     <string name="savedSiteDialogTitleHint">Rubrik</string>
     <string name="savedSiteDialogUrlHint">Webbadress</string>
     <string name="savedSiteDialogTitleEdit">Redigera</string>

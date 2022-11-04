@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Atrast iepriekšējo</string>
     <string name="closeFindInPageButtonDescription">Aizvērt atrašanas lapā skatu</string>
     <string name="findInPageHint">Atrast lapā</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Rediģēt vaicājumu pirms meklēšanas</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">VIETNES AIZSARDZĪBA IR IESPĒJOTA</string>
     <string name="privacyProtectionDisabled">VIETAS AIZSARDZĪBA IR ATSPĒJOTA</string>
     <string name="privacyDashboardActivityTitle">Privātuma informācijas panelis</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">UZLABOTS NO &lt;img src=\"%1$d\" /&gt; UZ &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">UZLABOTS NO &lt;img src=\"%1$d\" /&gt; UZ &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privātuma līmenis</string>
     <string name="privacyProtectionTemporarilyDisabled">Mēs īslaicīgi atspējojām privātuma aizsardzību, jo šķiet, ka tā traucē šīs vietnes darbību.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Atlasi importējamo grāmatzīmju failu</string>
     <string name="importBookmarksError">Nevar importēt nevienu grāmatzīmi, kaut kas nav pareizi</string>
     <string name="importBookmarksEmpty">Failā nav importējamu grāmatzīmju</string>
-    <string name="importBookmarksSuccess">Sekmīgi importētas %1$d grāmatzīmes</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Sekmīgi importētas %1$d grāmatzīmes</string>
     <string name="savedSiteDialogTitleHint">Nosaukums</string>
     <string name="savedSiteDialogUrlHint">Vietrādis URL</string>
     <string name="savedSiteDialogTitleEdit">Rediģēt</string>

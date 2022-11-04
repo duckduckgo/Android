@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Найти предыдущий</string>
     <string name="closeFindInPageButtonDescription">Закрыть окно поиска на странице</string>
     <string name="findInPageHint">Найти на странице</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Редактировать запрос перед поиском</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">ЗАЩИТА САЙТА ВКЛЮЧЕНА</string>
     <string name="privacyProtectionDisabled">ЗАЩИТА САЙТА ОТКЛЮЧЕНА</string>
     <string name="privacyDashboardActivityTitle">Панель конфиденциальности</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">УРОВЕНЬ ЗАЩИТЫ ПОВЫШЕН С &lt;img src=\"%1$d\" /&gt; ДО &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">УРОВЕНЬ ЗАЩИТЫ ПОВЫШЕН С &lt;img src=\"%1$d\" /&gt; ДО &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Рейтинг конфиденциальности</string>
     <string name="privacyProtectionTemporarilyDisabled">Мы временно отключили функцию защиты конфиденциальности, так как она мешала работе сайта.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Выберите файл с закладками для импортирования</string>
     <string name="importBookmarksError">Что-то пошло не так, и импортировать закладки не удалось</string>
     <string name="importBookmarksEmpty">В указанном файле нет закладок</string>
-    <string name="importBookmarksSuccess">Закладки (%1$d) успешно импортированы</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Закладки (%1$d) успешно импортированы</string>
     <string name="savedSiteDialogTitleHint">Название</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Редактировать</string>

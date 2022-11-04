@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Najít předchozí</string>
     <string name="closeFindInPageButtonDescription">Zavřít vyhledání v zobrazení stránky</string>
     <string name="findInPageHint">Vyhledávání na stránce</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Upravit dotaz před vyhledáváním</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">OCHRANA STRÁNKY ZAPNUTÁ</string>
     <string name="privacyProtectionDisabled">OCHRANA STRÁNKY VYPNUTA</string>
     <string name="privacyDashboardActivityTitle">Deska ochrany soukromí</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VYLEPŠENO Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">VYLEPŠENO Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Hodnocení ochrany soukromí</string>
     <string name="privacyProtectionTemporarilyDisabled">Dočasně jsme zakázali ochranu osobních údajů, protože se zdá, že porušuje podmínky této stránky.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Vyberte soubor se záložkami, který chcete importovat</string>
     <string name="importBookmarksError">Nepodařilo se importovat žádné záložky, něco se pokazilo</string>
     <string name="importBookmarksEmpty">Soubor nemá žádné záložky k importování</string>
-    <string name="importBookmarksSuccess">Úspěšně importovaných %1$d záložek</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Úspěšně importovaných %1$d záložek</string>
     <string name="savedSiteDialogTitleHint">Název</string>
     <string name="savedSiteDialogUrlHint">URL adresa</string>
     <string name="savedSiteDialogTitleEdit">Upravit</string>

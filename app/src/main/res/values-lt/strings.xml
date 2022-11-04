@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Rasti ankstesnį</string>
     <string name="closeFindInPageButtonDescription">Uždaryti paiešką puslapio peržiūroje</string>
     <string name="findInPageHint">Rasti puslapyje</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redaguoti užklausą prieš ieškant</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">SVETAINĖS APSAUGA ĮJUNGTA</string>
     <string name="privacyProtectionDisabled">SVETAINĖS APSAUGA IŠJUNGTA</string>
     <string name="privacyDashboardActivityTitle">Privatumo valdymo skydelis</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">PATOBULINTA NUO &lt;img src=\"%1$d\" /&gt; IKI &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">PATOBULINTA NUO &lt;img src=\"%1$d\" /&gt; IKI &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privatumo laipsnis</string>
     <string name="privacyProtectionTemporarilyDisabled">Laikinai išjungiame privatumo apsaugą, kadangi atrodo, kad ji trukdo šios svetainės veikimui.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Pasirinkti importuotiną žymelės failą</string>
     <string name="importBookmarksError">Nepavyko importuoti jokių žymelių, įvyko klaida</string>
     <string name="importBookmarksEmpty">Faile nėra jokių importuotinų žymelių</string>
-    <string name="importBookmarksSuccess">Sėkmingos importuotos %1$d žymelės</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Sėkmingos importuotos %1$d žymelės</string>
     <string name="savedSiteDialogTitleHint">Pavadinimas</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Redaguoti</string>
