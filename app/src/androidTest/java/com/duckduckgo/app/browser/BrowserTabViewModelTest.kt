@@ -124,6 +124,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.downloads.api.DownloadStateListener
@@ -4205,9 +4206,9 @@ class BrowserTabViewModelTest {
             username = "tester",
             password = "test123"
         )
-        testee.updateCredentials(url, credentials)
+        testee.updateCredentials(url, credentials, CredentialUpdateType.Password)
 
-        verify(mockAutofillStore).updateCredentials(url, credentials)
+        verify(mockAutofillStore).updateCredentials(url, credentials, CredentialUpdateType.Password)
     }
 
     @Test
@@ -4267,10 +4268,65 @@ class BrowserTabViewModelTest {
         }
     }
 
+    @Test
+    fun whenNotEditingUrlBarAndNotCancelledThenCanAutomaticallyShowAutofillPrompt() {
+        configureOmnibarNotEditing()
+        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenEditingUrlBarAndNotCancelledThenCannotAutomaticallyShowAutofillPrompt() {
+        configureOmnibarEditing()
+        assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenNotEditingUrlBarAndCancelledThenCannotAutomaticallyShowAutofillPrompt() {
+        configureOmnibarNotEditing()
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenEditingUrlBarAndCancelledThenCannotAutomaticallyShowAutofillPrompt() {
+        configureOmnibarEditing()
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenNavigationStateChangesSameSiteThenShowAutofillPromptFlagIsReset() {
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        updateUrl("example.com", "example.com", true)
+        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenNavigationStateChangesDifferentSiteThenShowAutofillPromptFlagIsReset() {
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        updateUrl("example.com", "foo.com", true)
+        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenPageRefreshesThenShowAutofillPromptFlagIsReset() {
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        testee.onWebViewRefreshed()
+        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
     private fun assertShowHistoryCommandSent(expectedStackSize: Int) {
         assertCommandIssued<ShowBackNavigationHistory> {
             assertEquals(expectedStackSize, history.size)
         }
+    }
+
+    private fun configureOmnibarEditing() {
+        testee.onOmnibarInputStateChanged(hasFocus = true, query = "", hasQueryChanged = false)
+    }
+
+    private fun configureOmnibarNotEditing() {
+        testee.onOmnibarInputStateChanged(hasFocus = false, query = "", hasQueryChanged = false)
     }
 
     private fun buildNavigationHistoryStack(stackSize: Int) {

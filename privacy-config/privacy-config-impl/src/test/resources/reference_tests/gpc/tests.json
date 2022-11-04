@@ -117,10 +117,10 @@
                 "exceptPlatforms": []
             },
             {
-                "name": "API NOT injected - user opted out of GPC",
+                "name": "API injected but returns 'false' - user opted out of GPC",
                 "siteURL": "http://global-privacy-control.glitch.me",
                 "gpcUserSettingOn": false,
-                "expectGPCAPI": false,
+                "expectGPCAPI": true,
                 "expectGPCAPIValue": "false",
                 "exceptPlatforms": []
             }

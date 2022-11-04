@@ -14,36 +14,38 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
     <string name="atp_name">Programų sekimo apsauga</string>
     <string name="refresh">Atnaujinti</string>
 
     <!-- Debug Screens -->
     <string name="atp_DiagnosticsMenuLabel">Diagnostika</string>
     <string name="atp_DataMenuLabel">Duomenų statistika</string>
-    <string name="atp_MeteredConnection">"Išmatuota: %1$s"</string>
-    <string name="atp_ConnectionStatus">"VPN prijungtas: %1$s"</string>
-    <string name="atp_NetworkAvailable">"Prisijungta prie interneto: %1$s"</string>
-    <string name="atp_DnsServers">"Aktyvus tinklo DNS: %1$s"</string>
+    <string name="atp_MeteredConnection" instruction="Placeholder is true or false">"Išmatuota: %1$s"</string>
+    <string name="atp_ConnectionStatus" instruction="Placeholder is true or false">"VPN prijungtas: %1$s"</string>
+    <string name="atp_NetworkAvailable" instruction="Placeholder is true or false">"Prisijungta prie interneto: %1$s"</string>
+    <string name="atp_DnsServers" instruction="Placeholder is a list of dns addresses">"Aktyvus tinklo DNS: %1$s"</string>
     <string name="atp_AppExitsReasonsTitle">Išėjimo iš programėlės priežastys</string>
     <string name="atp_AppRestartsTitle">Programėlės paleidimai iš naujo</string>
 
     <!-- Diagnostics -->
-    <string name="vpnTimeRunning">Einantis laikas: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday">Šiandien užblokuotos sekimo įmonės: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek">Užblokuotos sekimo įmonės:%1$d</string>
+    <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Einantis laikas: %1$s</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Šiandien užblokuotos sekimo įmonės: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Užblokuotos sekimo įmonės:%1$d</string>
     <string name="vpnTrackerCompaniesNone">"Dar nėra užblokuotų sekimo įmonių"</string>
-    <string name="vpnTrackersBlockedToday">Šiandien užblokuoti sekimo įrenginiai: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek">Šią savaitę užblokuoti sekimo įrenginiai: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Šiandien užblokuoti sekimo įrenginiai: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Šią savaitę užblokuoti sekimo įrenginiai: %1$d</string>
     <string name="vpnTrackersNone">"Dar neužblokuota sekimo įrenginių"</string>
     <string name="vpnNotRunYet">"VPN dar nebuvo paleistas"</string>
-    <string name="vpnDataTransferred">"%1$1s\n%2$2s paketai"</string>
+    <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s paketai"</string>
 
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Turite sunkumų su programėle?</string>
     <string name="atp_OnInitialNotification">"Programėlės sekimo apsauga yra įjungta ir blokuoja sekimo bandymus visose jūsų programose"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Ieškoma sekimo veiklos… pypt… boop"</string>
-    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Užblokuoti bandymai sekti <b> %1$d programoje</b> (per pastarąją valandą).]]></item>
         <item quantity="few"><![CDATA[ Užblokuoti bandymai sekti <b> %1$d programose</b> (per pastarąją valandą).]]></item>
         <item quantity="many"><![CDATA[ Užblokuoti bandymai sekti <b> %1$d programose</b> (per pastarąją valandą).]]></item>
@@ -53,42 +55,42 @@
     <string name="atp_RevokedNotification">Jūsų prietaise esanti VPN programa išjungė programėlių sekimo apsaugą. Palieskite, kad vėl įjungtumėte.</string>
 
     <!-- App Tracking Protection Daily Notification -->
-    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymą</b> (praėjusią dieną).]]></string>
-    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimmo bandymą 1 programėlėje, %2$s</b> (praėjusią dieną).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ <b>%1$d sekimo bandymų</b> (praėjusią dieną).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų %2$d programėlėse, įskaitant %3$s</b> (praėjusią dieną).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymą</b> (praėjusią dieną).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps" instruction="%1$d is the number of tracking attempts and %2$s is the name of the app where it happened"><![CDATA[ Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimmo bandymą 1 programėlėje, %2$s</b> (praėjusią dieną).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ <b>%1$d sekimo bandymų</b> (praėjusią dieną).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų %2$d programėlėse, įskaitant %3$s</b> (praėjusią dieną).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_DailyTopCompanyNotification">
         <item quantity="one"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlėje</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
         <item quantity="few"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlėse</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
         <item quantity="many"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlėse</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
         <item quantity="other"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlių</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
     </plurals>
 
-     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_DailyCompanyBlockedNotification">
         <item quantity="one"><![CDATA[Apsauga nuo programėlių sekimo užblokavo daugiausia sekimo bandymų <b> %1$s</b> ir <b>%2$s</b> (praėjusią dieną).]]></item>
         <item quantity="few"><![CDATA[Apsauga nuo programėlių sekimo užblokavo daugiausia sekimo bandymų <b> %1$s</b> ir <b>%2$s</b> (praėjusią dieną).]]></item>
         <item quantity="many"><![CDATA[Apsauga nuo programėlių sekimo užblokavo daugiausia sekimo bandymų <b> %1$s</b> ir <b>%2$s</b> (praėjusią dieną).]]></item>
         <item quantity="other"><![CDATA[Apsauga nuo programėlių sekimo užblokavo daugiausia sekimo bandymų <b> %1$s</b> ir <b>%2$s</b> (praėjusią dieną).]]></item>
     </plurals>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d kartą per %3$s</b> (praėjusią dieną).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[App Tracking Protection blocked <b>%1$s %2$d kartų per %3$s ir 1 kitą programėlę</b> (past day).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[App Tracking Protection blocked <b>%1$s %2$d kartų per %3$s ir %4$d kitose programėlėse</b> (praėjusią dieną).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d kartą per %3$s</b> (praėjusią dieną).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection blocked <b>%1$s %2$d kartų per %3$s ir 1 kitą programėlę</b> (past day).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[App Tracking Protection blocked <b>%1$s %2$d kartų per %3$s ir %4$d kitose programėlėse</b> (praėjusią dieną).]]></string>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[App Tracking Protection blocked <b>%1$s %2$d times in %3$s</b> (past day).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d kartus per %3$s ir 1 kitoje programėlėje</b> (praėjusią dieną).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d kartus per %3$s ir %4$d kitose programėlėse</b> (praėjusią dieną).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection blocked <b>%1$s %2$d times in %3$s</b> (past day).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d kartus per %3$s ir 1 kitoje programėlėje</b> (praėjusią dieną).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d kartus per %3$s ir %4$d kitose programėlėse</b> (praėjusią dieną).]]></string>
 
     <!-- App Tracking Protection Weekly Notification -->
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[užblokavo <b>%1$d sekimo bandymą per %2$s</b> (praėjusią savaitę).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymą %2$s</b> ir 1 kitoje programėlėje (praėjusią savaitę).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d per %2$s</b> ir %3$d kitose programėlėse (praėjusią savaitę).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymus per %2$s</b> (praėjusią savaitę).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų %2$s</b> ir 1 kitoje programėlėje (praėjusią savaitę).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų %2$s</b> ir %3$d kitose programėlėse (per pastarąją savaitę).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[užblokavo <b>%1$d sekimo bandymą per %2$s</b> (praėjusią savaitę).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymą %2$s</b> ir 1 kitoje programėlėje (praėjusią savaitę).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d per %2$s</b> ir %3$d kitose programėlėse (praėjusią savaitę).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymus per %2$s</b> (praėjusią savaitę).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų %2$s</b> ir 1 kitoje programėlėje (praėjusią savaitę).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų %2$s</b> ir %3$d kitose programėlėse (per pastarąją savaitę).]]></string>
 
-     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_WeeklyCompanyTeaserNotification">
         <item quantity="one"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d programėlėje, įskaitant %3$s</b> (praėjusią savaitę).]]></item>
         <item quantity="few"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d programėlėse, įskaitant %3$s</b> (praėjusią savaitę).]]></item>
         <item quantity="many"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d programėlėse, įskaitant %3$s</b> (praėjusią savaitę).]]></item>
@@ -97,12 +99,12 @@
 
     <string name="atp_EnableCTA">Įjungti apsaugą nuo programėlių sekimo</string>
 
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymą per %2$s</b> (per pastarąją valandą).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymą %2$s ir 1 kitą programėlę</b> (per pastarąją valandą).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymą %2$s ir %3$d kitomis programėlėmis</b> (per pastarąją valandą).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų per %2$s</b> (per pastarąją valandą).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymus per %2$s ir 1 kitoje programėlėje</b> (per pastarąją valandą).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų %2$s ir %3$d kitose programėlėse</b> (praėjusią valandą).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymą per %2$s</b> (per pastarąją valandą).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymą %2$s ir 1 kitą programėlę</b> (per pastarąją valandą).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymą %2$s ir %3$d kitomis programėlėmis</b> (per pastarąją valandą).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų per %2$s</b> (per pastarąją valandą).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymus per %2$s ir 1 kitoje programėlėje</b> (per pastarąją valandą).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų %2$s ir %3$d kitose programėlėse</b> (praėjusią valandą).]]></string>
 
     <!-- App Tracking Protection Privacy Report -->
     <string name="atp_PrivacyReportEnabledTooltip">Įjungta apsauga nuo programėlių sekimo, kuri blokuoja sekimo programėles visame jūsų prietaise.</string>
@@ -110,7 +112,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Įjungti apsaugą nuo programėlių sekimo</string>
     <string name="atp_OnboardingLastPageOneTitle">Vienas paprastas žingsnis siekiant geresnio programų privatumo!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Nustatėme, kad <b>daugiau kaip 96\u0025 populiarių nemokamų programėlių</b> leidžia kitoms bendrovėms sekti jūsų asmeninę informaciją, net kai miegate.\n\nSužinokite, kurios programėlės <b>leidžia kitoms įmonėms jus sekti</b>, ir atgaukite kontrolę!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle" formatted="false">Nustatėme, kad <b>daugiau kaip 96 % populiarių nemokamų programėlių</b> leidžia kitoms bendrovėms sekti jūsų asmeninę informaciją, net kai miegate.\n\nSužinokite, kurios programėlės <b>leidžia kitoms įmonėms jus sekti</b>, ir atgaukite kontrolę!</string>
     <string name="atp_OnboardingLastPageTwoTitle">Kaip tai veikia?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Apsauga nuo programėlių sekimo <b>aptinka ir blokuoja kitų įmonių programėlių sekimo priemones</b>, pavyzdžiui, kai „Facebook“ bando jus sekti sveikatos programėlėje.\n\n<b>Ji nemokama</b>, o programėlėmis galite naudotis kaip įprastai. Veikdama fone, ji padeda <b>apsaugoti jus dieną ir naktį.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kas mato jūsų duomenis?</string>
@@ -121,7 +123,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Programų sekimo apsauga</string>
-    <string name="atp_daxOnboardingIntroMessage">Daugiau kaip 96\u0025 populiarių nemokamų programėlių leidžia kitoms bendrovėms jus sekti, net kai nesinaudojate telefonu. „App Tracking Protection“ aptinka ir blokuoja šiuos bandymus sekti.</string>
+    <string name="atp_daxOnboardingIntroMessage" formatted="false">Daugiau kaip 96 % populiarių nemokamų programėlių leidžia kitoms bendrovėms jus sekti, net kai nesinaudojate telefonu. „App Tracking Protection“ aptinka ir blokuoja šiuos bandymus sekti.</string>
     <string name="atp_daxOnboardingPermissionTitle">Kaip tai veikia?</string>
     <string name="atp_daxOnboardingPermissionMessage">Apsauga nuo programėlių sekimo nėra VPN. Tačiau jūsų įrenginys atpažins ją kaipo tokią. Taip yra todėl, kad jis veikia naudodamas vietinį VPN ryšį. Ji niekada nenukreips programos duomenų per išorinį serverį. <annotation type="learn_more_link">Sužinokite daugiau</annotation>.</string>
 
@@ -149,7 +151,7 @@
     <string name="atp_ExcludeAppsManuallyCTACancel">Atšaukti</string>
     <string name="atp_ExcludeAppsManuallyCTAEnable">Įjungti</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Atkurti</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Rankiniu būdu įjungti %1$s programos apsaugą?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Rankiniu būdu įjungti %1$s programos apsaugą?</string>
     <string name="atp_ExcludeAppsManuallyEnableAppLabel">Yra žinoma, kad šios programos veikimas sutrinka, kai bandymai sekti nepavyksta.</string>
     <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Svetainės turinys šioje programėlėje gali būti rodomas netinkamai, kai įjungta apsauga.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Įjungus apsaugą, programos pavadinimas siunčiamas „DuckDuckGo“.</string>
@@ -170,7 +172,7 @@
     <!--  Breakage report app list  -->
     <string name="atp_ReportBreakageAppListActivityTitle">Pranešti apie problemą</string>
     <string name="atp_ReportBreakageAppFeature"><b> Pasirinkite programą, kurioje kilo problema </b> . Jūsų atsiliepimai tikrai padeda mums tobulėti!\n\nTurite bendro pobūdžio atsiliepimų apie apsaugą nuo programėlių stebėjimo? Vietoj to naudokite <annotation type="use_this_form_link"> šią formą </annotation> .</string>
-    <string name="atp_ReportBreakageAppEntry">%1$s programa</string>
+    <string name="atp_ReportBreakageAppEntry" instruction="Placeholder is the name of an app">%1$s programa</string>
     <string name="atp_ReportBreakageAppSubmitCta">Štai keletas nuorodų! Galite eiti tiesiai į:</string>
     <string name="atp_ReportBreakageAppNextCta">Kitas</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Aprašykite, kas vyksta, ko tikėjotės, kad įvyks, ir veiksmus, dėl kurių iškilo problema.</string>
@@ -197,7 +199,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">Apie programėlių sekimo įrenginius</string>
     <string name="atp_ProfilingInfoTitle">Kas yra programėlių sekimo įrenginiai?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Tikriausiai esate girdėję, kad tokios bendrovės kaip „Google“ ir „Facebook“ stebi jus trečiųjų šalių svetainėse. Bet ar žinojote, kad jie taip pat seka jūsų asmeninę informaciją per jūsų įrenginyje esančias programėles?\n\n<b>Daugiau nei 96\u0025 iš 100 populiarių nemokamų „Android“ programėlių</b>, kurias išbandėme, buvo slaptos trečiųjų šalių sekimo programos. Iš jų 87\u0025 siuntė duomenis „Google“, o 68\u0025 - „Facebook“. Tai vyksta net kai nenaudojate savo įrenginio.\n\n<b>Sekimo programos gali turėti prieigą prie daug daugiau informacijos</b> nei jų svetainės sekimo programos, pavyzdžiui, jūsų buvimo vietą iki pat pastato aukšto, kuriame esate, kaip dažnai žaidžiate žaidimus darbe, kada ir kiek laiko miegate kiekvieną dieną. <b>Pavyzdžiui, jei neturite „Google\" ar „Facebook\" paskyros, jos vis tiek gali rinkti duomenis apie jus iš jūsų programėlių.</b>\n\nTokie sekimo tinklai kaip „Facebook\" ir „Google\" naudoja šiuos mažus informacijos elementus <b> skaitmeniniam jūsų profiliui sukurti.</b> Naudodamiesi juo sekimo tinklai gali keisti tai, ką matote internete, ir leisti reklamuotojams siūlyti prieigą prie jūsų pagal jūsų duomenis.\n\nProgramų stebėjimo priemonės yra DIDELĖ privatumo problema. <b> Tačiau „DuckDuckGo“ turi sprendimą, kuris gali padėti. </b>\n\nKai „DuckDuckGo“ privatumo naršyklės programėlėje įjungta apsauga nuo programėlių sekimo blokuoja daugelį kitų jūsų prietaise esančių programėlių sekiklių, o „DuckDuckGo“ programėlė tuo pačiu metu blokuoja sekimo programas, kurias randame svetainėse, kai naršote. <b>Šie du apsaugos sluoksniai sumažina sekimo bendrovių žinomų duomenų apie jus kiekį</b>, todėl galite ramiau naudotis programėlėmis žinodami, kad esate geriau apsaugoti.</string>
+    <string name="atp_ProfilingInfoFirstParagraph" formatted="false">Tikriausiai esate girdėję, kad tokios bendrovės kaip „Google“ ir „Facebook“ stebi jus trečiųjų šalių svetainėse. Bet ar žinojote, kad jie taip pat seka jūsų asmeninę informaciją per jūsų įrenginyje esančias programėles?\n\n<b>Daugiau nei 96 % iš 100 populiarių nemokamų „Android“ programėlių</b>, kurias išbandėme, buvo slaptos trečiųjų šalių sekimo programos. Iš jų 87 % siuntė duomenis „Google“, o 68 % - „Facebook“. Tai vyksta net kai nenaudojate savo įrenginio.\n\n<b>Sekimo programos gali turėti prieigą prie daug daugiau informacijos</b> nei jų svetainės sekimo programos, pavyzdžiui, jūsų buvimo vietą iki pat pastato aukšto, kuriame esate, kaip dažnai žaidžiate žaidimus darbe, kada ir kiek laiko miegate kiekvieną dieną. <b>Pavyzdžiui, jei neturite „Google\" ar „Facebook\" paskyros, jos vis tiek gali rinkti duomenis apie jus iš jūsų programėlių.</b>\n\nTokie sekimo tinklai kaip „Facebook\" ir „Google\" naudoja šiuos mažus informacijos elementus <b> skaitmeniniam jūsų profiliui sukurti.</b> Naudodamiesi juo sekimo tinklai gali keisti tai, ką matote internete, ir leisti reklamuotojams siūlyti prieigą prie jūsų pagal jūsų duomenis.\n\nProgramų stebėjimo priemonės yra DIDELĖ privatumo problema. <b> Tačiau „DuckDuckGo“ turi sprendimą, kuris gali padėti. </b>\n\nKai „DuckDuckGo“ privatumo naršyklės programėlėje įjungta apsauga nuo programėlių sekimo blokuoja daugelį kitų jūsų prietaise esančių programėlių sekiklių, o „DuckDuckGo“ programėlė tuo pačiu metu blokuoja sekimo programas, kurias randame svetainėse, kai naršote. <b>Šie du apsaugos sluoksniai sumažina sekimo bendrovių žinomų duomenų apie jus kiekį</b>, todėl galite ramiau naudotis programėlėmis žinodami, kad esate geriau apsaugoti.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Praėjusios 7 dienos</string>
@@ -210,30 +212,39 @@
     <string name="atp_ActivityBetaInstructions">Beta instrukcijos</string>
     <string name="atp_ActivityManageProtection">Turite problemų su programėle?</string>
 
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[%1$d sekimo bandymas užblokuotas %2$d įmonėje <b>%3$s</b> programoje]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[%1$d sekimo bandymas užblokuotas iš %2$d įmonių <b>%3$s</b> programoje]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[%1$d sekimo bandymai užblokuoti iš %2$d įmonės <b>%3$s</b> programoje]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[%1$d sekimo bandymai užblokuoti iš %2$d įmonių <b>%3$s</b> programoje]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
+        <![CDATA[1 sekimo bandymas iš 1 įmonės užblokuotas <b>%1$s</b> programoje]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies" instruction="Placeholder %1$d is the number of companies doing the tracking. Placeholder %2$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 5 companies in Venmo app.">
+        <![CDATA[1 sekimo bandymas iš %1$d įmonių užblokuotas <b>%2$s</b> programoje]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$s is the name of the app doing the tracking. Example: 5 tracking attempts blocked from 1 company in Venmo app.">
+        <![CDATA[%1$d sekimo bandymai iš 1 įmonės užblokuoti <b>%2$s</b> programoje]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
+        <![CDATA[%1$d sekimo bandymai užblokuoti iš %2$d įmonių <b>%3$s</b> programoje]]>
+    </string>
 
     <string name="atp_ActivityEmptyListTitle">Naujos veiklos nėra</string>
     <string name="atp_ActivityEmptyListMessage">Toliau naudokite savo prietaisą. Čia rodomi sekimo bandymai, kuriuos blokuoja apsauga nuo programėlių sekimo.</string>
     <string name="atp_ActivityPastWeekBlocked">Užblokuota</string>
     <string name="atp_ActivityPastWeekAcross">Per</string>
 
-     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Bandymas sekti</item>
         <item quantity="few">Bandymai sekti</item>
         <item quantity="many">Bandymų sekti</item>
         <item quantity="other">Bandymų sekti</item>
     </plurals>
-      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Programa</item>
         <item quantity="few">Programos</item>
         <item quantity="many">Programų</item>
         <item quantity="other">Programų</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Ši funkcija yra beta versijoje. <annotation type="app_settings_link"> Kyla problemų dėl programos? </annotation></string>
+    <string name="atp_ActivityEnabledLabel">Ši funkcija yra beta versijos. Pastebėjote programėlės problemą? <annotation type="app_settings_link">Praneškite apie problemą.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Apsauga nuo programėlių sekimo yra išjungta</b>\nAr apsauga nuo programėlių sekimo sukėlė problemų su jūsų programėlėmis? <annotation type="report_issues_link">Pranešti apie problemas</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>„Android“ išjungė programėlių sekimo apsaugą</b>. Norite, kad tai nepasikartotų? <annotation type="re_enable_link">Iš naujo įjunkite</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPV programa jūsų įrenginyje išjungė apsaugą nuo programėlių sekimo.</b>\nAr apsauga nuo programėlių sekimo sukėlė problemų su jūsų programėlėmis? <annotation type="report_issues_link">Pranešti apie problemas</annotation></string>
     <string name="atp_ActivityAbout">Apie</string>
     <string name="atp_ActivityManage">Tvarkyti</string>
@@ -293,10 +304,11 @@
         <item quantity="other">Užblokuota %1$d stebėjimo bandymų</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Praneškite apie problemą, susijusią su šia programa</string>
-    <string name="atp_CompanyDetailsTrackingShowMore">Rodyti dar %1$d</string>
+    <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Rodyti dar %1$d</string>
     <string name="atp_CompanyDetailsTrackingLearnMore">Programėlėse gali būti kitų įmonių sekimo priemonių, pavyzdžiui, analitikos ir rinkodaros tikslais. Jei jų neužblokuotume, šie sekimo įrenginiai galėtų sukurti dar išsamesnius jūsų skaitmeninius profilius. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
     <string name="atp_CompanyDetailsTrackingShowLess">Rodyti Mažiau</string>
     <string name="atp_CompanyDetailsAppInfoPanel">Šiuo metu šios programos apsauga yra išjungta. Jei apsauga nuo programėlių sekimo sukėlė problemą, <annotation type="report_issues_link">praneškite apie problemą</annotation></string>
+    <string name="atp_CompanyDetailsNotAvailableForUninstalledApps" instruction="Toast shown when users tap on item that corresponds to an already uninstalled application">Sekimo priemonės informacija nepasiekiama išdiegtoms programėlėms</string>
 
     <!--  App Tracking Company Signals -->
     <string name="atp_TrackingSignalAAID">„Android“ reklamos ID</string>
@@ -382,10 +394,13 @@
     <string name="atp_RemoveFeatureDialogRemove">Išjungti</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Nustatyta kaip visada įjungta?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Kaip neleisti „Android“ periodiškai išjungti apsaugos nuo programėlių sekimo:\n\nEikite į „Android“ nustatymus\nAtidarykite „DuckDuckGo“ VPN nustatymus\nĮjunkite „Always-on VPN“.</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Eikite į „Nustatymai“</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Priminti man vėliau</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Ne, dėkoju</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Ne dabar</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Eikite į savo įrenginio „DuckDuckGo“ VPN nustatymus ir įjunkite <b>„Visada įjungti“</b> VPN, kad „Android“ neišjungtų apsaugos.\n\nBūtinai palikite kitą nustatymą išjungtą.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Norėdami išvengti programėlių problemų, eikite į savo įrenginio <b>„DuckDuckG“ VPN nustatymus</b> ir išjunkite <b>Blokuoti ryšius be VPN</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Nustatykite kaip „Visada įjungti“</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Pakeiskite VPN nustatymus</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Reikia imtis veiksmų!</b> Kad išvengtumėte programėlių problemų, turite pakeisti savo „Android“ nustatymus. <annotation type="open_settings_link">Keisti nustatymus</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Reikia imtis veiksmų! Reikia pakeisti „Android“ nustatymą, kad būtų užtikrinta programėlių sekimo apsauga.</string>
 
 </resources>

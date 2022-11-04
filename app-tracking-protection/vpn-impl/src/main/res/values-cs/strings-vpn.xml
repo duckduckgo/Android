@@ -14,36 +14,38 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
     <string name="atp_name">Ochrana před sledováním aplikace</string>
     <string name="refresh">Obnovit</string>
 
     <!-- Debug Screens -->
     <string name="atp_DiagnosticsMenuLabel">Diagnostika</string>
     <string name="atp_DataMenuLabel">Datové statistiky</string>
-    <string name="atp_MeteredConnection">"Měřené: %1$s"</string>
-    <string name="atp_ConnectionStatus">"Připojení k VPN: %1$s"</string>
-    <string name="atp_NetworkAvailable">"Připojení k internetu: %1$s"</string>
-    <string name="atp_DnsServers">"DNS aktivní sítě: %1$s"</string>
+    <string name="atp_MeteredConnection" instruction="Placeholder is true or false">"Měřené: %1$s"</string>
+    <string name="atp_ConnectionStatus" instruction="Placeholder is true or false">"Připojení k VPN: %1$s"</string>
+    <string name="atp_NetworkAvailable" instruction="Placeholder is true or false">"Připojení k internetu: %1$s"</string>
+    <string name="atp_DnsServers" instruction="Placeholder is a list of dns addresses">"DNS aktivní sítě: %1$s"</string>
     <string name="atp_AppExitsReasonsTitle">Důvody ukončení aplikace</string>
     <string name="atp_AppRestartsTitle">Restartování aplikace</string>
 
     <!-- Diagnostics -->
-    <string name="vpnTimeRunning">Doba provozu: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday">Společnosti, jejichž trackery byly dnes zablokované: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek">Společnosti, jejichž trackery byly tenhle týden zablokované: %1$d</string>
+    <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Doba provozu: %1$s</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Společnosti, jejichž trackery byly dnes zablokované: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Společnosti, jejichž trackery byly tenhle týden zablokované: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Zatím nebyly zablokované trackery žádných společností"</string>
-    <string name="vpnTrackersBlockedToday">Dnes zablokované trackery: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek">Trackery zablokované tento týden: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Dnes zablokované trackery: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Trackery zablokované tento týden: %1$d</string>
     <string name="vpnTrackersNone">"Zatím nebyly zablokované žádné trackery"</string>
     <string name="vpnNotRunYet">"VPN ještě nebyla spuštěna"</string>
-    <string name="vpnDataTransferred">"%1$1s\n%2$2s pakety"</string>
+    <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s pakety"</string>
 
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Máš problémy s aplikací?</string>
     <string name="atp_OnInitialNotification">"App Tracking Protection je zapnutá a blokuje pokusy aplikací o sledování"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Vyhledávání sledování… pípnutí… pípnutí"</string>
-    <plurals name="atp_OnNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Zablokované pokusy o sledování <b>v %1$d aplikaci</b> (za poslední hodinu).]]></item>
         <item quantity="few"><![CDATA[ Zablokované pokusy o sledování <b>ve %1$d aplikacích</b> (za poslední hodinu).]]></item>
         <item quantity="many"><![CDATA[ Zablokované pokusy o sledování <b>v %1$d aplikacích</b> (za poslední hodinu).]]></item>
@@ -53,42 +55,42 @@
     <string name="atp_RevokedNotification">VPN aplikace ve tvém zařízení vypnula App Tracking Protection. Klepnutím na položku ji znovu zapneš.</string>
 
     <!-- App Tracking Protection Daily Notification -->
-    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps"><![CDATA[ App Tracking Protection zablokovala <b>%1$d pokus o sledování</b> (za poslední den).]]></string>
-    <string name="atp_DailyTrackersNotificationOneTrackingOneApps"><![CDATA[ App Tracking Protection zablokovala <b>%1$d pokus o sledování v 1 aplikaci, %2$s</b> (za poslední den).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps"><![CDATA[ Počet <b>pokusů o sledování zablokovaných App Tracking Protection:</b>%1$d (za poslední den).]]></string>
-    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps"><![CDATA[ Počet <b>pokusů o sledování zablokovaných pomocí App Tracking Protection: %1$d, v počtu aplikací: %2$d, včetně %3$s</b> (za poslední den).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ App Tracking Protection zablokovala <b>%1$d pokus o sledování</b> (za poslední den).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps" instruction="%1$d is the number of tracking attempts and %2$s is the name of the app where it happened"><![CDATA[ App Tracking Protection zablokovala <b>%1$d pokus o sledování v 1 aplikaci, %2$s</b> (za poslední den).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ Počet <b>pokusů o sledování zablokovaných App Tracking Protection:</b>%1$d (za poslední den).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Počet <b>pokusů o sledování zablokovaných pomocí App Tracking Protection: %1$d, v počtu aplikací: %2$d, včetně %3$s</b> (za poslední den).]]></string>
 
-    <plurals name="atp_DailyTopCompanyNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_DailyTopCompanyNotification">
         <item quantity="one"><![CDATA[%1$s se tě pokusil sledovat <b>v %2$d aplikaci</b> (za poslední den). <b>Další informace</b>]]></item>
         <item quantity="few"><![CDATA[%1$s se tě pokusil sledovat <b>ve %2$d aplikacích</b> (za poslední den). <b>Další informace</b>]]></item>
         <item quantity="many"><![CDATA[%1$s se tě pokusil sledovat <b>v %2$d aplikacích</b> (za poslední den). <b>Další informace</b>]]></item>
         <item quantity="other"><![CDATA[%1$s se tě pokusil sledovat <b>v %2$d aplikacích</b> (za poslední den). <b>Další informace</b>]]></item>
     </plurals>
 
-     <plurals name="atp_DailyCompanyBlockedNotification" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[App Tracking Protection zablokovala nejvíc pokusů o sledování v aplikaci <b>%1$s</b> (za poslední den).]]></item>
-        <item quantity="few"><![CDATA[App Tracking Protection zablokovala nejvíc pokusů o sledování v aplikacích <b>%1$s</b> a <b>%2$s</b> (za poslední den).]]></item>
-        <item quantity="many"><![CDATA[App Tracking Protection zablokovala nejvíc pokusů o sledování v aplikacích <b>%1$s</b> a <b>%2$s</b> (za poslední den).]]></item>
-        <item quantity="other"><![CDATA[App Tracking Protection zablokovala nejvíc pokusů o sledování v aplikacích <b>%1$s</b> a <b>%2$s</b> (za poslední den).]]></item>
+    <plurals name="atp_DailyCompanyBlockedNotification">
+        <item quantity="one"><![CDATA[Funkce App Tracking Protection zablokovala nejvíce pokusů o sledování za <b>%1$s</b> (předchozí den).]]></item>
+        <item quantity="few"><![CDATA[Funkce App Tracking Protection zablokovala nejvíce pokusů o sledování za <b>%1$s</b> a <b>%2$s</b> (předchozí den).]]></item>
+        <item quantity="many"><![CDATA[Funkce App Tracking Protection zablokovala nejvíce pokusů o sledování za <b>%1$s</b> a <b>%2$s</b> (předchozí den).]]></item>
+        <item quantity="other"><![CDATA[Funkce App Tracking Protection zablokovala nejvíce pokusů o sledování za <b>%1$s</b> a <b>%2$s</b> (předchozí den).]]></item>
     </plurals>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps"><![CDATA[App Tracking Protection <b> zablokovala %1$s %2$d krát v %3$s</b> (minulý den).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp"><![CDATA[App Tracking Protection zablokovala <b>%1$s %2$d krát v aplikaci %3$s a 1 další</b> (minulý den).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps"><![CDATA[App Tracking Protection zablokovala <b>%1$s %2$d krát v %3$s a %4$d dalších aplikacích</b> (minulý den).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection <b> zablokovala %1$s %2$d krát v %3$s</b> (minulý den).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$s %2$d krát v aplikaci %3$s a 1 další</b> (minulý den).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[App Tracking Protection zablokovala <b>%1$s %2$d krát v %3$s a %4$d dalších aplikacích</b> (minulý den).]]></string>
 
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[App Tracking Protection zablokovala <b>%1$s %2$d krát za %3$s</b> (za poslední den).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp"><![CDATA[App Tracking Protection zablokovala <b>%1$s %2$dkrát v %3$s a 1 další aplikaci</b> (za poslední den).]]></string>
-    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection zablokovala <b>%1$s %2$dkrát v %3$s a %4$d dalších aplikacích</b> (za poslední den).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$s %2$d krát za %3$s</b> (za poslední den).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$s %2$dkrát v %3$s a 1 další aplikaci</b> (za poslední den).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[App Tracking Protection zablokovala <b>%1$s %2$dkrát v %3$s a %4$d dalších aplikacích</b> (za poslední den).]]></string>
 
     <!-- App Tracking Protection Weekly Notification -->
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusů o sledování v %2$s</b> (za poslední týden).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokus o sledování v %2$s</b> a 1 další aplikaci (za poslední týden).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokus o sledování v %2$s</b> a %3$d dalších aplikacích (za poslední týden).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusů o sledování v %2$s</b> (za poslední týden).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusů o sledování v %2$s</b> a 1 další aplikaci (za poslední týden).]]></string>
-    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusů o sledování v %2$s</b> a %3$d dalších aplikacích (za poslední týden).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusů o sledování v %2$s</b> (za poslední týden).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokus o sledování v %2$s</b> a 1 další aplikaci (za poslední týden).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokus o sledování v %2$s</b> a %3$d dalších aplikacích (za poslední týden).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusů o sledování v %2$s</b> (za poslední týden).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusů o sledování v %2$s</b> a 1 další aplikaci (za poslední týden).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusů o sledování v %2$s</b> a %3$d dalších aplikacích (za poslední týden).]]></string>
 
-     <plurals name="atp_WeeklyCompanyTeaserNotification" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_WeeklyCompanyTeaserNotification">
         <item quantity="one"><![CDATA[App Tracking Protection zablokovala <b>%1$s v %2$d aplikaci, %3$s</b> (za minulý týden).]]></item>
         <item quantity="few"><![CDATA[App Tracking Protection zablokovala <b>%1$s v %2$d aplikacích, včetně %3$s</b> (za minulý týden).]]></item>
         <item quantity="many"><![CDATA[App Tracking Protection zablokovala <b>%1$s v %2$d aplikacích, včetně %3$s</b> (za minulý týden).]]></item>
@@ -97,12 +99,12 @@
 
     <string name="atp_EnableCTA">Povolit App Tracking Protection</string>
 
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokus o sledování v %2$s</b> (za poslední hodinu).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokus o sledování v %2$s a 1 další aplikaci</b> (za poslední hodinu).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokus o sledování v %2$s a %3$d dalších aplikacích</b> (za poslední hodinu).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusy/ů o sledování v %2$s</b> (za poslední hodinu).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusy/ů o sledování v %2$s a 1 další aplikaci</b> (za poslední hodinu).]]></string>
-    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusy/ů o sledování v %2$s a %3$d dalších aplikacích</b> (za poslední hodinu).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokus o sledování v %2$s</b> (za poslední hodinu).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokus o sledování v %2$s a 1 další aplikaci</b> (za poslední hodinu).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokus o sledování v %2$s a %3$d dalších aplikacích</b> (za poslední hodinu).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusy/ů o sledování v %2$s</b> (za poslední hodinu).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusy/ů o sledování v %2$s a 1 další aplikaci</b> (za poslední hodinu).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[App Tracking Protection zablokovala <b>%1$d pokusy/ů o sledování v %2$s a %3$d dalších aplikacích</b> (za poslední hodinu).]]></string>
 
     <!-- App Tracking Protection Privacy Report -->
     <string name="atp_PrivacyReportEnabledTooltip">App Tracking Protection je zapnutá a blokuje trackery v celém zařízení</string>
@@ -110,7 +112,7 @@
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Zapnout App Tracking Protection</string>
     <string name="atp_OnboardingLastPageOneTitle">Jeden snadný krok pro větší soukromí v aplikacích!</string>
-    <string name="atp_OnboardingLatsPageOneSubtitle">Zjistili jsme, že <b>víc než 96 \u0025 populárních bezplatných aplikací</b> umožňuje jiným společnostem sledovat tvoje osobní údaje, dokonce i když spíš.\n\nPodívej se, které aplikace <b>jsme přistihli, že umožňují jiným společnostem tě sledovat</b>, a vezmi si to zase pod kontrolu.</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle" formatted="false">Zjistili jsme, že <b>víc než 96 % populárních bezplatných aplikací</b> umožňuje jiným společnostem sledovat tvoje osobní údaje, dokonce i když spíš.\n\nPodívej se, které aplikace <b>jsme přistihli, že umožňují jiným společnostem tě sledovat</b>, a vezmi si to zase pod kontrolu.</string>
     <string name="atp_OnboardingLastPageTwoTitle">Jak to funguje?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>detekuje a blokuje trackery jiných společností</b>, například když se tě Facebook pokouší sledovat ve zdravotní aplikaci.\n\n<b>Je to zdarma</b> a aplikace můžeš používat jako obvykle. Pracuje na pozadí a <b>chrání tě ve dne v noci.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kdo vidí tvoje data?</string>
@@ -121,7 +123,7 @@
 
     <!-- App Tracking Protection Dax Onboarding -->
     <string name="atp_daxOnboardingIntroTitle">Ochrana před sledováním aplikace</string>
-    <string name="atp_daxOnboardingIntroMessage">Více než 96 \u0025 oblíbených bezplatných aplikací umožňuje jiným společnostem tě sledovat i ve chvílích, když nepoužíváš telefon. App Tracking Protection tyhle pokusy o sledování detekuje a blokuje.</string>
+    <string name="atp_daxOnboardingIntroMessage" formatted="false">Více než 96 % oblíbených bezplatných aplikací umožňuje jiným společnostem tě sledovat i ve chvílích, když nepoužíváš telefon. App Tracking Protection tyhle pokusy o sledování detekuje a blokuje.</string>
     <string name="atp_daxOnboardingPermissionTitle">Jak to funguje?</string>
     <string name="atp_daxOnboardingPermissionMessage">App Tracking Protection není VPN. Tvé zařízení ji však bude za VPN považovat. Je to proto, že k činnosti využívá místní připojení VPN.\n\n Nikdy nesměruje data aplikace přes externí server. <annotation type="learn_more_link">Více informací</annotation></string>
 
@@ -149,7 +151,7 @@
     <string name="atp_ExcludeAppsManuallyCTACancel">Zrušit</string>
     <string name="atp_ExcludeAppsManuallyCTAEnable">Povolit</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Obnovit</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName">Ručně zapnout ochranu aplikace %1$s?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Ručně zapnout ochranu aplikace %1$s?</string>
     <string name="atp_ExcludeAppsManuallyEnableAppLabel">O téhle aplikaci se ví, že při neúspěšných pokusech o sledování v ní dochází k problémům.</string>
     <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Když je zapnutá ochrana, nemusí se obsah stránek v téhle aplikaci zobrazovat správně.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Zapnutí ochrany odešle název aplikace do DuckDuckGo.</string>
@@ -170,11 +172,11 @@
     <!--  Breakage report app list  -->
     <string name="atp_ReportBreakageAppListActivityTitle">Nahlášení problému</string>
     <string name="atp_ReportBreakageAppFeature"><b>Vyber aplikaci, ve které dochází k problému</b>. Tvoje zpětná vazba nám opravdu pomáhá se zlepšováním!\n\nMáš obecnou zpětnou vazbu pro App Tracking Protection? Použij radši <annotation type="use_this_form_link">tenhle formulář</annotation> .</string>
-    <string name="atp_ReportBreakageAppEntry">Aplikace %1$s</string>
+    <string name="atp_ReportBreakageAppEntry" instruction="Placeholder is the name of an app">Aplikace %1$s</string>
     <string name="atp_ReportBreakageAppSubmitCta">Odeslat</string>
     <string name="atp_ReportBreakageAppNextCta">Další</string>
-    <string name="atp_ReportBreakageFormWhatHappenedText">Popiš, co se stalo, co jsi očekával/a a jaké kroky vedly k problému.</string>
-    <string name="atp_ReportBreakageFormInputHint">Popiš, co se stalo (nepovinné)</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Popiš, co se děje, co se mělo stát a jaké kroky k problému vedly.</string>
+    <string name="atp_ReportBreakageFormInputHint">Řekni nám víc o svém problému</string>
     <string name="atp_ReportBreakageFormCheckboxText">Kliknutím na tlačítko \"Odeslat\" souhlasím s tím, že DuckDuckGo může použít informace v této zprávě pro zlepšení App Tracking Protection.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
@@ -197,7 +199,7 @@
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">O trackerech v aplikacích</string>
     <string name="atp_ProfilingInfoTitle">Co jsou trackery v aplikacích?</string>
-    <string name="atp_ProfilingInfoFirstParagraph">Pravděpodobně jsi už slyšel(a) o tom, že tě společnosti jako Google a Facebook na webových stránkách třetích stran skrytě sledují. Víš, že sledují tvoje osobní údaje taky prostřednictvím aplikací v tvém zařízení?\n\n<b>Více než 96 \u0025 ze 100 testovaných populárních bezplatných aplikací pro Android</b> obsahovalo skryté sledovací programy třetích stran. Z nich 87 \u0025 odesílalo data společnosti Google a 68 \u0025 společnosti Facebook. Dochází k tomu, i když zařízení nepoužíváš.\n\n<b>Trackery v aplikacích můžou mít přístup k mnohem více informacím</b> než jejich příbuzní na webových stránkách. Například k tvojí poloze včetně patra budovy, na kterém se nacházíš, k tomu, jak často hraješ v práci hry, nebo k údajům o tom, kdy a jak dlouho denně spíš. <b>Můžou o tobě shromažďovat údaje z tvých aplikací, i když nemáš účet na Googlu nebo Facebooku.</b>\n\nSledovací sítě jako Facebook nebo Google si z těchhle střípků informací <b>skládají tvůj digitální profil.</b> Díky němu můžou sledovací sítě manipulovat s tím, co vidíš online, a umožnit inzerentům, aby na základě tvých dat finančně ohodnotili přístup k tobě.\n\nTrackery v aplikacích jsou VELKÝ problém pro soukromí. <b>DuckDuckGo má však řešení, které ti může pomoct. </b>\n\nApp Tracking Protection po zapnutí v aplikaci DuckDuckGo Privacy Browser blokuje ve tvém zařízení hodně trackerů v jiných aplikacích a zároveň aplikace DuckDuckGo blokuje trackery, která při prohlížení najdeme na webových stránkách. <b>Tyhle dvě vrstvy ochrany omezují to, co o tobě sledovací společnosti obecně vědí</b>, takže můžeš aplikace používat s větším klidem a vědomím lepší ochrany.</string>
+    <string name="atp_ProfilingInfoFirstParagraph" formatted="false">Pravděpodobně jsi už slyšel(a) o tom, že tě společnosti jako Google a Facebook na webových stránkách třetích stran skrytě sledují. Víš, že sledují tvoje osobní údaje taky prostřednictvím aplikací v tvém zařízení?\n\n<b>Více než 96 % ze 100 testovaných populárních bezplatných aplikací pro Android</b> obsahovalo skryté sledovací programy třetích stran. Z nich 87 % odesílalo data společnosti Google a 68 % společnosti Facebook. Dochází k tomu, i když zařízení nepoužíváš.\n\n<b>Trackery v aplikacích můžou mít přístup k mnohem více informacím</b> než jejich příbuzní na webových stránkách. Například k tvojí poloze včetně patra budovy, na kterém se nacházíš, k tomu, jak často hraješ v práci hry, nebo k údajům o tom, kdy a jak dlouho denně spíš. <b>Můžou o tobě shromažďovat údaje z tvých aplikací, i když nemáš účet na Googlu nebo Facebooku.</b>\n\nSledovací sítě jako Facebook nebo Google si z těchhle střípků informací <b>skládají tvůj digitální profil.</b> Díky němu můžou sledovací sítě manipulovat s tím, co vidíš online, a umožnit inzerentům, aby na základě tvých dat finančně ohodnotili přístup k tobě.\n\nTrackery v aplikacích jsou VELKÝ problém pro soukromí. <b>DuckDuckGo má však řešení, které ti může pomoct. </b>\n\nApp Tracking Protection po zapnutí v aplikaci DuckDuckGo Privacy Browser blokuje ve tvém zařízení hodně trackerů v jiných aplikacích a zároveň aplikace DuckDuckGo blokuje trackery, která při prohlížení najdeme na webových stránkách. <b>Tyhle dvě vrstvy ochrany omezují to, co o tobě sledovací společnosti obecně vědí</b>, takže můžeš aplikace používat s větším klidem a vědomím lepší ochrany.</string>
 
     <!--  App Tracking Protection Activity -->
     <string name="atp_ActivityPastWeek">Posledních 7 dní</string>
@@ -210,30 +212,39 @@
     <string name="atp_ActivityBetaInstructions">Pokyny pro beta verzi</string>
     <string name="atp_ActivityManageProtection">Máš problémy s aplikací?</string>
 
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"><![CDATA[blokován %1$d pokus o sledování od %2$d společnosti v <b>%3$s</b> aplikaci]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies"><![CDATA[zablokovaný %1$d pokus o sledování od %2$d společností v aplikaci <b>%3$s</b>]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany"><![CDATA[počet zablokovaných pokusů o sledování: %1$d od %2$d společnosti v aplikaci <b>%3$s</b> ]]></string>
-    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies"><![CDATA[počet zablokovaných pokusů o sledování: %1$d od %2$d společností v aplikaci <b>%3$s</b>]]></string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
+        <![CDATA[Zablokován 1 pokus o sledování od 1 společnosti v aplikaci <b>%1$s</b>]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies" instruction="Placeholder %1$d is the number of companies doing the tracking. Placeholder %2$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 5 companies in Venmo app.">
+        <![CDATA[Zablokován 1 pokus o sledování od %1$d společností v aplikaci <b>%2$s</b>]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$s is the name of the app doing the tracking. Example: 5 tracking attempts blocked from 1 company in Venmo app.">
+        <![CDATA[Zablokovány pokusy o sledování (%1$d) od 1 společnosti v aplikaci <b>%2$s</b>]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
+        <![CDATA[počet zablokovaných pokusů o sledování: %1$d od %2$d společností v aplikaci <b>%3$s</b>]]>
+    </string>
 
     <string name="atp_ActivityEmptyListTitle">Žádná nová aktivita</string>
     <string name="atp_ActivityEmptyListMessage">Používej i nadále své zařízení. Zde se zobrazují pokusy o sledování, které ochrana před sledováním aplikací blokuje.</string>
     <string name="atp_ActivityPastWeekBlocked">Zablokované</string>
     <string name="atp_ActivityPastWeekAcross">Ve více</string>
 
-     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Pokus o sledování</item>
         <item quantity="few">Pokusy o sledování</item>
         <item quantity="many">Pokusu o sledování</item>
         <item quantity="other">Pokusů o sledování</item>
     </plurals>
-      <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Aplikace</item>
         <item quantity="few">Aplikace</item>
         <item quantity="many">Aplikace</item>
         <item quantity="other">Aplikace</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Tato funkce je ve fázi beta. <annotation type="app_settings_link">Máš problémy s aplikací?</annotation></string>
+    <string name="atp_ActivityEnabledLabel">Tahle funkce je ve fázi beta. Máš problémy s aplikací? <annotation type="app_settings_link">Nahlas nám to, prosím.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection je zakázána</b>\nZpůsobila ti APp Tracking Protection problém s tvými aplikacemi? <annotation type="report_issues_link">Oznámit problémy</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>Android deaktivoval ochranu App Tracking Protection</b>. Chceš zabránit tomu, aby se to opakovalo? <annotation type="re_enable_link">Znovu povolit</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>VPN aplikace ve tvém zařízení vypnula App Tracking Protection.</b>\nZpůsobila ti App Tracking Protection problém s aplikacemi? <annotation type="report_issues_link">Oznámit problémy</annotation></string>
     <string name="atp_ActivityAbout">Informace</string>
     <string name="atp_ActivityManage">Spravovat</string>
@@ -293,10 +304,11 @@
         <item quantity="other">Zablokováno %1$d pokusů o sledování</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Nahlásit problém s touhle aplikací</string>
-    <string name="atp_CompanyDetailsTrackingShowMore">Zobrazit další %1$d</string>
+    <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Zobrazit další %1$d</string>
     <string name="atp_CompanyDetailsTrackingLearnMore">Aplikace můžou obsahovat trackery jiných společností, například pro analytické a marketingové účely. Kdybychom je nezablokovali, mohly by si tyhle trackery vytvářet ještě podrobnější digitální profily. <annotation type="learn_more_link">Více.</annotation></string>
     <string name="atp_CompanyDetailsTrackingShowLess">Zobrazit méně</string>
     <string name="atp_CompanyDetailsAppInfoPanel">Ochrana pro tuto aplikaci je momentálně vypnutá. Pokud App Tracking Protection způsobila problém, <annotation type="report_issues_link">prosíme o nahlášení</annotation></string>
+    <string name="atp_CompanyDetailsNotAvailableForUninstalledApps" instruction="Toast shown when users tap on item that corresponds to an already uninstalled application">Podrobnosti o trackeru nejsou u odinstalovaných aplikací dostupné</string>
 
     <!--  App Tracking Company Signals -->
     <string name="atp_TrackingSignalAAID">Reklamní ID Androidu</string>
@@ -382,10 +394,13 @@
     <string name="atp_RemoveFeatureDialogRemove">Vypnout</string>
 
     <!--  App Tracking Protection Promote Always On -->
-    <string name="atp_PromoteAlwaysOnDialogTitle">Nastavit na Vždy zapnuto?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">Jak zabránit Androidu v opakovaném deaktivování App Tracking Protection:\n\nPřejdi do Nastavení systému Android\nOtevři nastavení VPN pro DuckDuckGo\nZapni volbu „Always-on VPN“</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Přejdi do Nastavení</string>
-    <string name="atp_PromoteAlwaysOnDialogLater">Připomenout později</string>
-    <string name="atp_PromoteAlwaysOnDialogForget">Ne, děkuji</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Teď ne</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Přejdi ve svém zařízení do nastavení VPN pro DuckDuckGo a vyber <b>Vždy zapnout</b> VPN. Tím zabráníš vypnutí naší ochrany v systému Android.\n\nUjisti se, že ostatní nastavení jsou vypnutá.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Problémům s aplikací předejdeš tak, že v <b>nastavení VPN ve svém zařízení pro DuckDuckGo</b> zakážeš možnost <b>Blokovat připojení bez VPN</b>.]]></string>
+    <string name="atp_AlwaysOnModalHeading">Nastavit na Vždy zapnout</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Změň si nastavení sítě VPN</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Je potřeba něco udělat!</b> Pokud se chceš vyhnout problémům s aplikací, musíš změnit nastavení systému Android. <annotation type="open_settings_link">Změnit nastavení</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Je potřeba něco udělat! App Tracking Protection vyžaduje pro správné fungování změnu nastavení systému Android.</string>
 
 </resources>

@@ -6,7 +6,6 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.squareup.anvil'
 apply from: '../versioning.gradle'
 apply from: "$rootDir/spotless.gradle"
-apply plugin: 'com.duckduckgo.buildtime'
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
@@ -189,7 +188,6 @@ dependencies {
     implementation project(':anrs-impl')
     implementation project(':macos-api')
     implementation project(':macos-impl')
-    implementation project(':macos-store')
 
     implementation project(':remote-messaging-api')
     implementation project(':remote-messaging-impl')
@@ -208,9 +206,6 @@ dependencies {
 
     implementation project(':site-permissions-api')
     implementation project(':site-permissions-impl')
-
-    implementation project(':bandwidth-impl')
-    implementation project(':bandwidth-store')
 
     implementation project(':secure-storage-api')
     implementation project(':secure-storage-impl')

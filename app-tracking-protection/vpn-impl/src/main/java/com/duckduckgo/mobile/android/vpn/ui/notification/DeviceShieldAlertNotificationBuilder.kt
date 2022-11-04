@@ -63,7 +63,13 @@ interface DeviceShieldAlertNotificationBuilder {
     fun buildStatusNotification(
         context: Context,
         deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-        onNotificationPressedCallback: ResultReceiver
+        onNotificationPressedCallback: ResultReceiver,
+    ): Notification
+
+    fun buildAlwaysOnLockdownNotification(
+        context: Context,
+        deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
+        onNotificationPressedCallback: ResultReceiver,
     ): Notification
 }
 
@@ -169,7 +175,7 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
     override fun buildStatusNotification(
         context: Context,
         deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-        onNotificationPressedCallback: ResultReceiver
+        onNotificationPressedCallback: ResultReceiver,
     ): Notification {
         registerAlertChannel(context)
 
@@ -179,7 +185,23 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
         notificationLayout.setImageViewResource(R.id.deviceShieldNotificationStatusIcon, notificationImage)
         notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
 
-        return buildNotification(context, notificationLayout, onNotificationPressedCallback)
+        return buildNotification(context, notificationLayout, onNotificationPressedCallback, addReportIssueAction = true)
+    }
+
+    override fun buildAlwaysOnLockdownNotification(
+        context: Context,
+        deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
+        onNotificationPressedCallback: ResultReceiver,
+    ): Notification {
+        registerAlertChannel(context)
+
+        val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_report)
+
+        val notificationImage = getNotificationImage(deviceShieldNotification)
+        notificationLayout.setImageViewResource(R.id.deviceShieldNotificationStatusIcon, notificationImage)
+        notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
+
+        return buildNotification(context, notificationLayout, onNotificationPressedCallback, addReportIssueAction = false)
     }
 
     private fun getNotificationImage(deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification): Int {
@@ -201,7 +223,8 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
     private fun buildNotification(
         context: Context,
         content: RemoteViews,
-        resultReceiver: ResultReceiver? = null
+        resultReceiver: ResultReceiver? = null,
+        addReportIssueAction: Boolean
     ): Notification {
         registerAlertChannel(context)
 
@@ -220,7 +243,11 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
-            .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
+            .apply {
+                if (addReportIssueAction) {
+                    addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
+                }
+            }
             .build()
     }
 

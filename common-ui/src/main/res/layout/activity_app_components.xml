@@ -27,16 +27,15 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <com.google.android.material.appbar.AppBarLayout
-        style="@style/Widget.MaterialComponents.AppBarLayout.Surface"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ToolbarTheme"
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
         android:translationZ="@dimen/elevation_default_top_app_bar">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/ToolbarTheme"
+            android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
             android:background="?attr/toolbarBgColor"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 

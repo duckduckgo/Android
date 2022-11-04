@@ -14,10 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Autoconsent -->
     <string name="autoconsentTitle">Administrer cookie pop op-vinduer</string>
     <string name="autoconsentDescription">Når DuckDuckGo registrerer pop op-vinduer med samtykke til brug af cookies på websteder, du besøger, kan vi automatisk indstille dine cookiepræferencer til at minimere cookies og maksimere privatlivets fred og derefter lukke pop op-vinduer.</string>
     <string name="autoconsentToggle">Lad DuckDuckGo administrere pop op-vinduer med samtykke til brug af cookies</string>
-
 </resources>

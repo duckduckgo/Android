@@ -26,6 +26,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FORGET_ALL_EXECUTED("mf"),
     FORGET_ALL_AUTO_RESTART("m_f_r"),
     FORGET_ALL_AUTO_RESTART_WITH_INTENT("m_f_ri"),
+    DATA_CLEARED_DAILY("m_data_cleared_today"),
 
     BROKEN_SITE_REPORTED("m_bsr"),
     BROKEN_SITE_REPORT("epbf"),
@@ -117,7 +118,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_APP_LINKS_ALWAYS_SELECTED("ms_app_links_always_setting_selected"),
     SETTINGS_APP_LINKS_NEVER_SELECTED("ms_app_links_never_setting_selected"),
     SETTINGS_ADD_HOME_SCREEN_WIDGET_CLICKED("ms_add_home_screen_widget_clicked"),
-    SETTINGS_AUTOFILL_MANAGEMENT_OPENED("m_autofill_management_screen_opened"),
+    SETTINGS_AUTOFILL_MANAGEMENT_OPENED("m_autofill_settings_opened"),
 
     SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
     SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),

@@ -129,13 +129,6 @@ class RealVpnNetwork @Inject constructor(
 
     // Called from native code
     @Suppress("unused")
-    private fun sniResolved(name: String, resource: String) {
-        Timber.v("sniResolved called for $name / $resource")
-        callback.get()?.onSniResolved(SniRR(name, resource))
-    }
-
-    // Called from native code
-    @Suppress("unused")
     private fun isDomainBlocked(name: String, uid: Int): Boolean {
         Timber.v("isDomainBlocked for $name ($uid)")
         return callback.get()?.isDomainBlocked(DomainRR(name, uid)) ?: false

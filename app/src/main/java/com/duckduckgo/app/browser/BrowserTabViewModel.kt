@@ -114,6 +114,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.FragmentScope
@@ -479,6 +480,13 @@ class BrowserTabViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private var refreshOnViewVisible = MutableStateFlow(true)
     private var ctaChangedTicker = MutableStateFlow("")
+
+    /*
+      Used to prevent autofill credential picker from automatically showing
+      Useful if user has done something that would result in a strange UX to then show the picker
+      This only prevents against automatically showing; if the user taps on an autofill field directly, the dialog can still show
+     */
+    private var canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
 
     val url: String?
         get() = site?.url
@@ -1111,6 +1119,8 @@ class BrowserTabViewModel @Inject constructor(
         webNavigationState = newWebNavigationState
 
         if (!currentBrowserViewState().browserShowing) return
+
+        canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
 
         browserViewState.value = currentBrowserViewState().copy(
             canGoBack = newWebNavigationState.canGoBack || !skipHome,
@@ -2697,6 +2707,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onWebViewRefreshed() {
         accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
+        canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
     }
 
     override fun handleCloakedAmpLink(initialUrl: String) {
@@ -2745,9 +2756,13 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override suspend fun updateCredentials(url: String, credentials: LoginCredentials): LoginCredentials? {
+    override suspend fun updateCredentials(
+        url: String,
+        credentials: LoginCredentials,
+        updateType: CredentialUpdateType
+    ): LoginCredentials? {
         return withContext(appCoroutineScope.coroutineContext) {
-            autofillStore.updateCredentials(url, credentials)
+            autofillStore.updateCredentials(url, credentials, updateType)
         }
     }
 
@@ -2772,6 +2787,14 @@ class BrowserTabViewModel @Inject constructor(
     @VisibleForTesting
     fun updateWebNavigation(webNavigationState: WebNavigationState) {
         this.webNavigationState = webNavigationState
+    }
+
+    fun cancelPendingAutofillRequestToChooseCredentials() {
+        canAutofillSelectCredentialsDialogCanAutomaticallyShow = false
+    }
+
+    fun canAutofillSelectCredentialsDialogCanAutomaticallyShow(): Boolean {
+        return canAutofillSelectCredentialsDialogCanAutomaticallyShow && !currentOmnibarViewState().isEditing
     }
 
     companion object {

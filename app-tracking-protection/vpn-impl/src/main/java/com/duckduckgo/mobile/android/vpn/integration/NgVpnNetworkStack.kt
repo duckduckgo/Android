@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.integration
 import android.content.Context
 import android.os.ParcelFileDescriptor
 import android.util.LruCache
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
@@ -29,7 +28,6 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorder
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType
@@ -37,10 +35,11 @@ import com.duckduckgo.vpn.network.api.*
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+
+private const val LRU_CACHE_SIZE = 2048
+private const val EMFILE_ERRNO = 24
 
 @ContributesBinding(
     scope = VpnScope::class,
@@ -52,14 +51,14 @@ import javax.inject.Inject
 )
 @SingleInstanceIn(VpnScope::class)
 class NgVpnNetworkStack @Inject constructor(
-    private val context: Context,
+    context: Context,
     private val appBuildConfig: AppBuildConfig,
     private val vpnNetwork: Lazy<VpnNetwork>,
     private val appTrackerRepository: AppTrackerRepository,
     private val appNameResolver: AppNameResolver,
     private val appTrackerRecorder: AppTrackerRecorder,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     vpnDatabase: VpnDatabase,
+    private val runtime: Runtime,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
     private val packageManager = context.packageManager
@@ -68,7 +67,7 @@ class NgVpnNetworkStack @Inject constructor(
     private var tunnelThread: Thread? = null
     private var jniContext = 0L
     private val jniLock = Any()
-    private val dnsResourceCache = LruCache<String, String>(1000)
+    private val addressLookupLruCache = LruCache<String, String>(LRU_CACHE_SIZE)
     // cache packageId -> app name
     private val appNamesCache = LruCache<String, AppNameResolver.OriginatingApp>(100)
 
@@ -118,35 +117,40 @@ class NgVpnNetworkStack @Inject constructor(
 
     override fun onExit(reason: String) {
         Timber.w("Native exit reason=$reason")
-        // restart the VPN
-        appCoroutineScope.launch {
-            TrackerBlockingVpnService.restartVpnService(context, forceGc = true)
+
+        fun killProcess() {
+            runtime.exit(0)
         }
+        // restart the VPN. We kill process to also avoid any memory leak in the native layer
+        killProcess()
     }
 
     override fun onError(errorCode: Int, message: String) {
+        fun Int.isEmfile(): Boolean {
+            return this == EMFILE_ERRNO
+        }
+
         Timber.w("onError $errorCode:$message")
+
+        if (errorCode.isEmfile()) {
+            onExit(message)
+        }
     }
 
     override fun onDnsResolved(dnsRR: DnsRR) {
-        dnsResourceCache.put(dnsRR.resource, dnsRR.qName)
-        Timber.w("dnsResolved called for $dnsRR")
-    }
-
-    override fun onSniResolved(sniRR: SniRR) {
-        dnsResourceCache.put(sniRR.resource, sniRR.name)
-        Timber.w("sniResolved called for ${sniRR.name} / ${sniRR.resource}")
+        addressLookupLruCache.put(dnsRR.resource, dnsRR.qName)
+        Timber.d("dnsResolved called for $dnsRR")
     }
 
     override fun isDomainBlocked(domainRR: DomainRR): Boolean {
-        Timber.w("isDomainBlocked for $domainRR")
+        Timber.d("isDomainBlocked for $domainRR")
         return !shouldAllowDomain(domainRR.name, domainRR.uid)
     }
 
     override fun isAddressBlocked(addressRR: AddressRR): Boolean {
-        val hostname = dnsResourceCache[addressRR.address] ?: return false
+        val hostname = addressLookupLruCache[addressRR.address] ?: return false
         val domainAllowed = shouldAllowDomain(hostname, addressRR.uid)
-        Timber.w("isAddressBlocked for $addressRR ($hostname) = ${!domainAllowed}")
+        Timber.d("isAddressBlocked for $addressRR ($hostname) = ${!domainAllowed}")
         return !domainAllowed
     }
 
@@ -165,8 +169,8 @@ class NgVpnNetworkStack @Inject constructor(
             val trackingApp = appNamesCache[packageId] ?: appNameResolver.getAppNameForPackageId(packageId)
             appNamesCache.put(packageId, trackingApp)
 
-            // if the app name is unknown, skip inserting the tracker but still block the tracker
-            if (trackingApp.isUnknown()) return false
+            // if the app name is unknown, do not block
+            if (trackingApp.isUnknown()) return true
 
             VpnTracker(
                 trackerCompanyId = type.tracker.trackerCompanyId,

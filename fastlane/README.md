@@ -63,6 +63,14 @@ Start new hotfix
 
 Finish a hotfix in progress
 
+### android asana_release_prep
+
+```sh
+[bundle exec] fastlane android asana_release_prep
+```
+
+Prepares the Asana release board with a new release task, tags tasks waiting for release etc..
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.

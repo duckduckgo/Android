@@ -36,7 +36,7 @@ import kotlin.random.Random
 @ContributesMultibinding(AppScope::class)
 class TrackerProtectionFlipperPlugin @Inject constructor(
     vpnDatabase: VpnDatabase,
-    private val dispatcherProvider: DispatcherProvider,
+    private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : FlipperPlugin {
 
@@ -67,7 +67,6 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
                 tracker?.let {
                     Timber.v("$id: sending $tracker")
                     FlipperObject.Builder()
-                        .put("id", tracker.trackerId)
                         .put("timestamp", tracker.timestamp)
                         .put("domain", tracker.domain)
                         .put("company", tracker.companyDisplayName)
@@ -77,7 +76,7 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
                         .also { enqueueRow(it) }
                 }
             }
-            .flowOn(Dispatchers.IO)
+            .flowOn(dispatchers.io())
             .launchIn(appCoroutineScope)
     }
 

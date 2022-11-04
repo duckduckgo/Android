@@ -14,8 +14,9 @@
   ~ limitations under the License.
   -->
 
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementScreenTitle">Autofill Logins</string>
 
     <string name="managementLockedModeText">Unlock Autofill</string>
@@ -34,12 +35,15 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
 
     <string name="useSavedLoginDialogTitle">Use Saved Login?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText">Login for %s</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Login for %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Login for site</string>
 
     <string name="updateLoginDialogTitle">Update Password?</string>
     <string name="updateLoginDialogButtonUpdatePassword">Update Password</string>
     <string name="updateLoginDialogButtonNotNow">Not Now</string>
+
+    <string name="updateLoginDialogTitleUpdateUsername">Update Username?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Update Username</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Close Autofill Dialog</string>
 
@@ -53,7 +57,7 @@
     <string name="credentialManagementEditButtonSaveChanges">Save Changes</string>
     <string name="credentialManagementEditButtonCopyUsername">Copy Username</string>
     <string name="credentialManagementEditButtonCopyPassword">Copy Password</string>
-    <string name="credentialManagementEditLastUpdated">Login last updated %s</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Login last updated %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Save and Autofill Logins</string>
     <string name="credentialManagementViewMenuEdit">Edit</string>
