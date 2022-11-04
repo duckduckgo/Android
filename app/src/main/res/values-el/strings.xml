@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Εύρεση προηγούμενου</string>
     <string name="closeFindInPageButtonDescription">Κλείσιμο εύρεσης στην προβολή σελίδας</string>
     <string name="findInPageHint">Εύρεση στη σελίδα</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Επεξεργασία ερωτήματος πριν την αναζήτηση</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">ΕΝΕΡΓΟΠΟΙΗΣΗ ΤΗΣ ΠΡΟΣΤΑΣΙΑΣ ΤΟΥ ΙΣΤΟΤΟΠΟΥ</string>
     <string name="privacyProtectionDisabled">ΑΠΕΝΕΡΓΟΠΟΊΗΣΗ ΤΗΣ ΠΡΟΣΤΑΣΙΑΣ ΤΟΥ ΙΣΤΟΤΟΠΟΥ</string>
     <string name="privacyDashboardActivityTitle">Πίνακας εργαλείων ιδιωτικότητας</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ΒΕΛΤΙΩΘΗΚΕ ΑΠΟ &lt;img src=\"%1$d\" /&gt; ΣΕ &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">ΒΕΛΤΙΩΘΗΚΕ ΑΠΟ &lt;img src=\"%1$d\" /&gt; ΣΕ &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Βαθμολογία ιδιωτικότητας</string>
     <string name="privacyProtectionTemporarilyDisabled">Απενεργοποιήσαμε προσωρινά την Προστασία προσωπικών δεδομένων καθώς φαίνεται ότι ρίχνει τον ιστότοπο.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Επιλέξτε αρχείο σελιδοδείκτη προς εισαγωγή</string>
     <string name="importBookmarksError">Δεν ήταν δυνατή η εισαγωγή σελιδοδεικτών, κάτι πήγε λάθος</string>
     <string name="importBookmarksEmpty">Το αρχείο δεν έχει σελιδοδείκτες προς εισαγωγή</string>
-    <string name="importBookmarksSuccess">Επιτυχής εισαγωγή %1$d σελιδοδεικτών</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Επιτυχής εισαγωγή %1$d σελιδοδεικτών</string>
     <string name="savedSiteDialogTitleHint">Τίτλος</string>
     <string name="savedSiteDialogUrlHint">Διεύθυνση URL</string>
     <string name="savedSiteDialogTitleEdit">Επεξεργασία</string>

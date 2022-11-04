@@ -379,27 +379,27 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Mijn apps</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Kan app-problemen veroorzaken indien ingeschakeld</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Toch inschakelen</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">%1$s kan problemen ondervinden als App Tracking Protection is ingeschakeld</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">%1$s kan problemen ondervinden als App Tracking Protection is ingeschakeld</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Een probleem melden?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Laat het ons weten als je App Tracking Protection voor %1$s hebt uitgeschakeld omdat je problemen met de app hebt ondervonden.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Laat het ons weten als je App Tracking Protection voor %1$s hebt uitgeschakeld omdat je problemen met de app hebt ondervonden.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Probleem melden</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Niet nu</string>
     <string name="atp_ActivityRecentActivityHeader">Activiteit</string>
     <string name="atp_ActivityManageProtectionLabel">Heb je problemen met een app?</string>
     <string name="atp_ActivityEnabledBannerLabel">Tijdens de bètaversie wordt de beveiliging voor sommige apps automatisch uitgeschakeld. <annotation type="app_settings_link">Apps bekijken</annotation></string>
     <string name="atp_ActivityDescription">Geblokkeerde trackingpogingen worden hier weergegeven</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s van je apps is beschermd tegen verborgen trackers waarvan we merken dat ze toegang proberen te krijgen tot je persoonlijke gegevens</item>
         <item quantity="other">%1$s van je apps zijn beschermd tegen verborgen trackers waarvan we merken dat ze toegang proberen te krijgen tot je persoonlijke gegevens</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">Bij %1$s van je apps is de bescherming automatisch uitgeschakeld</item>
         <item quantity="other">Bij %1$s van je apps is de bescherming automatisch uitgeschakeld</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Goed nieuws! App Tracking Protection is nu ingeschakeld.<br/><br/>👌 Ik laat je een realtime lijst zien van apps op je apparaat die ik betrap op pogingen om je te volgen.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Ik snap het!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Bescherming ingeschakeld (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Bescherming uitgeschakeld (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Bescherming ingeschakeld (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Bescherming uitgeschakeld (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Alle</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Bescherming ingeschakeld</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Bescherming uitgeschakeld</string>

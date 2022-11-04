@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Arată rezultatul anterior</string>
     <string name="closeFindInPageButtonDescription">Închide vizualizarea „caută în pagină”</string>
     <string name="findInPageHint">Căutare în pagină</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editare interogare înainte de căutare</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">PROTECȚIE SITE ACTIVATĂ</string>
     <string name="privacyProtectionDisabled">PROTECȚIE SITE DEZACTIVATĂ</string>
     <string name="privacyDashboardActivityTitle">Tabloul de bord privind confidențialitatea</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MĂRIT DE LA &lt;img src=\"%1$d\" /&gt; LA &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">MĂRIT DE LA &lt;img src=\"%1$d\" /&gt; LA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Grad de confidențialitate</string>
     <string name="privacyProtectionTemporarilyDisabled">Am dezactivat temporar protecția confidențialității, deoarece pare să strice acest site.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Selectați un fișier cu marcaje de importat</string>
     <string name="importBookmarksError">Nu s-au putut importa marcajele, a apărut o eroare</string>
     <string name="importBookmarksEmpty">Fișierul nu are marcaje de importat</string>
-    <string name="importBookmarksSuccess">%1$d marcaje importate cu succes</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d marcaje importate cu succes</string>
     <string name="savedSiteDialogTitleHint">Titlu</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Editare</string>

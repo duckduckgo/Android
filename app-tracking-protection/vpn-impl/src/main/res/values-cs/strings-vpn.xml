@@ -395,22 +395,22 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Moje aplikace</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Povolení může způsobit problémy s aplikací</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">I tak povolit</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">Když povolíš funkci App Tracking Protection, může dojít k problémům s aplikací %1$s</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">Když povolíš funkci App Tracking Protection, může dojít k problémům s aplikací %1$s</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Nahlásit problém?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Máš v aplikaci %1$s zakázanou funkci App Tracking Protection, protože způsobovala problémy? Dej nám o tom prosím vědět.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Máš v aplikaci %1$s zakázanou funkci App Tracking Protection, protože způsobovala problémy? Dej nám o tom prosím vědět.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Nahlásit problém</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Teď ne</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivita</string>
     <string name="atp_ActivityManageProtectionLabel">Máš problémy s aplikací?</string>
     <string name="atp_ActivityEnabledBannerLabel">V beta verzi je ochrana některých aplikací automaticky zakázaná. <annotation type="app_settings_link">Zobrazit aplikace</annotation></string>
     <string name="atp_ActivityDescription">Tady se zobrazí zablokované pokusy o sledování</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s tvoje aplikace je chráněná před skrytými trackery, které se snaží získat přístup k tvým osobním údajům</item>
         <item quantity="few">%1$s tvoje aplikace jsou chráněné před skrytými trackery, které se snaží získat přístup k tvým osobním údajům</item>
         <item quantity="many">%1$s tvých aplikací je chráněných před skrytými trackery, které se snaží získat přístup k tvým osobním údajům</item>
         <item quantity="other">%1$s tvých aplikací je chráněných před skrytými trackery, které se snaží získat přístup k tvým osobním údajům</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">%1$s tvá aplikace má ochranu automaticky vypnutou</item>
         <item quantity="few">%1$s tvé aplikace mají ochranu automaticky vypnutou</item>
         <item quantity="many">%1$s tvé aplikace má ochranu automaticky vypnutou</item>
@@ -418,8 +418,8 @@
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Skvělá zpráva! Funkce App Tracking Protection je zapnutá.<br/><br/>👌V reálném čase ti budu ukazovat seznam aplikací z tvého zařízení, které se tě pokoušely sledovat.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Mám to!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Ochrana je zapnutá (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Ochrana je vypnutá (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Ochrana je zapnutá (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Ochrana je vypnutá (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Vše</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Ochrana je zapnutá</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Ochrana je vypnutá</string>

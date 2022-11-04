@@ -395,22 +395,22 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Moje aplikácie</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Ak je táto možnosť povolená, môžu sa vyskytnúť problémy s aplikáciou</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Napriek tomu povoliť</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">%1$s môžu nastať problémy, ak je povolená Ochrana aplikácii pred sledovaním</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">%1$s môžu nastať problémy, ak je povolená Ochrana aplikácii pred sledovaním</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Chcete nahlásiť problému?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Ak ste zakázali Ochranu aplikácie pred sledovaním pre %1$s, dajte nám o tom vedieť, pretože ste zaznamenali problémy s aplikáciou.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Ak ste zakázali Ochranu aplikácie pred sledovaním pre %1$s, dajte nám o tom vedieť, pretože ste zaznamenali problémy s aplikáciou.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Nahlásiť problém</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Teraz nie</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivita</string>
     <string name="atp_ActivityManageProtectionLabel">Máte problémy s aplikáciou?</string>
     <string name="atp_ActivityEnabledBannerLabel">Pri používaní beta verzie je ochrana niektorých aplikácií automaticky vypnutá. <annotation type="app_settings_link">Zobraziť aplikácie</annotation></string>
     <string name="atp_ActivityDescription">Tu sa zobrazia zablokované pokusy o sledovanie</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s z vašich aplikácií je chránených pred skrytými sledovaniami, o ktorých si myslíme, že sa pokúšajú získať prístup k vašim osobným údajom</item>
         <item quantity="few">%1$s z vašich aplikácií sú chránené pred skrytými sledovaniami, o ktorých si myslíme, že sa pokúšajú získať prístup k vašim osobným údajom</item>
         <item quantity="many">%1$s z vašich aplikácií je chránených pred skrytými sledovaniami, o ktorých si myslíme, že sa pokúšajú získať prístup k vašim osobným údajom</item>
         <item quantity="other">%1$s z vašich aplikácií je chránených pred skrytými sledovaniami, o ktorých si myslíme, že sa pokúšajú získať prístup k vašim osobným údajom</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">%1$s z vašich aplikácií má automaticky zakázanú ochranu</item>
         <item quantity="few">%1$s z vašich aplikácií automaticky majú zakázanú ochranu</item>
         <item quantity="many">%1$s z vašich aplikácií má automaticky zakázanú ochranu</item>
@@ -418,8 +418,8 @@
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Máme dobré správy! Ochrana aplikácii pred sledovaním je teraz povolená.<br/><br/>👌V reálnom čase vám zobrazím zoznam aplikácií vo vašom zariadení, ktoré sa vás pokúšajú sledovať.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Mám to!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Ochrana povolená (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Ochrana vypnutá (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Ochrana povolená (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Ochrana vypnutá (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Všetko</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Ochrana povolená</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Ochrana vypnutá</string>

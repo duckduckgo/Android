@@ -395,22 +395,22 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Мои приложения</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Активация этой функции может нарушить работу приложения</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Все равно включить</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">Активация блокировки отслеживания приложениями может нарушить работу %1$s</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">Активация блокировки отслеживания приложениями может нарушить работу %1$s</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Сообщить о проблеме?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Если вы отключили блокировку отслеживания приложениями в %1$s из-за сбоев в работе программы, дайте нам знать.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Если вы отключили блокировку отслеживания приложениями в %1$s из-за сбоев в работе программы, дайте нам знать.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Сообщить о проблеме</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Не сейчас</string>
     <string name="atp_ActivityRecentActivityHeader">Активность</string>
     <string name="atp_ActivityManageProtectionLabel">Возникли проблемы с приложением?</string>
     <string name="atp_ActivityEnabledBannerLabel">Защита некоторых приложений автоматически отключается на время бета-тестирования. <annotation type="app_settings_link">Просмотреть приложения</annotation></string>
     <string name="atp_ActivityDescription">Заблокированные попытки отслеживания будут отображаться здесь</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">Мы защитили %1$s приложение от скрытых трекеров, которые пытались получить доступ к вашим личным данным</item>
         <item quantity="few">Мы защитили %1$s приложения от скрытых трекеров, которые пытались получить доступ к вашим личным данным</item>
         <item quantity="many">Мы защитили %1$s приложений от скрытых трекеров, которые пытались получить доступ к вашим личным данным</item>
         <item quantity="other">Мы защитили %1$s приложений от скрытых трекеров, которые пытались получить доступ к вашим личным данным</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">Защита %1$s приложения отключена автоматически</item>
         <item quantity="few">Защита %1$s приложений отключена автоматически</item>
         <item quantity="many">Защита %1$s приложений отключена автоматически</item>
@@ -418,8 +418,8 @@
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Хорошие новости! Функция блокировки отслеживания приложениями включена.<br/><br/>👌Теперь мы будем в реальном времени показывать вам список приложений, заблокированных за попытки слежки.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Понятно!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Защита включена (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Защита отключена (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Защита включена (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Защита отключена (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Всё</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Защита включена</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Защита отключена</string>

@@ -80,7 +80,7 @@
     <string name="previousSearchTermDescription">Find previous</string>
     <string name="closeFindInPageButtonDescription">Close find in page view</string>
     <string name="findInPageHint">Find in page</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
@@ -113,7 +113,7 @@
     <string name="privacyProtectionEnabled">SITE PROTECTION ENABLED</string>
     <string name="privacyProtectionDisabled">SITE PROTECTION DISABLED</string>
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">ENHANCED FROM &lt;img src="%1$d" /> TO &lt;img src="%2$d" /></string>
     <string name="privacyGradeContentDescription">Privacy Grade</string>
     <string name="privacyProtectionTemporarilyDisabled">We temporarily disabled Privacy Protection as it appears to be breaking this site.</string>
 
@@ -268,7 +268,7 @@
     <string name="importBookmarksFileTitle">Select a bookmark file to import</string>
     <string name="importBookmarksError">Couldn\'t import any bookmarks, something went wrong</string>
     <string name="importBookmarksEmpty">The file has no bookmarks to import</string>
-    <string name="importBookmarksSuccess">Successfully imported %1$d bookmarks</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Successfully imported %1$d bookmarks</string>
     <string name="savedSiteDialogTitleHint">Title</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Edit</string>

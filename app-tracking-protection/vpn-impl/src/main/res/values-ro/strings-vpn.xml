@@ -387,29 +387,29 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Aplicațiile mele</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Dacă se activează, pot apărea probleme cu aplicația</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Activează oricum</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">%1$s poate întâmpina probleme dacă se activează funcția Protecția împotriva urmăririi de către aplicație</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">%1$s poate întâmpina probleme dacă se activează funcția Protecția împotriva urmăririi de către aplicație</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Vrei să raportezi o problemă?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Anunță-ne dacă ai dezactivat Protecția împotriva urmăririi de către aplicație pentru %1$s, deoarece ai întâmpinat probleme legate de aplicație.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Anunță-ne dacă ai dezactivat Protecția împotriva urmăririi de către aplicație pentru %1$s, deoarece ai întâmpinat probleme legate de aplicație.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Raportează problema</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Nu acum</string>
     <string name="atp_ActivityRecentActivityHeader">Activitate</string>
     <string name="atp_ActivityManageProtectionLabel">Aveți probleme cu o aplicație?</string>
     <string name="atp_ActivityEnabledBannerLabel">În timpul versiunii beta, protecția pentru unele aplicații este dezactivată automat. <annotation type="app_settings_link">Vezi aplicațiile</annotation></string>
     <string name="atp_ActivityDescription">Încercările de urmărire blocate vor apărea aici</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s dintre aplicațiile tale este protejată împotriva tehnologiilor de urmărire ascunse despre care am constatat că încearcă să îți acceseze informațiile personale</item>
         <item quantity="few">%1$s dintre aplicațiile tale sunt protejate împotriva tehnologiilor de urmărire ascunse despre care am constatat că încearcă să îți acceseze informațiile personale</item>
         <item quantity="other">%1$s dintre aplicațiile tale sunt protejate împotriva tehnologiilor de urmărire ascunse despre care am constatat că încearcă să îți acceseze informațiile personale</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">%1$s dintre aplicațiile tale are protecția dezactivată automat</item>
         <item quantity="few">%1$s dintre aplicațiile tale au protecția dezactivată automat</item>
         <item quantity="other">%1$s dintre aplicațiile tale au protecția dezactivată automat</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Vești bune! Protecția împotriva urmăririi de către aplicație este acum activată.<br/><br/>👌Îți voi arăta o listă în timp real a aplicațiilor de pe dispozitivul tău despre care am observat că încearcă să te urmărească.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Am înțeles!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Protecție activată (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Protecție dezactivată (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Protecție activată (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Protecție dezactivată (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Toate</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Protecție activată</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Protecție dezactivată</string>

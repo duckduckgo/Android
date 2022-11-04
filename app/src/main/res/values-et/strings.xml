@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Otsi eelmine</string>
     <string name="closeFindInPageButtonDescription">Sulge lehe vaates otsimine</string>
     <string name="findInPageHint">Otsi lehel</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Enne otsimist muutke päringut</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">SAIDI KAITSE ON LUBATUD</string>
     <string name="privacyProtectionDisabled">SAIDI KAITSE ON KEELATUD</string>
     <string name="privacyDashboardActivityTitle">Privaatsuse juhtpaneel</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TÄIUSTATUD &lt;img src=\"%1$d\" /&gt; - &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">TÄIUSTATUD &lt;img src=\"%1$d\" /&gt; - &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privaatsusaste</string>
     <string name="privacyProtectionTemporarilyDisabled">Keelasime ajutiselt privaatsuse kaitse, kuna näib, et see kahjustab seda saiti.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Valige järjehoidja fail, mida importida</string>
     <string name="importBookmarksError">Ühtegi järjehoidjat ei saanud importida, midagi läks valesti</string>
     <string name="importBookmarksEmpty">Failil pole järjehoidjaid, mida importida</string>
-    <string name="importBookmarksSuccess">%1$d järjehoidjat on edukalt imporditud</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d järjehoidjat on edukalt imporditud</string>
     <string name="savedSiteDialogTitleHint">Pealkiri</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Redigeeri</string>

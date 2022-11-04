@@ -379,27 +379,27 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Minu rakendused</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Kui see on lubatud, võib esineda probleeme rakendusega</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Luba ikkagi</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">Kui rakenduse jälgimiskaitse on lubatud, võib rakenduses %1$s tekkida probleeme</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">Kui rakenduse jälgimiskaitse on lubatud, võib rakenduses %1$s tekkida probleeme</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Kas teatada probleemist?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Abba meile teada, kui sa keelasid rakenduse jälgimiskaitse rakenduses %1$s, kuna sul tekkis selle rakendusega probleeme.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Abba meile teada, kui sa keelasid rakenduse jälgimiskaitse rakenduses %1$s, kuna sul tekkis selle rakendusega probleeme.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Teata probleemist</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Mitte praegu</string>
     <string name="atp_ActivityRecentActivityHeader">Tegevus</string>
     <string name="atp_ActivityManageProtectionLabel">Kas rakendusega on probleeme?</string>
     <string name="atp_ActivityEnabledBannerLabel">Beetaversioonis on mõne rakenduse kaitse automaatselt välja lülitatud. <annotation type="app_settings_link">Kuva rakendused</annotation></string>
     <string name="atp_ActivityDescription">Siin kuvatakse blokeeritud jälgimiskatsed</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s rakendus on kaitstud varjatud jälgurite eest, mille me oleme tabanud katselt jälgida sinu isiklikku teavet</item>
         <item quantity="other">%1$s rakendust on kaitstud varjatud jälgurite eest, mille me oleme tabanud katselt jälgida sinu isiklikku teavet</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">%1$s rakenduse kaitse on automaatselt keelatud</item>
         <item quantity="other">%1$s rakenduse kaitse on automaatselt keelatud</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Head uudised! Rakenduse jälgimiskaitse on nüüd lubatud.<br/><br/>👌Näitan reaalajas loetelu sinu seadme rakendustest, mille olen tabanud katselt sind jälgida.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Sain aru!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Kaitse on lubatud (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Kaitse on keelatud (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Kaitse on lubatud (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Kaitse on keelatud (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Kõik</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Kaitse on lubatud</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Kaitse on keelatud</string>

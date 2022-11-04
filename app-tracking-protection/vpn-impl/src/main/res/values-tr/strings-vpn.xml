@@ -379,27 +379,27 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Uygulamalarım</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Etkinleştirilirse uygulama sorunları oluşabilir</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Yine de Etkinleştir</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">Uygulama İzleme Koruması etkinleştirilirse %1$s sorun yaşayabilir</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">Uygulama İzleme Koruması etkinleştirilirse %1$s sorun yaşayabilir</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Sorun mu bildireceksiniz?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Uygulama sorunları yaşadığınızdan, %1$s için Uygulama İzleme Korumasını devre dışı bırakıp bırakmadığınızı lütfen bize bildirin.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Uygulama sorunları yaşadığınızdan, %1$s için Uygulama İzleme Korumasını devre dışı bırakıp bırakmadığınızı lütfen bize bildirin.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Sorun Bildir</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Şimdi Değil</string>
     <string name="atp_ActivityRecentActivityHeader">Etkinlik</string>
     <string name="atp_ActivityManageProtectionLabel">Bir Uygulamayla İlgili Sorun mu Yaşıyorsunuz?</string>
     <string name="atp_ActivityEnabledBannerLabel">Beta sırasında bazı uygulamalar için koruma otomatik olarak devre dışı bırakılır. <annotation type="app_settings_link">Uygulamaları Görüntüle</annotation></string>
     <string name="atp_ActivityDescription">Engellenen izleme girişimleri burada görünecek</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">Uygulamalarınızdan %1$s tanesi, kişisel bilgilerinize erişmeye çalışırken bulduğumuz gizli izleyicilerden korunuyor</item>
         <item quantity="other">Uygulamalarınızdan %1$s tanesi kişisel bilgilerinize erişmeye çalışırken bulduğumuz gizli izleyicilerden korunuyor</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">Uygulamalarınızdan %1$s tanesi için koruma otomatik olarak devre dışı bırakıldı</item>
         <item quantity="other">Uygulamalarınızdan %1$s tanesi için koruma otomatik olarak devre dışı bırakıldı</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[İyi haberlerim var! Uygulama İzleme Koruması artık etkin.<br/><br/>👌Cihazınızda sizi izlemeye çalışırken yakaladığım uygulamaların gerçek zamanlı bir listesini size göstereceğim.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Anladım!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Koruma Etkin (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Koruma Devre Dışı (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Koruma Etkin (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Koruma Devre Dışı (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Tümü</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Koruma Etkin</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Koruma Devre Dışı</string>
