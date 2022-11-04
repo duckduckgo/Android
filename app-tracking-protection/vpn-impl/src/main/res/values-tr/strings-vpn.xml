@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Çalışma süresi: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Bugün engellenen izleyici şirketleri: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Bu hafta engellenen izleyici şirketleri: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Bugün engellenen izleyici şirketleri: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Bu hafta engellenen izleyici şirketleri: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Henüz engellenen izleyici şirketi yok"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Bugün engellenen izleyiciler: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Bu hafta engellenen izleyiciler: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Bugün engellenen izleyiciler: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Bu hafta engellenen izleyiciler: %1$d</string>
     <string name="vpnTrackersNone">"Henüz engellenen izleyici yok"</string>
     <string name="vpnNotRunYet">"VPN henüz çalıştırılmadı"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s paket"</string>
@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Beta sırasında DuckDuckGo, bilinen içerik yükleme sorunlarını çözmek üzere bazı uygulamalar için korumayı devre dışı bırakabilir. Varsayılan ayarlara geri dönmediğiniz sürece özel ayarlarınız değişmez.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Uygulama İzleme Koruması devre dışı</b> Uygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
     <string name="atp_ExcludedAppsReport">Başka Bir Uygulamayla İlgili Sorun Bildir</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Web sitelerini yükler</string>
-    <string name="atp_ExcludedReasonKnownIssues">Bilinen sorunlar</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuel olarak devre dışı bırakıldı</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manuel olarak etkinleştirildi</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">İptal</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Etkinleştir</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Geri Yükle</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">%1$s uygulaması için koruma manuel olarak etkinleştirilsin mi?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Bu uygulamanın, izleme girişimleri başarısız olduğunda sorunlarla karşılaştığı bilinmektedir.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Koruma etkinleştirildiğinde bu uygulamadaki site içeriği düzgün görünmeyebilir.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Korumayı etkinleştirdiğinizde, uygulamanın adı DuckDuckGo\'ya gönderilir.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Gizlilik Koruması Devre Dışı</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Bir sorunu çözmek için korumayı devre dışı bıraktıysanız, lütfen sorunu DuckDuckGo\'ya bildirmeden önce uygulamanın artık çalışıp çalışmadığını kontrol edin.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Beklendiği gibi çalışmayı durdurdu</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Bu uygulamada izlenmek benim için sorun değil</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Başka bir nedenden dolayı</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Bildir</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Atla</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Varsayılan Korumalı Uygulamaları Geri Yükle</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Bir Uygulamayla İlgili Sorun Bildir</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Varsayılan koruma geri yüklensin mi?</string>
@@ -197,12 +187,12 @@
     <string name="atp_ActivityPastWeek">Son 7 Gün</string>
     <string name="atp_ActivityTitle">Uygulama İzleme Koruması</string>
     <string name="atp_MostRecentActivityTitle">Tüm Son Etkinlikler</string>
-    <string name="atp_ActivityRecentActivity">Son Etkinlikler</string>
+    <string name="atp_ActivityRecentActivity">Etkinlik</string>
     <string name="atp_ActivityCtaShowAll">Tüm Son Etkinlikleri Görüntüle</string>
     <string name="atp_ActivityAppTrackersFAQ">Uygulama İzleyici Nedir?</string>
     <string name="atp_ActivityReportProblem">Bir Uygulamayla İlgili Sorun Bildir</string>
     <string name="atp_ActivityBetaInstructions">Beta Talimatları</string>
-    <string name="atp_ActivityManageProtection">Bir Uygulamayla İlgili Sorun mu Yaşıyorsunuz?</string>
+    <string name="atp_ActivityManageProtection">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[<b>%1$s</b> uygulamasında 1 şirket tarafından 1 izleme girişimi engellendi]]>
@@ -217,8 +207,6 @@
         <![CDATA[<b>%3$s</b> uygulamasında %2$d şirketlerine ait %1$d izleme girişimi engellendi]]>
     </string>
 
-    <string name="atp_ActivityEmptyListTitle">Yeni etkinlik yok</string>
-    <string name="atp_ActivityEmptyListMessage">Cihazınızı kullanmaya devam edin. Uygulama İzleme Koruması\'nın engellediği izleme girişimleri burada görünür.</string>
     <string name="atp_ActivityPastWeekBlocked">Engellendi</string>
     <string name="atp_ActivityPastWeekAcross">Uygulama Sayısı:</string>
 
@@ -386,5 +374,39 @@
     <string name="atp_AlwaysOnLockdownModalHeading">VPN ayarlarınızı değiştirin</string>
     <string name="atp_AlwaysOnLockDownEnabled"><b>İşlem gerekli!</b> Uygulama sorunlarını önlemek için Android ayarlarınızı değiştirmeniz gerekiyor. <annotation type="open_settings_link">Ayarları değiştir</annotation></string>
     <string name="atp_AlwaysOnLockDownNotificationTitle">İşlem gerekli! Uygulama İzleme Koruması için bir Android ayarının değiştirilmesi gerekiyor.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Uygulamalarım</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Etkinleştirilirse uygulama sorunları oluşabilir</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Yine de Etkinleştir</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">Uygulama İzleme Koruması etkinleştirilirse %1$s sorun yaşayabilir</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Sorun mu bildireceksiniz?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Uygulama sorunları yaşadığınızdan, %1$s için Uygulama İzleme Korumasını devre dışı bırakıp bırakmadığınızı lütfen bize bildirin.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Sorun Bildir</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Şimdi Değil</string>
+    <string name="atp_ActivityRecentActivityHeader">Etkinlik</string>
+    <string name="atp_ActivityManageProtectionLabel">Bir Uygulamayla İlgili Sorun mu Yaşıyorsunuz?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Beta sırasında bazı uygulamalar için koruma otomatik olarak devre dışı bırakılır. <annotation type="app_settings_link">Uygulamaları Görüntüle</annotation></string>
+    <string name="atp_ActivityDescription">Engellenen izleme girişimleri burada görünecek</string>
+    <plurals name="atp_ActivityProtectedApps">
+        <item quantity="one">Uygulamalarınızdan %1$s tanesi, kişisel bilgilerinize erişmeye çalışırken bulduğumuz gizli izleyicilerden korunuyor</item>
+        <item quantity="other">Uygulamalarınızdan %1$s tanesi kişisel bilgilerinize erişmeye çalışırken bulduğumuz gizli izleyicilerden korunuyor</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps">
+        <item quantity="one">Uygulamalarınızdan %1$s tanesi için koruma otomatik olarak devre dışı bırakıldı</item>
+        <item quantity="other">Uygulamalarınızdan %1$s tanesi için koruma otomatik olarak devre dışı bırakıldı</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[İyi haberlerim var! Uygulama İzleme Koruması artık etkin.<br/><br/>👌Cihazınızda sizi izlemeye çalışırken yakaladığım uygulamaların gerçek zamanlı bir listesini size göstereceğim.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Anladım!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel">Koruma Etkin (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Koruma Devre Dışı (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Tümü</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Koruma Etkin</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Koruma Devre Dışı</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Tümü</string>
+    <string name="atp_ActivityViewAppsLabel">Uygulamaları Görüntüle</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Bu özellik beta aşamasındadır. Bir uygulamayla ilgili sorun mu yaşıyorsunuz? <annotation type="app_settings_link">Geliştirmemize Yardımcı Olun</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Uygulama İzleme Koruması etkinleştirildiğinde bazı uygulamalar sorun yaşayabilir.\n<annotation type="learn_why_link">Nedenini Öğrenin</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Bilinen sorunları olan uygulamalar için koruma devre dışı bırakılır. Bu uygulamaları etkinleştirebilirsiniz, ancak beklendiği gibi çalışmayabilirler. <annotation type="learn_why_link">Nedenini Öğrenin</annotation></string>
 
 </resources>

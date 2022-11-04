@@ -432,7 +432,7 @@
 
     <style name="DeviceShield.PrivacyReport.TrackerEntry">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">?normalTextColor</item>
+        <item name="android:textColor">@color/primary_text_color_selector</item>
         <item name="android:lineSpacingExtra">6sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:selectable">false</item>

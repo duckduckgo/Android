@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Käyntiaika: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Tänään estetyt seurantayritykset: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Tällä viikolla estetyt seurantayritykset: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Tänään estetyt seurantayritykset: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Tällä viikolla estetyt seurantayritykset: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Yhtään seurantayritystä ei ole vielä estetty"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Tänään estetyt seurannat: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Tällä viikolla estetyt seurannat: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Tänään estetyt seurannat: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Tällä viikolla estetyt seurannat: %1$d</string>
     <string name="vpnTrackersNone">"Ei vielä estettyjä seurantoja"</string>
     <string name="vpnNotRunYet">"VPN:ää ei ole vielä ajettu"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s pakettia"</string>
@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Beetaversion aikana DuckDuckGo voi poistaa suojauksen käytöstä joistakin sovelluksista ratkaistakseen tunnettuja sisällön latausongelmia. Mukautetut asetukset eivät muutu, ellet palauta oletusasetuksia.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection on poistettu käytöstä</b> Aiheuttiko App Tracking Protection ongelmia sovelluksissasi <annotation type="report_issues_link">Ilmoita ongelmista</annotation></string>
     <string name="atp_ExcludedAppsReport">Ilmoita ongelmasta toisessa sovelluksessa</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Lataa verkkosivustoja</string>
-    <string name="atp_ExcludedReasonKnownIssues">Tunnetut ongelmat</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Poistettu käytöstä manuaalisesti</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Otettu käyttöön manuaalisesti</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Peruuta</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Ota käyttöön</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Palauta</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Ota suojaus käyttöön manuaalisesti sovellukselle %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Tässä sovelluksessa tiedetään olevan ongelmia, kun seurantayritykset epäonnistuvat.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Sivuston sisältö tässä sovelluksessa ei ehkä näy oikein, kun suojaus on käytössä.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Suojauksen ottaminen käyttöön lähettää sovelluksen nimen DuckDuckGolle.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Yksityisyyden suoja poistettu käytöstä</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Jos poistit suojauksen käytöstä ongelman ratkaisemiseksi, tarkista, että sovellus toimii, ennen kuin ilmoitat ongelmasta DuckDuckGolle.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Se lakkasi toimimasta odotetusti</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Seuranta ei haittaa minua tässä sovelluksessa</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Muu syy</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Ilmoita</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Ohita</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Palauta oletuksena suojatut sovellukset</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Ilmoita ongelmasta sovelluksessa</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Palauta oletussuojaus?</string>
@@ -197,12 +187,12 @@
     <string name="atp_ActivityPastWeek">Viimeiset 7 päivää</string>
     <string name="atp_ActivityTitle">Sovellusten seurantasuojaus</string>
     <string name="atp_MostRecentActivityTitle">Kaikki viimeaikainen toiminta</string>
-    <string name="atp_ActivityRecentActivity">Viimeaikainen toiminta</string>
+    <string name="atp_ActivityRecentActivity">Toiminta</string>
     <string name="atp_ActivityCtaShowAll">Näytä kaikki viimeaikaiset toiminnat</string>
     <string name="atp_ActivityAppTrackersFAQ">Mitä ovat sovellusten seurantalaitteet?</string>
     <string name="atp_ActivityReportProblem">Ilmoita ongelmasta sovelluksessa</string>
     <string name="atp_ActivityBetaInstructions">Beetaohjeet</string>
-    <string name="atp_ActivityManageProtection">Ongelmia jonkin sovelluksen kanssa?</string>
+    <string name="atp_ActivityManageProtection">Onko sinulla ongelmia sovelluksen kanssa?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[1 seurantayritys estetty 1 yritykseltä sovelluksessa <b>%1$s</b>]]>
@@ -217,8 +207,6 @@
         <![CDATA[%1$d seurantayritystä estetty %2$d yritykseltä <b>%3$s</b> sovelluksessa]]>
     </string>
 
-    <string name="atp_ActivityEmptyListTitle">Ei uutta toimintaa</string>
-    <string name="atp_ActivityEmptyListMessage">Jatka laitteen käyttöä. Seurantayritykset, jotka App Tracking Protection estää, näkyvät tässä.</string>
     <string name="atp_ActivityPastWeekBlocked">Estetty</string>
     <string name="atp_ActivityPastWeekAcross">Kaikkiaan</string>
 
@@ -386,5 +374,39 @@
     <string name="atp_AlwaysOnLockdownModalHeading">Muokkaa VPN-asetuksia</string>
     <string name="atp_AlwaysOnLockDownEnabled"><b>Toimia vaaditaan!</b> Sovellusongelmien välttämiseksi sinun on muokattava Android-asetuksia. <annotation type="open_settings_link">Muokkaa asetuksia</annotation></string>
     <string name="atp_AlwaysOnLockDownNotificationTitle">Toimia vaaditaan! App Tracking Protection edellyttää Android-asetuksen muuttamista.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Omat sovellukset</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Sovellusongelmia voi ilmetä, jos tämä on käytössä</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Ota käyttöön joka tapauksessa</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">%1$s saattaa kohdata ongelmia, jos App Tracking Protection on käytössä</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Ilmoita ongelmasta?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Kerro meille, jos olet poistanut App Tracking Protectionin käytöstä kohteelle %1$s, koska olet kohdannut ongelmia sovelluksen kanssa.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Ilmoita ongelmasta</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Ei nyt</string>
+    <string name="atp_ActivityRecentActivityHeader">Toiminta</string>
+    <string name="atp_ActivityManageProtectionLabel">Ongelmia jonkin sovelluksen kanssa?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Beeta-version aikana joidenkin sovellusten suojaus poistetaan käytöstä automaattisesti. <annotation type="app_settings_link">Näytä sovellukset</annotation></string>
+    <string name="atp_ActivityDescription">Estetyt seurantayritykset näkyvät täällä</string>
+    <plurals name="atp_ActivityProtectedApps">
+        <item quantity="one">%1$s sovelluksistasi on suojattu piilotetuilta seurantalaitteilta, jotka yrittävät päästä käsiksi henkilökohtaisiin tietoihin</item>
+        <item quantity="other">%1$s sovelluksistasi on suojattu piilotetuilta seurantalaitteilta, jotka yrittävät päästä käsiksi henkilökohtaisiin tietoihin</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps">
+        <item quantity="one">%1$s sovelluksesi suojaus on poistettu käytöstä automaattisesti</item>
+        <item quantity="other">%1$s sovelluksesi suojaus on poistettu käytöstä automaattisesti</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Hyviä uutisia! App Tracking Protection on nyt käytössä.<br/><br/>👌Näytän sinulle reaaliaikaisen luettelon laitteellasi olevista sovelluksista, joiden uskon yrittävän seurata sinua.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Selvä!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel">Suojaus käytössä (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Suojaus poistettu käytöstä (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Kaikki</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Suojaus käytössä</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Suojaus poistettu käytöstä</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Kaikki</string>
+    <string name="atp_ActivityViewAppsLabel">Näytä sovellukset</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Tämä ominaisuus on beetavaiheessa. Ongelmia sovelluksen kanssa? <annotation type="app_settings_link">Auta meitä parantamaan</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Joissakin sovelluksissa voi esiintyä ongelmia, kun App Tracking Protection on käytössä.\n<annotation type="learn_why_link">Lue miksi</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Suojaus on poistettu käytöstä sovelluksissa, joissa on tunnettuja ongelmia. Voit ottaa nämä sovellukset käyttöön, mutta ne eivät välttämättä toimi odotetulla tavalla. <annotation type="learn_why_link">Lue miksi</annotation></string>
 
 </resources>

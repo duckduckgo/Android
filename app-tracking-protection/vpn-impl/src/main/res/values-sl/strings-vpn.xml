@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Pretečeni čas: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Danes blokirana sledilna podjetja: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Podjetja za sledenje, blokirana ta teden: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Danes blokirana sledilna podjetja: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Podjetja za sledenje, blokirana ta teden: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Nobeno podjetje za sledenje še ni blokirano"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Sledilniki, blokirani danes: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Sledilniki, blokirani ta teden: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Sledilniki, blokirani danes: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Sledilniki, blokirani ta teden: %1$d</string>
     <string name="vpnTrackersNone">"Še ni blokiranih sledilnikov"</string>
     <string name="vpnNotRunYet">"VPN se še ni zagnal"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s paketov"</string>
@@ -144,24 +144,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">V beta različici lahko DuckDuckGo onemogoči zaščito nekaterih aplikacij, da bi odpravil znane težave z nalaganjem vsebine. Nastavitve po meri se ne bodo spremenile, razen če obnovite privzete nastavitve.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Zaščita pred sledenjem aplikacijam App Tracking Protection je onemogočena</b> Ali je zaščita pred sledenjem aplikacijam povzročila težavo z vašimi aplikacijami <annotation type="report_issues_link">Prijavite težave</annotation></string>
     <string name="atp_ExcludedAppsReport">Prijavite težavo z drugo aplikacijo</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Naloži spletne strani</string>
-    <string name="atp_ExcludedReasonKnownIssues">Znane težave</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Ročno onemogočeno</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Ročno omogočeno</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Preklic</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Omogoči</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Obnovitev</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Želite ročno omogočiti zaščito za aplikacijo %1$s ?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Ta aplikacija je znana po težavah, ko poskusi sledenja niso uspešni.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Če je omogočena zaščita, vsebina spletnega mesta v tej aplikaciji morda ne bo pravilno prikazana.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Ko omogočite zaščito, se pošlje ime aplikacije portalu DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Onemogočena zaščita zasebnosti</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Če ste onemogočili zaščito, da bi odpravili težavo, preverite, ali aplikacija zdaj deluje, preden o težavi poročate DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Po pričakovanjih je prenehalo delovati</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">V redu je, da mi sledijo v tej aplikaciji</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Iz drugega razloga</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Poročilo</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Preskoči</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Obnovi privzeto zaščitene aplikacije</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Prijava težave z aplikacijo</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Obnovitev privzete zaščite?</string>
@@ -205,7 +195,7 @@
     <string name="atp_ActivityPastWeek">Zadnjih 7 dni</string>
     <string name="atp_ActivityTitle">Zaščita pred sledenjem aplikacij</string>
     <string name="atp_MostRecentActivityTitle">Vse nedavne dejavnosti</string>
-    <string name="atp_ActivityRecentActivity">Nedavne dejavnosti</string>
+    <string name="atp_ActivityRecentActivity">Dejavnost</string>
     <string name="atp_ActivityCtaShowAll">Ogled vseh nedavnih dejavnosti</string>
     <string name="atp_ActivityAppTrackersFAQ">Kaj so sledilniki aplikacij?</string>
     <string name="atp_ActivityReportProblem">Prijava težave z aplikacijo</string>
@@ -225,8 +215,6 @@
         <![CDATA[%1$d poskusov sledenja blokiranih iz %2$d podjetij v aplikaciji <b>%3$s</b>]]>
     </string>
 
-    <string name="atp_ActivityEmptyListTitle">Ni novih dejavnosti</string>
-    <string name="atp_ActivityEmptyListMessage">Še naprej uporabljajte svojo napravo. Tu so prikazani poskusi sledenja, ki jih zaščita pred sledenjem aplikacijam App Tracking Protection blokira.</string>
     <string name="atp_ActivityPastWeekBlocked">Blokirana stran</string>
     <string name="atp_ActivityPastWeekAcross">Na spletni strani</string>
 
@@ -402,5 +390,43 @@
     <string name="atp_AlwaysOnLockdownModalHeading">Spreminjanje nastavitev VPN</string>
     <string name="atp_AlwaysOnLockDownEnabled"><b>Potrebno je ukrepanje!</b> Če se želite izogniti težavam z aplikacijami, morate spremeniti nastavitve sistema Android. <annotation type="open_settings_link">Spremenite nastavitve</annotation></string>
     <string name="atp_AlwaysOnLockDownNotificationTitle">Potrebno je ukrepanje! Za zaščito pred sledenjem aplikacijam je treba spremeniti nastavitev sistema Android.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Moje aplikacije</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Če je ta možnost omogočena, se lahko pojavijo težave z aplikacijo</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Vseeno omogoči</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">V aplikaciji %1$s lahko pride do težav, če je omogočena zaščita pred sledenjem aplikaciji</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Želite prijaviti težavo?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Sporočite nam, če ste onemogočili zaščito pred sledenjem aplikaciji za %1$s, ker ste imeli težave z aplikacijami.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Izdaja poročila</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Ne zdaj</string>
+    <string name="atp_ActivityRecentActivityHeader">Dejavnost</string>
+    <string name="atp_ActivityManageProtectionLabel">Imate težave z aplikacijo?</string>
+    <string name="atp_ActivityEnabledBannerLabel">V času različice beta je zaščita nekaterih aplikacij samodejno onemogočena. <annotation type="app_settings_link">Pregled aplikacij</annotation></string>
+    <string name="atp_ActivityDescription">Tukaj bodo prikazani blokirani poskusi sledenja</string>
+    <plurals name="atp_ActivityProtectedApps">
+        <item quantity="one">%1$s vaša aplikacija je zaščitena pred skritim sledilniki, ki jih poiščemo, da poskušajo dostopati do vaših osebnih podatkov</item>
+        <item quantity="two">%1$s vaši aplikaciji sta zaščiteni pred skritim sledilniki, ki jih poiščemo, da poskušajo dostopati do vaših osebnih podatkov</item>
+        <item quantity="few">%1$s vaše aplikacije so zaščitene pred skritim sledilniki, ki jih poiščemo, da poskušajo dostopati do vaših osebnih podatkov</item>
+        <item quantity="other">%1$s vaših aplikacij je zaščitenih pred skritim sledilniki, ki jih poiščemo, da poskušajo dostopati do vaših osebnih podatkov</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps">
+        <item quantity="one">%1$s vaša aplikacija ima samodejno onemogočeno zaščito</item>
+        <item quantity="two">%1$s vaši aplikaciji imata samodejno onemogočeno zaščito</item>
+        <item quantity="few">%1$s vaše aplikacije imajo samodejno onemogočeno zaščito</item>
+        <item quantity="other">%1$s vaših aplikacij ima samodejno onemogočeno zaščito</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Dobra novica! Zaščita sledenja aplikaciji je zdaj omogočena.<br/><br/>👌V realnem času vam prikažem seznam aplikacij v vaši napravi, ki jih poskušam izslediti.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Razumem!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel">Zaščita je omogočena (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Zaščita ni omogočena (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Vse</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Zaščita je omogočena</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Zaščita ni omogočena</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Vse</string>
+    <string name="atp_ActivityViewAppsLabel">Prikaži aplikacije</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Ta funkcija je v različici beta. Imate težave z aplikacijo? <annotation type="app_settings_link">Pomagajte nam jo izboljšati</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Pri nekaterih aplikacijah se lahko pojavijo težave, ko je omogočena zaščita pred sledenjem aplikaciji.\n<annotation type="learn_why_link">Več o tem</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Zaščita je onemogočena za aplikacije z znanimi težavami. Te aplikacije lahko omogočite, vendar morda ne bodo delovale po pričakovanjih. <annotation type="learn_why_link">Več o tem</annotation></string>
 
 </resources>

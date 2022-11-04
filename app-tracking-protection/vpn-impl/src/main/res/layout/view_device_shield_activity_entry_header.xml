@@ -21,7 +21,7 @@
     android:id="@+id/timestamp_header"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/colorPrimaryDark"
+    android:background="?android:windowBackground"
     android:paddingStart="16dp"
     android:paddingTop="15dp"
     android:paddingEnd="0dp"

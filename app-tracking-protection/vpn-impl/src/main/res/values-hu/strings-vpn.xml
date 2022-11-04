@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Futási idő: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">A mai napon letiltott nyomkövető cégek: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Ezen a héten letiltott nyomkövető cégek: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">A mai napon letiltott nyomkövető cégek: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Ezen a héten letiltott nyomkövető cégek: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Még egyetlen nyomkövető cég sem lett letiltva"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">A mai napon letiltott nyomkövetők: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">A héten letiltott nyomkövetők: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">A mai napon letiltott nyomkövetők: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">A héten letiltott nyomkövetők: %1$d</string>
     <string name="vpnTrackersNone">"Még nincsenek letiltott nyomkövetők"</string>
     <string name="vpnNotRunYet">"A VPN még nem futott"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s csomag"</string>
@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">A bétaverzióban a DuckDuckGo kikapcsolhatja a védelmet egyes alkalmazásoknál az ismert tartalombetöltési problémák megoldása érdekében. Az egyéni beállításaid csak akkor változnak, ha visszaállítod az alapértelmezett beállításokat.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Az alkalmazáskövetés elleni védelem ki van kapcsolva</b> Okozott problémát az alkalmazáskövetés elleni védelem az alkalmazásaidban? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
     <string name="atp_ExcludedAppsReport">Másik alkalmazással kapcsolatos probléma jelentése</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Webhelyek betöltése</string>
-    <string name="atp_ExcludedReasonKnownIssues">Ismert problémák</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuálisan kikapcsolva</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Manuálisan bekapcsolva</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Mégsem</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Engedélyezés</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Visszaállítás</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Manuálisan bekapcsolod a védelmet a(z) %1$s alkalmazás számára?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Ebben az alkalmazásban köztudottan problémák lépnek fel, ha a követési kísérletek sikertelenek.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Előfordulhat, hogy az alkalmazásban lévő webhelytartalom nem jelenik meg megfelelően, ha a védelem be van kapcsolva.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">A védelem bekapcsolása elküldi az alkalmazás nevét a DuckDuckGo részére.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Adatvédelem letiltva</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Ha kikapcsolod a védelmet egy probléma kijavításához, ellenőrizd, hogy az alkalmazás most működik-e, mielőtt jelentenéd a problémát a DuckDuckGónak.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Leállt az elvárt módon történő működés</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Elfogadom, hogy nyomon követnek ebben az alkalmazásban</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Más okból</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Jelentés</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Kihagyás</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Az alapértelmezett védett alkalmazások visszaállítása</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Alkalmazással kapcsolatos probléma bejelentése</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Visszaállítod az alapértelmezett védelmet?</string>
@@ -197,7 +187,7 @@
     <string name="atp_ActivityPastWeek">Az elmúlt 7 nap</string>
     <string name="atp_ActivityTitle">Alkalmazáskövetés elleni védelem</string>
     <string name="atp_MostRecentActivityTitle">Minden legutóbbi tevékenység</string>
-    <string name="atp_ActivityRecentActivity">Legutóbbi tevékenység</string>
+    <string name="atp_ActivityRecentActivity">Tevékenység</string>
     <string name="atp_ActivityCtaShowAll">Minden legutóbbi tevékenység megtekintése</string>
     <string name="atp_ActivityAppTrackersFAQ">Mik az alkalmazáskövetők?</string>
     <string name="atp_ActivityReportProblem">Alkalmazással kapcsolatos probléma bejelentése</string>
@@ -217,8 +207,6 @@
         <![CDATA[%1$d követési kísérlet blokkolva %2$d cégtől a(z) <b>%3$s</b> alkalmazásban]]>
     </string>
 
-    <string name="atp_ActivityEmptyListTitle">Nincs új tevékenység</string>
-    <string name="atp_ActivityEmptyListMessage">Továbbra is használd a készülékedet Az alkalmazáskövetés elleni védelem által blokkolt követési kísérletek itt jelennek meg.</string>
     <string name="atp_ActivityPastWeekBlocked">Blokkolt</string>
     <string name="atp_ActivityPastWeekAcross">Itt:</string>
 
@@ -386,5 +374,39 @@
     <string name="atp_AlwaysOnLockdownModalHeading">A VPN beállítások módosítása</string>
     <string name="atp_AlwaysOnLockDownEnabled"><b>Beavatkozás szükséges!</b> Az alkalmazással kapcsolatos problémák elkerülése érdekében módosítanod kell az Android beállításait. <annotation type="open_settings_link">Beállítások módosítása</annotation></string>
     <string name="atp_AlwaysOnLockDownNotificationTitle">Beavatkozás szükséges! Az alkalmazáskövetés elleni védelemhez módosítani kell egy Android-beállítást.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Saját alkalmazások</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Ha engedélyezve van, alkalmazásproblémák léphetnek fel</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Engedélyezés mindenképpen</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">A(z) %1$s alkalmazásban problémák merülhetnek fel, ha az alkalmazáskövetés elleni védelem engedélyezve van</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Jelentesz egy problémát?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Értesíts minket, ha az alkalmazásban tapasztalt problémák miatt letiltottad a(z) %1$s alkalmazáskövetés elleni védelmét.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Probléma jelentése</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Most nem</string>
+    <string name="atp_ActivityRecentActivityHeader">Tevékenység</string>
+    <string name="atp_ActivityManageProtectionLabel">Problémáid vannak egy alkalmazással?</string>
+    <string name="atp_ActivityEnabledBannerLabel">A béta verzióban egyes alkalmazások védelme automatikusan le van tiltva. <annotation type="app_settings_link">Alkalmazások megtekintése</annotation></string>
+    <string name="atp_ActivityDescription">Itt jelennek meg a blokkolt nyomkövetési kísérletek</string>
+    <plurals name="atp_ActivityProtectedApps">
+        <item quantity="one">%1$s alkalmazásod védve van a rejtett nyomkövetőkkel szemben, amelyekről megállapítottuk, hogy megpróbáltak hozzáférni a személyes adataidhoz</item>
+        <item quantity="other">%1$s alkalmazásod védve van azokkal a nyomkövetőkkel szemben, amelyekről megállapítottuk, hogy megpróbáltak hozzáférni a személyes adataidhoz</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps">
+        <item quantity="one">%1$s alkalmazás védelme automatikusan le lett tiltva</item>
+        <item quantity="other">%1$s alkalmazás védelme automatikusan le lett tiltva</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Jó hír! Az alkalmazáskövetés elleni mostantól engedélyezve van.<br/><br/>👌Megmutatom az eszközön található alkalmazások valós idejű listáját, amelyekről megállapítottam, hogy megpróbálnak nyomon követni.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Rendben!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel">Védelem engedélyezve (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Védelem letiltva (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Összes</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Védelem engedélyezve</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Védelem letiltva</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Összes</string>
+    <string name="atp_ActivityViewAppsLabel">Alkalmazások megtekintése</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Ez a funkció bétaverzióban van. Problémáid vannak egy alkalmazással? <annotation type="app_settings_link">Segíts kijavítani</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Egyes alkalmazásoknál problémák merülhetnek fel, ha az alkalmazáskövetés elleni védelem engedélyezve van.\n<annotation type="learn_why_link">Tudd meg, miért</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Az ismert problémákat tartalmazó alkalmazások védelme le van tiltva. Engedélyezheted ezeket az alkalmazásokat, de előfordulhat, hogy nem a várt módon működnek. <annotation type="learn_why_link">Tudd meg, miért</annotation></string>
 
 </resources>

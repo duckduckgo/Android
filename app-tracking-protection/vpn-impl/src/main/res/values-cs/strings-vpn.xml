@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Doba provozu: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Společnosti, jejichž trackery byly dnes zablokované: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Společnosti, jejichž trackery byly tenhle týden zablokované: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Společnosti, jejichž trackery byly dnes zablokované: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Společnosti, jejichž trackery byly tenhle týden zablokované: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Zatím nebyly zablokované trackery žádných společností"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Dnes zablokované trackery: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Trackery zablokované tento týden: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Dnes zablokované trackery: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Trackery zablokované tento týden: %1$d</string>
     <string name="vpnTrackersNone">"Zatím nebyly zablokované žádné trackery"</string>
     <string name="vpnNotRunYet">"VPN ještě nebyla spuštěna"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s pakety"</string>
@@ -144,24 +144,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">V betaverzi může DuckDuckGo ochranu pro některé aplikace vypnout, a vyřešit tak známé problémy s načítáním obsahu. Pokud neobnovíš výchozí nastavení, tvoje vlastní nastavení se nezmění.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection je vypnutá</b> Způsobila ti App Tracking Protection problém s aplikacemi <annotation type="report_issues_link">Nahlásit problémy</annotation></string>
     <string name="atp_ExcludedAppsReport">Nahlásit problém s jinou aplikací</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Načte webové stránky</string>
-    <string name="atp_ExcludedReasonKnownIssues">Známé problémy</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Ručně vypnuto</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Ručně zapnuto</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Zrušit</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Povolit</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Obnovit</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Ručně zapnout ochranu aplikace %1$s?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">O téhle aplikaci se ví, že při neúspěšných pokusech o sledování v ní dochází k problémům.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Když je zapnutá ochrana, nemusí se obsah stránek v téhle aplikaci zobrazovat správně.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Zapnutí ochrany odešle název aplikace do DuckDuckGo.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Vypnutá ochrana soukromí</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Pokud jsi ochranu vypnul(a) kvůli vyřešení problému, zkontroluj před jeho nahlášením DuckDuckGo, jestli už aplikace nefunguje.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Přestalo to fungovat podle mých očekávání</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Nemám problém s tím, že mě tahle aplikace sleduje</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Jiný důvod</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Nahlásit</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Přeskočit</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Obnovení výchozích chráněných aplikací</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Nahlášení problému s aplikací</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Obnovit výchozí ochranu?</string>
@@ -205,12 +195,12 @@
     <string name="atp_ActivityPastWeek">Posledních 7 dní</string>
     <string name="atp_ActivityTitle">Ochrana před sledováním aplikace</string>
     <string name="atp_MostRecentActivityTitle">Všechny nedávné aktivity</string>
-    <string name="atp_ActivityRecentActivity">Nedávná aktivita</string>
+    <string name="atp_ActivityRecentActivity">Aktivita</string>
     <string name="atp_ActivityCtaShowAll">Zobrazit všechny nedávné aktivity</string>
     <string name="atp_ActivityAppTrackersFAQ">Co jsou trackery v aplikacích?</string>
     <string name="atp_ActivityReportProblem">Nahlásit problém s aplikací</string>
     <string name="atp_ActivityBetaInstructions">Pokyny pro beta verzi</string>
-    <string name="atp_ActivityManageProtection">Máš problémy s aplikací?</string>
+    <string name="atp_ActivityManageProtection">Máš problémy s aplikací?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[Zablokován 1 pokus o sledování od 1 společnosti v aplikaci <b>%1$s</b>]]>
@@ -225,8 +215,6 @@
         <![CDATA[počet zablokovaných pokusů o sledování: %1$d od %2$d společností v aplikaci <b>%3$s</b>]]>
     </string>
 
-    <string name="atp_ActivityEmptyListTitle">Žádná nová aktivita</string>
-    <string name="atp_ActivityEmptyListMessage">Používej i nadále své zařízení. Zde se zobrazují pokusy o sledování, které ochrana před sledováním aplikací blokuje.</string>
     <string name="atp_ActivityPastWeekBlocked">Zablokované</string>
     <string name="atp_ActivityPastWeekAcross">Ve více</string>
 
@@ -402,5 +390,43 @@
     <string name="atp_AlwaysOnLockdownModalHeading">Změň si nastavení sítě VPN</string>
     <string name="atp_AlwaysOnLockDownEnabled"><b>Je potřeba něco udělat!</b> Pokud se chceš vyhnout problémům s aplikací, musíš změnit nastavení systému Android. <annotation type="open_settings_link">Změnit nastavení</annotation></string>
     <string name="atp_AlwaysOnLockDownNotificationTitle">Je potřeba něco udělat! App Tracking Protection vyžaduje pro správné fungování změnu nastavení systému Android.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Moje aplikace</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Povolení může způsobit problémy s aplikací</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">I tak povolit</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">Když povolíš funkci App Tracking Protection, může dojít k problémům s aplikací %1$s</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Nahlásit problém?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Máš v aplikaci %1$s zakázanou funkci App Tracking Protection, protože způsobovala problémy? Dej nám o tom prosím vědět.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Nahlásit problém</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Teď ne</string>
+    <string name="atp_ActivityRecentActivityHeader">Aktivita</string>
+    <string name="atp_ActivityManageProtectionLabel">Máš problémy s aplikací?</string>
+    <string name="atp_ActivityEnabledBannerLabel">V beta verzi je ochrana některých aplikací automaticky zakázaná. <annotation type="app_settings_link">Zobrazit aplikace</annotation></string>
+    <string name="atp_ActivityDescription">Tady se zobrazí zablokované pokusy o sledování</string>
+    <plurals name="atp_ActivityProtectedApps">
+        <item quantity="one">%1$s tvoje aplikace je chráněná před skrytými trackery, které se snaží získat přístup k tvým osobním údajům</item>
+        <item quantity="few">%1$s tvoje aplikace jsou chráněné před skrytými trackery, které se snaží získat přístup k tvým osobním údajům</item>
+        <item quantity="many">%1$s tvých aplikací je chráněných před skrytými trackery, které se snaží získat přístup k tvým osobním údajům</item>
+        <item quantity="other">%1$s tvých aplikací je chráněných před skrytými trackery, které se snaží získat přístup k tvým osobním údajům</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps">
+        <item quantity="one">%1$s tvá aplikace má ochranu automaticky vypnutou</item>
+        <item quantity="few">%1$s tvé aplikace mají ochranu automaticky vypnutou</item>
+        <item quantity="many">%1$s tvé aplikace má ochranu automaticky vypnutou</item>
+        <item quantity="other">%1$s tvých aplikací má ochranu automaticky vypnutou</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Skvělá zpráva! Funkce App Tracking Protection je zapnutá.<br/><br/>👌V reálném čase ti budu ukazovat seznam aplikací z tvého zařízení, které se tě pokoušely sledovat.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Mám to!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel">Ochrana je zapnutá (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Ochrana je vypnutá (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Vše</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Ochrana je zapnutá</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Ochrana je vypnutá</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Vše</string>
+    <string name="atp_ActivityViewAppsLabel">Zobrazit aplikace</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Tato funkce je ve fázi beta. Máš s aplikací problémy? <annotation type="app_settings_link">Pomoz nám se zlepšit</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Když povolíš funkci App Tracking Protection, může u&lt;br /&gt;některých aplikací dojít k problémům.\n<annotation type="learn_why_link">Zjisti proč</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">U aplikací se známými problémy je ochrana vypnutá. Můžeš ji u&lt;br /&gt;nich zapnout, ale aplikace pak nemusí fungovat podle očekávání. <annotation type="learn_why_link">Zjisti proč</annotation></string>
 
 </resources>

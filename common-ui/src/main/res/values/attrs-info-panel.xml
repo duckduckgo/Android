@@ -18,12 +18,12 @@
 <resources>
 
     <attr name="tooltipPanelBackgroundColor" format="color" />
-    <color name="tooltipPanelBackgroundColorLight">#E7EDFF</color>
-    <color name="tooltipPanelBackgroundColorDark">#1D2334</color>
+    <color name="tooltipPanelBackgroundColorLight">@color/blue0_50</color>
+    <color name="tooltipPanelBackgroundColorDark">@color/blue50_14</color>
 
     <attr name="alertPanelBackgroundColor" format="color" />
     <color name="alertPanelBackgroundColorLight">@color/yellow10</color>
-    <color name="alertPanelBackgroundColorDark">#30251E</color>
+    <color name="alertPanelBackgroundColorDark">@color/yellow50_14</color>
 
     <!--Panel view-->
     <declare-styleable name="InfoPanel">

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/threeOrFourIconsContainer"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
+        android:background="@drawable/ic_oval_background"
+        android:padding="@dimen/multi_apps_icon_margin"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/threeOrFourIconsContainerFirstIcon"
+            android:layout_width="@dimen/multi_apps_icon_size"
+            android:layout_height="@dimen/multi_apps_icon_size"
+            android:layout_margin="@dimen/keyline_0"
+            android:importantForAccessibility="no"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/tracking_network_logo_adjust" />
+
+        <ImageView
+            android:id="@+id/threeOrFourIconsContainerSecondIcon"
+            android:layout_width="@dimen/multi_apps_icon_size"
+            android:layout_height="@dimen/multi_apps_icon_size"
+            android:layout_margin="@dimen/keyline_0"
+            android:importantForAccessibility="no"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/threeOrFourIconsContainerFirstIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/tracking_network_logo_adjust" />
+
+        <ImageView
+            android:id="@+id/threeOrFourIconsContainerThirdIcon"
+            android:layout_width="@dimen/multi_apps_icon_size"
+            android:layout_height="@dimen/multi_apps_icon_size"
+            android:layout_margin="@dimen/keyline_0"
+            android:importantForAccessibility="no"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/threeOrFourIconsContainerFirstIcon"
+            tools:src="@drawable/tracking_network_logo_adjust" />
+
+        <ImageView
+            android:id="@+id/threeOrFourIconsContainerFourthIcon"
+            android:layout_width="@dimen/multi_apps_icon_size"
+            android:layout_height="@dimen/multi_apps_icon_size"
+            android:layout_margin="@dimen/keyline_0"
+            android:importantForAccessibility="no"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/threeOrFourIconsContainerThirdIcon"
+            app:layout_constraintTop_toBottomOf="@id/threeOrFourIconsContainerSecondIcon"
+            tools:src="@drawable/tracking_network_logo_adjust" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/twoIconsContainer"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
+        android:background="@drawable/ic_oval_background"
+        android:padding="@dimen/multi_apps_icon_margin"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/twoIconsContainerFirstIcon"
+            android:layout_width="@dimen/multi_apps_icon_size"
+            android:layout_height="@dimen/multi_apps_icon_size"
+            android:layout_margin="@dimen/keyline_0"
+            android:importantForAccessibility="no"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/tracking_network_logo_adjust" />
+
+        <ImageView
+            android:id="@+id/twoIconsContainerSecondIcon"
+            android:layout_width="@dimen/multi_apps_icon_size"
+            android:layout_height="@dimen/multi_apps_icon_size"
+            android:layout_margin="@dimen/keyline_0"
+            android:importantForAccessibility="no"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/twoIconsContainerFirstIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/tracking_network_logo_adjust" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/oneIconContainer"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
+        tools:src="@drawable/tracking_network_logo_adjust" />
+
+</FrameLayout>

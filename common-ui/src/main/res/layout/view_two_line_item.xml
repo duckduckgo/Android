@@ -106,6 +106,7 @@
                 android:layout_height="@dimen/listItemImageContainerSize"
                 android:background="?selectableItemBackground"
                 android:scaleType="center"
+                android:visibility="gone"
                 android:src="@drawable/ic_overflow"
                 tools:ignore="ContentDescription"/>
 
