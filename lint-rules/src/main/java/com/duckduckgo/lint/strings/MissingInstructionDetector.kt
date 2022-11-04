@@ -57,7 +57,8 @@ class MissingInstructionDetector : ResourceXmlDetector(), XmlScanner {
 
     }
 
-    private fun visitNode(context: XmlContext, node: Node) {
+    private fun visitNode(context: XmlContext, node: Node, parentHasInstruction: Boolean = false) {
+        var parentInstruction = parentHasInstruction
         val nodeType = node.nodeType
         if (nodeType == Node.TEXT_NODE) {
             val text = node.nodeValue
@@ -65,12 +66,20 @@ class MissingInstructionDetector : ResourceXmlDetector(), XmlScanner {
             val translatable = node.parentNode.attributes.getNamedItem("translatable")
             val translatableValue = (translatable as Attr?)?.value
 
-            if (translatableValue != "false" && PLACEHOLDERS.firstOrNull { text.contains(it) } != null && instruction == null) {
+            if (translatableValue != "false" && PLACEHOLDERS.firstOrNull { text.contains(it) } != null && (instruction == null && !parentHasInstruction)) {
                 context.report(
                     MISSING_INSTRUCTION, node, location = context.getNameLocation(node),
                     "Missing instructions attribute"
                 )
             }
+        }
+
+        if (nodeType == Node.ELEMENT_NODE && node.nodeName == "plurals") {
+            val instruction = node.attributes.getNamedItem("instruction")
+            val translatable = node.attributes.getNamedItem("translatable")
+            val translatableValue = (translatable as Attr?)?.value
+
+            parentInstruction = (translatableValue != "false") && instruction != null
         }
 
         // Visit children
@@ -79,7 +88,7 @@ class MissingInstructionDetector : ResourceXmlDetector(), XmlScanner {
         val n = childNodes.length
         while (i < n) {
             val child = childNodes.item(i)
-            visitNode(context, child)
+            visitNode(context, child, parentInstruction)
             i++
         }
     }
