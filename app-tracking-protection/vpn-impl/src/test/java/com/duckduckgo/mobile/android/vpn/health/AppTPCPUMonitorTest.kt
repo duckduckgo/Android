@@ -197,12 +197,17 @@ class AppTPCPUMonitorTest {
     }
 
     private fun assertWorkerRunning() {
-        val scheduledWorkers = getScheduledWorkers()
+        var scheduledWorkers = getScheduledWorkers()
         assertEquals(1, scheduledWorkers.size)
         assertEquals(WorkInfo.State.ENQUEUED, scheduledWorkers[0].state)
 
         // Skip initial delay so we don't have to wait
         testDriver.setInitialDelayMet(scheduledWorkers[0].id)
+
+        scheduledWorkers = getScheduledWorkers()
+        assertEquals(1, scheduledWorkers.size)
+        val currState = scheduledWorkers[0].state
+        assertTrue(WorkInfo.State.RUNNING == currState || WorkInfo.State.SUCCEEDED == currState)
     }
 
     private fun assertWorkerNotRunning() {
