@@ -379,27 +379,27 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Omat sovellukset</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Sovellusongelmia voi ilmetä, jos tämä on käytössä</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Ota käyttöön joka tapauksessa</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">%1$s saattaa kohdata ongelmia, jos App Tracking Protection on käytössä</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">%1$s saattaa kohdata ongelmia, jos App Tracking Protection on käytössä</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Ilmoita ongelmasta?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Kerro meille, jos olet poistanut App Tracking Protectionin käytöstä kohteelle %1$s, koska olet kohdannut ongelmia sovelluksen kanssa.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Kerro meille, jos olet poistanut App Tracking Protectionin käytöstä kohteelle %1$s, koska olet kohdannut ongelmia sovelluksen kanssa.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Ilmoita ongelmasta</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ei nyt</string>
     <string name="atp_ActivityRecentActivityHeader">Toiminta</string>
     <string name="atp_ActivityManageProtectionLabel">Ongelmia jonkin sovelluksen kanssa?</string>
     <string name="atp_ActivityEnabledBannerLabel">Beeta-version aikana joidenkin sovellusten suojaus poistetaan käytöstä automaattisesti. <annotation type="app_settings_link">Näytä sovellukset</annotation></string>
     <string name="atp_ActivityDescription">Estetyt seurantayritykset näkyvät täällä</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s sovelluksistasi on suojattu piilotetuilta seurantalaitteilta, jotka yrittävät päästä käsiksi henkilökohtaisiin tietoihin</item>
         <item quantity="other">%1$s sovelluksistasi on suojattu piilotetuilta seurantalaitteilta, jotka yrittävät päästä käsiksi henkilökohtaisiin tietoihin</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">%1$s sovelluksesi suojaus on poistettu käytöstä automaattisesti</item>
         <item quantity="other">%1$s sovelluksesi suojaus on poistettu käytöstä automaattisesti</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Hyviä uutisia! App Tracking Protection on nyt käytössä.<br/><br/>👌Näytän sinulle reaaliaikaisen luettelon laitteellasi olevista sovelluksista, joiden uskon yrittävän seurata sinua.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Selvä!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Suojaus käytössä (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Suojaus poistettu käytöstä (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Suojaus käytössä (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Suojaus poistettu käytöstä (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Kaikki</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Suojaus käytössä</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Suojaus poistettu käytöstä</string>

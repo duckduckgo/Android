@@ -395,22 +395,22 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Moje aplikacje</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Po włączeniu mogą wystąpić problemy z aplikacją</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Włącz mimo to</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">Mogą wystąpić problemy z aplikacją %1$s, jeśli włączona jest ochrona przed śledzeniem przez aplikacje</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">Mogą wystąpić problemy z aplikacją %1$s, jeśli włączona jest ochrona przed śledzeniem przez aplikacje</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Chcesz zgłosić problem?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Daj nam znać, jeśli ochrona przed śledzeniem przez aplikacje została wyłączona dla aplikacji %1$s z powodu problemów z tą aplikacją.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Daj nam znać, jeśli ochrona przed śledzeniem przez aplikacje została wyłączona dla aplikacji %1$s z powodu problemów z tą aplikacją.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Zgłoś błąd</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Nie teraz</string>
     <string name="atp_ActivityRecentActivityHeader">Aktywność</string>
     <string name="atp_ActivityManageProtectionLabel">Masz problemy z aplikacją?</string>
     <string name="atp_ActivityEnabledBannerLabel">W wersji beta w przypadku niektórych aplikacji ochrona jest automatycznie wyłączona. <annotation type="app_settings_link">Wyświetl aplikacje</annotation></string>
     <string name="atp_ActivityDescription">Tutaj pojawią się zablokowane próby śledzenia</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s z Twoich aplikacji jest chroniona przed ukrytymi trackerami, które według nas próbują uzyskać dostęp do Twoich danych osobowych.</item>
         <item quantity="few">%1$s z Twoich aplikacji są chronione przed ukrytymi trackerami, które według nas próbują uzyskać dostęp do Twoich danych osobowych.</item>
         <item quantity="many">%1$s z Twoich aplikacji jest chronionych przed ukrytymi trackerami, które według nas próbują uzyskać dostęp do Twoich danych osobowych.</item>
         <item quantity="other">%1$s z Twoich aplikacji jest chronione przed ukrytymi trackerami, które według nas próbują uzyskać dostęp do Twoich danych osobowych.</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">%1$s z Twoich aplikacji ma automatycznie wyłączoną ochronę.</item>
         <item quantity="few">%1$s z Twoich aplikacji mają automatycznie wyłączoną ochronę.</item>
         <item quantity="many">%1$s z Twoich aplikacji ma automatycznie wyłączoną ochronę.</item>
@@ -418,8 +418,8 @@
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Dobra wiadomość! Ochrona przed śledzeniem przez aplikacje jest teraz włączona.<br/><br/>👌Na bieżąco będziemy pokazywać Ci listę aplikacji zainstalowanych na Twoim urządzeniu, które próbują Cię śledzić.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Rozumiem!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Ochrona włączona (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Ochrona wyłączona (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Ochrona włączona (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Ochrona wyłączona (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Wszystko</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Ochrona włączona</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Ochrona wyłączona</string>

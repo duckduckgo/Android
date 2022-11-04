@@ -379,27 +379,27 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Οι εφαρμογές μου</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Εάν έχει ενεργοποιηθεί, ενδέχεται να προκύψουν προβλήματα με την εφαρμογή</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Ενεργοποίηση οπωσδήποτε</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">Η εφαρμογή %1$s ενδέχεται να αντιμετωπίσει προβλήματα εάν είναι ενεργοποιημένη η Προστασία παρακολούθησης από εφαρμογές</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">Η εφαρμογή %1$s ενδέχεται να αντιμετωπίσει προβλήματα εάν είναι ενεργοποιημένη η Προστασία παρακολούθησης από εφαρμογές</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Θέλετε να αναφέρετε ένα πρόβλημα;</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Ενημερώστε μας αν έχετε απενεργοποιήσει την Προστασία παρακολούθησης από εφαρμογές για την εφαρμογή %1$s επειδή αντιμετωπίσατε προβλήματα με την εφαρμογή.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Ενημερώστε μας αν έχετε απενεργοποιήσει την Προστασία παρακολούθησης από εφαρμογές για την εφαρμογή %1$s επειδή αντιμετωπίσατε προβλήματα με την εφαρμογή.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Αναφορά προβλήματος</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Όχι τώρα</string>
     <string name="atp_ActivityRecentActivityHeader">Δραστηριότητα</string>
     <string name="atp_ActivityManageProtectionLabel">Αντιμετωπίζετε προβλήματα με μια εφαρμογή;</string>
     <string name="atp_ActivityEnabledBannerLabel">Κατά τη διάρκεια της έκδοσης beta, η προστασία για ορισμένες εφαρμογές απενεργοποιείται αυτόματα. <annotation type="app_settings_link">Προβολή εφαρμογών</annotation></string>
     <string name="atp_ActivityDescription">Οι αποκλεισμένες προσπάθειες παρακολούθησης θα εμφανίζονται εδώ</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s από τις εφαρμογές σας προστατεύεται από κρυφές εφαρμογές παρακολούθησης που εντοπίζουμε να προσπαθούν να αποκτήσουν πρόσβαση στις προσωπικές πληροφορίες σας</item>
         <item quantity="other">%1$s από τις εφαρμογές σας προστατεύονται από κρυφές εφαρμογές παρακολούθησης που εντοπίζουμε να προσπαθούν να αποκτήσουν πρόσβαση στις προσωπικές πληροφορίες σας</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">%1$s από τις εφαρμογές σας έχει την προστασία αυτόματα απενεργοποιημένη</item>
         <item quantity="other">%1$s από τις εφαρμογές σας έχουν την προστασία αυτόματα απενεργοποιημένη</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Υπέροχα νέα! Η Προστασία παρακολούθησης από εφαρμογές είναι πλέον ενεργοποιημένη.<br/><br/>👌Θα σας δείξω μια λίστα σε πραγματικό χρόνο που περιλαμβάνει εφαρμογές στη συσκευή σας που εντοπίζω να προσπαθούν να σας παρακολουθήσουν.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Το κατάλαβα!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Η προστασία ενεργοποιήθηκε (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Η προστασία απενεργοποιήθηκε (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Η προστασία ενεργοποιήθηκε (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Η προστασία απενεργοποιήθηκε (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Όλα</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Η προστασία ενεργοποιήθηκε</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Η προστασία απενεργοποιήθηκε</string>

@@ -395,22 +395,22 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Mano programėlės</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Jei įjungta, gali kilti programėlių problemų</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Vis tiek įjungti</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">Gali kilti %1$s problemų, jei įjungta programėlės sekimo apsauga</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">Gali kilti %1$s problemų, jei įjungta programėlės sekimo apsauga</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Pranešti apie problemą?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Praneškite mums, jei %1$s išjungėte programėlių sekimo apsaugą, nes kilo programėlės problemų.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Praneškite mums, jei %1$s išjungėte programėlių sekimo apsaugą, nes kilo programėlės problemų.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Pranešti apie problemą</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ne dabar</string>
     <string name="atp_ActivityRecentActivityHeader">Veikla</string>
     <string name="atp_ActivityManageProtectionLabel">Turite problemų su programėle?</string>
     <string name="atp_ActivityEnabledBannerLabel">Beta versijos metu kai kurių programėlių apsauga automatiškai išjungiama. <annotation type="app_settings_link">Rodyti programėles</annotation></string>
     <string name="atp_ActivityDescription">Čia bus rodomi užblokuoti sekimo bandymai</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s jūsų programėlė apsaugota nuo paslėptų sekimo priemonių, kurias randame bandydami pasiekti jūsų asmeninę informaciją</item>
         <item quantity="few">%1$s jūsų programėlės apsaugotos nuo paslėptų sekimo priemonių, kurias randame bandydami pasiekti jūsų asmeninę informaciją</item>
         <item quantity="many">%1$s jūsų programėlės apsaugota nuo paslėptų sekimo priemonių, kurias randame bandydami pasiekti jūsų asmeninę informaciją</item>
         <item quantity="other">%1$s jūsų programėlių apsaugota nuo paslėptų sekimo priemonių, kurias randame bandydami pasiekti jūsų asmeninę informaciją</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">%1$s jūsų programėlės apsauga automatiškai išjungta</item>
         <item quantity="few">%1$s jūsų programėlių apsauga automatiškai išjungta</item>
         <item quantity="many">%1$s jūsų programėlių apsauga automatiškai išjungta</item>
@@ -418,8 +418,8 @@
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Geros naujienos! Programėlių sekimo apsauga dabar įjungta.<br/><br/>👌Realiuoju laiku parodysiu jūsų įrenginyje esančių programėlių, kurias užfiksuoju bandant jus sekti, sąrašą.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Supratau!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Apsauga įjungta (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Apsauga išjungta (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Apsauga įjungta (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Apsauga išjungta (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Visi</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Apsauga įjungta</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Apsauga išjungta</string>

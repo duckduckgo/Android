@@ -379,27 +379,27 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Saját alkalmazások</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Ha engedélyezve van, alkalmazásproblémák léphetnek fel</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Engedélyezés mindenképpen</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">A(z) %1$s alkalmazásban problémák merülhetnek fel, ha az alkalmazáskövetés elleni védelem engedélyezve van</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">A(z) %1$s alkalmazásban problémák merülhetnek fel, ha az alkalmazáskövetés elleni védelem engedélyezve van</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Jelentesz egy problémát?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Értesíts minket, ha az alkalmazásban tapasztalt problémák miatt letiltottad a(z) %1$s alkalmazáskövetés elleni védelmét.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Értesíts minket, ha az alkalmazásban tapasztalt problémák miatt letiltottad a(z) %1$s alkalmazáskövetés elleni védelmét.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Probléma jelentése</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Most nem</string>
     <string name="atp_ActivityRecentActivityHeader">Tevékenység</string>
     <string name="atp_ActivityManageProtectionLabel">Problémáid vannak egy alkalmazással?</string>
     <string name="atp_ActivityEnabledBannerLabel">A béta verzióban egyes alkalmazások védelme automatikusan le van tiltva. <annotation type="app_settings_link">Alkalmazások megtekintése</annotation></string>
     <string name="atp_ActivityDescription">Itt jelennek meg a blokkolt nyomkövetési kísérletek</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s alkalmazásod védve van a rejtett nyomkövetőkkel szemben, amelyekről megállapítottuk, hogy megpróbáltak hozzáférni a személyes adataidhoz</item>
         <item quantity="other">%1$s alkalmazásod védve van azokkal a nyomkövetőkkel szemben, amelyekről megállapítottuk, hogy megpróbáltak hozzáférni a személyes adataidhoz</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">%1$s alkalmazás védelme automatikusan le lett tiltva</item>
         <item quantity="other">%1$s alkalmazás védelme automatikusan le lett tiltva</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Jó hír! Az alkalmazáskövetés elleni mostantól engedélyezve van.<br/><br/>👌Megmutatom az eszközön található alkalmazások valós idejű listáját, amelyekről megállapítottam, hogy megpróbálnak nyomon követni.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Rendben!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Védelem engedélyezve (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Védelem letiltva (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Védelem engedélyezve (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Védelem letiltva (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Összes</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Védelem engedélyezve</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Védelem letiltva</string>
