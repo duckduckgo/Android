@@ -155,6 +155,21 @@ abstract class VpnDatabase : RoomDatabase() {
                         "timestamp TEXT NOT NULL, bucket TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY(bucket, domain, packageId))"
                 )
 
+                // First delete the elements in the DB we're not going to migrate to minimize chances of running out of space
+                database.execSQL(
+                    """
+                    DELETE FROM vpn_tracker
+                    WHERE trackerId
+                        NOT IN (
+                            SELECT trackerId
+                            FROM vpn_tracker
+                            ORDER by timestamp DESC
+                            LIMIT 10000
+                        )
+                    """.trimIndent()
+                )
+
+                // Now copy the data over
                 database.execSQL(
                     """
                     INSERT INTO vpn_tracker_new (trackerCompanyId, domain, company, companyDisplayName, packageId, appDisplayName, timestamp, bucket, count)
@@ -165,6 +180,7 @@ abstract class VpnDatabase : RoomDatabase() {
                     """.trimIndent()
                 )
 
+                // clean up the old table
                 database.execSQL("DROP TABLE IF EXISTS `vpn_tracker`")
                 database.execSQL("ALTER TABLE `vpn_tracker_new` RENAME TO `vpn_tracker`")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_vpn_tracker_bucket` ON `vpn_tracker` (`bucket`)")
