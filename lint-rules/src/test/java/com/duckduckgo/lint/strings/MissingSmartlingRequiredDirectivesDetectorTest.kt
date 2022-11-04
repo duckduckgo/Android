@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.lint
+package com.duckduckgo.lint.strings
 
 import com.android.tools.lint.checks.infrastructure.TestFiles.xml
 import com.android.tools.lint.checks.infrastructure.TestLintTask
 import com.android.tools.lint.checks.infrastructure.TestMode
-import com.duckduckgo.lint.MissingSmartlingRequiredDirectivesDetector.Companion.MISSING_SMARTLING_REQUIRED_DIRECTIVES
+import com.duckduckgo.lint.strings.MissingSmartlingRequiredDirectivesDetector.Companion.MISSING_SMARTLING_REQUIRED_DIRECTIVES
 import org.junit.Test
 
 @Suppress("UnstableApiUsage")

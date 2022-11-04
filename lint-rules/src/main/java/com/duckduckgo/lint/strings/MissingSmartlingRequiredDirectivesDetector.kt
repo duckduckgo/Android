@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.lint
+package com.duckduckgo.lint.strings
 
 import com.android.resources.ResourceFolderType
 import com.android.tools.lint.detector.api.Category
