@@ -18,12 +18,12 @@
 
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:scrollbarAlwaysDrawVerticalTrack="true"
-    android:fadeScrollbars="false"
-    android:scrollbars="vertical">
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:fadeScrollbars="false"
+            android:scrollbars="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,12 +39,12 @@
                 android:layout_gravity="center"
                 android:id="@+id/onboarding_page_animation"
                 android:layout_width="wrap_content"
-                android:layout_height="260dp"
+                android:layout_height="wrap_content"
                 android:paddingTop="40dp"
                 android:importantForAccessibility="no"
                 android:scaleType="centerCrop"
                 app:lottie_imageAssetsFolder="images"
-                app:lottie_loop="true" />
+                app:lottie_loop="true"/>
 
             <ImageView
                 android:id="@+id/onboarding_page_image"
@@ -53,38 +53,44 @@
                 android:layout_height="260dp"
                 android:contentDescription="@string/atp_OnboardingLogoDescription"
                 android:importantForAccessibility="no"
-                app:srcCompat="@drawable/device_shield_onboarding_page_three_header_transparent" />
+                app:srcCompat="@drawable/device_shield_onboarding_page_three_header_transparent"/>
 
         </FrameLayout>
 
-        <TextView
-            android:id="@+id/onboarding_page_title"
-            android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline2"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:paddingStart="50dp"
-            android:paddingEnd="50dp"
-            android:text="@string/atp_OnboardingLastPageOneTitle"
-            android:textAlignment="center"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/onboarding_page_header" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:layout_marginTop="200dp"
+            android:paddingStart="150dp"
+            android:paddingEnd="150dp">
 
-        <TextView
-            android:id="@+id/onboarding_page_text"
-            android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
-            android:textColor="?secondaryTextColor"
-            android:textAlignment="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:paddingStart="40dp"
-            android:paddingEnd="40dp"
-            android:text="@string/atp_OnboardingLatsPageOneSubtitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/onboarding_page_title" />
+            <TextView
+                android:id="@+id/onboarding_page_title"
+                android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/atp_OnboardingLastPageOneTitle"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/onboarding_page_header"/>
+
+            <TextView
+                android:id="@+id/onboarding_page_text"
+                android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
+                android:textColor="?secondaryTextColor"
+                android:textAlignment="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="@string/atp_OnboardingLatsPageOneSubtitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/onboarding_page_title"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>
