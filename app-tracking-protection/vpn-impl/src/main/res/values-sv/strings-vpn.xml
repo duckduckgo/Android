@@ -379,27 +379,27 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Mina appar</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Aktivering kan leda till problem med vissa appar</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Aktivera ändå</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">Aktivering av App Tracking Protection kan leda till problem med appen %1$s</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">Aktivering av App Tracking Protection kan leda till problem med appen %1$s</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Rapportera ett problem?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Meddela oss om du har inaktiverat App Tracking Protection för %1$s på grund av att du fick problem med appen.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Meddela oss om du har inaktiverat App Tracking Protection för %1$s på grund av att du fick problem med appen.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Rapportera problem</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Inte nu</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivitet</string>
     <string name="atp_ActivityManageProtectionLabel">Har du problem med en app?</string>
     <string name="atp_ActivityEnabledBannerLabel">Under betaperioden inaktiveras skyddet för vissa appar automatiskt. <annotation type="app_settings_link">Visa appar</annotation></string>
     <string name="atp_ActivityDescription">Blockerade spårningsförsök visas här</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s av dina appar är skyddad mot dolda spårare som vi kommer på med att försöka komma åt din personliga information</item>
         <item quantity="other">%1$s av dina appar är skyddade mot dolda spårare som vi kommer på med att försöka komma åt din personliga information</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">%1$s av dina appar har skyddet inaktiverat automatiskt</item>
         <item quantity="other">%1$s av dina appar har skyddet inaktiverat automatiskt</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Goda nyheter! App Tracking Protection är nu aktiverat.<br/><br/>👌Jag visar dig en lista i realtid över appar på din enhet som jag kommer på med att försöka spåra dig.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Jag förstår!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Skydd aktiverat (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Skydd inaktiverat (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Skydd aktiverat (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Skydd inaktiverat (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Alla</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Skydd aktiverat</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Skydd inaktiverat</string>

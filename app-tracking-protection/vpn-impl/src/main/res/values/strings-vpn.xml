@@ -382,27 +382,27 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">My Apps</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">App issues may occur if enabled</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Enable Anyway</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">%1$s may experience issues if App Tracking Protection is enabled</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">%1$s may experience issues if App Tracking Protection is enabled</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Report an issue?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Please let us know if you disabled App Tracking Protection for %1$s because you experienced app issues.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Please let us know if you disabled App Tracking Protection for %1$s because you experienced app issues.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Report Issue</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Not Now</string>
     <string name="atp_ActivityRecentActivityHeader">Activity</string>
     <string name="atp_ActivityManageProtectionLabel">Having Problems With An App?</string>
     <string name="atp_ActivityEnabledBannerLabel">During beta, protection for some apps is automatically disabled. <annotation type="app_settings_link">View Apps</annotation></string>
     <string name="atp_ActivityDescription">Blocked tracking attempts will appear here</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s of your apps is protected from hidden trackers we find trying to access your personal info</item>
         <item quantity="other">%1$s of your apps are protected from hidden trackers we find trying to access your personal info</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">%1$s of your apps has protection automatically disabled</item>
         <item quantity="other">%1$s of your apps have protection automatically disabled</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Good news! App Tracking Protection is now enabled.<br/><br/>👌I’ll show you a real-time list of apps on your device that I catch trying to track you.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Got It!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Protection Enabled (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Protection Disabled (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Protection Enabled (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Protection Disabled (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">All</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Protection Enabled</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Protection Disabled</string>

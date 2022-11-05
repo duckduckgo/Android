@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Előző keresése</string>
     <string name="closeFindInPageButtonDescription">Keresés az oldalon nézet bezárása</string>
     <string name="findInPageHint">Keresés az oldalon</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Lekérdezés szerkesztése keresés előtt</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">WEBOLDAL VÉDELME ENGEDÉLYEZVE</string>
     <string name="privacyProtectionDisabled">WEBOLDAL VÉDELME LETILTVA</string>
     <string name="privacyDashboardActivityTitle">Adatvédelmi műszerfal</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TOVÁBBFEJLESZTVE ERRŐL: &lt;img src=\"%1$d\" /&gt; ERRE: &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">TOVÁBBFEJLESZTVE ERRŐL: &lt;img src=\"%1$d\" /&gt; ERRE: &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Adatvédelmi fokozat</string>
     <string name="privacyProtectionTemporarilyDisabled">Ideiglenesen letiltottuk az adatvédelmet, mert úgy tűnik, hogy kárt okoz ezen a webhelyen.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Válassz ki egy importálni kívánt könyvjelző fájlt.</string>
     <string name="importBookmarksError">Nem sikerült importálni egyetlen könyvjelzőt sem, valami hiba történt.</string>
     <string name="importBookmarksEmpty">A fájlnak nincs importálható könyvjelzője.</string>
-    <string name="importBookmarksSuccess">%1$d könyvjelző sikeresen importálva.</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d könyvjelző sikeresen importálva.</string>
     <string name="savedSiteDialogTitleHint">Cím</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Szerkesztés</string>

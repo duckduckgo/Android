@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Etsi edellinen</string>
     <string name="closeFindInPageButtonDescription">Sulje etsi sivulta -näkymä</string>
     <string name="findInPageHint">Etsi sivulta</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Muokkaa kyselyä ennen hakua</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">SIVUSTOSUOJAUS KÄYTÖSSÄ</string>
     <string name="privacyProtectionDisabled">SIVUSTOSUOJAUS EI KÄYTÖSSÄ</string>
     <string name="privacyDashboardActivityTitle">Tietosuojan ohjauspaneeli</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">PARANNETTU &lt;img src=\"%1$d\" /&gt;–&lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">PARANNETTU &lt;img src=\"%1$d\" /&gt;–&lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Tietosuoja-arvosana</string>
     <string name="privacyProtectionTemporarilyDisabled">Yksityisyyden suoja on väliaikaisesti poistettu käytöstä, koska se näyttäisi rikkovan tämän sivun.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Valitse kirjanmerkkitiedosto tuotavaksi</string>
     <string name="importBookmarksError">Kirjanmerkkejä ei voitu tuoda, jokin meni vikaan</string>
     <string name="importBookmarksEmpty">Tiedostossa ei ole tuotavia kirjanmerkkejä</string>
-    <string name="importBookmarksSuccess">%1$d kirjanmerkkiä tuotu</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d kirjanmerkkiä tuotu</string>
     <string name="savedSiteDialogTitleHint">Otsikko</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Muokkaa</string>

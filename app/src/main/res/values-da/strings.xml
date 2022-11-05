@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Find tidligere</string>
     <string name="closeFindInPageButtonDescription">Luk visningen find på side</string>
     <string name="findInPageHint">Find på side</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redigér forespørgsel før søgning</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">BESKYTTELSE AF WEBSTEDET ER AKTIVERET</string>
     <string name="privacyProtectionDisabled">BESKYTTELSE AF WEBSTEDET ER DEAKTIVERET</string>
     <string name="privacyDashboardActivityTitle">Privatlivspanel</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FORSTÆRKET FRA &lt;img src=\"%1$d\" /&gt; TIL &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">FORSTÆRKET FRA &lt;img src=\"%1$d\" /&gt; TIL &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Grad af privatliv</string>
     <string name="privacyProtectionTemporarilyDisabled">Vi har midlertidigt deaktiveret beskyttelse af privatlivets fred, da det ser ud til at ødelægge dette websted.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Vælg en bogmærkefil, der skal importeres</string>
     <string name="importBookmarksError">Kunne ikke importere nogen bogmærker, noget gik galt</string>
     <string name="importBookmarksEmpty">Filen har ingen bogmærker at importere</string>
-    <string name="importBookmarksSuccess">Importerede %1$d bogmærker</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Importerede %1$d bogmærker</string>
     <string name="savedSiteDialogTitleHint">Titel</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Rediger</string>

@@ -387,29 +387,29 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Manas lietotnes</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Iespējošana var traucēt citām lietotnēm</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Tomēr iespējot</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">%1$s var nedarboties pareizi, ja ir iespējota lietotņu pretizsekošanas aizsardzība</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">%1$s var nedarboties pareizi, ja ir iespējota lietotņu pretizsekošanas aizsardzība</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Ziņot par problēmu?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Lūdzu, informē mūs, ja atspējoji pretizsekošanas aizsardzību lietotnei %1$s tās darbības traucējumu dēļ.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Lūdzu, informē mūs, ja atspējoji pretizsekošanas aizsardzību lietotnei %1$s tās darbības traucējumu dēļ.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Ziņot par problēmu</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ne tagad</string>
     <string name="atp_ActivityRecentActivityHeader">Darbības</string>
     <string name="atp_ActivityManageProtectionLabel">Problēmas ar lietotni?</string>
     <string name="atp_ActivityEnabledBannerLabel">Beta versijas stadijā dažu lietotņu aizsardzība ir automātiski atspējota. <annotation type="app_settings_link">Skatīt lietotnes</annotation></string>
     <string name="atp_ActivityDescription">Šeit tiks parādīti bloķētie izsekošanas mēģinājumi</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="zero">%1$s no tavām lietotnēm ir aizsargātas pret slēptiem izsekotājiem, kuri mēģina piekļūt tavai personiskajai informācijai</item>
         <item quantity="one">%1$s no tavām lietotnēm ir aizsargāta pret slēptiem izsekotājiem, kuri mēģina piekļūt tavai personiskajai informācijai</item>
         <item quantity="other">%1$s no tavām lietotnēm ir aizsargātas pret slēptiem izsekotājiem, kuri mēģina piekļūt tavai personiskajai informācijai</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="zero">%1$s no tavām lietotnēm aizsardzība ir automātiski atspējota</item>
         <item quantity="one">%1$s no tavām lietotnēm aizsardzība ir automātiski atspējota</item>
         <item quantity="other">%1$s no tavām lietotnēm aizsardzība ir automātiski atspējota</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Labas ziņas! Lietotņu pretizsekošanas aizsardzība tagad ir iespējota.<br/><br/>👌Es rādīšu reāllaika sarakstu ar lietotnēm tavā ierīcē, kuras pieķeršu, mēģinot tevi izsekot.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Sapratu!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Aizsardzība iespējota (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Aizsardzība atspējota (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Aizsardzība iespējota (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Aizsardzība atspējota (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Viss</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Aizsardzība iespējota</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Aizsardzība atspējota</string>

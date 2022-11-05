@@ -379,27 +379,27 @@
     <string name="atp_TrackingProtectionExclusionListActivityTitle">Моите приложения</string>
     <string name="atp_ExcludedReasonIssuesMayOccur">Проблеми с приложението могат да възникнат, ако защитата е активирана</string>
     <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Активиране въпреки това</string>
-    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel">Може да възникнат проблеми с %1$s, ако защитата App Tracking Protection е активирана</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">Може да възникнат проблеми с %1$s, ако защитата App Tracking Protection е активирана</string>
     <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Докладване на проблем?</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel">Моля, уведомете ни, ако сте деактивирали защитата App Tracking Protection за %1$s, защото са възникнали проблеми с приложението.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Моля, уведомете ни, ако сте деактивирали защитата App Tracking Protection за %1$s, защото са възникнали проблеми с приложението.</string>
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Докладване на проблем</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Не сега</string>
     <string name="atp_ActivityRecentActivityHeader">Дейност</string>
     <string name="atp_ActivityManageProtectionLabel">Имате ли проблеми с някое приложение?</string>
     <string name="atp_ActivityEnabledBannerLabel">В бета версията защитата на някои приложения се деактивира автоматично. <annotation type="app_settings_link">Преглед на приложенията</annotation></string>
     <string name="atp_ActivityDescription">Блокираните опити за проследяване се показват тук</string>
-    <plurals name="atp_ActivityProtectedApps">
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s от Вашите приложения е защитено от скрити тракери, които установихме, че се опитват да получат достъп до Вашата лична информация</item>
         <item quantity="other">%1$s от Вашите приложения са защитени от скрити тракери, които установихме, че се опитват да получат достъп до Вашата лична информация</item>
     </plurals>
-    <plurals name="atp_ActivityUnprotectedApps">
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">%1$s от Вашите приложения деактивира защитата автоматично</item>
         <item quantity="other">%1$s от Вашите приложения деактивират защитата автоматично</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Добри новини! Защитата App Tracking Protection вече е активирана.<br/><br/>👌Ще ви покажа в реално време списък с приложенията на Вашето устройство, които установих, че се опитват да Ви проследяват.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Разбрах!</string>
-    <string name="atp_ExcludedAppsFilterProtectedLabel">Активирана защита (%1$s)</string>
-    <string name="atp_ExcludedAppsFilterUnprotectedLabel">Деактивирана защита (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Активирана защита (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Деактивирана защита (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Всички</string>
     <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Активирана защита</string>
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Деактивирана защита</string>
