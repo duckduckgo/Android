@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Ενημέρωση κωδικού πρόσβασης</string>
     <string name="updateLoginDialogButtonNotNow">Όχι τώρα</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Ενημέρωση ονόματος χρήστη;</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Ενημέρωση ονόματος χρήστη</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Κλείσιμο διαλόγου αυτόματης συμπλήρωσης</string>
 
     <string name="credentialManagementEditLoginTitleHint">Τίτλος σύνδεσης</string>

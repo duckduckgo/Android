@@ -16,22 +16,62 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
+
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:clipToPadding="false"
+    android:fillViewport="true">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/activity_recycler_view"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:clipToPadding="false"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listItem="@layout/view_device_shield_activity_entry"/>
+        android:orientation="vertical">
 
-</LinearLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/activity_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listItem="@layout/view_device_shield_activity_entry"/>
+
+        <LinearLayout
+            android:id="@+id/appsStateContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/apps_protection_state_insetPadding"
+                    app:defaultPadding="false"/>
+
+            <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
+                android:id="@+id/protectedAppsState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/apps_protection_state_insetPadding"
+                app:defaultPadding="false"/>
+
+            <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
+                android:id="@+id/unProtectedAppsState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
 

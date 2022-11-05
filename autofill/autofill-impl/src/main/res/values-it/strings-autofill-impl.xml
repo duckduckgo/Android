@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Aggiorna password</string>
     <string name="updateLoginDialogButtonNotNow">Non adesso</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Aggiornare nome utente?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Aggiorna nome utente</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Chiudi la finestra di dialogo della compilazione automatica</string>
 
     <string name="credentialManagementEditLoginTitleHint">Titolo dati di accesso</string>

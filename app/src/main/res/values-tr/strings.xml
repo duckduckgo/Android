@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Öncekini bul</string>
     <string name="closeFindInPageButtonDescription">Sayfa görünümünde bul özelliğini kapat</string>
     <string name="findInPageHint">Sayfada bul</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Aramadan önce sorguyu düzenle</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">SAHA KORUMASI ETKİN</string>
     <string name="privacyProtectionDisabled">SİTE KORUMASI KAPATILDI</string>
     <string name="privacyDashboardActivityTitle">Gizlilik Tablosu</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">&lt;img src=\"%1$d\" /&gt; \'dan &lt;img src=\"%2$d\" /&gt;\' ye GELİŞTİRİLDİ</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">&lt;img src=\"%1$d\" /&gt; \'dan &lt;img src=\"%2$d\" /&gt;\' ye GELİŞTİRİLDİ</string>
     <string name="privacyGradeContentDescription">Gizlilik Derecesi</string>
     <string name="privacyProtectionTemporarilyDisabled">Bu sitede hatalara neden olduğu için Gizlilik Korumasını geçici olarak devre dışı bıraktık.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">İçe aktarılacak bir yer işareti dosyası seçin</string>
     <string name="importBookmarksError">Yer işaretleri içe aktarılamadı, bir hata oluştu</string>
     <string name="importBookmarksEmpty">Dosyada içe aktarılacak yer işareti yok</string>
-    <string name="importBookmarksSuccess">%1$d yer işareti başarıyla içe aktarıldı</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d yer işareti başarıyla içe aktarıldı</string>
     <string name="savedSiteDialogTitleHint">Title</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Düzenle</string>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.2)" variant="all" version="7.2.2">
+<issues format="6" by="lint 7.2.0" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.0)" variant="all" version="7.2.0">
 
     <issue
         id="BadPeriodicWorkRequestEnqueue"
         message="Use `enqueueUniquePeriodicWork()` instead of `enqueue()`">
         <location
-            file="../../../../.gradle/caches/transforms-3/21609eac404ba6661a0fb25988dd3ea0/transformed/work-runtime-2.7.1/jars/classes.jar!/androidx/work/WorkManager.class"/>
+            file="../../../../../.gradle/caches/transforms-3/63f656f9dce56a89cf2e6b2ddfa0b6c0/transformed/work-runtime-2.7.1/jars/classes.jar!/androidx/work/WorkManager.class"/>
     </issue>
 
     <issue
@@ -97,17 +97,6 @@
     </issue>
 
     <issue
-        id="UseCompatTextViewDrawableXml"
-        message="Use `app:drawableStartCompat` instead of `android:drawableStart`"
-        errorLine1="        android:drawableStart=&quot;@drawable/ic_alert_yellow_16&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_device_shield_excluded_app_entry.xml"
-            line="84"
-            column="9"/>
-    </issue>
-
-    <issue
         id="MissingQuantity"
         message="For locale &quot;fr&quot; (French) the following quantities should also be defined: `many`"
         errorLine1="    &lt;plurals name=&quot;atp_OnNotification&quot;>"
@@ -158,7 +147,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-vpn.xml"
-            line="225"
+            line="213"
             column="5"/>
     </issue>
 
@@ -169,7 +158,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-vpn.xml"
-            line="229"
+            line="217"
             column="5"/>
     </issue>
 
@@ -180,7 +169,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-vpn.xml"
-            line="282"
+            line="270"
             column="5"/>
     </issue>
 
@@ -191,107 +180,30 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-vpn.xml"
-            line="286"
+            line="274"
             column="5"/>
     </issue>
 
     <issue
-        id="MissingTranslation"
-        message="&quot;atp_ActivityEnabledLabel&quot; is not translated in &quot;cs&quot; (Czech) or &quot;ro&quot; (Romanian)"
-        errorLine1="    &lt;string name=&quot;atp_ActivityEnabledLabel&quot;>This feature is in beta. Notice a problem with an app? &lt;annotation type=&quot;app_settings_link&quot;>Please report an issue.&lt;/annotation>&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="MissingQuantity"
+        message="For locale &quot;fr&quot; (French) the following quantities should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;atp_ActivityProtectedApps&quot;>"
+        errorLine2="    ^">
         <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="236"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;atp_ActivityDisabledBySystemLabel&quot; is not translated in &quot;cs&quot; (Czech) or &quot;ro&quot; (Romanian)"
-        errorLine1="    &lt;string name=&quot;atp_ActivityDisabledBySystemLabel&quot;>&lt;b>Android disabled App Tracking Protection&lt;/b>. Want to prevent this happening again? &lt;annotation type=&quot;re_enable_link&quot;>Re-enable&lt;/annotation>&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="238"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;atp_PromoteAlwaysOnDialogNotNow&quot; is not translated in &quot;cs&quot; (Czech) or &quot;ro&quot; (Romanian)"
-        errorLine1="    &lt;string name=&quot;atp_PromoteAlwaysOnDialogNotNow&quot;>Not Now&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="385"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;atp_AlwaysOnModalBody&quot; is not translated in &quot;cs&quot; (Czech) or &quot;ro&quot; (Romanian)"
-        errorLine1="    &lt;string name=&quot;atp_AlwaysOnModalBody&quot;>&lt;![CDATA[Go to your device’s VPN Settings for DuckDuckGo and enable &lt;b>Always-on&lt;/b> VPN to prevent Android disabling protection.\n\nMake sure to leave the other setting OFF.]]&gt;&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="386"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;atp_AlwaysOnLockdownModalBody&quot; is not translated in &quot;cs&quot; (Czech) or &quot;ro&quot; (Romanian)"
-        errorLine1="    &lt;string name=&quot;atp_AlwaysOnLockdownModalBody&quot;>&lt;![CDATA[To avoid app issues, go to your device\&apos;s &lt;b>VPN Settings for DuckDuckGo&lt;/b> and disable &lt;b>Block connections without VPN&lt;/b>]]&gt;&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="387"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;atp_AlwaysOnModalHeading&quot; is not translated in &quot;cs&quot; (Czech) or &quot;ro&quot; (Romanian)"
-        errorLine1="    &lt;string name=&quot;atp_AlwaysOnModalHeading&quot;>Set to Always-on&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="388"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;atp_AlwaysOnLockdownModalHeading&quot; is not translated in &quot;cs&quot; (Czech) or &quot;ro&quot; (Romanian)"
-        errorLine1="    &lt;string name=&quot;atp_AlwaysOnLockdownModalHeading&quot;>Change your VPN settings&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="389"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;atp_AlwaysOnLockDownEnabled&quot; is not translated in &quot;cs&quot; (Czech) or &quot;ro&quot; (Romanian)"
-        errorLine1="    &lt;string name=&quot;atp_AlwaysOnLockDownEnabled&quot;>&lt;b>Action required!&lt;/b> To avoid app issues, you need to change your Android settings. &lt;annotation type=&quot;open_settings_link&quot;>Change settings&lt;/annotation>&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="390"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;atp_AlwaysOnLockDownNotificationTitle&quot; is not translated in &quot;cs&quot; (Czech) or &quot;ro&quot; (Romanian)"
-        errorLine1="    &lt;string name=&quot;atp_AlwaysOnLockDownNotificationTitle&quot;>Action required! An Android setting needs to be changed for App Tracking Protection.&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
+            file="src/main/res/values-fr/strings-vpn.xml"
             line="391"
-            column="13"/>
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;fr&quot; (French) the following quantities should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;atp_ActivityUnprotectedApps&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-fr/strings-vpn.xml"
+            line="395"
+            column="5"/>
     </issue>
 
     <issue
@@ -312,7 +224,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-vpn.xml"
-            line="226"
+            line="214"
             column="9"/>
     </issue>
 
@@ -323,7 +235,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-vpn.xml"
-            line="226"
+            line="214"
             column="9"/>
     </issue>
 
@@ -334,7 +246,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-vpn.xml"
-            line="230"
+            line="218"
             column="9"/>
     </issue>
 
@@ -345,7 +257,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-vpn.xml"
-            line="230"
+            line="218"
             column="9"/>
     </issue>
 
@@ -356,7 +268,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-vpn.xml"
-            line="230"
+            line="218"
             column="9"/>
     </issue>
 
@@ -367,7 +279,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-vpn.xml"
-            line="231"
+            line="219"
             column="9"/>
     </issue>
 
@@ -378,7 +290,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-vpn.xml"
-            line="234"
+            line="222"
             column="9"/>
     </issue>
 
@@ -389,7 +301,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-vpn.xml"
-            line="234"
+            line="222"
             column="9"/>
     </issue>
 
@@ -400,7 +312,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-vpn.xml"
-            line="234"
+            line="222"
             column="9"/>
     </issue>
 
@@ -411,7 +323,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-vpn.xml"
-            line="234"
+            line="222"
             column="9"/>
     </issue>
 
@@ -422,7 +334,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-vpn.xml"
-            line="235"
+            line="223"
             column="9"/>
     </issue>
 
@@ -433,7 +345,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-vpn.xml"
-            line="235"
+            line="223"
             column="9"/>
     </issue>
 
@@ -444,7 +356,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-vpn.xml"
-            line="236"
+            line="224"
             column="9"/>
     </issue>
 
@@ -455,7 +367,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-vpn.xml"
-            line="240"
+            line="228"
             column="9"/>
     </issue>
 
@@ -466,7 +378,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-vpn.xml"
-            line="240"
+            line="228"
             column="9"/>
     </issue>
 
@@ -477,7 +389,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-vpn.xml"
-            line="240"
+            line="228"
             column="9"/>
     </issue>
 
@@ -488,7 +400,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-vpn.xml"
-            line="240"
+            line="228"
             column="9"/>
     </issue>
 
@@ -499,7 +411,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-vpn.xml"
-            line="241"
+            line="229"
             column="9"/>
     </issue>
 
@@ -752,7 +664,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="210"
+            line="200"
             column="5"/>
     </issue>
 
@@ -763,7 +675,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="214"
+            line="204"
             column="5"/>
     </issue>
 
@@ -774,7 +686,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="218"
+            line="208"
             column="5"/>
     </issue>
 
@@ -785,7 +697,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="294"
+            line="282"
             column="5"/>
     </issue>
 
@@ -840,7 +752,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-vpn.xml"
-            line="233"
+            line="221"
             column="5"/>
     </issue>
 
@@ -851,7 +763,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-vpn.xml"
-            line="239"
+            line="227"
             column="5"/>
     </issue>
 
@@ -862,7 +774,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-vpn.xml"
-            line="294"
+            line="282"
             column="5"/>
     </issue>
 
@@ -873,7 +785,29 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-vpn.xml"
-            line="300"
+            line="288"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedQuantity"
+        message="For language &quot;hr&quot; (Croatian) the following quantities are not relevant: `many`"
+        errorLine1="    &lt;plurals name=&quot;atp_ActivityProtectedApps&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-hr/strings-vpn.xml"
+            line="407"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedQuantity"
+        message="For language &quot;hr&quot; (Croatian) the following quantities are not relevant: `many`"
+        errorLine1="    &lt;plurals name=&quot;atp_ActivityUnprotectedApps&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-hr/strings-vpn.xml"
+            line="413"
             column="5"/>
     </issue>
 
@@ -882,17 +816,6 @@
         message="This folder configuration (`v23`) is unnecessary; `minSdkVersion` is 23. Merge all the resources in this folder into `drawable`.">
         <location
             file="src/main/res/drawable-v23"/>
-    </issue>
-
-    <issue
-        id="UseCompoundDrawables"
-        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
-        errorLine1="&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2=" ~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_manage_recent_apps_empty.xml"
-            line="19"
-            column="2"/>
     </issue>
 
     <issue
@@ -1162,12 +1085,12 @@
     <issue
         id="Overdraw"
         message="Possible overdraw: Root element paints background `?dialogBgColor` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
-        errorLine1="        android:background=&quot;?dialogBgColor&quot;>"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="    android:background=&quot;?dialogBgColor&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/dialog_tracking_protection_manually_enable_app.xml"
-            line="25"
-            column="9"/>
+            line="24"
+            column="5"/>
     </issue>
 
     <issue
@@ -1206,19 +1129,30 @@
     <issue
         id="Overdraw"
         message="Possible overdraw: Root element paints background `@drawable/default_selectable_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
-        errorLine1="              android:background=&quot;@drawable/default_selectable_bg&quot;>"
-        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="    android:background=&quot;@drawable/default_selectable_bg&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/view_device_shield_activity_entry.xml"
-            line="27"
-            column="15"/>
+            file="src/main/res/layout/view_device_shield_activity_apps.xml"
+            line="24"
+            column="5"/>
     </issue>
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorPrimaryDark` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
-        errorLine1="    android:background=&quot;?attr/colorPrimaryDark&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Possible overdraw: Root element paints background `@drawable/default_selectable_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        errorLine1="    android:background=&quot;@drawable/default_selectable_bg&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_device_shield_activity_entry.xml"
+            line="24"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?android:windowBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        errorLine1="    android:background=&quot;?android:windowBackground&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/view_device_shield_activity_entry_header.xml"
             line="24"
@@ -1321,6 +1255,17 @@
         message="The resource `R.drawable.ic_active_dot` appears to be unused">
         <location
             file="src/main/res/drawable/ic_active_dot.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_alert_yellow` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_alert_yellow.xml"
+            line="17"
+            column="1"/>
     </issue>
 
     <issue
@@ -1520,7 +1465,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.vpnTrackerCompaniesBlockedToday` appears to be unused"
-        errorLine1="    &lt;string name=&quot;vpnTrackerCompaniesBlockedToday&quot; instructions=&quot;Placeholder is a number&quot;>Tracker companies blocked today: %1$d&lt;/string>"
+        errorLine1="    &lt;string name=&quot;vpnTrackerCompaniesBlockedToday&quot; instruction=&quot;Placeholder is a number&quot;>Tracker companies blocked today: %1$d&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
@@ -1531,7 +1476,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.vpnTrackerCompaniesBlockedThisWeek` appears to be unused"
-        errorLine1="    &lt;string name=&quot;vpnTrackerCompaniesBlockedThisWeek&quot; instructions=&quot;Placeholder is a number&quot;>Tracker companies blocked this week: %1$d&lt;/string>"
+        errorLine1="    &lt;string name=&quot;vpnTrackerCompaniesBlockedThisWeek&quot; instruction=&quot;Placeholder is a number&quot;>Tracker companies blocked this week: %1$d&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
@@ -1553,7 +1498,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.vpnTrackersBlockedToday` appears to be unused"
-        errorLine1="    &lt;string name=&quot;vpnTrackersBlockedToday&quot; instructions=&quot;Placeholder is a number&quot;>Trackers blocked today: %1$d&lt;/string>"
+        errorLine1="    &lt;string name=&quot;vpnTrackersBlockedToday&quot; instruction=&quot;Placeholder is a number&quot;>Trackers blocked today: %1$d&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
@@ -1564,7 +1509,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.vpnTrackersBlockedThisWeek` appears to be unused"
-        errorLine1="    &lt;string name=&quot;vpnTrackersBlockedThisWeek&quot; instructions=&quot;Placeholder is a number&quot;>Trackers blocked this week: %1$d&lt;/string>"
+        errorLine1="    &lt;string name=&quot;vpnTrackersBlockedThisWeek&quot; instruction=&quot;Placeholder is a number&quot;>Trackers blocked this week: %1$d&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
@@ -1662,12 +1607,56 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.string.atp_EnabledTitle` appears to be unused"
+        errorLine1="    &lt;string name=&quot;atp_EnabledTitle&quot;>Hooray! You’re all set up.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings-vpn.xml"
+            line="122"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.atp_EnabledMessage` appears to be unused"
+        errorLine1="    &lt;string name=&quot;atp_EnabledMessage&quot;>App Tracking Protection shows &lt;b>a real-time list of apps on your device&lt;/b> that we catch trying to track you.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings-vpn.xml"
+            line="123"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.atp_EnabledActivityCTA` appears to be unused"
+        errorLine1="    &lt;string name=&quot;atp_EnabledActivityCTA&quot;>View App Tracking Summary&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings-vpn.xml"
+            line="124"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.string.atp_EnabledSettings` appears to be unused"
         errorLine1="    &lt;string name=&quot;atp_EnabledSettings&quot;>You can access App Tracking Protection in &lt;annotation type=&quot;settings_link&quot;>Settings.&lt;/annotation>&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
             line="125"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.atp_ExclusionListActivityTitle` appears to be unused"
+        errorLine1="    &lt;string name=&quot;atp_ExclusionListActivityTitle&quot;>All Apps&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings-vpn.xml"
+            line="133"
             column="13"/>
     </issue>
 
@@ -1711,7 +1700,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="151"
+            line="143"
             column="13"/>
     </issue>
 
@@ -1722,7 +1711,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="152"
+            line="144"
             column="13"/>
     </issue>
 
@@ -1733,7 +1722,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="153"
+            line="145"
             column="13"/>
     </issue>
 
@@ -1744,7 +1733,18 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="168"
+            line="158"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.atp_ActivityRecentActivity` appears to be unused"
+        errorLine1="    &lt;string name=&quot;atp_ActivityRecentActivity&quot;>Activity&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings-vpn.xml"
+            line="189"
             column="13"/>
     </issue>
 
@@ -1755,7 +1755,29 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="202"
+            line="192"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.atp_ActivityManageProtection` appears to be unused"
+        errorLine1="    &lt;string name=&quot;atp_ActivityManageProtection&quot;>Having Issues with an app?&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings-vpn.xml"
+            line="194"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.atp_ActivityEnabledLabel` appears to be unused"
+        errorLine1="    &lt;string name=&quot;atp_ActivityEnabledLabel&quot;>This feature is in beta. Notice a problem with an app? &lt;annotation type=&quot;app_settings_link&quot;>Please report an issue.&lt;/annotation>&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings-vpn.xml"
+            line="224"
             column="13"/>
     </issue>
 
@@ -1766,7 +1788,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="260"
+            line="248"
             column="13"/>
     </issue>
 
@@ -1777,7 +1799,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="261"
+            line="249"
             column="13"/>
     </issue>
 
@@ -1788,7 +1810,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="262"
+            line="250"
             column="13"/>
     </issue>
 
@@ -1799,7 +1821,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="263"
+            line="251"
             column="13"/>
     </issue>
 
@@ -1810,7 +1832,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="264"
+            line="252"
             column="13"/>
     </issue>
 
@@ -1821,7 +1843,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="265"
+            line="253"
             column="13"/>
     </issue>
 
@@ -1832,7 +1854,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="266"
+            line="254"
             column="13"/>
     </issue>
 
@@ -1843,7 +1865,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="267"
+            line="255"
             column="13"/>
     </issue>
 
@@ -1854,7 +1876,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="268"
+            line="256"
             column="13"/>
     </issue>
 
@@ -1865,7 +1887,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="269"
+            line="257"
             column="13"/>
     </issue>
 
@@ -1876,7 +1898,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="270"
+            line="258"
             column="13"/>
     </issue>
 
@@ -1887,7 +1909,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="271"
+            line="259"
             column="13"/>
     </issue>
 
@@ -1898,7 +1920,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="272"
+            line="260"
             column="13"/>
     </issue>
 
@@ -1909,7 +1931,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="273"
+            line="261"
             column="13"/>
     </issue>
 
@@ -1920,7 +1942,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="274"
+            line="262"
             column="13"/>
     </issue>
 
@@ -1931,7 +1953,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="275"
+            line="263"
             column="13"/>
     </issue>
 
@@ -1942,7 +1964,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="276"
+            line="264"
             column="13"/>
     </issue>
 
@@ -1953,7 +1975,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="277"
+            line="265"
             column="13"/>
     </issue>
 
@@ -1964,7 +1986,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="278"
+            line="266"
             column="13"/>
     </issue>
 
@@ -1975,7 +1997,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="279"
+            line="267"
             column="13"/>
     </issue>
 
@@ -1986,7 +2008,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="280"
+            line="268"
             column="13"/>
     </issue>
 
@@ -1997,7 +2019,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="281"
+            line="269"
             column="13"/>
     </issue>
 
@@ -2008,7 +2030,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="293"
+            line="281"
             column="13"/>
     </issue>
 
@@ -2019,19 +2041,8 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-vpn.xml"
-            line="306"
+            line="294"
             column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.tracking_network_logo_adjust` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/tracking_network_logo_adjust.xml"
-            line="1"
-            column="1"/>
     </issue>
 
     <issue
@@ -2566,17 +2577,6 @@
     </issue>
 
     <issue
-        id="UnusedResources"
-        message="The resource `R.layout.view_manage_recent_apps_empty` appears to be unused"
-        errorLine1="&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/layout/view_manage_recent_apps_empty.xml"
-            line="19"
-            column="1"/>
-    </issue>
-
-    <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
         errorLine1="    &lt;string name=&quot;atp_OnNoTrackersNotificationHeader&quot;>&quot;Escaneando actividad de rastreo... pi... pi...&quot;&lt;/string>"
@@ -2715,7 +2715,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-vpn.xml"
-            line="271"
+            line="259"
             column="48"/>
     </issue>
 
@@ -2726,7 +2726,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-vpn.xml"
-            line="271"
+            line="259"
             column="48"/>
     </issue>
 
@@ -2737,7 +2737,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-vpn.xml"
-            line="271"
+            line="259"
             column="48"/>
     </issue>
 
@@ -2748,7 +2748,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-vpn.xml"
-            line="275"
+            line="265"
             column="48"/>
     </issue>
 
@@ -2759,7 +2759,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-vpn.xml"
-            line="283"
+            line="271"
             column="48"/>
     </issue>
 
@@ -2770,7 +2770,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-vpn.xml"
-            line="283"
+            line="271"
             column="48"/>
     </issue>
 
@@ -2781,7 +2781,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-vpn.xml"
-            line="283"
+            line="271"
             column="48"/>
     </issue>
 
@@ -2892,7 +2892,7 @@
         errorLine2="     ~~~~~~~~~">
         <location
             file="src/main/res/layout/dialog_tracking_protection_manually_enable_app.xml"
-            line="100"
+            line="79"
             column="6"/>
     </issue>
 
@@ -2932,23 +2932,34 @@
     <issue
         id="ContentDescription"
         message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
         <location
-            file="src/main/res/layout/view_device_shield_activity_entry.xml"
-            line="34"
-            column="10"/>
+            file="src/main/res/layout/view_device_shield_activity_apps.xml"
+            line="37"
+            column="6"/>
     </issue>
 
     <issue
         id="ContentDescription"
         message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
         <location
             file="src/main/res/layout/view_device_shield_activity_entry.xml"
-            line="78"
-            column="10"/>
+            line="26"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_device_shield_activity_entry.xml"
+            line="70"
+            column="6"/>
     </issue>
 
     <issue
@@ -3042,56 +3053,56 @@
     <issue
         id="RtlSymmetry"
         message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                android:paddingStart=&quot;@dimen/keyline_4&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="                    android:paddingStart=&quot;@dimen/keyline_4&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_device_shield_activity.xml"
-            line="65"
-            column="17"/>
+            line="69"
+            column="21"/>
     </issue>
 
     <issue
         id="RtlSymmetry"
         message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                android:paddingStart=&quot;@dimen/keyline_4&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="                    android:paddingStart=&quot;@dimen/keyline_4&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_device_shield_activity.xml"
-            line="107"
-            column="17"/>
+            line="111"
+            column="21"/>
     </issue>
 
     <issue
         id="RtlSymmetry"
         message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                android:paddingStart=&quot;72dp&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="                    android:paddingStart=&quot;56dp&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_device_shield_activity.xml"
-            line="122"
-            column="17"/>
+            line="127"
+            column="21"/>
     </issue>
 
     <issue
         id="RtlSymmetry"
         message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                android:paddingStart=&quot;@dimen/keyline_4&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="                    android:paddingStart=&quot;@dimen/keyline_4&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_device_shield_activity.xml"
-            line="133"
-            column="17"/>
+            line="140"
+            column="21"/>
     </issue>
 
     <issue
         id="RtlSymmetry"
         message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                android:paddingStart=&quot;@dimen/keyline_4&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="                    android:paddingStart=&quot;@dimen/keyline_4&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_device_shield_activity.xml"
-            line="159"
-            column="17"/>
+            line="166"
+            column="21"/>
     </issue>
 
     <issue
@@ -3114,17 +3125,6 @@
             file="src/main/res/layout/menu_item_device_tracker_switch.xml"
             line="22"
             column="5"/>
-    </issue>
-
-    <issue
-        id="RtlSymmetry"
-        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="              android:paddingStart=&quot;@dimen/keyline_4&quot;"
-        errorLine2="              ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_device_shield_activity_entry.xml"
-            line="25"
-            column="15"/>
     </issue>
 
     <issue

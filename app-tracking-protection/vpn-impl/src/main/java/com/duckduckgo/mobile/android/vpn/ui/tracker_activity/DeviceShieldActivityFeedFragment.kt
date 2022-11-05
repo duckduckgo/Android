@@ -23,15 +23,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.*
-import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayoutManager
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
+import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter
+import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityFeedBinding
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.TrackerFeedViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerLoadingSkeleton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -47,6 +55,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
     lateinit var trackerFeedAdapter: TrackerFeedAdapter
 
     private val activityFeedViewModel: DeviceShieldActivityFeedViewModel by bindViewModel()
+    private lateinit var binding: ViewDeviceShieldActivityFeedBinding
 
     private var config: ActivityFeedConfig = defaultConfig
 
@@ -56,15 +65,16 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.view_device_shield_activity_feed, container, false)
+    ): View {
+        binding = ViewDeviceShieldActivityFeedBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?
     ) {
-        with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
+        with(binding.activityRecyclerView) {
             val stickyHeadersLayoutManager =
                 StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
             layoutManager = stickyHeadersLayoutManager
@@ -78,30 +88,93 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
                     config.timeWindowUnits
                 ),
                 config.showTimeWindowHeadings
-            )
-                .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-                .collect {
-                    feedListener?.onTrackerListShowed(it.size)
-                    trackerFeedAdapter.updateData(if (config.unboundedRows()) it else it.take(config.maxRows)) { trackerFeedData ->
-                        if (trackerFeedData.isAppInstalled()) {
-                            startActivity(
-                                AppTPCompanyTrackersActivity.intent(
-                                    requireContext(),
-                                    trackerFeedData.trackingApp.packageId,
-                                    trackerFeedData.trackingApp.appDisplayName,
-                                    trackerFeedData.bucket
-                                )
-                            )
-                        } else {
-                            Snackbar.make(
-                                requireView(),
-                                getString(R.string.atp_CompanyDetailsNotAvailableForUninstalledApps),
-                                Snackbar.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
+            ).flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+                .collect { viewState ->
+                    renderViewState(viewState)
                 }
         }
+    }
+
+    private suspend fun renderViewState(viewState: TrackerFeedViewState) {
+        renderTrackerList(viewState)
+        renderAppsData(viewState)
+
+        if (viewState.trackers.isNotEmpty()) {
+            if (viewState.trackers.first() != TrackerLoadingSkeleton) {
+                feedListener?.onTrackerListShowed(viewState.trackers.size)
+            }
+        }
+    }
+
+    private suspend fun renderTrackerList(viewState: TrackerFeedViewState) {
+        trackerFeedAdapter.updateData(
+            if (config.unboundedRows()) viewState.trackers else viewState.trackers.take(config.maxRows)
+        ) { trackerFeedData ->
+            if (trackerFeedData.isAppInstalled()) {
+                startActivity(
+                    AppTPCompanyTrackersActivity.intent(
+                        requireContext(),
+                        trackerFeedData.trackingApp.packageId,
+                        trackerFeedData.trackingApp.appDisplayName,
+                        trackerFeedData.bucket
+                    )
+                )
+            } else {
+                Snackbar.make(
+                    requireView(),
+                    getString(R.string.atp_CompanyDetailsNotAvailableForUninstalledApps),
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun renderAppsData(viewState: TrackerFeedViewState) {
+        if (viewState.vpnState.state != VpnRunningState.ENABLED) {
+            binding.appsStateContainer.gone()
+            return
+        }
+
+        if (config.unboundedRows() || viewState.trackers.size >= config.maxRows) {
+            binding.appsStateContainer.gone()
+            return
+        }
+
+        if (viewState.appsProtectionData == null) {
+            binding.appsStateContainer.gone()
+            return
+        }
+
+        if (viewState.appsProtectionData.protectedAppsData.appsCount > 0) {
+            binding.protectedAppsState.bind(viewState.appsProtectionData.protectedAppsData) { appsFilter ->
+                launchExclusionlist(viewState.vpnState, appsFilter)
+            }
+            binding.protectedAppsState.show()
+        } else {
+            binding.protectedAppsState.gone()
+        }
+        if (viewState.appsProtectionData.unprotectedAppsData.appsCount > 0) {
+            binding.unProtectedAppsState.bind(viewState.appsProtectionData.unprotectedAppsData) { appsFilter ->
+                launchExclusionlist(viewState.vpnState, appsFilter)
+            }
+            binding.unProtectedAppsState.show()
+        } else {
+            binding.unProtectedAppsState.gone()
+        }
+        binding.appsStateContainer.show()
+    }
+
+    private fun launchExclusionlist(
+        vpnState: VpnState,
+        filter: AppsFilter
+    ) {
+        startActivity(
+            TrackingProtectionExclusionListActivity.intent(
+                requireContext(),
+                vpnState.state == VpnRunningState.ENABLED,
+                filter
+            )
+        )
     }
 
     override fun onAttach(context: Context) {

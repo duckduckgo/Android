@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Намери предишен</string>
     <string name="closeFindInPageButtonDescription">Затваряне на изгледа за търсене в страницата</string>
     <string name="findInPageHint">Намери в страницата</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Редактиране на заявка преди търсене</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">ЗАЩИТА НА САЙТА АКТИВИРАНА</string>
     <string name="privacyProtectionDisabled">ЗАЩИТА НА САЙТА ДЕАКТИВИРАНА</string>
     <string name="privacyDashboardActivityTitle">Табло за управление на поверителността</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ПОДОБРЕН ОТ &lt;img src=\"%1$d\" /&gt; ДО &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">ПОДОБРЕН ОТ &lt;img src=\"%1$d\" /&gt; ДО &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Клас на поверителност</string>
     <string name="privacyProtectionTemporarilyDisabled">Деактивирахме временно защитата на поверителността, защото изглежда, че пречи на зареждането на този сайт.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Изберете файл с отметки за импортиране</string>
     <string name="importBookmarksError">Не успяхме да импортираме отметките, възникна някаква грешка</string>
     <string name="importBookmarksEmpty">Във файла няма отметки за импортиране</string>
-    <string name="importBookmarksSuccess">%1$d отметки са импортирани успешно</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d отметки са импортирани успешно</string>
     <string name="savedSiteDialogTitleHint">Заглавие</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Редактиране</string>

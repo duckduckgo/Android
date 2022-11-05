@@ -32,11 +32,11 @@
 
     <!-- Diagnostics -->
     <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Tööaeg: %1$s</string>
-    <string name="vpnTrackerCompaniesBlockedToday" instructions="Placeholder is a number">Täna blokeeritud jälgimisettevõtted: %1$d</string>
-    <string name="vpnTrackerCompaniesBlockedThisWeek" instructions="Placeholder is a number">Sel nädalal blokeeritud jälgimisettevõtted: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Täna blokeeritud jälgimisettevõtted: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Sel nädalal blokeeritud jälgimisettevõtted: %1$d</string>
     <string name="vpnTrackerCompaniesNone">"Ühtegi jälgimisettevõtet pole veel blokeeritud"</string>
-    <string name="vpnTrackersBlockedToday" instructions="Placeholder is a number">Täna blokeeritud jälgurid: %1$d</string>
-    <string name="vpnTrackersBlockedThisWeek" instructions="Placeholder is a number">Sel nädalal blokeeritud jälgurid: %1$d</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Täna blokeeritud jälgurid: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Sel nädalal blokeeritud jälgurid: %1$d</string>
     <string name="vpnTrackersNone">"Jälgureid pole veel blokeeritud"</string>
     <string name="vpnNotRunYet">"VPN-i ei ole veel käivitatud"</string>
     <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s paketti"</string>
@@ -136,24 +136,14 @@
     <string name="atp_ExcludedAppsEnabledLabel">Beeta-versiooni ajal võib DuckDuckGo mõne rakenduse kaitse keelata, et lahendada teada olevad sisu laadimisega seotud probleemid. Sinu kohandatud sätted ei muutu, kui sa just vaikesätteid ei taasta.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Rakenduse jälgimise kaitse on keelatud</b> Kas rakenduse jälgimise kaitse põhjustas sinu rakendustega probleeme <annotation type="report_issues_link">Teavita probleemidest</annotation></string>
     <string name="atp_ExcludedAppsReport">Teavita probleemist teise rakendusega</string>
-    <string name="atp_ExcludedReasonLoadsWebsites">Laadib veebisaite</string>
-    <string name="atp_ExcludedReasonKnownIssues">Teada olevad probleemid</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Käsitsi keelatud</string>
     <string name="atp_ExcludedReasonManuallyEnabled">Käsitsi lubatud</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Tühista</string>
-    <string name="atp_ExcludeAppsManuallyCTAEnable">Luba</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Taasta</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppName" instruction="Placeholder is the name of an app">Kas lubada rakenduse %1$s kaitse käsitsi?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">Selle rakenduse puhul esineb teada olevalt probleeme, kui jälgimiskatsed ebaõnnestuvad.</string>
-    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Kui kaitse on lubatud, ei pruugi selle rakenduse saidi sisu korralikult ilmuda.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Kaitse lubamine saadab rakenduse nime DuckDuckGo\'le.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Privaatsuskaitse on keelatud</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Kui keelasid probleemi lahendamiseks kaitse, kontrolli enne DuckDuckGo\'le probleemist teatamist, kas rakendus nüüd töötab.</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">See lakkas ootuspäraselt töötamast</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Mulle sobib, et mind selles rakenduses jälgitakse</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Muudel põhjustel</string>
-    <string name="atp_ExcludeAppsManuallyCTAReport">Teavitus</string>
-    <string name="atp_ExcludeAppsManuallyCTASkip">Jäta vahele</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Taasta vaikimisi kaitstud rakendused</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Teata rakendusega seotud probleemist</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Kas taastada vaikimisi kaitse?</string>
@@ -197,12 +187,12 @@
     <string name="atp_ActivityPastWeek">Viimased 7 päeva</string>
     <string name="atp_ActivityTitle">Rakenduse jälgimise kaitse</string>
     <string name="atp_MostRecentActivityTitle">Kõik hiljutised tegevused</string>
-    <string name="atp_ActivityRecentActivity">Hiljutine tegevus</string>
+    <string name="atp_ActivityRecentActivity">Tegevus</string>
     <string name="atp_ActivityCtaShowAll">Kuva kõik hiljutised tegevused</string>
     <string name="atp_ActivityAppTrackersFAQ">Mis on rakendusejälgurid?</string>
     <string name="atp_ActivityReportProblem">Teata rakendusega seotud probleemist</string>
     <string name="atp_ActivityBetaInstructions">Beeta-juhtnöörid</string>
-    <string name="atp_ActivityManageProtection">Kas rakendusega on probleeme?</string>
+    <string name="atp_ActivityManageProtection">Kas sul on rakendusega probleeme?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[Blokeeriti 1 ettevõtte 1 jälgimiskatse rakenduses <b>%1$s</b>]]>
@@ -217,8 +207,6 @@
         <![CDATA[Rakenduses <b>%3$s</b> blokeeriti %1$d jälgimiskatset ettevõtetelt %2$d]]>
     </string>
 
-    <string name="atp_ActivityEmptyListTitle">Uut tegevust pole</string>
-    <string name="atp_ActivityEmptyListMessage">Jätka seadme kasutamist. Jälgimiskatsed, mille rakenduste jälgimise kaitse blokeerib, kuvatakse siin.</string>
     <string name="atp_ActivityPastWeekBlocked">Blokeeritud</string>
     <string name="atp_ActivityPastWeekAcross">Üle</string>
 
@@ -386,5 +374,39 @@
     <string name="atp_AlwaysOnLockdownModalHeading">Muuda oma VPN-i sätteid</string>
     <string name="atp_AlwaysOnLockDownEnabled"><b>Sekkumine on vajalik!</b> Rakenduseprobleemide vältimiseks tuleb muuta Androidi sätteid. <annotation type="open_settings_link">Muuda sätteid</annotation></string>
     <string name="atp_AlwaysOnLockDownNotificationTitle">Sekkumine on vajalik! Rakenduse jälgimiskaitse jaoks tuleb muuta üht Androidi sätet.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Minu rakendused</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Kui see on lubatud, võib esineda probleeme rakendusega</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Luba ikkagi</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">Kui rakenduse jälgimiskaitse on lubatud, võib rakenduses %1$s tekkida probleeme</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Kas teatada probleemist?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Abba meile teada, kui sa keelasid rakenduse jälgimiskaitse rakenduses %1$s, kuna sul tekkis selle rakendusega probleeme.</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Teata probleemist</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Mitte praegu</string>
+    <string name="atp_ActivityRecentActivityHeader">Tegevus</string>
+    <string name="atp_ActivityManageProtectionLabel">Kas rakendusega on probleeme?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Beetaversioonis on mõne rakenduse kaitse automaatselt välja lülitatud. <annotation type="app_settings_link">Kuva rakendused</annotation></string>
+    <string name="atp_ActivityDescription">Siin kuvatakse blokeeritud jälgimiskatsed</string>
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
+        <item quantity="one">%1$s rakendus on kaitstud varjatud jälgurite eest, mille me oleme tabanud katselt jälgida sinu isiklikku teavet</item>
+        <item quantity="other">%1$s rakendust on kaitstud varjatud jälgurite eest, mille me oleme tabanud katselt jälgida sinu isiklikku teavet</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
+        <item quantity="one">%1$s rakenduse kaitse on automaatselt keelatud</item>
+        <item quantity="other">%1$s rakenduse kaitse on automaatselt keelatud</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Head uudised! Rakenduse jälgimiskaitse on nüüd lubatud.<br/><br/>👌Näitan reaalajas loetelu sinu seadme rakendustest, mille olen tabanud katselt sind jälgida.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Sain aru!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Kaitse on lubatud (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Kaitse on keelatud (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Kõik</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Kaitse on lubatud</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Kaitse on keelatud</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Kõik</string>
+    <string name="atp_ActivityViewAppsLabel">Kuva rakendused</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">See funktsioon on beetaversioonis. Kas sul on rakendusega probleeme? <annotation type="app_settings_link">Aita meil paremaks saada</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Kui rakenduse jälgimiskaitse on lubatud, võib mõnes rakenduses tekkida probleeme.\n<annotation type="learn_why_link">Loe, miks</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Teadaolevate probleemidega rakenduste kaitse on keelatud. Võid need rakendused lubada, kuid need ei pruugi töötada ootuspäraselt. <annotation type="learn_why_link">Loe, miks</annotation></string>
 
 </resources>

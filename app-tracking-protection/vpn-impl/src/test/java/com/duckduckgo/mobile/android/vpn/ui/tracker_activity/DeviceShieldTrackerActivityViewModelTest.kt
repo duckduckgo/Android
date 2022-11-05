@@ -30,8 +30,9 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.BannerState
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -43,6 +44,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.time.ExperimentalTime
@@ -309,6 +311,50 @@ class DeviceShieldTrackerActivityViewModelTest {
 
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenAppTpEnabledCtaShownAndListShownThenNoCommandSent() = runBlocking {
+        whenever(vpnStore.didShowAppTpEnabledCta()).thenReturn(true)
+
+        viewModel.commands().test {
+            viewModel.showAppTpEnabledCtaIfNeeded()
+
+            expectNoEvents()
+            verify(vpnStore, never()).appTpEnabledCtaDidShow()
+        }
+    }
+
+    @Test
+    fun whenAppTpEnabledCtaNotAlreadyShownAndListShownThenCommandSent() = runBlocking {
+        whenever(vpnStore.didShowAppTpEnabledCta()).thenReturn(false)
+
+        viewModel.commands().test {
+            viewModel.showAppTpEnabledCtaIfNeeded()
+
+            verify(vpnStore).appTpEnabledCtaDidShow()
+            verify(vpnStore).onOnboardingSessionSet()
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowAppTpEnabledCta, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenBannerStateCalledOutsideOnboardingSessionThenReturnNextSessionBanner() {
+        whenever(vpnStore.isOnboardingSession()).thenReturn(false)
+
+        val bannerState = viewModel.bannerState()
+
+        assertEquals(BannerState.NextSessionBanner, bannerState)
+    }
+
+    @Test
+    fun whenBannerStateCalledDuringOnboardingSessionThenReturnOnboardingBanner() {
+        whenever(vpnStore.isOnboardingSession()).thenReturn(true)
+
+        val bannerState = viewModel.bannerState()
+
+        assertEquals(BannerState.OnboardingBanner, bannerState)
     }
 
     private fun createInMemoryDb(): VpnDatabase {

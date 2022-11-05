@@ -148,41 +148,18 @@ abstract class VpnDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // https://stackoverflow.com/a/57797179/980345
                 // SQLite does not support Alter table operations like Foreign keys
+
+                // delete the old table
+                database.execSQL("DROP TABLE IF EXISTS `vpn_tracker`")
+
+                // create the new table
                 database.execSQL(
-                    "CREATE TABLE IF NOT EXISTS `vpn_tracker_new`" +
+                    "CREATE TABLE IF NOT EXISTS `vpn_tracker`" +
                         "(trackerCompanyId INTEGER NOT NULL, domain TEXT NOT NULL, company TEXT NOT NULL," +
                         "companyDisplayName TEXT NOT NULL, packageId TEXT NOT NULL, appDisplayName TEXT NOT NULL," +
                         "timestamp TEXT NOT NULL, bucket TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY(bucket, domain, packageId))"
                 )
 
-                // First delete the elements in the DB we're not going to migrate to minimize chances of running out of space
-                database.execSQL(
-                    """
-                    DELETE FROM vpn_tracker
-                    WHERE trackerId
-                        NOT IN (
-                            SELECT trackerId
-                            FROM vpn_tracker
-                            ORDER by timestamp DESC
-                            LIMIT 10000
-                        )
-                    """.trimIndent()
-                )
-
-                // Now copy the data over
-                database.execSQL(
-                    """
-                    INSERT INTO vpn_tracker_new (trackerCompanyId, domain, company, companyDisplayName, packageId, appDisplayName, timestamp, bucket, count)
-                    SELECT  trackerCompanyId, domain, company, companyDisplayName, packageId, appDisplayName, timestamp,
-                            strftime('%Y-%m-%d', timestamp), count()
-                    FROM vpn_tracker
-                    GROUP BY strftime('%Y-%m-%d', timestamp), domain, packageId
-                    """.trimIndent()
-                )
-
-                // clean up the old table
-                database.execSQL("DROP TABLE IF EXISTS `vpn_tracker`")
-                database.execSQL("ALTER TABLE `vpn_tracker_new` RENAME TO `vpn_tracker`")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_vpn_tracker_bucket` ON `vpn_tracker` (`bucket`)")
             }
         }

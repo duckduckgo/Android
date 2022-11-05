@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Najdi prejšnje</string>
     <string name="closeFindInPageButtonDescription">Zapri iskanje v pogledu strani</string>
     <string name="findInPageHint">Najdi na strani</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Uredi poizvedbo pred iskanjem</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">OMOGOČI ZAŠČITO NA STRANI</string>
     <string name="privacyProtectionDisabled">ONEMOGOČI ZAŠČITO NA STRANI</string>
     <string name="privacyDashboardActivityTitle">Nadzorna plošča zasebnosti</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">IZBOLJŠANO OD &lt;img src=\"%1$d\" /&gt; DO &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">IZBOLJŠANO OD &lt;img src=\"%1$d\" /&gt; DO &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Ocena zasebnosti</string>
     <string name="privacyProtectionTemporarilyDisabled">Začasno smo onemogočili zaščito zasebnosti, saj se zdi, da zato pride do napak na tem spletnem mestu.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Izberite datoteko zaznamka za uvoz</string>
     <string name="importBookmarksError">Zaznamkov ni bilo mogoče uvoziti, nekaj je šlo narobe</string>
     <string name="importBookmarksEmpty">Datoteka nima zaznamkov za uvoz</string>
-    <string name="importBookmarksSuccess">Uspešno uvoženih %1$d zaznamkov</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Uspešno uvoženih %1$d zaznamkov</string>
     <string name="savedSiteDialogTitleHint">Naslov</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Uredi</string>

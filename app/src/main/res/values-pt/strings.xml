@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Encontrar anterior</string>
     <string name="closeFindInPageButtonDescription">Fechar a vista de encontrar na página</string>
     <string name="findInPageHint">Encontrar na página</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editar consulta antes de pesquisar</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">PROTEÇÃO DO SITE ATIVADA</string>
     <string name="privacyProtectionDisabled">PROTEÇÃO DO SITE DESATIVADA</string>
     <string name="privacyDashboardActivityTitle">Painel de privacidade</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MELHORADO DE &lt;img src=\"%1$d\" /&gt; PARA &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">MELHORADO DE &lt;img src=\"%1$d\" /&gt; PARA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Grau de privacidade</string>
     <string name="privacyProtectionTemporarilyDisabled">Desativámos temporariamente a Proteção de Privacidade, pois parece estar a bloquear este site.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Selecione um ficheiro de marcadores para importar</string>
     <string name="importBookmarksError">Não foi possível importar quaisquer marcadores, algo correu mal</string>
     <string name="importBookmarksEmpty">O ficheiro não tem marcadores para importar</string>
-    <string name="importBookmarksSuccess">%1$d marcadores importados com êxito</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d marcadores importados com êxito</string>
     <string name="savedSiteDialogTitleHint">Título</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Editar</string>

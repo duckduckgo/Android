@@ -19,8 +19,16 @@
         <attr name="android:hint" />
         <attr name="android:text" />
         <attr name="editable" format="boolean" />
-        <attr name="isPassword" format="boolean" />
         <attr name="endIcon" format="reference" />
         <attr name="endIconContentDescription" format="string" />
+
+        <attr name="type" format="enum" >
+            <enum name="multi_line" value="0"/>
+            <enum name="single_line" value="1"/>
+            <enum name="password" value="2"/>
+        </attr>
+
     </declare-styleable>
+
+
 </resources>

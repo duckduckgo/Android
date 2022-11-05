@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Finn forrige</string>
     <string name="closeFindInPageButtonDescription">Lukk finn-på-side-visning</string>
     <string name="findInPageHint">Finn på side</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Rediger spørringen før du søker</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">BESKYTTELSE AKTIVERT FOR NETTSTEDET</string>
     <string name="privacyProtectionDisabled">BESKYTTELSE DEAKTIVERT FOR NETTSTEDET</string>
     <string name="privacyDashboardActivityTitle">Dashbord for personvern</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FORBEDRET FRA &lt;img src=\"%1$d\" /&gt; TIL &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">FORBEDRET FRA &lt;img src=\"%1$d\" /&gt; TIL &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Grad av personvern</string>
     <string name="privacyProtectionTemporarilyDisabled">Vi har midlertidig deaktivert personvernbeskyttelse, da det ser ut til å få nettstedet til å slutte å fungere.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Velg en bokmerkefil du vil importere</string>
     <string name="importBookmarksError">Vi kunne ikke importere noen av bokmerkene, noe gikk galt</string>
     <string name="importBookmarksEmpty">Filen har ingen bokmerker å importere</string>
-    <string name="importBookmarksSuccess">%1$d bokmerker ble importert</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d bokmerker ble importert</string>
     <string name="savedSiteDialogTitleHint">Tittel</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Rediger</string>

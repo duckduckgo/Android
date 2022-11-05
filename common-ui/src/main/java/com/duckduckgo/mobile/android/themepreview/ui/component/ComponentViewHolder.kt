@@ -186,9 +186,9 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         ComponentViewHolder(inflate(parent, R.layout.component_outline_text_input)) {
         init {
             view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext1).onAction { toastOnClick(it) }
-            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext2).onAction { toastOnClick(it) }
             view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext4).onAction { toastOnClick(it) }
             view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext6).onAction { toastOnClick(it) }
+            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext8).onAction { toastOnClick(it) }
         }
 
         private fun toastOnClick(action: Action) = when (action) {

@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Znajdź poprzedni element</string>
     <string name="closeFindInPageButtonDescription">Zamknij widok wyszukiwania na stronie</string>
     <string name="findInPageHint">Znajdź na stronie</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edytuj zapytanie przed wyszukiwaniem</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">WŁĄCZONA OCHRONA WITRYNY</string>
     <string name="privacyProtectionDisabled">WYŁĄCZONA OCHRONA WITRYNY</string>
     <string name="privacyDashboardActivityTitle">Panel zarządzania prywatnością</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ULEPSZONY Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">ULEPSZONY Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Poziom prywatności</string>
     <string name="privacyProtectionTemporarilyDisabled">Tymczasowo wyłączyliśmy ochronę prywatności, ponieważ wygląda na to, że zniekształca tę witrynę.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Wybierz plik z zakładkami do zaimportowania</string>
     <string name="importBookmarksError">Nie udało się zaimportować żadnych zakładek, coś poszło nie tak</string>
     <string name="importBookmarksEmpty">Plik nie zawiera zakładek do zaimportowania</string>
-    <string name="importBookmarksSuccess">Pomyślnie zaimportowano zakładki (%1$d)</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Pomyślnie zaimportowano zakładki (%1$d)</string>
     <string name="savedSiteDialogTitleHint">Tytuł</string>
     <string name="savedSiteDialogUrlHint">Adres URL</string>
     <string name="savedSiteDialogTitleEdit">Edytuj</string>

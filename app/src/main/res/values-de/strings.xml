@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Vorheriges Ergebnis</string>
     <string name="closeFindInPageButtonDescription">Seitensuchansicht schließen</string>
     <string name="findInPageHint">Auf Seite suchen</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Anfrage vor der Suche bearbeiten</string>
@@ -114,7 +114,7 @@
     <string name="privacyProtectionEnabled">WEBSITE-SCHUTZ AKTIVIERT</string>
     <string name="privacyProtectionDisabled">WEBSITE-SCHUTZ DEAKTIVIERT</string>
     <string name="privacyDashboardActivityTitle">Privatsphäre-Dashboard</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VERBESSERT VON &lt;img src=\"%1$d\" /&gt; AUF &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">VERBESSERT VON &lt;img src=\"%1$d\" /&gt; AUF &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Datenschutz-Stufe</string>
     <string name="privacyProtectionTemporarilyDisabled">Wir haben den Datenschutz vorübergehend deaktiviert, da die Seite derzeit dadurch gestört wird.</string>
 
@@ -267,7 +267,7 @@
     <string name="importBookmarksFileTitle">Wählen Sie aus, welche Lesezeichendatei Sie importieren möchten</string>
     <string name="importBookmarksError">Etwas ist schief gegangen und es konnten keine Lesezeichen importiert werden</string>
     <string name="importBookmarksEmpty">Diese Datei enthält keine Lesezeichen, die importiert werden können</string>
-    <string name="importBookmarksSuccess">%1$d Lesezeichen wurden erfolgreich importiert</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d Lesezeichen wurden erfolgreich importiert</string>
     <string name="savedSiteDialogTitleHint">Titel</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Bearbeiten</string>

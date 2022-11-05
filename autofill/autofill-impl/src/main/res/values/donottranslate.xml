@@ -16,6 +16,4 @@
   -->
 
 <resources>
-    <string name="updateLoginDialogTitleUpdateUsername">Update Username?</string>
-    <string name="updateLoginDialogButtonUpdateUsername">Update Username</string>
 </resources>
