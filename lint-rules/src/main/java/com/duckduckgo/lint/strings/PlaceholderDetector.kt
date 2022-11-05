@@ -81,7 +81,7 @@ class PlaceholderDetector : ResourceXmlDetector(), XmlScanner {
 
     companion object {
         val PLACEHOLDERS = listOf(
-            "%s", "%d"
+            "%s", "%d", "%f", "%o",
         )
 
         val PLACEHOLDER_MISSING_POSITION = Issue.create(

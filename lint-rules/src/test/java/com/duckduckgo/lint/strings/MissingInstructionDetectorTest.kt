@@ -28,7 +28,7 @@ class MissingInstructionDetectorTest {
     fun whenStringHasSPlaceholderAndNoInstructionThenFailWithError() {
         val expected =
             """
-            res/values/strings.xml:3: Error: Missing instructions attribute [MissingInstruction]
+            res/values/strings.xml:3: Error: Missing instruction attribute or attribute empty [MissingInstruction]
                 <string name="macos_windows">Windows coming soon! %s</string>
                                              ~~~~~
             1 errors, 0 warnings
@@ -53,7 +53,7 @@ class MissingInstructionDetectorTest {
     fun whenStringHasDPlaceholderAndNoInstructionThenFailWithError() {
         val expected =
             """
-            res/values/strings.xml:3: Error: Missing instructions attribute [MissingInstruction]
+            res/values/strings.xml:3: Error: Missing instruction attribute or attribute empty [MissingInstruction]
                 <string name="macos_windows">Windows coming soon! %d</string>
                                              ~~~~~
             1 errors, 0 warnings
@@ -75,10 +75,35 @@ class MissingInstructionDetectorTest {
     }
 
     @Test
+    fun whenStringHasDPlaceholderAndEmptyInstructionThenFailWithError() {
+        val expected =
+            """
+            res/values/strings.xml:3: Error: Missing instruction attribute or attribute empty [MissingInstruction]
+                <string name="macos_windows" instruction="">Windows coming soon! %d</string>
+                                                            ~~~~~
+            1 errors, 0 warnings
+            """
+
+        TestLintTask.lint().files(
+            xml(
+                "res/values/strings.xml",
+                """
+                <?xml version="1.0" encoding="utf-8"?>
+                <resources>
+                    <string name="macos_windows" instruction="">Windows coming soon! %d</string>
+                </resources>    
+                """
+            ).indented())
+            .skipTestModes(TestMode.CDATA)
+            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .run().expect(expected)
+    }
+
+    @Test
     fun whenStringHasSeveralPlaceholdersAndNoInstructionThenFailWithError() {
         val expected =
             """
-            res/values/strings.xml:3: Error: Missing instructions attribute [MissingInstruction]
+            res/values/strings.xml:3: Error: Missing instruction attribute or attribute empty [MissingInstruction]
                 <string name="macos_windows">Windows %d coming soon! %s</string>
                                              ~~~~~
             1 errors, 0 warnings
@@ -103,8 +128,8 @@ class MissingInstructionDetectorTest {
     fun whenStringHasOrderedPlaceholdersAndNoInstructionThenFailWithError() {
         val expected =
             """
-            res/values/strings.xml:3: Error: Missing instructions attribute [MissingInstruction]
-                <string name="macos_windows">Windows %1$\s coming soon! %2$\s</string>
+            res/values/strings.xml:3: Error: Missing instruction attribute or attribute empty [MissingInstruction]
+                <string name="macos_windows">Windows %1＄s coming soon! %2＄s</string>
                                              ~~~~~
             1 errors, 0 warnings
             """
@@ -115,7 +140,7 @@ class MissingInstructionDetectorTest {
                 """
                 <?xml version="1.0" encoding="utf-8"?>
                 <resources>
-                    <string name="macos_windows">Windows %1$\s coming soon! %2$\s</string>
+                    <string name="macos_windows">Windows %1${'$'}s coming soon! %2${'$'}s</string>
                 </resources>    
                 """
             ).indented())
@@ -149,7 +174,7 @@ class MissingInstructionDetectorTest {
                 """
                 <?xml version="1.0" encoding="utf-8"?>
                 <resources>
-                    <string name="macos_windows" instruction="">Windows coming soon! %d</string>
+                    <string name="macos_windows" instruction="test">Windows coming soon! %d</string>
                 </resources>    
                 """
             ).indented())
@@ -183,7 +208,7 @@ class MissingInstructionDetectorTest {
                 """
                 <?xml version="1.0" encoding="utf-8"?>
                 <resources>
-                    <string name="macos_windows" instruction="test">Windows %1$\s coming soon! %2$\s</string>
+                    <string name="macos_windows" instruction="test">Windows %1${'$'}s coming soon! %2${'$'}s</string>
                 </resources>    
                 """
             ).indented())
@@ -199,7 +224,7 @@ class MissingInstructionDetectorTest {
                 """
                 <?xml version="1.0" encoding="utf-8"?>
                 <resources>
-                    <string name="macos_windows" translatable="false">Windows %1$\s coming soon! %2$\s</string>
+                    <string name="macos_windows" translatable="false">Windows %1${'$'}s coming soon! %2${'$'}s</string>
                 </resources>    
                 """
             ).indented())
@@ -232,10 +257,10 @@ class MissingInstructionDetectorTest {
     fun whenPluralsHavePlaceholdersAndNoInstructionThenFailWithError() {
         val expected =
             """
-            res/values/strings.xml:4: Error: Missing instructions attribute [MissingInstruction]
+            res/values/strings.xml:4: Error: Missing instruction attribute or attribute empty [MissingInstruction]
                     <item quantity="one">%1＄s of your apps is protected from hidden trackers we find trying to access your personal info</item>
                                          ~~~~~
-            res/values/strings.xml:5: Error: Missing instructions attribute [MissingInstruction]
+            res/values/strings.xml:5: Error: Missing instruction attribute or attribute empty [MissingInstruction]
                     <item quantity="other">%1＄s of your apps are protected from hidden trackers we find trying to access your personal info</item>
                                            ~~~~~
             2 errors, 0 warnings

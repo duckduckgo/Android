@@ -54,27 +54,33 @@ class MissingInstructionDetector : ResourceXmlDetector(), XmlScanner {
             }
             return
         }
+    }
 
+    private fun isNodeNotTranslatable(node: Node) : Boolean {
+        val translatable = node.parentNode.attributes.getNamedItem("translatable")
+        val translatableValue = (translatable as Attr?)?.value
+        return translatableValue != SdkConstants.VALUE_FALSE
+    }
+
+    private fun doesNodeContainPlaceholdersWithoutInstructionsOrParentInstructions(node: Node, parentHasInstruction: Boolean) : Boolean {
+        val text = node.nodeValue
+        val instruction = node.parentNode.attributes.getNamedItem("instruction")?.nodeValue
+        return PLACEHOLDERS.firstOrNull { text.contains(it) } != null && (instruction.isNullOrEmpty() && !parentHasInstruction)
     }
 
     private fun visitNode(context: XmlContext, node: Node, parentHasInstruction: Boolean = false) {
         var parentInstruction = parentHasInstruction
         val nodeType = node.nodeType
         if (nodeType == Node.TEXT_NODE) {
-            val text = node.nodeValue
-            val instruction = node.parentNode.attributes.getNamedItem("instruction")
-            val translatable = node.parentNode.attributes.getNamedItem("translatable")
-            val translatableValue = (translatable as Attr?)?.value
 
-            if (translatableValue != "false" && PLACEHOLDERS.firstOrNull { text.contains(it) } != null && (instruction == null && !parentHasInstruction)) {
+            if (isNodeNotTranslatable(node) && doesNodeContainPlaceholdersWithoutInstructionsOrParentInstructions(node, parentHasInstruction)) {
                 context.report(
                     MISSING_INSTRUCTION, node, location = context.getNameLocation(node),
-                    "Missing instructions attribute"
+                    "Missing instruction attribute or attribute empty"
                 )
             }
-        }
 
-        if (nodeType == Node.ELEMENT_NODE && node.nodeName == "plurals") {
+        } else if (nodeType == Node.ELEMENT_NODE && node.nodeName == "plurals") {
             val instruction = node.attributes.getNamedItem("instruction")
             val translatable = node.attributes.getNamedItem("translatable")
             val translatableValue = (translatable as Attr?)?.value
@@ -96,14 +102,14 @@ class MissingInstructionDetector : ResourceXmlDetector(), XmlScanner {
 
     companion object {
         val PLACEHOLDERS = listOf(
-            "%s", "%d", "%1\$"
+            "%s", "%d", "%f", "%o", "%1${'$'}"
         )
 
         val MISSING_INSTRUCTION = Issue.create(
             id = "MissingInstruction",
-            briefDescription = "Instructions missing in string",
+            briefDescription = "Instruction missing in string or empty instruction",
             explanation = """
-            A string that has placeholders and is translatable should include instructions""",
+            A string that has placeholders and is translatable should include an instruction attribute""",
             category = CUSTOM_LINT_CHECKS,
             priority = 10,
             severity = Severity.ERROR,
