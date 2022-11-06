@@ -30,7 +30,7 @@ import org.threeten.bp.format.DateTimeFormatter
 
 @Database(
     exportSchema = true,
-    version = 30,
+    version = 31,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -177,6 +177,34 @@ abstract class VpnDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_30_TO_31: Migration = object : Migration(30, 31) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    """
+                    CREATE TABLE `vpn_service_state_stats_new` (
+                      `timestamp` INTEGER NOT NULL,
+                      `state` TEXT PRIMARY KEY NOT NULL,
+                      `stopReason` TEXT NOT NULL,
+                      `alwaysOnEnabled` INTEGER NOT NULL,
+                      `alwaysOnLockedDown` INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+
+                database.execSQL(
+                    """
+                    INSERT INTO vpn_service_state_stats_new (timestamp, state, stopReason, alwaysOnEnabled, alwaysOnLockedDown)
+                    SELECT 1, state, stopReason, alwaysOnEnabled, alwaysOnLockedDown
+                    FROM vpn_service_state_stats
+                    ORDER BY id DESC limit 1
+                    """.trimIndent()
+                )
+
+                database.execSQL("DROP TABLE IF EXISTS `vpn_service_state_stats`")
+                database.execSQL("ALTER TABLE `vpn_service_state_stats_new` RENAME TO `vpn_service_state_stats`")
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_18_TO_19,
@@ -191,6 +219,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_27_TO_28,
                 MIGRATION_28_TO_29,
                 MIGRATION_29_TO_30,
+                MIGRATION_30_TO_31,
             )
     }
 }
