@@ -358,7 +358,7 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">If you’re having problems with an app (such as content not loading), try disabling protection for that app and <annotation type="report_issues_link">submit a report.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Recent Apps</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Recent App Activity</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Show All Apps</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Apps with recently blocked tracking attempts will appear here</string>
 
