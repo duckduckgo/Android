@@ -20,13 +20,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:padding="@dimen/listItemSectionHeaderPadding">
+    android:orientation="horizontal">
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/sectionHeaderText"
         android:layout_width="0dp"
         android:layout_height="@dimen/listItemSectionHeaderIconSize"
+        android:layout_marginStart="@dimen/listItemSectionHeaderHorizontalPadding"
+        android:layout_marginTop="@dimen/actionBottomSheetVerticalPadding"
+        android:layout_marginEnd="@dimen/listItemSectionHeaderHorizontalPadding"
+        android:layout_marginBottom="@dimen/actionBottomSheetVerticalPadding"
         android:layout_weight="1"
         app:typography="h4"
         tools:text="Title Text" />
@@ -35,8 +38,9 @@
         android:id="@+id/sectionHeaderOverflowIcon"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/listItemSectionHeaderIconSize"
+        android:layout_marginEnd="@dimen/listItemSectionHeaderOverflowIconEndPadding"
         android:adjustViewBounds="true"
         android:src="@drawable/ic_overflow"
-        tools:ignore="ContentDescription"/>
+        tools:ignore="ContentDescription" />
 
 </LinearLayout>
