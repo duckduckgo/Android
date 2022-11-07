@@ -657,8 +657,8 @@
     <string name="bookmarkFolderEmpty">Празна</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s и %1$d елемент?</item>
-        <item quantity="other">%1$s%2$s и %1$d елемента?</item>
+        <item quantity="one">%1$s%2$s и %3$d елемент?</item>
+        <item quantity="other">%1$s%2$s и %3$d елемента?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

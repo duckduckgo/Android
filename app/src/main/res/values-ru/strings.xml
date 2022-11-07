@@ -661,10 +661,10 @@
     <string name="bookmarkFolderEmpty">Пусто</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s и еще %1$d объект?</item>
-        <item quantity="few">%1$s%2$s и еще %1$d объекта?</item>
-        <item quantity="many">%1$s%2$s и еще %1$d объектов?</item>
-        <item quantity="other">%1$s%2$s и еще объекты (%1$d)?</item>
+        <item quantity="one">%1$s%2$s и еще %3$d объект?</item>
+        <item quantity="few">%1$s%2$s и еще %3$d объекта?</item>
+        <item quantity="many">%1$s%2$s и еще %3$d объектов?</item>
+        <item quantity="other">%1$s%2$s и еще объекты (%3$d)?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

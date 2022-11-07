@@ -661,10 +661,10 @@
     <string name="bookmarkFolderEmpty">Pusty</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s %2$s i %1$d element?</item>
-        <item quantity="few">%1$s %2$s i %1$d elementy?</item>
-        <item quantity="many">%1$s %2$s i %1$d elementów?</item>
-        <item quantity="other">%1$s %2$s i %1$d elementu?</item>
+        <item quantity="one">%1$s %2$s i %3$d element?</item>
+        <item quantity="few">%1$s %2$s i %3$d elementy?</item>
+        <item quantity="many">%1$s %2$s i %3$d elementów?</item>
+        <item quantity="other">%1$s %2$s i %3$d elementu?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

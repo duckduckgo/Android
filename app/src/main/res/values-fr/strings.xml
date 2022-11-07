@@ -657,8 +657,8 @@
     <string name="bookmarkFolderEmpty">Vide</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s et %1$d élément ?</item>
-        <item quantity="other">%1$s%2$s et %1$d éléments ?</item>
+        <item quantity="one">%1$s%2$s et %3$d élément ?</item>
+        <item quantity="other">%1$s%2$s et %3$d éléments ?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

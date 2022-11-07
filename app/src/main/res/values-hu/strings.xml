@@ -657,8 +657,8 @@
     <string name="bookmarkFolderEmpty">Üres</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s és a(z) %1$d elemet?</item>
-        <item quantity="other">%1$s%2$s és a(z) %1$d elemet?</item>
+        <item quantity="one">%1$s%2$s és a(z) %3$d elemet?</item>
+        <item quantity="other">%1$s%2$s és a(z) %3$d elemet?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

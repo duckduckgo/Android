@@ -661,10 +661,10 @@
     <string name="bookmarkFolderEmpty">Prázdne</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s a %1$d položku?</item>
-        <item quantity="few">%1$s%2$s a %1$d položky?</item>
-        <item quantity="many">%1$s%2$s a %1$d položky?</item>
-        <item quantity="other">%1$s%2$s a %1$d položiek?</item>
+        <item quantity="one">%1$s%2$s a %3$d položku?</item>
+        <item quantity="few">%1$s%2$s a %3$d položky?</item>
+        <item quantity="many">%1$s%2$s a %3$d položky?</item>
+        <item quantity="other">%1$s%2$s a %3$d položiek?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
