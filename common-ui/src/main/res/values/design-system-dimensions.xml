@@ -55,10 +55,9 @@
     <dimen name="oneLineItemPadding">14dp</dimen>
     <dimen name="twoLineItemHeight">56dp</dimen>
     <dimen name="twoLineItemPadding">14dp</dimen>
-    <dimen name="listItemSectionHeaderIconSize">24dp</dimen>
-    <dimen name="listItemSectionHeaderHorizontalPadding">16dp</dimen>
-    <dimen name="listItemSectionHeaderVerticalPadding">14dp</dimen>
-    <dimen name="listItemSectionHeaderOverflowIconEndPadding">10dp</dimen>
+    <dimen name="sectionHeaderListItemImageSize">24dp</dimen>
+    <dimen name="sectionHeaderListItemHeight">48dp</dimen>
+    <dimen name="sectionHeaderListItemImagePadding">10dp</dimen>
 
     <!-- PopupMenu -->
     <dimen name="popupMenuWidth">280dp</dimen>

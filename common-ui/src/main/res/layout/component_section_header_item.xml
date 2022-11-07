@@ -25,13 +25,13 @@
         android:id="@+id/sectionHeaderItemTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="Section Header" />
+        app:primaryText="Section Header" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/sectionHeaderWithOverflow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:showOverflowMenu="true"
-        app:titleText="Section Header with Overflow Menu" />
+        app:primaryText="Section Header with Overflow Menu" />
 
 </LinearLayout>

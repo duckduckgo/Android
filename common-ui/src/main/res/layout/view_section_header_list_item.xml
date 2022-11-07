@@ -20,27 +20,26 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
+    android:minHeight="@dimen/sectionHeaderListItemHeight"
     android:orientation="horizontal">
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/sectionHeaderText"
         android:layout_width="0dp"
-        android:layout_height="@dimen/listItemSectionHeaderIconSize"
-        android:layout_marginStart="@dimen/listItemSectionHeaderHorizontalPadding"
-        android:layout_marginTop="@dimen/actionBottomSheetVerticalPadding"
-        android:layout_marginEnd="@dimen/listItemSectionHeaderHorizontalPadding"
-        android:layout_marginBottom="@dimen/actionBottomSheetVerticalPadding"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
         android:layout_weight="1"
         app:typography="h4"
         tools:text="Title Text" />
 
-    <ImageView
+    <com.duckduckgo.mobile.android.ui.view.button.IconButton
         android:id="@+id/sectionHeaderOverflowIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/listItemSectionHeaderIconSize"
-        android:layout_marginEnd="@dimen/listItemSectionHeaderOverflowIconEndPadding"
-        android:adjustViewBounds="true"
-        android:src="@drawable/ic_overflow"
+        android:layout_width="@dimen/sectionHeaderListItemImageSize"
+        android:layout_height="@dimen/sectionHeaderListItemImageSize"
+        android:layout_marginEnd="@dimen/sectionHeaderListItemImagePadding"
+        android:background="?selectableItemBackgroundBorderless"
+        app:srcCompat="@drawable/ic_overflow"
         tools:ignore="ContentDescription" />
 
 </LinearLayout>
