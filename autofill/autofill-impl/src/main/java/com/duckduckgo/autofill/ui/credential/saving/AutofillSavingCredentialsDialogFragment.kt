@@ -39,7 +39,17 @@ import com.duckduckgo.autofill.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_SAVE_LOGIN_PROMPT_DISMISSED
 import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_SAVE_LOGIN_PROMPT_SAVED
 import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_SAVE_LOGIN_PROMPT_SHOWN
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_SAVE_PASSWORD_PROMPT_DISMISSED
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_SAVE_PASSWORD_PROMPT_SAVED
+import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_SAVE_PASSWORD_PROMPT_SHOWN
 import com.duckduckgo.autofill.ui.credential.dialog.animateClosed
+import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogAccepted
+import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogDismissed
+import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogShown
+import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.saveType
+import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment.CredentialSaveType.PasswordOnly
+import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment.CredentialSaveType.UsernameAndPassword
+import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment.CredentialSaveType.UsernameOnly
 import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Accepted
 import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Dismissed
 import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Shown
@@ -91,7 +101,11 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         super.onAttach(context)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         pixelNameDialogEvent(Shown)?.let { pixel.fire(it) }
 
         val binding = ContentAutofillSaveNewCredentialsBinding.inflate(inflater, container, false)
@@ -99,7 +113,10 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         return binding.root
     }
 
-    private fun configureViews(binding: ContentAutofillSaveNewCredentialsBinding, credentials: LoginCredentials) {
+    private fun configureViews(
+        binding: ContentAutofillSaveNewCredentialsBinding,
+        credentials: LoginCredentials
+    ) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         configureSiteDetails(binding)
         configureTitles(binding, credentials)
@@ -152,7 +169,10 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         (dialog as BottomSheetDialog).animateClosed()
     }
 
-    private fun configureTitles(binding: ContentAutofillSaveNewCredentialsBinding, credentials: LoginCredentials) {
+    private fun configureTitles(
+        binding: ContentAutofillSaveNewCredentialsBinding,
+        credentials: LoginCredentials
+    ) {
         val resources = viewModel.determineTextResources(credentials)
 
         binding.dialogTitle.text = getString(resources.title)
@@ -175,12 +195,19 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     private fun pixelNameDialogEvent(dialogEvent: DialogEvent): AutofillPixelNames? {
+        val saveType = getCredentialsToSave().saveType()
         return when (dialogEvent) {
-            is Shown -> AUTOFILL_SAVE_LOGIN_PROMPT_SHOWN
-            is Dismissed -> AUTOFILL_SAVE_LOGIN_PROMPT_DISMISSED
-            is Accepted -> AUTOFILL_SAVE_LOGIN_PROMPT_SAVED
+            is Shown -> pixelNameDialogShown(saveType)
+            is Dismissed -> pixelNameDialogDismissed(saveType)
+            is Accepted -> pixelNameDialogAccepted(saveType)
             else -> null
         }
+    }
+
+    internal sealed interface CredentialSaveType {
+        object UsernameAndPassword : CredentialSaveType
+        object UsernameOnly : CredentialSaveType
+        object PasswordOnly : CredentialSaveType
     }
 
     private interface DialogEvent {
@@ -197,7 +224,11 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     companion object {
 
-        fun instance(url: String, credentials: LoginCredentials, tabId: String): AutofillSavingCredentialsDialogFragment {
+        fun instance(
+            url: String,
+            credentials: LoginCredentials,
+            tabId: String
+        ): AutofillSavingCredentialsDialogFragment {
 
             val fragment = AutofillSavingCredentialsDialogFragment()
             fragment.arguments =
@@ -207,6 +238,46 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
                     it.putString(CredentialSavePickerDialog.KEY_TAB_ID, tabId)
                 }
             return fragment
+        }
+    }
+
+    internal class AutofillSavingPixelEventNames {
+
+        companion object {
+
+            fun LoginCredentials.saveType(): CredentialSaveType {
+                return if (!username.isNullOrBlank() && !password.isNullOrBlank()) {
+                    UsernameAndPassword
+                } else if (username.isNullOrBlank()) {
+                    PasswordOnly
+                } else {
+                    UsernameOnly
+                }
+            }
+
+            fun pixelNameDialogShown(credentialSaveType: CredentialSaveType): AutofillPixelNames? {
+                return when (credentialSaveType) {
+                    UsernameAndPassword -> AUTOFILL_SAVE_LOGIN_PROMPT_SHOWN
+                    PasswordOnly -> AUTOFILL_SAVE_PASSWORD_PROMPT_SHOWN
+                    else -> null
+                }
+            }
+
+            fun pixelNameDialogDismissed(credentialSaveType: CredentialSaveType): AutofillPixelNames? {
+                return when (credentialSaveType) {
+                    UsernameAndPassword -> AUTOFILL_SAVE_LOGIN_PROMPT_DISMISSED
+                    PasswordOnly -> AUTOFILL_SAVE_PASSWORD_PROMPT_DISMISSED
+                    else -> null
+                }
+            }
+
+            fun pixelNameDialogAccepted(credentialSaveType: CredentialSaveType): AutofillPixelNames? {
+                return when (credentialSaveType) {
+                    UsernameAndPassword -> AUTOFILL_SAVE_LOGIN_PROMPT_SAVED
+                    PasswordOnly -> AUTOFILL_SAVE_PASSWORD_PROMPT_SAVED
+                    else -> null
+                }
+            }
         }
     }
 }
