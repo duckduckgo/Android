@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2020 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,13 +15,7 @@
   ~ limitations under the License.
   -->
 
-<!--  TODO aitor - Once we extract the themes to its own gradle module, this will go  -->
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/white">
-    <item>
-        <shape>
-            <solid android:color="@color/button_contained_background" />
-            <corners android:radius="22dp" />
-        </shape>
-    </item>
-</ripple>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/daxColorButtonDestructiveGhostContainer" android:state_checked="true"/>
+    <item android:color="@android:color/transparent" android:state_checked="false"/>
+</selector>

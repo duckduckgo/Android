@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,6 +16,7 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/subtleGrayTwo" android:state_enabled="false" />
-    <item android:color="@color/cornflowerBlue" />
+    <item android:state_enabled="false" android:color="?attr/daxColorTextDisabled" />
+    <item android:color="?attr/daxColorButtonPrimaryTextPressed" android:state_pressed="true"/>
+    <item android:color="?attr/daxColorButtonPrimaryText" android:state_enabled="true"/>
 </selector>
