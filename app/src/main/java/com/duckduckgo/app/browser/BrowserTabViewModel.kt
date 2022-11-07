@@ -476,6 +476,7 @@ class BrowserTabViewModel @Inject constructor(
     var skipHome = false
     var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    val liveSelectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private var refreshOnViewVisible = MutableStateFlow(true)
