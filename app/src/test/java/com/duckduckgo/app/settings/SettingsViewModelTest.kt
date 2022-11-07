@@ -684,6 +684,26 @@ class SettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenAppTPOnboardingNotShownThenViewStateIsCorrect() = runTest {
+        whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(false)
+        testee.start()
+
+        testee.viewState().test {
+            assertFalse(awaitItem().appTrackingProtectionOnboardingShown)
+        }
+    }
+
+    @Test
+    fun whenAppTPOnboardingShownThenViewStateIsCorrect() = runTest {
+        whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(true)
+        testee.start()
+
+        testee.viewState().test {
+            assertTrue(awaitItem().appTrackingProtectionOnboardingShown)
+        }
+    }
+
     private fun givenSelectedFireAnimation(fireAnimation: FireAnimation) {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(fireAnimation)
         whenever(mockAppSettingsDataStore.isCurrentlySelected(fireAnimation)).thenReturn(true)

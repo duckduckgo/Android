@@ -234,7 +234,7 @@ class SettingsActivity :
                     setAutoconsentSetting(it.autoconsentEnabled)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
-                    updateDeviceShieldSettings(it.appTrackingProtectionEnabled)
+                    updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionOnboardingShown)
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
                 }
@@ -368,9 +368,12 @@ class SettingsActivity :
 
     private fun updateDeviceShieldSettings(
         appTPEnabled: Boolean,
+        appTPOnboardingShown: Boolean
     ) {
         with(viewsMore) {
-            if (appTPEnabled) {
+            if (!appTPOnboardingShown){
+                vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
+            } else  if (appTPEnabled) {
                 vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldEnabled))
             } else {
                 vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
