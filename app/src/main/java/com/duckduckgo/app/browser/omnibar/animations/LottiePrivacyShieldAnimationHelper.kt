@@ -42,6 +42,7 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(val appTheme: AppTh
             PROTECTED -> {
                 val res = if (appTheme.isLightModeEnabled()) R.raw.protected_shield else R.raw.dark_protected_shield
                 holder.setAnimation(res)
+                holder.progress = 0.0f
                 Timber.i("Shield: PROTECTED")
             }
             UNPROTECTED -> {

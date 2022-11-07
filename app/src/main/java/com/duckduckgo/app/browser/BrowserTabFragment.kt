@@ -2537,6 +2537,7 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
                 lastSeenPrivacyShieldViewState = viewState
                 privacyShieldView.setAnimationView(shieldIcon, viewState.privacyShield)
+                cancelTrackersAnimation()
             }
         }
 
