@@ -195,7 +195,6 @@
     <string name="atp_ActivityCtaShowAll">Vezi toate activitățile recente</string>
     <string name="atp_ActivityAppTrackersFAQ">Ce sunt tehnologiile de urmărire din aplicații?</string>
     <string name="atp_ActivityReportProblem">Raportează o problemă cu o aplicație</string>
-    <string name="atp_ActivityBetaInstructions">Instrucțiuni beta</string>
     <string name="atp_ActivityManageProtection">Ai probleme cu o aplicație?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">

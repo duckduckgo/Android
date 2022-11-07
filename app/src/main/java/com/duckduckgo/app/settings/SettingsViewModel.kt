@@ -181,7 +181,7 @@ class SettingsViewModel @Inject constructor(
                 val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
                 if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
                     viewState.value = currentViewState().copy(
-                        appTrackingProtectionOnboardingShown  = vpnStore.didShowOnboarding(),
+                        appTrackingProtectionOnboardingShown = vpnStore.didShowOnboarding(),
                         appTrackingProtectionEnabled = isDeviceShieldEnabled
                     )
                 }

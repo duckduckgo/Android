@@ -191,7 +191,6 @@
     <string name="atp_ActivityCtaShowAll">Tüm Son Etkinlikleri Görüntüle</string>
     <string name="atp_ActivityAppTrackersFAQ">Uygulama İzleyici Nedir?</string>
     <string name="atp_ActivityReportProblem">Bir Uygulamayla İlgili Sorun Bildir</string>
-    <string name="atp_ActivityBetaInstructions">Beta Talimatları</string>
     <string name="atp_ActivityManageProtection">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">

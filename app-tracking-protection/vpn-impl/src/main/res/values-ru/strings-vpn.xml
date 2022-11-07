@@ -199,7 +199,6 @@
     <string name="atp_ActivityCtaShowAll">Просмотреть всю недавнюю активность</string>
     <string name="atp_ActivityAppTrackersFAQ">Что такое трекеры в приложениях?</string>
     <string name="atp_ActivityReportProblem">Сообщить о проблеме с приложением</string>
-    <string name="atp_ActivityBetaInstructions">Инструкции к бета-версии</string>
     <string name="atp_ActivityManageProtection">Проблемы с приложением?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">

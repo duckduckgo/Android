@@ -191,7 +191,6 @@
     <string name="atp_ActivityCtaShowAll">Kuva kõik hiljutised tegevused</string>
     <string name="atp_ActivityAppTrackersFAQ">Mis on rakendusejälgurid?</string>
     <string name="atp_ActivityReportProblem">Teata rakendusega seotud probleemist</string>
-    <string name="atp_ActivityBetaInstructions">Beeta-juhtnöörid</string>
     <string name="atp_ActivityManageProtection">Kas sul on rakendusega probleeme?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">

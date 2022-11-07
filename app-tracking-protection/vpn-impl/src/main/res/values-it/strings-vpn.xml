@@ -191,7 +191,6 @@
     <string name="atp_ActivityCtaShowAll">Visualizza tutte le attività recenti</string>
     <string name="atp_ActivityAppTrackersFAQ">Cosa sono i sistemi di tracciamento delle app?</string>
     <string name="atp_ActivityReportProblem">Segnala un problema con un\'app</string>
-    <string name="atp_ActivityBetaInstructions">Istruzioni beta</string>
     <string name="atp_ActivityManageProtection">Hai riscontrato qualche problema con un\'app?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">

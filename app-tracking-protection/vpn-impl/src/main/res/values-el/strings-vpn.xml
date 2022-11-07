@@ -191,7 +191,6 @@
     <string name="atp_ActivityCtaShowAll">Προβολή όλης της πρόσφατης δραστηριότητας</string>
     <string name="atp_ActivityAppTrackersFAQ">Τι είναι οι εφαρμογές παρακολούθησης;</string>
     <string name="atp_ActivityReportProblem">Αναφορά προβλήματος με μια εφαρμογή</string>
-    <string name="atp_ActivityBetaInstructions">Οδηγίες Beta</string>
     <string name="atp_ActivityManageProtection">Έχετε προβλήματα με μια εφαρμογή;</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">

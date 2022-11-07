@@ -199,7 +199,6 @@
     <string name="atp_ActivityCtaShowAll">Peržiūrėti visą naujausią veiklą</string>
     <string name="atp_ActivityAppTrackersFAQ">Kas yra programų sekimo įrenginiai?</string>
     <string name="atp_ActivityReportProblem">Praneškite apie problemą, susijusią su programa</string>
-    <string name="atp_ActivityBetaInstructions">Beta instrukcijos</string>
     <string name="atp_ActivityManageProtection">Kyla problemų dėl programėlės?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">

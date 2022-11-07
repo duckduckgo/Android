@@ -199,7 +199,6 @@
     <string name="atp_ActivityCtaShowAll">Zobrazit všechny nedávné aktivity</string>
     <string name="atp_ActivityAppTrackersFAQ">Co jsou trackery v aplikacích?</string>
     <string name="atp_ActivityReportProblem">Nahlásit problém s aplikací</string>
-    <string name="atp_ActivityBetaInstructions">Pokyny pro beta verzi</string>
     <string name="atp_ActivityManageProtection">Máš problémy s aplikací?</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">

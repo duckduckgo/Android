@@ -371,9 +371,9 @@ class SettingsActivity :
         appTPOnboardingShown: Boolean
     ) {
         with(viewsMore) {
-            if (!appTPOnboardingShown){
+            if (!appTPOnboardingShown) {
                 vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
-            } else  if (appTPEnabled) {
+            } else if (appTPEnabled) {
                 vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldEnabled))
             } else {
                 vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
