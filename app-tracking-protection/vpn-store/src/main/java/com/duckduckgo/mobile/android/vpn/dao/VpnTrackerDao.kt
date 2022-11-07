@@ -100,7 +100,7 @@ interface VpnTrackerDao {
     )
     fun getTrackersForAppFromDate(
         date: String,
-        appPackage: String
+        appPackage: String,
     ): Flow<List<VpnTrackerCompanySignal>>
 
     @Query("SELECT * from vpn_tracker WHERE packageId = :appPackage")
