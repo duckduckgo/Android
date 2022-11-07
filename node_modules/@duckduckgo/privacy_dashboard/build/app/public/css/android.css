@@ -748,27 +748,40 @@
   }
 }
 .mdc-switch {
-  --mdc-switch-selected-track-color: rgba(57, 105, 239, 0.38);
+  --mdc-switch-selected-handle-color: #3969ef;
+  --mdc-switch-selected-hover-handle-color: #3969ef;
+  --mdc-switch-selected-pressed-handle-color: #3969ef;
+  --mdc-switch-selected-focus-handle-color: #3969ef;
   --mdc-switch-unselected-handle-color: white;
+  --mdc-switch-unselected-hover-handle-color: white;
+  --mdc-switch-unselected-pressed-handle-color: white;
+  --mdc-switch-unselected-focus-handle-color: white;
+  --mdc-switch-selected-track-color: rgba(57, 105, 239, 0.38);
+  --mdc-switch-selected-hover-track-color: rgba(57, 105, 239, 0.38);
+  --mdc-switch-selected-focus-track-color: rgba(57, 105, 239, 0.38);
+  --mdc-switch-selected-pressed-track-color: rgba(57, 105, 239, 0.38);
   --mdc-switch-unselected-track-color: rgba(102, 102, 102, 0.3);
+  --mdc-switch-unselected-hover-track-color: rgba(102, 102, 102, 0.3);
+  --mdc-switch-unselected-focus-track-color: rgba(102, 102, 102, 0.3);
+  --mdc-switch-unselected-pressed-track-color: rgba(102, 102, 102, 0.3);
 }
 .body--theme-dark .mdc-switch {
-  --mdc-switch-selected-hover-handle-color: #7295f6;
   --mdc-switch-selected-handle-color: #7295f6;
+  --mdc-switch-selected-hover-handle-color: #7295f6;
   --mdc-switch-selected-pressed-handle-color: #7295f6;
   --mdc-switch-selected-focus-handle-color: #7295f6;
+  --mdc-switch-unselected-handle-color: white;
+  --mdc-switch-unselected-hover-handle-color: white;
+  --mdc-switch-unselected-pressed-handle-color: white;
+  --mdc-switch-unselected-focus-handle-color: white;
   --mdc-switch-selected-track-color: rgba(114, 149, 246, 0.38);
   --mdc-switch-selected-hover-track-color: rgba(114, 149, 246, 0.38);
   --mdc-switch-selected-focus-track-color: rgba(114, 149, 246, 0.38);
-  --mdc-switch-unselected-pressed-handle-color: white;
-  --mdc-switch-unselected-handle-color: white;
-  --mdc-switch-unselected-hover-handle-color: white;
-  --mdc-switch-unselected-track-color: #666666;
-  --mdc-switch-unselected-hover-track-color: #666666;
-  --mdc-switch-unselected-focus-handle-color: white;
-  --mdc-switch-unselected-focus-track-color: #666666;
-  --mdc-switch-disabled-selected-handle-color: red;
-  --mdc-switch-disabled-unselected-handle-color: green;
+  --mdc-switch-selected-pressed-track-color: rgba(114, 149, 246, 0.38);
+  --mdc-switch-unselected-track-color: rgba(102, 102, 102, 0.3);
+  --mdc-switch-unselected-hover-track-color: rgba(102, 102, 102, 0.3);
+  --mdc-switch-unselected-focus-track-color: rgba(102, 102, 102, 0.3);
+  --mdc-switch-unselected-pressed-track-color: rgba(102, 102, 102, 0.3);
 }
 
 .material-design-ripple {

@@ -502,9 +502,6 @@ a {
 a:hover {
   text-decoration: underline;
 }
-a.link-action {
-  white-space: nowrap;
-}
 .environment--ios a.link-action:visited, .environment--ios a.link-action:active, .environment--ios a.link-action:hover, .environment--android a.link-action:visited, .environment--android a.link-action:active, .environment--android a.link-action:hover {
   text-decoration: none;
 }
