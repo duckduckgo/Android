@@ -28,12 +28,9 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.PromoBottomSheetDialog
-import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialog
-import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialog.RadioListAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog
-import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialog.StackedAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog.EventListener
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialog.TextAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 
 /** Fragment to display a list of dialogs. */
@@ -62,7 +59,7 @@ class DialogsFragment : Fragment() {
                     .setMessage(R.string.text_dialog_message)
                     .setPositiveButton(R.string.text_dialog_positive)
                     .setNegativeButton(R.string.text_dialog_negative)
-                    .addEventListener(object : EventListener() {
+                    .addEventListener(object : TextAlertDialogBuilder.EventListener() {
                         override fun onPositiveButtonClicked() {
                             Snackbar.make(it, "Negative Button Clicked", Snackbar.LENGTH_SHORT).show()
                         }
@@ -82,7 +79,7 @@ class DialogsFragment : Fragment() {
                     .setPositiveButton(R.string.text_dialog_positive)
                     .setNegativeButton(R.string.text_dialog_negative)
                     .setOptions(listOf(R.string.text_dialog_option, R.string.text_dialog_option, R.string.text_dialog_option))
-                    .addEventListener(object : RadioListAlertDialog.EventListener() {
+                    .addEventListener(object : RadioListAlertDialogBuilder.EventListener() {
                         override fun onRadioItemSelected(selectedItem: Int) {
                             Snackbar.make(it, "Radio Button $selectedItem selected", Snackbar.LENGTH_SHORT).show()
                         }
@@ -98,7 +95,7 @@ class DialogsFragment : Fragment() {
                     .setMessage(R.string.text_dialog_message)
                     .setPositiveButton(R.string.text_dialog_positive)
                     .setNegativeButton(R.string.text_dialog_negative)
-                    .addEventListener(object : EventListener() {
+                    .addEventListener(object : TextAlertDialogBuilder.EventListener() {
                         override fun onPositiveButtonClicked() {
                             Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
                         }
@@ -122,7 +119,7 @@ class DialogsFragment : Fragment() {
                             R.string.text_dialog_positive
                         )
                     )
-                    .addEventListener(object : StackedAlertDialog.EventListener() {
+                    .addEventListener(object : StackedAlertDialogBuilder.EventListener() {
                         override fun onButtonClicked(position: Int) {
                             Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
                         }
@@ -143,7 +140,7 @@ class DialogsFragment : Fragment() {
                                 R.string.text_dialog_positive
                             )
                         )
-                        .addEventListener(object : StackedAlertDialog.EventListener() {
+                        .addEventListener(object : StackedAlertDialogBuilder.EventListener() {
                             override fun onButtonClicked(position: Int) {
                                 Snackbar.make(it, "Button $position Clicked", Snackbar.LENGTH_SHORT).show()
                             }
