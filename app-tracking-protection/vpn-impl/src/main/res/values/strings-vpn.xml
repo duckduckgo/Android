@@ -399,7 +399,7 @@
         <item quantity="one">%1$s of your apps has protection disabled</item>
         <item quantity="other">%1$s of your apps have protection disabled</item>
     </plurals>
-    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Good news! App Tracking Protection is now enabled.<br/><br/>👌I’ll show you a real-time list of apps on your device that I catch trying to track you.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Good news! App Tracking Protection is now enabled.<br/><br/>👍I’ll show you a real-time list of apps on your device that I catch trying to track you.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Got it!</string>
     <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Protection Enabled (%1$s)</string>
     <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Protection Disabled (%1$s)</string>
