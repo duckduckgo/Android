@@ -2536,7 +2536,6 @@ class BrowserTabFragment :
 
         fun renderPrivacyShield(viewState: PrivacyShieldViewState) {
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
-                Timber.i("CR: renderPrivacyShieldChanged $viewState")
                 if (viewState.privacyShield != UNKNOWN) {
                     lastSeenPrivacyShieldViewState = viewState
                     privacyShieldView.setAnimationView(shieldIcon, viewState.privacyShield)
