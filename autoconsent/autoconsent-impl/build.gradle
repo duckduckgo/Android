@@ -52,7 +52,7 @@ dependencies {
     implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.runtimeKtx
+    implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.room.runtime
     implementation AndroidX.constraintLayout
 

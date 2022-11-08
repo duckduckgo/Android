@@ -272,7 +272,7 @@ dependencies {
     implementation AndroidX.fragment.ktx
 
     // ViewModel and LiveData
-    implementation AndroidX.lifecycle.runtimeKtx
+    implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.lifecycle.process
