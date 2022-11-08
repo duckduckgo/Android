@@ -275,7 +275,6 @@
     <string name="atp_WaitlistJoinedWithoutNotification">Jūsų kviečiama išbandyti apsauga nuo programėlių sekimo pasirodys čia. Netrukus sugrįžkite arba galime atsiųsti jums pranešimą, kai ateis jūsų eilė\n\n<annotation type="notify_me_link">Pranešti man</annotation>\n\n<annotation type="beta_link">Sužinoti daugiau apie beta versiją</annotation></string>
     <string name="atp_WaitlistRedeemCodeActivityTitle">Įveskite kvietimo kodą</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Pavyko! Jūs prisijungėte.</string>
-    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">

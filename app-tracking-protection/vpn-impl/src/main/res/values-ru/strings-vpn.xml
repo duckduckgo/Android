@@ -275,7 +275,6 @@
     <string name="atp_WaitlistJoinedWithoutNotification">Приглашение тестировать защиту от слежки придет сюда. Загляните сюда позже либо дождитесь нашего уведомления, когда подойдет ваша очередь\n\n<annotation type="notify_me_link">Получить уведомление</annotation>\n\n<annotation type="beta_link">Подробнее о бета-версии...</annotation></string>
     <string name="atp_WaitlistRedeemCodeActivityTitle">Введите код приглашения</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Готово! Вы приняты.</string>
-    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">

@@ -275,7 +275,6 @@
     <string name="atp_WaitlistJoinedWithoutNotification">Pozvánka do App Tracking Protection ti přijde sem. Brzy si to zkontroluj nebo ti můžeme poslat upozornění, až na tebe přijde řada\n\n<annotation type="notify_me_link">Dejte mi vědět</annotation>\n\n<annotation type="beta_link">Více informací o beta verzi</annotation></string>
     <string name="atp_WaitlistRedeemCodeActivityTitle">Zadej svůj pozvánkový kód</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Úspěch! Podařilo se.</string>
-    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">

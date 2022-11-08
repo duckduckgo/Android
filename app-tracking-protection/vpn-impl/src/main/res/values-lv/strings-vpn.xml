@@ -269,7 +269,6 @@
     <string name="atp_WaitlistJoinedWithoutNotification">Tavs uzaicinājums izmēģināt Lietotņu pretizsekošanas aizsardzību pienāks šeit. Drīz ieskaties atkal, vai arī mēs varam tev nosūtīt paziņojumu, kad būs pienākusi tava kārta\n\n<annotation type="notify_me_link">Paziņojiet man</annotation>\n\n<annotation type="beta_link">Uzzināt vairāk par beta versiju</annotation></string>
     <string name="atp_WaitlistRedeemCodeActivityTitle">Ievadi ielūguma kodu</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Izdevās! Tu esi pievienojies.</string>
-    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">

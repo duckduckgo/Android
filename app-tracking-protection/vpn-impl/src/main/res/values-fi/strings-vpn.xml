@@ -263,7 +263,6 @@
     <string name="atp_WaitlistJoinedWithoutNotification">Kutsu kokeilla App Tracking Protectionia saapuu tähän osoitteeseen. Palaa pian takaisin, tai voimme lähettää sinulle ilmoituksen, kun on sinun vuorosi\n\n<annotation type="notify_me_link">Ilmoita minulle</annotation>\n\n<annotation type="beta_link">Lue lisää beetaversiosta</annotation></string>
     <string name="atp_WaitlistRedeemCodeActivityTitle">Anna kutsukoodisi</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Onnistui! Pääsit mukaan.</string>
-    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">

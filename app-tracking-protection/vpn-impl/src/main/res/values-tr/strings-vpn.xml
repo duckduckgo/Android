@@ -263,7 +263,6 @@
     <string name="atp_WaitlistJoinedWithoutNotification">Uygulama İzleme Koruması\'nı denemek için davetiyeniz buraya gelecektir. Yakında tekrar kontrol edin veya sıra size geldiğinde size bir bildirim gönderebiliriz\n\n<annotation type="notify_me_link">Bana bildirim gönder</annotation>\n\n<annotation type="beta_link">Beta hakkında daha fazla bilgi edinin</annotation></string>
     <string name="atp_WaitlistRedeemCodeActivityTitle">Davet Kodunuzu Girin</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Başarılı! Katıldın.</string>
-    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">

@@ -263,7 +263,6 @@
     <string name="atp_WaitlistJoinedWithoutNotification">Η πρόσκλησή σας για να δοκιμάσετε την Προστασία παρακολούθησης από εφαρμογές θα σταλεί εδώ. Ελέγξτε πάλι σύντομα. Διαφορετικά, μπορούμε να σας στείλουμε ειδοποίηση όταν έρθει η σειρά σας.\n\n<annotation type="notify_me_link">Να ειδοποιηθώ</annotation>\n\n<annotation type="beta_link">Μάθετε περισσότερα σχετικά με την έκδοση beta</annotation></string>
     <string name="atp_WaitlistRedeemCodeActivityTitle">Εισαγάγετε τον Κωδικό πρόσκλησής σας</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Τέλεια! Τα καταφέρατε!</string>
-    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">

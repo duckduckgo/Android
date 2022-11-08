@@ -263,7 +263,6 @@
     <string name="atp_WaitlistJoinedWithoutNotification">Votre invitation à essayer App Tracking Protection arrivera ici. Vous pouvez revenir dans quelque temps ou attendre de recevoir une notification de notre part\n\n<annotation type="notify_me_link">Me prévenir</annotation>\n\n<annotation type="beta_link">En savoir plus sur la version bêta</annotation></string>
     <string name="atp_WaitlistRedeemCodeActivityTitle">Saisissez votre code d\'invitation</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Bravo ! Vous y êtes.</string>
-    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">

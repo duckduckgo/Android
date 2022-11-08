@@ -263,7 +263,6 @@
     <string name="atp_WaitlistJoinedWithoutNotification">Sinu kutse proovida rakenduse jälgimise kaitset saabub siia. Vaata peagi tagasi või saadame sulle teate, kui on sinu kord\n\n<annotation type="notify_me_link">Teavita mind</annotation>\n\n<annotation type="beta_link">Beetaversiooni lisateave</annotation></string>
     <string name="atp_WaitlistRedeemCodeActivityTitle">Sisesta oma kutsekood</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Edu! Oled liitunud.</string>
-    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
