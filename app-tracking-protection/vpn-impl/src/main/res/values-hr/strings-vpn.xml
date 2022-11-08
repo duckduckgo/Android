@@ -233,7 +233,7 @@
     <string name="atp_ActivityEnabledLabel">Ova je značajka u beta verziji. Primijetio si problem s aplikacijom? <annotation type="app_settings_link">Prijavi problem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection je onemogućen</b>\nJe li App Tracking Protection uzrokovao problem s tvojim aplikacijama? <annotation type="report_issues_link">Prijavi probleme</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android je onemogućio zaštitu od praćenja aplikacija App Tracking Protection</b>. Želite li spriječiti da se ovo ponovi? <annotation type="re_enable_link">Ponovno omogući</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>VPN aplikacija na tvom uređaju onemogućila je App Tracking Protection</b>\n.Je li App Tracking Protection uzrokovao problem s tvojim aplikacijama? <annotation type="report_issues_link">Prijavi probleme</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection je onemogućena.</b>\nVPN aplikacija na tvom uređaju ga je možda onemogućila. Koristi gornji gumb za ponovno uključivanje.</string>
     <string name="atp_ActivityAbout">O</string>
     <string name="atp_ActivityManage">Upravljanje</string>
     <string name="atp_ActivityRemoveFeature">Onemogućavanje i brisanje podataka</string>
@@ -371,9 +371,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Ako imaš problema s aplikacijom (kao što je sadržaj koji se ne učitava), pokušaj onemogućiti zaštitu za tu aplikaciju i <annotation type="report_issues_link">pošalji izvještaj o tome.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Nedavne aplikacije</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Nedavna aktivnost aplikacije</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Prikaži sve aplikacije</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Još nema nedavnih aplikacija</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Ovdje će se pojaviti aplikacije s nedavno blokiranim pokušajima praćenja</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Onemogućiti i izbrisati podatke?</string>
@@ -411,12 +411,12 @@
         <item quantity="other">%1$s tvojih aplikacija zaštićeno je od skrivenih alata za praćenje koje smo otkrili da pokušavaju pristupiti tvojim osobnim podacima</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">%1$s tvoja aplikacija ima automatski onemogućenu zaštitu</item>
-        <item quantity="few">%1$s tvoje aplikacije imaju automatski onemogućenu zaštitu</item>
-        <item quantity="many">%1$s tvojih aplikacija ima automatski onemogućenu zaštitu</item>
-        <item quantity="other">%1$s tvojih aplikacija ima automatski onemogućenu zaštitu</item>
+        <item quantity="one">Onemogućena je zaštita na %1$s aplikaciji</item>
+        <item quantity="few">Onemogućena je zaštita na %1$s aplikacije</item>
+        <item quantity="many">Onemogućena je zaštita na %1$s aplikacija</item>
+        <item quantity="other">Onemogućena je zaštita na %1$s aplikacija</item>
     </plurals>
-    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Dobre vijesti! Zaštita od praćenja aplikacije App Tracking Protection sad je omogućena.<br/><br/>👌U stvarnom vremenu ću ti pokazivati popis aplikacija koje uhvatim u pokušaju praćenja na tvom uređaju.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Dobre vijesti! Zaštita od praćenja aplikacija App Tracking Protection sada je omogućena.<br/><br/>👍 U stvarnom vremenu će ti pokazivati popis aplikacija na tvom uređaju koje uhvatim u pokušaju praćenja.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Shvaćam!</string>
     <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Zaštita omogućena (%1$s)</string>
     <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Zaštita onemogućena (%1$s)</string>
