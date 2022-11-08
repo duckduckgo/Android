@@ -24,6 +24,7 @@ import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
 import com.duckduckgo.app.waitlist.trackerprotection.AppTrackingProtectionWaitlistCodeFetcher
 import com.duckduckgo.app.waitlist.trackerprotection.TrackingProtectionWaitlistCodeFetcher
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.squareup.anvil.annotations.ContributesTo
@@ -46,10 +47,18 @@ object AppTrackingProtectionModule {
         notification: AppTPWaitlistCodeNotification,
         notificationSender: NotificationSender,
         dispatcherProvider: DispatcherProvider,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        appTpFeatureConfig: AppTpFeatureConfig,
     ): TrackingProtectionWaitlistCodeFetcher {
         return AppTrackingProtectionWaitlistCodeFetcher(
-            workManager, atpWaitlistStateRepository, manager, notification, notificationSender, dispatcherProvider, appCoroutineScope
+            workManager,
+            atpWaitlistStateRepository,
+            manager,
+            notification,
+            notificationSender,
+            dispatcherProvider,
+            appCoroutineScope,
+            appTpFeatureConfig
         )
     }
 

@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.waitlist.store
 
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import org.junit.Assert.*
 import org.junit.Test
@@ -25,11 +27,13 @@ import org.mockito.kotlin.whenever
 class WaitlistStateRepositoryTest {
 
     private val dataStore: AppTrackingProtectionWaitlistDataStore = mock()
-    private val testee = WaitlistStateRepository(dataStore)
+    private val appTpFeatureConfig: AppTpFeatureConfig = mock()
+    private val testee = WaitlistStateRepository(dataStore, appTpFeatureConfig)
 
     @Test
     fun whenGettingStateAndUserInBetaTheReturnInBeta() {
         whenever(dataStore.inviteCode).thenReturn("inviteCode")
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.OpenBeta)).thenReturn(false)
 
         val state = testee.getState()
 
@@ -48,6 +52,18 @@ class WaitlistStateRepositoryTest {
     }
 
     @Test
+    fun whenGettingStateAndUserJoinedWaitlistAndRemoteOpenBetaEnabledTheReturnInBeta() {
+        whenever(dataStore.inviteCode).thenReturn(null)
+        whenever(dataStore.waitlistTimestamp).thenReturn(1643404916)
+        whenever(dataStore.waitlistToken).thenReturn("someToken")
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.OpenBeta)).thenReturn(true)
+
+        val state = testee.getState()
+
+        assertTrue(state is WaitlistState.InBeta)
+    }
+
+    @Test
     fun whenGettingStateAndUserNotIntBetaOrWaitlistTheReturnNotJoinedQueue() {
         whenever(dataStore.waitlistTimestamp).thenReturn(-1)
         whenever(dataStore.waitlistToken).thenReturn(null)
@@ -55,6 +71,17 @@ class WaitlistStateRepositoryTest {
         val state = testee.getState()
 
         assertEquals(WaitlistState.NotJoinedQueue, state)
+    }
+
+    @Test
+    fun whenGettingStateAndUserNotIntBetaOrWaitlistAndRemoteOpenBetaEnabledThenReturnInBeta() {
+        whenever(dataStore.waitlistTimestamp).thenReturn(-1)
+        whenever(dataStore.waitlistToken).thenReturn(null)
+        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.OpenBeta)).thenReturn(true)
+
+        val state = testee.getState()
+
+        assertEquals(WaitlistState.InBeta, state)
     }
 
     @Test
