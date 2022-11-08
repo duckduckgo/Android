@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2020 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,26 +15,23 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:clipToPadding="false"
+    android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
-        android:id="@+id/sitePermissionsSectionTitle"
-        android:layout_width="0dp"
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/sectionHeaderItemTitle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        tools:text="Title" />
+        app:primaryText="Section Header" />
 
-    <ImageView
-        android:id="@+id/overflowMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:background="?selectableItemBackground"
-        android:paddingStart="14dp"
-        android:paddingEnd="@dimen/toolbarOverflowPadding"
-        android:scaleType="center"
-        android:src="@drawable/ic_overflow"
-        tools:ignore="ContentDescription" />
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/sectionHeaderWithOverflow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:showOverflowMenu="true"
+        app:primaryText="Section Header with Overflow Menu" />
+
 </LinearLayout>

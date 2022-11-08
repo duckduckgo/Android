@@ -41,6 +41,13 @@
         <enum name="rounded" value="2" />
     </attr>
     <attr name="textColorOverride" format="color"/>
+    <attr name="showOverflowMenu" format="boolean"/>
+
+    <!--Section Header Item view-->
+    <declare-styleable name="SectionHeaderListItem">
+        <attr name="primaryText"/>
+        <attr name="showOverflowMenu"/>
+    </declare-styleable>
 
     <!--One Line Item view-->
     <declare-styleable name="OneLineListItem">
