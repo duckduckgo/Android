@@ -659,9 +659,9 @@
     <string name="bookmarkFolderEmpty">Tukšs</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="zero">%1$s%2$s un %1$d vienumus?</item>
-        <item quantity="one">%1$s%2$s un %1$d vienumu?</item>
-        <item quantity="other">%1$s%2$s un %1$d vienumus?</item>
+        <item quantity="zero">%1$s%2$s un %3$d vienumus?</item>
+        <item quantity="one">%1$s%2$s un %3$d vienumu?</item>
+        <item quantity="other">%1$s%2$s un %3$d vienumus?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

@@ -659,9 +659,9 @@
     <string name="bookmarkFolderEmpty">Gol</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s și %1$d element?</item>
-        <item quantity="few">%1$s%2$s și %1$d elemente?</item>
-        <item quantity="other">%1$s%2$s și %1$d elemente?</item>
+        <item quantity="one">%1$s%2$s și %3$d element?</item>
+        <item quantity="few">%1$s%2$s și %3$d elemente?</item>
+        <item quantity="other">%1$s%2$s și %3$d elemente?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

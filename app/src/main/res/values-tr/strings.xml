@@ -657,8 +657,8 @@
     <string name="bookmarkFolderEmpty">Boş</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s ve %1$d öge?</item>
-        <item quantity="other">%1$s%2$s ve %1$d öge?</item>
+        <item quantity="one">%1$s%2$s ve %3$d öge?</item>
+        <item quantity="other">%1$s%2$s ve %3$d öge?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
