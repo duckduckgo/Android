@@ -357,7 +357,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Om du har problem med en app (t.ex. innehåll som inte läses in) kan du prova med att inaktivera skyddet för den appen och <annotation type="report_issues_link">skicka in en rapport.</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Senaste appar</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Visa alla appar</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Inga senaste appar ännu</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Appar med nyligen blockerade spårningsförsök visas här</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Inaktivera och radera data?</string>

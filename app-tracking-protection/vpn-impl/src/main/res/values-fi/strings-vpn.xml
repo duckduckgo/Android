@@ -357,7 +357,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Jos sinulla on ongelmia sovelluksen kanssa (sisältö ei esimerkiksi lataudu), yritä poistaa kyseisen sovelluksen suojaus käytöstä ja <annotation type="report_issues_link">lähettää raportti.</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Viimeaikaiset sovellukset</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Näytä kaikki sovellukset</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Ei vielä viimeaikaisia sovelluksia</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Täällä näkyvät sovellukset, joiden seurantayritykset on estetty hiljattain</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Poistetaanko tiedot käytöstä ja poistetaan?</string>

@@ -357,7 +357,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Hvis du har problemer med en app (f.eks. indhold, der ikke indlæses), kan du prøve at deaktivere beskyttelsen for den pågældende app og <annotation type="report_issues_link">indsende en rapport. </annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Seneste apps</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Vis alle apps</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Endnu ingen apps</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Apps med nyligt blokerede sporingsforsøg vises her</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Deaktiver og slet data?</string>

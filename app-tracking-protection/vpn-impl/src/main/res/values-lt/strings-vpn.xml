@@ -373,7 +373,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Jei kyla problemų su programa (pvz., neįkeliamas turinys), pabandykite išjungti tos programos apsaugą ir <annotation type="report_issues_link">pateikite ataskaitą.</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Naujausios programos</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Rodyti visas programas</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Naujausių programų dar nėra</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Čia bus rodomos programėlės, kuriose neseniai buvo užblokuoti bandymai sekti.</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Išjungti ir ištrinti duomenis?</string>

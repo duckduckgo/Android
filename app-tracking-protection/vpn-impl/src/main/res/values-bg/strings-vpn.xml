@@ -357,7 +357,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Ако имате проблеми с някое приложение (например съдържанието не се зарежда), опитайте да деактивирате защитата за това приложение и <annotation type="report_issues_link">докладвайте проблема.</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Скорошни приложения</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Показване на всички приложения</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Все още няма скорошни приложения</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Тук се показват приложенията с наскоро блокирани опити за проследяване</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Деактивиране и изтриване на данните?</string>
