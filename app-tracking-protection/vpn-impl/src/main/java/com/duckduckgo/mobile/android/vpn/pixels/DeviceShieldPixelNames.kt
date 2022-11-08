@@ -163,9 +163,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG("m_atp_ev_vpn_conflict_dialog_continue_c"),
     ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG_DAILY("m_atp_ev_vpn_conflict_dialog_continue_d"),
 
-    ATP_DID_OPEN_BETA_INSTRUCTIONS("m_atp_imp_beta_instructions_c"),
-    ATP_DID_OPEN_BETA_INSTRUCTIONS_DAILY("m_atp_imp_beta_instructions_d"),
-
     ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY_UNIQUE("m_atp_imp_exclusion_list_activity_u"),
     ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY_DAILY("m_atp_imp_exclusion_list_activity_d"),
     ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY("m_atp_imp_exclusion_list_activity_c"),

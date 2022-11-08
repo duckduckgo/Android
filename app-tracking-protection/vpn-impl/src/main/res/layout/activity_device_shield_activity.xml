@@ -152,12 +152,6 @@
                     android:layout_height="wrap_content"
                     app:primaryText="@string/atp_FAQCta"/>
 
-                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/cta_beta_instructions"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="@string/atp_ActivityBetaInstructions"/>
-
                 <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
