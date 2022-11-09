@@ -97,6 +97,7 @@ class SettingsViewModel @Inject constructor(
         val globalPrivacyControlEnabled: Boolean = false,
         val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
         val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
+        val appTrackingProtectionOnboardingShown: Boolean = false,
         val appTrackingProtectionEnabled: Boolean = false,
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
@@ -165,6 +166,7 @@ class SettingsViewModel @Inject constructor(
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value),
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
+                    appTrackingProtectionOnboardingShown = vpnStore.didShowOnboarding(),
                     appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN),
                     appTrackingProtectionWaitlistState = atpRepository.getState(),
                     emailAddress = emailManager.getEmailAddress(),
@@ -185,6 +187,7 @@ class SettingsViewModel @Inject constructor(
                 val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
                 if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
                     viewState.value = currentViewState().copy(
+                        appTrackingProtectionOnboardingShown = vpnStore.didShowOnboarding(),
                         appTrackingProtectionEnabled = isDeviceShieldEnabled
                     )
                 }
