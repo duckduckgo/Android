@@ -176,6 +176,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest {
                     if (it == null) return@collectLatest
+                    binding.loadingIndicator.hide()
                     dashboardRenderer.render(it)
                 }
         }

@@ -210,6 +210,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
+import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.coroutines.flow.cancellable
 import javax.inject.Provider
@@ -2535,8 +2536,11 @@ class BrowserTabFragment :
 
         fun renderPrivacyShield(viewState: PrivacyShieldViewState) {
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
-                lastSeenPrivacyShieldViewState = viewState
-                privacyShieldView.setAnimationView(shieldIcon, viewState.privacyShield)
+                if (viewState.privacyShield != UNKNOWN) {
+                    lastSeenPrivacyShieldViewState = viewState
+                    privacyShieldView.setAnimationView(shieldIcon, viewState.privacyShield)
+                    cancelTrackersAnimation()
+                }
             }
         }
 
