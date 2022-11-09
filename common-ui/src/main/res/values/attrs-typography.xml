@@ -30,6 +30,10 @@
             <enum name="button" value="8"/>
             <enum name="caption" value="9"/>
         </attr>
+        <attr name="textColor" format="enum" >
+            <enum name="primary" value="0"/>
+            <enum name="secondary" value="1"/>
+        </attr>
     </declare-styleable>
 
     <!-- Attributes for all Design System Text Appearances -->

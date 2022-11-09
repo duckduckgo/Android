@@ -30,14 +30,15 @@
         android:layout_height="@dimen/dialogImageSize"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_globe_gray_16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="@dimen/keyline_4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/textAlertDialogTitle"
-        style="@style/Widget.DuckDuckGo.Dialog.Title"
+        app:typography="h2"
+        app:textColor="primary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -45,29 +46,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textAlertDialogImage"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/textAlertDialogMessage"
-        style="@style/TextAppearance.DuckDuckGo.Body1"
+        app:typography="body1"
+        app:textColor="secondary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/keyline_4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/textAlertDialogTitle"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/textAlertDialogPositiveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/keyline_4"
         android:text="Positive" app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
         android:id="@+id/textAlertDialogCancelButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_2"
         android:text="Cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/textAlertDialogPositiveButton" app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>

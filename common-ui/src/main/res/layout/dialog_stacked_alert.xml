@@ -35,9 +35,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/stackedAlertDialogTitle"
-        style="@style/Widget.DuckDuckGo.Dialog.Title"
+        app:typography="h2"
+        app:textColor="primary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -45,9 +46,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/stackedAlertDialogImage"/>
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/stackedlertDialogMessage"
-        style="@style/TextAppearance.DuckDuckGo.Body1"
+        app:typography="body1"
+        app:textColor="secondary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
