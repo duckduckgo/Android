@@ -233,7 +233,7 @@
     <string name="atp_ActivityEnabledLabel">Tahle funkce je ve fázi beta. Máš problémy s aplikací? <annotation type="app_settings_link">Nahlas nám to, prosím.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection je zakázána</b>\nZpůsobila ti APp Tracking Protection problém s tvými aplikacemi? <annotation type="report_issues_link">Oznámit problémy</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android deaktivoval ochranu App Tracking Protection</b>. Chceš zabránit tomu, aby se to opakovalo? <annotation type="re_enable_link">Znovu povolit</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>VPN aplikace ve tvém zařízení vypnula App Tracking Protection.</b>\nZpůsobila ti App Tracking Protection problém s aplikacemi? <annotation type="report_issues_link">Oznámit problémy</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>Funkce App Tracking Protection je vypnutá.</b>\nMohla ji zakázat aplikace pro VPN ve tvém zařízení. Přepínačem nahoře ji můžeš znovu povolit.</string>
     <string name="atp_ActivityAbout">Informace</string>
     <string name="atp_ActivityManage">Spravovat</string>
     <string name="atp_ActivityRemoveFeature">Zakázat a odstranit data</string>
@@ -371,9 +371,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Pokud máš s nějakou aplikací problémy (například se vám nenačítá obsah), zkus pro ni vypnout ochranu a <annotation type="report_issues_link">odeslat zprávu.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Poslední aplikace</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Nedávná aktivita aplikací</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Zobrazit všechny aplikace</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Zatím žádné poslední aplikace</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Tady se zobrazí aplikace s nedávno zablokovanými pokusy o sledování</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Vypnout a smazat data?</string>
@@ -401,7 +401,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Nahlásit problém</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Teď ne</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivita</string>
-    <string name="atp_ActivityManageProtectionLabel">Máš problémy s aplikací?</string>
+    <string name="atp_ActivityManageProtectionLabel">Máš problémy s aplikací?</string>
     <string name="atp_ActivityEnabledBannerLabel">V beta verzi je ochrana některých aplikací automaticky zakázaná. <annotation type="app_settings_link">Zobrazit aplikace</annotation></string>
     <string name="atp_ActivityDescription">Tady se zobrazí zablokované pokusy o sledování</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
@@ -411,12 +411,12 @@
         <item quantity="other">%1$s tvých aplikací je chráněných před skrytými trackery, které se snaží získat přístup k tvým osobním údajům</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">%1$s tvá aplikace má ochranu automaticky vypnutou</item>
-        <item quantity="few">%1$s tvé aplikace mají ochranu automaticky vypnutou</item>
-        <item quantity="many">%1$s tvé aplikace má ochranu automaticky vypnutou</item>
-        <item quantity="other">%1$s tvých aplikací má ochranu automaticky vypnutou</item>
+        <item quantity="one">%1$s vaše aplikace má vypnutou ochranu</item>
+        <item quantity="few">%1$s vaše aplikace mají vypnutou ochranu</item>
+        <item quantity="many">%1$s vašich aplikací má vypnutou ochranu</item>
+        <item quantity="other">%1$s vašich aplikací má vypnutou ochranu</item>
     </plurals>
-    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Skvělá zpráva! Funkce App Tracking Protection je zapnutá.<br/><br/>👌V reálném čase ti budu ukazovat seznam aplikací z tvého zařízení, které se tě pokoušely sledovat.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Skvělá zpráva! Funkce App Tracking Protection je zapnutá.<br/><br/>👍 V reálném čase ti budu ukazovat seznam aplikací z tvého zařízení, které se tě pokoušely sledovat.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Mám to!</string>
     <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Ochrana je zapnutá (%1$s)</string>
     <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Ochrana je vypnutá (%1$s)</string>
@@ -426,7 +426,7 @@
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Vše</string>
     <string name="atp_ActivityViewAppsLabel">Zobrazit aplikace</string>
     <string name="atp_ActivityEnabledMoreThanADayLabel">Tato funkce je ve fázi beta. Máš s aplikací problémy? <annotation type="app_settings_link">Pomoz nám se zlepšit</annotation></string>
-    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Když povolíš funkci App Tracking Protection, může u&lt;br /&gt;některých aplikací dojít k problémům.\n<annotation type="learn_why_link">Zjisti proč</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Když povolíš funkci App Tracking Protection, může u některých aplikací dojít k problémům. <annotation type="learn_why_link">Zjisti proč</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">U aplikací se známými problémy je ochrana vypnutá. Můžeš ji u&lt;br /&gt;nich zapnout, ale aplikace pak nemusí fungovat podle očekávání. <annotation type="learn_why_link">Zjisti proč</annotation></string>
 
 </resources>
