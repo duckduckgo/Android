@@ -239,7 +239,9 @@ class SettingsActivity :
                     setAutoconsentSetting(it.autoconsentEnabled)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
-                    updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
+                    updateDeviceShieldSettings(
+                        it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState, it.appTrackingProtectionOnboardingShown
+                    )
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
                 }
@@ -374,7 +376,8 @@ class SettingsActivity :
 
     private fun updateDeviceShieldSettings(
         appTPEnabled: Boolean,
-        waitlistState: WaitlistState
+        waitlistState: WaitlistState,
+        appTrackingProtectionOnboardingShown: Boolean
     ) {
         with(viewsMore) {
             if (waitlistState != WaitlistState.InBeta) {
@@ -383,7 +386,11 @@ class SettingsActivity :
                 if (appTPEnabled) {
                     vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldEnabled))
                 } else {
-                    vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
+                    if (appTrackingProtectionOnboardingShown) {
+                        vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
+                    } else {
+                        vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
+                    }
                 }
             }
         }
