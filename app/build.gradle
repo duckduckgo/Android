@@ -39,7 +39,7 @@ android {
                     }
                 }
                 assets {
-                    srcDirs += files("$projectDir/../node_modules/@duckduckgo/privacy_dashboard/build/app".toString())
+                    srcDirs += files("$projectDir/../node_modules/@duckduckgo/privacy-dashboard/build/app".toString())
                 }
             }
         }
