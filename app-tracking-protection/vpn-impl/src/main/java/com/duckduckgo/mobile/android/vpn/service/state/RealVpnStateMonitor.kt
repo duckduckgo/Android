@@ -29,6 +29,7 @@ import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.INVALID
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -47,6 +48,7 @@ class RealVpnStateMonitor @Inject constructor(
 
     override fun getStateFlow(vpnFeature: VpnFeature): Flow<VpnState> {
         return database.vpnServiceStateDao().getStateStats().map { mapState(it) }
+            .filter { it.state != INVALID }
             .onEach { Timber.v("service $it") }
             .combine(
                 vpnFeaturesRegistry.registryChanges()

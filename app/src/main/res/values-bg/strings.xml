@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Намери предишен</string>
     <string name="closeFindInPageButtonDescription">Затваряне на изгледа за търсене в страницата</string>
     <string name="findInPageHint">Намери в страницата</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Редактиране на заявка преди търсене</string>
@@ -197,7 +197,7 @@
     <string name="importBookmarksFileTitle">Изберете файл с отметки за импортиране</string>
     <string name="importBookmarksError">Не успяхме да импортираме отметките, възникна някаква грешка</string>
     <string name="importBookmarksEmpty">Във файла няма отметки за импортиране</string>
-    <string name="importBookmarksSuccess">%1$d отметки са импортирани успешно</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d отметки са импортирани успешно</string>
     <string name="savedSiteDialogTitleHint">Заглавие</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Редактиране</string>
@@ -587,8 +587,8 @@
     <string name="bookmarkFolderEmpty">Празна</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s и %1$d елемент?</item>
-        <item quantity="other">%1$s%2$s и %1$d елемента?</item>
+        <item quantity="one">%1$s%2$s и %3$d елемент?</item>
+        <item quantity="other">%1$s%2$s и %3$d елемента?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

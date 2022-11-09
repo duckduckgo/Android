@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Otsi eelmine</string>
     <string name="closeFindInPageButtonDescription">Sulge lehe vaates otsimine</string>
     <string name="findInPageHint">Otsi lehel</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Enne otsimist muutke päringut</string>
@@ -197,7 +197,7 @@
     <string name="importBookmarksFileTitle">Valige järjehoidja fail, mida importida</string>
     <string name="importBookmarksError">Ühtegi järjehoidjat ei saanud importida, midagi läks valesti</string>
     <string name="importBookmarksEmpty">Failil pole järjehoidjaid, mida importida</string>
-    <string name="importBookmarksSuccess">%1$d järjehoidjat on edukalt imporditud</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d järjehoidjat on edukalt imporditud</string>
     <string name="savedSiteDialogTitleHint">Pealkiri</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Redigeeri</string>
@@ -587,8 +587,8 @@
     <string name="bookmarkFolderEmpty">Tühi</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s ja %1$d üksuse?</item>
-        <item quantity="other">%1$s%2$s ja %1$d üksust?</item>
+        <item quantity="one">%1$s%2$s ja %3$d üksuse?</item>
+        <item quantity="other">%1$s%2$s ja %3$d üksust?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

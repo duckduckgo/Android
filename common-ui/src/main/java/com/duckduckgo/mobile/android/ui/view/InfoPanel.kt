@@ -30,7 +30,6 @@ import android.text.style.UnderlineSpan
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewInfoPanelBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -59,7 +58,7 @@ class InfoPanel : FrameLayout {
         setImageResource(
             attributes.getResourceId(
                 R.styleable.InfoPanel_panelDrawable,
-                R.drawable.ic_link_color_24
+                R.drawable.ic_info_panel_info
             )
         )
         setBackgroundResource(
@@ -124,8 +123,7 @@ class InfoPanel : FrameLayout {
      * Sets the panel image resource
      */
     fun setImageResource(idRes: Int) {
-        val drawable = VectorDrawableCompat.create(resources, idRes, null)
-        binding.infoPanelImage.setImageDrawable(drawable)
+        binding.infoPanelImage.setImageResource(idRes)
     }
 
     companion object {

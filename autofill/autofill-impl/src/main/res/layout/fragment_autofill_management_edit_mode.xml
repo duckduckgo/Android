@@ -31,6 +31,7 @@
             android:id="@+id/domainTitleEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:type="single_line"
             android:layout_marginBottom="@dimen/keyline_5"
             android:hint="@string/credentialManagementEditLoginTitleHint"
             android:visibility="gone"
@@ -43,6 +44,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/credentialManagementEditUsernameHint"
             app:editable="false"
+            app:type="single_line"
             app:endIcon="@drawable/ic_copy"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyUsername" />
 
@@ -55,7 +57,7 @@
             app:editable="false"
             app:endIcon="@drawable/ic_copy"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyPassword"
-            app:isPassword="true" />
+            app:type="password" />
 
         <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
             android:id="@+id/domainEditText"
@@ -63,6 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
             android:hint="@string/credentialManagementEditWebsiteHint"
+            app:type="single_line"
             app:editable="false" />
 
         <com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
@@ -70,6 +73,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
+            app:type="multi_line"
             android:hint="@string/credentialManagementEditNotesHint"
             app:editable="false" />
 

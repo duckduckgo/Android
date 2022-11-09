@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Encontrar anterior</string>
     <string name="closeFindInPageButtonDescription">Fechar a vista de encontrar na página</string>
     <string name="findInPageHint">Encontrar na página</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editar consulta antes de pesquisar</string>
@@ -197,7 +197,7 @@
     <string name="importBookmarksFileTitle">Selecione um ficheiro de marcadores para importar</string>
     <string name="importBookmarksError">Não foi possível importar quaisquer marcadores, algo correu mal</string>
     <string name="importBookmarksEmpty">O ficheiro não tem marcadores para importar</string>
-    <string name="importBookmarksSuccess">%1$d marcadores importados com êxito</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d marcadores importados com êxito</string>
     <string name="savedSiteDialogTitleHint">Título</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Editar</string>
@@ -587,8 +587,8 @@
     <string name="bookmarkFolderEmpty">Vazio</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s e %1$d item?</item>
-        <item quantity="other">%1$s%2$s e %1$d items?</item>
+        <item quantity="one">%1$s%2$s e %3$d item?</item>
+        <item quantity="other">%1$s%2$s e %3$d items?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

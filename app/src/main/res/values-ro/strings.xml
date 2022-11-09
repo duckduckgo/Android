@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Arată rezultatul anterior</string>
     <string name="closeFindInPageButtonDescription">Închide vizualizarea „caută în pagină”</string>
     <string name="findInPageHint">Căutare în pagină</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editare interogare înainte de căutare</string>
@@ -197,7 +197,7 @@
     <string name="importBookmarksFileTitle">Selectați un fișier cu marcaje de importat</string>
     <string name="importBookmarksError">Nu s-au putut importa marcajele, a apărut o eroare</string>
     <string name="importBookmarksEmpty">Fișierul nu are marcaje de importat</string>
-    <string name="importBookmarksSuccess">%1$d marcaje importate cu succes</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d marcaje importate cu succes</string>
     <string name="savedSiteDialogTitleHint">Titlu</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Editare</string>
@@ -589,9 +589,9 @@
     <string name="bookmarkFolderEmpty">Gol</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s și %1$d element?</item>
-        <item quantity="few">%1$s%2$s și %1$d elemente?</item>
-        <item quantity="other">%1$s%2$s și %1$d elemente?</item>
+        <item quantity="one">%1$s%2$s și %3$d element?</item>
+        <item quantity="few">%1$s%2$s și %3$d elemente?</item>
+        <item quantity="other">%1$s%2$s și %3$d elemente?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Pronađi prethodno</string>
     <string name="closeFindInPageButtonDescription">Zatvori prikaz „Pronađi na stranici”</string>
     <string name="findInPageHint">Pronađi na stranici</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Uredi upit prije pretraživanja</string>
@@ -197,7 +197,7 @@
     <string name="importBookmarksFileTitle">Odaberite datoteku knjižne oznake za uvoz</string>
     <string name="importBookmarksError">Nije moguće uvesti nijednu knjižnu oznaku, došlo je do pogreške</string>
     <string name="importBookmarksEmpty">Datoteka nema knjižnih oznaka za uvoz</string>
-    <string name="importBookmarksSuccess">Uspješno uvezene knjižne oznake (njih %1$d)</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Uspješno uvezene knjižne oznake (njih %1$d)</string>
     <string name="savedSiteDialogTitleHint">Naslov</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Uredi</string>
@@ -591,10 +591,10 @@
     <string name="bookmarkFolderEmpty">Prazno</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s i %1$d stavka?</item>
-        <item quantity="few">%1$s%2$s i %1$d stavke?</item>
-        <item quantity="many">%1$s%2$s i %1$d stavki?</item>
-        <item quantity="other">%1$s%2$s i %1$d stavki?</item>
+        <item quantity="one">%1$s%2$s i %3$d stavka?</item>
+        <item quantity="few">%1$s%2$s i %3$d stavke?</item>
+        <item quantity="many">%1$s%2$s i %3$d stavki?</item>
+        <item quantity="other">%1$s%2$s i %3$d stavki?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

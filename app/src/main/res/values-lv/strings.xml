@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Atrast iepriekšējo</string>
     <string name="closeFindInPageButtonDescription">Aizvērt atrašanas lapā skatu</string>
     <string name="findInPageHint">Atrast lapā</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Rediģēt vaicājumu pirms meklēšanas</string>
@@ -197,7 +197,7 @@
     <string name="importBookmarksFileTitle">Atlasi importējamo grāmatzīmju failu</string>
     <string name="importBookmarksError">Nevar importēt nevienu grāmatzīmi, kaut kas nav pareizi</string>
     <string name="importBookmarksEmpty">Failā nav importējamu grāmatzīmju</string>
-    <string name="importBookmarksSuccess">Sekmīgi importētas %1$d grāmatzīmes</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Sekmīgi importētas %1$d grāmatzīmes</string>
     <string name="savedSiteDialogTitleHint">Nosaukums</string>
     <string name="savedSiteDialogUrlHint">Vietrādis URL</string>
     <string name="savedSiteDialogTitleEdit">Rediģēt</string>
@@ -589,9 +589,9 @@
     <string name="bookmarkFolderEmpty">Tukšs</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="zero">%1$s%2$s un %1$d vienumus?</item>
-        <item quantity="one">%1$s%2$s un %1$d vienumu?</item>
-        <item quantity="other">%1$s%2$s un %1$d vienumus?</item>
+        <item quantity="zero">%1$s%2$s un %3$d vienumus?</item>
+        <item quantity="one">%1$s%2$s un %3$d vienumu?</item>
+        <item quantity="other">%1$s%2$s un %3$d vienumus?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

@@ -42,6 +42,9 @@
     <string name="updateLoginDialogButtonUpdatePassword">Update Password</string>
     <string name="updateLoginDialogButtonNotNow">Not Now</string>
 
+    <string name="updateLoginDialogTitleUpdateUsername">Update Username?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Update Username</string>
+
     <string name="autofillDialogCloseButtonContentDescription">Close Autofill Dialog</string>
 
     <string name="credentialManagementEditLoginTitleHint">Login Title</string>

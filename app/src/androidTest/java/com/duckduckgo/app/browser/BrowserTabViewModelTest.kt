@@ -4170,10 +4170,65 @@ class BrowserTabViewModelTest {
         }
     }
 
+    @Test
+    fun whenNotEditingUrlBarAndNotCancelledThenCanAutomaticallyShowAutofillPrompt() {
+        configureOmnibarNotEditing()
+        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenEditingUrlBarAndNotCancelledThenCannotAutomaticallyShowAutofillPrompt() {
+        configureOmnibarEditing()
+        assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenNotEditingUrlBarAndCancelledThenCannotAutomaticallyShowAutofillPrompt() {
+        configureOmnibarNotEditing()
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenEditingUrlBarAndCancelledThenCannotAutomaticallyShowAutofillPrompt() {
+        configureOmnibarEditing()
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        assertFalse(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenNavigationStateChangesSameSiteThenShowAutofillPromptFlagIsReset() {
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        updateUrl("example.com", "example.com", true)
+        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenNavigationStateChangesDifferentSiteThenShowAutofillPromptFlagIsReset() {
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        updateUrl("example.com", "foo.com", true)
+        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
+    @Test
+    fun whenPageRefreshesThenShowAutofillPromptFlagIsReset() {
+        testee.cancelPendingAutofillRequestToChooseCredentials()
+        testee.onWebViewRefreshed()
+        assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
+    }
+
     private fun assertShowHistoryCommandSent(expectedStackSize: Int) {
         assertCommandIssued<ShowBackNavigationHistory> {
             assertEquals(expectedStackSize, history.size)
         }
+    }
+
+    private fun configureOmnibarEditing() {
+        testee.onOmnibarInputStateChanged(hasFocus = true, query = "", hasQueryChanged = false)
+    }
+
+    private fun configureOmnibarNotEditing() {
+        testee.onOmnibarInputStateChanged(hasFocus = false, query = "", hasQueryChanged = false)
     }
 
     private fun buildNavigationHistoryStack(stackSize: Int) {

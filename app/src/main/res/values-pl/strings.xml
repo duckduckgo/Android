@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Znajdź poprzedni element</string>
     <string name="closeFindInPageButtonDescription">Zamknij widok wyszukiwania na stronie</string>
     <string name="findInPageHint">Znajdź na stronie</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edytuj zapytanie przed wyszukiwaniem</string>
@@ -197,7 +197,7 @@
     <string name="importBookmarksFileTitle">Wybierz plik z zakładkami do zaimportowania</string>
     <string name="importBookmarksError">Nie udało się zaimportować żadnych zakładek, coś poszło nie tak</string>
     <string name="importBookmarksEmpty">Plik nie zawiera zakładek do zaimportowania</string>
-    <string name="importBookmarksSuccess">Pomyślnie zaimportowano zakładki (%1$d)</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Pomyślnie zaimportowano zakładki (%1$d)</string>
     <string name="savedSiteDialogTitleHint">Tytuł</string>
     <string name="savedSiteDialogUrlHint">Adres URL</string>
     <string name="savedSiteDialogTitleEdit">Edytuj</string>
@@ -591,10 +591,10 @@
     <string name="bookmarkFolderEmpty">Pusty</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s %2$s i %1$d element?</item>
-        <item quantity="few">%1$s %2$s i %1$d elementy?</item>
-        <item quantity="many">%1$s %2$s i %1$d elementów?</item>
-        <item quantity="other">%1$s %2$s i %1$d elementu?</item>
+        <item quantity="one">%1$s %2$s i %3$d element?</item>
+        <item quantity="few">%1$s %2$s i %3$d elementy?</item>
+        <item quantity="many">%1$s %2$s i %3$d elementów?</item>
+        <item quantity="other">%1$s %2$s i %3$d elementu?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

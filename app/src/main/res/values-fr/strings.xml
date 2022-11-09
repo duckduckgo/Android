@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Précédent</string>
     <string name="closeFindInPageButtonDescription">Fermer la recherche en vue de page</string>
     <string name="findInPageHint">Rechercher dans la page</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Modifier la requête avant la recherche</string>
@@ -197,7 +197,7 @@
     <string name="importBookmarksFileTitle">Sélectionnez un fichier de signets à importer.</string>
     <string name="importBookmarksError">Impossible d\'importer les signets. Un problème est survenu.</string>
     <string name="importBookmarksEmpty">Le fichier ne contient aucun signet à importer.</string>
-    <string name="importBookmarksSuccess">Importation réussie de %1$d signets.</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Importation réussie de %1$d signets.</string>
     <string name="savedSiteDialogTitleHint">Titre</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Modifier</string>
@@ -587,8 +587,8 @@
     <string name="bookmarkFolderEmpty">Vide</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s et %1$d élément ?</item>
-        <item quantity="other">%1$s%2$s et %1$d éléments ?</item>
+        <item quantity="one">%1$s%2$s et %3$d élément ?</item>
+        <item quantity="other">%1$s%2$s et %3$d éléments ?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

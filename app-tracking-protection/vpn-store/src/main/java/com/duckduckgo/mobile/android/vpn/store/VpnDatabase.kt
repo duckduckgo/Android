@@ -29,7 +29,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 @Database(
-    exportSchema = true, version = 29,
+    exportSchema = true, version = 30,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -49,7 +49,6 @@ import org.threeten.bp.format.DateTimeFormatter
         AppTrackerSystemAppOverrideListMetadata::class,
         AppTrackerEntity::class,
         VpnFeatureRemoverState::class,
-        VpnAddressLookup::class,
     ]
 )
 
@@ -65,7 +64,6 @@ abstract class VpnDatabase : RoomDatabase() {
     abstract fun vpnServiceStateDao(): VpnServiceStateStatsDao
     abstract fun vpnSystemAppsOverridesDao(): VpnAppTrackerSystemAppsOverridesDao
     abstract fun vpnFeatureRemoverDao(): VpnFeatureRemoverDao
-    abstract fun vpnAddressLookupDao(): VpnAddressLookupDao
     companion object {
 
         private val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
@@ -150,25 +148,18 @@ abstract class VpnDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // https://stackoverflow.com/a/57797179/980345
                 // SQLite does not support Alter table operations like Foreign keys
+
+                // delete the old table
+                database.execSQL("DROP TABLE IF EXISTS `vpn_tracker`")
+
+                // create the new table
                 database.execSQL(
-                    "CREATE TABLE IF NOT EXISTS `vpn_tracker_new`" +
+                    "CREATE TABLE IF NOT EXISTS `vpn_tracker`" +
                         "(trackerCompanyId INTEGER NOT NULL, domain TEXT NOT NULL, company TEXT NOT NULL," +
                         "companyDisplayName TEXT NOT NULL, packageId TEXT NOT NULL, appDisplayName TEXT NOT NULL," +
                         "timestamp TEXT NOT NULL, bucket TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY(bucket, domain, packageId))"
                 )
 
-                database.execSQL(
-                    """
-                    INSERT INTO vpn_tracker_new (trackerCompanyId, domain, company, companyDisplayName, packageId, appDisplayName, timestamp, bucket, count)
-                    SELECT  trackerCompanyId, domain, company, companyDisplayName, packageId, appDisplayName, timestamp,
-                            strftime('%Y-%m-%d', timestamp), count()
-                    FROM vpn_tracker
-                    GROUP BY strftime('%Y-%m-%d', timestamp), domain, packageId
-                    """.trimIndent()
-                )
-
-                database.execSQL("DROP TABLE IF EXISTS `vpn_tracker`")
-                database.execSQL("ALTER TABLE `vpn_tracker_new` RENAME TO `vpn_tracker`")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_vpn_tracker_bucket` ON `vpn_tracker` (`bucket`)")
             }
         }
@@ -176,6 +167,12 @@ abstract class VpnDatabase : RoomDatabase() {
         private val MIGRATION_28_TO_29: Migration = object : Migration(28, 29) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("DROP TABLE IF EXISTS `vpn_running_stats`")
+            }
+        }
+
+        private val MIGRATION_29_TO_30: Migration = object : Migration(29, 30) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE IF EXISTS `vpn_address_lookup`")
             }
         }
 
@@ -192,6 +189,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_26_TO_27,
                 MIGRATION_27_TO_28,
                 MIGRATION_28_TO_29,
+                MIGRATION_29_TO_30,
             )
     }
 }

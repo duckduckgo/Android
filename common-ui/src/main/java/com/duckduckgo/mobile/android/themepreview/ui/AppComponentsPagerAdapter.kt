@@ -22,6 +22,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentOtherFragment
+import com.duckduckgo.mobile.android.themepreview.ui.component.buttons.ComponentButtonsFragment
 import com.duckduckgo.mobile.android.themepreview.ui.component.buttons.ComponentInteractiveElementsFragment
 import com.duckduckgo.mobile.android.themepreview.ui.component.listitems.ComponentListItemsElementsFragment
 import com.duckduckgo.mobile.android.themepreview.ui.component.navigation.ComponentMessagingFragment
@@ -39,6 +40,7 @@ class AppComponentsPagerAdapter(
     enum class MainFragments(val titleRes: Int) {
         PALETTE(R.string.tab_title_color_palette),
         TYPOGRAPHY(R.string.tab_title_typography),
+        BUTTONS(R.string.tab_title_buttons),
         DIALOGS(R.string.tab_title_dialogs),
         INTERACTIVE_ELEMENTS(R.string.tab_title_component_interactive),
         MESSAGING(R.string.tab_title_component_messaging),
@@ -61,6 +63,7 @@ class AppComponentsPagerAdapter(
         return when (getItemType(position)) {
             MainFragments.PALETTE -> ColorPaletteFragment()
             MainFragments.TYPOGRAPHY -> TypographyFragment()
+            MainFragments.BUTTONS -> ComponentButtonsFragment()
             MainFragments.DIALOGS -> DialogsFragment()
             MainFragments.INTERACTIVE_ELEMENTS -> ComponentInteractiveElementsFragment()
             MainFragments.MESSAGING -> ComponentMessagingFragment()

@@ -80,7 +80,7 @@
     <string name="previousSearchTermDescription">Find previous</string>
     <string name="closeFindInPageButtonDescription">Close find in page view</string>
     <string name="findInPageHint">Find in page</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Edit query before searching</string>
@@ -198,7 +198,7 @@
     <string name="importBookmarksFileTitle">Select a bookmark file to import</string>
     <string name="importBookmarksError">Couldn\'t import any bookmarks, something went wrong</string>
     <string name="importBookmarksEmpty">The file has no bookmarks to import</string>
-    <string name="importBookmarksSuccess">Successfully imported %1$d bookmarks</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Successfully imported %1$d bookmarks</string>
     <string name="savedSiteDialogTitleHint">Title</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Edit</string>
@@ -588,8 +588,8 @@
     <string name="bookmarkFolderEmpty">Empty</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %1$d item?</item>
-        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %1$d items?</item>
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %3$d item?</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %3$d items?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

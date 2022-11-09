@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Najít předchozí</string>
     <string name="closeFindInPageButtonDescription">Zavřít vyhledání v zobrazení stránky</string>
     <string name="findInPageHint">Vyhledávání na stránce</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Upravit dotaz před vyhledáváním</string>
@@ -197,7 +197,7 @@
     <string name="importBookmarksFileTitle">Vyberte soubor se záložkami, který chcete importovat</string>
     <string name="importBookmarksError">Nepodařilo se importovat žádné záložky, něco se pokazilo</string>
     <string name="importBookmarksEmpty">Soubor nemá žádné záložky k importování</string>
-    <string name="importBookmarksSuccess">Úspěšně importovaných %1$d záložek</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Úspěšně importovaných %1$d záložek</string>
     <string name="savedSiteDialogTitleHint">Název</string>
     <string name="savedSiteDialogUrlHint">URL adresa</string>
     <string name="savedSiteDialogTitleEdit">Upravit</string>
@@ -591,10 +591,10 @@
     <string name="bookmarkFolderEmpty">Prázdné</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s a %1$d položka?</item>
-        <item quantity="few">%1$s%2$s a %1$d položky?</item>
-        <item quantity="many">%1$s%2$s a %1$d položek?</item>
-        <item quantity="other">%1$s%2$s a %1$d položek?</item>
+        <item quantity="one">%1$s%2$s a %3$d položka?</item>
+        <item quantity="few">%1$s%2$s a %3$d položky?</item>
+        <item quantity="many">%1$s%2$s a %3$d položek?</item>
+        <item quantity="other">%1$s%2$s a %3$d položek?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

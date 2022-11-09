@@ -28,6 +28,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView
 import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.google.android.material.snackbar.Snackbar
 
@@ -63,6 +64,20 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class MenuItemComponentViewHolder(
         parent: ViewGroup
     ) : ComponentViewHolder(inflate(parent, R.layout.component_menu_item))
+
+    class HeaderSectionComponentViewHolder(
+        parent: ViewGroup
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_section_header_item)) {
+        override fun bind(component: Component) {
+            view.findViewById<SectionHeaderListItem>(R.id.sectionHeaderItemTitle).apply {
+                revertUpperCaseTitleText()
+            }
+            view.findViewById<SectionHeaderListItem>(R.id.sectionHeaderWithOverflow).apply {
+                setOverflowMenuClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
+                revertUpperCaseTitleText()
+            }
+        }
+    }
 
     class OneLineListItemComponentViewHolder(
         parent: ViewGroup
@@ -186,9 +201,9 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         ComponentViewHolder(inflate(parent, R.layout.component_outline_text_input)) {
         init {
             view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext1).onAction { toastOnClick(it) }
-            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext2).onAction { toastOnClick(it) }
             view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext4).onAction { toastOnClick(it) }
             view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext6).onAction { toastOnClick(it) }
+            view.findViewById<OutLinedTextInputView>(R.id.outlinedinputtext8).onAction { toastOnClick(it) }
         }
 
         private fun toastOnClick(action: Action) = when (action) {
@@ -215,6 +230,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
+                Component.SECTION_HEADER_LIST_ITEM -> HeaderSectionComponentViewHolder(parent)
                 Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)

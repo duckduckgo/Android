@@ -30,7 +30,6 @@
             <enum name="button" value="8"/>
             <enum name="caption" value="9"/>
         </attr>
-
     </declare-styleable>
 
     <!-- Attributes for all Design System Text Appearances -->

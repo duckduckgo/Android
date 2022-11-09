@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Trova precedente</string>
     <string name="closeFindInPageButtonDescription">Esci dalla vista Trova nella pagina</string>
     <string name="findInPageHint">Trova nella pagina</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Modifica query prima di iniziare la ricerca</string>
@@ -197,7 +197,7 @@
     <string name="importBookmarksFileTitle">Seleziona un file di segnalibri da importare</string>
     <string name="importBookmarksError">Impossibile importare i segnalibri, si è verificato un errore</string>
     <string name="importBookmarksEmpty">Il file non contiene nessun segnalibro da importare</string>
-    <string name="importBookmarksSuccess">%1$d segnalibri sono stati importati correttamente</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d segnalibri sono stati importati correttamente</string>
     <string name="savedSiteDialogTitleHint">Titolo</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Modifica</string>
@@ -587,8 +587,8 @@
     <string name="bookmarkFolderEmpty">Vuoto</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s e %1$d elemento?</item>
-        <item quantity="other">%1$s%2$s e %1$d elementi?</item>
+        <item quantity="one">%1$s%2$s e %3$d elemento?</item>
+        <item quantity="other">%1$s%2$s e %3$d elementi?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

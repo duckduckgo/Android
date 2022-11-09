@@ -311,7 +311,6 @@ interface DeviceShieldPixels {
     fun didRestartVpnProcessOnBadHealth()
 
     /** Will fire when Beta instructions CTA is pressed */
-    fun didOpenBetaInstructions()
 
     /**
      * This fun will fire two pixels
@@ -378,6 +377,8 @@ interface DeviceShieldPixels {
     fun reportAlwaysOnLockdownEnabledDaily()
 
     fun reportUnprotectedAppsBucket(bucketSize: Int)
+
+    fun didPressOnAppTpEnabledCtaButton()
 }
 
 @ContributesBinding(AppScope::class)
@@ -704,11 +705,6 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH)
     }
 
-    override fun didOpenBetaInstructions() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_OPEN_BETA_INSTRUCTIONS_DAILY)
-        firePixel(DeviceShieldPixelNames.ATP_DID_OPEN_BETA_INSTRUCTIONS)
-    }
-
     override fun didShowExclusionListActivity() {
         tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY_UNIQUE)
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY_DAILY)
@@ -825,6 +821,10 @@ class RealDeviceShieldPixels @Inject constructor(
             String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY.pixelName, bucketSize)
         )
         firePixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET.pixelName, bucketSize))
+    }
+
+    override fun didPressOnAppTpEnabledCtaButton() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_APPTP_ENABLED_CTA_BUTTON)
     }
 
     private fun firePixel(

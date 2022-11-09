@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Najdi prejšnje</string>
     <string name="closeFindInPageButtonDescription">Zapri iskanje v pogledu strani</string>
     <string name="findInPageHint">Najdi na strani</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Uredi poizvedbo pred iskanjem</string>
@@ -197,7 +197,7 @@
     <string name="importBookmarksFileTitle">Izberite datoteko zaznamka za uvoz</string>
     <string name="importBookmarksError">Zaznamkov ni bilo mogoče uvoziti, nekaj je šlo narobe</string>
     <string name="importBookmarksEmpty">Datoteka nima zaznamkov za uvoz</string>
-    <string name="importBookmarksSuccess">Uspešno uvoženih %1$d zaznamkov</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Uspešno uvoženih %1$d zaznamkov</string>
     <string name="savedSiteDialogTitleHint">Naslov</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Uredi</string>
@@ -591,10 +591,10 @@
     <string name="bookmarkFolderEmpty">Prazno</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s in %1$d element?</item>
-        <item quantity="two">%1$s%2$s in %1$d elementa?</item>
-        <item quantity="few">%1$s%2$s in %1$d elementi?</item>
-        <item quantity="other">%1$s%2$s in %1$d elementov?</item>
+        <item quantity="one">%1$s%2$s in %3$d element?</item>
+        <item quantity="two">%1$s%2$s in %3$d elementa?</item>
+        <item quantity="few">%1$s%2$s in %3$d elementi?</item>
+        <item quantity="other">%1$s%2$s in %3$d elementov?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

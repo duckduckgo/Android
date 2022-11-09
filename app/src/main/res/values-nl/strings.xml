@@ -81,7 +81,7 @@
     <string name="previousSearchTermDescription">Vorige zoeken</string>
     <string name="closeFindInPageButtonDescription">Scherm zoek op pagina sluiten</string>
     <string name="findInPageHint">Zoek op pagina</string>
-    <string name="findInPageMatches" translatable="false">%d/%d</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Bewerk query alvorens te zoeken</string>
@@ -197,7 +197,7 @@
     <string name="importBookmarksFileTitle">Selecteer een bladwijzerbestand om te importeren</string>
     <string name="importBookmarksError">Er is iets misgegaan, er kunnen geen bladwijzers worden geïmporteerd</string>
     <string name="importBookmarksEmpty">Dit bestand bevat geen bladwijzers om te importeren</string>
-    <string name="importBookmarksSuccess">%1$d bladwijzers geïmporteerd</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d bladwijzers geïmporteerd</string>
     <string name="savedSiteDialogTitleHint">Titel</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Bewerken</string>
@@ -587,8 +587,8 @@
     <string name="bookmarkFolderEmpty">Leeg</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s %2$s en %1$d item?</item>
-        <item quantity="other">%1$s %2$s en %1$d items?</item>
+        <item quantity="one">%1$s %2$s en %3$d item?</item>
+        <item quantity="other">%1$s %2$s en %3$d items?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
