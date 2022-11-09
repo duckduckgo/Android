@@ -357,7 +357,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Bir uygulamayla ilgili sorun yaşıyorsanız (içeriğin yüklenmemesi gibi), bu uygulama için korumayı devre dışı bırakmayı deneyin ve <annotation type="report_issues_link">bir rapor gönderin.</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Son Uygulamalar</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Tüm Uygulamaları Göster</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Son uygulama yok</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Yakın zamanda izleme girişimleri engellenen uygulamalar burada gösterilir</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Veriler Devre Dışı Bırakılsın ve Silinsin mi?</string>
