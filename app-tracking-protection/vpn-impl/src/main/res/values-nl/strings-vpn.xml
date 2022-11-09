@@ -357,7 +357,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Als je problemen hebt met een app (zoals inhoud die niet laadt), probeer dan de beveiliging voor die app uit te schakelen en <annotation type="report_issues_link">een rapport in te dienen.</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Recente apps</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Alle apps weergeven</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Nog geen recente apps</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Apps met recent geblokkeerde trackingpogingen worden hier weergegeven</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Uitschakelen en gegevens verwijderen?</string>
