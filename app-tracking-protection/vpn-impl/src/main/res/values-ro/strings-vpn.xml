@@ -365,7 +365,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Dacă ai probleme cu o aplicație (cum ar fi faptul că nu se încarcă conținutul), încearcă să dezactivezi protecția pentru aplicația respectivă și <annotation type="report_issues_link">transmite un raport.</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Aplicații recente</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Afișează toate aplicațiile</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Încă nu există aplicații recente</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Aplicațiile cu încercări de urmărire blocate recent vor apărea aici</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Dezactivează și șterge datele?</string>
