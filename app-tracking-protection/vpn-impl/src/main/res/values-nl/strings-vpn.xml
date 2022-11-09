@@ -221,7 +221,7 @@
     <string name="atp_ActivityEnabledLabel">Deze functie is in bèta. Heb je een probleem met een app opgemerkt? <annotation type="app_settings_link">Meld dit probleem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is uitgeschakeld</b>\nHeeft App Tracking Protection een probleem met een van je apps veroorzaakt? <annotation type="report_issues_link">Problemen melden</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android heeft App Tracking Protection uitgeschakeld</b>. Wil je voorkomen dat dit nog een keer gebeurt? <annotation type="re_enable_link">Opnieuw inschakelen</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>Een VPN-app op je apparaat heeft App Tracking Protection uitgeschakeld.</b>Heeft App Tracking Protection een probleem veroorzaakt met je apps? <annotation type="report_issues_link">Problemen melden</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection is uitgeschakeld.</b>\nMogelijk komt dit door een VPN-app op je apparaat. Gebruik de schakelaar hierboven om de bescherming opnieuw in te schakelen.</string>
     <string name="atp_ActivityAbout">Over</string>
     <string name="atp_ActivityManage">Beheren</string>
     <string name="atp_ActivityRemoveFeature">Uitschakelen en gegevens verwijderen</string>
@@ -355,9 +355,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Als je problemen hebt met een app (zoals inhoud die niet laadt), probeer dan de beveiliging voor die app uit te schakelen en <annotation type="report_issues_link">een rapport in te dienen.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Recente apps</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Recente app-activiteit</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Alle apps weergeven</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Nog geen recente apps</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Apps met recent geblokkeerde trackingpogingen worden hier weergegeven</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Uitschakelen en gegevens verwijderen?</string>
@@ -393,10 +393,10 @@
         <item quantity="other">%1$s van je apps zijn beschermd tegen verborgen trackers waarvan we merken dat ze toegang proberen te krijgen tot je persoonlijke gegevens</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">Bij %1$s van je apps is de bescherming automatisch uitgeschakeld</item>
-        <item quantity="other">Bij %1$s van je apps is de bescherming automatisch uitgeschakeld</item>
+        <item quantity="one">Bij %1$s van je apps is de bescherming uitgeschakeld</item>
+        <item quantity="other">Bij %1$s van je apps is de bescherming uitgeschakeld</item>
     </plurals>
-    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Goed nieuws! App Tracking Protection is nu ingeschakeld.<br/><br/>👌 Ik laat je een realtime lijst zien van apps op je apparaat die ik betrap op pogingen om je te volgen.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Goed nieuws! App Tracking Protection is nu ingeschakeld.<br/><br/>👍 Ik laat je een realtime lijst zien van apps op je apparaat die ik betrap op pogingen om je te volgen.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Ik snap het!</string>
     <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Bescherming ingeschakeld (%1$s)</string>
     <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Bescherming uitgeschakeld (%1$s)</string>
