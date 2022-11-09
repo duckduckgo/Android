@@ -357,7 +357,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Εάν αντιμετωπίζετε προβλήματα με μια εφαρμογή (όπως για παράδειγμα μη φόρτωση περιεχομένου), προσπαθήστε να απενεργοποιήσετε την προστασία για την εν λόγω εφαρμογή και <annotation type="report_issues_link">υποβάλετε μια αναφορά.</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Πρόσφατες εφαρμογές</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Εμφάνιση όλων των εφαρμογών</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Δεν υπάρχουν ακόμη πρόσφατες εφαρμογές</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Οι εφαρμογές με προσπάθειες παρακολούθησης που αποκλείστηκαν πρόσφατα θα εμφανίζονται εδώ</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Απενεργοποίηση και διαγραφή δεδομένων;</string>
