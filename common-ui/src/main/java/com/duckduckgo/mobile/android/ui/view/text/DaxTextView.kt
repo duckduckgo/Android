@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.ui.view.text
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R

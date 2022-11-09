@@ -23,7 +23,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.mobile.android.databinding.DialogStackedAlertBinding
-import com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
 import com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
