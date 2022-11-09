@@ -27,12 +27,8 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.LaunchWebsiteAllowed
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
-import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelParameter
-import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.PixelValue
-import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.SitePermissionsPixelName
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import kotlinx.coroutines.channels.Channel
@@ -50,8 +46,7 @@ class SitePermissionsViewModel @Inject constructor(
     private val locationPermissionsRepository: LocationPermissionsRepositoryAPI,
     private val geolocationPermissions: GeoLocationPermissions,
     private val settingsDataStore: SettingsDataStore,
-    private val dispatcherProvider: DispatcherProvider,
-    private val pixel: Pixel
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -116,17 +111,14 @@ class SitePermissionsViewModel @Inject constructor(
                 settingsDataStore.appLocationPermission = isChecked
                 _viewState.value = _viewState.value.copy(askLocationEnabled = isChecked)
                 removeLocationSites()
-                fireTogglePixel(isChecked, PixelValue.LOCATION)
             }
             R.string.sitePermissionsSettingsCamera -> {
                 sitePermissionsRepository.askCameraEnabled = isChecked
                 _viewState.value = _viewState.value.copy(askCameraEnabled = isChecked)
-                fireTogglePixel(isChecked, PixelValue.CAMERA)
             }
             R.string.sitePermissionsSettingsMicrophone -> {
                 sitePermissionsRepository.askMicEnabled = isChecked
                 _viewState.value = _viewState.value.copy(askMicEnabled = isChecked)
-                fireTogglePixel(isChecked, PixelValue.MIC)
             }
         }
     }
@@ -135,14 +127,6 @@ class SitePermissionsViewModel @Inject constructor(
         viewModelScope.launch {
             geolocationPermissions.clearAll()
         }
-    }
-
-    private fun fireTogglePixel(enabled: Boolean, paramValue: String) {
-        val pixelName = when (enabled) {
-            true -> SitePermissionsPixelName.SITE_PERMISSIONS_ASK_ENABLED
-            false -> SitePermissionsPixelName.SITE_PERMISSIONS_ASK_DISABLED
-        }
-        pixel.fire(pixelName, mapOf(PixelParameter.SITE_PERMISSION to paramValue))
     }
 
     fun allowedSiteSelected(domain: String) {
