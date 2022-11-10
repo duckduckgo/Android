@@ -221,7 +221,7 @@
     <string name="atp_ActivityEnabledLabel">Den här funktionen är på betastadiet. Har du upptäckt ett problem med en app? <annotation type="app_settings_link">Rapportera ett problem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection är inaktiverat</b>\nHar App Tracking Protection orsakat problem med dina appar? <annotation type="report_issues_link">Rapportera problem</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android har inaktiverat App Tracking Protection</b>. Vill du förhindra att detta händer igen? <annotation type="re_enable_link">Återaktivera</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>En VPN-app på din enhet har inaktiverat App Tracking Protection.</b>\nHar App Tracking Protection orsakat problem med dina appar? <annotation type="report_issues_link">Rapportera problem</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection är inaktiverat.</b>\nEn VPN-app på din enhet kan ha inaktiverat det. Använd reglaget ovan för att återaktivera skyddet.</string>
     <string name="atp_ActivityAbout">Om</string>
     <string name="atp_ActivityManage">Hantera</string>
     <string name="atp_ActivityRemoveFeature">Inaktivera och radera data</string>
@@ -355,9 +355,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Om du har problem med en app (t.ex. innehåll som inte läses in) kan du prova med att inaktivera skyddet för den appen och <annotation type="report_issues_link">skicka in en rapport.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Senaste appar</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Senaste appaktivitet</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Visa alla appar</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Inga senaste appar ännu</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Appar med nyligen blockerade spårningsförsök visas här</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Inaktivera och radera data?</string>
@@ -393,10 +393,10 @@
         <item quantity="other">%1$s av dina appar är skyddade mot dolda spårare som vi kommer på med att försöka komma åt din personliga information</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">%1$s av dina appar har skyddet inaktiverat automatiskt</item>
-        <item quantity="other">%1$s av dina appar har skyddet inaktiverat automatiskt</item>
+        <item quantity="one">%1$s av dina appar har skyddet inaktiverat</item>
+        <item quantity="other">%1$s av dina appar har skyddet inaktiverat</item>
     </plurals>
-    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Goda nyheter! App Tracking Protection är nu aktiverat.<br/><br/>👌Jag visar dig en lista i realtid över appar på din enhet som jag kommer på med att försöka spåra dig.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Goda nyheter! App Tracking Protection är nu aktiverat.<br/><br/>👍Jag visar dig en lista i realtid över appar på din enhet som jag kommer på med att försöka spåra dig.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Jag förstår!</string>
     <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Skydd aktiverat (%1$s)</string>
     <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Skydd inaktiverat (%1$s)</string>

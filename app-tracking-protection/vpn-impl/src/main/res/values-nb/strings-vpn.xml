@@ -221,7 +221,7 @@
     <string name="atp_ActivityEnabledLabel">Denne funksjonen er i beta. Har du lagt merke til et problem med en app? <annotation type="app_settings_link">Rapporter et problem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection er deaktivert</b>\nHar appsporingsbeskyttelse forårsaket et problem med appene dine? <annotation type="report_issues_link">Rapporter problemer</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android deaktiverte App Tracking Protection</b>. Vil du forhindre at dette skjer igjen? <annotation type="re_enable_link">Aktiver på nytt</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>En VPN-app på enheten din deaktiverte App Tracking Protection.</b>\nHar App Tracking Protection forårsaket et problem med appene dine? <annotation type="report_issues_link">Rapporter problemer</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection er deaktivert.</b>\nEn VPN-app på enheten din kan ha deaktivert den. Bruk bryteren ovenfor for å aktivere på nytt.</string>
     <string name="atp_ActivityAbout">Om</string>
     <string name="atp_ActivityManage">Administrere</string>
     <string name="atp_ActivityRemoveFeature">Deaktivere og slette data</string>
@@ -355,9 +355,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Hvis du har problemer med en app (for eksempel innhold som ikke lastes), kan du prøve å deaktivere beskyttelsen for den appen og <annotation type="report_issues_link">sende inn en rapport.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Nylig brukte apper</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Nylig appaktivitet</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Vis alle apper</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Ingen nylig brukte apper ennå</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Apper med nylig blokkerte sporingsforsøk vises her</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Vil du deaktivere og slette data?</string>
@@ -386,15 +386,15 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ikke nå</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivitet</string>
     <string name="atp_ActivityManageProtectionLabel">Har du problemer med en app?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Under beta blir beskyttelsen for enkelte apper automatisk deaktivert. <annotation type="app_settings_link">Vis apper</annotation></string>
+    <string name="atp_ActivityEnabledBannerLabel">Under beta er beskyttelsen for enkelte apper automatisk deaktivert. <annotation type="app_settings_link">Vis apper</annotation></string>
     <string name="atp_ActivityDescription">Blokkerte sporingsforsøk vises her</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s av appene dine er beskyttet mot skjulte sporere vi finner som prøver å få tilgang til personopplysningene dine</item>
         <item quantity="other">%1$s av appene dine er beskyttet mot skjulte sporere vi finner som prøver å få tilgang til personopplysningene dine</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">%1$s av appene dine har automatisk beskyttelse deaktivert</item>
-        <item quantity="other">%1$s av appene dine har automatisk beskyttelse deaktivert</item>
+        <item quantity="one">%1$s av appene dine har beskyttelse deaktivert</item>
+        <item quantity="other">%1$s av appene dine har beskyttelse deaktivert</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Gode nyheter! App Tracking Protection er nå aktivert.<br/><br/>👌Jeg viser deg en sanntidsliste over apper som prøver å spore deg.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Skjønner!</string>

@@ -221,7 +221,7 @@
     <string name="atp_ActivityEnabledLabel">Αυτή η λειτουργία είναι σε έκδοση beta. Παρατηρήσατε κάποιο πρόβλημα με μια εφαρμογή; <annotation type="app_settings_link">Αναφέρετε κάποιο πρόβλημα.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Η Προστασία παρακολούθησης από εφαρμογές είναι απενεργοποιημένη</b>\nΠροκάλεσε η Προστασία παρακολούθησης από εφαρμογές πρόβλημα στις εφαρμογές σας; <annotation type="report_issues_link">Αναφορά προβλημάτων</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Το Android απενεργοποίησε την Προστασία παρακολούθησης από εφαρμογές</b>. Θέλετε να αποτρέψετε την επανάληψή του; <annotation type="re_enable_link">Επανενεργοποίηση</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>Μια εφαρμογή VPN στη συσκευή σας απενεργοποίησε την Προστασία παρακολούθησης από εφαρμογές.</b>\nΠροκάλεσε η Προστασία παρακολούθησης από εφαρμογές πρόβλημα με τις εφαρμογές σας; <annotation type="report_issues_link">Αναφορά προβλημάτων</annotation></string>
+    <string name="atp_ActivityRevokedLabel">Η <b>Προστασία παρακολούθησης από εφαρμογές είναι απενεργοποιημένη.</b>\nΕνδέχεται να την έχει απενεργοποιήσει μια εφαρμογή VPN στη συσκευή σας. Χρησιμοποιήστε τον διακόπτη πιο πάνω για να την ενεργοποιήσετε ξανά.</string>
     <string name="atp_ActivityAbout">Σχετικά</string>
     <string name="atp_ActivityManage">Διαχείριση</string>
     <string name="atp_ActivityRemoveFeature">Απενεργοποίηση και διαγραφή δεδομένων</string>
@@ -355,9 +355,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Εάν αντιμετωπίζετε προβλήματα με μια εφαρμογή (όπως για παράδειγμα μη φόρτωση περιεχομένου), προσπαθήστε να απενεργοποιήσετε την προστασία για την εν λόγω εφαρμογή και <annotation type="report_issues_link">υποβάλετε μια αναφορά.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Πρόσφατες εφαρμογές</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Πρόσφατη δραστηριότητα εφαρμογών</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Εμφάνιση όλων των εφαρμογών</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Δεν υπάρχουν ακόμη πρόσφατες εφαρμογές</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Οι εφαρμογές με προσπάθειες παρακολούθησης που αποκλείστηκαν πρόσφατα θα εμφανίζονται εδώ</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Απενεργοποίηση και διαγραφή δεδομένων;</string>
@@ -385,7 +385,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Αναφορά προβλήματος</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Όχι τώρα</string>
     <string name="atp_ActivityRecentActivityHeader">Δραστηριότητα</string>
-    <string name="atp_ActivityManageProtectionLabel">Αντιμετωπίζετε προβλήματα με μια εφαρμογή;</string>
+    <string name="atp_ActivityManageProtectionLabel">Έχετε προβλήματα με μια εφαρμογή;</string>
     <string name="atp_ActivityEnabledBannerLabel">Κατά τη διάρκεια της έκδοσης beta, η προστασία για ορισμένες εφαρμογές απενεργοποιείται αυτόματα. <annotation type="app_settings_link">Προβολή εφαρμογών</annotation></string>
     <string name="atp_ActivityDescription">Οι αποκλεισμένες προσπάθειες παρακολούθησης θα εμφανίζονται εδώ</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
@@ -393,8 +393,8 @@
         <item quantity="other">%1$s από τις εφαρμογές σας προστατεύονται από κρυφές εφαρμογές παρακολούθησης που εντοπίζουμε να προσπαθούν να αποκτήσουν πρόσβαση στις προσωπικές πληροφορίες σας</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">%1$s από τις εφαρμογές σας έχει την προστασία αυτόματα απενεργοποιημένη</item>
-        <item quantity="other">%1$s από τις εφαρμογές σας έχουν την προστασία αυτόματα απενεργοποιημένη</item>
+        <item quantity="one">%1$s από τις εφαρμογές σας έχει την προστασία απενεργοποιημένη</item>
+        <item quantity="other">%1$s από τις εφαρμογές σας έχουν την προστασία απενεργοποιημένη</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Υπέροχα νέα! Η Προστασία παρακολούθησης από εφαρμογές είναι πλέον ενεργοποιημένη.<br/><br/>👌Θα σας δείξω μια λίστα σε πραγματικό χρόνο που περιλαμβάνει εφαρμογές στη συσκευή σας που εντοπίζω να προσπαθούν να σας παρακολουθήσουν.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Το κατάλαβα!</string>
