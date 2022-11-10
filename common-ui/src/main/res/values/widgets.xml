@@ -298,11 +298,6 @@
         <item name="cornerSize">@dimen/dialogBorderRadius</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.Dialog.Title">
-        <item name="android:textAppearance">@style/TextAppearance.DuckDuckGo.Headline2</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-    </style>
-
     <style name="Widget.DuckDuckGo.OutlinedTextInputView.TextInputLayout"
            parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="android:textColorHint">@color/outlined_text_input_hint_color_selector</item>
