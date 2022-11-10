@@ -1,3 +1,7 @@
+:root {
+    color-scheme: light dark;
+}
+
 .wrapper *, .wrapper *::before, .wrapper *::after {
     box-sizing: border-box;
 }
@@ -27,8 +31,13 @@
 }
 .tooltip--data, #topAutofill {
     background-color: rgba(242, 240, 240, 0.9);
-    -webkit-backdrop-filter: blur(40px);
-    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(96px);
+    backdrop-filter: blur(96px);
+}
+@media (prefers-color-scheme: dark) {
+    .tooltip--data, #topAutofill {
+        background: rgb(100, 98, 102, .9);
+    }
 }
 .tooltip--data {
     padding: 6px;
@@ -39,9 +48,14 @@
 :not(.top-autofill) .tooltip--data {
     top: 100%;
     left: 100%;
-    border: 0.5px solid rgba(0, 0, 0, 0.2);
+    border: 0.5px solid rgba(255, 255, 255, 0.2);
     border-radius: 6px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.32);
+}
+@media (prefers-color-scheme: dark) {
+    :not(.top-autofill) .tooltip--data {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
 }
 :not(.top-autofill) .tooltip--email {
     top: calc(100% + 6px);
@@ -89,7 +103,7 @@
 }
 .tooltip__button.currentFocus,
 .tooltip__button:hover {
-    background-color: rgba(0, 121, 242, 0.8);
+    background-color: rgba(0, 121, 242, 0.9);
     color: #FFFFFF;
 }
 
@@ -102,9 +116,6 @@
     font-weight: 500;
     line-height: 16px;
     text-align: left;
-}
-.tooltip__button--data > * {
-    opacity: 0.9;
 }
 .tooltip__button--data:first-child {
     margin-top: 0;
@@ -126,6 +137,13 @@
 .tooltip__button--data.currentFocus::before,
 .tooltip__button--data:hover::before {
     filter: invert(100%);
+}
+@media (prefers-color-scheme: dark) {
+    .tooltip__button--data::before,
+    .tooltip__button--data::before {
+        filter: invert(100%);
+        opacity: .9;
+    }
 }
 .tooltip__button__text-container {
     margin: auto 0;
@@ -149,6 +167,17 @@
     font-weight: 400;
     letter-spacing: 0.06px;
     color: rgba(0,0,0,0.6);
+}
+@media (prefers-color-scheme: dark) {
+    .tooltip--data .label {
+        color: #ffffff;
+    }
+    .tooltip--data .label--medium {
+        color: #ffffff;
+    }
+    .tooltip--data .label--small {
+        color: #cdcdcd;
+    }
 }
 .tooltip__button.currentFocus .label,
 .tooltip__button:hover .label,
@@ -178,6 +207,12 @@ hr {
 
 hr:first-child {
     display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+    hr {
+        border-top: 1px solid rgba(255,255,255,.2);
+    }
 }
 
 #privateAddress {
