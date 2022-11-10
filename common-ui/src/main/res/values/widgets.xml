@@ -335,6 +335,8 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopRight">@dimen/dialogBorderRadius</item>
         <item name="cornerSizeTopLeft">@dimen/dialogBorderRadius</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
     </style>
 
     <!-- Switches -->
