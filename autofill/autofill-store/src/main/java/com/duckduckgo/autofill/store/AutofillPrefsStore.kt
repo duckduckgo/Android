@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.store
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.autofill.InternalTestUserChecker
 
 interface AutofillPrefsStore {
     var isEnabled: Boolean
@@ -28,7 +29,8 @@ interface AutofillPrefsStore {
 }
 
 class RealAutofillPrefsStore constructor(
-    private val applicationContext: Context
+    private val applicationContext: Context,
+    private val internalTestUserChecker: InternalTestUserChecker
 ) : AutofillPrefsStore {
 
     private val prefs: SharedPreferences by lazy {
@@ -36,7 +38,7 @@ class RealAutofillPrefsStore constructor(
     }
 
     override var isEnabled: Boolean
-        get() = prefs.getBoolean(AUTOFILL_ENABLED, true)
+        get() = prefs.getBoolean(AUTOFILL_ENABLED, autofillEnabledDefaultValue())
         set(value) = prefs.edit {
             putBoolean(AUTOFILL_ENABLED, value)
         }
@@ -52,6 +54,15 @@ class RealAutofillPrefsStore constructor(
     override var monitorDeclineCounts: Boolean
         get() = prefs.getBoolean(MONITOR_AUTOFILL_DECLINES, true)
         set(value) = prefs.edit { putBoolean(MONITOR_AUTOFILL_DECLINES, value) }
+
+    /**
+     * Internal builds should have autofill enabled by default
+     * It'll be disabled by default for public users, even after internal testing gate removed
+     * If we decide to make it enabled by default for all users, we can hardcode the value to true
+     */
+    private fun autofillEnabledDefaultValue(): Boolean {
+        return internalTestUserChecker.isInternalTestUser
+    }
 
     companion object {
         const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"

@@ -49,7 +49,7 @@ class AutofillModule {
             secureStorage,
             internalTestUserChecker,
             RealLastUpdatedTimeProvider(),
-            RealAutofillPrefsStore(context)
+            RealAutofillPrefsStore(context, internalTestUserChecker)
         )
     }
 }
