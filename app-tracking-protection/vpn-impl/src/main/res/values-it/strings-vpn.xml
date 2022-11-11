@@ -357,7 +357,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Se riscontri problemi con un\'app (come il mancato caricamento dei contenuti), prova a disabilitare la protezione per quell\'app e <annotation type="report_issues_link">invia una segnalazione.</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">App recenti</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Mostra tutte le app</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Ancora nessuna app recente</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Le app il cui tentativo di tracciamento è stato bloccato di recente appariranno qui</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Disattivare ed eliminare i dati?</string>

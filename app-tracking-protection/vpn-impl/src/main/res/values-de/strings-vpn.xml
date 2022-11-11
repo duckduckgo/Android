@@ -357,7 +357,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Wenn du Probleme mit einer App hast (z. B. Inhalte, die nicht geladen werden), versuche, den Schutz für diese App zu deaktivieren und <annotation type="report_issues_link">reiche einen Bericht ein</annotation>.</string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Aktuelle Apps</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Alle Apps anzeigen</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Noch keine aktuellen Apps</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Apps mit kürzlich blockierten Tracking-Versuchen werden hier angezeigt</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Daten deaktivieren und löschen?</string>

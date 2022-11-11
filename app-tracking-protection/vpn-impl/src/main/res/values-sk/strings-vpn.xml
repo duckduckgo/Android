@@ -373,7 +373,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Ak máte problémy s aplikáciou (napríklad sa nenačítava obsah), skúste pre danú aplikáciu vypnúť ochranu a <annotation type="report_issues_link"> odošlite hlásenie. </annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Nedávne aplikácie</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Zobraziť všetky aplikácie</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Zatiaľ žiadne najnovšie aplikácie</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Tu sa zobrazia aplikácie s nedávno zablokovanými pokusmi o sledovanie</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Zakázať a odstrániť údaje?</string>

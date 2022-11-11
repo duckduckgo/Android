@@ -357,7 +357,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Ha problémád van egy alkalmazással (például a tartalom nem töltődik be), próbáld meg kikapcsolni az adott alkalmazás védelmét, és <annotation type="report_issues_link">küldj jelentést.</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Legutóbbi alkalmazások</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Összes alkalmazás megjelenítése</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Még nincsenek legutóbbi alkalmazások</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Itt jelennek meg a nemrég blokkolt nyomkövetéssel próbálkozó alkalmazások</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Letiltod és törlöd az adatokat?</string>

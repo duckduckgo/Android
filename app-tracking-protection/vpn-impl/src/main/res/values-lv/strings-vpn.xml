@@ -365,7 +365,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Ja rodas problēmas ar lietotni (piemēram, netiek ielādēts saturs), pamēģini atspējot šīs lietotnes aizsardzību un <annotation type="report_issues_link">iesniedz ziņojumu.</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Nesenās lietotnes</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Rādīt visas lietotnes</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Vēl nav nevienas nesenas lietotnes</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Šeit parādīsies lietotnes ar nesen bloķētiem izsekošanas mēģinājumiem</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Atspējot un dzēst datus?</string>

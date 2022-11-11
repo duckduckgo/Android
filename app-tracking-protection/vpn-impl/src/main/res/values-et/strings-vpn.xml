@@ -357,7 +357,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Kui sul on mõne rakendusega probleeme (näiteks sisu ei laadi), proovi selle rakenduse kaitse välja lülitada ja <annotation type="report_issues_link">saada meile asjakohane teavitus.</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Hiljuti kasutatud rakendused</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Kuva kõik rakendused</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Hiljuti kasutatud rakendusi veel ei ole</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Siin ilmuvad äsja blokeeritud jälgimiskatsetega rakendused</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Andmete keelamine ja kustutamine?</string>

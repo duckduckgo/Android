@@ -373,7 +373,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Если вы столкнулись со сбоями в приложении (например, не грузится содержимое), попробуйте отключить его защиту и <annotation type="report_issues_link">сообщите нам о проблеме</annotation>.</string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Недавние приложения</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Показать все приложения</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Недавних приложений пока нет</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Здесь будут отображаться приложения, недавно пытавшиеся отследить ваши действия</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Отключить и удалить данные?</string>

@@ -373,7 +373,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Jeśli masz problemy z jakąś aplikacją (np. nie ładuje się jej zawartość), spróbuj wyłączyć ochronę dla tej aplikacji i <annotation type="report_issues_link">prześlij zgłoszenie</annotation>.</string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Ostatnie aplikacje</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Pokaż wszystkie aplikacje</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Brak ostatnich aplikacji</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Tutaj pojawią się aplikacje, w których ostatnio zablokowano próby śledzenia.</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Czy chcesz wyłączyć i usunąć dane?</string>

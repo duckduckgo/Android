@@ -373,7 +373,7 @@
     <string name="atp_ManageRecentAppsProtectionReportIssues">Če imate težave z aplikacijo (na primer vsebina, ki se ne naloži), poskusite onemogočiti zaščito za to aplikacijo in <annotation type="report_issues_link">predložiti poročilo.</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Nedavne aplikacije</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Prikaži vse aplikacije</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Nedavnih aplikacij še ni</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Aplikacije z nedavno blokiranimi poskusi sledenja bodo prikazane tukaj</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Onemogočiti in izbrisati podatke?</string>
