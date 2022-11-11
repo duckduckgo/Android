@@ -14,11 +14,11 @@
   ~ limitations under the License.
   -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                   android:layout_width="match_parent"
-                                                   android:layout_height="wrap_content"
-                                                   android:clipToPadding="false"
-                                                   android:paddingTop="@dimen/keyline_5">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipToPadding="false"
+    android:paddingTop="@dimen/keyline_5">
 
     <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
         android:id="@+id/oneLineListTitle"
@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:text="Single Line Items"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItem"
@@ -36,7 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListTitle"
-        app:primaryText="This is a simple item "/>
+        app:primaryText="This is a simple item " />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithImage"
@@ -46,8 +46,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItem"
-        app:leadingIcon="@drawable/list_item_circular_background_sample"
-        app:primaryText="Item with Leading Image"/>
+        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:primaryText="Item with Leading Image" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithTrailingIcon"
@@ -58,7 +58,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithImage"
         app:primaryText="Item With Trailing Icon"
-        app:trailingIcon="@drawable/ic_overflow"/>
+        app:trailingIcon="@drawable/ic_overflow" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithLeadingAndTrailingIcons"
@@ -68,9 +68,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithTrailingIcon"
-        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIconBackground="circular"
         app:primaryText="Item With Leading and Trailing Icons"
-        app:trailingIcon="@drawable/ic_overflow"/>
+        app:trailingIcon="@drawable/ic_overflow" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemSwitch"
@@ -81,7 +82,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLeadingAndTrailingIcons"
         app:primaryText="Item with Switch Item"
-        app:showSwitch="true"/>
+        app:showSwitch="true" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListSwitchItemWithLeadingIcon"
@@ -91,9 +92,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemSwitch"
-        app:leadingIcon="@drawable/list_item_circular_background_sample"
+        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIconBackground="rounded"
         app:primaryText="Item With Switch and Leading Icon"
-        app:showSwitch="true"/>
+        app:showSwitch="true" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemDisabled"
@@ -103,7 +105,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListSwitchItemWithLeadingIcon"
-        app:primaryText="Item disabled"/>
+        app:primaryText="Item disabled" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemCustomTextColor"
@@ -114,7 +116,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemDisabled"
         app:primaryText="Item with custom text color"
-        app:primaryTextColorOverlay="@color/red_text_color_selector"/>
+        app:primaryTextColorOverlay="@color/red_text_color_selector" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
