@@ -28,7 +28,6 @@ import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWe
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSetting
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
@@ -53,13 +52,11 @@ class PermissionsPerWebsiteViewModelTest {
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
     private val mockLocationPermissionsRepository: LocationPermissionsRepositoryAPI = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
-    private val mockPixel: Pixel = mock()
 
     private val viewModel = PermissionsPerWebsiteViewModel(
         sitePermissionsRepository = mockSitePermissionsRepository,
         locationPermissionsRepository = mockLocationPermissionsRepository,
-        settingsDataStore = mockSettingsDataStore,
-        pixel = mockPixel
+        settingsDataStore = mockSettingsDataStore
     )
 
     private val domain = "domain.com"

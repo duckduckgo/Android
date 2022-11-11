@@ -189,7 +189,7 @@
     <string name="atp_MostRecentActivityTitle">Tüm Son Etkinlikler</string>
     <string name="atp_ActivityRecentActivity">Etkinlik</string>
     <string name="atp_ActivityCtaShowAll">Tüm Son Etkinlikleri Görüntüle</string>
-    <string name="atp_ActivityAppTrackersFAQ">Uygulama İzleyici Nedir?</string>
+    <string name="atp_ActivityAppTrackersFAQ">Uygulama izleyici nedir?</string>
     <string name="atp_ActivityReportProblem">Bir Uygulamayla İlgili Sorun Bildir</string>
     <string name="atp_ActivityBetaInstructions">Beta Talimatları</string>
     <string name="atp_ActivityManageProtection">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</string>
@@ -221,7 +221,7 @@
     <string name="atp_ActivityEnabledLabel">Bu özellik beta aşamasındadır. Bir uygulama ile ilgili sorun mu fark ettiniz? <annotation type="app_settings_link">Lütfen sorunu bize bildirin.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Uygulama İzleme Koruması devre dışı</b> Uygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android, Uygulama İzleme Korumasını devre dışı bıraktı</b>. Bunun tekrar olmasını önlemek ister misiniz? <annotation type="re_enable_link">Yeniden etkinleştir</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>Cihazınızdaki bir VPN uygulaması Uygulama İzleme Koruması\'nı devre dışı bıraktı.</b>\nUygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>Uygulama İzleme Koruması devre dışı.</b>\nCihazınızdaki bir VPN uygulaması bu özelliği devre dışı bırakmış olabilir. Yeniden etkinleştirmek için yukarıdaki düğmeyi kullanın.</string>
     <string name="atp_ActivityAbout">Hakkında</string>
     <string name="atp_ActivityManage">Yönet</string>
     <string name="atp_ActivityRemoveFeature">Verileri Devre Dışı Bırak ve Sil</string>
@@ -355,9 +355,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Bir uygulamayla ilgili sorun yaşıyorsanız (içeriğin yüklenmemesi gibi), bu uygulama için korumayı devre dışı bırakmayı deneyin ve <annotation type="report_issues_link">bir rapor gönderin.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Son Uygulamalar</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Son Uygulama Etkinliği</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Tüm Uygulamaları Göster</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Son uygulama yok</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Yakın zamanda izleme girişimleri engellenen uygulamalar burada gösterilir</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Veriler Devre Dışı Bırakılsın ve Silinsin mi?</string>
@@ -385,7 +385,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Sorun Bildir</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Şimdi Değil</string>
     <string name="atp_ActivityRecentActivityHeader">Etkinlik</string>
-    <string name="atp_ActivityManageProtectionLabel">Bir Uygulamayla İlgili Sorun mu Yaşıyorsunuz?</string>
+    <string name="atp_ActivityManageProtectionLabel">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</string>
     <string name="atp_ActivityEnabledBannerLabel">Beta sırasında bazı uygulamalar için koruma otomatik olarak devre dışı bırakılır. <annotation type="app_settings_link">Uygulamaları Görüntüle</annotation></string>
     <string name="atp_ActivityDescription">Engellenen izleme girişimleri burada görünecek</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
@@ -393,10 +393,10 @@
         <item quantity="other">Uygulamalarınızdan %1$s tanesi kişisel bilgilerinize erişmeye çalışırken bulduğumuz gizli izleyicilerden korunuyor</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">Uygulamalarınızdan %1$s tanesi için koruma otomatik olarak devre dışı bırakıldı</item>
-        <item quantity="other">Uygulamalarınızdan %1$s tanesi için koruma otomatik olarak devre dışı bırakıldı</item>
+        <item quantity="one">%1$s uygulamanızda koruma devre dışı bırakıldı</item>
+        <item quantity="other">%1$s uygulamanızda koruma devre dışı bırakıldı</item>
     </plurals>
-    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[İyi haberlerim var! Uygulama İzleme Koruması artık etkin.<br/><br/>👌Cihazınızda sizi izlemeye çalışırken yakaladığım uygulamaların gerçek zamanlı bir listesini size göstereceğim.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Müjde! Uygulama İzleme Koruması etkinleştirildi.<br/><br/>👍Cihazınızda sizi izlemeye çalışırken yakalanan uygulamaların gerçek zamanlı bir listesini göstereceğim.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Anladım!</string>
     <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Koruma Etkin (%1$s)</string>
     <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Koruma Devre Dışı (%1$s)</string>
@@ -406,7 +406,7 @@
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Tümü</string>
     <string name="atp_ActivityViewAppsLabel">Uygulamaları Görüntüle</string>
     <string name="atp_ActivityEnabledMoreThanADayLabel">Bu özellik beta aşamasındadır. Bir uygulamayla ilgili sorun mu yaşıyorsunuz? <annotation type="app_settings_link">Geliştirmemize Yardımcı Olun</annotation></string>
-    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Uygulama İzleme Koruması etkinleştirildiğinde bazı uygulamalar sorun yaşayabilir.\n<annotation type="learn_why_link">Nedenini Öğrenin</annotation></string>
-    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Bilinen sorunları olan uygulamalar için koruma devre dışı bırakılır. Bu uygulamaları etkinleştirebilirsiniz, ancak beklendiği gibi çalışmayabilirler. <annotation type="learn_why_link">Nedenini Öğrenin</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Uygulama İzleme Koruması etkinleştirildiğinde bazı uygulamalar sorun yaşayabilir. <annotation type="learn_why_link">Nedenini Öğrenin</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Bilinen sorunları olan uygulamalar için koruma devre dışı bırakılır. Bu uygulamaları etkinleştirebilirsiniz, ancak beklendiği gibi çalışmayabilirler. <annotation type="learn_why_link">Nedenini öğrenin</annotation></string>
 
 </resources>

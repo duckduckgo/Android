@@ -23,9 +23,8 @@ import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.mobile.android.R
 
-class SectionHeaderTextView
-@JvmOverloads
-constructor(
+@Deprecated("Use SectionHeaderListItem.kt instead")
+class SectionHeaderTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.style.Widget_DuckDuckGo_SectionHeader

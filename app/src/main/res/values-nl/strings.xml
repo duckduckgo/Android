@@ -657,8 +657,8 @@
     <string name="bookmarkFolderEmpty">Leeg</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s %2$s en %1$d item?</item>
-        <item quantity="other">%1$s %2$s en %1$d items?</item>
+        <item quantity="one">%1$s %2$s en %3$d item?</item>
+        <item quantity="other">%1$s %2$s en %3$d items?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

@@ -391,6 +391,8 @@ class BrowserTabFragment :
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
 
+    private var isActiveTab: Boolean = false
+
     private val downloadMessagesJob = ConflatedJob()
 
     private val viewModel: BrowserTabViewModel by lazy {
@@ -469,8 +471,8 @@ class BrowserTabFragment :
     }
 
     private val autofillCallback = object : Callback {
-        override suspend fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
-            showAutofillDialogChooseCredentials(credentials, triggerType)
+        override suspend fun onCredentialsAvailableToInject(originalUrl: String, credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
+            showAutofillDialogChooseCredentials(originalUrl, credentials, triggerType)
         }
 
         override fun noCredentialsAvailable(originalUrl: String) {
@@ -791,6 +793,22 @@ class BrowserTabFragment :
             Observer {
                 it?.let {
                     decorator.renderTabIcon(it)
+                }
+            }
+        )
+
+        viewModel.liveSelectedTab.distinctUntilChanged().observe(
+            viewLifecycleOwner,
+            Observer {
+                it?.let {
+                    val wasActive = isActiveTab
+                    isActiveTab = it.tabId == tabId
+                    if (wasActive && !isActiveTab) {
+                        Timber.v("Tab %s is newly inactive", tabId)
+
+                        // want to ensure that we aren't offering to inject credentials from an inactive tab
+                        hideDialogWithTag(CredentialAutofillPickerDialog.TAG)
+                    }
                 }
             }
         )
@@ -1676,14 +1694,18 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showAutofillDialogChooseCredentials(credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
+    private fun showAutofillDialogChooseCredentials(originalUrl: String, credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
         if (triggerType == LoginTriggerType.AUTOPROMPT && !(viewModel.canAutofillSelectCredentialsDialogCanAutomaticallyShow())) {
             Timber.d("AutoPrompt is disabled, not showing dialog")
             return
         }
         val url = webView?.url ?: return
+        if (url != originalUrl) {
+            Timber.w("WebView url has changed since autofill request; bailing")
+            return
+        }
         val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(url, credentials, triggerType, tabId)
-        showDialogHidingPrevious(dialog, CredentialAutofillPickerDialog.TAG)
+        showDialogHidingPrevious(dialog, CredentialAutofillPickerDialog.TAG, originalUrl)
     }
 
     private fun cancelPendingAutofillRequestsToChooseCredentials() {
@@ -1729,7 +1751,23 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showDialogHidingPrevious(dialog: DialogFragment, tag: String) {
+    private fun showDialogHidingPrevious(dialog: DialogFragment, tag: String, requiredUrl: String? = null) {
+        // want to ensure lifecycle is at least resumed before attempting to show dialog
+        lifecycleScope.launchWhenResumed {
+            hideDialogWithTag(tag)
+
+            val currentUrl = webView?.url
+            val urlMatch = requiredUrl == null || requiredUrl == currentUrl
+            if (isActiveTab && urlMatch) {
+                Timber.i("Showing dialog (%s), hidden=%s, requiredUrl=%s, currentUrl=%s, tabId=%s", tag, isHidden, requiredUrl, currentUrl, tabId)
+                dialog.show(childFragmentManager, tag)
+            } else {
+                Timber.w("Not showing dialog (%s), hidden=%s, requiredUrl=%s, currentUrl=%s, tabId=%s", tag, isHidden, requiredUrl, currentUrl, tabId)
+            }
+        }
+    }
+
+    private fun hideDialogWithTag(tag: String) {
         childFragmentManager.findFragmentByTag(tag)?.let {
             Timber.i("Found existing dialog for %s; removing it now", tag)
             if (it is DaxDialog) {
@@ -1737,7 +1775,6 @@ class BrowserTabFragment :
             }
             childFragmentManager.commitNow(allowStateLoss = true) { remove(it) }
         }
-        dialog.show(childFragmentManager, tag)
     }
 
     private fun showDialogIfNotExist(dialog: DialogFragment, tag: String) {

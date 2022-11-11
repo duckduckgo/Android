@@ -221,7 +221,7 @@
     <string name="atp_ActivityEnabledLabel">See funktsioon on beetaversioonis. Kas märkad rakendusega probleeme? <annotation type="app_settings_link">Teata probleemist.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Rakenduse jälgimise kaitse on välja lülitatud</b>\nKas rakenduse jälgimise kaitse põhjustas sinu rakendustega probleeme? <annotation type="report_issues_link">Probleemidest teavitamine</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android keelas rakenduste jälgimise kaitse</b>. Kas soovid selle kordumist vältida? <annotation type="re_enable_link">Luba uuesti</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>VPN-rakendus sinu seadmes on rakenduse jälgimise kaitse keelanud.</b>\nKas rakenduse jälgimise kaitse põhjustas sinu rakendustega probleeme? <annotation type="report_issues_link">Teata probleemidest</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>Rakenduse jälgimiskaitse on keelatud.</b>\nSinu seadmes olev VPN-rakendus võib olla selle keelanud. Uuesti lubamiseks kasuta ülaltoodud lülitit.</string>
     <string name="atp_ActivityAbout">Teave</string>
     <string name="atp_ActivityManage">Halda</string>
     <string name="atp_ActivityRemoveFeature">Keela ja kustuta andmed</string>
@@ -355,9 +355,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Kui sul on mõne rakendusega probleeme (näiteks sisu ei laadi), proovi selle rakenduse kaitse välja lülitada ja <annotation type="report_issues_link">saada meile asjakohane teavitus.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Hiljuti kasutatud rakendused</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Hiljutine rakenduste tegevus</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Kuva kõik rakendused</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Hiljuti kasutatud rakendusi veel ei ole</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Siin ilmuvad äsja blokeeritud jälgimiskatsetega rakendused</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Andmete keelamine ja kustutamine?</string>
@@ -385,7 +385,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Teata probleemist</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Mitte praegu</string>
     <string name="atp_ActivityRecentActivityHeader">Tegevus</string>
-    <string name="atp_ActivityManageProtectionLabel">Kas rakendusega on probleeme?</string>
+    <string name="atp_ActivityManageProtectionLabel">Kas sul on rakendusega probleeme?</string>
     <string name="atp_ActivityEnabledBannerLabel">Beetaversioonis on mõne rakenduse kaitse automaatselt välja lülitatud. <annotation type="app_settings_link">Kuva rakendused</annotation></string>
     <string name="atp_ActivityDescription">Siin kuvatakse blokeeritud jälgimiskatsed</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
@@ -393,10 +393,10 @@
         <item quantity="other">%1$s rakendust on kaitstud varjatud jälgurite eest, mille me oleme tabanud katselt jälgida sinu isiklikku teavet</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">%1$s rakenduse kaitse on automaatselt keelatud</item>
-        <item quantity="other">%1$s rakenduse kaitse on automaatselt keelatud</item>
+        <item quantity="one">%1$s sinu rakenduse kaitse on keelatud</item>
+        <item quantity="other">%1$s sinu rakenduse kaitse on keelatud</item>
     </plurals>
-    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Head uudised! Rakenduse jälgimiskaitse on nüüd lubatud.<br/><br/>👌Näitan reaalajas loetelu sinu seadme rakendustest, mille olen tabanud katselt sind jälgida.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Head uudised! Rakenduse jälgimiskaitse on nüüd lubatud.<br/><br/>👍Näitan reaalajas loetelu sinu seadme rakendustest, mille olen tabanud katselt sind jälgida.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Sain aru!</string>
     <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Kaitse on lubatud (%1$s)</string>
     <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Kaitse on keelatud (%1$s)</string>

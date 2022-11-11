@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2019 DuckDuckGo
+  ~ Copyright (c) 2018 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,10 +15,8 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <stroke
-        android:width="1.5dp"
-        android:color="@color/cornflowerBlue" />
-
-    <corners android:radius="4dp" />
-</shape>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false" android:color="?attr/daxColorTextDisabled" />
+    <item android:color="?attr/daxColorButtonSecondaryTextPressed" android:state_pressed="true"/>
+    <item android:color="?attr/daxColorButtonSecondaryText" android:state_enabled="true"/>
+</selector>

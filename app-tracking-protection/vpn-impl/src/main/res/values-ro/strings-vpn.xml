@@ -193,7 +193,7 @@
     <string name="atp_MostRecentActivityTitle">Toate activitățile recente</string>
     <string name="atp_ActivityRecentActivity">Activitate</string>
     <string name="atp_ActivityCtaShowAll">Vezi toate activitățile recente</string>
-    <string name="atp_ActivityAppTrackersFAQ">Ce sunt tehnologiile de urmărire din aplicații?</string>
+    <string name="atp_ActivityAppTrackersFAQ">Ce sunt tehnologiile de urmărire ale aplicațiilor?</string>
     <string name="atp_ActivityReportProblem">Raportează o problemă cu o aplicație</string>
     <string name="atp_ActivityBetaInstructions">Instrucțiuni beta</string>
     <string name="atp_ActivityManageProtection">Ai probleme cu o aplicație?</string>
@@ -227,7 +227,7 @@
     <string name="atp_ActivityEnabledLabel">Această funcție este în versiune beta. Ai observat o problemă cu o aplicație? <annotation type="app_settings_link">Raportează o problemă.</annotation></string>
     <string name="atp_ActivityDisabledLabel">Protecția împotriva urmăririi de către aplicație <b>este dezactivată</b>\nProtecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale? <annotation type="report_issues_link">Raportează probleme</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android a dezactivat Protecția împotriva urmăririi de către aplicație</b>. Vrei să împiedici recurența acestei situații? <annotation type="re_enable_link">Reactivează</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>O aplicație VPN de pe dispozitivul tău a dezactivat Protecția împotriva urmăririi de către aplicație.</b>\nProtecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale? <annotation type="report_issues_link">Raportează probleme</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b> Protecția împotriva urmăririi de către aplicație a fost dezactivată. </b>\nEste posibil ca o aplicație VPN de pe dispozitivul tău să o fi dezactivat. Utilizează comutatorul de mai sus pentru a reactiva.</string>
     <string name="atp_ActivityAbout">Despre</string>
     <string name="atp_ActivityManage">Gestionează</string>
     <string name="atp_ActivityRemoveFeature">Dezactivează și șterge date</string>
@@ -363,9 +363,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Dacă ai probleme cu o aplicație (cum ar fi faptul că nu se încarcă conținutul), încearcă să dezactivezi protecția pentru aplicația respectivă și <annotation type="report_issues_link">transmite un raport.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Aplicații recente</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Activitatea recentă a aplicației</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Afișează toate aplicațiile</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Încă nu există aplicații recente</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Aplicațiile cu încercări de urmărire blocate recent vor apărea aici</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Dezactivează și șterge datele?</string>
@@ -393,7 +393,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Raportează problema</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Nu acum</string>
     <string name="atp_ActivityRecentActivityHeader">Activitate</string>
-    <string name="atp_ActivityManageProtectionLabel">Aveți probleme cu o aplicație?</string>
+    <string name="atp_ActivityManageProtectionLabel">Ai probleme cu o aplicație?</string>
     <string name="atp_ActivityEnabledBannerLabel">În timpul versiunii beta, protecția pentru unele aplicații este dezactivată automat. <annotation type="app_settings_link">Vezi aplicațiile</annotation></string>
     <string name="atp_ActivityDescription">Încercările de urmărire blocate vor apărea aici</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
@@ -402,11 +402,11 @@
         <item quantity="other">%1$s dintre aplicațiile tale sunt protejate împotriva tehnologiilor de urmărire ascunse despre care am constatat că încearcă să îți acceseze informațiile personale</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">%1$s dintre aplicațiile tale are protecția dezactivată automat</item>
-        <item quantity="few">%1$s dintre aplicațiile tale au protecția dezactivată automat</item>
-        <item quantity="other">%1$s dintre aplicațiile tale au protecția dezactivată automat</item>
+        <item quantity="one">%1$s dintre aplicațiile tale are protecția dezactivată</item>
+        <item quantity="few">%1$s dintre aplicațiile tale au protecția dezactivată</item>
+        <item quantity="other">%1$s dintre aplicațiile tale au protecția dezactivată</item>
     </plurals>
-    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Vești bune! Protecția împotriva urmăririi de către aplicație este acum activată.<br/><br/>👌Îți voi arăta o listă în timp real a aplicațiilor de pe dispozitivul tău despre care am observat că încearcă să te urmărească.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Vești bune! Protecția împotriva urmăririi de către aplicație este acum activată.<br/><br/>👍 Îți voi arăta o listă în timp real a aplicațiilor de pe dispozitivul tău despre care am observat că încearcă să te urmărească.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Am înțeles!</string>
     <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Protecție activată (%1$s)</string>
     <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Protecție dezactivată (%1$s)</string>

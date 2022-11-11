@@ -54,6 +54,7 @@ interface VpnStateMonitor {
         SELF_STOP,
         ERROR,
         REVOKED,
-        UNKNOWN
+        UNKNOWN,
+        RESTART
     }
 }

@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.ERROR
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.RESTART
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.UNKNOWN
@@ -114,6 +115,7 @@ class VpnServiceStateLogger @Inject constructor(
 
     private fun mapStopReason(vpnStopReason: VpnStopReason): VpnStoppingReason {
         return when (vpnStopReason) {
+            VpnStopReason.RESTART -> RESTART
             VpnStopReason.SELF_STOP -> SELF_STOP
             VpnStopReason.REVOKED -> REVOKED
             VpnStopReason.ERROR -> ERROR

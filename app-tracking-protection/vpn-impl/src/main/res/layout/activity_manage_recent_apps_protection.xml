@@ -91,21 +91,31 @@
 
             <TextView
                 android:id="@+id/manageRecentAppsEmptyView"
-                android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
+                style="@style/DeviceShield.PrivacyReport.TrackerEntry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?secondaryTextColor"
-                android:textAlignment="center"
-                android:paddingTop="40dp"
-                android:paddingBottom="40dp"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:drawablePadding="@dimen/keyline_4"
+                android:gravity="center_vertical"
+                android:padding="@dimen/keyline_4"
                 android:visibility="gone"
-                android:text="@string/atp_ManageRecentAppsProtectionEmpty" />
+                android:text="@string/atp_ManageRecentAppsProtectionEmpty"
+                app:drawableStartCompat="@drawable/ic_green_key"/>
+
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                android:id="@+id/manageRecentAppsDivider"
+                android:layout_marginStart="72dp"
+                app:defaultPadding="false"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/manageRecentAppsShowAll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="56dp"
+                android:visibility="gone"
                 app:primaryText="@string/atp_ManageRecentAppsProtectionShowAll"/>
 
         </LinearLayout>

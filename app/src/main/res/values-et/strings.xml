@@ -657,8 +657,8 @@
     <string name="bookmarkFolderEmpty">Tühi</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s ja %1$d üksuse?</item>
-        <item quantity="other">%1$s%2$s ja %1$d üksust?</item>
+        <item quantity="one">%1$s%2$s ja %3$d üksuse?</item>
+        <item quantity="other">%1$s%2$s ja %3$d üksust?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">

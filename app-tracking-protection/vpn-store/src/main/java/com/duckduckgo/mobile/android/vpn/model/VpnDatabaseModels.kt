@@ -59,7 +59,8 @@ enum class VpnStoppingReason {
     SELF_STOP,
     ERROR,
     REVOKED,
-    UNKNOWN
+    UNKNOWN,
+    RESTART
 }
 
 data class AlwaysOnState(val alwaysOnEnabled: Boolean, val alwaysOnLockedDown: Boolean) {

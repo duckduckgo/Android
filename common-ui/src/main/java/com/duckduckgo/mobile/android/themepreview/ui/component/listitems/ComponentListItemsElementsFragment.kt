@@ -18,12 +18,13 @@ package com.duckduckgo.mobile.android.themepreview.ui.component.listitems
 
 import com.duckduckgo.mobile.android.themepreview.ui.component.Component
 import com.duckduckgo.mobile.android.themepreview.ui.component.Component.MENU_ITEM
+import com.duckduckgo.mobile.android.themepreview.ui.component.Component.SECTION_HEADER_LIST_ITEM
 import com.duckduckgo.mobile.android.themepreview.ui.component.Component.SINGLE_LINE_LIST_ITEM
 import com.duckduckgo.mobile.android.themepreview.ui.component.Component.TWO_LINE_LIST_ITEM
 import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
 
 class ComponentListItemsElementsFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(MENU_ITEM, SINGLE_LINE_LIST_ITEM, TWO_LINE_LIST_ITEM)
+        return listOf(SECTION_HEADER_LIST_ITEM, SINGLE_LINE_LIST_ITEM, TWO_LINE_LIST_ITEM, MENU_ITEM)
     }
 }

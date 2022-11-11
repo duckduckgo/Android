@@ -29,13 +29,20 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
-import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_CANCELLED
-import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_FAILURE
-import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_SHOWN
-import com.duckduckgo.autofill.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_SUCCESSFUL
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.*
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitDisabledMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ExitLockedMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Editing
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.NotInCredentialMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementCredentialsMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementListMode
@@ -101,7 +108,6 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         if (deviceAuthenticator.hasValidDeviceAuthentication()) {
             viewModel.lock()
 
-            pixel.fire(AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_SHOWN)
             deviceAuthenticator.authenticate(AUTOFILL, this) {
                 when (it) {
                     Success -> onAuthenticationSuccessful()
@@ -116,17 +122,14 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun onAuthenticationSuccessful() {
-        pixel.fire(AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_SUCCESSFUL)
         viewModel.unlock()
     }
 
     private fun onAuthenticationCancelled() {
-        pixel.fire(AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_CANCELLED)
         finish()
     }
 
     private fun onAuthenticationError() {
-        pixel.fire(AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_FAILURE)
         finish()
     }
 

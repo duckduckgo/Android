@@ -107,17 +107,6 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenLaunchBetaInstructionsViewEventThenCommandIsLaunchBetaInstructions() = runBlocking {
-        viewModel.commands().test {
-            viewModel.onViewEvent(ViewEvent.LaunchBetaInstructions)
-
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchBetaInstructions, awaitItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenLaunchDeviceShieldFAQViewEventThenCommandIsLaunchDeviceShieldFAQ() = runBlocking {
         viewModel.commands().test {
             viewModel.onViewEvent(ViewEvent.LaunchDeviceShieldFAQ)

@@ -92,6 +92,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     @Inject lateinit var vpnNetworkStack: VpnNetworkStack
 
+    private var restartRequested = false
+
     private val isInterceptDnsTrafficEnabled by lazy {
         appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic)
     }
@@ -165,6 +167,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         Timber.d("VPN log onDestroy")
         vpnNetworkStack.onDestroyVpn()
         super.onDestroy()
+
+        if (restartRequested) {
+            restartRequested = false
+            startService(this)
+        }
     }
 
     override fun onStartCommand(
@@ -176,6 +183,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
         var returnCode: Int = Service.START_NOT_STICKY
 
+        restartRequested = false
+
         when (val action = intent?.action) {
             ACTION_START_VPN, ACTION_ALWAYS_ON_START -> {
                 notifyVpnStart()
@@ -184,6 +193,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             }
             ACTION_STOP_VPN -> {
                 launch { stopVpn(VpnStopReason.SELF_STOP) }
+            }
+            ACTION_RESTART_VPN -> {
+                restartRequested = true
+                launch { stopVpn(VpnStopReason.RESTART) }
             }
             else -> Timber.e("Unknown intent action: $action")
         }
@@ -423,8 +436,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     private fun sendStopPixels(reason: VpnStopReason) {
         when (reason) {
-            VpnStopReason.SELF_STOP, VpnStopReason.UNKNOWN -> { /* noop */
-            }
+            VpnStopReason.SELF_STOP, VpnStopReason.RESTART, VpnStopReason.UNKNOWN -> {} // no-op
             VpnStopReason.ERROR -> deviceShieldPixels.startError()
             VpnStopReason.REVOKED -> deviceShieldPixels.suddenKillByVpnRevoked()
         }
@@ -466,7 +478,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             TRIM_MEMORY_RUNNING_MODERATE -> deviceShieldPixels.vpnMemoryRunningModerate(memoryData)
             TRIM_MEMORY_RUNNING_LOW -> deviceShieldPixels.vpnMemoryRunningLow(memoryData)
             TRIM_MEMORY_RUNNING_CRITICAL -> deviceShieldPixels.vpnMemoryRunningCritical(memoryData)
-            else -> null /* noop */
+            else -> {} // no-op
         }
     }
 
@@ -498,6 +510,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         private fun stopIntent(context: Context): Intent {
             return serviceIntent(context).also {
                 it.action = ACTION_STOP_VPN
+            }
+        }
+
+        private fun restartIntent(context: Context): Intent {
+            return serviceIntent(context).also {
+                it.action = ACTION_RESTART_VPN
             }
         }
 
@@ -565,6 +583,14 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             }
         }
 
+        internal fun restartService(context: Context) {
+            val applicationContext = context.applicationContext
+
+            restartIntent(applicationContext).run {
+                ContextCompat.startForegroundService(applicationContext, this)
+            }
+        }
+
         internal suspend fun restartVpnService(
             context: Context,
             forceGc: Boolean = false
@@ -572,32 +598,19 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             val applicationContext = context.applicationContext
             if (isServiceRunning(applicationContext)) {
                 Timber.v("VPN log: stopping service")
-                stopService(applicationContext)
-                // wait for the service to stop and then restart it
-                waitUntilStopped(applicationContext)
+
+                restartService(applicationContext)
 
                 if (forceGc) {
                     Timber.d("Forcing a garbage collection to run while VPN is restarting")
                     System.gc()
-                }
-
-                Timber.v("VPN log: re-starting service")
-                startService(applicationContext)
-            }
-        }
-
-        private suspend fun waitUntilStopped(applicationContext: Context) {
-            // it's possible `isServiceRunning` keeps returning true and we never stop waiting, the timeout ensures we don't block forever
-            withTimeoutOrNull(10_000) {
-                while (isServiceRunning(applicationContext)) {
-                    delay(500)
-                    Timber.v("VPN log: waiting for service to stop...")
                 }
             }
         }
 
         private const val ACTION_START_VPN = "ACTION_START_VPN"
         private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
+        private const val ACTION_RESTART_VPN = "ACTION_RESTART_VPN"
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
     }
 

@@ -23,6 +23,10 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_SAVE_LOGIN_PROMPT_DISMISSED("m_autofill_logins_save_login_inline_dismissed"),
     AUTOFILL_SAVE_LOGIN_PROMPT_SAVED("m_autofill_logins_save_login_inline_confirmed"),
 
+    AUTOFILL_SAVE_PASSWORD_PROMPT_SHOWN("m_autofill_logins_save_password_inline_displayed"),
+    AUTOFILL_SAVE_PASSWORD_PROMPT_DISMISSED("m_autofill_logins_save_password_inline_dismissed"),
+    AUTOFILL_SAVE_PASSWORD_PROMPT_SAVED("m_autofill_logins_save_password_inline_confirmed"),
+
     AUTOFILL_UPDATE_LOGIN_PROMPT_SHOWN("m_autofill_logins_update_password_inline_displayed"),
     AUTOFILL_UPDATE_LOGIN_PROMPT_DISMISSED("m_autofill_logins_update_password_inline_dismissed"),
     AUTOFILL_UPDATE_LOGIN_PROMPT_SAVED("m_autofill_logins_update_password_inline_confirmed"),
@@ -35,15 +39,10 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_SELECT_LOGIN_AUTOPROMPT_DISMISSED("m_autofill_logins_autoprompt_dismissed"),
     AUTOFILL_SELECT_LOGIN_AUTOPROMPT_SELECTED("m_autofill_logins_fill_login_inline_autoprompt_confirmed"),
 
-    AUTOFILL_AUTHENTICATION_TO_AUTOFILL_SHOWN("m_autofill_authentication_to_autofill_shown"),
-    AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_SUCCESSFUL("m_autofill_authentication_to_autofill_success"),
-    AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_FAILURE("m_autofill_authentication_to_autofill_failure"),
-    AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_CANCELLED("m_autofill_authentication_to_autofill_cancelled"),
-
-    AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_SHOWN("m_autofill_authentication_to_creds_management_shown"),
-    AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_SUCCESSFUL("m_autofill_authentication_to_creds_management_success"),
-    AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_FAILURE("m_autofill_authentication_to_creds_management_failure"),
-    AUTOFILL_AUTHENTICATION_TO_CREDENTIAL_MANAGEMENT_CANCELLED("m_autofill_authentication_to_creds_management_cancelled"),
+    AUTOFILL_AUTHENTICATION_TO_AUTOFILL_SHOWN("m_autofill_logins_fill_login_inline_authentication_device-displayed"),
+    AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_SUCCESSFUL("m_autofill_logins_fill_login_inline_authentication_device-auth_authenticated"),
+    AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_FAILURE("m_autofill_logins_fill_login_inline_authentication_device-auth_failed"),
+    AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_CANCELLED("m_autofill_logins_fill_login_inline_authentication_device-auth_cancelled"),
 
     AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SHOWN("m_autofill_logins_save_disable-prompt_shown"),
     AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_KEEP_USING("m_autofill_logins_save_disable-prompt_autofill-kept"),

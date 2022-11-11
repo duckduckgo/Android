@@ -657,8 +657,8 @@
     <string name="bookmarkFolderEmpty">Tyhjä</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s ja %1$d kohteen?</item>
-        <item quantity="other">%1$s%2$s ja %1$d kohdetta?</item>
+        <item quantity="one">%1$s%2$s ja %3$d kohteen?</item>
+        <item quantity="other">%1$s%2$s ja %3$d kohdetta?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
