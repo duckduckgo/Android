@@ -24,6 +24,7 @@ import com.duckduckgo.fingerprintprotection.store.features.fingerprintingcanvas.
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintinghardware.FingerprintingHardwareDao
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintingscreensize.FingerprintingScreenSizeDao
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintingtemporarystorage.FingerprintingTemporaryStorageDao
+import com.duckduckgo.fingerprintprotection.store.seed.FingerprintProtectionSeedDao
 
 @Database(
     exportSchema = true,
@@ -34,6 +35,7 @@ import com.duckduckgo.fingerprintprotection.store.features.fingerprintingtempora
         FingerprintingHardwareEntity::class,
         FingerprintingScreenSizeEntity::class,
         FingerprintingTemporaryStorageEntity::class,
+        FingerprintProtectionSeedEntity::class,
     ],
 )
 abstract class FingerprintProtectionDatabase : RoomDatabase() {
@@ -42,6 +44,7 @@ abstract class FingerprintProtectionDatabase : RoomDatabase() {
     abstract fun fingerprintingHardwareDao(): FingerprintingHardwareDao
     abstract fun fingerprintingScreenSizeDao(): FingerprintingScreenSizeDao
     abstract fun fingerprintingTemporaryStorageDao(): FingerprintingTemporaryStorageDao
+    abstract fun fingerprintProtectionSeedDao(): FingerprintProtectionSeedDao
 }
 
 val ALL_MIGRATIONS = emptyArray<Migration>()

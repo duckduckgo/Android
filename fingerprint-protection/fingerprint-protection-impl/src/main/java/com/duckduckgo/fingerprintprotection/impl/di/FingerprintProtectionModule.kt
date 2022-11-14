@@ -33,6 +33,8 @@ import com.duckduckgo.fingerprintprotection.store.features.fingerprintingscreens
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintingscreensize.RealFingerprintingScreenSizeRepository
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintingtemporarystorage.FingerprintingTemporaryStorageRepository
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintingtemporarystorage.RealFingerprintingTemporaryStorageRepository
+import com.duckduckgo.fingerprintprotection.store.seed.FingerprintProtectionSeedRepository
+import com.duckduckgo.fingerprintprotection.store.seed.RealFingerprintProtectionSeedRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -100,5 +102,15 @@ object FingerprintProtectionModule {
         dispatcherProvider: DispatcherProvider,
     ): FingerprintingTemporaryStorageRepository {
         return RealFingerprintingTemporaryStorageRepository(database, coroutineScope, dispatcherProvider)
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideFingerprintProtectionSeedRepository(
+        database: FingerprintProtectionDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): FingerprintProtectionSeedRepository {
+        return RealFingerprintProtectionSeedRepository(database, coroutineScope, dispatcherProvider)
     }
 }
