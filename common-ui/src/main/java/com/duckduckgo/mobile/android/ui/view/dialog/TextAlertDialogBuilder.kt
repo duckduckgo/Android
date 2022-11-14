@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.ui.view.dialog
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.WindowManager
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
