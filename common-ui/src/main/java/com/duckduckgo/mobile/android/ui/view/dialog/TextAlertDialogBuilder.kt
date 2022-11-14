@@ -18,9 +18,11 @@ package com.duckduckgo.mobile.android.ui.view.dialog
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.WindowManager
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -104,6 +106,22 @@ class TextAlertDialogBuilder(val context: Context) {
         setViews(binding, dialog)
 
         dialog.show()
+
+        // val mDisplayMetrics = context.resources.displayMetrics
+        // val mDisplayWidth = mDisplayMetrics.widthPixels
+        // val mDisplayHeight = mDisplayMetrics.heightPixels
+        // val dialogPadding = context.resources.getDimensionPixelOffset(R.dimen.keyline_4)
+        // dialog.window().getDecorView().getHeight()
+        //
+        // // Generate custom width and height and
+        // // add to the dialog attributes
+        // // we multiplied the width and height by 0.5,
+        // // meaning reducing the size to 50%
+        // val mLayoutParams = WindowManager.LayoutParams()
+        // mLayoutParams.width = mDisplayWidth - dialogPadding
+        // mLayoutParams.height = (mDisplayHeight * 0.5f).toInt()
+        // dialog.window?.attributes = mLayoutParams
+
         listener.onDialogShown()
     }
 

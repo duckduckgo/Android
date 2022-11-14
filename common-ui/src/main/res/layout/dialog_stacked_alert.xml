@@ -30,7 +30,7 @@
         android:layout_height="@dimen/dialogImageSize"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_globe_gray_16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="@dimen/keyline_4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -52,7 +52,7 @@
         app:textColor="secondary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/keyline_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/stackedAlertDialogTitle"/>
@@ -61,7 +61,7 @@
         android:id="@+id/stackedAlertDialogButtonLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp" android:gravity="end"
+        android:layout_marginTop="@dimen/keyline_5" android:gravity="end"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"

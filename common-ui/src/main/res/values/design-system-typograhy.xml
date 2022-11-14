@@ -108,7 +108,7 @@
     <style name="Typography.DuckDuckGo.H2">
         <item name="android:textSize">20sp</item>
         <item name="android:lineSpacingExtra">4sp</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="Typography.DuckDuckGo.H3">

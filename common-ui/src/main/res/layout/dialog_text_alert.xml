@@ -22,7 +22,10 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="@dimen/keyline_5">
+    android:paddingTop="@dimen/keyline_5"
+    android:paddingBottom="@dimen/keyline_4"
+    android:paddingStart="@dimen/keyline_4"
+    android:paddingEnd="@dimen/keyline_4">
 
     <ImageView
         android:id="@+id/textAlertDialogImage"
@@ -37,30 +40,33 @@
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/textAlertDialogTitle"
-        app:typography="h2"
-        app:textColor="primary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogImage"/>
+        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogImage" app:textColor="primary" app:typography="h2"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/textAlertDialogMessage"
-        app:typography="body1"
-        app:textColor="secondary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/textAlertDialogTitle"/>
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/textAlertDialogTitle"
+        app:textColor="secondary" app:typography="body1"/>
 
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/textAlertDialogPositiveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
         android:text="Positive" app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
 
@@ -70,6 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_2"
+        android:layout_marginBottom="8dp"
         android:text="Cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/textAlertDialogPositiveButton" app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
