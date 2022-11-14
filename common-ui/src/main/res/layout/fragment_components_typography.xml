@@ -31,10 +31,10 @@
         android:paddingTop="@dimen/keyline_5"
         android:paddingBottom="@dimen/keyline_5">
 
-        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Typography"/>
+            app:primaryText="Typography"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:layout_width="match_parent"

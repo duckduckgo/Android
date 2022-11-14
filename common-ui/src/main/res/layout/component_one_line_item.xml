@@ -20,11 +20,11 @@
                                                    android:clipToPadding="false"
                                                    android:paddingTop="@dimen/keyline_5">
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/oneLineListTitle"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Single Line Items"
+        android:layout_width="match_parent"
+        app:primaryText="Single Line Items"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 

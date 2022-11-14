@@ -21,11 +21,11 @@
                                                    android:paddingTop="@dimen/keyline_5"
                                                    android:paddingBottom="@dimen/keyline_5">
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/label"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Two Line Items"
+        android:layout_width="match_parent"
+        app:primaryText="Two Line Items"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
