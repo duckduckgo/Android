@@ -26,7 +26,6 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/keyline_3"
         android:paddingEnd="@dimen/keyline_3"
         android:paddingTop="@dimen/keyline_5"
         android:paddingBottom="@dimen/keyline_5">
@@ -41,6 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"
             app:typography="title"
             android:text="Text Appearance Title"
             tools:ignore="HardcodedText"/>
@@ -50,6 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"
             app:typography="h1"
             android:text="Text Appearance H1"
             tools:ignore="HardcodedText"/>
@@ -59,6 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"
             app:typography="h2"
             android:text="Text Appearance H2"
             tools:ignore="HardcodedText"/>
@@ -67,6 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_2"
             app:typography="h3"
             android:text="Text Appearance H3"
@@ -76,6 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_2"
             app:typography="h4"
             android:text="Text Appearance H4"
@@ -86,6 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"
             app:typography="h5"
             android:text="Text Appearance H5"
             tools:ignore="HardcodedText"/>
@@ -94,6 +99,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_2"
             app:typography="body1"
             android:text="Text Appearance Body1"
@@ -103,6 +109,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_2"
             app:typography="body2"
             android:text="Text Appearance Body2"
@@ -113,6 +120,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"
             app:typography="button"
             android:text="Text Appearance Button"
             tools:ignore="HardcodedText"/>
@@ -121,29 +129,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_2"
             app:typography="caption"
             android:text="Text Appearance Caption"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Typography Set Manually"/>
+            app:primaryText="Typography Set Manually"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/typographyTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingStart="@dimen/keyline_3"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
             android:text="Text Appearance Body 1 set manually"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Legacy Typography"/>
+            app:primaryText="Legacy Typography"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -151,6 +161,7 @@
             android:gravity="start"
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline1"
             android:text="Text Appearance H1"
+            android:paddingStart="@dimen/keyline_3"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
             tools:ignore="HardcodedText"/>
@@ -162,6 +173,7 @@
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline2"
             android:text="Text Appearance H2"
             android:layout_marginTop="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_2"
             tools:ignore="HardcodedText"/>
 
@@ -171,6 +183,7 @@
             android:gravity="start"
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline3"
             android:text="Text Appearance H3"
+            android:paddingStart="@dimen/keyline_3"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
             tools:ignore="HardcodedText"/>
@@ -181,6 +194,7 @@
             android:gravity="start"
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline4"
             android:text="Text Appearance H4"
+            android:paddingStart="@dimen/keyline_3"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
             tools:ignore="HardcodedText"/>
@@ -191,6 +205,7 @@
             android:gravity="start"
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline5"
             android:text="Text Appearance H5"
+            android:paddingStart="@dimen/keyline_3"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
             tools:ignore="HardcodedText"/>
@@ -201,6 +216,7 @@
             android:gravity="start"
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline6"
             android:text="Text Appearance H6"
+            android:paddingStart="@dimen/keyline_3"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
             tools:ignore="HardcodedText"/>
@@ -209,6 +225,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
+            android:paddingStart="@dimen/keyline_3"
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
             android:text="Text Appearance Body1"
             android:layout_marginTop="@dimen/keyline_2"
@@ -219,6 +236,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
+            android:paddingStart="@dimen/keyline_3"
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
             android:text="Text Appearance Body2"
             android:layout_marginTop="@dimen/keyline_2"
@@ -229,6 +247,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
+            android:paddingStart="@dimen/keyline_3"
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Button1"
             android:text="Text Appearance Button1"
             android:layout_marginTop="@dimen/keyline_2"
@@ -239,6 +258,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
+            android:paddingStart="@dimen/keyline_3"
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Button2"
             android:text="Text Button2"
             android:layout_marginTop="@dimen/keyline_2"
@@ -249,6 +269,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
+            android:paddingStart="@dimen/keyline_3"
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Caption"
             android:text="Text Appearance Caption"
             android:layout_marginTop="@dimen/keyline_2"
