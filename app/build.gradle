@@ -235,6 +235,10 @@ dependencies {
     implementation project(':content-scope-scripts-api')
     implementation project(':content-scope-scripts-impl')
 
+    implementation project(':fingerprint-protection-api')
+    implementation project(':fingerprint-protection-impl')
+    implementation project(':fingerprint-protection-store')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
