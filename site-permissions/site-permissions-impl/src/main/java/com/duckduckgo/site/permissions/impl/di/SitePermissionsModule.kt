@@ -41,7 +41,6 @@ object SitePermissionsModule {
     @SingleInstanceIn(AppScope::class)
     fun providesSitePermissionsDatabase(context: Context): SitePermissionsDatabase {
         return Room.databaseBuilder(context, SitePermissionsDatabase::class.java, "site_permissions.db")
-            .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .build()
     }

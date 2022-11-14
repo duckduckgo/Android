@@ -221,7 +221,7 @@
     <string name="atp_ActivityEnabledLabel">Esta función está en versión beta. ¿Tienes problemas con una aplicación? <annotation type="app_settings_link">Informa de un problema.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection está desactivada</b>\n¿Ha causado App Tracking Protection un problema con tus aplicaciones? <annotation type="report_issues_link">Informa de los problemas</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android ha desactivado App Tracking Protection</b>. ¿Quieres evitar que esto vuelva a suceder? <annotation type="re_enable_link">Reactivar</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>Una aplicación VPN en tu dispositivo ha desactivado App Tracking Protection.</b>\n¿Ha causado App Tracking Protection un problema con tus aplicaciones? <annotation type="report_issues_link">Informa de los problemas</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection está desactivada.</b>\nEs posible que una aplicación de VPN en tu dispositivo la haya desactivado. Usa el botón de arriba para volver a activarla.</string>
     <string name="atp_ActivityAbout">Sobre</string>
     <string name="atp_ActivityManage">Gestionar</string>
     <string name="atp_ActivityRemoveFeature">Desactivar y borrar datos</string>
@@ -355,9 +355,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Si tienes problemas con una aplicación (como que el contenido no se cargue), prueba a desactivar la protección para esa aplicación y <annotation type="report_issues_link">envía un informe.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Aplicaciones recientes</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Actividad reciente de las aplicaciones</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Mostrar todas las aplicaciones</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Aún no hay aplicaciones recientes</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Las aplicaciones con intentos recientes de rastreo bloqueados aparecerán aquí</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">¿Desactivar y borrar datos?</string>
@@ -393,10 +393,10 @@
         <item quantity="other">%1$s de tus aplicaciones están protegidas de los rastreadores ocultos que encontramos al intentar acceder a tu información personal</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">%1$s de tus aplicaciones ha desactivado automáticamente la protección</item>
-        <item quantity="other">%1$s de tus aplicaciones han desactivado automáticamente la protección</item>
+        <item quantity="one">%1$s de tus aplicaciones tiene la protección desactivada</item>
+        <item quantity="other">%1$s de tus aplicaciones tienen la protección desactivada</item>
     </plurals>
-    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[¡Buenas noticias! App Tracking Protection ahora está habilitada.<br/><br/>👌Te mostraré una lista en tiempo real de las aplicaciones de tu dispositivo para las que detecte intentos de rastreo.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[¡Buenas noticias! App Tracking Protection ahora está activada.<br/><br/>👍Te mostraré una lista en tiempo real de las aplicaciones de tu dispositivo para las que detecte intentos de rastreo.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Entendido</string>
     <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Protección activada (%1$s)</string>
     <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Protección desactivada (%1$s)</string>

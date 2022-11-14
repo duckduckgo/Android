@@ -36,6 +36,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import timber.log.Timber
+import java.net.InetAddress
 import javax.inject.Inject
 
 private const val LRU_CACHE_SIZE = 2048
@@ -84,7 +85,6 @@ class NgVpnNetworkStack @Inject constructor(
                 vpnNetwork.destroy(jniContext)
                 jniContext = 0
             }
-
         }
         jniContext = vpnNetwork.create()
 
@@ -114,6 +114,15 @@ class NgVpnNetworkStack @Inject constructor(
     override fun mtu(): Int {
         return vpnNetwork.get().mtu()
     }
+
+    override fun addresses(): Map<InetAddress, Int> = mapOf(
+        InetAddress.getByName("10.0.0.2") to 32,
+        InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
+    )
+
+    override fun dns(): Set<InetAddress> = emptySet()
+
+    override fun routes(): Map<InetAddress, Int> = emptyMap()
 
     override fun onExit(reason: String) {
         Timber.w("Native exit reason=$reason")

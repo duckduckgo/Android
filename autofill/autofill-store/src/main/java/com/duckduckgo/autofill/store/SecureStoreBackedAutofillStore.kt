@@ -58,6 +58,12 @@ class SecureStoreBackedAutofillStore(
             autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin = value
         }
 
+    override var hasEverBeenPromptedToSaveLogin: Boolean
+        get() = autofillPrefsStore.hasEverBeenPromptedToSaveLogin
+        set(value) {
+            autofillPrefsStore.hasEverBeenPromptedToSaveLogin = value
+        }
+
     override var autofillDeclineCount: Int
         get() = autofillPrefsStore.autofillDeclineCount
         set(value) {

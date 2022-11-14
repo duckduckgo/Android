@@ -54,7 +54,6 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
                 "secure_storage_database_encrypted.db"
             ).openHelperFactory(SupportFactory(keyProvider.getl1Key()))
                 .addMigrations(*ALL_MIGRATIONS)
-                .enableMultiInstanceInvalidation()
                 .build()
             _database
         } else {

@@ -25,6 +25,7 @@ interface AutofillPrefsStore {
     var showOnboardingWhenOfferingToSaveLogin: Boolean
     var autofillDeclineCount: Int
     var monitorDeclineCounts: Boolean
+    var hasEverBeenPromptedToSaveLogin: Boolean
 }
 
 class RealAutofillPrefsStore constructor(
@@ -45,6 +46,10 @@ class RealAutofillPrefsStore constructor(
         get() = prefs.getBoolean(SHOW_SAVE_LOGIN_ONBOARDING, true)
         set(value) = prefs.edit { putBoolean(SHOW_SAVE_LOGIN_ONBOARDING, value) }
 
+    override var hasEverBeenPromptedToSaveLogin: Boolean
+        get() = prefs.getBoolean(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN, false)
+        set(value) = prefs.edit { putBoolean(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN, value) }
+
     override var autofillDeclineCount: Int
         get() = prefs.getInt(AUTOFILL_DECLINE_COUNT, 0)
         set(value) = prefs.edit { putInt(AUTOFILL_DECLINE_COUNT, value) }
@@ -57,6 +62,7 @@ class RealAutofillPrefsStore constructor(
         const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
         const val AUTOFILL_ENABLED = "autofill_enabled"
         const val SHOW_SAVE_LOGIN_ONBOARDING = "autofill_show_onboardind_saved_login"
+        const val HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN = "autofill_has_ever_been_prompted_to_save_login"
         const val AUTOFILL_DECLINE_COUNT = "autofill_decline_count"
         const val MONITOR_AUTOFILL_DECLINES = "monitor_autofill_declines"
     }

@@ -107,6 +107,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         savedInstanceState: Bundle?
     ): View {
         pixelNameDialogEvent(Shown)?.let { pixel.fire(it) }
+        viewModel.userPromptedToSaveCredentials()
 
         val binding = ContentAutofillSaveNewCredentialsBinding.inflate(inflater, container, false)
         configureViews(binding, getCredentialsToSave())

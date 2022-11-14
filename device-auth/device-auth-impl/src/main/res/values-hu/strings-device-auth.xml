@@ -17,6 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofill_auth_text">Zárolás feloldása a mentett bejelentkezések használatához</string>
-    <string name="biometric_prompt_title">Személyazonosságod igazolása</string>
+    <string name="autofill_auth_text">A mentett bejelentkezések használatához oldd fel az eszköz zárolását.</string>
+    <string name="biometric_prompt_title">Automatikus kitöltés zárolva</string>
 </resources>
