@@ -46,6 +46,7 @@ import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -106,6 +107,7 @@ class SettingsViewModel @Inject constructor(
         val autoconsentEnabled: Boolean = false,
         @StringRes val notificationsSettingSubtitleId: Int = R.string.settingsSubtitleNotificationsDisabled,
         val windowsWaitlistState: WindowsWaitlistState? = null,
+        val networkProtectionEnabled: Boolean = false,
     )
 
     data class AutomaticallyClearData(
@@ -132,6 +134,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchGlobalPrivacyControl : Command()
         object LaunchAutoconsent : Command()
         object LaunchAppTPTrackersScreen : Command()
+        object LaunchNetPManagementScreen : Command()
         object LaunchAppTPOnboarding : Command()
         object UpdateTheme : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
@@ -181,6 +184,7 @@ class SettingsViewModel @Inject constructor(
                     windowsWaitlistState = windowsSettingState(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     syncEnabled = deviceSyncState.isUserSignedInOnDevice(),
+                    networkProtectionEnabled = vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN),
                 ),
             )
         }
@@ -198,6 +202,20 @@ class SettingsViewModel @Inject constructor(
                     viewState.value = currentViewState().copy(
                         appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                         appTrackingProtectionEnabled = isDeviceShieldEnabled,
+                    )
+                }
+                delay(1_000)
+            }
+        }
+    }
+
+    fun startPollingNetPEnableState() {
+        viewModelScope.launch {
+            while (isActive) {
+                val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)
+                if (currentViewState().networkProtectionEnabled != isDeviceShieldEnabled) {
+                    viewState.value = currentViewState().copy(
+                        networkProtectionEnabled = isDeviceShieldEnabled
                     )
                 }
                 delay(1_000)
@@ -313,6 +331,10 @@ class SettingsViewModel @Inject constructor(
         } else {
             viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
         }
+    }
+
+    fun onNetPSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchNetPManagementScreen) }
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {

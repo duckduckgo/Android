@@ -44,10 +44,6 @@ private const val EMFILE_ERRNO = 24
 
 @ContributesMultibinding(
     scope = VpnScope::class,
-    boundType = VpnNetworkStack::class,
-)
-@ContributesBinding(
-    scope = VpnScope::class,
     boundType = VpnNetworkCallback::class,
 )
 @SingleInstanceIn(VpnScope::class)

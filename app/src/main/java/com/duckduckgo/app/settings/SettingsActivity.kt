@@ -89,6 +89,7 @@ import com.duckduckgo.windows.api.WindowsWaitlistState.InBeta
 import com.duckduckgo.windows.api.WindowsWaitlistState.JoinedWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistState.NotJoinedQueue
 import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
+import com.duckduckgo.networkprotection.impl.entry.NetworkProtectionManagementActivity
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -171,6 +172,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         val notificationsEnabled = NotificationManagerCompat.from(this).areNotificationsEnabled()
         viewModel.start(notificationsEnabled)
         viewModel.startPollingAppTpEnableState()
+        viewModel.startPollingNetPEnableState()
     }
 
     private fun configureUiEventHandlers() {
@@ -226,6 +228,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             macOsSetting.setClickListener { viewModel.onMacOsSettingClicked() }
             vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
             windowsSetting.setClickListener { viewModel.windowsSettingClicked() }
+            netpPSetting.setClickListener { viewModel.onNetPSettingClicked() }
         }
     }
 
@@ -267,6 +270,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                         it.appTrackingProtectionEnabled,
                         it.appTrackingProtectionOnboardingShown,
                     )
+                    updateNetPSettings(it.networkProtectionEnabled)
                     updateEmailSubtitle(it.emailAddress)
                     updateWindowsSettings(it.windowsWaitlistState)
                     updateFeaturesSection(it)
@@ -446,6 +450,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
             is Command.LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
+            is Command.LaunchNetPManagementScreen -> launchNetpManagementScreen()
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
@@ -489,6 +494,16 @@ class SettingsActivity : DuckDuckGoActivity() {
                 } else {
                     vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
                 }
+            }
+        }
+    }
+
+    private fun updateNetPSettings(networkProtectionEnabled: Boolean) {
+        with(viewsMore) {
+            if (networkProtectionEnabled) {
+                netpPSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldEnabled))
+            } else {
+                netpPSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
             }
         }
     }
@@ -678,6 +693,10 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchAppTPTrackersScreen() {
         globalActivityStarter.start(this, AppTrackerActivityWithEmptyParams)
+    }
+
+    private fun launchNetpManagementScreen() {
+        startActivity(NetworkProtectionManagementActivity.intent(this))
     }
 
     private fun launchAppTPOnboardingScreen() {

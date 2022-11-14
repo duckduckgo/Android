@@ -66,11 +66,11 @@ android {
     }
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
+            applicationIdSuffix ".debug.netp"
             pseudoLocalesEnabled false
             manifestPlaceholders = [
-                    appIcon     : "@mipmap/ic_launcher_blue",
-                    appIconRound: "@mipmap/ic_launcher_blue_round"
+                    appIcon     : "@mipmap/ic_launcher_black",
+                    appIconRound: "@mipmap/ic_launcher_black_round"
             ]
         }
         release {
@@ -246,6 +246,9 @@ dependencies {
 
     implementation project(':content-scope-scripts-api')
     implementation project(':content-scope-scripts-impl')
+
+    implementation project(':network-protection-api')
+    implementation project(':network-protection-impl')
 
     implementation project(':fingerprint-protection-api')
     implementation project(':fingerprint-protection-impl')

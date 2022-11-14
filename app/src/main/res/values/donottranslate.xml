@@ -24,4 +24,6 @@
     <string name="syncSettingsDisabled">Off</string>
     <string name="syncSettingsEnabled">On</string>
 
+    <!-- Network Protection -->
+    <string name="netpSettingsTitle">Network Protection</string>
 </resources>
