@@ -153,19 +153,19 @@
     </style>
 
     <!-- Buttons -->
-    <style name="Widget.DuckDuckGo.DaxButton.Contained" parent="Widget.MaterialComponents.Button">
+    <style name="Widget.DuckDuckGo.DaxButton.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
         <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxButton.Contained.Primary">
+    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Primary">
         <item name="android:textColor">@color/button_primary_text_color_selector</item>
         <item name="backgroundTint">@color/button_primary_container_selector</item>
         <item name="rippleColor">@color/button_primary_ripple_selector</item>
         <item name="iconTint">@color/button_primary_text_color_selector</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxButton.Contained.Destructive">
+    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Destructive">
         <item name="android:textColor">@color/button_primary_text_color_selector</item>
         <item name="backgroundTint">@color/button_destructive_container_selector</item>
         <item name="rippleColor">@color/button_destructive_ripple_selector</item>
@@ -337,10 +337,9 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Switch</item>
     </style>
 
-    <style name="ThemeOverlay.DuckDuckGo.Switch">
-        <item name="colorSurface">@color/white</item>
-        <item name="colorOnSurface">@color/gray70</item>
-        <item name="colorSecondary">@color/cornflowerBlue</item>
+    <style name="ThemeOverlay.DuckDuckGo.Switch" >
+        <item name="trackTint">@color/switch_track_tint</item>
+        <item name="thumbTint">@color/switch_thumb_tint</item>
     </style>
 
     <!-- Deprecated, will be deleted when all new styles are applied -->

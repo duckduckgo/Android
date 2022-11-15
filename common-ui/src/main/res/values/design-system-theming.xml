@@ -77,14 +77,14 @@
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
-        <item name="materialButtonStyle">@style/Widget.DuckDuckGo.DaxButton.Contained.Primary</item>
+        <item name="materialButtonStyle">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
         <item name="materialButtonOutlinedStyle">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
         <item name="borderlessButtonStyle">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
 
         <!-- Design System Components -->
-        <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.Contained.Primary</item>
+        <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.TextButton.Primary</item>
         <item name="daxButtonSecondary">@style/Widget.DuckDuckGo.DaxButton.Secondary</item>
-        <item name="daxButtonDestructive">@style/Widget.DuckDuckGo.DaxButton.Contained.Destructive</item>
+        <item name="daxButtonDestructive">@style/Widget.DuckDuckGo.DaxButton.TextButton.Destructive</item>
         <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
         <item name="daxButtonGhostDestructive">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhost</item>
 
@@ -252,6 +252,7 @@
         <item name="daxColorAccentYellow">@color/yellow50</item>
 
         <!-- Design System Component Colors Dark -->
+        <!-- Buttons -->
         <item name="daxColorButtonPrimaryContainer">@color/blue30</item>
         <item name="daxColorButtonPrimaryContainerPressed">@color/blue50</item>
         <item name="daxColorButtonSecondaryContainer">@android:color/transparent</item>
@@ -260,13 +261,20 @@
         <item name="daxColorButtonDestructiveContainerPressed">@color/red50</item>
         <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
         <item name="daxColorButtonDestructiveGhostContainerPressed">@color/red30_18</item>
-
         <item name="daxColorButtonPrimaryText">@color/black84</item>
         <item name="daxColorButtonPrimaryTextPressed">@color/black84</item>
         <item name="daxColorButtonSecondaryText">@color/blue30</item>
         <item name="daxColorButtonSecondaryTextPressed">@color/blue20</item>
         <item name="daxColorButtonDestructiveGhostText">@color/red30</item>
         <item name="daxColorButtonDestructiveGhostTextPressed">@color/red20</item>
+
+        <!-- Switch -->
+        <item name="daxColorSwitchTrackDisabled">?attr/daxColorTextDisabled</item>
+        <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
+        <item name="daxColorSwitchTrackOff">@color/gray70</item>
+        <item name="daxColorSwitchThumbDisabled">?attr/daxColorTextDisabled</item>
+        <item name="daxColorSwitchThumbOn">?attr/daxColorAccentBlue</item>
+        <item name="daxColorSwitchThumbOff">@color/white</item>
 
     </style>
 
@@ -391,6 +399,7 @@
         <item name="daxColorAccentYellow">@color/yellow50</item>
 
         <!-- Design System Component Colors Light -->
+        <!-- Buttons -->
         <item name="daxColorButtonPrimaryContainer">@color/blue50</item>
         <item name="daxColorButtonPrimaryContainerPressed">@color/blue70</item>
         <item name="daxColorButtonSecondaryContainer">@android:color/transparent</item>
@@ -399,13 +408,21 @@
         <item name="daxColorButtonDestructiveContainerPressed">@color/red70</item>
         <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
         <item name="daxColorButtonDestructiveGhostContainerPressed">@color/red60_12</item>
-
         <item name="daxColorButtonPrimaryText">@color/white</item>
         <item name="daxColorButtonPrimaryTextPressed">@color/white</item>
         <item name="daxColorButtonSecondaryText">@color/blue50</item>
         <item name="daxColorButtonSecondaryTextPressed">@color/blue70</item>
         <item name="daxColorButtonDestructiveGhostText">@color/red50</item>
         <item name="daxColorButtonDestructiveGhostTextPressed">@color/red70</item>
+
+        <!-- Switch -->
+        <item name="daxColorSwitchTrackDisabled">?attr/daxColorTextDisabled</item>
+        <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
+        <item name="daxColorSwitchTrackOff">@color/gray50</item>
+        <item name="daxColorSwitchThumbDisabled">?attr/daxColorTextDisabled</item>
+        <item name="daxColorSwitchThumbOn">?attr/daxColorAccentBlue</item>
+        <item name="daxColorSwitchThumbOff">@color/white</item>
+
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">
