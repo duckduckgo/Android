@@ -28,8 +28,10 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class MicrophonePermissionRequestTest {
@@ -38,6 +40,9 @@ class MicrophonePermissionRequestTest {
 
     @Mock
     private lateinit var voiceSearchRepository: VoiceSearchRepository
+
+    @Mock
+    private lateinit var permissionRationale: PermissionRationale
 
     private lateinit var voiceSearchPermissionDialogsLauncher: FakeVoiceSearchPermissionDialogsLauncher
 
@@ -54,7 +59,8 @@ class MicrophonePermissionRequestTest {
             pixel,
             voiceSearchRepository,
             voiceSearchPermissionDialogsLauncher,
-            activityResultLauncherWrapper
+            activityResultLauncherWrapper,
+            permissionRationale
         )
     }
 
@@ -72,7 +78,8 @@ class MicrophonePermissionRequestTest {
     }
 
     @Test
-    fun whenPermissionRequestResultIsFalseThenOnPermissionsGrantedNotInvoked() {
+    fun whenPermissionRequestResultIsFalseThenOnPermissionsGrantedNotInvokedAndDeclinePermissionForever() {
+        whenever(permissionRationale.shouldShow(any())).thenReturn(false)
         var permissionGranted = false
         testee.registerResultsCallback(mock(), mock()) {
             permissionGranted = true
@@ -82,6 +89,22 @@ class MicrophonePermissionRequestTest {
         lastKnownRequest.onResult(false)
 
         assertFalse(permissionGranted)
+        verify(voiceSearchRepository).declinePermissionForever()
+    }
+
+    @Test
+    fun whenPermissionRequestResultIsFalseThenOnPermissionsGrantedNotInvoked() {
+        whenever(permissionRationale.shouldShow(any())).thenReturn(true)
+        var permissionGranted = false
+        testee.registerResultsCallback(mock(), mock()) {
+            permissionGranted = true
+        }
+
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
+        lastKnownRequest.onResult(false)
+
+        assertFalse(permissionGranted)
+        verifyNoInteractions(voiceSearchRepository)
     }
 
     @Test
