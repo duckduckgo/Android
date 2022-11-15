@@ -150,7 +150,7 @@
         android:id="@+id/twoLineSwitchListItemWithDisabledSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="Two Line Item"
+        app:primaryText="Two Line Item Two Line Item Two Line Item Two Line Item "
         app:secondaryText="In disabled state"
         app:leadingIcon="@drawable/ic_globe_gray_16dp"
         app:showBetaPill="true"

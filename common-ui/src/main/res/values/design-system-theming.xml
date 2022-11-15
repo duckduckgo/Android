@@ -125,6 +125,9 @@
         <!--colorBackground appears behind scrollable content and is used for the default window background -->
         <item name="android:colorBackground">?attr/daxColorBackground</item>
         <item name="android:windowBackground">?attr/daxColorBackground</item>
+
+        <!--controls the ripple coloring-->
+        <item name="colorControlHighlight">?attr/daxColorRipple</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
@@ -250,6 +253,7 @@
         <item name="daxColorLines">@color/white12</item>
         <item name="daxColorAccentBlue">@color/blue30</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
+        <item name="daxColorRipple">@color/white12</item>
 
         <!-- Design System Component Colors Dark -->
         <!-- Buttons -->
@@ -397,6 +401,7 @@
         <item name="daxColorLines">@color/black18</item>
         <item name="daxColorAccentBlue">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
+        <item name="daxColorRipple">@color/black6</item>
 
         <!-- Design System Component Colors Light -->
         <!-- Buttons -->
