@@ -423,7 +423,7 @@
         <!-- Switch -->
         <item name="daxColorSwitchTrackDisabled">?attr/daxColorTextDisabled</item>
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
-        <item name="daxColorSwitchTrackOff">@color/gray50</item>
+        <item name="daxColorSwitchTrackOff">@color/gray60</item>
         <item name="daxColorSwitchThumbDisabled">?attr/daxColorTextDisabled</item>
         <item name="daxColorSwitchThumbOn">?attr/daxColorAccentBlue</item>
         <item name="daxColorSwitchThumbOff">@color/white</item>
