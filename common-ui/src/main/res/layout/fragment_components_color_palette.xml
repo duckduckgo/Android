@@ -58,16 +58,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
-            android:text="Window"
-            app:colorFillColor="?attr/daxColorWindow"
-            app:colorStrokeColor="?attr/daxColorBackgroundInverted"
-            tools:ignore="HardcodedText"/>
-
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_marginBottom="@dimen/keyline_2"
             android:text="Container"
             app:colorFillColor="?attr/daxColorContainer"
             app:colorStrokeColor="?attr/daxColorBackgroundInverted"

@@ -288,7 +288,7 @@
     <!-- Dialogs -->
     <style name="Widget.DuckDuckGo.Dialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.DialogCorners</item>
-        <item name="android:background">?attr/daxColorWindow</item>
+        <item name="android:background">?attr/daxColorSurface</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DialogCorners">
@@ -321,7 +321,7 @@
 
     <style name="Widget.DuckDuckGo.ModalBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.BottomSheetDialogCorners</item>
-        <item name="android:backgroundTint">?attr/daxDialogBackgroundColor</item>
+        <item name="android:backgroundTint">?attr/daxColorSurface</item>
     </style>
 
     <style name="Widget.DuckDuckGo.BottomSheetDialogCorners">
