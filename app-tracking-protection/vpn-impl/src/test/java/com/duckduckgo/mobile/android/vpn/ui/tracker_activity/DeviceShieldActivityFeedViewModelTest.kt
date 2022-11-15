@@ -21,12 +21,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.model.TrackingApp
-import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.apps.AppCategory
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.model.TrackingApp
+import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
@@ -34,12 +36,12 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.ERROR
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNKNOWN
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.AppsData
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.AppsProtectionData
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.TrackerFeedViewState
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.AppsData
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.AppsProtectionData
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerLoadingSkeleton
@@ -95,8 +97,8 @@ class DeviceShieldActivityFeedViewModelTest {
 
     @Test
     fun whenGetMostRecentTrackersCalledStartWithSkeleton() = runBlocking {
-        viewModel.getMostRecentTrackers(timeWindow, false).test {
-            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), null, VpnState(DISABLED, ERROR)), awaitItem())
+        viewModel.getMostRecentTrackers(timeWindow, config).test {
+            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -111,17 +113,13 @@ class DeviceShieldActivityFeedViewModelTest {
         mockVpnEnabled()
         getAppsAndProtectionInfoReturnsEmptyList()
 
-        viewModel.getMostRecentTrackers(timeWindow, false).test {
-            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), null, VpnState(DISABLED, ERROR)), awaitItem())
+        viewModel.getMostRecentTrackers(timeWindow, config).test {
+            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)), awaitItem())
             assertEquals(
                 TrackerFeedViewState(
                     listOf(
                         trackerFeedDataWithTwoTrackers,
                         trackerFeedDataWithOneTracker,
-                    ),
-                    appsProtectionData = AppsProtectionData(
-                        protectedAppsData = AppsData(appsCount = 0, isProtected = true, packageNames = emptyList()),
-                        unprotectedAppsData = AppsData(appsCount = 0, isProtected = false, packageNames = emptyList())
                     ),
                     vpnState = VpnState(state = ENABLED, stopReason = UNKNOWN)
                 ),
@@ -136,12 +134,97 @@ class DeviceShieldActivityFeedViewModelTest {
     fun whenGetMostRecentTrackersIsNotEmptyAndOutsideTimeWindowThenEmitLoadingSkeleton() = runBlocking {
         db.vpnTrackerDao().insert(dummyTrackers[3])
 
-        viewModel.getMostRecentTrackers(timeWindow, false).test {
+        viewModel.getMostRecentTrackers(timeWindow, config).test {
             assertEquals(
                 TrackerFeedViewState(
                     listOf(TrackerLoadingSkeleton),
-                    appsProtectionData = null,
                     vpnState = VpnState(state = DISABLED, stopReason = ERROR)
+                ),
+                awaitItem()
+            )
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetMostRecentTrackersIsEmptyAndVpnEnabledAndBoundedConfigThenEmitDescriptionAndAppsProtectionState() = runBlocking {
+        mockVpnEnabled()
+        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(flowOf(listOf(app, excludedApp)))
+        val boundedConfig = config.copy(maxRows = 5)
+
+        viewModel.getMostRecentTrackers(timeWindow, boundedConfig).test {
+            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)), awaitItem())
+            assertEquals(
+                TrackerFeedViewState(
+                    listOf(
+                        TrackerFeedItem.TrackerDescriptionFeed,
+                        TrackerFeedItem.TrackerTrackerAppsProtection(
+                            appsData = AppsProtectionData(
+                                protectedAppsData = AppsData(
+                                    appsCount = 1,
+                                    isProtected = true,
+                                    packageNames = listOf(app.packageName)
+                                ),
+                                unprotectedAppsData = AppsData(
+                                    appsCount = 1,
+                                    isProtected = false,
+                                    packageNames = listOf(excludedApp.packageName)
+                                )
+                            )
+                        ),
+                    ),
+                    vpnState = VpnState(state = ENABLED, stopReason = UNKNOWN)
+                ),
+                awaitItem()
+            )
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetMostRecentTrackersIsEmptyAndVpnDisabledAndFiveRowsThenEmitDescription() = runBlocking {
+        mockVpnDisabled()
+        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(flowOf(listOf(app, excludedApp)))
+        val boundedConfig = config.copy(maxRows = 5)
+
+        viewModel.getMostRecentTrackers(timeWindow, boundedConfig).test {
+            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)), awaitItem())
+            assertEquals(
+                TrackerFeedViewState(
+                    listOf(
+                        TrackerFeedItem.TrackerDescriptionFeed
+                    ),
+                    vpnState = VpnState(state = DISABLED, stopReason = UNKNOWN)
+                ),
+                awaitItem()
+            )
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetMostRecentTrackersReturnsLessTrackersThanMaxRowsAndVpnEnabledThenEmitOnlyTrackerFeedDataItems() = runBlocking {
+        db.vpnTrackerDao().insert(dummyTrackers[0])
+        db.vpnTrackerDao().insert(dummyTrackers[1])
+        db.vpnTrackerDao().insert(dummyTrackers[2])
+        db.vpnAppTrackerBlockingDao().insertTrackerEntities(dummySignals)
+
+        mockVpnEnabled()
+        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(flowOf(listOf(app, excludedApp)))
+        val boundedConfig = config.copy(maxRows = 2)
+
+        viewModel.getMostRecentTrackers(timeWindow, boundedConfig).test {
+            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)), awaitItem())
+            assertEquals(
+                TrackerFeedViewState(
+                    listOf(
+                        trackerFeedDataWithTwoTrackers,
+                        trackerFeedDataWithOneTracker,
+                    ),
+                    vpnState = VpnState(state = ENABLED, stopReason = UNKNOWN)
                 ),
                 awaitItem()
             )
@@ -156,6 +239,10 @@ class DeviceShieldActivityFeedViewModelTest {
 
     private fun mockVpnEnabled() {
         whenever(mockVpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN)).thenReturn(flowOf(VpnState(ENABLED, UNKNOWN)))
+    }
+
+    private fun mockVpnDisabled() {
+        whenever(mockVpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN)).thenReturn(flowOf(VpnState(DISABLED, UNKNOWN)))
     }
 
     companion object {
@@ -276,4 +363,31 @@ private val trackerFeedDataWithOneTracker = TrackerFeedItem.TrackerFeedData(
     timestamp = TEST_TIMESTAMP,
     displayTimestamp = "Just Now",
     trackersTotalCount = 1
+)
+
+private val config = DeviceShieldActivityFeedFragment.ActivityFeedConfig(
+    maxRows = Int.MAX_VALUE,
+    timeWindow = 5,
+    timeWindowUnits = DAYS,
+    showTimeWindowHeadings = false
+)
+
+private val app = TrackingProtectionAppInfo(
+    packageName = "com.package.name",
+    name = "App",
+    type = "None",
+    category = AppCategory.Undefined,
+    isExcluded = false,
+    knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
+    userModified = false
+)
+
+private val excludedApp = TrackingProtectionAppInfo(
+    packageName = "com.package.name",
+    name = "App",
+    type = "None",
+    category = AppCategory.Undefined,
+    isExcluded = true,
+    knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
+    userModified = false
 )

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model
 
+import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 
 sealed class TrackerFeedItem(open val id: Int) {
@@ -33,6 +34,11 @@ sealed class TrackerFeedItem(open val id: Int) {
 
     object TrackerDescriptionFeed : TrackerFeedItem(0)
 
+    data class TrackerTrackerAppsProtection(
+        val appsData: AppsProtectionData,
+        val selectedFilter: TrackingProtectionExclusionListActivity.Companion.AppsFilter? = null
+    ) : TrackerFeedItem(0)
+
     data class TrackerFeedItemHeader(val timestamp: String) : TrackerFeedItem(timestamp.hashCode())
 }
 
@@ -46,3 +52,14 @@ sealed class TrackerCompanyBadge {
         val amount: Int
     ) : TrackerCompanyBadge()
 }
+
+data class AppsData(
+    val appsCount: Int,
+    val isProtected: Boolean,
+    val packageNames: List<String>
+)
+
+data class AppsProtectionData(
+    val protectedAppsData: AppsData,
+    val unprotectedAppsData: AppsData
+)
