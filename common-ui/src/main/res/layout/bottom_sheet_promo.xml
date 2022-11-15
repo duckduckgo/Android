@@ -59,7 +59,7 @@
         app:typography="body2"
         tools:text="Add our search widget to your home screen for quick, easy access." />
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/bottomSheetPromoPrimaryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
         app:layout_constraintTop_toBottomOf="@id/bottomSheetPromoContent"
         tools:text="Primary" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
         android:id="@+id/bottomSheetPromoSecondaryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
