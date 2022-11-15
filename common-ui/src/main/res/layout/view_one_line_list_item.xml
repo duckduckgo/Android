@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,74 +15,74 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                   xmlns:tools="http://schemas.android.com/tools"
-                                                   android:id="@+id/item_container"
-                                                   android:background="?attr/selectableItemBackground"
-                                                   android:layout_width="match_parent"
-                                                   android:minHeight="@dimen/oneLineItemHeight"
-                                                   android:paddingEnd="@dimen/keyline_0"
-                                                   android:layout_height="wrap_content">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:minHeight="@dimen/oneLineItemHeight">
 
     <FrameLayout
-            android:id="@+id/leadingIconBackground"
-            android:layout_width="@dimen/listItemImageContainerSize"
-            android:layout_height="@dimen/listItemImageContainerSize"
-            android:layout_marginStart="@dimen/keyline_4"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+        android:id="@+id/leadingIconBackground"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-                android:id="@+id/leadingIcon"
-                android:layout_width="@dimen/listItemImageSize"
-                android:layout_height="@dimen/listItemImageSize"
-                android:layout_gravity="center"
-                android:importantForAccessibility="no"/>
+            android:id="@+id/leadingIcon"
+            android:layout_width="@dimen/listItemImageSize"
+            android:layout_height="@dimen/listItemImageSize"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no" />
 
     </FrameLayout>
 
-    <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/primaryText"
-            style="@style/TextAppearance.DuckDuckGo.Body1"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:gravity="start|center"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_4"
-            android:layout_marginEnd="@dimen/keyline_2"
-            android:paddingTop="@dimen/oneLineItemPadding"
-            android:paddingBottom="@dimen/oneLineItemPadding"
-            android:textColor="@color/primary_text_color_selector"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/trailingContainer"
-            app:layout_constraintStart_toEndOf="@id/leadingIconBackground"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Title"/>
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        android:id="@+id/primaryText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/primary_text_color_selector"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/trailingContainer"
+        app:layout_constraintStart_toEndOf="@id/leadingIconBackground"
+        app:layout_constraintTop_toTopOf="parent"
+        app:typography="body1"
+        tools:text="Title" />
 
     <FrameLayout
         android:id="@+id/trailingContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+        <com.duckduckgo.mobile.android.ui.view.button.IconButton
             android:id="@+id/trailingIcon"
-            android:layout_width="@dimen/listItemImageContainerSize"
-            android:layout_height="@dimen/listItemImageContainerSize"
-            android:background="?selectableItemBackground"
-            android:scaleType="center"
-            android:src="@drawable/ic_overflow"
+            android:layout_width="@dimen/listItemImageSize"
+            android:layout_height="@dimen/listItemImageSize"
+            android:layout_marginEnd="@dimen/listItemEndPadding"
+            android:background="?selectableItemBackgroundBorderless"
+            app:srcCompat="@drawable/ic_overflow"
             tools:ignore="ContentDescription" />
 
         <com.duckduckgo.mobile.android.ui.view.SwitchView
             android:id="@+id/trailingSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/keyline_2"/>
+            android:layout_marginEnd="@dimen/keyline_2"
+            android:padding="0dp"
+            tools:ignore="SpeakableTextPresentCheck" />
 
     </FrameLayout>
 
