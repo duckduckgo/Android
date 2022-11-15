@@ -19,7 +19,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/promoBottomSheetPadding">
+    android:paddingStart="@dimen/promoBottomSheetPadding"
+    android:paddingTop="@dimen/promoBottomSheetPadding"
+    android:paddingEnd="@dimen/keyline_4"
+    android:paddingBottom="@dimen/promoBottomSheetPadding">
 
     <ImageView
         android:id="@+id/bottomSheetPromoIcon"
@@ -41,7 +44,7 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/bottomSheetPromoContent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/bottomSheetPromoPrimaryButton"
         app:layout_constraintStart_toStartOf="@id/bottomSheetPromoContent"
         app:layout_constraintTop_toTopOf="parent"
         app:typography="h2"
@@ -53,7 +56,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_2"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/bottomSheetPromoPrimaryButton"
         app:layout_constraintStart_toEndOf="@id/bottomSheetPromoIcon"
         app:layout_constraintTop_toBottomOf="@id/bottomSheetPromoTitle"
         app:typography="body2"
@@ -64,6 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bottomSheetPromoContent"
         tools:text="Primary" />
@@ -72,6 +76,7 @@
         android:id="@+id/bottomSheetPromoSecondaryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/keyline_2"
         app:layout_constraintBottom_toBottomOf="@id/bottomSheetPromoPrimaryButton"
         app:layout_constraintEnd_toStartOf="@id/bottomSheetPromoPrimaryButton"
         app:layout_constraintTop_toTopOf="@id/bottomSheetPromoPrimaryButton"
