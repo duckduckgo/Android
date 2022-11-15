@@ -43,7 +43,7 @@
     <attr name="daxColorAccentYellow" format="color"/>
     <attr name="daxColorContainerDisabled" format="color"/>
     <attr name="daxColorTextDisabled" format="color"/>
-    <attr name="daxColorRippleHighlight" format="color"/>
+    <attr name="daxColorRipple" format="color"/>
 
     <!-- Component Specific Colors -->
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
