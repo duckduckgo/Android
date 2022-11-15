@@ -24,17 +24,18 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/internal_input_layout"
-        style="@style/Widget.DuckDuckGo.OutlinedTextInputView.TextInputLayout"
+        style="@style/Widget.DuckDuckGo.TextInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:endIconMode="none">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/internal_edit_text"
-            style="@style/TextAppearance.DuckDuckGo.Body1"
+            style="@style/Typography.DuckDuckGo.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="?attr/normalTextColor" />
+
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.duckduckgo.mobile.android.ui.view.button.IconButton

@@ -34,9 +34,9 @@ import androidx.core.view.doOnNextLayout
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.R.styleable
-import com.duckduckgo.mobile.android.databinding.ViewOutlinedTextInputBinding
-import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView.Type.INPUT_TYPE_MULTI_LINE
-import com.duckduckgo.mobile.android.ui.view.OutLinedTextInputView.Type.INPUT_TYPE_PASSWORD
+import com.duckduckgo.mobile.android.databinding.ViewTextInputBinding
+import com.duckduckgo.mobile.android.ui.view.TextInputView.Type.INPUT_TYPE_MULTI_LINE
+import com.duckduckgo.mobile.android.ui.view.TextInputView.Type.INPUT_TYPE_PASSWORD
 import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
 import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action.PerformEndAction
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -58,12 +58,12 @@ interface OutlinedTextInput {
     }
 }
 
-class OutLinedTextInputView @JvmOverloads constructor(
+class TextInputView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), OutlinedTextInput {
-    private val binding: ViewOutlinedTextInputBinding by viewBinding()
+    private val binding: ViewTextInputBinding by viewBinding()
     private val transformationMethod by lazy {
         PasswordTransformationMethod.getInstance()
     }
@@ -73,18 +73,18 @@ class OutLinedTextInputView @JvmOverloads constructor(
     init {
         context.obtainStyledAttributes(
             attrs,
-            R.styleable.OutLinedTextInputView,
+            R.styleable.TextInputView,
             0,
             com.google.android.material.R.style.Widget_MaterialComponents_TextInputEditText_OutlinedBox
         ).apply {
-            text = getString(R.styleable.OutLinedTextInputView_android_text) ?: ""
-            getDrawable(R.styleable.OutLinedTextInputView_endIcon)?.let {
-                setupEndIcon(it, getString(R.styleable.OutLinedTextInputView_endIconContentDescription) ?: "")
+            text = getString(R.styleable.TextInputView_android_text) ?: ""
+            getDrawable(R.styleable.TextInputView_endIcon)?.let {
+                setupEndIcon(it, getString(R.styleable.TextInputView_endIconContentDescription) ?: "")
             }
 
             // This needs to be done after we know that the view has the end icon set
-            isEditable = getBoolean(R.styleable.OutLinedTextInputView_editable, true)
-            binding.internalInputLayout.setHintWithoutAnimation(getString(R.styleable.OutLinedTextInputView_android_hint))
+            isEditable = getBoolean(R.styleable.TextInputView_editable, true)
+            binding.internalInputLayout.setHintWithoutAnimation(getString(R.styleable.TextInputView_android_hint))
 
             val inputType = getInputType()
 
@@ -232,7 +232,7 @@ class OutLinedTextInputView @JvmOverloads constructor(
     }
 
     private fun TypedArray.getInputType(): Type {
-        val inputTypeInt = getInt(styleable.OutLinedTextInputView_type, INPUT_TYPE_MULTI_LINE.value)
+        val inputTypeInt = getInt(styleable.TextInputView_type, INPUT_TYPE_MULTI_LINE.value)
         return Type.values().firstOrNull { it.value == inputTypeInt } ?: INPUT_TYPE_MULTI_LINE
     }
 

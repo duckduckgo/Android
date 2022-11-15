@@ -14,21 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <declare-styleable name="OutLinedTextInputView">
-        <attr name="android:hint" />
-        <attr name="android:text" />
-        <attr name="editable" format="boolean" />
-        <attr name="endIcon" format="reference" />
-        <attr name="endIconContentDescription" format="string" />
-
-        <attr name="type" format="enum" >
-            <enum name="multi_line" value="0"/>
-            <enum name="single_line" value="1"/>
-            <enum name="password" value="2"/>
-        </attr>
-
-    </declare-styleable>
-
-
-</resources>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/daxColorAccentBlue" android:state_focused="true"/>
+    <item android:color="?attr/secondaryIconColor"/>
+</selector>

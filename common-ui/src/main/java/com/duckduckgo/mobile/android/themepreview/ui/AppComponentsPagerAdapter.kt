@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.themepreview.ui.component.buttons.Component
 import com.duckduckgo.mobile.android.themepreview.ui.component.buttons.ComponentInteractiveElementsFragment
 import com.duckduckgo.mobile.android.themepreview.ui.component.listitems.ComponentListItemsElementsFragment
 import com.duckduckgo.mobile.android.themepreview.ui.component.navigation.ComponentMessagingFragment
+import com.duckduckgo.mobile.android.themepreview.ui.component.textinput.ComponentTextInputFragment
 import com.duckduckgo.mobile.android.themepreview.ui.dialogs.DialogsFragment
 import com.duckduckgo.mobile.android.themepreview.ui.palette.ColorPaletteFragment
 import com.duckduckgo.mobile.android.themepreview.ui.typography.TypographyFragment
@@ -41,6 +42,7 @@ class AppComponentsPagerAdapter(
         PALETTE(R.string.tab_title_color_palette),
         TYPOGRAPHY(R.string.tab_title_typography),
         BUTTONS(R.string.tab_title_buttons),
+        TEXT_INPUT(R.string.tab_title_text_input),
         DIALOGS(R.string.tab_title_dialogs),
         INTERACTIVE_ELEMENTS(R.string.tab_title_component_interactive),
         MESSAGING(R.string.tab_title_component_messaging),
@@ -64,6 +66,7 @@ class AppComponentsPagerAdapter(
             MainFragments.PALETTE -> ColorPaletteFragment()
             MainFragments.TYPOGRAPHY -> TypographyFragment()
             MainFragments.BUTTONS -> ComponentButtonsFragment()
+            MainFragments.TEXT_INPUT -> ComponentTextInputFragment()
             MainFragments.DIALOGS -> DialogsFragment()
             MainFragments.INTERACTIVE_ELEMENTS -> ComponentInteractiveElementsFragment()
             MainFragments.MESSAGING -> ComponentMessagingFragment()

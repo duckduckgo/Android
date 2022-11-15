@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.themepreview.ui.component.buttons
+package com.duckduckgo.mobile.android.themepreview.ui.component.textinput
 
 import com.duckduckgo.mobile.android.themepreview.ui.component.Component
 import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
 
-class ComponentInteractiveElementsFragment : ComponentFragment() {
+class ComponentTextInputFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
         return listOf(
-            Component.TOP_APP_BAR,
-            Component.SWITCH,
-            Component.RADIO_BUTTON,
-            Component.CHECKBOX,
-            Component.SEARCH_BAR
+            Component.OUTLINED_TEXT_INPUT
         )
     }
 }
