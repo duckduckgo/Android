@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.health
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.NO_VPN_CONNECTIVITY
+import com.duckduckgo.vpn.di.VpnCoroutineScope
 import dagger.SingleInstanceIn
 import java.util.concurrent.Executors
 import javax.inject.Inject
