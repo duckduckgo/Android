@@ -66,15 +66,14 @@
         app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage" />
 
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
-        android:id="@+id/textAlertDialogCancelButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:text="Cancel"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textAlertDialogPositiveButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage" />
+            android:id="@+id/textAlertDialogCancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_2"
+            android:text="Cancel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/textAlertDialogPositiveButton"
+            app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

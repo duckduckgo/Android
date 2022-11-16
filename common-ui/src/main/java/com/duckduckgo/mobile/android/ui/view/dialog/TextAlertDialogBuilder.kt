@@ -94,7 +94,7 @@ class TextAlertDialogBuilder(val context: Context) {
         checkRequiredFieldsSet()
         val binding: DialogTextAlertBinding = DialogTextAlertBinding.inflate(LayoutInflater.from(context))
 
-        val dialogBuilder = MaterialAlertDialogBuilder(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
+        val dialogBuilder = MaterialAlertDialogBuilder(context, R.style.Widget_DuckDuckGo_Dialog)
             .setView(binding.root)
             .apply {
                 setCancelable(false)
