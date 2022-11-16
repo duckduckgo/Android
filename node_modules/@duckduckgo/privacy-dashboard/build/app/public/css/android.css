@@ -764,6 +764,8 @@
   --mdc-switch-unselected-hover-track-color: rgba(102, 102, 102, 0.3);
   --mdc-switch-unselected-focus-track-color: rgba(102, 102, 102, 0.3);
   --mdc-switch-unselected-pressed-track-color: rgba(102, 102, 102, 0.3);
+  --mdc-switch-selected-hover-state-layer-opacity: 0;
+  --mdc-switch-unselected-hover-state-layer-opacity: 0;
 }
 .body--theme-dark .mdc-switch {
   --mdc-switch-selected-handle-color: #7295f6;
@@ -782,6 +784,8 @@
   --mdc-switch-unselected-hover-track-color: rgba(102, 102, 102, 0.3);
   --mdc-switch-unselected-focus-track-color: rgba(102, 102, 102, 0.3);
   --mdc-switch-unselected-pressed-track-color: rgba(102, 102, 102, 0.3);
+  --mdc-switch-selected-hover-state-layer-opacity: 0;
+  --mdc-switch-unselected-hover-state-layer-opacity: 0;
 }
 
 .material-design-ripple {

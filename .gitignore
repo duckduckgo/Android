@@ -82,11 +82,11 @@ report
 /node_modules/@duckduckgo/autofill/dist/*
 !/node_modules/@duckduckgo/autofill/dist/*
 
-!/node_modules/@duckduckgo/privacy_dashboard/
-/node_modules/@duckduckgo/privacy_dashboard/*
-!/node_modules/@duckduckgo/privacy_dashboard/build/
-/node_modules/@duckduckgo/privacy_dashboard/build/*
-!/node_modules/@duckduckgo/privacy_dashboard/build/app
+!/node_modules/@duckduckgo/privacy-dashboard/
+/node_modules/@duckduckgo/privacy-dashboard/*
+!/node_modules/@duckduckgo/privacy-dashboard/build/
+/node_modules/@duckduckgo/privacy-dashboard/build/*
+!/node_modules/@duckduckgo/privacy-dashboard/build/app
 
 !/node_modules/@duckduckgo/content-scope-scripts/
 /node_modules/@duckduckgo/content-scope-scripts/*
