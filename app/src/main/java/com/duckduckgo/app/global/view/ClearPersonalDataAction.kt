@@ -25,7 +25,6 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
-import com.duckduckgo.app.fire.ClearDataPixel
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
@@ -67,8 +66,7 @@ class ClearPersonalDataAction(
     private val adClickManager: AdClickManager,
     private val fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
     private val sitePermissionsManager: SitePermissionsManager,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val clearDataPixel: ClearDataPixel
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean) {
@@ -86,7 +84,6 @@ class ClearPersonalDataAction(
         shouldFireDataClearPixel: Boolean
     ) {
         withContext(dispatchers.io()) {
-            clearDataPixel.onDataCleared()
             val fireproofDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
             cookieManager.flush()
             geoLocationPermissions.clearAllButFireproofed()
@@ -105,7 +102,6 @@ class ClearPersonalDataAction(
     @WorkerThread
     override suspend fun clearTabsAsync(appInForeground: Boolean) {
         withContext(dispatchers.io()) {
-            clearDataPixel.onDataCleared()
             Timber.i("Clearing tabs")
             dataManager.clearWebViewSessions()
             tabRepository.deleteAll()
