@@ -30,6 +30,7 @@ import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.recursiveEnable
+import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -180,6 +181,7 @@ class OneLineListItem @JvmOverloads constructor(
 
     /** Sets the switch as enabled or not */
     override fun setEnabled(enabled: Boolean) {
+        setEnabledOpacity(enabled)
         recursiveEnable(enabled)
         super.setEnabled(enabled)
     }

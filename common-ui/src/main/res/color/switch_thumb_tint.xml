@@ -15,8 +15,6 @@
   ~ limitations under the License.
   -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:alpha="0.9" android:color="?attr/daxColorSwitchThumbOn" android:state_enabled="false" android:state_checked="true"/>
-    <item android:color="?attr/daxColorSwitchThumbDisabled" android:state_enabled="false" android:state_checked="false"/>
     <item android:color="?attr/daxColorSwitchThumbOn" android:state_checked="true"/>
     <item android:color="?attr/daxColorSwitchThumbOff"/>
 </selector>

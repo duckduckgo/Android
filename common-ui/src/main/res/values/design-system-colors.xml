@@ -63,10 +63,8 @@
     <attr name="daxColorButtonDestructiveGhostText" format="color"/>
     <attr name="daxColorButtonDestructiveGhostTextPressed" format="color"/>
 
-    <attr name="daxColorSwitchTrackDisabled" format="color"/>
     <attr name="daxColorSwitchTrackOn" format="color"/>
     <attr name="daxColorSwitchTrackOff" format="color"/>
-    <attr name="daxColorSwitchThumbDisabled" format="color"/>
     <attr name="daxColorSwitchThumbOn" format="color"/>
     <attr name="daxColorSwitchThumbOff" format="color"/>
 

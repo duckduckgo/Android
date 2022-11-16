@@ -106,13 +106,6 @@ fun View.setAllParentsClip(enabled: Boolean = false) {
     }
 }
 
-fun View.recursiveEnable(enabled: Boolean) {
-    (this as? ViewGroup)?.children?.forEach {
-        it.isEnabled = enabled
-        it.recursiveEnable(enabled)
-    }
-}
-
 fun CompoundButton.quietlySetIsChecked(
     newCheckedState: Boolean,
     changeListener: CompoundButton.OnCheckedChangeListener?
@@ -147,4 +140,19 @@ fun Slider.quietlySetValue(
     removeOnChangeListener(listener)
     value = newValue
     addOnChangeListener(listener)
+}
+
+fun View.recursiveEnable(enabled: Boolean) {
+    (this as? ViewGroup)?.children?.forEach {
+        it.isEnabled = enabled
+        it.recursiveEnable(enabled)
+    }
+}
+
+fun View.setEnabledOpacity(enabled: Boolean) {
+    alpha = if (enabled) {
+        1f
+    } else {
+        0.4f
+    }
 }

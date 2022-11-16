@@ -272,10 +272,8 @@
         <item name="daxColorButtonDestructiveGhostTextPressed">@color/red20</item>
 
         <!-- Switch -->
-        <item name="daxColorSwitchTrackDisabled">@color/white36</item>
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
         <item name="daxColorSwitchTrackOff">@color/gray40</item>
-        <item name="daxColorSwitchThumbDisabled">@color/gray60</item>
         <item name="daxColorSwitchThumbOn">?attr/daxColorAccentBlue</item>
         <item name="daxColorSwitchThumbOff">@color/gray40</item>
 
@@ -419,10 +417,8 @@
         <item name="daxColorButtonDestructiveGhostTextPressed">@color/red70</item>
 
         <!-- Switch -->
-        <item name="daxColorSwitchTrackDisabled">@color/gray60</item>
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
         <item name="daxColorSwitchTrackOff">@color/gray60</item>
-        <item name="daxColorSwitchThumbDisabled">@color/white</item>
         <item name="daxColorSwitchThumbOn">?attr/daxColorAccentBlue</item>
         <item name="daxColorSwitchThumbOff">@color/white</item>
 

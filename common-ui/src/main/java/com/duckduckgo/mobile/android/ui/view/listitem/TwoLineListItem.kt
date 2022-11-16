@@ -31,6 +31,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -196,6 +197,7 @@ class TwoLineListItem @JvmOverloads constructor(
     }
 
     override fun setEnabled(enabled: Boolean) {
+        setEnabledOpacity(enabled)
         recursiveEnable(enabled)
         super.setEnabled(enabled)
     }
