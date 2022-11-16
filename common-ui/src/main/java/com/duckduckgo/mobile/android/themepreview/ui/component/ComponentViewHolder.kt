@@ -176,6 +176,13 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 isEnabled = false
             }
+
+            view.findViewById<TwoLineListItem>(R.id.twoLineSwitchListItemWithDisabledSwitchEnabled).apply {
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
+                quietlySetIsChecked(true, null)
+                isEnabled = false
+            }
+
         }
     }
 
