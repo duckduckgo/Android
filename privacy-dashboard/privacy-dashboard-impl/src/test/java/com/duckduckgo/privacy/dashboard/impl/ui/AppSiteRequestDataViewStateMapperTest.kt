@@ -57,15 +57,17 @@ class AppSiteRequestDataViewStateMapperTest {
         val site = site(
             events = listOf(
                 TrackingEvent("test.com", "test.com", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
-                TrackingEvent("test2.com", "test2.com", null, MAJOR_ENTITY_A, null, BLOCKED, AD)
+                TrackingEvent("test2.com", "test2.com", null, MAJOR_ENTITY_A, null, BLOCKED, AD),
+                TrackingEvent("test3.com", "test3.com", null, null, null, BLOCKED, AD),
             )
         )
 
         val viewState = testee.mapFromSite(site)
 
-        assertTrue(viewState.requests.count() == 2)
+        assertTrue(viewState.requests.count() == 3)
         assertNotNull(viewState.requests.find { it.url == "http://test.com" })
         assertNotNull(viewState.requests.find { it.url == "http://test2.com" })
+        assertNotNull(viewState.requests.find { it.url == "http://test3.com" })
     }
 
     @Test
@@ -147,7 +149,7 @@ class AppSiteRequestDataViewStateMapperTest {
         assertEquals("test.com", viewState.requests.first().pageUrl)
         assertEquals(MAJOR_ENTITY_A.displayName, viewState.requests.first().entityName)
         assertEquals(MAJOR_ENTITY_A.name, viewState.requests.first().ownerName)
-        assertEquals(MAJOR_ENTITY_A.prevalence, viewState.requests.first().prevalence, 0.0)
+        assertEquals(MAJOR_ENTITY_A.prevalence, viewState.requests.first().prevalence!!, 0.0)
         assertTrue(viewState.requests.first().state is Blocked)
     }
 

@@ -64,22 +64,21 @@ class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewS
         val requests: List<DetectedRequest> = site.trackingEvents.map {
             val withSchemeTrackerUrl = kotlin.runCatching { it.trackerUrl.toUri().withScheme().toString() }.getOrNull() ?: return@map null
             val trackerEvent = it.copy(trackerUrl = withSchemeTrackerUrl)
-            val entity: Entity = if (trackerEvent.entity == null) return@map null else trackerEvent.entity!!
 
             if (trackerEvent.surrogateId?.isNotEmpty() == true) {
                 installedSurrogates.add(trackerEvent.trackerUrl)
             }
 
-            if (uniqueEntityDomainState.shouldSkipEvent(entity, trackerEvent)) return@map null
+            if (uniqueEntityDomainState.shouldSkipEvent(trackerEvent.entity, trackerEvent)) return@map null
 
             DetectedRequest(
                 category = trackerEvent.categories?.firstOrNull { category -> allowedCategories.contains(category) },
                 url = trackerEvent.trackerUrl,
                 eTLDplus1 = toTldPlusOne(trackerEvent.trackerUrl),
                 pageUrl = trackerEvent.documentUrl,
-                entityName = entity.displayName,
-                ownerName = entity.name,
-                prevalence = entity.prevalence,
+                entityName = trackerEvent.entity?.displayName,
+                ownerName = trackerEvent.entity?.name,
+                prevalence = trackerEvent.entity?.prevalence,
                 state = trackerEvent.status.mapToViewState()
             )
         }.filterNotNull()
@@ -90,8 +89,8 @@ class AppSiteRequestDataViewStateMapper @Inject constructor() : RequestDataViewS
         )
     }
 
-    private fun MutableMap<String, List<TrackerStatus>>.shouldSkipEvent(entity: Entity, trackerEvent: TrackingEvent): Boolean {
-        val entityName = entity.displayName
+    private fun MutableMap<String, List<TrackerStatus>>.shouldSkipEvent(entity: Entity?, trackerEvent: TrackingEvent): Boolean {
+        val entityName = entity?.displayName
         val trackerDomain = trackerEvent.trackerUrl.extractDomain() ?: return true
         val trackerStatus = trackerEvent.status
         val hash = "$entityName$trackerDomain"

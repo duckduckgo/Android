@@ -83,10 +83,10 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     data class DetectedRequest(
         val category: String?,
         val eTLDplus1: String?,
-        val entityName: String,
+        val entityName: String?,
         val ownerName: String?,
         val pageUrl: String,
-        val prevalence: Double,
+        val prevalence: Double?,
         val state: RequestState,
         val url: String
     )
