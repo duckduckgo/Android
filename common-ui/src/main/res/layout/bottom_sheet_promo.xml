@@ -40,6 +40,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="gone"
+        android:layout_marginBottom="@dimen/keyline_2"
         app:layout_constraintBottom_toTopOf="@id/bottomSheetPromoContent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/bottomSheetPromoContent"
@@ -52,11 +53,11 @@
         android:id="@+id/bottomSheetPromoContent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/bottomSheetPromoIcon"
         app:layout_constraintTop_toBottomOf="@id/bottomSheetPromoTitle"
-        app:typography="body2"
+        app:layout_constraintBottom_toTopOf="@id/bottomSheetPromoPrimaryButton"
+        app:typography="body1"
         tools:text="Add our search widget to your home screen for quick, easy access." />
 
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
