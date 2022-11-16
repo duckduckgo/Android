@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.ui.credential.management.sorting
 
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem
+import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.CredentialListItem
 import java.util.*
 import javax.inject.Inject
 
@@ -39,7 +40,7 @@ class CredentialGrouper @Inject constructor(
             flattenedList.add(ListItem.GroupHeading(key))
 
             sorter.sort(value).forEach {
-                flattenedList.add(ListItem.Credential(it))
+                flattenedList.add(CredentialListItem.Credential(it))
             }
         }
 

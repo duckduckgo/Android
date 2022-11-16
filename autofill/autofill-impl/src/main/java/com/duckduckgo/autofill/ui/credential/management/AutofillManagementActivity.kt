@@ -184,7 +184,8 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun showListMode() {
         resetToolbar()
-        supportFragmentManager.showFragment(AutofillManagementListMode.instance(), TAG_ALL_CREDENTIALS, false)
+        val currentUrl = intent.getStringExtra(EXTRAS_SUGGESTIONS_FOR_URL)
+        supportFragmentManager.showFragment(AutofillManagementListMode.instance(currentUrl), TAG_ALL_CREDENTIALS, false)
     }
 
     private fun showCredentialMode(
@@ -237,26 +238,34 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val EXTRAS_CREDENTIALS_TO_VIEW = "extras_credentials_to_view"
+        private const val EXTRAS_SUGGESTIONS_FOR_URL = "extras_suggestions_for_url"
         private const val TAG_LOCKED = "tag_fragment_locked"
         private const val TAG_DISABLED = "tag_fragment_disabled"
         private const val TAG_CREDENTIAL = "tag_fragment_credential"
         private const val TAG_ALL_CREDENTIALS = "tag_fragment_all_credentials"
 
         /**
-         * Launch the Autofill management activity.
-         * Optionally, can provide LoginCredentials to jump directly into viewing mode.
-         * If no LoginCredentials provided, will show the list mode.
+         * Launch the Autofill management activity, with LoginCredentials to jump directly into viewing mode.
          */
-        fun intent(
+        fun intentDirectViewMode(
             context: Context,
-            loginCredentials: LoginCredentials? = null,
+            loginCredentials: LoginCredentials,
         ): Intent {
             return Intent(context, AutofillManagementActivity::class.java).apply {
-                if (loginCredentials != null) {
-                    putExtra(EXTRAS_CREDENTIALS_TO_VIEW, loginCredentials)
-                }
+                putExtra(EXTRAS_CREDENTIALS_TO_VIEW, loginCredentials)
             }
         }
+
+        fun intentShowSuggestion(
+            context: Context,
+            currentUrl: String?,
+        ): Intent {
+            return Intent(context, AutofillManagementActivity::class.java).apply {
+                putExtra(EXTRAS_SUGGESTIONS_FOR_URL, currentUrl)
+            }
+        }
+
+        fun intentDefaultList(context: Context): Intent = Intent(context, AutofillManagementActivity::class.java)
     }
 }
 
@@ -267,11 +276,20 @@ class AutofillSettingsModule {
     @Provides
     fun activityLauncher(): AutofillSettingsActivityLauncher {
         return object : AutofillSettingsActivityLauncher {
-            override fun intent(
+            override fun intent(context: Context): Intent = AutofillManagementActivity.intentDefaultList(context)
+
+            override fun intentAlsoShowSuggestionsForSite(
                 context: Context,
-                loginCredentials: LoginCredentials?,
+                currentUrl: String?,
             ): Intent {
-                return AutofillManagementActivity.intent(context, loginCredentials)
+                return AutofillManagementActivity.intentShowSuggestion(context, currentUrl)
+            }
+
+            override fun intentDirectlyViewCredentials(
+                context: Context,
+                loginCredentials: LoginCredentials,
+            ): Intent {
+                return AutofillManagementActivity.intentDirectViewMode(context, loginCredentials)
             }
         }
     }
