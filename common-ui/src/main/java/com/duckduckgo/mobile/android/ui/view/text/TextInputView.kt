@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.ui.view
+package com.duckduckgo.mobile.android.ui.view.text
 
 import android.content.Context
 import android.content.res.TypedArray
@@ -35,10 +35,11 @@ import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.R.styleable
 import com.duckduckgo.mobile.android.databinding.ViewTextInputBinding
-import com.duckduckgo.mobile.android.ui.view.TextInputView.Type.INPUT_TYPE_MULTI_LINE
-import com.duckduckgo.mobile.android.ui.view.TextInputView.Type.INPUT_TYPE_PASSWORD
-import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
-import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action.PerformEndAction
+import com.duckduckgo.mobile.android.ui.view.showKeyboard
+import com.duckduckgo.mobile.android.ui.view.text.TextInputView.Type.INPUT_TYPE_MULTI_LINE
+import com.duckduckgo.mobile.android.ui.view.text.TextInputView.Type.INPUT_TYPE_PASSWORD
+import com.duckduckgo.mobile.android.ui.view.text.OutlinedTextInput.Action
+import com.duckduckgo.mobile.android.ui.view.text.OutlinedTextInput.Action.PerformEndAction
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textfield.TextInputLayout.END_ICON_CUSTOM

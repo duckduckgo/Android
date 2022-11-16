@@ -25,8 +25,8 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.ui.view.TextInputView
-import com.duckduckgo.mobile.android.ui.view.OutlinedTextInput.Action
+import com.duckduckgo.mobile.android.ui.view.text.TextInputView
+import com.duckduckgo.mobile.android.ui.view.text.OutlinedTextInput.Action
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
