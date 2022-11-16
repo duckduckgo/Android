@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryAPI
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.GoBackToSitePermissions
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command.ShowPermissionSettingSelectionDialog
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissionSettingType.ALLOW
@@ -43,8 +42,7 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class PermissionsPerWebsiteViewModel @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository,
-    private val locationPermissionsRepository: LocationPermissionsRepositoryAPI,
-    private val settingsDataStore: SettingsDataStore
+    private val locationPermissionsRepository: LocationPermissionsRepositoryAPI
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -76,18 +74,9 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
         sitePermissionsEntity: SitePermissionsEntity?,
         locationPermissionEntity: LocationPermissionEntity?
     ): List<WebsitePermissionSetting> {
-        val locationSetting = when (settingsDataStore.appLocationPermission) {
-            true -> WebsitePermissionSettingType.mapToWebsitePermissionSetting(locationPermissionEntity?.permission?.name)
-            false -> DENY
-        }
-        val cameraSetting = when (sitePermissionsRepository.askCameraEnabled) {
-            true -> WebsitePermissionSettingType.mapToWebsitePermissionSetting(sitePermissionsEntity?.askCameraSetting)
-            false -> DENY
-        }
-        val micSetting = when (sitePermissionsRepository.askMicEnabled) {
-            true -> WebsitePermissionSettingType.mapToWebsitePermissionSetting(sitePermissionsEntity?.askMicSetting)
-            false -> DENY
-        }
+        val locationSetting = WebsitePermissionSettingType.mapToWebsitePermissionSetting(locationPermissionEntity?.permission?.name)
+        val cameraSetting = WebsitePermissionSettingType.mapToWebsitePermissionSetting(sitePermissionsEntity?.askCameraSetting)
+        val micSetting = WebsitePermissionSettingType.mapToWebsitePermissionSetting(sitePermissionsEntity?.askMicSetting)
 
         return getSettingsList(locationSetting, cameraSetting, micSetting)
     }
