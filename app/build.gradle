@@ -229,6 +229,9 @@ dependencies {
     implementation project(':content-scope-scripts-api')
     implementation project(':content-scope-scripts-impl')
 
+    implementation project(':element-hiding-impl')
+    implementation project(':element-hiding-store')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
