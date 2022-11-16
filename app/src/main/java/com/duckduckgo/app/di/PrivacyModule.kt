@@ -80,8 +80,7 @@ object PrivacyModule {
         adClickManager: AdClickManager,
         fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
         sitePermissionsManager: SitePermissionsManager,
-        dispatcherProvider: DispatcherProvider,
-        clearDataPixel: ClearDataPixel
+        dispatcherProvider: DispatcherProvider
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -96,8 +95,7 @@ object PrivacyModule {
             adClickManager,
             fireproofWebsiteRepository,
             sitePermissionsManager,
-            dispatcherProvider,
-            clearDataPixel
+            dispatcherProvider
         )
     }
 

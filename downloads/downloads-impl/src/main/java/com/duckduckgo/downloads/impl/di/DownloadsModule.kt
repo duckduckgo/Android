@@ -33,7 +33,6 @@ class DownloadsModule {
     @SingleInstanceIn(AppScope::class)
     fun provideDownloadsDatabase(context: Context): DownloadsDatabase {
         return Room.databaseBuilder(context, DownloadsDatabase::class.java, "downloads.db")
-            .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .build()
     }

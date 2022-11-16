@@ -221,7 +221,7 @@
     <string name="atp_ActivityEnabledLabel">Denne funktion er i betatest. Har du bemærket et problem med en app? <annotation type="app_settings_link">Rapportér et problem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection er deaktiveret</b>\nHar App Tracking Protection forårsaget et problem med dine apps? <annotation type="report_issues_link">Rapportér problem</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android deaktiverede App Tracking Protection</b>. Vil du forhindre, at dette sker igen? <annotation type="re_enable_link">Genaktiver</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>En VPN-app på din enhed har deaktiveret App Tracking Protection.</b>\nHar App Tracking Protection forårsaget et problem med dine apps? <annotation type="report_issues_link">Rapportér problemer</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection er deaktiveret.</b>\nEn VPN-app på din enhed kan have deaktiveret den. Brug til/fra-knappen ovenfor til at genaktivere.</string>
     <string name="atp_ActivityAbout">Omkring</string>
     <string name="atp_ActivityManage">Administrer</string>
     <string name="atp_ActivityRemoveFeature">Deaktiver og slet data</string>
@@ -355,9 +355,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Hvis du har problemer med en app (f.eks. indhold, der ikke indlæses), kan du prøve at deaktivere beskyttelsen for den pågældende app og <annotation type="report_issues_link">indsende en rapport. </annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Seneste apps</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Seneste app-aktivitet</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Vis alle apps</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Endnu ingen apps</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Apps med nyligt blokerede sporingsforsøg vises her</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Deaktiver og slet data?</string>
@@ -393,8 +393,8 @@
         <item quantity="other">%1$s af dine apps er beskyttet mod skjulte trackere, som vi finder, der forsøger at få adgang til dine personlige oplysninger</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">%1$s af dine apps har automatisk beskyttelse deaktiveret</item>
-        <item quantity="other">%1$s af dine apps har automatisk beskyttelse deaktiveret</item>
+        <item quantity="one">%1$s af dine apps har beskyttelse deaktiveret</item>
+        <item quantity="other">%1$s af dine apps har beskyttelse deaktiveret</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Gode nyheder! App Tracking Protection er nu aktiveret.<br/><br/>👌Jeg viser dig en liste over apps i realtid på din enhed, som jeg fanger i forsøget på at spore dig.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Forstået</string>

@@ -17,6 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.waitlist.store
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -31,9 +33,12 @@ interface AtpWaitlistStateRepository {
 @ContributesBinding(AppScope::class)
 class WaitlistStateRepository @Inject constructor(
     private val dataStore: AppTrackingProtectionWaitlistDataStore,
+    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : AtpWaitlistStateRepository {
 
     override fun getState(): WaitlistState {
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.OpenBeta)) return WaitlistState.InBeta
+
         if (didJoinBeta()) {
             return WaitlistState.InBeta
         }

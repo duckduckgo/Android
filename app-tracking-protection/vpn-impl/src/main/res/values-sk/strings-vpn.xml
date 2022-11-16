@@ -233,7 +233,7 @@
     <string name="atp_ActivityEnabledLabel">Táto funkcia je vo verzii beta. Zaznamenali ste nejaký problém s aplikáciou? <annotation type="app_settings_link">Prosím, nahláste problém.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Ochrana sledovania aplikácií je vypnutá</b>\nSpôsobila ochrana sledovania aplikácií problém s vašimi aplikáciami? <annotation type="report_issues_link">Hlásenie problémov</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android zakázal ochranu pred sledovaním aplikácií</b>. Chcete zabrániť tomu, aby sa to opakovalo? <annotation type="re_enable_link">Znovu povoliť</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>Aplikácia VPN vo vašom zariadení zakázala ochranu pred sledovaním aplikácií.</b>\nSpôsobila stránka App Tracking Protection problém s vašimi aplikáciami? <annotation type="report_issues_link">Záležitosti správy</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>Ochrana proti sledovaniu aplikácií je zakázaná. </b>\nMohla ju zakázať VPN aplikácia vo vašom zariadení. Na opätovné zapnutie použite vyššie uvedený prepínač.</string>
     <string name="atp_ActivityAbout">O</string>
     <string name="atp_ActivityManage">Spravujte stránku</string>
     <string name="atp_ActivityRemoveFeature">Zakázanie a odstránenie údajov</string>
@@ -371,9 +371,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Ak máte problémy s aplikáciou (napríklad sa nenačítava obsah), skúste pre danú aplikáciu vypnúť ochranu a <annotation type="report_issues_link"> odošlite hlásenie. </annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Nedávne aplikácie</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Nedávna aktivita aplikácie</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Zobraziť všetky aplikácie</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Zatiaľ žiadne najnovšie aplikácie</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Tu sa zobrazia aplikácie s nedávno zablokovanými pokusmi o sledovanie</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Zakázať a odstrániť údaje?</string>
@@ -411,13 +411,13 @@
         <item quantity="other">%1$s z vašich aplikácií je chránených pred skrytými sledovaniami, o ktorých si myslíme, že sa pokúšajú získať prístup k vašim osobným údajom</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">%1$s z vašich aplikácií má automaticky zakázanú ochranu</item>
-        <item quantity="few">%1$s z vašich aplikácií automaticky majú zakázanú ochranu</item>
-        <item quantity="many">%1$s z vašich aplikácií má automaticky zakázanú ochranu</item>
-        <item quantity="other">%1$s z vašich aplikácií má automaticky zakázanú ochranu</item>
+        <item quantity="one">%1$s vaša aplikácia má vypnutú ochranu</item>
+        <item quantity="few">%1$s vaše aplikácie má vypnutú ochranu</item>
+        <item quantity="many">%1$s vašich aplikácií má vypnutú ochranu</item>
+        <item quantity="other">%1$s vašich aplikácií má vypnutú ochranu</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Máme dobré správy! Ochrana aplikácii pred sledovaním je teraz povolená.<br/><br/>👌V reálnom čase vám zobrazím zoznam aplikácií vo vašom zariadení, ktoré sa vás pokúšajú sledovať.]]></string>
-    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Mám to!</string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Rozumiem!</string>
     <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Ochrana povolená (%1$s)</string>
     <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Ochrana vypnutá (%1$s)</string>
     <string name="atp_ExcludedAppsFilterAllLabel">Všetko</string>

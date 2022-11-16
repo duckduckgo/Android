@@ -63,6 +63,7 @@
         android:id="@+id/deviceShieldCtaSplitter"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:defaultPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

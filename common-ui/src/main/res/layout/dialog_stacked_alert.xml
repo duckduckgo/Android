@@ -37,7 +37,7 @@
 
     <TextView
         android:id="@+id/stackedAlertDialogTitle"
-        style="@style/Widget.DuckDuckGo.Dialog.Title"
+        style="@style/TextAppearance.DuckDuckGo.Headline2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"

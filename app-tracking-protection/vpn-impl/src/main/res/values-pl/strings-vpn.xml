@@ -233,7 +233,7 @@
     <string name="atp_ActivityEnabledLabel">Ta funkcja jest w fazie beta. Masz problem z aplikacją? <annotation type="app_settings_link">Prześlij zgłoszenie.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Ochrona przed śledzeniem przez aplikacje jest wyłączona.</b>\nCzy ochrona przed śledzeniem przez aplikacje wywołała problem z Twoimi aplikacjami? <annotation type="report_issues_link">Zgłoś problemy</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>System Android wyłączył ochronę przed śledzeniem aplikacji</b>. Chcesz temu zapobiec w przyszłości? <annotation type="re_enable_link">Włącz ją ponownie</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>Aplikacja VPN na Twoim urządzeniu wyłączyła ochronę przed śledzeniem przez aplikacje. </b>\nCzy ochrona przed śledzeniem przez aplikacje wywołała problem z Twoimi aplikacjami? <annotation type="report_issues_link">Zgłoś problemy</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>Ochrona przed śledzeniem przez aplikacje jest wyłączona.</b>\nMogła zostać wyłączona przez aplikację VPN na Twoim urządzeniu. Użyj przełącznika powyżej, aby ponownie ją włączyć.</string>
     <string name="atp_ActivityAbout">Informacje</string>
     <string name="atp_ActivityManage">Zarządzaj</string>
     <string name="atp_ActivityRemoveFeature">Wyłącz i usuń dane</string>
@@ -371,9 +371,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Jeśli masz problemy z jakąś aplikacją (np. nie ładuje się jej zawartość), spróbuj wyłączyć ochronę dla tej aplikacji i <annotation type="report_issues_link">prześlij zgłoszenie</annotation>.</string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Ostatnie aplikacje</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Ostatnia aktywność aplikacji</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Pokaż wszystkie aplikacje</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Brak ostatnich aplikacji</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Tutaj pojawią się aplikacje, w których ostatnio zablokowano próby śledzenia.</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Czy chcesz wyłączyć i usunąć dane?</string>
@@ -411,12 +411,12 @@
         <item quantity="other">%1$s z Twoich aplikacji jest chronione przed ukrytymi trackerami, które według nas próbują uzyskać dostęp do Twoich danych osobowych.</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">%1$s z Twoich aplikacji ma automatycznie wyłączoną ochronę.</item>
-        <item quantity="few">%1$s z Twoich aplikacji mają automatycznie wyłączoną ochronę.</item>
-        <item quantity="many">%1$s z Twoich aplikacji ma automatycznie wyłączoną ochronę.</item>
-        <item quantity="other">%1$s z Twoich aplikacji ma automatycznie wyłączoną ochronę.</item>
+        <item quantity="one">%1$s z Twoich aplikacji ma wyłączoną ochronę.</item>
+        <item quantity="few">%1$s z Twoich aplikacji mają wyłączoną ochronę.</item>
+        <item quantity="many">%1$s z Twoich aplikacji ma wyłączoną ochronę.</item>
+        <item quantity="other">%1$s z Twoich aplikacji ma wyłączoną ochronę.</item>
     </plurals>
-    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Dobra wiadomość! Ochrona przed śledzeniem przez aplikacje jest teraz włączona.<br/><br/>👌Na bieżąco będziemy pokazywać Ci listę aplikacji zainstalowanych na Twoim urządzeniu, które próbują Cię śledzić.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Dobra wiadomość! Ochrona przed śledzeniem przez aplikacje jest teraz włączona.<br/><br/>👍Na bieżąco będziemy pokazywać Ci listę aplikacji zainstalowanych na Twoim urządzeniu, które próbują Cię śledzić.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Rozumiem!</string>
     <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Ochrona włączona (%1$s)</string>
     <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Ochrona wyłączona (%1$s)</string>

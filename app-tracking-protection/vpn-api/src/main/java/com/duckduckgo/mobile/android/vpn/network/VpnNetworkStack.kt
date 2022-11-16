@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.network
 
 import android.os.ParcelFileDescriptor
+import java.net.InetAddress
 
 interface VpnNetworkStack {
 
@@ -55,4 +56,21 @@ interface VpnNetworkStack {
      * @return the MTU size you wish the VPN service to set
      */
     fun mtu(): Int
+
+    /**
+     * @return the address you wish to add to the VPN service.
+     * They key contains the InetAddress of the address and value should be the mask width.
+     */
+    fun addresses(): Map<InetAddress, Int>
+
+    /**
+     * @return the additional dns servers you wish to add to the VPN service
+     */
+    fun dns(): Set<InetAddress>
+
+    /**
+     * @return the additional routes you wish to add to the VPN service.
+     * They key contains the InetAddress of the route and value should be the mask width.
+     */
+    fun routes(): Map<InetAddress, Int>
 }
