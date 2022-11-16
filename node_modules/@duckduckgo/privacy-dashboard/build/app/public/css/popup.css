@@ -437,6 +437,7 @@ body.body--theme-dark.environment--ios {
 .site-info__protection {
   opacity: 1;
   margin-top: 0;
+  padding-right: 10px;
 }
 
 .site-info__li--toggle {
@@ -563,9 +564,7 @@ body.body--theme-dark.environment--ios {
   z-index: 1;
   margin-left: 10px;
   margin-right: 10px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1;
 }
 
 .main-nav__chev {
