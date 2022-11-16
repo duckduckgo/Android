@@ -43,6 +43,12 @@ interface AutofillStore {
     var showOnboardingWhenOfferingToSaveLogin: Boolean
 
     /**
+     * Used to determine if a user has ever been prompted to save a login (note: prompted to save, not necessarily saved)
+     * Defaults to false, and will be set to true after the user has been shown a prompt to save a login
+     */
+    var hasEverBeenPromptedToSaveLogin: Boolean
+
+    /**
      * Whether to monitor autofill decline counts or not
      * Used to determine whether we should actively detect when a user new to autofill doesn't appear to want it enabled
      */

@@ -45,7 +45,6 @@ object AutoconsentModule {
     @SingleInstanceIn(AppScope::class)
     fun provideAutoconsentDatabase(context: Context): AutoconsentDatabase {
         return Room.databaseBuilder(context, AutoconsentDatabase::class.java, "autoconsent.db")
-            .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .build()
     }

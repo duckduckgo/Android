@@ -23,6 +23,8 @@ import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder.Companion.APP_TP_WAITLIST_SYNC_WORK_TAG
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import com.squareup.anvil.annotations.ContributesBinding
@@ -75,7 +77,12 @@ class AppTPWaitlistWorker(
     @Inject
     lateinit var workRequestBuilder: AppTPWaitlistWorkRequestBuilder
 
+    @Inject
+    lateinit var appTpFeatureConfig: AppTpFeatureConfig
+
     override suspend fun doWork(): Result {
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.OpenBeta)) return Result.success()
+
         when (waitlistManager.fetchInviteCode()) {
             FetchCodeResult.CodeExisted -> Result.success()
             FetchCodeResult.Code -> notificationSender.sendNotification(notification)

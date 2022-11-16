@@ -28,7 +28,6 @@ import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.fire.DataClearerTimeKeeper
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.fire.ClearDataPixel
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
 import com.duckduckgo.app.global.DispatcherProvider
@@ -80,8 +79,7 @@ object PrivacyModule {
         adClickManager: AdClickManager,
         fireproofWebsiteRepository: FireproofWebsiteRepositoryAPI,
         sitePermissionsManager: SitePermissionsManager,
-        dispatcherProvider: DispatcherProvider,
-        clearDataPixel: ClearDataPixel
+        dispatcherProvider: DispatcherProvider
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -96,8 +94,7 @@ object PrivacyModule {
             adClickManager,
             fireproofWebsiteRepository,
             sitePermissionsManager,
-            dispatcherProvider,
-            clearDataPixel
+            dispatcherProvider
         )
     }
 

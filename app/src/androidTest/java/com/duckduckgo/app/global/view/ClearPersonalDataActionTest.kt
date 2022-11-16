@@ -23,7 +23,6 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
-import com.duckduckgo.app.fire.ClearDataPixel
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryAPI
@@ -59,7 +58,6 @@ class ClearPersonalDataActionTest {
     private val mockAdClickManager: AdClickManager = mock()
     private val mockFireproofWebsiteRepository: FireproofWebsiteRepositoryAPI = mock()
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
-    private val mockClearDataPixel: ClearDataPixel = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
@@ -78,7 +76,6 @@ class ClearPersonalDataActionTest {
             adClickManager = mockAdClickManager,
             fireproofWebsiteRepository = mockFireproofWebsiteRepository,
             sitePermissionsManager = mockSitePermissionsManager,
-            clearDataPixel = mockClearDataPixel
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
     }

@@ -221,7 +221,7 @@
     <string name="atp_ActivityEnabledLabel">Questa funzione è in versione beta. Hai riscontrato un problema con un\'app? <annotation type="app_settings_link">Segnalalo.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection è disattivata</b>\nApp Tracking Protection ha causato un problema con le tue app? <annotation type="report_issues_link">Segnala problemi</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android ha disattivato App Tracking Protection</b>. Vuoi evitare che succeda ancora? <annotation type="re_enable_link">Riattiva</annotation></string>
-    <string name="atp_ActivityRevokedLabel"><b>Un\'app VPN sul tuo dispositivo ha disattivato App Tracking Protection.</b>\nApp Tracking Protection ha causato un problema con le tue app? <annotation type="report_issues_link">Segnala problemi</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection disattivata.</b>\nPotrebbe essere stata disattivata da un\'app VPN presente sul tuo dispositivo. Usa l\'opzione in alto per riattivarla.</string>
     <string name="atp_ActivityAbout">Informazioni</string>
     <string name="atp_ActivityManage">Gestisci</string>
     <string name="atp_ActivityRemoveFeature">Disattiva ed elimina dati</string>
@@ -355,9 +355,9 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">Se riscontri problemi con un\'app (come il mancato caricamento dei contenuti), prova a disabilitare la protezione per quell\'app e <annotation type="report_issues_link">invia una segnalazione.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">App recenti</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Attività recente dell\'app</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Mostra tutte le app</string>
-    <string name="atp_ManageRecentAppsProtectionEmpty">Ancora nessuna app recente</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Le app il cui tentativo di tracciamento è stato bloccato di recente appariranno qui</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Disattivare ed eliminare i dati?</string>
@@ -385,7 +385,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Segnala problema</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Non adesso</string>
     <string name="atp_ActivityRecentActivityHeader">Attività</string>
-    <string name="atp_ActivityManageProtectionLabel">Problemi con un\'app?</string>
+    <string name="atp_ActivityManageProtectionLabel">Hai riscontrato qualche problema con un\'app?</string>
     <string name="atp_ActivityEnabledBannerLabel">Nel corso della fase beta, la protezione di alcune app viene disattivata automaticamente. <annotation type="app_settings_link">Visualizza le app</annotation></string>
     <string name="atp_ActivityDescription">I tentativi di tracciamento bloccati verranno visualizzati qui</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
@@ -393,10 +393,10 @@
         <item quantity="other">%1$s delle tue app sono protette dai sistemi di tracciamento nascosti che abbiamo individuato mentre cercavano di accedere alle tue informazioni personali</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
-        <item quantity="one">La protezione di %1$s delle tue app è stata disattivata automaticamente</item>
-        <item quantity="other">La protezione di %1$s delle tue app è stata disattivata automaticamente</item>
+        <item quantity="one">La protezione di %1$s delle tue app è stata disattivata</item>
+        <item quantity="other">La protezione di %1$s delle tue app è stata disattivata</item>
     </plurals>
-    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Buone notizie: App Tracking Protection è ora attiva.<br/><br/>👌Ti mostrerò un elenco in tempo reale delle app presenti sul dispositivo che hanno cercato di tracciare la tua attività.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Buone notizie! App Tracking Protection è ora attiva.<br/><br/>👌Ti mostrerò un elenco in tempo reale delle app presenti sul dispositivo che hanno cercato di tracciare la tua attività.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Ho capito!</string>
     <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Protezione attivata (%1$s)</string>
     <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Protezione disattivata (%1$s)</string>
@@ -406,7 +406,7 @@
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Tutto</string>
     <string name="atp_ActivityViewAppsLabel">Visualizza le app</string>
     <string name="atp_ActivityEnabledMoreThanADayLabel">Questa funzione è in versione beta. Hai riscontrato qualche problema con un\'app? <annotation type="app_settings_link">Aiutaci a migliorare</annotation></string>
-    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Alcune app potrebbero riscontrare dei problemi quando App Tracking Protection è attivata.\n<annotation type="learn_why_link">Scopri perché</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Alcune app potrebbero riscontrare dei problemi quando App Tracking Protection è attivata. <annotation type="learn_why_link">Scopri perché</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">La protezione è disattivata per le app che presentano problemi noti. È possibile attivarle, ma potrebbero non funzionare come previsto. <annotation type="learn_why_link">Scopri perché</annotation></string>
 
 </resources>

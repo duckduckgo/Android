@@ -49,7 +49,6 @@ import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateReposito
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.site.permissions.impl.pixels.SitePermissionsPixel.SitePermissionsPixelName
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -97,6 +96,7 @@ class SettingsViewModel @Inject constructor(
         val globalPrivacyControlEnabled: Boolean = false,
         val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
         val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
+        val appTrackingProtectionOnboardingShown: Boolean = false,
         val appTrackingProtectionEnabled: Boolean = false,
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
@@ -165,6 +165,7 @@ class SettingsViewModel @Inject constructor(
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value),
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
+                    appTrackingProtectionOnboardingShown = vpnStore.didShowOnboarding(),
                     appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN),
                     appTrackingProtectionWaitlistState = atpRepository.getState(),
                     emailAddress = emailManager.getEmailAddress(),
@@ -185,6 +186,7 @@ class SettingsViewModel @Inject constructor(
                 val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
                 if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
                     viewState.value = currentViewState().copy(
+                        appTrackingProtectionOnboardingShown = vpnStore.didShowOnboarding(),
                         appTrackingProtectionEnabled = isDeviceShieldEnabled
                     )
                 }
@@ -247,7 +249,6 @@ class SettingsViewModel @Inject constructor(
 
     fun onSitePermissionsClicked() {
         viewModelScope.launch { command.send(Command.LaunchLocation) }
-        pixel.fire(SitePermissionsPixelName.SITE_PERMISSIONS_SETTINGS_VISITED)
     }
 
     fun onAutomaticallyClearWhatClicked() {
