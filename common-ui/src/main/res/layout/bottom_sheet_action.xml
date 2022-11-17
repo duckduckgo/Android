@@ -23,16 +23,16 @@
     android:paddingTop="@dimen/actionBottomSheetVerticalPadding"
     android:paddingBottom="@dimen/actionBottomSheetVerticalPadding">
 
-    <TextView
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/actionBottomSheetDialogTitle"
-        style="@style/TextAppearance.DuckDuckGo.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
         android:paddingTop="@dimen/bottomSheetTitleVerticalPadding"
         android:paddingBottom="@dimen/bottomSheetTitleVerticalPadding"
-        android:textColor="?secondaryTextColor"
         android:visibility="gone"
+        app:textColor="secondary"
+        app:typography="body1"
         tools:text="Actions" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem

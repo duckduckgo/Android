@@ -15,7 +15,7 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/cornflowerBlue" android:state_checked="true"/>
-    <item android:color="@color/cornflowerDisabled" android:state_enabled="false"/>
-    <item android:color="@color/cornflowerBlue"/>
+    <item android:color="?attr/daxColorAccentBlue" android:state_checked="true"/>
+    <item android:color="?attr/daxColorContainerDisabled" android:state_enabled="false"/>
+    <item android:color="?attr/daxColorAccentBlue"/>
 </selector>

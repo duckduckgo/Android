@@ -40,6 +40,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="gone"
+        android:layout_marginBottom="@dimen/keyline_2"
         app:layout_constraintBottom_toTopOf="@id/bottomSheetPromoContent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/bottomSheetPromoContent"
@@ -52,14 +53,14 @@
         android:id="@+id/bottomSheetPromoContent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/bottomSheetPromoIcon"
         app:layout_constraintTop_toBottomOf="@id/bottomSheetPromoTitle"
-        app:typography="body2"
+        app:layout_constraintBottom_toTopOf="@id/bottomSheetPromoPrimaryButton"
+        app:typography="body1"
         tools:text="Add our search widget to your home screen for quick, easy access." />
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonPrimaryLarge
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/bottomSheetPromoPrimaryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -68,10 +69,11 @@
         app:layout_constraintTop_toBottomOf="@id/bottomSheetPromoContent"
         tools:text="Primary" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
+    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
         android:id="@+id/bottomSheetPromoSecondaryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/keyline_2"
         app:layout_constraintBottom_toBottomOf="@id/bottomSheetPromoPrimaryButton"
         app:layout_constraintEnd_toStartOf="@id/bottomSheetPromoPrimaryButton"
         app:layout_constraintTop_toTopOf="@id/bottomSheetPromoPrimaryButton"

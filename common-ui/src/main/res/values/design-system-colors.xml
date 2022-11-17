@@ -34,6 +34,7 @@
     <attr name="daxColorBackgroundInverted" format="color"/>
     <attr name="daxColorSurface" format="color"/>
     <attr name="daxColorContainer" format="color"/>
+    <attr name="daxColorWindow" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
     <attr name="daxColorSecondaryText" format="color"/>
     <attr name="daxColorPrimaryIcon" format="color"/>
@@ -43,6 +44,7 @@
     <attr name="daxColorAccentYellow" format="color"/>
     <attr name="daxColorContainerDisabled" format="color"/>
     <attr name="daxColorTextDisabled" format="color"/>
+    <attr name="daxColorRipple" format="color"/>
 
     <!-- Component Specific Colors -->
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
@@ -60,6 +62,11 @@
     <attr name="daxColorButtonSecondaryTextPressed" format="color"/>
     <attr name="daxColorButtonDestructiveGhostText" format="color"/>
     <attr name="daxColorButtonDestructiveGhostTextPressed" format="color"/>
+
+    <attr name="daxColorSwitchTrackOn" format="color"/>
+    <attr name="daxColorSwitchTrackOff" format="color"/>
+    <attr name="daxColorSwitchThumbOn" format="color"/>
+    <attr name="daxColorSwitchThumbOff" format="color"/>
 
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
@@ -90,6 +97,7 @@
     <color name="gray60">#888888</color>
     <color name="gray50">#ABABAB</color>
     <color name="gray40">#CCCCCC</color>
+    <color name="gray40_40">#66CCCCCC</color>
     <color name="gray30">#DDDDDD</color>
     <color name="gray25">#E5E5E5</color>
     <color name="gray20">#EEEEEE</color>

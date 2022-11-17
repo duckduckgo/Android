@@ -27,10 +27,10 @@
               android:paddingEnd="@dimen/keyline_4"
               android:gravity="center">
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:text="Dax Buttons"/>
+        app:primaryText="Dax Buttons"/>
 
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/dax_button_primary"
@@ -139,11 +139,11 @@
         android:enabled="false"
         android:text="Ghost Destructive Disabled"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/label"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:text="Deprecated Buttons"
+        app:primaryText="Deprecated Buttons"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 

@@ -23,7 +23,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.mobile.android.databinding.DialogStackedAlertBinding
-import com.duckduckgo.mobile.android.ui.view.button.ButtonGhostLarge
+import com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -127,7 +127,7 @@ class StackedAlertDialogBuilder(val context: Context) {
         )
 
         stackedButtonList.forEachIndexed { index, text ->
-            val button = ButtonGhostLarge(context, null)
+            val button = DaxButtonGhost(context, null)
             button.text = text
             button.layoutParams = buttonParams
 

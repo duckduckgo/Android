@@ -18,12 +18,13 @@ package com.duckduckgo.mobile.android.ui.view.dialog
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.widget.FrameLayout
+import android.widget.RadioGroup
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.mobile.android.databinding.DialogSingleChoiceAlertBinding
 import com.duckduckgo.mobile.android.ui.view.button.RadioButton
 import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.toDp
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class RadioListAlertDialogBuilder(val context: Context) {
@@ -131,8 +132,9 @@ class RadioListAlertDialogBuilder(val context: Context) {
 
         optionList.forEach {
             val radioButton = RadioButton(context, null)
-            radioButton.setPadding(30.toDp(), 0, 0, 0)
             radioButton.text = it
+            val params = RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+            radioButton.layoutParams = params
             binding.radioListDialogRadioGroup.addView(radioButton)
         }
 

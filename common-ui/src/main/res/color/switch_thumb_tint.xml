@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,9 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:color="?attr/daxColorPrimaryText" />
-    <item android:color="?attr/daxColorPrimaryText" android:state_pressed="true"/>
-    <item android:color="?attr/daxColorPrimaryText" android:state_enabled="true"/>
+    <item android:color="?attr/daxColorSwitchThumbOn" android:state_checked="true"/>
+    <item android:color="?attr/daxColorSwitchThumbOff"/>
 </selector>

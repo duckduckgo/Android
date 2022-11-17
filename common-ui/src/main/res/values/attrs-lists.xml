@@ -26,6 +26,7 @@
 
     <attr name="primaryText" format="string"/>
     <attr name="primaryTextColorOverlay" format="color"/>
+    <attr name="primaryTextTruncated" format="boolean"/>
     <attr name="secondaryText" format="string"/>
     <attr name="secondaryTextColorOverlay" format="color"/>
     <attr name="leadingIcon" format="integer"/>
@@ -53,6 +54,7 @@
     <declare-styleable name="OneLineListItem">
         <attr name="primaryText"/>
         <attr name="primaryTextColorOverlay"/>
+        <attr name="primaryTextTruncated"/>
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
         <attr name="trailingIcon"/>
@@ -63,6 +65,7 @@
     <declare-styleable name="TwoLineListItem">
         <attr name="primaryText"/>
         <attr name="primaryTextColorOverlay"/>
+        <attr name="primaryTextTruncated"/>
         <attr name="secondaryText"/>
         <attr name="secondaryTextColorOverlay"/>
         <attr name="leadingIcon"/>
