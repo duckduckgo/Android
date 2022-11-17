@@ -49,8 +49,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_4"
-        android:ellipsize="end"
-        android:maxLines="1"
         android:textColor="@color/primary_text_color_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/trailingContainer"

@@ -118,5 +118,27 @@
         app:primaryText="Item with custom text color"
         app:primaryTextColorOverlay="@color/red_text_color_selector" />
 
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithLongText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemCustomTextColor"
+        app:primaryText="Item with custom text color asdasda sd asda sdasda s"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithLongTextTruncated"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLongText"
+        app:primaryText="Item with custom text color asdasda sd asda sdasda s"
+        app:primaryTextTruncated="true"/>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

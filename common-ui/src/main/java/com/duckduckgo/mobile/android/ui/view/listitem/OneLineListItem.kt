@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.text.TextUtils.TruncateAt
 import android.util.AttributeSet
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
@@ -54,6 +55,14 @@ class OneLineListItem @JvmOverloads constructor(
 
             if (hasValue(R.styleable.OneLineListItem_primaryTextColorOverlay)) {
                 binding.primaryText.setTextColor(getColorStateList(R.styleable.OneLineListItem_primaryTextColorOverlay))
+            }
+
+            if (hasValue(R.styleable.OneLineListItem_primaryTextTruncated)) {
+                val truncated = getBoolean(R.styleable.OneLineListItem_primaryTextTruncated, false)
+                if (truncated) {
+                    binding.primaryText.maxLines = 1
+                    binding.primaryText.ellipsize = TruncateAt.END
+                }
             }
 
             if (hasValue(R.styleable.OneLineListItem_leadingIcon)) {

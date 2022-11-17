@@ -20,6 +20,7 @@ package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.text.TextUtils.TruncateAt
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -56,6 +57,14 @@ class TwoLineListItem @JvmOverloads constructor(
 
             if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
                 binding.primaryText.setTextColor(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
+            }
+
+            if (hasValue(R.styleable.TwoLineListItem_primaryTextTruncated)) {
+                val truncated = getBoolean(R.styleable.TwoLineListItem_primaryTextTruncated, false)
+                if (truncated) {
+                    binding.primaryText.maxLines = 1
+                    binding.primaryText.ellipsize = TruncateAt.END
+                }
             }
 
             if (hasValue(R.styleable.TwoLineListItem_secondaryTextColorOverlay)) {
