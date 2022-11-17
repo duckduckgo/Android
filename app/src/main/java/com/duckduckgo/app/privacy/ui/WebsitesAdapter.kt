@@ -169,8 +169,9 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
                 entity.domain
             )
 
-            listItem.setPrimaryText(entity.domain)
             loadFavicon(entity.domain, listItem.leadingIcon())
+            listItem.setPrimaryText(entity.domain)
+            listItem.showTrailingIcon()
             listItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, entity)
             }
