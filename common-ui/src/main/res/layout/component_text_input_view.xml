@@ -81,13 +81,12 @@
             app:type="password"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.TextInputView
-            android:id="@+id/outlinedinputtext7"
+            android:id="@+id/outlinedinputtext9"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_3"
-            android:hint="Non-editable password without icon"
+            android:hint="Editable password that doesn't fit in one line"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
-            app:editable="false"
             app:type="password"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.TextInputView
@@ -95,19 +94,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_3"
+            android:hint="Non-editable password"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
+            app:editable="false"
+            app:type="password"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.TextInputView
+            android:id="@+id/outlinedinputtext20"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_3"
             android:hint="Non-editable password with icon"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
             app:editable="false"
             app:endIcon="@drawable/ic_copy"
-            app:type="password"/>
-
-        <com.duckduckgo.mobile.android.ui.view.text.TextInputView
-            android:id="@+id/outlinedinputtext9"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_3"
-            android:hint="Editable password that doesn't fit in one line"
-            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
             app:type="password"/>
 
     </LinearLayout>
