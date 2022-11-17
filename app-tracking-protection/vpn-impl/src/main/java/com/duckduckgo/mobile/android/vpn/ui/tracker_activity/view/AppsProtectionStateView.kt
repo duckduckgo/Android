@@ -29,7 +29,7 @@ import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionList
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter.PROTECTED_ONLY
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter.UNPROTECTED_ONLY
 import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityAppsBinding
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.AppsData
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.AppsData
 
 class AppsProtectionStateView @JvmOverloads constructor(
     context: Context,
