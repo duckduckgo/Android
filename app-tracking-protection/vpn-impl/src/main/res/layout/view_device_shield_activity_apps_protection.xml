@@ -41,6 +41,7 @@
     <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
         android:id="@+id/unProtectedAppsState"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_3"/>
 
 </LinearLayout>
