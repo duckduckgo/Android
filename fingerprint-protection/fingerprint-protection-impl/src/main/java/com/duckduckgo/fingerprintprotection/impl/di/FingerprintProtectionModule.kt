@@ -47,7 +47,6 @@ object FingerprintProtectionModule {
     @Provides
     fun provideFingerprintProtectionDatabase(context: Context): FingerprintProtectionDatabase {
         return Room.databaseBuilder(context, FingerprintProtectionDatabase::class.java, "fingerprint_protection.db")
-            .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .addMigrations(*ALL_MIGRATIONS)
             .build()
