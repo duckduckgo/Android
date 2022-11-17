@@ -16,13 +16,43 @@
 
 package com.duckduckgo.mobile.android.themepreview.ui.component.textinput
 
-import com.duckduckgo.mobile.android.themepreview.ui.component.Component
-import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
+import android.annotation.SuppressLint
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.duckduckgo.mobile.android.databinding.ComponentTextInputViewBinding
+import com.duckduckgo.mobile.android.ui.view.text.OutlinedTextInput.Action
+import com.google.android.material.snackbar.Snackbar
 
-class ComponentTextInputFragment : ComponentFragment() {
-    override fun getComponents(): List<Component> {
-        return listOf(
-            Component.OUTLINED_TEXT_INPUT
-        )
+@SuppressLint("NoFragment") // we don't use DI here
+class ComponentTextInputFragment : Fragment() {
+
+    private lateinit var binding: ComponentTextInputViewBinding
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = ComponentTextInputViewBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.outlinedinputtext4.onAction { toastOnClick(it) }
+        binding.outlinedinputtext6.onAction { toastOnClick(it) }
+        binding.outlinedinputtext8.onAction { toastOnClick(it) }
+    }
+
+    private fun toastOnClick(action: Action) = when (action) {
+        is Action.PerformEndAction -> {
+            Snackbar.make(binding.root, "End icon clicked", Snackbar.LENGTH_SHORT).show()
+        }
     }
 }

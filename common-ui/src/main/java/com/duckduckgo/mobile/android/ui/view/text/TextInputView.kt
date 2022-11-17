@@ -178,9 +178,11 @@ class TextInputView @JvmOverloads constructor(
             isPasswordShown = !isPasswordShown
             if (isPasswordShown) {
                 binding.internalPasswordIcon.setImageResource(R.drawable.ic_password_hide)
+                binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
                 binding.internalEditText.transformationMethod = null
             } else {
                 binding.internalPasswordIcon.setImageResource(R.drawable.ic_password_show)
+                binding.internalEditText.inputType = EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
                 binding.internalEditText.transformationMethod = transformationMethod
             }
         }

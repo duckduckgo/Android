@@ -204,24 +204,6 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class DividerComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_section_divider))
 
-    class OutlinedTextInputComponentViewHolder(val parent: ViewGroup) :
-        ComponentViewHolder(inflate(parent, R.layout.component_outline_text_input)) {
-        init {
-            view.findViewById<TextInputView>(R.id.outlinedinputtext1).onAction { toastOnClick(it) }
-            view.findViewById<TextInputView>(R.id.outlinedinputtext4).onAction { toastOnClick(it) }
-            view.findViewById<TextInputView>(R.id.outlinedinputtext6).onAction { toastOnClick(it) }
-            view.findViewById<TextInputView>(R.id.outlinedinputtext8).onAction { toastOnClick(it) }
-        }
-
-        private fun toastOnClick(action: Action) = when (action) {
-            is Action.PerformEndAction -> Toast.makeText(
-                parent.context,
-                "End icon clicked!",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-
     companion object {
         fun create(
             parent: ViewGroup,
@@ -241,7 +223,6 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
-                Component.OUTLINED_TEXT_INPUT -> OutlinedTextInputComponentViewHolder(parent)
                 else -> {
                     TODO()
                 }

@@ -30,35 +30,15 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="Text Input"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-
         <com.duckduckgo.mobile.android.ui.view.text.TextInputView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Label"
-            app:editable="true"/>
-
-        <com.duckduckgo.mobile.android.ui.view.text.TextInputView
+            android:id="@+id/outlinedinputtext3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_3"
-            android:hint="Label"
-            app:editable="false"
-            app:endIcon="@drawable/ic_copy"/>
-
-        <com.duckduckgo.mobile.android.ui.view.text.TextInputView
-            android:id="@+id/outlinedinputtext1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_3"
-            android:hint="Editable text"
-            android:text="This is an editable text!"
+            android:hint="Single line editable text"
+            android:text="This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt is restricted to a single line."
             app:editable="true"
+            app:type="single_line"
             app:endIcon="@drawable/ic_copy"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.TextInputView
@@ -66,20 +46,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_3"
-            android:hint="Editable text"
+            android:hint="Multi line editable text"
             android:text="This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt can include multiline text."
             app:editable="true"
-            app:endIcon="@drawable/ic_copy"/>
-
-        <com.duckduckgo.mobile.android.ui.view.text.TextInputView
-            android:id="@+id/outlinedinputtext3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_3"
-            android:hint="Editable text"
-            android:text="This is an editable text! It has a very long text to show how it behaves when the text is too long to fit in a single line.\n\nIt is restricted to a single line."
-            app:editable="true"
-            app:type="single_line"
+            app:type="multi_line"
             app:endIcon="@drawable/ic_copy"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.TextInputView
@@ -106,9 +76,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_3"
-            android:hint="Editable password"
-            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
-            app:endIcon="@drawable/ic_copy"
+            android:hint="Editable password that fits in one line"
+            android:text="Loremipsumolor"
             app:type="password"/>
 
         <com.duckduckgo.mobile.android.ui.view.text.TextInputView
@@ -130,6 +99,15 @@
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
             app:editable="false"
             app:endIcon="@drawable/ic_copy"
+            app:type="password"/>
+
+        <com.duckduckgo.mobile.android.ui.view.text.TextInputView
+            android:id="@+id/outlinedinputtext9"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_3"
+            android:hint="Editable password that doesn't fit in one line"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
             app:type="password"/>
 
     </LinearLayout>
