@@ -38,6 +38,9 @@ android {
                         srcDirs += files("$projectDir/../submodules/".toString())
                     }
                 }
+                assets {
+                    srcDirs += files("$projectDir/../node_modules/@duckduckgo/privacy-dashboard/build/app".toString())
+                }
             }
         }
 
@@ -188,6 +191,9 @@ dependencies {
     implementation project(':anrs-impl')
     implementation project(':macos-api')
     implementation project(':macos-impl')
+
+    implementation project(':privacy-dashboard-api')
+    implementation project(':privacy-dashboard-impl')
 
     implementation project(':remote-messaging-api')
     implementation project(':remote-messaging-impl')

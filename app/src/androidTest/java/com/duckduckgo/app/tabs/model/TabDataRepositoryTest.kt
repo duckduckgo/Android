@@ -28,15 +28,17 @@ import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.model.SiteFactory
-import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.global.model.SiteFactoryImpl
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -407,14 +409,15 @@ class TabDataRepositoryTest {
 
     private fun tabDataRepository(
         dao: TabsDao = mockDatabase(),
-        privacyPractices: PrivacyPractices = mock(),
         entityLookup: EntityLookup = mock(),
+        allowListDao: UserWhitelistDao = mock(),
+        contentBlocking: ContentBlocking = mock(),
         webViewPreviewPersister: WebViewPreviewPersister = mock(),
         faviconManager: FaviconManager = mock()
     ): TabDataRepository {
         return TabDataRepository(
             dao,
-            SiteFactory(privacyPractices, entityLookup),
+            SiteFactoryImpl(entityLookup, allowListDao, contentBlocking, TestScope()),
             webViewPreviewPersister,
             faviconManager,
             coroutinesTestRule.testScope,

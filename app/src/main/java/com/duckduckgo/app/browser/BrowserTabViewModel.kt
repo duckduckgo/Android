@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
+import android.net.http.SslCertificate
 import android.os.Message
 import android.util.Patterns
 import android.view.ContextMenu
@@ -48,7 +49,6 @@ import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
-import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Browser
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Invalidated
@@ -100,7 +100,7 @@ import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
-import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ALWAYS
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ASK_EVERY_TIME
@@ -117,6 +117,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadStateListener
@@ -219,7 +220,7 @@ class BrowserTabViewModel @Inject constructor(
         val isFullScreen: Boolean = false,
         val isDesktopBrowsingMode: Boolean = false,
         val canChangeBrowsingMode: Boolean = false,
-        val showPrivacyGrade: Boolean = false,
+        val showPrivacyShield: Boolean = false,
         val showSearchIcon: Boolean = false,
         val showClearButton: Boolean = false,
         val showTabsButton: Boolean = true,
@@ -298,13 +299,9 @@ class BrowserTabViewModel @Inject constructor(
         val numberMatches: Int = 0
     )
 
-    data class PrivacyGradeViewState(
-        val privacyGrade: PrivacyGrade? = null,
-        val shouldAnimate: Boolean = false,
-        val showEmptyGrade: Boolean = true
-    ) {
-        val isEnabled: Boolean = privacyGrade != PrivacyGrade.UNKNOWN
-    }
+    data class PrivacyShieldViewState(
+        val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN
+    )
 
     data class AutoCompleteViewState(
         val showSuggestions: Boolean = false,
@@ -471,7 +468,7 @@ class BrowserTabViewModel @Inject constructor(
     val accessibilityViewState: MutableLiveData<AccessibilityViewState> = MutableLiveData()
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
     var siteLiveData: MutableLiveData<Site> = MutableLiveData()
-    val privacyGradeViewState: MutableLiveData<PrivacyGradeViewState> = MutableLiveData()
+    val privacyShieldViewState: MutableLiveData<PrivacyShieldViewState> = MutableLiveData()
 
     var skipHome = false
     var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
@@ -1193,7 +1190,7 @@ class BrowserTabViewModel @Inject constructor(
             addToHomeEnabled = domain != null,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = domain != null,
-            showPrivacyGrade = true,
+            showPrivacyShield = true,
             canReportSite = domain != null,
             canChangePrivacyProtection = domain != null,
             isPrivacyProtectionEnabled = false,
@@ -1258,10 +1255,10 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun shouldShowDaxIcon(
         currentUrl: String?,
-        showPrivacyGrade: Boolean
+        showPrivacyShield: Boolean
     ): Boolean {
         val url = currentUrl ?: return false
-        return showPrivacyGrade && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
+        return showPrivacyShield && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
     }
 
     private suspend fun updateLoadingStatePrivacy(domain: String) {
@@ -1380,7 +1377,7 @@ class BrowserTabViewModel @Inject constructor(
             addToHomeEnabled = false,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = false,
-            showPrivacyGrade = false,
+            showPrivacyShield = false,
             canReportSite = false,
             showSearchIcon = true,
             showClearButton = true,
@@ -1388,6 +1385,7 @@ class BrowserTabViewModel @Inject constructor(
             showDaxIcon = false,
             canPrintPage = false
         )
+        Timber.d("showPrivacyShield=false, showSearchIcon=true, showClearButton=true")
     }
 
     override fun pageRefreshed(refreshedUrl: String) {
@@ -1411,12 +1409,6 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
-
-        val showLoadingGrade = progress.privacyOn || isLoading
-        privacyGradeViewState.value = currentPrivacyGradeState().copy(
-            shouldAnimate = isLoading,
-            showEmptyGrade = showLoadingGrade
-        )
 
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
@@ -1644,6 +1636,7 @@ class BrowserTabViewModel @Inject constructor(
         site?.surrogateDetected(surrogate)
     }
 
+    // This is called when interceptor upgrades to https
     override fun upgradedToHttps() {
         httpsUpgraded = true
     }
@@ -1669,6 +1662,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    override fun onCertificateReceived(certificate: SslCertificate?) {
+        site?.certificate = certificate
+    }
+
     private fun enableUrlParametersRemovedFlag() {
         site?.urlParametersRemoved = true
         onSiteChanged()
@@ -1683,28 +1680,17 @@ class BrowserTabViewModel @Inject constructor(
     private fun onSiteChanged() {
         httpsUpgraded = false
         viewModelScope.launch {
-
-            val improvedGrade = withContext(dispatchers.io()) {
-                site?.calculateGrades()?.improvedGrade
+            val privacyProtection: PrivacyShield = withContext(dispatchers.io()) {
+                site?.privacyProtection() ?: PrivacyShield.UNKNOWN
             }
-
+            Timber.i("Shield: privacyProtection $privacyProtection")
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
-                val isWhiteListed: Boolean = site?.domain?.let { isWhitelisted(it) } ?: false
-                if (!isWhiteListed) {
-                    privacyGradeViewState.value = currentPrivacyGradeState().copy(privacyGrade = improvedGrade)
-                }
+                privacyShieldViewState.value = currentPrivacyShieldState().copy(privacyShield = privacyProtection)
             }
-
             withContext(dispatchers.io()) {
                 tabRepository.update(tabId, site)
             }
-        }
-    }
-
-    fun stopShowingEmptyGrade() {
-        if (currentPrivacyGradeState().showEmptyGrade) {
-            privacyGradeViewState.value = currentPrivacyGradeState().copy(showEmptyGrade = false)
         }
     }
 
@@ -1723,14 +1709,13 @@ class BrowserTabViewModel @Inject constructor(
     private fun currentOmnibarViewState(): OmnibarViewState = omnibarViewState.value!!
     private fun currentLoadingViewState(): LoadingViewState = loadingViewState.value!!
     private fun currentCtaViewState(): CtaViewState = ctaViewState.value!!
-    private fun currentPrivacyGradeState(): PrivacyGradeViewState = privacyGradeViewState.value!!
+    private fun currentPrivacyShieldState(): PrivacyShieldViewState = privacyShieldViewState.value!!
 
     fun onOmnibarInputStateChanged(
         query: String,
         hasFocus: Boolean,
         hasQueryChanged: Boolean
     ) {
-
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank() || !hasFocus) {
             AutoCompleteResult(query, emptyList())
@@ -1750,13 +1735,8 @@ class BrowserTabViewModel @Inject constructor(
         }
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
-        val showPrivacyGrade = !hasFocus
+        val showPrivacyShield = !hasFocus
         val showSearchIcon = hasFocus
-
-        // show the real grade in case the animation was canceled before changing the state, this avoids showing an empty grade when regaining focus.
-        if (showPrivacyGrade) {
-            privacyGradeViewState.value = currentPrivacyGradeState().copy(showEmptyGrade = false)
-        }
 
         omnibarViewState.value = currentOmnibarViewState().copy(
             isEditing = hasFocus,
@@ -1768,7 +1748,7 @@ class BrowserTabViewModel @Inject constructor(
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyGrade = showPrivacyGrade,
+            showPrivacyShield = showPrivacyShield,
             showSearchIcon = showSearchIcon,
             showTabsButton = showControls,
             fireButton = if (showControls) {
@@ -1782,10 +1762,10 @@ class BrowserTabViewModel @Inject constructor(
                 HighlightableButton.Gone
             },
             showClearButton = showClearButton,
-            showDaxIcon = shouldShowDaxIcon(url, showPrivacyGrade)
+            showDaxIcon = shouldShowDaxIcon(url, showPrivacyShield)
         )
 
-        Timber.d("showPrivacyGrade=$showPrivacyGrade, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
+        Timber.d("showPrivacyShield=$showPrivacyShield, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
 
         autoCompleteViewState.value = currentAutoCompleteViewState()
             .copy(
@@ -2194,7 +2174,7 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = OmnibarViewState()
         findInPageViewState.value = FindInPageViewState()
         ctaViewState.value = CtaViewState()
-        privacyGradeViewState.value = PrivacyGradeViewState()
+        privacyShieldViewState.value = PrivacyShieldViewState()
         accessibilityViewState.value = AccessibilityViewState()
     }
 

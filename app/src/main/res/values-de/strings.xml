@@ -109,77 +109,7 @@
     <string name="tabClosedUndo">Rückgängig machen</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
 
-    <!-- Privacy Dashboard Activities -->
-    <string name="privacyProtectionToggle">Datenschutz der Website</string>
-    <string name="privacyProtectionEnabled">WEBSITE-SCHUTZ AKTIVIERT</string>
-    <string name="privacyProtectionDisabled">WEBSITE-SCHUTZ DEAKTIVIERT</string>
-    <string name="privacyDashboardActivityTitle">Privatsphäre-Dashboard</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes" instruction="Both placeholders are resource ids (integers) for two images">VERBESSERT VON &lt;img src=\"%1$d\" /&gt; AUF &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Datenschutz-Stufe</string>
-    <string name="privacyProtectionTemporarilyDisabled">Wir haben den Datenschutz vorübergehend deaktiviert, da die Seite derzeit dadurch gestört wird.</string>
-
-    <string name="httpsGood">Verschlüsselte Verbindung</string>
-    <string name="httpsMixed">Verschlüsselte und unverschlüsselte Verbindung</string>
-    <string name="httpsBad">Unverschlüsselte Verbindung</string>
-
-    <string name="scorecardActivityTitle">Datenschutz-Stufe</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Diese Website gehört zu einem großen Tracker-Netzwerk</string>
-    <string name="scorecardPrivacyGrade">Datenschutz-Stufe</string>
-    <string name="scorecardEnhancedGrade">Erhöhte Stufe</string>
-
-    <string name="privacyTermsActivityTitle">Datenschutzpraktiken</string>
-    <string name="practicesGood">Gute Datenschutzpraktiken</string>
-    <string name="practicesMixed">Gemischte Datenschutzpraktiken</string>
-    <string name="practicesBad">Schlechte Datenschutzpraktiken</string>
-    <string name="practicesUnknown">Unbekannte Datenschutzpraktiken</string>
-    <string name="practicesOverview">Datenschutzpraktiken geben an, inwieweit die personenbezogenen Daten, die du mit einer Website teilst, geschützt sind.</string>
-    <string name="practicesTosdrLink">Datenschutzpraktiken von <b><u>ToS;DR</u></b>.</string>
-    <string name="practicesIconContentGood">Good Practice Icon</string>
-    <string name="practicesIconContentBad">Bad Practice Icon</string>
-
-    <string name="networkTrackerSummaryHeader">HARTNÄCKIGSTE TRACKER-NETZWERKE</string>
-    <string name="networkTrackerSummaryNotReady">Wir sammeln immer noch Daten, um anzuzeigen, wie viele Tracker wir blockiert haben.</string>
-
-    <string name="trackersActivityTitle">Tracking-Anfragen blockiert</string>
-    <string name="trackersContentDescription">Tracking-Anfragen blockiert</string>
-    <string name="trackersOverview">Das Laden folgender Anfragen von Drittanbieter-Domains wurde blockiert, da sie als Tracking-Anfragen identifiziert wurden. Wenn die Anfragen eines Unternehmens geladen werden, kann ihm dies ermöglichen, ein Profil von dir zu erstellen.</string>
-    <string name="trackersOverviewProtectionsOff">Das Laden von Tracking-Anfragen wurde nicht blockiert, da der Schutz für diese Website deaktiviert ist. Wenn die Anfragen eines Unternehmens geladen werden, kann ihm dies ermöglichen, ein Profil von dir zu erstellen.</string>
-
-    <string name="domainsLoadedActivityTitle">Anfragen von Drittanbietern geladen</string>
-    <string name="domainsLoadedContentDescription">Anfragen von Drittanbietern geladen</string>
-    <string name="domainsLoadedOverview">Die Anfragen der folgenden Drittanbieter-Domains wurden geladen. Wenn die Anfragen eines Unternehmens geladen werden, kann dies ihm erlauben, ein Profil von dir zu erstellen, obwohl unsere anderen Schutzmaßnahmen für das Web-Tracking weiterhin gelten.</string>
-    <string name="domainsLoadedOverviewProtectionsOff">Das Laden von Anfragen von Drittanbietern wurde nicht blockiert, da der Schutz für diese Website deaktiviert ist. Wenn die Anfragen eines Unternehmens geladen werden, kann ihm dies ermöglichen, ein Profil von dir zu erstellen.</string>
-    <string name="domainsLoadedOverviewEmpty">Wir haben keine Anfragen von Drittanbieter-Domains erkannt.</string>
-    <string name="domainsLoadedHeadingText">Keine Drittanbieter-Domains geladen</string>
-
-    <string name="webTrackingProtectionsText"><annotation type="learn_more_link">Über unseren Web-Tracking-Schutz</annotation></string>
-    <string name="webTrackingProtectionsUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/</string>
-
-    <string name="trackersBlockedNoSectionDescription">Die Anfragen der folgenden Domain wurden geladen.</string>
-
-    <string name="adLoadedSectionDescription" instruction="Placeholder is the name of the company who owns the ad">Die Anfragen der folgenden Domain wurden geladen, da kürzlich eine %1$s-Werbung auf DuckDuckGo angeklickt wurde. Diese Anfragen helfen bei der Bewertung der Effektivität von Werbung. Werbung auf DuckDuckGo erstellt keine Profile von dir.</string>
-    <string name="adLoadedSectionLinkText"><annotation type="learn_more_link">Wie sich unsere Suchanzeigen auf unseren Schutz auswirken</annotation></string>
-    <string name="adLoadedSectionUrl" translatable="false">https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection</string>
-
-    <string name="domainsLoadedSectionDescription">Die Anfragen der folgenden Domain wurden ebenfalls geladen.</string>
-    <string name="domainsLoadedSectionSingleSectionDescription">Die Tracking-Anfragen der folgenden Domains wurden geladen.</string>
-    <string name="domainsLoadedSectionEmptyListDescription">Wir haben keine Anfragen von Drittanbieter-Domains erkannt.</string>
-
-    <string name="domainsLoadedBreakageSectionDescription">Die Anfragen der folgenden Domain wurden geladen, um eine Störung der Website zu verhindern.</string>
-    <string name="domainsLoadedAssociatedSectionDescription" instruction="Placeholder is the name of a company">Die Anfragen der folgenden Domain wurden geladen, da sie mit %1$s verknüpft sind.</string>
-
-    <string name="trackersBlockedText">Blockierte Anfragen</string>
-    <string name="trackersNotBlockedText">Keine Tracking-Anfragen blockiert</string>
-    <string name="trackersNoFoundText">Keine Tracking-Anfragen gefunden</string>
-    <string name="trackersFoundText">Tracking-Anfragen gefunden</string>
-
-    <string name="domainsLoadedText">Anfragen von Drittanbietern geladen</string>
-    <string name="domainsNotLoadedText">Keine Anfragen von Drittanbietern geladen</string>
-
-    <string name="majorNetworksNoFound">Keine große Tracker-Netzwerke gefunden</string>
-    <string name="majorNetworksFound">Große Tracker-Netzwerke gefunden</string>
-
-    <!-- Fire -->
+   <!-- Fire -->
     <string name="fireMenu">Daten löschen</string>
     <string name="fireClearAll">Alle Tabs schließen und Daten löschen</string>
     <string name="fireCancel">Abbrechen</string>

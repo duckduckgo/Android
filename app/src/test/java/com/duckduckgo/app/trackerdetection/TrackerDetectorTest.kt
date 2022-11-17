@@ -322,10 +322,10 @@ class TrackerDetectorTest {
         whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(matches = false, isATracker = true))
         return client
     }
-
     companion object {
         // It doesn't matter what the value of these is they just need to be different
         private val CLIENT_A = EASYLIST
         private val CLIENT_B = EASYPRIVACY
+        private val ENTITY = TestEntity("name", "displayName", 10.0)
     }
 }

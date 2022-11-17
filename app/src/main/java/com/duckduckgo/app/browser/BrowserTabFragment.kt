@@ -64,7 +64,6 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
-import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -97,7 +96,8 @@ import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
-import com.duckduckgo.app.global.model.orderedTrackingEntities
+import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
+import com.duckduckgo.mobile.android.ui.view.DaxDialog
 import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.TextChangedWatcher
@@ -114,7 +114,6 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
@@ -123,8 +122,6 @@ import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
-import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
@@ -153,6 +150,7 @@ import android.print.PrintAttributes
 import android.print.PrintManager
 import android.webkit.PermissionRequest
 import android.webkit.URLUtil
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -168,18 +166,20 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyShieldViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
 import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu
+import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.cta.ui.DaxDialogCta.DaxAutoconsentCta
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoFragment
+import com.duckduckgo.app.cta.ui.DaxDialogCta.DaxTrackersBlockedCta
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
@@ -195,6 +195,7 @@ import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.ui.ExistingCredentialMatchDetector
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -204,9 +205,12 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
+import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
+import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
+import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
+import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.coroutines.flow.cancellable
 import javax.inject.Provider
@@ -305,7 +309,7 @@ class BrowserTabFragment :
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
 
     @Inject
-    lateinit var themingDataStore: ThemingDataStore
+    lateinit var appTheme: BrowserAppTheme
 
     @Inject
     lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
@@ -351,13 +355,16 @@ class BrowserTabFragment :
     lateinit var existingCredentialMatchDetector: ExistingCredentialMatchDetector
 
     @Inject
+    lateinit var privacyShieldView: PrivacyShieldAnimationHelper
+
+    @Inject
+    lateinit var animatorHelper: BrowserTrackersAnimatorHelper
+
+    @Inject
     lateinit var autoconsent: Autoconsent
 
     @Inject
     lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
-
-    @Inject
-    lateinit var appTheme: AppTheme
 
     @Inject
     lateinit var sitePermissionsDialogLauncher: SitePermissionsDialogLauncher
@@ -402,6 +409,7 @@ class BrowserTabFragment :
         viewModel
     }
 
+/*
     private val animatorHelper by lazy {
         BrowserTrackersAnimatorHelper(
             omnibarViews = listOf(clearTextButton, omnibarTextInput, searchIcon),
@@ -413,6 +421,7 @@ class BrowserTabFragment :
             appTheme = appTheme
         )
     }
+ */
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
@@ -461,7 +470,7 @@ class BrowserTabFragment :
 
         override fun onPopUpHandled() {
             launch {
-                context?.let { animatorHelper.createCookiesAnimation(it) }
+                context?.let { animatorHelper.createCookiesAnimation(it, omnibarViews(), cookieDummyView, cookieAnimation, scene_root) }
             }
         }
 
@@ -553,9 +562,8 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         configureObservers()
-        configurePrivacyGrade()
+        configurePrivacyShield()
         configureWebView()
         configureSwipeRefresh()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
@@ -629,7 +637,6 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
-
         appBarLayout.setExpanded(true)
         viewModel.onViewResumed()
 
@@ -649,6 +656,9 @@ class BrowserTabFragment :
     }
 
     override fun onStop() {
+        // workaround for: https://app.asana.com/0/0/1202537960603388/f
+        renderer.cancelTrackersAnimation()
+        trackerAnimationContainer.removeAllViews()
         alertDialog?.dismiss()
         super.onStop()
     }
@@ -746,10 +756,10 @@ class BrowserTabFragment :
             }
         )
 
-        viewModel.privacyGradeViewState.observe(
+        viewModel.privacyShieldViewState.observe(
             viewLifecycleOwner,
             Observer {
-                it.let { renderer.renderPrivacyGrade(it) }
+                it.let { renderer.renderPrivacyShield(it) }
             }
         )
 
@@ -865,6 +875,7 @@ class BrowserTabFragment :
         if (it is NavigationCommand) {
             renderer.cancelTrackersAnimation()
         }
+
         when (it) {
             is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
@@ -1518,8 +1529,8 @@ class BrowserTabFragment :
         recyclerView.setPadding(sidePadding, recyclerView.paddingTop, sidePadding, recyclerView.paddingBottom)
     }
 
-    private fun configurePrivacyGrade() {
-        toolbar.privacyGradeButton.setOnClickListener {
+    private fun configurePrivacyShield() {
+        toolbar.shieldIcon.setOnClickListener {
             browserActivity?.launchPrivacyDashboard()
         }
     }
@@ -1785,17 +1796,9 @@ class BrowserTabFragment :
     }
 
     private fun configureDarkThemeSupport(webSettings: WebSettings) {
-        when (themingDataStore.theme) {
-            DuckDuckGoTheme.LIGHT -> webSettings.enableLightMode()
-            DuckDuckGoTheme.DARK -> webSettings.enableDarkMode()
-            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
-                val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-                if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
-                    webSettings.enableDarkMode()
-                } else {
-                    webSettings.enableLightMode()
-                }
-            }
+        when (appTheme.isLightModeEnabled()) {
+            true -> webSettings.enableLightMode()
+            false -> webSettings.enableDarkMode()
         }
     }
 
@@ -2081,6 +2084,7 @@ class BrowserTabFragment :
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+
         ddgLogo.setImageResource(R.drawable.logo_full)
         if (ctaContainer.isNotEmpty()) {
             renderer.renderHomeCta()
@@ -2252,7 +2256,7 @@ class BrowserTabFragment :
     }
 
     private fun finishPartialTrackerAnimation() {
-        context?.let { animatorHelper.finishTrackerAnimation(it) }
+        animatorHelper.finishPartialTrackerAnimation()
     }
 
     private fun showHideTipsDialog(cta: Cta) {
@@ -2311,7 +2315,7 @@ class BrowserTabFragment :
     fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, searchIcon)
 
     override fun onAnimationFinished() {
-        viewModel.stopShowingEmptyGrade()
+        // NO OP
     }
 
     private fun showEmailTooltip(address: String) {
@@ -2575,37 +2579,14 @@ class BrowserTabFragment :
         private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
         private var lastSeenCtaViewState: CtaViewState? = null
-        private var lastSeenPrivacyGradeViewState: PrivacyGradeViewState? = null
+        private var lastSeenPrivacyShieldViewState: PrivacyShieldViewState? = null
 
-        fun renderPrivacyGrade(viewState: PrivacyGradeViewState) {
-
-            renderIfChanged(viewState, lastSeenPrivacyGradeViewState) {
-
-                val oldGrade = lastSeenPrivacyGradeViewState?.privacyGrade
-                val oldShowEmptyGrade = lastSeenPrivacyGradeViewState?.showEmptyGrade
-                val grade = viewState.privacyGrade
-                val newShowEmptyGrade = viewState.showEmptyGrade
-
-                val canChangeGrade = (oldGrade != grade && !newShowEmptyGrade) || (oldGrade == grade && oldShowEmptyGrade != newShowEmptyGrade)
-                lastSeenPrivacyGradeViewState = viewState
-
-                if (canChangeGrade) {
-                    context?.let {
-                        val drawable = if (viewState.showEmptyGrade || viewState.shouldAnimate) {
-                            ContextCompat.getDrawable(it, R.drawable.privacygrade_icon_loading)
-                        } else {
-                            ContextCompat.getDrawable(it, viewState.privacyGrade.icon())
-                        }
-                        privacyGradeButton?.setImageDrawable(drawable)
-                    }
-                }
-
-                privacyGradeButton?.isEnabled = viewState.isEnabled
-
-                if (viewState.shouldAnimate) {
-                    animatorHelper.startPulseAnimation()
-                } else {
-                    animatorHelper.stopPulseAnimation()
+        fun renderPrivacyShield(viewState: PrivacyShieldViewState) {
+            renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
+                if (viewState.privacyShield != UNKNOWN) {
+                    lastSeenPrivacyShieldViewState = viewState
+                    privacyShieldView.setAnimationView(shieldIcon, viewState.privacyShield)
+                    cancelTrackersAnimation()
                 }
             }
         }
@@ -2699,19 +2680,38 @@ class BrowserTabFragment :
                 delay(TRACKERS_INI_DELAY)
                 viewModel.refreshCta()
                 delay(TRACKERS_SECONDARY_DELAY)
+                if (isHidden) {
+                    return@launch
+                }
                 if (lastSeenOmnibarViewState?.isEditing != true) {
                     val site = viewModel.siteLiveData.value
-                    val events = site?.orderedTrackingEntities()
+                    val events = site?.orderedTrackerBlockedEntities()
 
-                    context?.let {
-                        animatorHelper.startTrackersAnimation(it, lastSeenCtaViewState?.cta, events)
+                    // workaround for: https://app.asana.com/0/0/1202537960603388/f
+                    val trackersAnimation = trackerAnimationContainer.findViewById<LottieAnimationView>(R.id.trackersAnimation)
+                    val trackerAnimationView = if (trackersAnimation?.isAttachedToWindow == true) {
+                        trackersAnimation
+                    } else {
+                        layoutInflater.inflate(R.layout.view_tracker_animation, trackerAnimationContainer, true)
+                            .findViewById<LottieAnimationView>(R.id.trackersAnimation)
+                    }
+
+                    activity?.let { activity ->
+                        animatorHelper.startTrackersAnimation(
+                            context = activity,
+                            shouldRunPartialAnimation = lastSeenCtaViewState?.cta is DaxTrackersBlockedCta,
+                            shieldAnimationView = shieldIcon,
+                            trackersAnimationView = trackerAnimationView,
+                            omnibarViews = omnibarViews(),
+                            entities = events
+                        )
                     }
                 }
             }
         }
 
         fun cancelTrackersAnimation() {
-            animatorHelper.cancelAnimations(omnibarViews(), animationContainer)
+            animatorHelper.cancelAnimations(omnibarViews())
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
@@ -2791,12 +2791,12 @@ class BrowserTabFragment :
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             if (viewState.browserShowing) {
                 daxIcon?.isVisible = viewState.showDaxIcon
-                privacyGradeButton?.isInvisible = !viewState.showPrivacyGrade || viewState.showDaxIcon
+                shieldIcon?.isInvisible = !viewState.showPrivacyShield || viewState.showDaxIcon
                 clearTextButton?.isVisible = viewState.showClearButton
                 searchIcon?.isVisible = viewState.showSearchIcon
             } else {
                 daxIcon.isVisible = false
-                privacyGradeButton?.isVisible = false
+                shieldIcon?.isVisible = false
                 clearTextButton?.isVisible = viewState.showClearButton
                 searchIcon?.isVisible = true
             }
