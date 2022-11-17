@@ -48,5 +48,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/internal_input_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/internal_input_layout"
-        app:srcCompat="@drawable/ic_password_show" />
+        app:srcCompat="@drawable/ic_password_show"
+        app:backgroundTint="?attr/daxColorPrimaryIcon"/>
 </merge>
