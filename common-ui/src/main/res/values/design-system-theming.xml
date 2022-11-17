@@ -242,7 +242,7 @@
         <item name="daxColorBackground">@color/gray100</item>
         <item name="daxColorBackgroundInverted">@color/gray0</item>
         <item name="daxColorSurface">@color/gray90</item>
-        <item name="daxColorContainer">@color/black12</item>
+        <item name="daxColorContainer">@color/white12</item>
         <item name="daxColorPrimaryText">@color/white84</item>
         <item name="daxColorSecondaryText">@color/white60</item>
         <item name="daxColorPrimaryIcon">@color/white84</item>
