@@ -134,7 +134,6 @@ class RadioListAlertDialogBuilder(val context: Context) {
 
         optionList.forEach {
             val radioButton = RadioButton(context, null)
-            radioButton.setPadding(30.toDp(), 0, 0, 0)
             radioButton.text = it
             val params = RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT)
             radioButton.layoutParams = params

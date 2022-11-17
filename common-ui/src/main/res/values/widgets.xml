@@ -254,10 +254,9 @@
     </style>
 
     <style name="Widget.DuckDuckGo.RadioButton" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
-        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:textColor">?attr/daxColorPrimaryText</item>
         <item name="buttonTint">@color/radio_button_tint</item>
-        <item name="android:drawablePadding">@dimen/keyline_4</item>
-        <item name="android:paddingLeft">@dimen/keyline_4</item>
+        <item name="android:padding">@dimen/keyline_3</item>
         <item name="android:textAppearance">?attr/textAppearanceBody1</item>
     </style>
 
