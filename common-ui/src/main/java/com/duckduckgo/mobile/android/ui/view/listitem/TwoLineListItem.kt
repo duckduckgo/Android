@@ -20,6 +20,7 @@ package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.text.TextUtils.TruncateAt
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +32,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -55,6 +57,12 @@ class TwoLineListItem @JvmOverloads constructor(
 
             if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
                 binding.primaryText.setTextColor(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
+            }
+
+            val truncated = getBoolean(R.styleable.TwoLineListItem_primaryTextTruncated, false)
+            if (truncated) {
+                binding.primaryText.maxLines = 1
+                binding.primaryText.ellipsize = TruncateAt.END
             }
 
             if (hasValue(R.styleable.TwoLineListItem_secondaryTextColorOverlay)) {
@@ -196,6 +204,7 @@ class TwoLineListItem @JvmOverloads constructor(
     }
 
     override fun setEnabled(enabled: Boolean) {
+        setEnabledOpacity(enabled)
         recursiveEnable(enabled)
         super.setEnabled(enabled)
     }

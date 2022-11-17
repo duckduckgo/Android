@@ -24,15 +24,12 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/keyline_5"
-        android:paddingBottom="@dimen/keyline_5"
-        android:paddingStart="@dimen/keyline_4"
-        android:paddingEnd="@dimen/keyline_4">
+        android:padding="@dimen/keyline_4">
 
-        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Dialogs"
+            app:primaryText="Dialogs"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
@@ -71,10 +68,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Bottom Sheet Dialogs"
+            app:primaryText="Bottom Sheet Dialogs"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
@@ -114,11 +111,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.SectionHeaderTextView
-            android:id="@+id/label"
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Dax Dialogs"
+            app:primaryText="Dax Dialogs"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>

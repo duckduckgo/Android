@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogTextAlertBinding
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -93,7 +94,7 @@ class TextAlertDialogBuilder(val context: Context) {
         checkRequiredFieldsSet()
         val binding: DialogTextAlertBinding = DialogTextAlertBinding.inflate(LayoutInflater.from(context))
 
-        val dialogBuilder = MaterialAlertDialogBuilder(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
+        val dialogBuilder = MaterialAlertDialogBuilder(context, R.style.Widget_DuckDuckGo_Dialog)
             .setView(binding.root)
             .apply {
                 setCancelable(false)
@@ -104,6 +105,7 @@ class TextAlertDialogBuilder(val context: Context) {
         setViews(binding, dialog)
 
         dialog.show()
+
         listener.onDialogShown()
     }
 

@@ -16,16 +16,17 @@
 -->
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+       xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-      android:id="@+id/color_attribute"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="start|center_vertical"
-      android:layout_marginEnd="26dp"
-      style="@style/TextAppearance.DuckDuckGo.Body1"
-      tools:text="colorPrimary" />
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        android:id="@+id/color_attribute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|center_vertical"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_5"
+        app:typography="body1"
+        tools:text="colorPrimary" />
 
     <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorDotView
       android:id="@+id/color_dot"

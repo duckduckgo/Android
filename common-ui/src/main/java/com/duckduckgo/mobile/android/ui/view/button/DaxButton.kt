@@ -24,7 +24,7 @@ import com.google.android.material.button.MaterialButton
 
 open class DaxButton @JvmOverloads constructor(
     ctx: Context,
-    attrs: AttributeSet,
+    attrs: AttributeSet?,
     defStyleAttr: Int
 ) : MaterialButton(
     ctx,

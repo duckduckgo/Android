@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-            android:background="?attr/toolbarBgColor"
+            android:background="?attr/daxColorSurface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <LinearLayout
@@ -46,13 +46,13 @@
                 android:layout_marginEnd="@dimen/keyline_4"
                 android:orientation="vertical">
 
-                <TextView
+                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    app:typography="h1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAlignment="viewStart"
-                    android:paddingTop="42dp"
+                    android:paddingTop="@dimen/keyline_4"
                     android:text="App Components"
-                    android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline1"
                     app:drawableStartCompat="@drawable/ic_dax_icon"
                     android:drawablePadding="@dimen/keyline_2"/>
 
@@ -73,11 +73,11 @@
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:layout_gravity="bottom"
-            android:background="?attr/toolbarBgColor"
-            app:tabIndicatorColor="?normalTextColor"
+            android:background="?attr/daxColorSurface"
+            app:tabIndicatorColor="?attr/daxColorPrimaryText"
             app:tabMode="scrollable"
-            app:tabSelectedTextColor="?normalTextColor"
-            app:tabTextColor="?secondaryTextColor"/>
+            app:tabSelectedTextColor="?attr/daxColorPrimaryText"
+            app:tabTextColor="?attr/daxColorSecondaryText"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
