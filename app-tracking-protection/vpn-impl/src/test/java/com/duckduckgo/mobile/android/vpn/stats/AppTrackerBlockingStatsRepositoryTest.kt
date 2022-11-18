@@ -29,6 +29,7 @@ import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -88,6 +89,18 @@ class AppTrackerBlockingStatsRepositoryTest {
         trackerFoundYesterday()
         val vpnTrackers = repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
         assertNoTrackers(vpnTrackers)
+    }
+
+    @Test
+    fun whenContainsVpnTrackersAndDbTableEmptyThenReturnFalse() = runTest {
+        assertFalse(repository.containsVpnTrackers())
+    }
+
+    @Test
+    fun whenContainsVpnTrackersAndDbTableNotEmptyThenReturnTrue() = runTest {
+        trackerFound()
+
+        assertTrue(repository.containsVpnTrackers())
     }
 
     private fun dateOfPreviousMidnightAsString(): String {

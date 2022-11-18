@@ -106,6 +106,9 @@ interface VpnTrackerDao {
     @Query("SELECT * from vpn_tracker WHERE packageId = :appPackage")
     fun getTrackersForApp(appPackage: String): List<VpnTracker>
 
+    @Query("select count(1) > 0 from vpn_tracker LIMIT 1")
+    fun tableIsNotEmpty(): Boolean
+
     companion object {
         private const val MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS = 10_000
     }

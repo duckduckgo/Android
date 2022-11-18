@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.feature.settings
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.feature.FakeAppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.SettingName
 import com.duckduckgo.mobile.android.vpn.model.HealthTriggerEntity
 import com.duckduckgo.mobile.android.vpn.store.AppHealthTriggersRepository
@@ -32,8 +33,7 @@ import org.mockito.kotlin.*
 class BadHealthMitigationSettingPluginTest {
 
     private lateinit var featureConfig: BadHealthMitigationSettingPlugin
-    private val appTpFeatureConfig: AppTpFeatureConfig = mock()
-    private val appTpFeatureConfigEditor: AppTpFeatureConfig.Editor = mock()
+    private lateinit var appTpFeatureConfig: AppTpFeatureConfig
     private val thresholdsTable = FakeAppHealthTriggersRepository()
     private val jsonEnabled = """
         {
@@ -127,7 +127,7 @@ class BadHealthMitigationSettingPluginTest {
 
     @Before
     fun setup() {
-        whenever(appTpFeatureConfig.edit()).thenReturn(appTpFeatureConfigEditor)
+        appTpFeatureConfig = FakeAppTpFeatureConfig()
         featureConfig = BadHealthMitigationSettingPlugin(appTpFeatureConfig, thresholdsTable)
     }
 
@@ -135,16 +135,16 @@ class BadHealthMitigationSettingPluginTest {
     fun whenStoreWithCorrectSettingAndEnabledThenStoreAndReturnTrue() {
         val result = featureConfig.store(featureConfig.settingName, jsonEnabled)
 
-        verify(appTpFeatureConfigEditor).setEnabled(AppTpSetting.BadHealthMitigation, enabled = true, isManualOverride = false)
         assertTrue(result)
+        assertTrue(appTpFeatureConfig.isEnabled(AppTpSetting.BadHealthMitigation))
     }
 
     @Test
     fun whenStoreWithCorrectSettingAndDisabledThenStoreAndReturnTrue() {
         val result = featureConfig.store(featureConfig.settingName, jsonDisabled)
 
-        verify(appTpFeatureConfigEditor).setEnabled(AppTpSetting.BadHealthMitigation, enabled = false, isManualOverride = false)
         assertTrue(result)
+        assertFalse(appTpFeatureConfig.isEnabled(AppTpSetting.BadHealthMitigation))
     }
 
     @Test
@@ -152,8 +152,8 @@ class BadHealthMitigationSettingPluginTest {
         val settingName = SettingName { "wrongSettingName" }
         val result = featureConfig.store(settingName, jsonEnabled)
 
-        verify(appTpFeatureConfigEditor, never()).setEnabled(any(), any(), any())
         assertFalse(result)
+        assertTrue(appTpFeatureConfig.isEnabled(AppTpSetting.BadHealthMitigation))
     }
 
     @Test
