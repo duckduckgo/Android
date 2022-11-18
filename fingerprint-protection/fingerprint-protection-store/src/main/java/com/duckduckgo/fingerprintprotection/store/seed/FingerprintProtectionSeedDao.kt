@@ -31,7 +31,7 @@ abstract class FingerprintProtectionSeedDao {
 
     @Transaction
     open fun updateAll(
-        fingerprintProtectionSeed: FingerprintProtectionSeedEntity
+        fingerprintProtectionSeed: FingerprintProtectionSeedEntity,
     ) {
         delete()
         insert(fingerprintProtectionSeed)

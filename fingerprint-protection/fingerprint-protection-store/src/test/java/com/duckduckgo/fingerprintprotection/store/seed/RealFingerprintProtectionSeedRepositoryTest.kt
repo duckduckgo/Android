@@ -57,7 +57,7 @@ class RealFingerprintProtectionSeedRepositoryTest {
                 RealFingerprintProtectionSeedRepository(
                     mockDatabase,
                     TestScope(),
-                    coroutineRule.testDispatcherProvider
+                    coroutineRule.testDispatcherProvider,
                 )
             assertEquals("1234", testee.fingerprintProtectionSeedEntity.seed)
 
@@ -66,7 +66,7 @@ class RealFingerprintProtectionSeedRepositoryTest {
                 RealFingerprintProtectionSeedRepository(
                     mockDatabase,
                     TestScope(),
-                    coroutineRule.testDispatcherProvider
+                    coroutineRule.testDispatcherProvider,
                 )
             assertEquals("5678", testee.fingerprintProtectionSeedEntity.seed)
 
@@ -93,7 +93,7 @@ class RealFingerprintProtectionSeedRepositoryTest {
                 RealFingerprintProtectionSeedRepository(
                     mockDatabase,
                     TestScope(),
-                    coroutineRule.testDispatcherProvider
+                    coroutineRule.testDispatcherProvider,
                 )
             testee.storeNewSeed()
 

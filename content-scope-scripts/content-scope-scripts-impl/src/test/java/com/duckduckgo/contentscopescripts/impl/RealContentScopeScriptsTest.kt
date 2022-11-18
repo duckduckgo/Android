@@ -54,7 +54,7 @@ class RealContentScopeScriptsTest {
             mockContentScopeJsReader,
             mockAppBuildConfig,
             mockUnprotectedTemporary,
-            mockFingerprintProtectionManager
+            mockFingerprintProtectionManager,
         )
         whenever(mockPlugin1.config()).thenReturn(config1)
         whenever(mockPlugin2.config()).thenReturn(config2)
@@ -99,7 +99,7 @@ class RealContentScopeScriptsTest {
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
                 " [\"foo.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"},\"sessionKey\":\"5678\"})",
-            js
+            js,
         )
 
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -125,7 +125,7 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
                 " [\"example.com\"], {\"globalPrivacyControlValue\":false,\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}," +
                 "\"sessionKey\":\"5678\"})",
-            js
+            js,
         )
 
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -152,7 +152,7 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"},{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]}," +
                 " [\"example.com\"], {\"globalPrivacyControlValue\":true,\"versionNumber\":1234,\"platform\":{\"name\":\"android\"}," +
                 "\"sessionKey\":\"5678\"})",
-            js
+            js,
         )
 
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -177,7 +177,7 @@ class RealContentScopeScriptsTest {
                 "\"config2\":{\"state\":\"disabled\"}}," +
                 "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"}]}," +
                 " [\"example.com\"], {\"versionNumber\":1234,\"platform\":{\"name\":\"android\"},\"sessionKey\":\"5678\"})",
-            js
+            js,
         )
 
         verify(mockUnprotectedTemporary, times(4)).unprotectedTemporaryExceptions

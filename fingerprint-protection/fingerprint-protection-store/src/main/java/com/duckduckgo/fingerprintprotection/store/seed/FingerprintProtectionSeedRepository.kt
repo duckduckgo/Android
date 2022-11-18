@@ -19,9 +19,9 @@ package com.duckduckgo.fingerprintprotection.store.seed
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionDatabase
 import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionSeedEntity
+import java.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.*
 
 interface FingerprintProtectionSeedRepository {
     var fingerprintProtectionSeedEntity: FingerprintProtectionSeedEntity
@@ -31,7 +31,7 @@ interface FingerprintProtectionSeedRepository {
 class RealFingerprintProtectionSeedRepository constructor(
     val database: FingerprintProtectionDatabase,
     val coroutineScope: CoroutineScope,
-    val dispatcherProvider: DispatcherProvider
+    val dispatcherProvider: DispatcherProvider,
 ) : FingerprintProtectionSeedRepository {
 
     private val fingerprintProtectionSeedDao: FingerprintProtectionSeedDao = database.fingerprintProtectionSeedDao()

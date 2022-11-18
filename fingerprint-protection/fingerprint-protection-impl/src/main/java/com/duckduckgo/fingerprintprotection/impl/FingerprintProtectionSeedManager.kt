@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class FingerprintProtectionSeedManager @Inject constructor(
-    private val fingerprintProtectionSeedRepository: FingerprintProtectionSeedRepository
+    private val fingerprintProtectionSeedRepository: FingerprintProtectionSeedRepository,
 ) : FingerprintProtectionManager {
 
     override fun getSeed(): String {

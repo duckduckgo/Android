@@ -32,15 +32,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.fingerprintprotection.store.seed.FingerprintProtectionSeedRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.DAYS
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 @ContributesWorker(AppScope::class)
 class FingerprintProtectionSeedWorker(
     context: Context,
-    workerParameters: WorkerParameters
+    workerParameters: WorkerParameters,
 ) : CoroutineWorker(context, workerParameters) {
 
     @Inject
@@ -59,12 +59,12 @@ class FingerprintProtectionSeedWorker(
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = LifecycleObserver::class
+    boundType = LifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
 class FingerprintProtectionSeedWorkerScheduler @Inject constructor(
     private val workManager: WorkManager,
-    private val fingerprintProtectionSeedRepository: FingerprintProtectionSeedRepository
+    private val fingerprintProtectionSeedRepository: FingerprintProtectionSeedRepository,
 ) : DefaultLifecycleObserver {
 
     private val workerRequest = PeriodicWorkRequestBuilder<FingerprintProtectionSeedWorker>(1, DAYS)

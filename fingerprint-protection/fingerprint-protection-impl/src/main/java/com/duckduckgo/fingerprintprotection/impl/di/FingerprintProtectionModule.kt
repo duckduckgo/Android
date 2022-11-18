@@ -109,7 +109,7 @@ object FingerprintProtectionModule {
     fun provideFingerprintProtectionSeedRepository(
         database: FingerprintProtectionDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): FingerprintProtectionSeedRepository {
         return RealFingerprintProtectionSeedRepository(database, coroutineScope, dispatcherProvider)
     }

@@ -41,7 +41,7 @@ class RealContentScopeScripts @Inject constructor(
     private val contentScopeJSReader: ContentScopeJSReader,
     private val appBuildConfig: AppBuildConfig,
     private val unprotectedTemporary: UnprotectedTemporary,
-    private val fingerprintProtectionManager: FingerprintProtectionManager
+    private val fingerprintProtectionManager: FingerprintProtectionManager,
 ) : ContentScopeScripts {
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
