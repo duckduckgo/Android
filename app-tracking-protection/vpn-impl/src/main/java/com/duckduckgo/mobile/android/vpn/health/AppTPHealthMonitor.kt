@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
@@ -80,8 +79,6 @@ class AppTPHealthMonitor @Inject constructor(
 
     private val monitoringJob = ConflatedJob()
     private val oldMetricCleanupJob = ConflatedJob()
-
-    private var simulatedGoodHealth: SimulatedHealthState? = null
 
     private val healthRules = mutableListOf<HealthRule>()
 
@@ -182,33 +179,8 @@ class AppTPHealthMonitor @Inject constructor(
     }
 
     sealed class HealthState(open val metrics: RawMetricsSubmission?) {
-        object Initializing : HealthState(null)
         data class GoodHealth(override val metrics: RawMetricsSubmission) : HealthState(metrics)
         data class BadHealth(override val metrics: RawMetricsSubmission) : HealthState(metrics)
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    fun simulateBadHealthState() {
-        this.simulatedGoodHealth = SimulatedHealthState.BAD
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    fun simulateCriticalHealthState() {
-        this.simulatedGoodHealth = SimulatedHealthState.CRITICAL
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    fun simulateGoodHealthState() {
-        this.simulatedGoodHealth = SimulatedHealthState.GOOD
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    fun stopHealthSimulation() {
-        this.simulatedGoodHealth = null
-    }
-
-    private enum class SimulatedHealthState {
-        GOOD, BAD, CRITICAL
     }
 
     private abstract class HealthRule(

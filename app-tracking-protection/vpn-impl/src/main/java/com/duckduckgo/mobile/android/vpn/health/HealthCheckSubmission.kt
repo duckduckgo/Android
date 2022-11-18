@@ -16,11 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
-data class HealthCheckSubmission(
-    val userReport: UserHealthSubmission,
-    val systemReport: SystemHealthData,
-)
-
 internal fun RawMetricsSubmission.isInBadHealth(): Boolean {
     return metrics.count { it.value.isBadState == true } > 0
 }
@@ -28,18 +23,3 @@ internal fun RawMetricsSubmission.isInBadHealth(): Boolean {
 internal fun RawMetricsSubmission.containsCriticalMetric(): Boolean {
     return metrics.any { it.value.isCritical }
 }
-
-internal fun RawMetricsSubmission.badHealthReasons(): List<String> {
-    val badHealthReasons = mutableListOf<String>()
-    metrics
-        .filter { it.value.isBadState == true }
-        .forEach {
-            badHealthReasons.add(it.key)
-        }
-    return badHealthReasons
-}
-
-data class UserHealthSubmission(
-    val state: String,
-    val notes: String? = null,
-)

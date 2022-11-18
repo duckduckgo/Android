@@ -45,12 +45,6 @@ class HealthMetricCounter @Inject constructor(
     private val healthStatsDao = db.healthStatDao()
     private val databaseDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
-    fun clearAllMetrics() {
-        coroutineScope.launch(databaseDispatcher) {
-            db.clearAllTables()
-        }
-    }
-
     fun onVpnConnectivityError() {
         coroutineScope.launch(databaseDispatcher) {
             healthStatsDao.insertEvent(NO_VPN_CONNECTIVITY())
