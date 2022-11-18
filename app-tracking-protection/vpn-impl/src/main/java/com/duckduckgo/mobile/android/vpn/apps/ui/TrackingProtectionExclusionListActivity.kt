@@ -127,9 +127,11 @@ class TrackingProtectionExclusionListActivity :
                 dialog.show(supportFragmentManager, RestoreDefaultProtectionDialog.TAG_RESTORE_DEFAULT_PROTECTION)
                 true
             }
+
             R.id.reportIssue -> {
                 launchFeedback(); true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -140,27 +142,28 @@ class TrackingProtectionExclusionListActivity :
     }
 
     private fun setupRecycler() {
-        adapter = ExclusionListAdapter(object : ExclusionListListener {
-            override fun onAppProtectionChanged(
-                excludedAppInfo: TrackingProtectionAppInfo,
-                enabled: Boolean,
-                position: Int,
-            ) {
-                viewModel.onAppProtectionChanged(excludedAppInfo, position, enabled)
-            }
+        adapter = ExclusionListAdapter(
+            object : ExclusionListListener {
+                override fun onAppProtectionChanged(
+                    excludedAppInfo: TrackingProtectionAppInfo,
+                    enabled: Boolean,
+                    position: Int,
+                ) {
+                    viewModel.onAppProtectionChanged(excludedAppInfo, position, enabled)
+                }
 
-            override fun onLaunchFAQ() {
-                launchFaq()
-            }
+                override fun onLaunchFAQ() {
+                    launchFaq()
+                }
 
-            override fun onLaunchFeedback() {
-                launchFeedback()
-            }
+                override fun onLaunchFeedback() {
+                    launchFeedback()
+                }
 
-            override fun onFilterClick(anchorView: View) {
-                showFilterPopupMenu(anchorView)
-            }
-        },
+                override fun onFilterClick(anchorView: View) {
+                    showFilterPopupMenu(anchorView)
+                }
+            },
         )
 
         val recyclerView = binding.excludedAppsRecycler
@@ -193,18 +196,22 @@ class TrackingProtectionExclusionListActivity :
         adapter.update(viewState, isListEnabled)
         shimmerLayout.gone()
     }
+
     private fun processCommand(command: Command) {
         when (command) {
             is Command.RestartVpn -> restartVpn()
             is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(
                 command.excludingReason,
             )
+
             is Command.ShowEnableProtectionDialog -> showEnableProtectionDialog(
                 command.excludingReason,
                 command.position,
             )
+
             is Command.LaunchFeedback -> reportBreakage.launch(command.reportBreakageScreen)
-            else -> { /* noop */ }
+            else -> { /* noop */
+            }
         }
     }
 
@@ -266,7 +273,11 @@ class TrackingProtectionExclusionListActivity :
         adapter.notifyItemChanged(position)
     }
 
-    override fun onAppProtectionDisabled(appName: String, packageName: String, report: Boolean) {
+    override fun onAppProtectionDisabled(
+        appName: String,
+        packageName: String,
+        report: Boolean,
+    ) {
         viewModel.onAppProtectionDisabled(appName = appName, packageName = packageName, report = report)
     }
 

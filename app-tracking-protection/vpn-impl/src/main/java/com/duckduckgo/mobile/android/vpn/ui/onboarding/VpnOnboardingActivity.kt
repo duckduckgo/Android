@@ -75,12 +75,13 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
         binding.onboardingPager.adapter = DeviceShieldOnboardingAdapter(viewModel.pages) {
             launchFAQ()
         }
-        binding.onboardingPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                showOnboardingPage(position)
-                super.onPageSelected(position)
-            }
-        },
+        binding.onboardingPager.registerOnPageChangeCallback(
+            object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    showOnboardingPage(position)
+                    super.onPageSelected(position)
+                }
+            },
         )
 
         binding.onboardingClose.setOnClickListener {
@@ -104,12 +105,15 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
             0 -> {
                 showNextPageCTA()
             }
+
             1 -> {
                 showNextPageCTA()
             }
+
             2 -> {
                 showEnableCTA()
             }
+
             else -> {} // no-op
         }
     }
@@ -181,6 +185,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
             is VpnPermissionStatus.Granted -> {
                 startVpn()
             }
+
             is VpnPermissionStatus.Denied -> {
                 viewModel.onVPNPermissionNeeded(permissionStatus.intent)
             }

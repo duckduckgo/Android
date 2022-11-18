@@ -409,19 +409,19 @@ class BrowserTabFragment :
         viewModel
     }
 
-/*
-    private val animatorHelper by lazy {
-        BrowserTrackersAnimatorHelper(
-            omnibarViews = listOf(clearTextButton, omnibarTextInput, searchIcon),
-            privacyGradeView = privacyGradeButton,
-            cookieView = cookieAnimation,
-            cookieScene = scene_root,
-            dummyCookieView = cookieDummyView,
-            container = animationContainer,
-            appTheme = appTheme
-        )
-    }
- */
+    /*
+        private val animatorHelper by lazy {
+            BrowserTrackersAnimatorHelper(
+                omnibarViews = listOf(clearTextButton, omnibarTextInput, searchIcon),
+                privacyGradeView = privacyGradeButton,
+                cookieView = cookieAnimation,
+                cookieScene = scene_root,
+                dummyCookieView = cookieDummyView,
+                container = animationContainer,
+                appTheme = appTheme
+            )
+        }
+     */
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
@@ -474,13 +474,21 @@ class BrowserTabFragment :
             }
         }
 
-        override fun onResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean) {
+        override fun onResultReceived(
+            consentManaged: Boolean,
+            optOutFailed: Boolean,
+            selfTestFailed: Boolean,
+        ) {
             viewModel.onAutoconsentResultReceived(consentManaged, optOutFailed, selfTestFailed)
         }
     }
 
     private val autofillCallback = object : Callback {
-        override suspend fun onCredentialsAvailableToInject(originalUrl: String, credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
+        override suspend fun onCredentialsAvailableToInject(
+            originalUrl: String,
+            credentials: List<LoginCredentials>,
+            triggerType: LoginTriggerType,
+        ) {
             showAutofillDialogChooseCredentials(originalUrl, credentials, triggerType)
         }
 
@@ -488,7 +496,10 @@ class BrowserTabFragment :
             viewModel.returnNoCredentialsWithPage(originalUrl)
         }
 
-        override suspend fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials) {
+        override suspend fun onCredentialsAvailableToSave(
+            currentUrl: String,
+            credentials: LoginCredentials,
+        ) {
             val username = credentials.username
             val password = credentials.password
 
@@ -540,6 +551,7 @@ class BrowserTabFragment :
                     userEnteredQuery(it.result)
                     resumeWebView()
                 }
+
                 else -> resumeWebView()
             }
         }
@@ -586,13 +598,14 @@ class BrowserTabFragment :
             viewModel.onViewRecreated()
         }
 
-        lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onStop(owner: LifecycleOwner) {
-                if (isVisible) {
-                    updateOrDeleteWebViewPreview()
+        lifecycle.addObserver(
+            object : DefaultLifecycleObserver {
+                override fun onStop(owner: LifecycleOwner) {
+                    if (isVisible) {
+                        updateOrDeleteWebViewPreview()
+                    }
                 }
-            }
-        },
+            },
         )
 
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
@@ -782,7 +795,7 @@ class BrowserTabFragment :
 
     private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
         val downloadFailedSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
-        view?.postDelayed({ downloadFailedSnackbar ?.show() }, DOWNLOAD_SNACKBAR_DELAY)
+        view?.postDelayed({ downloadFailedSnackbar?.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
     private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
@@ -882,12 +895,15 @@ class BrowserTabFragment :
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query, it.sourceTabId)
             }
+
             is Command.OpenMessageInNewTab -> {
                 browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)
             }
+
             is Command.OpenInNewBackgroundTab -> {
                 openInNewBackgroundTab()
             }
+
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
             is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
@@ -900,40 +916,50 @@ class BrowserTabFragment :
                 dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
             }
+
             is NavigationCommand.NavigateBack -> {
                 dismissAppLinkSnackBar()
                 webView?.goBackOrForward(-it.steps)
             }
+
             is NavigationCommand.NavigateForward -> {
                 dismissAppLinkSnackBar()
                 webView?.goForward()
             }
+
             is Command.ResetHistory -> {
                 resetWebView()
             }
+
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
                 openExternalDialog(intent = intent, fallbackUrl = null, fallbackIntent = null, useFirstActivityFound = false)
             }
+
             is Command.SendEmail -> {
                 val intent = Intent(Intent.ACTION_SENDTO)
                 intent.data = Uri.parse(it.emailAddress)
                 openExternalDialog(intent)
             }
+
             is Command.SendSms -> {
                 val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
                 openExternalDialog(intent)
             }
+
             is Command.ShowKeyboard -> {
                 showKeyboard()
             }
+
             is Command.HideKeyboard -> {
                 hideKeyboard()
             }
+
             is Command.BrokenSiteFeedback -> {
                 launchBrokenSiteFeedback(it.data)
             }
+
             is Command.ShowFullScreen -> {
                 webViewFullScreenContainer.addView(
                     it.view,
@@ -943,6 +969,7 @@ class BrowserTabFragment :
                     ),
                 )
             }
+
             is Command.DownloadImage -> requestImageDownload(it.url, it.requestUserConfirmation)
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             is Command.DismissFindInPage -> webView?.findAllAsync("")
@@ -951,17 +978,21 @@ class BrowserTabFragment :
             is Command.ShowFileChooser -> {
                 launchFilePicker(it)
             }
+
             is Command.AddHomeShortcut -> {
                 context?.let { context ->
                     addHomeShortcut(it, context)
                 }
             }
+
             is Command.ShowAppLinkPrompt -> {
                 showAppLinkSnackBar(it.appLink)
             }
+
             is Command.OpenAppLink -> {
                 openAppLink(it.appLink)
             }
+
             is Command.HandleNonHttpAppLink -> {
                 openExternalDialog(
                     intent = it.nonHttpAppLink.intent,
@@ -971,13 +1002,16 @@ class BrowserTabFragment :
                     headers = it.headers,
                 )
             }
+
             is Command.ExtractUrlFromCloakedAmpLink -> {
                 extractUrlFromAmpLink(it.initialUrl)
             }
+
             is Command.LoadExtractedUrl -> {
                 webView?.loadUrl(it.extractedUrl)
                 destroyUrlExtractingWebView()
             }
+
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchPlayStore -> launchPlayStore(it.appPackage)
             is Command.SubmitUrl -> submitQuery(it.url)
@@ -1013,11 +1047,13 @@ class BrowserTabFragment :
                 omnibarTextInput.setText(it.query)
                 omnibarTextInput.setSelection(it.query.length)
             }
+
             is ShowBackNavigationHistory -> showBackNavigationHistory(it)
             is NavigationCommand.NavigateToHistory -> navigateBackHistoryStack(it.historyStackIndex)
             is Command.EmailSignEvent -> {
                 notifyEmailSignEvent()
             }
+
             is Command.PrintLink -> launchPrint(it.url)
             is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest, it.request)
             is Command.GrantSitePermissionRequest -> grantSitePermissionRequest(it.sitePermissionsToGrant, it.request)
@@ -1190,23 +1226,26 @@ class BrowserTabFragment :
             appLinksSnackBar = view.makeSnackbarWithNoBottomInset(
                 message,
                 Snackbar.LENGTH_LONG,
-            ).setAction(action) {
-                pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED)
-                openAppLink(appLink)
-            }.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                override fun onShown(transientBottomBar: Snackbar?) {
-                    super.onShown(transientBottomBar)
-                    pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
-                }
-
-                override fun onDismissed(
-                    transientBottomBar: Snackbar?,
-                    event: Int,
-                ) {
-                    super.onDismissed(transientBottomBar, event)
-                }
-            },
             )
+                .setAction(action) {
+                    pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED)
+                    openAppLink(appLink)
+                }
+                .addCallback(
+                    object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                        override fun onShown(transientBottomBar: Snackbar?) {
+                            super.onShown(transientBottomBar)
+                            pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
+                        }
+
+                        override fun onDismissed(
+                            transientBottomBar: Snackbar?,
+                            event: Int,
+                        ) {
+                            super.onDismissed(transientBottomBar, event)
+                        }
+                    },
+                )
 
             appLinksSnackBar?.setDuration(6000)?.show()
         }
@@ -1278,9 +1317,11 @@ class BrowserTabFragment :
                         val fallbackActivities = pm.queryIntentActivities(fallbackIntent, 0)
                         launchDialogForIntent(it, pm, fallbackIntent, fallbackActivities, useFirstActivityFound)
                     }
+
                     fallbackUrl != null -> {
                         webView?.loadUrl(fallbackUrl, headers)
                     }
+
                     else -> {
                         showToast(R.string.unableToOpenLink)
                     }
@@ -1699,7 +1740,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun injectAutofillCredentials(url: String, credentials: LoginCredentials?) {
+    private fun injectAutofillCredentials(
+        url: String,
+        credentials: LoginCredentials?,
+    ) {
         webView?.let {
             if (it.url != url) {
                 Timber.w("WebView url has changed since autofill request; bailing")
@@ -1709,7 +1753,11 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showAutofillDialogChooseCredentials(originalUrl: String, credentials: List<LoginCredentials>, triggerType: LoginTriggerType) {
+    private fun showAutofillDialogChooseCredentials(
+        originalUrl: String,
+        credentials: List<LoginCredentials>,
+        triggerType: LoginTriggerType,
+    ) {
         if (triggerType == LoginTriggerType.AUTOPROMPT && !(viewModel.canAutofillSelectCredentialsDialogCanAutomaticallyShow())) {
             Timber.d("AutoPrompt is disabled, not showing dialog")
             return
@@ -1728,7 +1776,10 @@ class BrowserTabFragment :
         viewModel.cancelPendingAutofillRequestToChooseCredentials()
     }
 
-    private fun showAutofillDialogSaveCredentials(currentUrl: String, credentials: LoginCredentials) {
+    private fun showAutofillDialogSaveCredentials(
+        currentUrl: String,
+        credentials: LoginCredentials,
+    ) {
         val url = webView?.url ?: return
         if (url != currentUrl) return
 
@@ -1736,7 +1787,10 @@ class BrowserTabFragment :
         showDialogHidingPrevious(dialog, CredentialSavePickerDialog.TAG)
     }
 
-    private fun showAutofillDialogUpdatePassword(currentUrl: String, credentials: LoginCredentials) {
+    private fun showAutofillDialogUpdatePassword(
+        currentUrl: String,
+        credentials: LoginCredentials,
+    ) {
         val url = webView?.url ?: return
         if (url != currentUrl) return
 
@@ -1744,7 +1798,10 @@ class BrowserTabFragment :
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
     }
 
-    private fun showAutofillDialogUpdateUsername(currentUrl: String, credentials: LoginCredentials) {
+    private fun showAutofillDialogUpdateUsername(
+        currentUrl: String,
+        credentials: LoginCredentials,
+    ) {
         val url = webView?.url ?: return
         if (url != currentUrl) return
 
@@ -1766,7 +1823,11 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showDialogHidingPrevious(dialog: DialogFragment, tag: String, requiredUrl: String? = null) {
+    private fun showDialogHidingPrevious(
+        dialog: DialogFragment,
+        tag: String,
+        requiredUrl: String? = null,
+    ) {
         // want to ensure lifecycle is at least resumed before attempting to show dialog
         lifecycleScope.launchWhenResumed {
             hideDialogWithTag(tag)
@@ -1792,7 +1853,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showDialogIfNotExist(dialog: DialogFragment, tag: String) {
+    private fun showDialogIfNotExist(
+        dialog: DialogFragment,
+        tag: String,
+    ) {
         childFragmentManager.findFragmentByTag(tag)?.let {
             return
         }
@@ -1868,11 +1932,13 @@ class BrowserTabFragment :
                 imageUrl = hitTestResult.extra,
                 type = hitTestResult.type,
             )
+
             hitTestResult.type == SRC_IMAGE_ANCHOR_TYPE -> LongPressTarget(
                 url = getTargetUrlForImageSource(),
                 imageUrl = hitTestResult.extra,
                 type = hitTestResult.type,
             )
+
             else -> LongPressTarget(
                 url = hitTestResult.extra,
                 type = hitTestResult.type,
@@ -2228,6 +2294,7 @@ class BrowserTabFragment :
                     toolbar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
                 }
             }
+
             PERMISSION_REQUEST_GEO_LOCATION -> {
                 if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     viewModel.onSystemLocationPermissionGranted()
@@ -2740,6 +2807,7 @@ class BrowserTabFragment :
                             browserLayout.show()
                         }
                     }
+
                     is GlobalLayoutViewState.Invalidated -> destroyWebView()
                 }
             }
@@ -2840,11 +2908,13 @@ class BrowserTabFragment :
                     viewState.cta != null -> {
                         showCta(viewState.cta, viewState.favorites)
                     }
+
                     viewState.message != null -> {
                         showRemoteMessage(viewState.message, newMessage)
                         showHomeBackground(viewState.favorites, hideLogo = true)
                         hideHomeCta()
                     }
+
                     else -> {
                         hideHomeCta()
                         hideDaxCta()
@@ -3095,13 +3165,19 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showSitePermissionsDialog(permissionsToRequest: Array<String>, request: PermissionRequest) {
+    private fun showSitePermissionsDialog(
+        permissionsToRequest: Array<String>,
+        request: PermissionRequest,
+    ) {
         activity?.let {
             sitePermissionsDialogLauncher.askForSitePermission(it, webView?.url.orEmpty(), tabId, permissionsToRequest, request, this)
         }
     }
 
-    private fun grantSitePermissionRequest(sitePermissionsToGrant: Array<String>, request: PermissionRequest) {
+    private fun grantSitePermissionRequest(
+        sitePermissionsToGrant: Array<String>,
+        request: PermissionRequest,
+    ) {
         request.grant(sitePermissionsToGrant)
     }
 

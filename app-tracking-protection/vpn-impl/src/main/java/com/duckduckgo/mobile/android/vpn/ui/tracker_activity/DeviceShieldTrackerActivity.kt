@@ -558,25 +558,26 @@ class DeviceShieldTrackerActivity :
             hideButtonText = "",
         )
 
-        dialog.setDaxDialogListener(object : DaxDialogListener {
-            override fun onDaxDialogDismiss() {
-                // NO OP
-            }
+        dialog.setDaxDialogListener(
+            object : DaxDialogListener {
+                override fun onDaxDialogDismiss() {
+                    // NO OP
+                }
 
-            override fun onDaxDialogPrimaryCtaClick() {
-                dialog.dismiss()
-                launchKonfetti()
-                deviceShieldPixels.didPressOnAppTpEnabledCtaButton()
-            }
+                override fun onDaxDialogPrimaryCtaClick() {
+                    dialog.dismiss()
+                    launchKonfetti()
+                    deviceShieldPixels.didPressOnAppTpEnabledCtaButton()
+                }
 
-            override fun onDaxDialogSecondaryCtaClick() {
-                // NO OP
-            }
+                override fun onDaxDialogSecondaryCtaClick() {
+                    // NO OP
+                }
 
-            override fun onDaxDialogHideClick() {
-                // NO OP
-            }
-        },
+                override fun onDaxDialogHideClick() {
+                    // NO OP
+                }
+            },
         )
 
         dialog.show(supportFragmentManager, TAG_APPTP_ENABLED_CTA_DIALOG)
